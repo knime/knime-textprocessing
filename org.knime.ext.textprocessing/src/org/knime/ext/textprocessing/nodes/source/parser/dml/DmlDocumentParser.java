@@ -217,27 +217,19 @@ public class DmlDocumentParser extends DefaultHandler implements
      * default.
      */
     public DmlDocumentParser() {
-        this(null, null, null, null);
+        this(null, null, null);
     }
     
     /**
      * Creates a new instance of <code>DmlDocumentParser</code>. The given
-     * source, category and file path is set to the created documents. These
-     * documents are kept in the given list.
+     * source, category and file path is set to the created documents.
      * 
-     * @param docs The list to keep the created 
-     * {@link org.knime.ext.textprocessing.data.Document} instances.
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public DmlDocumentParser(final List<Document> docs, final String docPath,
+    public DmlDocumentParser(final String docPath,
             final DocumentCategory category, final DocumentSource source) {
-        if (docs == null) {
-            m_docs = new ArrayList<Document>();
-        } else {
-            m_docs = docs;
-        }
         m_category = category;
         m_source = source;
         m_docPath = docPath;
@@ -248,16 +240,17 @@ public class DmlDocumentParser extends DefaultHandler implements
      */
     public List<Document> parse(final InputStream is) {
         try {
+            m_docs = new ArrayList<Document>();
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not instanciate parser");
-            LOGGER.warn(e.getStackTrace());
+            LOGGER.info(e.getMessage());
         } catch (SAXException e) {
             LOGGER.error("Could not parse file");
-            LOGGER.warn(e.getStackTrace());
+            LOGGER.info(e.getMessage());
         } catch (IOException e) {
             LOGGER.error("Could not read file");
-            LOGGER.warn(e.getStackTrace());
+            LOGGER.info(e.getMessage());
         }
         return m_docs;
     }
@@ -319,12 +312,12 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_docs.add(doc);
             m_currentDoc = null;
         } else if(m_lastTag.equals(AUTHOR)) {
-            Author a = new Author(m_firstName, m_lastName);
+            Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
         } else if (m_lastTag.equals(PUBLICATIONDATE)) {
-            int day = Integer.parseInt(m_day);
-            int month = Integer.parseInt(m_month);
-            int year = Integer.parseInt(m_year);
+            int day = Integer.parseInt(m_day.trim());
+            int month = Integer.parseInt(m_month.trim());
+            int year = Integer.parseInt(m_year.trim());
             PublicationDate pd;
             try {
                 pd = new PublicationDate(year, month, day);
@@ -337,12 +330,13 @@ public class DmlDocumentParser extends DefaultHandler implements
             }
         } else if(m_lastTag.equals(WORD)) {
             if (m_words != null && m_word != null) {
-                Word w = new Word(m_word);
+                Word w = new Word(m_word.trim());
                 m_words.add(w);
             }
         } else if(m_lastTag.equals(TAG)) {
             if (m_tags != null && m_tagType != null && m_tagValue != null) {
-                Tag t = TagFactory.createTag(m_tagType, m_tagValue);
+                Tag t = TagFactory.createTag(m_tagType.trim(), 
+                        m_tagValue.trim());
                 m_tags.add(t);
             }
         } else if(m_lastTag.equals(TERM)) {

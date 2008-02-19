@@ -59,7 +59,7 @@ public class Section implements TextContainer {
         if (paragraphs == null) {
             throw new NullPointerException(
                     "List of paragraphs may not be null!");
-        } else if (m_annotation == null) {
+        } else if (annotation == null) {
             throw new NullPointerException("Annotation may not be null!");
         }
         

@@ -38,6 +38,7 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -68,6 +69,9 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     public static final boolean DEFAULT_RECURSIVE = false;
     
+    
+    private static final NodeLogger LOGGER = 
+        NodeLogger.getLogger(DocumentParserNodeModel.class);
     
     private SettingsModelString m_pathModel = 
         DocumentParserNodeDialog.getPathModel();
@@ -119,6 +123,9 @@ public class DocumentParserNodeModel extends NodeModel {
         FileCollector fc = new FileCollector(dir, m_validExtensions, recursive);
         List<File> files = fc.getFiles();
         for (File f : files) {
+            
+            LOGGER.info("Parsing file: " + f.getAbsolutePath());
+            
             InputStream is;
             if (f.getName().toLowerCase().endsWith(".gz") 
                     || f.getName().toLowerCase().endsWith(".zip")) {

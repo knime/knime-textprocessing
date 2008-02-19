@@ -41,6 +41,7 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
 /**
  * A utility class which helps building up a 

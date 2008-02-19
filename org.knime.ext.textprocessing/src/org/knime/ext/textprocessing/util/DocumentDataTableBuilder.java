@@ -88,6 +88,7 @@ public final class DocumentDataTableBuilder {
             DocumentCell docCell = new DocumentCell(d);
             DataRow row = new DefaultRow(rowKey, docCell);
             dc.addRowToTable(row);
+            i++;
         }
         dc.close();
 

@@ -21,13 +21,10 @@
  * History
  *   14.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.util;
+package org.knime.ext.textprocessing.nodes.tokenization;
 
 import java.util.List;
 
-import org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSentenceTokenizer;
-import org.knime.ext.textprocessing.nodes.tokenization.OpenNlpWordTokenizer;
-import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
 /**
  * Is a utility class which provides methods for the default tokenization of

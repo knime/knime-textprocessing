@@ -41,7 +41,6 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
 import org.knime.ext.textprocessing.util.DocumentBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -87,11 +86,6 @@ public class SdmlDocumentParser extends DefaultHandler implements
     public static final String ANNOTATION = "annotation";
     
     /**
-     * The name of the authors tag.
-     */
-    public static final String AUTHORS = "authors";
-    
-    /**
      * The name of the author tag.
      */
     public static final String AUTHOR = "author";
@@ -128,7 +122,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     
     
     private static final NodeLogger LOGGER = 
-        NodeLogger.getLogger(DmlDocumentParser.class);
+        NodeLogger.getLogger(SdmlDocumentParser.class);
     
     private List<Document> m_docs;
     
@@ -166,27 +160,19 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * default.
      */
     public SdmlDocumentParser() {
-        this(null, null, null, null);
+        this(null, null, null);
     }    
     
     /**
      * Creates a new instance of <code>SdmlDocumentParser</code>. The given
-     * source, category and file path is set to the created documents. These
-     * documents are kept in the given list.
+     * source, category and file path is set to the created documents.
      * 
-     * @param docs The list to keep the created 
-     * {@link org.knime.ext.textprocessing.data.Document} instances.
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public SdmlDocumentParser(final List<Document> docs, final String docPath,
+    public SdmlDocumentParser(final String docPath,
             final DocumentCategory category, final DocumentSource source) {
-        if (docs == null) {
-            m_docs = new ArrayList<Document>();
-        } else {
-            m_docs = docs;
-        }
         m_category = category;
         m_source = source;
         m_docPath = docPath;
@@ -198,16 +184,17 @@ public class SdmlDocumentParser extends DefaultHandler implements
      */
     public List<Document> parse(InputStream is) {
         try {
+            m_docs = new ArrayList<Document>();
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not instanciate parser");
-            LOGGER.warn(e.getStackTrace());
+            LOGGER.info(e.getMessage());
         } catch (SAXException e) {
             LOGGER.error("Could not parse file");
-            LOGGER.warn(e.getStackTrace());
+            LOGGER.info(e.getMessage());
         } catch (IOException e) {
             LOGGER.error("Could not read file");
-            LOGGER.warn(e.getStackTrace());
+            LOGGER.info(e.getMessage());
         }
         return m_docs;
     }
@@ -262,14 +249,18 @@ public class SdmlDocumentParser extends DefaultHandler implements
         if (qName.equals(DOCUMENT) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
             m_docs.add(doc);
+            
+            LOGGER.info("Build document " + doc.getTitle());
+            LOGGER.info("Temp Dir: " + System.getProperty("java.io.tmpdir"));
+            
             m_currentDoc = null;
-        } else if(m_lastTag.equals(AUTHOR)) {
-            Author a = new Author(m_firstName, m_lastName);
+        } else if(qName.equals(AUTHOR)) {
+            Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
-        } else if (m_lastTag.equals(PUBLICATIONDATE)) {
-            int day = Integer.parseInt(m_day);
-            int month = Integer.parseInt(m_month);
-            int year = Integer.parseInt(m_year);
+        } else if (qName.equals(PUBLICATIONDATE)) {
+            int day = Integer.parseInt(m_day.trim());
+            int month = Integer.parseInt(m_month.trim());
+            int year = Integer.parseInt(m_year.trim());
             PublicationDate pd;
             try {
                 pd = new PublicationDate(year, month, day);
@@ -280,10 +271,10 @@ public class SdmlDocumentParser extends DefaultHandler implements
                         + ") could not be parsed !");
                 LOGGER.warn(e.getStackTrace());
             }
-        } else if (m_lastTag.equals(TITLE)) {
-            m_currentDoc.addTitle(m_title);
-        } else if (m_lastTag.equals(SECTION)) {
-            m_currentDoc.addSection(m_section, 
+        } else if (qName.equals(TITLE)) {
+            m_currentDoc.addTitle(m_title.trim());
+        } else if (qName.equals(SECTION)) {
+            m_currentDoc.addSection(m_section.trim(), 
                     SectionAnnotation.stringToAnnotation(m_annotation));
         }        
     }
