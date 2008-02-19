@@ -35,7 +35,7 @@ import java.util.List;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public enum PartOfSpeechTag {
+public enum PartOfSpeechTag implements TagBuilder {
 
     /** Unkown type. */
     UNKNOWN,
@@ -135,7 +135,7 @@ public enum PartOfSpeechTag {
     private PartOfSpeechTag() {
         m_tag = new Tag(name(), TAG_TYPE);
     }
-
+    
     /**
      * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding 
      * to the specified <code>PartOfSpeechTag</code>.
@@ -174,5 +174,15 @@ public enum PartOfSpeechTag {
             return pos.getTag();
         }
         return PartOfSpeechTag.UNKNOWN.getTag();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Tag buildTag(String type, String value) {
+        if (type.equals(TAG_TYPE)) {
+            return PartOfSpeechTag.stringToTag(value);
+        }
+        return null;
     }
 }

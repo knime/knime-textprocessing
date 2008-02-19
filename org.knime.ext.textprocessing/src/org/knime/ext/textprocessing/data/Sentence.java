@@ -28,9 +28,7 @@ import java.util.List;
 
 /**
  * Contains a complete sentence as a list of 
- * {@link org.knime.ext.textprocessing.data.Term}s. The terminal punctuation 
- * mark of the sentence is represented as a 
- * {@link org.knime.ext.textprocessing.data.Word}. 
+ * {@link org.knime.ext.textprocessing.data.Term}s.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -38,35 +36,22 @@ public class Sentence implements TextContainer {
     
     private List<Term> m_terms;
     
-    private Word m_terminalPunctMark;
-    
-    
     /**
      * Creates a new instance of <code>Sentence</code> with the given list of
-     * {@link org.knime.ext.textprocessing.data.Term}s as sentence and the
-     * given {@link org.knime.ext.textprocessing.data.Word} as terminal 
-     * punctuation mark. If one of these parameters is <code>null</code> is
-     * <code>NullPointerException</code> is thrown.
+     * {@link org.knime.ext.textprocessing.data.Term}s as its words . 
+     * If it is set to <code>null</code> a <code>NullPointerException</code> is 
+     * thrown.
      * 
      * @param sentence The list of terms to set as sentence.
-     * @param terminalPunctuationMark The word to set as terminal punctuation 
-     * mark.
-     * @throws NullPointerException If given terminal punctuation mark or 
-     * sentence is <code>null</code>.
+     * @throws NullPointerException If the list of terms is <code>null</code>.
      */
-    public Sentence(final List<Term> sentence, 
-            final Word terminalPunctuationMark) throws NullPointerException {
+    public Sentence(final List<Term> sentence) throws NullPointerException {
         if (sentence == null) {
             throw new NullPointerException(
                     "Term list \"sentence\" may not be null!");
         } 
-        if (terminalPunctuationMark == null) {
-            throw new NullPointerException(
-                    "Terminal punctuation mark may not be null!");
-        }
         
         m_terms = sentence;
-        m_terminalPunctMark = terminalPunctuationMark;
     }
 
     /**
@@ -74,13 +59,6 @@ public class Sentence implements TextContainer {
      */
     public List<Term> getTerms() {
         return Collections.unmodifiableList(m_terms);
-    }
-
-    /**
-     * @return the terminal punctuation mark of the sentence.
-     */
-    public Word getTerminalPunctuationMark() {
-        return m_terminalPunctMark;
     }
 
     /**
@@ -94,7 +72,6 @@ public class Sentence implements TextContainer {
                 sb.append(Term.WORD_SEPARATOR);
             }
         }
-        sb.append(m_terminalPunctMark.getWord());
         return sb.toString();
     }
     
@@ -110,7 +87,6 @@ public class Sentence implements TextContainer {
                 sb.append(Term.WORD_SEPARATOR);
             }
         }
-        sb.append(m_terminalPunctMark.toString());
         return sb.toString();        
     }
     
@@ -129,9 +105,6 @@ public class Sentence implements TextContainer {
         if (!s.getTerms().equals(getTerms())) {
             return false;
         }
-        if (!s.getTerminalPunctuationMark().equals(m_terminalPunctMark)) {
-            return false;
-        }
         
         return true;
     }
@@ -147,7 +120,6 @@ public class Sentence implements TextContainer {
         for (Term t : m_terms) {
             hash += fac * t.hashCode() / div; 
         }
-        hash -= fac * m_terminalPunctMark.hashCode();
         return hash;
     }    
 }

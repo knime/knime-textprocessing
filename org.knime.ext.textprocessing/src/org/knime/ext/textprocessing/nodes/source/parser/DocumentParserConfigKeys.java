@@ -19,26 +19,28 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   14.02.2008 (thiel): created
+ *   19.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
-
-import java.util.List;
+package org.knime.ext.textprocessing.nodes.source.parser;
 
 /**
- * Defines the default methods all tokenizer have to provide.
+ * Holds the configuration keys of the 
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel}
+ * node. 
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public interface Tokenizer {
+public class DocumentParserConfigKeys {
 
     /**
-     * Tokenizes the given text with the usage of the underlying tokenization
-     * method and returns a list of strings.
-     * 
-     * @param text The text to tokenize.
-     * @return A list of the string tokens created during the tokenization 
-     * of the given text string.
+     * The configuration key of the path of the directory containing the files
+     * to parse.
      */
-    public List<String> tokenize(final String text);
+    public static final String CFGKEY_PATH = "Path";
+    
+    /**
+     * The configuration key of the recursive flag (if set the specified 
+     * directory is search recursively).
+     */
+    public static final String CFGKEY_RECURSIVE = "Rec";
 }

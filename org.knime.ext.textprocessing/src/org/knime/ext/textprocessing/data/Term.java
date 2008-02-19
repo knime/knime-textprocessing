@@ -156,12 +156,18 @@ public class Term implements TextContainer {
         StringBuilder sb = new StringBuilder();
         sb.append(getText());
         sb.append(WORD_SEPARATOR);
+        sb.append("[");
         for (int i = 0; i < m_tags.size(); i++) {
             sb.append(m_tags.get(i).getTagValue());
+            sb.append("(");
+            sb.append(m_tags.get(i).getTagType());
+            sb.append(")");
+            sb.append(WORD_SEPARATOR);
             if (i < m_tags.size() - 1) {
                 sb.append(WORD_SEPARATOR);
             }
         }
+        sb.append("]");
         return sb.toString();
     }
     

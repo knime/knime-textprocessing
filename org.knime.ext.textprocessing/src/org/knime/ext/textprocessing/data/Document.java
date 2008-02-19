@@ -279,7 +279,7 @@ public class Document implements TextContainer {
      * @return The title of the document, if a section with "Title" annotation
      * exists, otherwise an empty string.
      */
-    public String getTitel() {
+    public String getTitle() {
         return getSectionText(SectionAnnotation.TITLE);
     }
     

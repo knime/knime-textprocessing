@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2007
+ * Copyright, 2003 - 2008
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,26 +19,34 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   14.02.2008 (thiel): created
+ *   04.01.2007 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.data;
 
-import java.util.List;
+import org.knime.core.data.DataValue;
+import org.knime.core.data.DataValueComparator;
 
 /**
- * Defines the default methods all tokenizer have to provide.
- * 
+ * Comparator returned by the 
+ * {@link org.knime.ext.textprocessing.data.TermValue} interface. 
+ *
+ * @see org.knime.ext.textprocessing.data.TermValue#UTILITY
+ * @see org.knime.ext.textprocessing.data.TermValue.TermUtilityFactory
  * @author Kilian Thiel, University of Konstanz
  */
-public interface Tokenizer {
+public class TermValueComparator extends DataValueComparator {
 
     /**
-     * Tokenizes the given text with the usage of the underlying tokenization
-     * method and returns a list of strings.
+     * Compares two {@link org.knime.ext.textprocessing.data.TermValue}s based 
+     * on their words (tags are ignored).
      * 
-     * @param text The text to tokenize.
-     * @return A list of the string tokens created during the tokenization 
-     * of the given text string.
+     * {@inheritDoc}
      */
-    public List<String> tokenize(final String text);
+    @Override
+    protected int compareDataValues(final DataValue v1, final DataValue v2) {
+        String str1 = ((TermValue)v1).getTermValue().getText();
+        String str2 = ((TermValue)v2).getTermValue().getText();
+        return str1.compareTo(str2);
+    }
+
 }

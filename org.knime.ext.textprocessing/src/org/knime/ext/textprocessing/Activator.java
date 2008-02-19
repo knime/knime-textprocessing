@@ -11,42 +11,42 @@ public class Activator extends AbstractUIPlugin {
     /**
      * The plug-in ID.
      */
-	public static final String PLUGIN_ID = "org.knime.ext.textprocessing";
+    public static final String PLUGIN_ID = "org.knime.ext.textprocessing";
 
-	// The shared instance
-	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	    plugin = this;
-	}
+    // The shared instance
+    private static Activator plugin;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void start(final BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
+    /**
+     * The constructor.
+     */
+    public Activator() {
+        plugin = this;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void stop(final BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void start(final BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stop(final BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
+
+    /**
+     * Returns the shared instance
+     * 
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
 }
