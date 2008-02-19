@@ -37,7 +37,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.BlobDataCell;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.nodes.source.parser.DmlDocumentParser;
+import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
 
 /**
  * A {@link org.knime.core.data.container.BlobDataCell} implementation holding a 

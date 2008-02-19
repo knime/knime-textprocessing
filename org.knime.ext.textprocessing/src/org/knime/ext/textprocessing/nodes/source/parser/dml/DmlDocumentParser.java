@@ -21,7 +21,7 @@
  * History
  *   18.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.source.parser;
+package org.knime.ext.textprocessing.nodes.source.parser.dml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,6 +48,7 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.util.DocumentBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -62,14 +63,14 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
  * Implements the 
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} 
  * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DmlDocumentParser#parse(InputStream)}
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
  * is able to parse the data of the given input stream representing <i>dml</i>
  * (<b>D</b>ocument <b>M</b>arkup <b>L</b>anguage) formatted text documents. 
  * See the <i>dml.dtd</i> file for more details about the format. 
  * This format is also used to serialize the 
  * {@link org.knime.ext.textprocessing.data.DocumentCell}s. Furthermore this 
  * class provides the method 
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DmlDocumentParser#documentAsSdml(Document)}
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#documentAsSdml(Document)}
  * which creates the serialized dml representation of the given document as 
  * a string.
  * 
@@ -81,92 +82,92 @@ public class DmlDocumentParser extends DefaultHandler implements
     /**
      * The name of the document tag.
      */
-    public static final String DOCUMENT = "Document";
+    public static final String DOCUMENT = "document";
     
     /**
      * The name of the term tag.
      */    
-    public static final String TERM = "Term";
+    public static final String TERM = "term";
     
     /**
      * The name of the word tag.
      */
-    public static final String WORD = "Word";
+    public static final String WORD = "word";
     
     /**
      * The name of the <i>tag</i> tag.
      */
-    public static final String TAG = "Tag";
+    public static final String TAG = "tag";
     
     /**
      * The name of the <i>tag</i> value tag.
      */    
-    public static final String TAG_VALUE = "TagValue";
+    public static final String TAG_VALUE = "tagvalue";
     
     /**
      * The name of the <i>tag</i> type tag.
      */    
-    public static final String TAG_TYPE = "TagType";
+    public static final String TAG_TYPE = "tagtype";
     
     /**
      * The name of the sentence tag.
      */    
-    public static final String SENTENCE = "Sentence";
+    public static final String SENTENCE = "sentence";
     
     /**
      * The name of the paragraph tag.
      */    
-    public static final String PARAGRAPH = "Paragraph";
+    public static final String PARAGRAPH = "paragraph";
     
     /**
      * The name of the section tag.
      */    
-    public static final String SECTION = "Section";
+    public static final String SECTION = "section";
     
     /**
      * The name of the annotation attribute.
      */
-    public static final String ANNOTATION = "Annotation";
+    public static final String ANNOTATION = "annotation";
     
     /**
      * The name of the authors tag.
      */
-    public static final String AUTHORS = "Authors";
+    public static final String AUTHORS = "authors";
     
     /**
      * The name of the author tag.
      */
-    public static final String AUTHOR = "Author";
+    public static final String AUTHOR = "author";
     
     /**
      * The name of the first name tag.
      */
-    public static final String FIRSTNAME = "Firstname";
+    public static final String FIRSTNAME = "firstname";
     
     /**
      * The name of the last name tag.
      */
-    public static final String LASTNAME = "Lastname";
+    public static final String LASTNAME = "lastname";
     
     /**
      * The name of the publication date tag.
      */
-    public static final String PUBLICATIONDATE = "PublicationDate";
+    public static final String PUBLICATIONDATE = "publicationdate";
     
     /**
      * The name of the day tag.
      */
-    public static final String DAY = "Day";
+    public static final String DAY = "day";
     
     /**
      * The name of the month tag.
      */
-    public static final String MONTH = "Month";
+    public static final String MONTH = "month";
     
     /**
      * The name of the year tag.
      */
-    public static final String YEAR = "Year";
+    public static final String YEAR = "year";
     
     
     
@@ -267,7 +268,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     @Override
     public void startElement(final String uri, final String localName, 
             final String qName, final Attributes attributes) {
-        m_lastTag = qName;
+        m_lastTag = qName.toLowerCase();
         
         if (m_lastTag.equals(DOCUMENT)) {
             m_currentDoc = new DocumentBuilder();

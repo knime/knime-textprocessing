@@ -21,7 +21,7 @@
  * History
  *   19.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.source.parser.dml;
+package org.knime.ext.textprocessing.nodes.source.parser.sdml;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -30,14 +30,14 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeDialog
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the Dml document parser node,
+ * The {@link org.knime.core.node.NodeFactory} of the Sdml document parser node,
  * provides methods to create the model and the dialog instance.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DmlDocumentParserNodeFactory extends 
+public class SdmlDocumentParserNodeFactory extends 
 NodeFactory<DocumentParserNodeModel> {
-    
+
     /**
      * {@inheritDoc}
      */
@@ -52,7 +52,7 @@ NodeFactory<DocumentParserNodeModel> {
     @Override
     public DocumentParserNodeModel createNodeModel() {
         return new DocumentParserNodeModel(
-                new DmlDocumentParser(), "xml");
+                new SdmlDocumentParser(), "xml");
     }
 
     /**
@@ -79,4 +79,5 @@ NodeFactory<DocumentParserNodeModel> {
     protected boolean hasDialog() {
         return true;
     }
+
 }

@@ -26,8 +26,11 @@ package org.knime.ext.textprocessing.nodes.source.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -57,7 +60,7 @@ public class DocumentParserNodeModel extends NodeModel {
     /**
      * The default path of the directory containing the files to parse.
      */
-    public static final String DEFAULT_PATH = "./";
+    public static final String DEFAULT_PATH = System.getProperty("user.home");
     
     /**
      * The default value of the recursive flag (if set <code>true</code> the 
@@ -75,21 +78,21 @@ public class DocumentParserNodeModel extends NodeModel {
     
     private DocumentParser m_parser;
     
-    private String m_validExtension;
+    private List<String> m_validExtensions;
     
     
     /**
      * Creates a new instance of <code>DocumentParserNodeModel</code> with the
-     * specified parser to use and the valid extension of files to parse.
+     * specified parser to use and the valid extensions of files to parse.
      * 
      * @param parser The parser to use.
-     * @param validFileExtension The valid extension of files to parse.
+     * @param validFileExtensions The valid extensions of files to parse.
      */
     public DocumentParserNodeModel(final DocumentParser parser, 
-            final String validFileExtension) {
+            final String... validFileExtensions) {
         super(0, 1);
         m_parser = parser;
-        m_validExtension = validFileExtension;
+        m_validExtensions = Arrays.asList(validFileExtensions);
     }
     
     /**
@@ -113,11 +116,17 @@ public class DocumentParserNodeModel extends NodeModel {
         File dir = new File(m_pathModel.getStringValue());        
         boolean recursive = m_recursiveModel.getBooleanValue();
         
-        FileCollector fc = new FileCollector(dir, m_validExtension, recursive);
+        FileCollector fc = new FileCollector(dir, m_validExtensions, recursive);
         List<File> files = fc.getFiles();
         for (File f : files) {
-            FileInputStream fis = new FileInputStream(f);
-            docs.addAll(m_parser.parse(fis));
+            InputStream is;
+            if (f.getName().toLowerCase().endsWith(".gz") 
+                    || f.getName().toLowerCase().endsWith(".zip")) {
+                is = new GZIPInputStream(new FileInputStream(f));
+            } else {
+                is = new FileInputStream(f);
+            }
+            docs.addAll(m_parser.parse(is));
         }
         
         return new BufferedDataTable[]{

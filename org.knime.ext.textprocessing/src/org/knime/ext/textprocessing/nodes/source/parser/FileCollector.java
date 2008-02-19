@@ -34,8 +34,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Provides functionality to search a specified directory for files with a 
- * given extension. The directory can be searched recursively or not.
+ * Provides functionality to search a specified directory for files with
+ * given extensions. The directory can be searched recursively or not.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -43,7 +43,7 @@ public class FileCollector {
 
     private File m_directory;
     
-    private String m_extension;
+    private List<String> m_extensions;
     
     private boolean m_recursive;
     
@@ -51,24 +51,24 @@ public class FileCollector {
     
     /**
      * Creates a new instance of <code>FileCollector</code> with given 
-     * directory, to search for file with given extension. If 
+     * directory, to search for file with given extensions. If 
      * <code>recursive</code> is set <code>true</code> the directory will be
      * searched recursively which means that subdirectories will by searched 
      * too.
      * @param dir Directory to search for files.
-     * @param ext Extension of file to search for.
+     * @param ext Extensions of file to search for.
      * @param recursive if set <code>true</code> the directory will be
      * searched recursively.
      */
-    public FileCollector(final File dir, final String ext, 
+    public FileCollector(final File dir, final List<String> ext, 
             final boolean recursive) {
         if (!dir.isDirectory()) {
-            throw new IllegalArgumentException(dir.getName() 
+            throw new IllegalArgumentException(dir.getName()
                     + " is not a directory ");
         }
         
         m_directory = dir;
-        m_extension = ext;
+        m_extensions = ext;
         m_recursive = recursive;
         
         collectFiles();
@@ -90,10 +90,10 @@ public class FileCollector {
     }
 
     /**
-     * @return Returns the file extension to search for.
+     * @return Returns the list of file extensions to search for.
      */
-    public String getExtension() {
-        return m_extension;
+    public List<String> getExtensions() {
+        return m_extensions;
     }
     
     /**
@@ -136,12 +136,16 @@ public class FileCollector {
      * @author Kilian Thiel, University of Konstanz
      */
     class FileFilter implements FilenameFilter {
-        
         /**
          * {@inheritDoc}
          */
         public boolean accept(final File f, final String s) {
-            return s.toLowerCase().endsWith("." + m_extension);
+            for (String ext : m_extensions) {
+                if (s.toLowerCase().endsWith("." + ext)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

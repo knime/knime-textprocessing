@@ -10,9 +10,26 @@
             name="Textprocessing"
             path="/">
       </category>
+      <category
+            description="Textprocessing IO nodes"
+            icon="icons/io.png"
+            level-id="io"
+            name="IO"
+            path="/textprocessing">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/textprocessing/io"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParserNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParserNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/io"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserNodeFactory">
+      </node>
    </extension>
-
+   
 </plugin>

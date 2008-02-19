@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Textprocessing Plug-in
 Bundle-SymbolicName: org.knime.ext.textprocessing;singleton:=true
 Bundle-Version: 2.0.0.0014633
-Bundle-Activator: org.knime.ext.textprocessing.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.knime.core,
@@ -12,4 +11,13 @@ Require-Bundle: org.eclipse.ui,
  org.knime.base
 Eclipse-LazyStart: true
 Bundle-Vendor: Chair for Bioinformatics and Information Mining, University of Konstanz, Germany
-Bundle-ClassPath: lib/opennlp-tools-1.3.0.jar
+Bundle-ClassPath: lib/opennlp-tools-1.3.0.jar,
+ knime-textprocessing.jar
+Export-Package: org.knime.ext.textprocessing,
+ org.knime.ext.textprocessing.data,
+ org.knime.ext.textprocessing.data.icon,
+ org.knime.ext.textprocessing.nodes.source.parser,
+ org.knime.ext.textprocessing.nodes.source.parser.dml,
+ org.knime.ext.textprocessing.nodes.tokenization,
+ org.knime.ext.textprocessing.util
+Bundle-Activator: org.knime.ext.textprocessing.TextprocessingPlugin
