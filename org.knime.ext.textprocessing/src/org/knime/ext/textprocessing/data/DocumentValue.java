@@ -60,7 +60,6 @@ public interface DocumentValue extends DataValue {
         /** Load icon, use <code>null</code> if not available. */
         static {
             ImageIcon icon;
-            // TODO create a particular icon for the DocumentListValue
             try {
                 ClassLoader loader = DocumentValue.class.getClassLoader();
                 String path = 

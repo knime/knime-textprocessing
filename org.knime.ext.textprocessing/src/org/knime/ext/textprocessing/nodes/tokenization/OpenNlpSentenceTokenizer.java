@@ -50,8 +50,9 @@ public class OpenNlpSentenceTokenizer implements Tokenizer {
      */
     public OpenNlpSentenceTokenizer() {
         try {
-            m_tokenizer = new SentenceDetector(
-                    OpenNlpModelPaths.SENTENCE_MODEL_FILE);
+            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
+            .getSentenceModelFile();
+            m_tokenizer = new SentenceDetector(modelPath);
         } catch (IOException e) {
             LOGGER.error("Could not create OpenNlpSentenceTokenizer since" +
             		"model could not be red!");

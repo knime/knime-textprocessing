@@ -27,6 +27,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.DocumentType;
 
 /**
  * All parser, parsing various document formats, like Reuters, PubMed, etc.
@@ -51,4 +54,24 @@ public interface DocumentParser {
      * @return A list of documents parsed out of the input stream's data.
      */
     public List<Document> parse(final InputStream is);
+    
+    /**
+     * @param category The category of the documents to set.
+     */
+    public void setDocumentCategroy(final DocumentCategory category);
+
+    /**
+     * @param source The source of the documents to set.
+     */
+    public void setDocumentSource(final DocumentSource source);
+    
+    /**
+     * @param type The type of the documents to set.
+     */
+    public void setDocumentType(final DocumentType type);
+    
+    /**
+     * @param filePath The path to the file containing the document.
+     */
+    public void setDocumentFilepath(final String filePath); 
 }

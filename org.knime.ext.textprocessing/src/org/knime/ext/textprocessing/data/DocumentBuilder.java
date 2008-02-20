@@ -21,7 +21,7 @@
  * History
  *   14.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.util;
+package org.knime.ext.textprocessing.data;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,18 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.knime.ext.textprocessing.data.Author;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCategory;
-import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.data.Paragraph;
-import org.knime.ext.textprocessing.data.PublicationDate;
-import org.knime.ext.textprocessing.data.Section;
-import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.knime.ext.textprocessing.data.Sentence;
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
 /**
@@ -67,7 +55,6 @@ import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
  * db.createNewSection(SectionAnnotation.CHAPTER);<br/>
  * // finally create document<br/>
  * Document d = db.createDocument(); <br/>
- * 
  * </code>
  * 
  * @author Kilian Thiel, University of Konstanz
@@ -196,14 +183,16 @@ public class DocumentBuilder {
      * @param title The title to tokenize and to add as section.
      */
     public void addTitle(final String title) {
-        Sentence s = internalAddSentence(title);
-        List<Sentence> sentences = new ArrayList<Sentence>();
-        sentences.add(s);
-        Paragraph p = new Paragraph(sentences);
-        List<Paragraph> paragraphs = new ArrayList<Paragraph>();
-        paragraphs.add(p);
-        Section section = new Section(paragraphs, SectionAnnotation.TITLE);
-        m_sections.add(section);
+        if (title != null && title.length() > 0) {
+            Sentence s = internalAddSentence(title);
+            List<Sentence> sentences = new ArrayList<Sentence>();
+            sentences.add(s);
+            Paragraph p = new Paragraph(sentences);
+            List<Paragraph> paragraphs = new ArrayList<Paragraph>();
+            paragraphs.add(p);
+            Section section = new Section(paragraphs, SectionAnnotation.TITLE);
+            m_sections.add(section);
+        }
     }
     
     
@@ -257,7 +246,6 @@ public class DocumentBuilder {
         m_paragraphs = new ArrayList<Paragraph>();
     }    
     
-    
     /**
      * Adds the given term to the list of terms.
      * 
@@ -266,6 +254,9 @@ public class DocumentBuilder {
      */
     public void addTerm(final Term term) {
         if (term != null && m_terms != null) {
+            m_terms.add(term);
+        } else if (m_terms == null) {
+            m_terms = new ArrayList<Term>();
             m_terms.add(term);
         }
     }    
@@ -377,16 +368,19 @@ public class DocumentBuilder {
      */
     private Section internalAddSection(final String section, 
             final SectionAnnotation annotation) {
-        List<String> strSentences = 
-            DefaultTokenization.detectSentences(section);
-        List<Sentence> sentences = new ArrayList<Sentence>(); 
-        for (String s : strSentences) {
-            sentences.add(internalAddSentence(s));
+        if (section != null && section.length() > 0) {
+            List<String> strSentences =
+                    DefaultTokenization.detectSentences(section);
+            List<Sentence> sentences = new ArrayList<Sentence>();
+            for (String s : strSentences) {
+                sentences.add(internalAddSentence(s));
+            }
+            Paragraph p = new Paragraph(sentences);
+            List<Paragraph> paragraphs = new ArrayList<Paragraph>();
+            paragraphs.add(p);
+            return new Section(paragraphs, annotation);
         }
-        Paragraph p = new Paragraph(sentences);
-        List<Paragraph> paragraphs = new ArrayList<Paragraph>();
-        paragraphs.add(p);
-        return new Section(paragraphs, annotation);
+        return null;
     }
     
     /**
@@ -397,13 +391,16 @@ public class DocumentBuilder {
      * {@link org.knime.ext.textprocessing.data.Paragraph}.
      */
     private Paragraph internalAddParagraph(final String paragraph) {
-        List<String> strSentences = 
-            DefaultTokenization.detectSentences(paragraph);
-        List<Sentence> sentences = new ArrayList<Sentence>(); 
-        for (String s : strSentences) {
-            sentences.add(internalAddSentence(s));
+        if (paragraph != null && paragraph.length() > 0) {
+            List<String> strSentences =
+                    DefaultTokenization.detectSentences(paragraph);
+            List<Sentence> sentences = new ArrayList<Sentence>();
+            for (String s : strSentences) {
+                sentences.add(internalAddSentence(s));
+            }
+            return new Paragraph(sentences);
         }
-        return new Paragraph(sentences);
+        return null;
     }
 
     /**

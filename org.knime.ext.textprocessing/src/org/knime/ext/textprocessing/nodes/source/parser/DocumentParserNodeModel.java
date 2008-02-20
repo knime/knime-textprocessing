@@ -45,6 +45,8 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 
@@ -69,6 +71,16 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     public static final boolean DEFAULT_RECURSIVE = false;
     
+    /**
+     * The default category of the documents.
+     */
+    public static final String DEFAULT_CATEGORY = "Default category";
+
+    /**
+     * The default source of the documents.
+     */
+    public static final String DEFAULT_SOURCE = "";    
+    
     
     private static final NodeLogger LOGGER = 
         NodeLogger.getLogger(DocumentParserNodeModel.class);
@@ -78,7 +90,12 @@ public class DocumentParserNodeModel extends NodeModel {
     
     private SettingsModelBoolean m_recursiveModel = 
         DocumentParserNodeDialog.getRecursiveModel();
+
+    private SettingsModelString m_categoryModel = 
+        DocumentParserNodeDialog.getCategoryModel();
     
+    private SettingsModelString m_sourceModel = 
+        DocumentParserNodeDialog.getSourceModel();    
     
     private DocumentParser m_parser;
     
@@ -119,11 +136,26 @@ public class DocumentParserNodeModel extends NodeModel {
         
         File dir = new File(m_pathModel.getStringValue());        
         boolean recursive = m_recursiveModel.getBooleanValue();
+        String category = m_categoryModel.getStringValue();
+        if (category != null && category.length() > 0) {
+            m_parser.setDocumentCategroy(new DocumentCategory(category));
+        }
+        String source = m_sourceModel.getStringValue();
+        if (source != null && source.length() > 0) {
+            m_parser.setDocumentSource(new DocumentSource(source));
+        }
         
         FileCollector fc = new FileCollector(dir, m_validExtensions, recursive);
         List<File> files = fc.getFiles();
+        int fileCount = files.size();
+        int currFile = 1;
         for (File f : files) {
             
+            double progress = (double)currFile / (double)fileCount;
+            exec.setProgress(progress, "Parsing file " + currFile + " of " 
+                    + fileCount);
+            exec.checkCanceled();
+            currFile++;
             LOGGER.info("Parsing file: " + f.getAbsolutePath());
             
             InputStream is;
@@ -133,6 +165,7 @@ public class DocumentParserNodeModel extends NodeModel {
             } else {
                 is = new FileInputStream(f);
             }
+            m_parser.setDocumentFilepath(f.getAbsolutePath());
             docs.addAll(m_parser.parse(is));
         }
         
@@ -175,6 +208,8 @@ public class DocumentParserNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_pathModel.loadSettingsFrom(settings);
         m_recursiveModel.loadSettingsFrom(settings);
+        m_categoryModel.loadSettingsFrom(settings);
+        m_sourceModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -184,6 +219,8 @@ public class DocumentParserNodeModel extends NodeModel {
     protected void saveSettingsTo(NodeSettingsWO settings) {
         m_pathModel.saveSettingsTo(settings);
         m_recursiveModel.saveSettingsTo(settings);
+        m_categoryModel.saveSettingsTo(settings);
+        m_sourceModel.saveSettingsTo(settings);
     }
 
     /**
@@ -194,6 +231,8 @@ public class DocumentParserNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_pathModel.validateSettings(settings);
         m_recursiveModel.validateSettings(settings);
+        m_categoryModel.validateSettings(settings);
+        m_sourceModel.validateSettings(settings);
     }
 
 }

@@ -45,6 +45,11 @@ import java.util.Set;
  * {@link org.knime.ext.textprocessing.data.DocumentCategory} and a
  * {@link org.knime.ext.textprocessing.data.DocumentType} can be assigned to 
  * a <code>Document</code> in order to specify more details.
+ * <br/><br/>
+ * To create instances of <code>Document</code> use the
+ * {@link org.knime.ext.textprocessing.data.DocumentBuilder} which provides 
+ * methods to add text and finally build a new <code>Document</code> instance
+ * out of it. 
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -92,7 +97,7 @@ public class Document implements TextContainer {
      * @throws NullPointerException If any of the parameters are set 
      * <code>null</code>.
      */
-    public Document(final List<Section> sections, final DocumentType type,
+    Document(final List<Section> sections, final DocumentType type,
             final Set<Author> authors, final Set<DocumentSource> sources, 
             final Set<DocumentCategory> categories, final PublicationDate date,
             final File documentFile) throws NullPointerException {
@@ -152,7 +157,7 @@ public class Document implements TextContainer {
      * @throws NullPointerException If the given list of sections to set is 
      * <code>null</code>.
      */
-    public Document(final List<Section> sections) 
+    Document(final List<Section> sections) 
     throws NullPointerException {        
         this(sections, DEFAULT_TYPE, new HashSet<Author>(), 
                 new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(), 
@@ -175,7 +180,7 @@ public class Document implements TextContainer {
      * @throws NullPointerException If any of the parameters are set 
      * <code>null</code>.
      */
-    public Document(final List<Section> sections, final Set<Author> authors, 
+    Document(final List<Section> sections, final Set<Author> authors, 
             final PublicationDate date, final File documentFile) {
         this(sections, DEFAULT_TYPE, authors, 
                 new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(), 

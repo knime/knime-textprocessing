@@ -28,6 +28,7 @@ import javax.swing.JFileChooser;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
@@ -64,6 +65,28 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
                 DocumentParserNodeModel.DEFAULT_RECURSIVE);
     }
     
+    /**
+     * @return The 
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the category to set to the documents. 
+     */
+    static SettingsModelString getCategoryModel() {
+        return new SettingsModelString(
+                DocumentParserConfigKeys.CFGKEY_CATEGORY, 
+                DocumentParserNodeModel.DEFAULT_CATEGORY);
+    }
+    
+    /**
+     * @return The 
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the document's source to set. 
+     */
+    static SettingsModelString getSourceModel() {
+        return new SettingsModelString(
+                DocumentParserConfigKeys.CFGKEY_SOURCE, 
+                DocumentParserNodeModel.DEFAULT_SOURCE);
+    }    
+    
     
     /**
      * Creates a new instance of <code>DocumentParserNodeDialog</code> which 
@@ -78,5 +101,11 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
         
         addDialogComponent(new DialogComponentBoolean(
                 getRecursiveModel(), "Search recursively"));
+        
+        addDialogComponent(new DialogComponentString(
+                getCategoryModel(), "Document category"));
+        
+        addDialogComponent(new DialogComponentString(
+                getSourceModel(), "Document source"));        
     }
 }

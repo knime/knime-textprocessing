@@ -43,4 +43,14 @@ public class DocumentParserConfigKeys {
      * directory is search recursively).
      */
     public static final String CFGKEY_RECURSIVE = "Rec";
+    
+    /**
+     * The configuration key of the category to set to the documents.
+     */
+    public static final String CFGKEY_CATEGORY = "Cat";
+    
+    /**
+     * The configuration key of the source to set to the documents.
+     */
+    public static final String CFGKEY_SOURCE = "Source";    
 }

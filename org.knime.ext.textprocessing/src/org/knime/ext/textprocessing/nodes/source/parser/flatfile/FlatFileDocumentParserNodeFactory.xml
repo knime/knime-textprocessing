@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./default.png" type="Source">
-    <name>Dml Document Parser</name>
-    <shortDescription>Parses dml formatted documents.
+    <name>Flat File Document Parser</name>
+    <shortDescription>Parses flat ascii files.
     </shortDescription>
     <fullDescription>
         <intro>
-            This node allows you to parse the dml formatted text documents
-            (for more details see the dml.dtd).
-            The specified directory will be searched for xml files, if 
-            recursive search is activated the subdirectories are going to be
-            search too. All the contained xml files are parsed.
+            This node allows you to read flat ascii files and create a document
+            for each file. The documents title will be the absolut path of the
+            file and the full text the data contained in the file. 
+            The specified directory will be searched for <b>all</b> files, 
+            if recursive search is activated the subdirectories are going to be
+            search too. All contained files are parsed.
             The document data is stored in the outgoing data table.
         </intro>
         <option name="Document directory">
             Set the directory containing the files to parse.
         </option>
         <option name="Search recursively">
-            If checked, the specified directory is searched for xml
+            If checked, the specified directory is searched for
             files recursively.
         </option>
         <option name="Document category">
             Specifies the category of the documents to set.
         </option>
         <option name="Document source">
-            Specifies the source of the documents to set.
+            Specifies the source of the documents to set. If no source is 
+            specified the PubMed default source "PubMed" is used by default.
         </option>
     </fullDescription>
         

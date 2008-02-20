@@ -2,23 +2,29 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./default.png" type="Source">
     <name>Sdml Document Parser</name>
-    <shortDescription>Parses sdml formatted documents .
+    <shortDescription>Parses sdml formatted documents.
     </shortDescription>
     <fullDescription>
         <intro>
             This node allows you to parse the sdml formatted text documents
             (for more details see the dml.dtd).
-            The specified directory will be searched for xml files, if 
-            recursive search is activated the subdirectories are going to be
-            search too. All the contained xml files are parsed.
+            The specified directory will be searched for xml, gz or zip files, 
+            if recursive search is activated the subdirectories are going to be
+            search too. All the contained xml, gz or zip files are parsed.
             The document data is stored in the outgoing data table.
         </intro>
         <option name="Document directory">
             Set the directory containing the files to parse.
         </option>
         <option name="Search recursively">
-            If checked, the specified directory is searched for xml
+            If checked, the specified directory is searched for
             files recursively.
+        </option>
+        <option name="Document category">
+            Specifies the category of the documents to set.
+        </option>
+        <option name="Document source">
+            Specifies the source of the documents to set.
         </option>
     </fullDescription>
         

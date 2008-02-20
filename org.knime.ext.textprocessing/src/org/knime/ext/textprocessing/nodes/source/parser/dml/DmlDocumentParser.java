@@ -37,8 +37,10 @@ import javax.xml.parsers.SAXParserFactory;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.Section;
@@ -49,7 +51,6 @@ import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.util.DocumentBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -180,6 +181,8 @@ public class DmlDocumentParser extends DefaultHandler implements
     
     private DocumentSource m_source;
     
+    private DocumentType m_type;
+    
     private String m_docPath;
     
     
@@ -213,7 +216,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     
     /**
      * Creates a new instance of <code>DmlDocumentParser</code>. The documents
-     * source, category and file path will be set to <code>null</code> be 
+     * source, category and file path will be set to <code>null</code> by 
      * default.
      */
     public DmlDocumentParser() {
@@ -271,6 +274,9 @@ public class DmlDocumentParser extends DefaultHandler implements
             if (m_source != null) {
                 m_currentDoc.addDocumentSource(m_source);
             }
+            if (m_type != null) {
+                m_currentDoc.setDocumentType(m_type);
+            }            
             if (m_docPath != null) {
                 File f = new File(m_docPath);
                 if (f.exists()) {
@@ -531,4 +537,32 @@ public class DmlDocumentParser extends DefaultHandler implements
 
         return os.toString();
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setDocumentCategroy(final DocumentCategory category) {
+        m_category = category;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDocumentSource(final DocumentSource source) {
+        m_source = source;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDocumentType(final DocumentType type) {
+        m_type = type;
+    }    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setDocumentFilepath(final String filePath) {
+        m_docPath = filePath;
+    }    
 }

@@ -30,6 +30,16 @@
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/io"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodefactory"
+            id="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodefactory">
+      </node>
+      <node
+            category-path="/textprocessing/io"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory">
+      </node>
    </extension>
    
 </plugin>

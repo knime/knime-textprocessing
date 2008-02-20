@@ -48,8 +48,9 @@ public class OpenNlpWordTokenizer implements Tokenizer {
      */
     public OpenNlpWordTokenizer() {
         try {
-            m_tokenizer = new opennlp.tools.lang.english.Tokenizer(
-                    OpenNlpModelPaths.TOKENIZER_MODEL_FILE);
+            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
+            .getTokenizerModelFile();
+            m_tokenizer = new opennlp.tools.lang.english.Tokenizer(modelPath);
         } catch (IOException e) {
             LOGGER.error("Sentence tokenizer model could not be red!");
             LOGGER.error(e.getStackTrace());

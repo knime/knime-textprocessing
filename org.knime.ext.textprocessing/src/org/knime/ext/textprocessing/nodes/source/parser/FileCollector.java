@@ -140,6 +140,10 @@ public class FileCollector {
          * {@inheritDoc}
          */
         public boolean accept(final File f, final String s) {
+            if (m_extensions.size() == 0) {
+                return true;
+            }
+            
             for (String ext : m_extensions) {
                 if (s.toLowerCase().endsWith("." + ext)) {
                     return true;

@@ -19,29 +19,81 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   14.02.2008 (thiel): created
+ *   14.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.util;
 
+import org.knime.ext.textprocessing.TextprocessingPlugin;
+
+
+
 /**
- * Provides the paths to the models used by the OpenNlp library.
- * 
+ * Provides the paths to the models used by the OpenNlp library. The paths 
+ * are based on the root directory of the Textprocessing plugin, which is
+ * held in the plugin's activator class 
+ * {@link org.knime.ext.textprocessing.TextprocessingPlugin}. Without the 
+ * activation of the plugin (which is usually done automatically by eclipse 
+ * by the creation of an instance of the activator class) the plugin root path
+ * and the model paths can not be created / provided.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public final class OpenNlpModelPaths {
 
-    private OpenNlpModelPaths() { }
+    private static OpenNlpModelPaths instance = null;
+
+    private static final String SENTENCE_MODEL_POSTFIX = 
+        "/resources/opennlpmodels/sentdetect/EnglishSD.bin"; 
+
+    private static final String TOKENIZATION_MODEL_POSTFIX = 
+        "/resources/opennlpmodels/tokenize/EnglishTok.bin";    
     
     /**
      * The path to the sentence detection model.
      */
-    public static final String SENTENCE_MODEL_FILE = 
-        "E:\\downloads\\Textmining\\OpenNLP\\Models\\sentdetect\\EnglishSD.bin";
+    private String m_sentenceModelFile;
     
     /**
      * The path to the tokenizer model file.
      */
-    public static final String TOKENIZER_MODEL_FILE = 
-        "E:\\downloads\\Textmining\\OpenNLP\\Models\\tokenize\\EnglishTok.bin";
+    private String m_tokenizerModelFile;    
+    
+    
+    /**
+     * @return The singleton <code>OpenNlpModelPaths</code> instance holding
+     * the paths to the OpenNlp models.
+     */
+    public static OpenNlpModelPaths getOpenNlpModelPaths() {
+        if (instance == null) {
+            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            String pluginPath = plugin.getPluginRootPath();
+            String sentModelPath = pluginPath + SENTENCE_MODEL_POSTFIX;
+            String tokModelPath = pluginPath + TOKENIZATION_MODEL_POSTFIX;
+            
+            instance = new OpenNlpModelPaths(sentModelPath, tokModelPath);
+        }
+        return instance;
+    }
+    
+    private OpenNlpModelPaths(final String tokModel, final String sentDetModel) 
+    { 
+        m_tokenizerModelFile = tokModel;
+        m_sentenceModelFile = sentDetModel;
+    }
+
+    /**
+     * @return the model file of the sentence detection model.
+     */
+    public String getSentenceModelFile() {
+        return m_sentenceModelFile;
+    }
+
+    /**
+     * @return the model file of the tokenization model.
+     */
+    public String getTokenizerModelFile() {
+        return m_tokenizerModelFile;
+    }
+    
+
 }
