@@ -62,15 +62,15 @@ Comparable<PublicationDate> {
      */
     public PublicationDate(final int year, final int month, final int day)
             throws ParseException {
-        String dateStr = year + "-" + month + "-" + day;
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+        String dateStr = year + "/" + month + "/" + day;
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
         Date date = df.parse(dateStr);
-
+        
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         
         m_year = cal.get(Calendar.YEAR);
-        m_month = cal.get(Calendar.MONTH);
+        m_month = cal.get(Calendar.MONTH) + 1;
         m_day = cal.get(Calendar.DAY_OF_MONTH);
     }
 
@@ -92,8 +92,8 @@ Comparable<PublicationDate> {
             throw new IllegalArgumentException("Month " + month 
                     + " is not valid !");
         }
-        m_year = cal.get(Calendar.YEAR);
-        m_month = cal.get(Calendar.MONTH);
+        m_year = year;
+        m_month = month;
     }
     
     /**
@@ -109,7 +109,7 @@ Comparable<PublicationDate> {
             throw new IllegalArgumentException("Year " + year 
                     + " is not valid !");
         }
-        m_year = cal.get(Calendar.YEAR);
+        m_year = year;
     }
     
     /**

@@ -269,7 +269,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
                 LOGGER.warn("Publication date (" 
                         + year + "-" + month + "-" + day 
                         + ") could not be parsed !");
-                LOGGER.warn(e.getStackTrace());
+                LOGGER.info(e.getMessage());
             }
         } else if (qName.equals(TITLE)) {
             m_currentDoc.addTitle(m_title.trim());

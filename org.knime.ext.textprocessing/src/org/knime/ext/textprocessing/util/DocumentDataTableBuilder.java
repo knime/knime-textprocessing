@@ -29,11 +29,10 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.container.DataContainer;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.IntCell;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
@@ -73,12 +72,10 @@ public final class DocumentDataTableBuilder {
      * {@link org.knime.ext.textprocessing.data.Document}s to keep in the table.
      * @return The <code>BufferedDataTable</code> containing the given 
      * documents. 
-     * @throws CanceledExecutionException If the execution has been canceled.
      */
     public static BufferedDataTable createDocumentDataTable(
-            final ExecutionContext exec, final List<Document> docs) 
-    throws CanceledExecutionException {
-        DataContainer dc =
+            final ExecutionContext exec, final List<Document> docs) {
+        BufferedDataContainer dc =
                 exec.createDataContainer(DocumentDataTableBuilder
                         .createDocumentDataTableSpec());
 
@@ -92,6 +89,6 @@ public final class DocumentDataTableBuilder {
         }
         dc.close();
 
-        return exec.createBufferedDataTable(dc.getTable(), exec);
+        return dc.getTable();
     }
 }

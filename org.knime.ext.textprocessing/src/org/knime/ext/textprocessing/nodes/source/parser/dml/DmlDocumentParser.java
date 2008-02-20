@@ -70,7 +70,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
  * This format is also used to serialize the 
  * {@link org.knime.ext.textprocessing.data.DocumentCell}s. Furthermore this 
  * class provides the method 
- * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#documentAsSdml(Document)}
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#documentAsDml(Document)}
  * which creates the serialized dml representation of the given document as 
  * a string.
  * 
@@ -311,10 +311,10 @@ public class DmlDocumentParser extends DefaultHandler implements
             Document doc = m_currentDoc.createDocument();
             m_docs.add(doc);
             m_currentDoc = null;
-        } else if(m_lastTag.equals(AUTHOR)) {
+        } else if(qName.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
-        } else if (m_lastTag.equals(PUBLICATIONDATE)) {
+        } else if (qName.equals(PUBLICATIONDATE)) {
             int day = Integer.parseInt(m_day.trim());
             int month = Integer.parseInt(m_month.trim());
             int year = Integer.parseInt(m_year.trim());
@@ -328,27 +328,27 @@ public class DmlDocumentParser extends DefaultHandler implements
                         + ") could not be parsed !");
                 LOGGER.warn(e.getStackTrace());
             }
-        } else if(m_lastTag.equals(WORD)) {
+        } else if(qName.equals(WORD)) {
             if (m_words != null && m_word != null) {
                 Word w = new Word(m_word.trim());
                 m_words.add(w);
             }
-        } else if(m_lastTag.equals(TAG)) {
+        } else if(qName.equals(TAG)) {
             if (m_tags != null && m_tagType != null && m_tagValue != null) {
                 Tag t = TagFactory.createTag(m_tagType.trim(), 
                         m_tagValue.trim());
                 m_tags.add(t);
             }
-        } else if(m_lastTag.equals(TERM)) {
+        } else if(qName.equals(TERM)) {
             if (m_words != null && m_tags != null) {
                 Term t = new Term(m_words, m_tags);
                 m_currentDoc.addTerm(t);
             }
-        } else if (m_lastTag.equals(SENTENCE)) {
+        } else if (qName.equals(SENTENCE)) {
             m_currentDoc.createNewSentence();
-        } else if (m_lastTag.equals(PARAGRAPH)) {
+        } else if (qName.equals(PARAGRAPH)) {
             m_currentDoc.createNewParagraph();
-        } else if (m_lastTag.equals(SECTION)) {
+        } else if (qName.equals(SECTION)) {
             m_currentDoc.createNewSection(
                     SectionAnnotation.stringToAnnotation(m_annotation));
         }
@@ -393,7 +393,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * @param doc The document to create the <i>dml</i> representation for.
      * @return The <i>dml</i> representation of the given document.
      */
-    public static String documentAsSdml(final Document doc) {
+    public static String documentAsDml(final Document doc) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         // header
@@ -523,10 +523,10 @@ public class DmlDocumentParser extends DefaultHandler implements
             os.close();
         } catch (SAXException e1) {
             LOGGER.error("Could not create xml output!");
-            LOGGER.warn(e1.getStackTrace());
+            LOGGER.info(e1.getMessage());
         } catch (IOException e2) {
             LOGGER.error("Could not write xml output to output stream!");
-            LOGGER.warn(e2.getStackTrace());
+            LOGGER.info(e2.getMessage());
         }
 
         return os.toString();
