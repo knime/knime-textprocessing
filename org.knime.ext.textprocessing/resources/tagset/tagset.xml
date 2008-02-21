@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tagset PUBLIC "-//UNIKN//DTD KNIME TagSet 2.0//EN" "./tagset.dtd">
 <tagset>
-<tag>org.knime.ext.textprocessing.data.PartOfSpeechTag.UNKNOWN</tag>
+    <tag>org.knime.ext.textprocessing.data.PartOfSpeechTag</tag>
 </tagset>

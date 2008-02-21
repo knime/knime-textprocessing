@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2007
+ * Copyright, 2003 - 2008
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,7 +19,7 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   18.02.2008 (thiel): created
+ *   18.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.data;
 
@@ -31,15 +31,20 @@ package org.knime.ext.textprocessing.data;
  * the underlying implementation is not responsible for the given type no
  * tag instance will be created but <code>null</code>.
  * <br/><br/>
- * To create your own tags, i.e. named entity tags, etc. set up an 
+ * To create your own tag type, i.e. named entity tag type, etc. set up an 
  * <code>enum</code> like the 
  * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag}. This 
  * <code>enum</code> has to implement the interface <code>TagBuilder</code>
- * and additionally it has to provide the public static method 
- * <code>Tag getDefault()</code> which returns the tag with the default value.
- * If these conditions are achieved, the tag can be registered via an xml
+ * and additionally it has to provide the method 
+ * <code>public static Tag getDefault()</code> which returns the default
+ * instance of the tag type <code>enum</code> as a <code>TagBuilder</code>.
+ * If these conditions are fulfilled, the tag type can be registered via an xml
  * file (see tagset.dtd for details) at the
- * {@link org.knime.ext.textprocessing.data.TagFactory}
+ * {@link org.knime.ext.textprocessing.data.TagFactory} by calling 
+ * {@link org.knime.ext.textprocessing.data.TagFactory#addTagSet(java.io.File)}.
+ * For more details see: <br/>
+ * {@link org.knime.ext.textprocessing.data.TagFactory} or <br/>
+ * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag}.
  * 
  * @author Kilian Thiel, University of Konstanz
  */

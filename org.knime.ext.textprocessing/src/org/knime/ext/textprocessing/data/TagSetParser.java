@@ -24,7 +24,9 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +34,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingPlugin;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -70,8 +74,10 @@ public class TagSetParser extends DefaultHandler {
      */
     public Set<String> parse(final File file) {
         try {
-            m_tagClassNames = new HashSet<String>();      
-            SAXParserFactory.newInstance().newSAXParser().parse(file, this);
+            m_tagClassNames = new HashSet<String>();     
+            SAXParserFactory fac = SAXParserFactory.newInstance();
+            fac.setValidating(true);
+            fac.newSAXParser().parse(file, this);
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not instanciate parser");
             LOGGER.info(e.getMessage());
@@ -84,6 +90,24 @@ public class TagSetParser extends DefaultHandler {
         }
         return m_tagClassNames;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputSource resolveEntity(final String pubId,
+            final String sysId) throws IOException, SAXException {
+        if (pubId != null) {
+            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            String path = plugin.getPluginRootPath();
+            if (pubId.equals("-//UNIKN//DTD KNIME TagSet 2.0//EN")) {
+                path += TagFactory.TAGSET_DTD_POSTFIX;
+            }
+            InputStream in = new FileInputStream(path);
+            return new InputSource(in);
+        }
+        return super.resolveEntity(pubId, sysId);
+    }    
     
     /**
      * {@inheritDoc}

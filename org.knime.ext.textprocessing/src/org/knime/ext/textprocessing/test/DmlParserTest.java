@@ -21,7 +21,7 @@
  * History
  *   20.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.source.parser.dml;
+package org.knime.ext.textprocessing.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParser;
 
 /**

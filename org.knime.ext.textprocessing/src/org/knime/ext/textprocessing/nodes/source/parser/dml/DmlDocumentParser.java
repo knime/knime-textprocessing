@@ -341,7 +341,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             }
         } else if(qName.equals(TAG)) {
             if (m_tags != null && m_tagType != null && m_tagValue != null) {
-                Tag t = TagFactory.createTag(m_tagType.trim(), 
+                Tag t = TagFactory.getInstance().createTag(m_tagType.trim(), 
                         m_tagValue.trim());
                 m_tags.add(t);
             }

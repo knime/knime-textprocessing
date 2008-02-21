@@ -24,7 +24,9 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,10 +34,14 @@ import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingPlugin;
 
 /**
- * All different kind of {@link org.knime.ext.textprocessing.data.Tag}s have
- * to be registered according their type in this factory to be able to create 
+ * All different types of {@link org.knime.ext.textprocessing.data.Tag}s have
+ * to be registered in this factory to be able to create 
  * the right tag instance (i.e. PartOfSpeechTag) related to the type of the
- * tag. 
+ * tag. Access the singleton instance of the factory by calling
+ * {@link org.knime.ext.textprocessing.data.TagFactory#getInstance()}. To add
+ * your own tagset, specified in a xml file (see tagset.dtd) use the method
+ * {@link org.knime.ext.textprocessing.data.TagFactory#addTagSet(File)}, which 
+ * registers the specified tags in this factory.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -44,27 +50,61 @@ public class TagFactory {
     private static final NodeLogger LOGGER = 
         NodeLogger.getLogger(TagFactory.class);
     
-    private static final HashSet<TagBuilder> TAG_BUILDER = 
-        new HashSet<TagBuilder>();
+    /**
+     * The path (postix) of the tagset.xml file relative to the plugin 
+     * directory.
+     */
+    public static final String TAGSET_XML_POSTFIX = 
+        "/resources/tagset/tagset.xml";
+
+    /**
+     * The path (postix) of the tagset.dtd file relative to the plugin 
+     * directory.
+     */
+    public static final String TAGSET_DTD_POSTFIX = 
+        "/resources/tagset/tagset.dtd";
     
-    private static final String TAGSET_POSTFIX = "/resources/tagset/tagset.xml";
+    private static TagFactory m_instance;
     
-    static {
+    private HashSet<TagBuilder> m_tagBuilder = new HashSet<TagBuilder>();
+    
+    
+    private TagFactory() {
         TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
         String pluginPath = plugin.getPluginRootPath();
-        String tagSetPath = pluginPath + TAGSET_POSTFIX;
-            
+        String tagSetPath = pluginPath + TAGSET_XML_POSTFIX;
         addTagSet(new File(tagSetPath));
     }
     
-    public static void addTagSet(final File xmlTagSet) {
+    /**
+     * @return The singleton instance of <code>TagFactory</code>.
+     */
+    public static TagFactory getInstance() {
+        if (m_instance == null) {
+            m_instance = new TagFactory();
+        }
+        return m_instance;
+    }
+    
+    /**
+     * Adds the tagset specified in the xml file.
+     * @param xmlTagSet The xml file containing the tagset to add.
+     */
+    public void addTagSet(final File xmlTagSet) {
         TagSetParser parser = new TagSetParser();
         Set<String> tagSet = parser.parse(xmlTagSet);
         addTags(tagSet);
     }
     
+    /**
+     * @return The so far registered tags as a set.
+     */
+    public Set<TagBuilder> getTagSet() {
+        return Collections.unmodifiableSet(m_tagBuilder);
+    }
+    
     @SuppressWarnings("unchecked")
-    private static void addTags(final Set<String> tagClassNames) {
+    private void addTags(final Set<String> tagClassNames) {
         Class<? extends TagBuilder> tagClass;
         try {
             for (String tagName : tagClassNames) {
@@ -78,14 +118,29 @@ public class TagFactory {
                     TagBuilder tagBuilder = (TagBuilder)method.invoke(
                             new Object[]{}, new Object[]{});
                 
-                    TAG_BUILDER.add(tagBuilder);
-                    LOGGER.error("Added TagBuilder: " 
+                    m_tagBuilder.add(tagBuilder);
+                    LOGGER.info("Added TagBuilder: " 
                             + tagBuilder.getClass().toString());
                 }
             }
-        } catch(Exception e) {
-            LOGGER.warn("Tags could not be loaded from tagset!");
-            LOGGER.info(e.getMessage());
+        } catch(ClassNotFoundException e) {
+            LOGGER.warn("Class of tag could not be found!");
+            LOGGER.warn(e.getMessage());
+        } catch (SecurityException e) {
+            LOGGER.warn("Security violation!");
+            LOGGER.warn(e.getMessage());
+        } catch (NoSuchMethodException e) {
+            LOGGER.warn("Method to create tag could not be found!");
+            LOGGER.warn(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Arguments of method to create tag are illegal!");
+            LOGGER.warn(e.getMessage());
+        } catch (IllegalAccessException e) {
+            LOGGER.warn("Illegal access of method to create tag!");
+            LOGGER.warn(e.getMessage());
+        } catch (InvocationTargetException e) {
+            LOGGER.warn("Error during invokation of method to create tag!");
+            LOGGER.warn(e.getMessage());
         }
     }
     
@@ -98,8 +153,8 @@ public class TagFactory {
      * @param value The value of the tag to create.
      * @return A new instance of tag with given type and value.
      */
-    public static Tag createTag(final String type, final String value) {
-        for (TagBuilder tb : TAG_BUILDER) {
+    public Tag createTag(final String type, final String value) {
+        for (TagBuilder tb : m_tagBuilder) {
             Tag t = tb.buildTag(type, value);
             if (t != null) {
                 return t;

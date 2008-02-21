@@ -201,7 +201,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
                 String type = tagsArr[i];
                 i++;
                 String value = tagsArr[i];
-                tags.add(TagFactory.createTag(type, value));
+                tags.add(TagFactory.getInstance().createTag(type, value));
             }
         }
         
