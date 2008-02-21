@@ -23,7 +23,13 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.Set;
+
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingPlugin;
 
 /**
  * All different kind of {@link org.knime.ext.textprocessing.data.Tag}s have
@@ -35,14 +41,54 @@ import java.util.HashSet;
  */
 public class TagFactory {
 
+    private static final NodeLogger LOGGER = 
+        NodeLogger.getLogger(TagFactory.class);
+    
     private static final HashSet<TagBuilder> TAG_BUILDER = 
         new HashSet<TagBuilder>();
     
-    // TODO Read tags and types from xml file !!!
+    private static final String TAGSET_POSTFIX = "/resources/tagset/tagset.xml";
+    
     static {
-        TAG_BUILDER.add(PartOfSpeechTag.UNKNOWN);
-        // register other tags here ...
+        TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+        String pluginPath = plugin.getPluginRootPath();
+        String tagSetPath = pluginPath + TAGSET_POSTFIX;
+            
+        addTagSet(new File(tagSetPath));
     }
+    
+    public static void addTagSet(final File xmlTagSet) {
+        TagSetParser parser = new TagSetParser();
+        Set<String> tagSet = parser.parse(xmlTagSet);
+        addTags(tagSet);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static void addTags(final Set<String> tagClassNames) {
+        Class<? extends TagBuilder> tagClass;
+        try {
+            for (String tagName : tagClassNames) {
+                tagName.trim();
+                if (tagName.length() > 0) {
+                    tagClass = (Class<? extends TagBuilder>)
+                    Class.forName(tagName);
+            
+                    final Method method = tagClass.getMethod(
+                            "getDefault", new Class[]{});
+                    TagBuilder tagBuilder = (TagBuilder)method.invoke(
+                            new Object[]{}, new Object[]{});
+                
+                    TAG_BUILDER.add(tagBuilder);
+                    LOGGER.error("Added TagBuilder: " 
+                            + tagBuilder.getClass().toString());
+                }
+            }
+        } catch(Exception e) {
+            LOGGER.warn("Tags could not be loaded from tagset!");
+            LOGGER.info(e.getMessage());
+        }
+    }
+    
     
     /**
      * Creates a valid instance of {@link org.knime.ext.textprocessing.data.Tag}
@@ -60,5 +106,5 @@ public class TagFactory {
             }
         }
         return null;
-    } 
+    }   
 }

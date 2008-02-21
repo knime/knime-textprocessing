@@ -185,4 +185,12 @@ public enum PartOfSpeechTag implements TagBuilder {
         }
         return null;
     }
+    
+    /**
+     * @return The default "UNKNOWN" <code>PartOfSpeechTag</code> as
+     * <code>TagBuilder</code>.
+     */
+    public static TagBuilder getDefault() {
+        return PartOfSpeechTag.UNKNOWN;
+    }
 }

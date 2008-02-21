@@ -30,6 +30,16 @@ package org.knime.ext.textprocessing.data;
  * {@link org.knime.ext.textprocessing.data.Tag} due to the given type. If
  * the underlying implementation is not responsible for the given type no
  * tag instance will be created but <code>null</code>.
+ * <br/><br/>
+ * To create your own tags, i.e. named entity tags, etc. set up an 
+ * <code>enum</code> like the 
+ * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag}. This 
+ * <code>enum</code> has to implement the interface <code>TagBuilder</code>
+ * and additionally it has to provide the public static method 
+ * <code>Tag getDefault()</code> which returns the tag with the default value.
+ * If these conditions are achieved, the tag can be registered via an xml
+ * file (see tagset.dtd for details) at the
+ * {@link org.knime.ext.textprocessing.data.TagFactory}
  * 
  * @author Kilian Thiel, University of Konstanz
  */

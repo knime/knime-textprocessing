@@ -42,7 +42,7 @@ public class DmlParserTest {
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) {        
         File file = new File("E:\\Documents\\KNIME\\TextminingPlugin\\"
                 + "testDoc\\SdmlTestDocument.xml");
 
@@ -77,7 +77,6 @@ public class DmlParserTest {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
 }
