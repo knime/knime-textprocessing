@@ -24,6 +24,7 @@
 package org.knime.ext.textprocessing.nodes.source.parser.sdml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -34,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingPlugin;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -44,6 +46,7 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -121,6 +124,18 @@ public class SdmlDocumentParser extends DefaultHandler implements
      */
     public static final String YEAR = "year";    
     
+    /**
+     * The path (postfix) of the sdml.dtd file relative to the plugin 
+     * directory.
+     */
+    public static final String SDML_DTD_POSTFIX = 
+        "/resources/documentformat/sdml.dtd";
+    
+    /**
+     * The public identifier for (sdml) xml files.
+     */
+    public static final String PUBLIC_IDENTIFIER = 
+        "-//UNIKN//DTD KNIME Sdml 2.0//EN";
     
     private static final NodeLogger LOGGER = 
         NodeLogger.getLogger(SdmlDocumentParser.class);
@@ -188,7 +203,9 @@ public class SdmlDocumentParser extends DefaultHandler implements
     public List<Document> parse(InputStream is) {
         try {
             m_docs = new ArrayList<Document>();
-            SAXParserFactory.newInstance().newSAXParser().parse(is, this);
+            SAXParserFactory fac = SAXParserFactory.newInstance();
+            fac.setValidating(true);
+            fac.newSAXParser().parse(is, this);
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not instanciate parser");
             LOGGER.info(e.getMessage());
@@ -202,6 +219,23 @@ public class SdmlDocumentParser extends DefaultHandler implements
         return m_docs;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputSource resolveEntity(final String pubId,
+            final String sysId) throws IOException, SAXException {
+        if (pubId != null) {
+            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            String path = plugin.getPluginRootPath();
+            if (pubId.equals(PUBLIC_IDENTIFIER)) {
+                path += SDML_DTD_POSTFIX;
+            }
+            InputStream in = new FileInputStream(path);
+            return new InputSource(in);
+        }
+        return super.resolveEntity(pubId, sysId);
+    }   
     
     /**
      * {@inheritDoc}

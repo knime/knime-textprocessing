@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2007
+ * Copyright, 2003 - 2008
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,7 +19,7 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   18.02.2008 (thiel): created
+ *   18.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.util;
 
@@ -38,6 +38,9 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 
 /**
+ * Provides convenient methods that create 
+ * {@link org.knime.core.node.BufferedDataTable}s containing
+ * {@link org.knime.ext.textprocessing.data.Document}s.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -75,6 +78,10 @@ public final class DocumentDataTableBuilder {
      */
     public static BufferedDataTable createDocumentDataTable(
             final ExecutionContext exec, final List<Document> docs) {
+        // create cache
+        FullDataCellCache cache = new FullDataCellCache(
+                new DocumentDataCellFactory());
+        
         BufferedDataContainer dc =
                 exec.createDataContainer(DocumentDataTableBuilder
                         .createDocumentDataTableSpec());
@@ -82,7 +89,7 @@ public final class DocumentDataTableBuilder {
         int i = 1;
         for (Document d : docs) {
             RowKey rowKey = new RowKey(new IntCell(i));
-            DocumentCell docCell = new DocumentCell(d);
+            DocumentCell docCell = (DocumentCell)cache.getInstance(d);
             DataRow row = new DefaultRow(rowKey, docCell);
             dc.addRowToTable(row);
             i++;

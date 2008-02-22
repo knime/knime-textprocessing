@@ -51,6 +51,12 @@ public class TagSetParser extends DefaultHandler {
      */
     public static final String TAG = "tag";
     
+    /**
+     * The public identifier for (sdml) xml files.
+     */
+    public static final String PUBLIC_IDENTIFIER = 
+        "-//UNIKN//DTD KNIME TagSet 2.0//EN";    
+    
     private static final NodeLogger LOGGER = 
         NodeLogger.getLogger(TagSetParser.class);
     
@@ -100,7 +106,7 @@ public class TagSetParser extends DefaultHandler {
         if (pubId != null) {
             TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
             String path = plugin.getPluginRootPath();
-            if (pubId.equals("-//UNIKN//DTD KNIME TagSet 2.0//EN")) {
+            if (pubId.equals(PUBLIC_IDENTIFIER)) {
                 path += TagFactory.TAGSET_DTD_POSTFIX;
             }
             InputStream in = new FileInputStream(path);

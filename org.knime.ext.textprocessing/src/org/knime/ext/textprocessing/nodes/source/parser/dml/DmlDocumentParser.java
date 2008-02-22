@@ -25,6 +25,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.dml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -35,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingPlugin;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -53,6 +55,7 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
@@ -170,6 +173,18 @@ public class DmlDocumentParser extends DefaultHandler implements
      */
     public static final String YEAR = "year";
     
+    /**
+     * The path (postfix) of the dml.dtd file relative to the plugin 
+     * directory.
+     */
+    public static final String DML_DTD_POSTFIX = 
+        "/resources/documentformat/dml.dtd";
+    
+    /**
+     * The public identifier for (dml) xml files.
+     */
+    public static final String PUBLIC_IDENTIFIER = 
+        "-//UNIKN//DTD KNIME Dml 2.0//EN";
     
     
     private static final NodeLogger LOGGER = 
@@ -257,6 +272,24 @@ public class DmlDocumentParser extends DefaultHandler implements
         }
         return m_docs;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputSource resolveEntity(final String pubId,
+            final String sysId) throws IOException, SAXException {
+        if (pubId != null) {
+            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            String path = plugin.getPluginRootPath();
+            if (pubId.equals(PUBLIC_IDENTIFIER)) {
+                path += DML_DTD_POSTFIX;
+            }
+            InputStream in = new FileInputStream(path);
+            return new InputSource(in);
+        }
+        return super.resolveEntity(pubId, sysId);
+    }      
     
     /**
      * {@inheritDoc}
@@ -406,7 +439,7 @@ public class DmlDocumentParser extends DefaultHandler implements
         OutputFormat of = new OutputFormat("XML", "ISO-8859-1", true);
         of.setIndent(1);
         of.setIndenting(true);
-        // of.setDoctype(null, "dml.dtd");
+        of.setDoctype(PUBLIC_IDENTIFIER, "./dml.dtd");
 
         try {
             XMLSerializer serializer = new XMLSerializer(os, of);
