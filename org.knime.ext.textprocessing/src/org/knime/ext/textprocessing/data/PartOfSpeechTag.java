@@ -25,6 +25,7 @@ package org.knime.ext.textprocessing.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This enum contains the Penn Treebank part-of-speech tag set. To create a
@@ -156,7 +157,7 @@ public enum PartOfSpeechTag implements TagBuilder {
             list.add(values[i].name());
         }
         return list;
-    }
+    }   
     
     /**
      * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to 
@@ -169,13 +170,29 @@ public enum PartOfSpeechTag implements TagBuilder {
      * the given string.
      */
     public static Tag stringToTag(final String str) {
-        PartOfSpeechTag pos = valueOf(str);
-        if (pos != null) {
-            return pos.getTag();
+        if (isSymbol(str)) {
+            return PartOfSpeechTag.SYM.getTag();
+        }
+        
+        for (PartOfSpeechTag pos : values()) {
+            if (pos.getTag().getTagValue().equals(str)) {
+                return pos.getTag();
+            }
         }
         return PartOfSpeechTag.UNKNOWN.getTag();
     }
 
+    private static Pattern m_symbolPattern = Pattern.compile(
+            "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]");
+    
+    private static boolean isSymbol(final String str) {
+        if (m_symbolPattern.matcher(str).matches()) {
+            return true;
+        }
+        return false;
+    }
+    
+    
     /**
      * {@inheritDoc}
      */

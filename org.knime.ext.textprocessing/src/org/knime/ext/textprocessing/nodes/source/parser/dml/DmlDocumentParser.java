@@ -87,6 +87,11 @@ public class DmlDocumentParser extends DefaultHandler implements
      * The name of the document tag.
      */
     public static final String DOCUMENT = "document";
+
+    /**
+     * The name of the file name.
+     */
+    public static final String FILENAME = "filename";
     
     /**
      * The name of the term tag.
@@ -337,6 +342,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_tags = new ArrayList<Tag>();
         } else if (m_lastTag.equals(SECTION)) {
             m_annotation = attributes.getValue(ANNOTATION);
+        } else if (m_lastTag.equals(FILENAME)) {
+            m_docPath = "";
         }
     }
     
@@ -390,7 +397,12 @@ public class DmlDocumentParser extends DefaultHandler implements
         } else if (qName.equals(SECTION)) {
             m_currentDoc.createNewSection(
                     SectionAnnotation.stringToAnnotation(m_annotation));
-        }
+        } else if (qName.equals(FILENAME)) {
+            File f = new File(m_docPath);
+            if (f.exists()) {
+                m_currentDoc.setDocumentFile(f);
+            }
+        } 
     }
     
     /**
@@ -414,6 +426,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_tagType += new String(ch, start, length);
         } else if (m_lastTag.equals(TAG_VALUE)) {
             m_tagValue += new String(ch, start, length);
+        } else if (m_lastTag.equals(FILENAME)) {
+            m_docPath += new String(ch, start, length);
         }
     }
     
@@ -449,6 +463,15 @@ public class DmlDocumentParser extends DefaultHandler implements
             AttributesImpl atts = new AttributesImpl();
             hd.startElement("", "", DOCUMENT, atts);
 
+            // Filename
+            if (doc.getDocFile().length() > 0) {
+                atts.clear();
+                hd.startElement("", "", FILENAME, atts);
+                hd.characters(doc.getDocFile().getAbsolutePath().toCharArray(),
+                        0, doc.getDocFile().getAbsolutePath().length());
+                hd.endElement("", "", FILENAME);
+            }
+            
             // Authors
             if (doc.getAuthors().size() > 0) {
                 atts.clear();

@@ -92,6 +92,42 @@ public class DocumentBuilder {
      */
     public DocumentBuilder() { }
     
+    
+    /**
+     * Creates new instance of <code>DocumentBuilder</code> and sets the meta
+     * information of the given <code>Document</code>.<br/>
+     * The meta information to copy is:
+     * the documents authors, the source, the category, the type, the file
+     * and the publicatioon date.<br/>
+     * The text data like title or sections are not copied.
+     */
+    public DocumentBuilder(final Document doc) { 
+        // Add authors
+        for (Author a : doc.getAuthors()) {
+            addAuthor(a);
+        }
+        
+        // Add source
+        for (DocumentSource s : doc.getSources()) { 
+            addDocumentSource(s);
+        }
+        
+        // Add categories
+        for (DocumentCategory c : doc.getCategories()) {
+            addDocumentCategory(c);
+        }
+        
+        // Add type
+        setDocumentType(doc.getType());
+        
+        // Add file
+        setDocumentFile(doc.getDocFile());
+        
+        // Add publication date
+        setPublicationDate(doc.getPubDate());
+    }
+    
+    
     /**
      * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance
      * with the specified data, like authors, sections, etc.

@@ -40,6 +40,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/io"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory">
+      </node>
    </extension>
    
 </plugin>

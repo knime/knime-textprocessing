@@ -46,18 +46,18 @@ public final class OpenNlpModelPaths {
         "/resources/opennlpmodels/sentdetect/EnglishSD.bin"; 
 
     private static final String TOKENIZATION_MODEL_POSTFIX = 
-        "/resources/opennlpmodels/tokenize/EnglishTok.bin";    
+        "/resources/opennlpmodels/tokenize/EnglishTok.bin"; 
+    
+    private static final String POS_MODEL_POSTFIX = 
+        "/resources/opennlpmodels/pos/tag.bin";
+    
+    private static final String POS_DICT_POSTFIX = 
+        "/resources/opennlpmodels/pos/tagdict";
     
     /**
-     * The path to the sentence detection model.
+     * The base path to the models.
      */
-    private String m_sentenceModelFile;
-    
-    /**
-     * The path to the tokenizer model file.
-     */
-    private String m_tokenizerModelFile;    
-    
+    private String m_basePath;
     
     /**
      * @return The singleton <code>OpenNlpModelPaths</code> instance holding
@@ -66,34 +66,41 @@ public final class OpenNlpModelPaths {
     public static OpenNlpModelPaths getOpenNlpModelPaths() {
         if (instance == null) {
             TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
-            String pluginPath = plugin.getPluginRootPath();
-            String sentModelPath = pluginPath + SENTENCE_MODEL_POSTFIX;
-            String tokModelPath = pluginPath + TOKENIZATION_MODEL_POSTFIX;
-            
-            instance = new OpenNlpModelPaths(sentModelPath, tokModelPath);
+            String pluginPath = plugin.getPluginRootPath();            
+            instance = new OpenNlpModelPaths(pluginPath);
         }
         return instance;
     }
     
-    private OpenNlpModelPaths(final String tokModel, final String sentDetModel) 
-    { 
-        m_tokenizerModelFile = tokModel;
-        m_sentenceModelFile = sentDetModel;
+    private OpenNlpModelPaths(final String basePath) { 
+        m_basePath = basePath;
     }
 
     /**
      * @return the model file of the sentence detection model.
      */
     public String getSentenceModelFile() {
-        return m_sentenceModelFile;
+        return m_basePath + SENTENCE_MODEL_POSTFIX;
     }
 
     /**
      * @return the model file of the tokenization model.
      */
     public String getTokenizerModelFile() {
-        return m_tokenizerModelFile;
+        return m_basePath + TOKENIZATION_MODEL_POSTFIX;
     }
     
-
+    /**
+     * @return the model file of the pos tagger model.
+     */
+    public String getPosTaggerModelFile() {
+        return m_basePath + POS_MODEL_POSTFIX;
+    }
+    
+    /**
+     * @return the model file of the pos tagger tag dictionary.
+     */
+    public String getPosTaggerDictFile() {
+        return m_basePath + POS_DICT_POSTFIX;
+    }    
 }

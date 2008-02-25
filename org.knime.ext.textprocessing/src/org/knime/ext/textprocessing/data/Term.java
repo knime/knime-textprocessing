@@ -162,7 +162,6 @@ public class Term implements TextContainer {
             sb.append("(");
             sb.append(m_tags.get(i).getTagType());
             sb.append(")");
-            sb.append(WORD_SEPARATOR);
             if (i < m_tags.size() - 1) {
                 sb.append(WORD_SEPARATOR);
             }

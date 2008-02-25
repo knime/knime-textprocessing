@@ -377,9 +377,15 @@ public class Document implements TextContainer {
         for (DocumentCategory c : m_categories) {
             hash += fac / div * c.hashCode();
         }
-        hash += fac / div * m_pubDate.hashCode();
-        hash += fac / div * m_type.hashCode();
-        hash += fac / div * m_docFile.hashCode();
+        if (m_pubDate != null) {
+            hash += fac / div * m_pubDate.hashCode();
+        }
+        if (m_type != null) {
+            hash += fac / div * m_type.hashCode();
+        }
+        if (m_docFile != null) {
+            hash += fac / div * m_docFile.hashCode();
+        }
         
         return hash;
     }    
