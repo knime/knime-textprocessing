@@ -33,6 +33,7 @@ import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
@@ -75,9 +76,11 @@ public final class DocumentDataTableBuilder {
      * {@link org.knime.ext.textprocessing.data.Document}s to keep in the table.
      * @return The <code>BufferedDataTable</code> containing the given 
      * documents. 
+     * @throws CanceledExecutionException If execution was canceled.
      */
     public static BufferedDataTable createDocumentDataTable(
-            final ExecutionContext exec, final List<Document> docs) {
+            final ExecutionContext exec, final List<Document> docs) 
+    throws CanceledExecutionException {
         // create cache
         FullDataCellCache cache = new FullDataCellCache(
                 new DocumentDataCellFactory());
@@ -88,6 +91,7 @@ public final class DocumentDataTableBuilder {
 
         int i = 1;
         for (Document d : docs) {
+            exec.checkCanceled();
             RowKey rowKey = new RowKey(new IntCell(i));
             DocumentCell docCell = (DocumentCell)cache.getInstance(d);
             DataRow row = new DefaultRow(rowKey, docCell);

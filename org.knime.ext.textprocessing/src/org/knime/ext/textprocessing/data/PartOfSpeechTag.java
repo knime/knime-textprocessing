@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * This enum contains the Penn Treebank part-of-speech tag set. To create a
+ * This enum contains the Penn Treebank part of speech tag set. To create a
  * valid {@link org.knime.ext.textprocessing.data.Tag} instance use
  * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag#getTag()}, i.e:
  * <br><br>

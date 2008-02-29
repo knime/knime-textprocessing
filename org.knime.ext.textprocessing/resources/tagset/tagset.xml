@@ -2,4 +2,5 @@
 <!DOCTYPE tagset PUBLIC "-//UNIKN//DTD KNIME TagSet 2.0//EN" "./tagset.dtd">
 <tagset>
     <tag>org.knime.ext.textprocessing.data.PartOfSpeechTag</tag>
+    <tag>org.knime.ext.textprocessing.data.BiomedicalNeTag</tag>
 </tagset>

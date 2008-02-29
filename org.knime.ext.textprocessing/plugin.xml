@@ -17,6 +17,13 @@
             name="IO"
             path="/textprocessing">
       </category>
+      <category
+            description="Tagger nodes (POS, NER)"
+            icon="icons/missing.gif"
+            level-id="tagging"
+            name="Tagging"
+            path="/textprocessing">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -41,9 +48,14 @@
             id="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory">
       </node>
       <node
-            category-path="/textprocessing/io"
+            category-path="/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/tagging"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.ner.AbnerTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.ner.AbnerTaggerNodeFactory">
       </node>
    </extension>
    

@@ -19,44 +19,44 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   22.02.2008 (Kilian Thiel): created
+ *   28.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.pos;
+package org.knime.ext.textprocessing.nodes.tagging.ner;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the POS tagger node,
+ * The {@link org.knime.core.node.NodeFactory} of the Abner tagger node,
  * provides methods to create the model and the dialog instance.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTaggerNodeFactory extends NodeFactory<PosTaggerNodeModel> {
+public class AbnerTaggerNodeFactory extends NodeFactory<AbnerTaggerNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new AbnerTaggerNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PosTaggerNodeModel createNodeModel() {
-        return new PosTaggerNodeModel();
+    public AbnerTaggerNodeModel createNodeModel() {
+        return new AbnerTaggerNodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<PosTaggerNodeModel> createNodeView(final int index, 
-            final PosTaggerNodeModel model) {
+    public NodeView<AbnerTaggerNodeModel> createNodeView(
+            final int index, final AbnerTaggerNodeModel model) {
         return null;
     }
 
@@ -73,6 +73,6 @@ public class PosTaggerNodeFactory extends NodeFactory<PosTaggerNodeModel> {
      */
     @Override
     protected boolean hasDialog() {
-        return false;
+        return true;
     }
 }

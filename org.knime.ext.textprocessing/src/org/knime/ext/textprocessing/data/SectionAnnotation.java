@@ -39,7 +39,11 @@ public enum SectionAnnotation {
     /** The abstract of a document. **/
     ABSTRACT,
     /** A chapter of a document. **/
-    CHAPTER;
+    CHAPTER,
+    /** The title of the journal the document was published at. **/
+    JOURNAL_TITLE,
+    /** The title of the conference the document was published at. **/
+    CONFERENCE_TITLE;
     
     
     /**

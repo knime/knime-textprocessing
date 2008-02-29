@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2007
+ * Copyright, 2003 - 2008
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,7 +19,7 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   22.02.2008 (thiel): created
+ *   22.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.pos;
 
@@ -45,6 +45,12 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
 /**
+ * The POS tagger node adds part of speech (POS) tags to terms of documents.
+ * Here the Penn Treebank part-of-speech tag set is used to define all kinds
+ * of tags, see {@link org.knime.ext.textprocessing.data.PartOfSpeechTag} for
+ * more details. The underlying tagger model which is used to choose the 
+ * (hopefully) proper tags for all the terms is an external model of the 
+ * OpenNLP framework, see (http://opennlp.sourceforge.net) for more details.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -52,12 +58,25 @@ public class PosDocumentTagger implements DocumentTagger {
     
     private PosTagger m_tagger;
     
+    /**
+     * Creates a new instance of PosDocumentTagger and loads internally the
+     * POS tagging model of the OpenNLP framework to POS tag the documents.
+     * If the model file could not be loaded an <code>IOException</code> will
+     * be thrown.
+     * 
+     * @throws IOException If the model file could not be loaded.
+     */
     public PosDocumentTagger() throws IOException {
         OpenNlpModelPaths paths = OpenNlpModelPaths.getOpenNlpModelPaths();
+        LOGGER.info("Creating PosTaggerModel: " 
+                + paths.getPosTaggerModelFile());
         m_tagger = new PosTagger(paths.getPosTaggerModelFile(),
                 new POSDictionary(paths.getPosTaggerDictFile()));
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Document tag(final Document doc) {
         DocumentBuilder db = new DocumentBuilder(doc);
         for (Section s : doc.getSections()) {
@@ -75,6 +94,8 @@ public class PosDocumentTagger implements DocumentTagger {
     
     private Sentence tagSentence(final Sentence s) {
         
+        LOGGER.info(s.getText());
+        
         // Collect words to tag
         Hashtable<String, Term> termCache = new Hashtable<String, Term>(); 
         List<String> words = new ArrayList<String>();
@@ -85,11 +106,14 @@ public class PosDocumentTagger implements DocumentTagger {
                 words.add(t.getWords().get(0).getWord());
             }
             // one term consists of more than one word.
-            // This granularity is destroyed and the new, better and
-            // democratic term granularity is applied.
+            // This granularity is destroyed and the new, better,
+            // democratic and freedom-loving term granularity is applied.
             else if (t.getWords().size() > 1) {
                 List<Word> tempWords = t.getWords();
                 for (Word w : tempWords) {
+                    
+                    LOGGER.info(w.getWord());
+                    
                     termCache.put(w.getWord(), null);
                     words.add(w.getWord());
                 }
@@ -109,7 +133,7 @@ public class PosDocumentTagger implements DocumentTagger {
                 List<Tag> newTags = new ArrayList<Tag>();
                 
                 Tag tag = PartOfSpeechTag.stringToTag(tagsArr[i]);
-                LOGGER.info(tagsArr[i] + "->" + tag.getTagValue());
+                //LOGGER.info(tagsArr[i] + "->" + tag.getTagValue());
                 newTags.add(tag);
                 
                 Term newTerm = new Term(newWords, newTags); 
@@ -119,7 +143,7 @@ public class PosDocumentTagger implements DocumentTagger {
                 tags.addAll(t.getTags());
                 
                 Tag tag = PartOfSpeechTag.stringToTag(tagsArr[i]);
-                LOGGER.info(tagsArr[i] + "->" + tag.getTagValue());
+                //LOGGER.info(tagsArr[i] + "->" + tag.getTagValue());
                 tags.add(tag);
                 
                 Term newTerm = new Term(t.getWords(), tags); 

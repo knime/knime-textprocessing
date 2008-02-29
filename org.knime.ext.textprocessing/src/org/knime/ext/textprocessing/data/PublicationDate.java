@@ -52,6 +52,97 @@ Comparable<PublicationDate> {
     private int m_day = 0;
 
     /**
+     * Creates a proper <code>PublicationDate</code> instance with the given
+     * year, month and day values and returns it. If day is less or equals
+     * zero, only the year and the month is taken into account, if the month
+     * is less or equals zero too only the year is used to create the
+     * <code>PublicationDate</code>. If the month number is not valid, i.e.
+     * greater than 12 a <code>ParseException</code> is thrown. 
+     * 
+     * @param year The year to create the <code>PublicationDate</code> with.
+     * @param month The month to create the <code>PublicationDate</code> with.
+     * @param day The day to create the <code>PublicationDate</code> with.
+     * @return The new instance of <code>PublicationDate</code> with the given
+     * parameters.
+     * @throws ParseException If any of the parameters is not valid, i.e.
+     * the number of the month is greater than 12 or the number of the day
+     * greater than 31 (or 30 according to the month).
+     */
+    public static PublicationDate createPublicationDate(final int year, 
+            final int month, final int day) throws ParseException {
+        PublicationDate date = null;
+        if (day > 0 && month > 0 && year > 0) {
+            date = new PublicationDate(year, month, day);
+        } else if (month > 0 && year > 0) {
+            date = new PublicationDate(year, month);
+        } else if (year > 0) {
+            date = new PublicationDate(year);
+        }
+
+        return date; 
+    }
+    
+    /**
+     * Creates a proper <code>PublicationDate</code> instance with the given
+     * year, month and day values and returns it. If day is less or equals
+     * zero, only the year and the month is taken into account. A 
+     * <code>ParseException</code> is thrown if the mont or day is not valid. 
+     * 
+     * @param year The year to create the <code>PublicationDate</code> with. 
+     * @param month The month to create the <code>PublicationDate</code> with.
+     * @param day The day to create the <code>PublicationDate</code> with.
+     * @return The new instance of <code>PublicationDate</code> with the given
+     * parameters.
+     * @throws ParseException If any of the parameters is not valid, i.e.
+     * the month is non of the 12 month names or the number of the day
+     * greater than 31 (or 30 according to the month).
+     */
+    public static PublicationDate createPublicationDate(final int year, 
+            final String month, final int day) throws ParseException {
+        return createPublicationDate(year, monthStrToInt(month), day); 
+    }    
+    
+    /**
+     * Returns the proper number representation (1 - 12) for the given month 
+     * string. The string can be the complete name of the month like "February"
+     * or the first three characters like "feb".
+     * 
+     * @param month A month represented as a string.
+     * @return The number representation of the given month.
+     */
+    public static int monthStrToInt(final String month) {
+        int m = 0;
+        String monthLc = month.toLowerCase();
+        if (monthLc.equals("jan") || monthLc.equals("january")) {
+            m = 1;
+        } else if (monthLc.equals("feb") || monthLc.equals("february")) {
+            m = 2;
+        } else if (monthLc.equals("mar") || monthLc.equals("march")) {
+            m = 3;
+        } else if (monthLc.equals("apr") || monthLc.equals("april")) {
+            m = 4;
+        } else if (monthLc.equals("may") || monthLc.equals("may")) {
+            m = 5;
+        } else if (monthLc.equals("jun") || monthLc.equals("june")) {
+            m = 6;
+        } else if (monthLc.equals("jul") || monthLc.equals("july")) {
+            m = 7;
+        } else if (monthLc.equals("aug") || monthLc.equals("august")) {
+            m = 8;
+        } else if (monthLc.equals("sep") || monthLc.equals("september")) {
+            m = 9;
+        } else if (monthLc.equals("oct") || monthLc.equals("october")) {
+            m = 10;
+        } else if (monthLc.equals("nov") || monthLc.equals("novemeber")) {
+            m = 11;
+        } else if (monthLc.equals("dec") || monthLc.equals("december")) {
+            m = 12;
+        }
+        return m;
+    }
+    
+    
+    /**
      * Creates a new instance of <code>PublicationDate</code> with given year,
      * month and day. These parameters have to be valid, otherwise a
      * <code>ParseException</code> will be thrown.

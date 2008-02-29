@@ -26,6 +26,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.pubmed;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
@@ -99,7 +101,36 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * The name of the last name tag.
      */
     public static final String LASTNAME = "lastname";    
+
+    /**
+     * The name of the publication date tag.
+     */
+    public static final String PUBDATE = "pubdate";
+
+    /**
+     * The name of the year tag.
+     */
+    public static final String YEAR = "year";
     
+    /**
+     * The name of the month tag.
+     */
+    public static final String MONTH = "month";
+    
+    /**
+     * The name of the day tag.
+     */
+    public static final String DAY = "day";
+
+    /**
+     * The name of the journal tag.
+     */
+    public static final String JOURNAL = "journal";    
+
+    /**
+     * The name of the title tag.
+     */
+    public static final String TITLE = "title";    
     
     
     private static final NodeLogger LOGGER = 
@@ -125,7 +156,19 @@ public class PubMedDocumentParser extends DefaultHandler implements
     
     private String m_firstName = "";
     
-    private String m_lastName = "";    
+    private String m_lastName = "";
+    
+    private boolean m_pubDateFlag = false;
+    
+    private String m_day = "";
+    
+    private String m_month = "";
+    
+    private String m_year = "";
+    
+    private String m_journalTitle = "";
+    
+    private boolean m_journalFlag = false;
     
     
     /**
@@ -208,6 +251,18 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_firstName = "";
         } else if (m_lastTag.equals(LASTNAME)) {
             m_lastName = "";
+        } else if (m_lastTag.equals(PUBDATE)) {
+            m_pubDateFlag = true;
+        } else if (m_lastTag.equals(YEAR)) {
+            m_year = "";
+        } else if (m_lastTag.equals(MONTH)) {
+            m_month = "";
+        } else if (m_lastTag.equals(DAY)) {
+            m_day = "";
+        } else if (m_lastTag.equals(JOURNAL)) {
+            m_journalFlag = true;
+        } else if (m_lastTag.equals(TITLE)) {
+            m_journalTitle = "";
         }
     }
     
@@ -230,7 +285,32 @@ public class PubMedDocumentParser extends DefaultHandler implements
         } else if (name.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
-        }       
+        } else if (name.equals(PUBDATE)) {
+            m_pubDateFlag = false;
+            int year = 0;
+            int day = 0;
+            if (m_year.length() > 0) {
+                year = Integer.parseInt(m_year);
+            }
+            if (m_day.length() > 0) {
+                day = Integer.parseInt(m_day);
+            }
+            try {
+                PublicationDate pubDate = PublicationDate.createPublicationDate(
+                        year, m_month, day);
+                m_currentDoc.setPublicationDate(pubDate);
+            } catch (ParseException e) {
+                LOGGER.warn("Publication date could not be created!");
+                LOGGER.warn(e.getMessage());
+            }
+        } else if (name.equals(TITLE)) {
+            if (m_journalTitle.length() > 0) {
+                m_currentDoc.addSection(m_journalTitle, 
+                        SectionAnnotation.JOURNAL_TITLE);
+            }
+        } else if (name.equals(JOURNAL)) {
+            m_journalFlag = false;
+        }
     }
     
     /**
@@ -246,6 +326,14 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_title += new String(ch, start, length);
         } else if (m_lastTag.equals(ABSTRACTTEXT)) {
             m_abstract += new String(ch, start, length);
+        } else if (m_lastTag.equals(YEAR) && m_pubDateFlag) {
+            m_year += new String(ch, start, length);
+        } else if (m_lastTag.equals(MONTH) && m_pubDateFlag) {
+            m_month += new String(ch, start, length);
+        } else if (m_lastTag.equals(DAY) && m_pubDateFlag) {
+            m_day += new String(ch, start, length);
+        } else if (m_lastTag.equals(TITLE) && m_journalFlag) {
+            m_journalTitle += new String(ch, start, length);
         }
     }
 

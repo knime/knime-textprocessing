@@ -98,8 +98,10 @@ public class DocumentBuilder {
      * information of the given <code>Document</code>.<br/>
      * The meta information to copy is:
      * the documents authors, the source, the category, the type, the file
-     * and the publicatioon date.<br/>
+     * and the publication date.<br/>
      * The text data like title or sections are not copied.
+     * 
+     * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) { 
         // Add authors

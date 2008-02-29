@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2007
+ * Copyright, 2003 - 2008
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,9 +19,9 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   22.02.2008 (thiel): created
+ *   28.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.pos;
+package org.knime.ext.textprocessing.nodes.tagging.ner;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +39,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
@@ -46,21 +47,29 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * The node model of the POS (part of speech) tagger. Extends 
- * {@link org.knime.core.node.NodeModel} and provides methods to configure and
- * execute the node.
+ * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger. 
+ * Extends {@link org.knime.core.node.NodeModel} and provides methods to 
+ * configure and execute the node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTaggerNodeModel extends NodeModel {
+public class AbnerTaggerNodeModel extends NodeModel {
+
+    /**
+     * The default value of the terms unmodifiable flag.
+     */
+    public static boolean DEFAULT_UNMODIFIABLE = true;
     
     private int m_docColIndex = -1;
     
+    private SettingsModelBoolean m_setUnmodifiableModel = 
+        AbnerTaggerNodeDialog.createSetUnmodifiableModel();
+    
     /**
-     * Creates new instance of <code>PosTaggerNodeModel</code> which adds
-     * part of speech tags to terms of documents.
+     * Creates a new instance of <code>AbnerTaggerNodeModel</code> wit one
+     * table in and one out port.
      */
-    public PosTaggerNodeModel() {
+    public AbnerTaggerNodeModel() {
         super(1, 1);
     }
     
@@ -70,7 +79,6 @@ public class PosTaggerNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[0]);
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
@@ -84,9 +92,10 @@ public class PosTaggerNodeModel extends NodeModel {
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+            ExecutionContext exec) throws Exception {
         List<Document> newDocuments = new ArrayList<Document>();
-        DocumentTagger tagger = new PosDocumentTagger();
+        DocumentTagger tagger = new AbnerDocumentTagger(
+                m_setUnmodifiableModel.getBooleanValue());
         
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
@@ -107,8 +116,34 @@ public class PosTaggerNodeModel extends NodeModel {
         return new BufferedDataTable[]{
                 DocumentDataTableBuilder.createDocumentDataTable(
                         exec, newDocuments)};
+    }   
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        m_setUnmodifiableModel.validateSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_setUnmodifiableModel.saveSettingsTo(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        m_setUnmodifiableModel.validateSettings(settings);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -132,30 +167,5 @@ public class PosTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-    }
-
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-    }
+    }     
 }

@@ -155,7 +155,6 @@ public class Term implements TextContainer {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getText());
-        sb.append(WORD_SEPARATOR);
         sb.append("[");
         for (int i = 0; i < m_tags.size(); i++) {
             sb.append(m_tags.get(i).getTagValue());

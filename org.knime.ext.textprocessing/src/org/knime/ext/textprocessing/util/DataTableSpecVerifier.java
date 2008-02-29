@@ -19,7 +19,7 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   11.01.2007 (thiel): created
+ *   11.01.2007 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.util;
 
@@ -30,6 +30,14 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.TermValue;
 
 /**
+ * Provides methods that verify various kinds of 
+ * {@link org.knime.core.data.DataTableSpec}s. These methods return 
+ * <code>false</code> or throw <code>InvalidSettingsException</code> if the
+ * spec to verify is not valid accordant to a specified setting, i.e. it can
+ * be verified if a spec contains at least one <code>DocumentCell</code>,
+ * a <code>DocumentCell</code> and a <code>TermCell</code> and much more. With
+ * these methods it can be verified conveniently, i.e. in a nodes configure 
+ * method, if a given spec fits the node needs. 
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -61,7 +69,7 @@ public class DataTableSpecVerifier {
     }
 
     /**
-     * ounts the number of specific cells and stores their indices.
+     * Counts the number of specific cells and stores their indices.
      */
     private void readDataTable() {
         for (int i = 0; i < m_spec.getNumColumns(); i++) {
