@@ -23,4 +23,4 @@ Export-Package: org.knime.ext.textprocessing,
  org.knime.ext.textprocessing.nodes.source.parser.dml,
  org.knime.ext.textprocessing.nodes.tokenization,
  org.knime.ext.textprocessing.util
-Bundle-Activator: org.knime.ext.textprocessing.TextprocessingPlugin
+Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin

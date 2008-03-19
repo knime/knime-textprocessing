@@ -25,18 +25,10 @@ package org.knime.ext.textprocessing.util;
 
 import java.util.List;
 
-import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.IntCell;
-import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCell;
 
 /**
  * Provides convenient methods that create 
@@ -45,24 +37,9 @@ import org.knime.ext.textprocessing.data.DocumentCell;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public final class DocumentDataTableBuilder {
+public abstract class DocumentDataTableBuilder implements DataTableFactory {
 
-    private DocumentDataTableBuilder() { }
-    
-    /**
-     * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
-     * containing just one column of type <code>DocumentCell</code> to
-     * store text documents.
-     * 
-     * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
-     *         with just one column of type <code>DocumentListCell</code>.
-     */
-    public static DataTableSpec createDocumentDataTableSpec() {
-        // create DataTableSpec for output DataTable
-        DataColumnSpecCreator dcscDocs =
-                new DataColumnSpecCreator("Document", DocumentCell.TYPE);
-        return new DataTableSpec(dcscDocs.createSpec());
-    }
+    public DocumentDataTableBuilder() { }
     
     /**
      * Creates and returns a {@link org.knime.core.node.BufferedDataTable} 
@@ -78,28 +55,7 @@ public final class DocumentDataTableBuilder {
      * documents. 
      * @throws CanceledExecutionException If execution was canceled.
      */
-    public static BufferedDataTable createDocumentDataTable(
+    public abstract BufferedDataTable createDataTable(
             final ExecutionContext exec, final List<Document> docs) 
-    throws CanceledExecutionException {
-        // create cache
-        FullDataCellCache cache = new FullDataCellCache(
-                new DocumentDataCellFactory());
-        
-        BufferedDataContainer dc =
-                exec.createDataContainer(DocumentDataTableBuilder
-                        .createDocumentDataTableSpec());
-
-        int i = 1;
-        for (Document d : docs) {
-            exec.checkCanceled();
-            RowKey rowKey = new RowKey(new IntCell(i));
-            DocumentCell docCell = (DocumentCell)cache.getInstance(d);
-            DataRow row = new DefaultRow(rowKey, docCell);
-            dc.addRowToTable(row);
-            i++;
-        }
-        dc.close();
-
-        return dc.getTable();
-    }
+    throws CanceledExecutionException;
 }

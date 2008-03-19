@@ -46,7 +46,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
  * <code>AbstractDocumentTagger</code> on the one hand have to provide the
  * procedure of tagging terms (or recognizing named entities etc.) by the
  * implementation of 
- * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger#tagEntities(String)}
+ * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger#tagEntities(Sentence)}
  * and on the other hand they need to provide the proper tag type accordant to
  * their tagging, i.e. POS tagger need to provide POS tag and so on. Proper tags
  * are provided by the implementation of
@@ -88,14 +88,14 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     protected abstract List<Tag> getTags(final String tag);
     
     /**
-     * Analysis the given sentences represented as string and recognized certain
+     * Analysis the given sentences and recognized certain
      * terms, such as parts of speech or biomedical named entities. These terms
      * and their corresponding tags and returned as a list.
      * 
-     * @param sentence The sentence represented as string.
+     * @param sentence The sentence to analyze.
      * @return A list of recognized entities and the corresponding tags.
      */
-    protected abstract List<TaggedEntity> tagEntities(final String sentence);    
+    protected abstract List<TaggedEntity> tagEntities(final Sentence sentence);    
     
     /**
      * {@inheritDoc}
@@ -116,7 +116,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     }
     
     private Sentence tagSentence(final Sentence s) {
-        List<TaggedEntity> entities = tagEntities(s.getText());
+        List<TaggedEntity> entities = tagEntities(s);
         if (entities.size() <= 0) {
             return s;
         }
@@ -138,21 +138,29 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     
     private List<Term> buildTermList(final List<Term> oldTermList, 
             final List<String> neWords, final String entityTag) {
-        List<Term> newTermList;
-        int[] startStop = findNe(oldTermList, neWords);
+        List<Term> newTermList = null;
+        List<Term> oldList = oldTermList;
+        List<IndexRange> startStopRanges = findNe(oldList, neWords);
+        
+        if (startStopRanges.size() <= 0) {
+            return oldList;
+        }
         
         // if start >= 0 means that there is a complete named entity contained
         // in the list of terms, so the terms have to be rearranged.
-        if (startStop[0] >= 0) {
+        for (int i = 0; i < startStopRanges.size(); i++) {
+            if (i > 0) {
+                oldList = newTermList;
+            }
             newTermList = new ArrayList<Term>();
-            int start = startStop[0];
-            int stop = startStop[1];
+            int start = startStopRanges.get(i).getStart();
+            int stop = startStopRanges.get(i).getStop();
             
             int neIndex = 0;
             // list to save term representing named entity at.
             List<Word> namedEntity = new ArrayList<Word>(neWords.size());
             
-            for (int t = 0; t < oldTermList.size(); t++) {
+            for (int t = 0; t < oldList.size(); t++) {
                 // if we reached the interesting terms containing the named 
                 // entity
                 if (t >= start && t <= stop) {
@@ -162,13 +170,13 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     // by only one term just add a tag.
                     if (start == stop) {
                         List<Tag> tags = new ArrayList<Tag>();
-                        tags.addAll(oldTermList.get(t).getTags());
+                        tags.addAll(oldList.get(t).getTags());
                         tags.addAll(getTags(entityTag));
                         Term newTerm = 
-                            new Term(oldTermList.get(t).getWords(), tags);
+                            new Term(oldList.get(t).getWords(), tags);
                         newTermList.add(newTerm);
                     } else {
-                        List<Word> words = oldTermList.get(t).getWords();
+                        List<Word> words = oldList.get(t).getWords();
                         for (Word w : words) {
                             // we have to split the term up if the
                             // words are not part of the named entity
@@ -192,6 +200,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                             m_setNeUnmodifiable);
 
                                     newTermList.add(newTerm);
+                                    neIndex = 0;
                                 }
                             }
                         }
@@ -200,17 +209,16 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 // if we are before or after the interesting part just add the
                 // terms without rearrangement
                 else {
-                    newTermList.add(oldTermList.get(t));
+                    newTermList.add(oldList.get(t));
                 }
             }
-            return newTermList;
         }
-        return oldTermList;
+        return newTermList;
     }
     
-    private int[] findNe(final List<Term>sentence, 
+    private List<IndexRange> findNe(final List<Term>sentence, 
             final List<String> ne) {
-        int[] startStop = new int[2];
+        List<IndexRange> ranges = new ArrayList<IndexRange>();
         int found = 0;
         boolean foundFlag = false;
         int start = -1;
@@ -233,28 +241,27 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     found++;
                     foundFlag = true;
                     
-                    // means we war at the end of the named entity
+                    // means we are at the end of the named entity
                     if (found == ne.size()) {
                         stop = t;
+                        
+                        ranges.add(new IndexRange(start, stop));
+                        start = -1;
+                        stop = -1;
                         foundFlag = false;
+                        found = 0;
                     }
                 } else {
                     if (foundFlag) {
                         foundFlag = false;
                         found = 0;
                         start = -1;
+                        stop = -1;
                     }
                 }
             }
         }
 
-        // found no complete named entity
-        if (start > stop) {
-            start = -1;
-            stop = -1;
-        }
-        startStop[0] = start;
-        startStop[1] = stop;
-        return startStop;
+        return ranges;
     }    
 }

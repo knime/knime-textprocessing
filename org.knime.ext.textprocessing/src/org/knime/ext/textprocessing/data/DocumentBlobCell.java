@@ -1,9 +1,8 @@
-/* 
- * -------------------------------------------------------------------
+/* ------------------------------------------------------------------
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2008
+ * Copyright, 2003 - 2007
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -17,10 +16,10 @@
  * If you have any questions please contact the copyright holder:
  * website: www.knime.org
  * email: contact@knime.org
- * -------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  * 
  * History
- *   19.12.2006 (Kilian Thiel): created
+ *   03.03.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.data;
 
@@ -35,18 +34,19 @@ import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.container.BlobDataCell;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
 
 /**
- * A {@link org.knime.core.data.DataCell} implementation holding a 
+ * A {@link org.knime.core.data.container.BlobDataCell} implementation holding a 
  * {@link org.knime.ext.textprocessing.data.Document} value by storing this 
  * value in a private <code>Document</code> member. It provides a document 
  * value as well as a string value.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentCell extends DataCell implements StringValue,
+public class DocumentBlobCell extends BlobDataCell implements StringValue,
         DocumentValue {
 
     /**
@@ -89,7 +89,7 @@ public class DocumentCell extends DataCell implements StringValue,
      * 
      * @param document The document to set.
      */
-    public DocumentCell(final Document document) {
+    public DocumentBlobCell(final Document document) {
         m_document = document;
     }
 
@@ -150,12 +150,12 @@ public class DocumentCell extends DataCell implements StringValue,
     
     /** Factory for (de-)serializing a DocumentCell. */
     private static class DocumentSerializer implements 
-        DataCellSerializer<DocumentCell> {
+        DataCellSerializer<DocumentBlobCell> {
 
         /**
          * {@inheritDoc}
          */
-        public void serialize(final DocumentCell cell, 
+        public void serialize(final DocumentBlobCell cell, 
                 final DataOutput output) throws IOException {
             output.writeUTF(cell.getSerializationString());
         }
@@ -163,16 +163,16 @@ public class DocumentCell extends DataCell implements StringValue,
         /**
          * {@inheritDoc}
          */
-        public DocumentCell deserialize(final DataInput input) 
+        public DocumentBlobCell deserialize(final DataInput input) 
             throws IOException {
             String s = input.readUTF();
-            return DocumentCell.createDocumentCell(s);
+            return DocumentBlobCell.createDocumentCell(s);
         }
     }
     
-    private static DocumentCell createDocumentCell(final String str) {
-        Document d = DocumentCell.createDocument(str);
-        return new DocumentCell(d);
+    private static DocumentBlobCell createDocumentCell(final String str) {
+        Document d = DocumentBlobCell.createDocument(str);
+        return new DocumentBlobCell(d);
     }
     
     

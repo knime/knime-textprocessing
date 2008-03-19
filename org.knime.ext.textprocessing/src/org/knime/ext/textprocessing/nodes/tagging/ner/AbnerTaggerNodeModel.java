@@ -41,8 +41,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
@@ -65,12 +66,15 @@ public class AbnerTaggerNodeModel extends NodeModel {
     private SettingsModelBoolean m_setUnmodifiableModel = 
         AbnerTaggerNodeDialog.createSetUnmodifiableModel();
     
+    private DocumentDataTableBuilder m_dtBuilder;
+    
     /**
      * Creates a new instance of <code>AbnerTaggerNodeModel</code> wit one
      * table in and one out port.
      */
     public AbnerTaggerNodeModel() {
         super(1, 1);
+        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
     }
     
     /**
@@ -83,8 +87,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
         
-        return new DataTableSpec[]{
-                DocumentDataTableBuilder.createDocumentDataTableSpec()};
+        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
     /**
@@ -109,13 +112,12 @@ public class AbnerTaggerNodeModel extends NodeModel {
             currDoc++;
             
             DataRow row = it.next();
-            DocumentCell docCell = (DocumentCell)row.getCell(m_docColIndex);
-            newDocuments.add(tagger.tag(docCell.getDocument()));
+            DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
+            newDocuments.add(tagger.tag(docVal.getDocument()));
         }
         
-        return new BufferedDataTable[]{
-                DocumentDataTableBuilder.createDocumentDataTable(
-                        exec, newDocuments)};
+        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
+                exec, newDocuments)};
     }   
     
     /**

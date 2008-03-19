@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
+import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
@@ -38,7 +39,7 @@ import abner.Tagger;
  * {@link org.knime.ext.textprocessing.nodes.tagging.DocumentTagger} and
  * extends 
  * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger}.
- * The method {@link AbnerDocumentTagger#tagEntities(String)} recognizes
+ * The method {@link AbnerDocumentTagger#tagEntities(Sentence)} recognizes
  * biomedical named entities by using ABNER (A Biomedical Named Entity 
  * Recognizer). For more details about ABNER see 
  * (http://pages.cs.wisc.edu/~bsettles/abner/).
@@ -76,8 +77,8 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
      * {@inheritDoc}
      */
     @Override
-    protected List<TaggedEntity> tagEntities(final String sentence) {
-        String[][] nes = m_tagger.getEntities(sentence);
+    protected List<TaggedEntity> tagEntities(final Sentence sentence) {
+        String[][] nes = m_tagger.getEntities(sentence.getText());
         List<TaggedEntity> entities = new ArrayList<TaggedEntity>();
         for (int i = 0; i < nes[0].length; i++) {
             entities.add(new TaggedEntity(nes[0][i], nes[1][i]));

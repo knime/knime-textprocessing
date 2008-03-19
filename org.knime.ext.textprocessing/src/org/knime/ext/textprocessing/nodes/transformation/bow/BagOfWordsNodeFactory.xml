@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./default.png" type="Manipulator">
+    <name>BoW creator</name>
+    <shortDescription>Bag of words creator.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node creates a bag of words (BoW) out of a set of documents.
+            A BoW consists of at least two columns, one containing the
+            documents and one containing the terms. A row represents a tupel
+            of a term and a document, meaning that the term is containd in
+            the document. 
+        </intro>
+    </fullDescription>
+        
+    <ports>
+        <dataIn name="Documents input table" index="0">The input table
+        containing the documents.</dataIn>    
+        <dataOut name="Documents output table" index="0">An output table
+        containing the bag of words.</dataOut>
+    </ports>
+</knimeNode>

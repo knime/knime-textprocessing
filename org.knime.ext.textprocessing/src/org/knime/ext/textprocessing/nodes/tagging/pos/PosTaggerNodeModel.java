@@ -40,8 +40,9 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
@@ -56,12 +57,15 @@ public class PosTaggerNodeModel extends NodeModel {
     
     private int m_docColIndex = -1;
     
+    private DocumentDataTableBuilder m_dtBuilder;
+    
     /**
      * Creates new instance of <code>PosTaggerNodeModel</code> which adds
      * part of speech tags to terms of documents.
      */
     public PosTaggerNodeModel() {
         super(1, 1);
+        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
     }
     
     /**
@@ -75,8 +79,7 @@ public class PosTaggerNodeModel extends NodeModel {
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
         
-        return new DataTableSpec[]{
-                DocumentDataTableBuilder.createDocumentDataTableSpec()};
+        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
     /**
@@ -100,12 +103,11 @@ public class PosTaggerNodeModel extends NodeModel {
             currDoc++;
             
             DataRow row = it.next();
-            DocumentCell docCell = (DocumentCell)row.getCell(m_docColIndex);
-            newDocuments.add(tagger.tag(docCell.getDocument()));
+            DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
+            newDocuments.add(tagger.tag(docVal.getDocument()));
         }
         
-        return new BufferedDataTable[]{
-                DocumentDataTableBuilder.createDocumentDataTable(
+        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                         exec, newDocuments)};
     }
 

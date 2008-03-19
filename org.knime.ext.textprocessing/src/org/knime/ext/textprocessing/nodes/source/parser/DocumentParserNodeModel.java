@@ -47,6 +47,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 
@@ -101,6 +102,7 @@ public class DocumentParserNodeModel extends NodeModel {
     
     private List<String> m_validExtensions;
     
+    private DocumentDataTableBuilder m_dtBuilder;
     
     /**
      * Creates a new instance of <code>DocumentParserNodeModel</code> with the
@@ -114,6 +116,7 @@ public class DocumentParserNodeModel extends NodeModel {
         super(0, 1);
         m_parser = parser;
         m_validExtensions = Arrays.asList(validFileExtensions);
+        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
     }
     
     /**
@@ -122,8 +125,7 @@ public class DocumentParserNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new DataTableSpec[]{
-                DocumentDataTableBuilder.createDocumentDataTableSpec()};
+        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }    
     
     /**
@@ -169,8 +171,7 @@ public class DocumentParserNodeModel extends NodeModel {
             docs.addAll(m_parser.parse(is));
         }
         
-        return new BufferedDataTable[]{
-                DocumentDataTableBuilder.createDocumentDataTable(exec, docs)};
+        return new BufferedDataTable[]{m_dtBuilder.createDataTable(exec, docs)};
     }
 
     /**

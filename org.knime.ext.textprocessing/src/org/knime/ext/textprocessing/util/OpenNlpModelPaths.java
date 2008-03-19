@@ -23,7 +23,7 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import org.knime.ext.textprocessing.TextprocessingPlugin;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 
 
@@ -65,7 +65,8 @@ public final class OpenNlpModelPaths {
      */
     public static OpenNlpModelPaths getOpenNlpModelPaths() {
         if (instance == null) {
-            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            TextprocessingCorePlugin plugin = 
+                TextprocessingCorePlugin.getDefault();
             String pluginPath = plugin.getPluginRootPath();            
             instance = new OpenNlpModelPaths(pluginPath);
         }

@@ -35,7 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.TextprocessingPlugin;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -226,7 +226,8 @@ public class SdmlDocumentParser extends DefaultHandler implements
     public InputSource resolveEntity(final String pubId,
             final String sysId) throws IOException, SAXException {
         if (pubId != null) {
-            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            TextprocessingCorePlugin plugin = 
+                TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
             if (pubId.equals(PUBLIC_IDENTIFIER)) {
                 path += SDML_DTD_POSTFIX;

@@ -34,7 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.TextprocessingPlugin;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -104,7 +104,8 @@ public class TagSetParser extends DefaultHandler {
     public InputSource resolveEntity(final String pubId,
             final String sysId) throws IOException, SAXException {
         if (pubId != null) {
-            TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+            TextprocessingCorePlugin plugin = 
+                TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
             if (pubId.equals(PUBLIC_IDENTIFIER)) {
                 path += TagFactory.TAGSET_DTD_POSTFIX;

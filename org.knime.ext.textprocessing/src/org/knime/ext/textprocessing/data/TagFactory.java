@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.TextprocessingPlugin;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 /**
  * All different types of {@link org.knime.ext.textprocessing.data.Tag}s have
@@ -70,7 +70,8 @@ public class TagFactory {
     
     
     private TagFactory() {
-        TextprocessingPlugin plugin = TextprocessingPlugin.getDefault();
+        TextprocessingCorePlugin plugin = 
+            TextprocessingCorePlugin.getDefault();
         String pluginPath = plugin.getPluginRootPath();
         String tagSetPath = pluginPath + TAGSET_XML_POSTFIX;
         addTagSet(new File(tagSetPath));

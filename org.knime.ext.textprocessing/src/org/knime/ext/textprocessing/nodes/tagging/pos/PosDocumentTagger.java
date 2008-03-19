@@ -31,7 +31,6 @@ import java.util.List;
 import opennlp.tools.lang.english.PosTagger;
 import opennlp.tools.postag.POSDictionary;
 
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.Paragraph;
@@ -67,12 +66,45 @@ public class PosDocumentTagger implements DocumentTagger {
      * @throws IOException If the model file could not be loaded.
      */
     public PosDocumentTagger() throws IOException {
+        //super(false);
         OpenNlpModelPaths paths = OpenNlpModelPaths.getOpenNlpModelPaths();
-        LOGGER.info("Creating PosTaggerModel: " 
-                + paths.getPosTaggerModelFile());
         m_tagger = new PosTagger(paths.getPosTaggerModelFile(),
                 new POSDictionary(paths.getPosTaggerDictFile()));
     }
+    
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    protected List<Tag> getTags(String tag) {
+//        List<Tag> tags = new ArrayList<Tag>();
+//        tags.add(PartOfSpeechTag.stringToTag(tag));
+//        return tags;
+//    }
+//
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    protected List<TaggedEntity> tagEntities(final Sentence sentence) {
+//        List<String> words = new ArrayList<String>();
+//        for (Term t : sentence.getTerms()) {
+//            List<Word> wordList = t.getWords();
+//            for (Word w : wordList) {
+//                words.add(w.getWord());
+//            }
+//        }
+//        String[] wordsArr = words.toArray(new String[0]);
+//        String[] tagsArr = m_tagger.tag(wordsArr);
+//        
+//        List<TaggedEntity> entities = new ArrayList<TaggedEntity>();
+//        for (int i = 0; i < wordsArr.length; i++) {
+//            entities.add(new TaggedEntity(wordsArr[i], tagsArr[i]));
+//        }
+//        
+//        return entities;
+//    }
+    
     
     /**
      * {@inheritDoc}
@@ -92,10 +124,7 @@ public class PosDocumentTagger implements DocumentTagger {
         return db.createDocument();
     }
     
-    private Sentence tagSentence(final Sentence s) {
-        
-        LOGGER.info(s.getText());
-        
+    private Sentence tagSentence(final Sentence s) {        
         // Collect words to tag
         Hashtable<String, Term> termCache = new Hashtable<String, Term>(); 
         List<String> words = new ArrayList<String>();
@@ -111,9 +140,6 @@ public class PosDocumentTagger implements DocumentTagger {
             else if (t.getWords().size() > 1) {
                 List<Word> tempWords = t.getWords();
                 for (Word w : tempWords) {
-                    
-                    LOGGER.info(w.getWord());
-                    
                     termCache.put(w.getWord(), null);
                     words.add(w.getWord());
                 }
@@ -152,7 +178,4 @@ public class PosDocumentTagger implements DocumentTagger {
         }
         return new Sentence(newTermList);
     }
-    
-    private static final NodeLogger LOGGER = 
-        NodeLogger.getLogger(PosDocumentTagger.class);    
 }
