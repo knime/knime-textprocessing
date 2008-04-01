@@ -26,6 +26,7 @@ package org.knime.ext.textprocessing.util;
 import java.util.Hashtable;
 import java.util.Set;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
@@ -34,7 +35,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBlobCell;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 
@@ -47,9 +48,12 @@ import org.knime.ext.textprocessing.data.TermCell;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class BagOfWordsDataTableBuilder implements DataTableFactory {
+public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
 
-    public BagOfWordsDataTableBuilder() { } 
+    /**
+     * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
+     */
+    public BagOfWordsDataTableBuilder() { }
     
     /**
      * Creates and returns a {@link org.knime.core.node.BufferedDataTable} 
@@ -78,20 +82,50 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableFactory {
 
     
 
-    public BufferedDataTable createReusedCellDataTable(
-            final ExecutionContext exec,
-            final Hashtable<DocumentBlobCell, Set<Term>> docTerms,
-            final boolean useTermCache) throws CanceledExecutionException {
+    /**
+     * Creates and returns a new {@link org.knime.core.node.BufferedDataTable}
+     * containing a column with the given data cells and one with the terms. 
+     * The data cells have to be compatible with <code>DocumentValue</code>,
+     * otherwise an <code>IllegalArgumentException</code> will be thrown.
+     * The given data cells are reused when creating the new data table,
+     * no new data cells are created to save memory and take full advantage
+     * of the benefit of <code>BlobDataCell</code>s.
+     * 
+     * @param exec The context to create a new <code>BufferedDataTable</code>
+     * and monitor the progress.
+     * @param docTerms A hash table containing the <code>DataCell</code>s
+     * with the documents and the terms to create a data table out of.
+     * @param useTermCache If true the term cells will be cached and
+     * only created once for each term. Equal term are represented by the
+     * same <code>TermCell</code>.
+     * @return The created <code>BufferedDataTable</code> containing the given
+     * data cells with the documents and terms represented by 
+     * <code>TermCell</code>s.
+     * @throws CanceledExecutionException If execution was canceled.
+     * @throws IllegalArgumentException If a data cell is not compatible with
+     * <code>DocumentValue</code>.
+     */
+    public BufferedDataTable createReusedDataTable(final ExecutionContext exec,
+            final Hashtable<DataCell, Set<Term>> docTerms, 
+            final boolean useTermCache) throws CanceledExecutionException, 
+            IllegalArgumentException {
         // create cache
         FullDataCellCache termCache =
                 new FullDataCellCache(new TermDataCellFactory());
-
         BufferedDataContainer dc =
                 exec.createDataContainer(this.createDataTableSpec());
 
         int i = 1;
-        Set<DocumentBlobCell> keys = docTerms.keySet();
-        for (DocumentBlobCell d : keys) {
+        Set<DataCell> keys = docTerms.keySet();
+        int rowCount = keys.size();
+        int currRow = 1;
+        
+        for (DataCell d : keys) {
+            if (!d.getType().isCompatible(DocumentValue.class)) {
+                throw new IllegalArgumentException("DataCell is not " 
+                        + "compatible with DocumentValue!");
+            }
+            
             Set<Term> terms = docTerms.get(d);
             for (Term t : terms) {
                 exec.checkCanceled();
@@ -107,6 +141,12 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableFactory {
                 DataRow row = new DefaultRow(rowKey, termCell, d);
                 dc.addRowToTable(row);
             }
+            
+            double progress = (double)currRow / (double)rowCount;
+            exec.setProgress(progress, "Creating Bow of document " + currRow 
+                    + " of " + rowCount);
+            exec.checkCanceled();
+            currRow++;               
         }
         dc.close();
         return dc.getTable();

@@ -34,8 +34,10 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 public class TextprocessingPreferenceInitializer extends
         AbstractPreferenceInitializer {
 
+    private static boolean DEFAULT_USE_BLOB = true;
+    
     /** Preference key for the usage of blob cells setting. */
-    public static final String PREF_USE_BLOB = "knime.textprocessing.blob";    
+    public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";    
     
     /**
      * {@inheritDoc}
@@ -46,7 +48,7 @@ public class TextprocessingPreferenceInitializer extends
             .getPreferenceStore();
 
         //set default values
-        store.setDefault(PREF_USE_BLOB, true);
+        store.setDefault(PREF_USE_BLOB, DEFAULT_USE_BLOB);
     }
 
     /**
@@ -57,6 +59,10 @@ public class TextprocessingPreferenceInitializer extends
     public static boolean useBlobCell() {
         final IPreferenceStore pStore = 
             TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        
+        if (!pStore.contains(PREF_USE_BLOB)) {
+            return DEFAULT_USE_BLOB;
+        }
         return pStore.getBoolean(PREF_USE_BLOB);
     }
 }

@@ -37,8 +37,11 @@ import org.knime.ext.textprocessing.data.Document;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class DocumentDataTableBuilder implements DataTableFactory {
+public abstract class DocumentDataTableBuilder implements DataTableBuilder {
 
+    /**
+     * Empty constructor of <code>DocumentDataTableBuilder</code>.
+     */
     public DocumentDataTableBuilder() { }
     
     /**

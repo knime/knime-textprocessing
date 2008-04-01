@@ -43,7 +43,6 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
@@ -87,80 +86,61 @@ public class BagOfWordsNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[0]);
-        verifier.verifyDocumentCell(true);
-        m_documentColIndex = verifier.getDocumentCellIndex();
-        
+        checkDataTableSpec(inSpecs[0]);
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
+    private void checkDataTableSpec(final DataTableSpec spec) 
+    throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyDocumentCell(true);
+        m_documentColIndex = verifier.getDocumentCellIndex();        
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             ExecutionContext exec) throws Exception {
-       
+        checkDataTableSpec(inData[0].getDataTableSpec());
+        
        Hashtable<Document, Set<Term>> docTerms = 
            new Hashtable<Document, Set<Term>>();
-       Hashtable<DocumentBlobCell, Set<Term>> docCellTerms = 
-           new Hashtable<DocumentBlobCell, Set<Term>>();
-       int isBlobCell = 2;
+       Hashtable<DataCell, Set<Term>> docCellTerms = 
+           new Hashtable<DataCell, Set<Term>>();
        
+       ExecutionMonitor subExec = exec.createSubProgress(0.5);
        int rowCount = inData[0].getRowCount();
        int currRow = 1;
-       RowIterator it = inData[0].iterator();
-       
-       DocumentBlobCell newCell = null;
-       
+       RowIterator it = inData[0].iterator();       
        while (it.hasNext()) {
            DataRow row = it.next();
            
-           // check for Blob cells
-           if (isBlobCell == 2) {
-               DataCell cell = row.getCell(m_documentColIndex);
-               if (cell instanceof DocumentBlobCell) {
-                   isBlobCell = 1;
-               } else {
-                   isBlobCell = 0;
-               }
-           }
-           
-           DocumentValue docCell = (DocumentValue)row.getCell(m_documentColIndex); 
+           // get terms for document
+           DocumentValue docCell = 
+               (DocumentValue)row.getCell(m_documentColIndex); 
            Document doc = docCell.getDocument();
-           
            Set<Term> terms = setOfTerms(doc);
            
-           if (isBlobCell == 1) {
-               DocumentBlobCell blobCell = 
-                   (DocumentBlobCell)row.getCell(m_documentColIndex);
-               
-               // create new blob cell *quick fix*
-               if (newCell == null) {
-                   newCell = new DocumentBlobCell(
-                       blobCell.getDocument());
-               }
-               
-               docCellTerms.put(newCell, terms);
-           } else if(isBlobCell == 0) {
-               docTerms.put(doc, terms);
-           }
+           // add data cell and corresponding terms
+           docTerms.put(doc, terms);
+           docCellTerms.put(row.getCell(m_documentColIndex), terms);
            
            // report status
            double progress = (double)currRow / (double)rowCount;
-           exec.setProgress(progress, "Processing document " + currRow + " of " 
+           subExec.setProgress(progress, "Processing document " + currRow + " of " 
                    + rowCount);
            exec.checkCanceled();
            currRow++;           
        }
        
-       if (isBlobCell == 1) {
-           return new BufferedDataTable[]{m_dtBuilder.createReusedCellDataTable(
-                   exec, docCellTerms, false)};
-       }
+       // build data table
+       ExecutionContext subContext = exec.createSubExecutionContext(0.5);
+//       return new BufferedDataTable[]{m_dtBuilder.createReusedDataTable(
+//               subContext, docCellTerms, false)};
        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-               exec, docTerms, false)};
+               subContext, docTerms, false)};
     }
     
     

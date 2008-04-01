@@ -83,6 +83,9 @@ public class BagOfWordsCellDataTableBuilder extends BagOfWordsDataTableBuilder {
 
       int i = 1;
       Set<Document> keys = docTerms.keySet();
+      int rowCount = keys.size();
+      int currRow = 1;      
+      
       for (Document d : keys) {
           DocumentCell docCell = (DocumentCell)docCache.getInstance(d);
           
@@ -101,8 +104,14 @@ public class BagOfWordsCellDataTableBuilder extends BagOfWordsDataTableBuilder {
               DataRow row = new DefaultRow(rowKey, termCell, docCell);
               dc.addRowToTable(row);
           }
+          
+          double progress = (double)currRow / (double)rowCount;
+          exec.setProgress(progress, "Creating Bow of document " + currRow 
+                  + " of " + rowCount);
+          exec.checkCanceled();
+          currRow++;             
       }
       dc.close();
       return dc.getTable();
-    }
+    }   
 }

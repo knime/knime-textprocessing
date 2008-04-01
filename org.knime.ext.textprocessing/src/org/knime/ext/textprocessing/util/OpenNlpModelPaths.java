@@ -31,7 +31,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * Provides the paths to the models used by the OpenNlp library. The paths 
  * are based on the root directory of the Textprocessing plugin, which is
  * held in the plugin's activator class 
- * {@link org.knime.ext.textprocessing.TextprocessingPlugin}. Without the 
+ * {@link org.knime.ext.textprocessing.TextprocessingCorePlugin}. Without the 
  * activation of the plugin (which is usually done automatically by eclipse 
  * by the creation of an instance of the activator class) the plugin root path
  * and the model paths can not be created / provided.

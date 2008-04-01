@@ -31,6 +31,12 @@
             name="Transformation"
             path="/textprocessing">
       </category>
+      <category
+            icon="icons/missing.gif"
+            level-id="preprocessing"
+            name="Preprocessing"
+            path="/textprocessing">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -69,21 +75,17 @@
             factory-class="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer">
-      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
-      <page
-            category="org.knime.workbench.ui.preferences"
-            class="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
-            id="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
-            name="Textprocessing">
-      </page>
    </extension>
    
 </plugin>

@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2008
+ * Copyright, 2003 - 2007
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,18 +19,32 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   03.03.2008 (Kilian Thiel): created
+ *   19.03.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.util;
+package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public interface DataTableFactory {
-    
-    public DataTableSpec createDataTableSpec();
+public class PreprocessingNodeDialogPane extends DefaultNodeSettingsPane {
 
+    public static SettingsModelBoolean getDeepPreprocessingModel() {
+        return new SettingsModelBoolean(
+                PreprocessingConfigKeys.CFG_KEY_DEEP_PREPRO,
+                PreprocessingNodeModel.DEF_DEEP_PREPRO);
+    }
+    
+    /**
+     * Creates a new instance of <code>PreprocessingNodeDialogPane</code>.
+     */
+    public PreprocessingNodeDialogPane() {
+        addDialogComponent(new DialogComponentBoolean(
+                getDeepPreprocessingModel(),
+                "Apply deep preprocessing"));
+    }
 }

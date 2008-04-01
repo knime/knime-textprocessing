@@ -78,15 +78,14 @@ public class DataTableSpecVerifier {
                     DocumentValue.class)) {
                 m_numDocumentCells++;
                 m_documentCellIndex = i;
-
-            } else if (m_spec.getColumnSpec(i).getType().isCompatible(
-                    StringValue.class)) {
-                m_numStringCells++;
-                m_stringCellIndex = i;
             } else if (m_spec.getColumnSpec(i).getType().isCompatible(
                     TermValue.class)) {
                 m_numTermCells++;
                 m_termCellIndex = i;
+            } else if (m_spec.getColumnSpec(i).getType().isCompatible(
+                    StringValue.class)) {
+                m_numStringCells++;
+                m_stringCellIndex = i;
             }
 
         }

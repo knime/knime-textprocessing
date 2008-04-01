@@ -83,19 +83,25 @@ public class AbnerTaggerNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[0]);
-        verfier.verifyDocumentCell(true);
-        m_docColIndex = verfier.getDocumentCellIndex();
-        
+        checkDataTableSpec(inSpecs[0]);
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
+    private void checkDataTableSpec(final DataTableSpec spec) 
+    throws InvalidSettingsException {
+        DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
+        verfier.verifyDocumentCell(true);
+        m_docColIndex = verfier.getDocumentCellIndex();
+    }  
+    
     /**
      * {@inheritDoc}
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             ExecutionContext exec) throws Exception {
+        checkDataTableSpec(inData[0].getDataTableSpec());
+        
         List<Document> newDocuments = new ArrayList<Document>();
         DocumentTagger tagger = new AbnerDocumentTagger(
                 m_setUnmodifiableModel.getBooleanValue());
