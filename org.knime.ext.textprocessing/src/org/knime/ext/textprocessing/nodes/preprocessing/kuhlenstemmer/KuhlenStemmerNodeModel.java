@@ -19,60 +19,58 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   01.04.2008 (thiel): created
+ *   02.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer;
+package org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
+import java.io.File;
+import java.io.IOException;
+
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PorterStemmerNodeFactory extends 
-NodeFactory<PorterStemmerNodeModel> {
-    
+public class KuhlenStemmerNodeModel extends PreprocessingNodeModel {
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new PreprocessingNodeSettingsPane();
+    protected void initPreprocessing() {
+        m_preprocessing = new KuhlenStemmer();
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() {
+        // Nothing to do ...
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PorterStemmerNodeModel createNodeModel() {
-        return new PorterStemmerNodeModel();
+    protected void saveInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // Nothing to do ...
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<PorterStemmerNodeModel> createNodeView(final int index, 
-            final PorterStemmerNodeModel model) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
+    protected void loadInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // Nothing to do ...
     }
 }

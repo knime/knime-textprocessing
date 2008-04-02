@@ -82,7 +82,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         DataTableBuilderFactory.createBowDataTableBuilder();
     
     private SettingsModelBoolean m_deepPreproModel = 
-        DeepPreprocessingDialogTab.getDeepPrepressingModel();
+        PreprocessingNodeSettingsPane.getDeepPrepressingModel();
     
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.

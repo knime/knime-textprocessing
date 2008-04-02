@@ -80,6 +80,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

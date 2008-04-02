@@ -19,22 +19,60 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   01.04.2008 (thiel): created
+ *   02.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer;
+package org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer;
 
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PorterStemmerNodeDialog extends PreprocessingNodeSettingsPane {
+public class KuhlenStemmerNodeFactory extends 
+NodeFactory<KuhlenStemmerNodeModel> {
 
     /**
-     * Creates new instance of <code>PorterStemmerNodeDialog</code>.
+     * {@inheritDoc}
      */
-    public PorterStemmerNodeDialog() {
-        super();
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new PreprocessingNodeSettingsPane();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KuhlenStemmerNodeModel createNodeModel() {
+        return new KuhlenStemmerNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<KuhlenStemmerNodeModel> createNodeView(
+            final int index, final KuhlenStemmerNodeModel model) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
     }
 }

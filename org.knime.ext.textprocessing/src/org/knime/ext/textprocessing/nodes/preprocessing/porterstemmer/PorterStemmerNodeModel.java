@@ -28,9 +28,6 @@ import java.io.IOException;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 /**
@@ -54,32 +51,7 @@ public class PorterStemmerNodeModel extends PreprocessingNodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-        
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        super.loadValidatedSettingsFrom(settings);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
-        super.saveSettingsTo(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        super.validateSettings(settings);
-    }
 
     /**
      * {@inheritDoc}

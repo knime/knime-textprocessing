@@ -23,13 +23,9 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane}
@@ -39,38 +35,29 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
  * @author Kilian Thiel, University of Konstanz
  */
 public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
-
-    private static final NodeLogger LOGGER = NodeLogger
-    .getLogger(PreprocessingNodeSettingsPane.class);  
     
-    private DeepPreprocessingDialogTab m_deepPreproTab = 
-        new DeepPreprocessingDialogTab();
+    /**
+     * @return Creates and returns the boolean settings model which contains
+     * the flag if deep preprocessing have to be applied or not.
+     */
+    public static SettingsModelBoolean getDeepPrepressingModel() {
+        return new SettingsModelBoolean(
+                PreprocessingConfigKeys.CFG_KEY_DEEP_PREPRO,
+                PreprocessingNodeModel.DEF_DEEP_PREPRO);
+    }
     
     /**
      * Creates new instance of <code>PreprocessingNodeSettingsPane</code>.
      */
     public PreprocessingNodeSettingsPane() {
-        addTab("Deep Preprocessing", m_deepPreproTab);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) {
-        m_deepPreproTab.saveSettings(settings);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings,
-            final DataTableSpec[] specs) throws NotConfigurableException {
-        try {
-            m_deepPreproTab.loadSettings(settings);
-        } catch (InvalidSettingsException e) {
-            LOGGER.info(e.getMessage());
-        }
+        removeTab("Options");
+        createNewTabAt("Deep Preprocessing", 1);
+        
+        DialogComponentBoolean comp = new DialogComponentBoolean(
+                getDeepPrepressingModel(), "Deep preprocessing");
+        comp.setToolTipText(
+                "Be aware that deep preprocessing can be very time consuming!");
+        
+        addDialogComponent(comp);
     }
 }
