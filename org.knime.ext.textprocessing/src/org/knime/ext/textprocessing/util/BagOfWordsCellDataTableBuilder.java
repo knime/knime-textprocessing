@@ -112,6 +112,11 @@ public class BagOfWordsCellDataTableBuilder extends BagOfWordsDataTableBuilder {
           currRow++;             
       }
       dc.close();
+      
+      docCache.reset();
+      termCache.reset();
+      docTerms.clear();
+      
       return dc.getTable();
     }   
 }

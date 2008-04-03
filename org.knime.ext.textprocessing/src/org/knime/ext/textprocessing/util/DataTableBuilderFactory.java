@@ -23,6 +23,7 @@
  */
 package org.knime.ext.textprocessing.util;
 
+import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 
@@ -37,6 +38,9 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  */
 public final class DataTableBuilderFactory {
 
+    private static final NodeLogger LOGGER =
+        NodeLogger.getLogger(DataTableBuilderFactory.class);
+    
     private DataTableBuilderFactory() { }
     
     /**
@@ -44,8 +48,10 @@ public final class DataTableBuilderFactory {
      */
     public static BagOfWordsDataTableBuilder createBowDataTableBuilder() {
         if (!TextprocessingPreferenceInitializer.useBlobCell()) {
+            LOGGER.info("Creating BOW with usual cells!");
             return new BagOfWordsCellDataTableBuilder();
         }
+        LOGGER.info("Creating BOW with Blob cells!");
         return new BagOfWordsBlobCellDataTableBuilder();
     }
     
@@ -54,8 +60,10 @@ public final class DataTableBuilderFactory {
      */
     public static DocumentDataTableBuilder createDocumentDataTableBuilder() {
         if (!TextprocessingPreferenceInitializer.useBlobCell()) {
+            LOGGER.info("Creating Document table with usual cells!");
             return new DocumentCellDataTableBuilder();
         }
+        LOGGER.info("Creating Document table with Blob cells!");
         return new DocumentBlobCellDataTableBuilder();
     }
 }

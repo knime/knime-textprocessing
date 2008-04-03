@@ -86,4 +86,11 @@ public class FullDataCellCache extends DataCellCache {
         return dc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        m_cache.clear();
+    }
 }

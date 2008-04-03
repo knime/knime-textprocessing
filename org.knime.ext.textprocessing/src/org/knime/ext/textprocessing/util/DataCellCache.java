@@ -76,4 +76,9 @@ public abstract class DataCellCache {
      * <code>TextContainer</code>.
      */
     public abstract DataCell getInstance(final TextContainer tc);
+    
+    /**
+     * Resets the cache and deletes all references to the cached instances.   
+     */
+    public abstract void reset();
 }

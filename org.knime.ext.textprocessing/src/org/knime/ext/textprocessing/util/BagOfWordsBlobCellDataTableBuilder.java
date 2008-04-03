@@ -113,6 +113,11 @@ public class BagOfWordsBlobCellDataTableBuilder extends
           currRow++;           
       }
       dc.close();
+      
+      docTerms.clear();
+      docCache.reset();
+      termCache.reset();
+      
       return dc.getTable();
     }
   

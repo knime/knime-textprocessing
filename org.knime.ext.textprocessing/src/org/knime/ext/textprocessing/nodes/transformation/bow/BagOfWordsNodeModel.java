@@ -132,15 +132,19 @@ public class BagOfWordsNodeModel extends NodeModel {
            subExec.setProgress(progress, "Processing document " + currRow + " of " 
                    + rowCount);
            exec.checkCanceled();
-           currRow++;           
+           currRow++;
        }
        
        // build data table
        ExecutionContext subContext = exec.createSubExecutionContext(0.5);
-//       return new BufferedDataTable[]{m_dtBuilder.createReusedDataTable(
-//               subContext, docCellTerms, false)};
+       
+       // Do not reuse the DocumentCells of the previous DataTable
        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                subContext, docTerms, false)};
+       
+       // Do reuse the DocumentCells of the previous DataTable
+//     return new BufferedDataTable[]{m_dtBuilder.createReusedDataTable(
+//     subContext, docCellTerms, false)};       
     }
     
     

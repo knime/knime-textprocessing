@@ -149,6 +149,9 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
             currRow++;               
         }
         dc.close();
+        
+        docTerms.clear();
+        
         return dc.getTable();
     }
 }

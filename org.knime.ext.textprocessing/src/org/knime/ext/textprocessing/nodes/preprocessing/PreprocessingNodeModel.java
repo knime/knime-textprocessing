@@ -220,6 +220,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             currRow++;             
         }
         
+        preprocessedDoc.clear();
         // build data table
         ExecutionContext subContext = exec.createSubExecutionContext(0.5);
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(

@@ -82,6 +82,9 @@ public class DocumentCellDataTableBuilder extends DocumentDataTableBuilder {
       }
       dc.close();
 
+      cache.reset();
+      docs.clear();
+      
       return dc.getTable();
     }
 }
