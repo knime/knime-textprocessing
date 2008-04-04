@@ -90,6 +90,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

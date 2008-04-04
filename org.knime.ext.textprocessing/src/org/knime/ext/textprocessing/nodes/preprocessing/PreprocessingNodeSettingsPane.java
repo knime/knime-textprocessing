@@ -56,7 +56,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         DialogComponentBoolean comp = new DialogComponentBoolean(
                 getDeepPrepressingModel(), "Deep preprocessing");
         comp.setToolTipText(
-                "Be aware that deep preprocessing can be very time consuming!");
+                "Be aware that deep preprocessing is more time consuming!");
         
         addDialogComponent(comp);
     }

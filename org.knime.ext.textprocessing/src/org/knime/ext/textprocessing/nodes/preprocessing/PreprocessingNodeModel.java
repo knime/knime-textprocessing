@@ -159,6 +159,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             // is the term unmodifiable ???
             if (!term.isUnmodifiable()) {
                 term = m_preprocessing.preprocess(term);
+                if (term.getText().length() <= 0) {
+                    continue;
+                }
             }
             // do we have to preprocess the documents itself too ?
             if (m_deepPreproModel.getBooleanValue()) {                
@@ -179,7 +182,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                                     if (!t.isUnmodifiable()) {
                                         t = m_preprocessing.preprocess(t);
                                     }
-                                    builder.addTerm(t);
+                                    if (t.getText().length() > 0) {
+                                        builder.addTerm(t);
+                                    }
                                 }
                                 builder.createNewSentence();
                             }
