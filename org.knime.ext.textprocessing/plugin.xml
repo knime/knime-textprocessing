@@ -100,6 +100,16 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter.NCharsFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter.NCharsFilterNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopwordFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopwordFilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

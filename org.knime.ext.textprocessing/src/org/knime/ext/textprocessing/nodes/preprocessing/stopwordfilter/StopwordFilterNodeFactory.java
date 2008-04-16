@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2008
+ * Copyright, 2003 - 2007
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,41 +19,59 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   14.08.2007 (thiel): created
+ *   16.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
+package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * Filters terms with less than the specified number N chars. If a given term
- * has less than N characters <code>null</code> is returned by the
- * {@link NCharsFilter#preprocess(Term)} method, otherwise unmodified term.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilter implements Preprocessing {
+public class StopwordFilterNodeFactory extends 
+NodeFactory<StopwordFilterNodeModel> {
 
-    private int m_n = 1;
-    
     /**
-     * Creates new instance of <code>NCharsFilter</code> with given N as the 
-     * number of minimum chars.
-     * 
-     * @param n The number n of minimum chars of a term.
+     * {@inheritDoc}
      */
-    public NCharsFilter(final int n) {
-        m_n = n;
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new StopwordFilterNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
-        if (term.getText().length() >= m_n) {
-            return term;
-        }
+    @Override
+    public StopwordFilterNodeModel createNodeModel() {
+        return new StopwordFilterNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<StopwordFilterNodeModel> createNodeView(final int index, 
+            final StopwordFilterNodeModel model) {
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
     }
 }

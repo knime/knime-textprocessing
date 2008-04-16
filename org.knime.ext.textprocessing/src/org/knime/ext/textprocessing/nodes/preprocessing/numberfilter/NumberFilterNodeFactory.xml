@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./default.png" type="Manipulator">
-    <name>N Chars Filter</name>
-    <shortDescription>Filters terms consisting of less than N characters.
+    <name>Number Filter</name>
+    <shortDescription>Filters term consisting of numbers.
     </shortDescription>
     <fullDescription>
         <intro>
-        	Filters all terms consisting of words with altogether less than 
-        	the specified number N characters.
+        	Filters all terms consisting of numbers only.
 		</intro>
-		<option name="N Chars">
-		    Specifies the number of minimum characters of a term. 
-		</option>
         <option name="Deep preprocessing">
              If deep preprocessing is checked, the terms contained inside
              the documents are filtered too, this means that the documents are

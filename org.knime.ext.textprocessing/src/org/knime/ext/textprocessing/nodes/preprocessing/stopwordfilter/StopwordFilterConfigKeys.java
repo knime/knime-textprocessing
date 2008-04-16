@@ -21,39 +21,21 @@
  * History
  *   14.08.2007 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
-
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
 /**
- * Filters terms with less than the specified number N chars. If a given term
- * has less than N characters <code>null</code> is returned by the
- * {@link NCharsFilter#preprocess(Term)} method, otherwise unmodified term.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilter implements Preprocessing {
+public class StopwordFilterConfigKeys {
 
-    private int m_n = 1;
+    /**
+     * Config Key for file containing the stop words.
+     */
+    public static final String CFGKEY_FILE = "File";
     
     /**
-     * Creates new instance of <code>NCharsFilter</code> with given N as the 
-     * number of minimum chars.
-     * 
-     * @param n The number n of minimum chars of a term.
+     * Config Key for the activation of case sensitivity.
      */
-    public NCharsFilter(final int n) {
-        m_n = n;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Term preprocess(final Term term) {
-        if (term.getText().length() >= m_n) {
-            return term;
-        }
-        return null;
-    }
+    public static final String CFGKEY_CASE_SENSITIVE = "CS";
 }

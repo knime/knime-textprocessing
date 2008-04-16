@@ -19,41 +19,43 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   14.08.2007 (thiel): created
+ *   11.05.2007 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
+package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
 
 /**
- * Filters terms with less than the specified number N chars. If a given term
- * has less than N characters <code>null</code> is returned by the
- * {@link NCharsFilter#preprocess(Term)} method, otherwise unmodified term.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilter implements Preprocessing {
+public class NumberFilter implements Preprocessing {
 
-    private int m_n = 1;
+    private static String numbers = "^[-+]?[\\d.,]+";
     
+    private static String replacement = "";
+        
     /**
-     * Creates new instance of <code>NCharsFilter</code> with given N as the 
-     * number of minimum chars.
-     * 
-     * @param n The number n of minimum chars of a term.
+     * Filters all strings containing numbers . or , the strings may also 
+     * start with + or - and replaces them with "". The filtered String is 
+     * returned.
+     * @param str String to filter numbers from.
+     * @return Filtered String.
      */
-    public NCharsFilter(final int n) {
-        m_n = n;
+    public static String numberFilter(final String str) {        
+        return str.replaceAll(numbers, replacement);
     }
+
 
     /**
      * {@inheritDoc}
      */
     public Term preprocess(final Term term) {
-        if (term.getText().length() >= m_n) {
-            return term;
+        String filtered = NumberFilter.numberFilter(term.getText());
+        if (filtered.length() <= 0) {
+            return null;
         }
-        return null;
+        return term;
     }
 }
