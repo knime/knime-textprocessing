@@ -159,7 +159,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             // is the term unmodifiable ???
             if (!term.isUnmodifiable()) {
                 term = m_preprocessing.preprocess(term);
-                if (term.getText().length() <= 0) {
+                
+                // if term is null or empty continue with next term !
+                if (term == null || term.getText().length() <= 0) {
                     continue;
                 }
             }
@@ -182,7 +184,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                                     if (!t.isUnmodifiable()) {
                                         t = m_preprocessing.preprocess(t);
                                     }
-                                    if (t.getText().length() > 0) {
+                                    if (t != null && t.getText().length() > 0) {
                                         builder.addTerm(t);
                                     }
                                 }
