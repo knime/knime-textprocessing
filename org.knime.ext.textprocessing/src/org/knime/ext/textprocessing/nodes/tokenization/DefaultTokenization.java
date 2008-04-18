@@ -34,9 +34,15 @@ import java.util.List;
  */
 public final class DefaultTokenization {
     
+    /**
+     * The default sentence tokenizer.
+     */
     public static final Tokenizer SENTENCE_TOKENIZER = 
         new OpenNlpSentenceTokenizer();
     
+    /**
+     * The default word tokenizer.
+     */
     public static final Tokenizer WORD_TOKENIZER = 
         new OpenNlpWordTokenizer();
     
@@ -61,8 +67,8 @@ public final class DefaultTokenization {
      * given sentence and returns them as a list of strings, each word as one
      * string.
      * 
-     * @param sentence
-     * @return
+     * @param sentence The sentence to tokenize.
+     * @return The tokenzied sentence as a list of tokens.
      */
     public static List<String> tokenizeSentence(final String sentence) {
         return WORD_TOKENIZER.tokenize(sentence);

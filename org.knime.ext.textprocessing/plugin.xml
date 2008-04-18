@@ -37,6 +37,13 @@
             name="Preprocessing"
             path="/textprocessing">
       </category>
+      <category
+            description="Contains nodes that compute several kinds of frequencies"
+            icon="icons/missing.gif"
+            level-id="frequencies"
+            name="Frequencies"
+            path="/textprocessing">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -109,6 +116,16 @@
             category-path="/textprocessing/preprocessing"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopwordFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopwordFilterNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/frequencies"
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.tf.TfNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.frequencies.tf.TfNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/frequencies"
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.idf.IdfNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.frequencies.idf.IdfNodeFactory">
       </node>
    </extension>
    <extension

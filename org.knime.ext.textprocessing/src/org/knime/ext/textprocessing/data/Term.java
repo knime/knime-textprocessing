@@ -192,6 +192,33 @@ public class Term implements TextContainer {
         
         return true;
     }
+
+    /**
+     * Compares <code>this</code> with the given object. Returns 
+     * <code>true</code> if given object is an instance of a <code>Term</code>
+     * and if the list of words of the given term is equal to the internal list
+     * of words. Otherwise <code>false</code> is returned. Attributes like
+     * tags or modifiability is not compared, therefore use 
+     * {@link Term#equals(Object)}.
+     * 
+     * @param o The object to compare with.
+     * @return <code>true</code> if given object is an instance of 
+     * <code>Term</code> and the list of words is equal to the list of words of 
+     * the given term.
+     */
+    public boolean equalsWordsOnly(final Object o) {
+        if (o == null) {
+            return false;
+        } else if (!(o instanceof Term)) {
+            return false;
+        }
+        Term t = (Term)o;
+        if (!t.getWords().equals(getWords())) {
+            return false;
+        }
+        
+        return true;
+    }    
     
     /**
      * {@inheritDoc}
