@@ -19,60 +19,29 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   17.04.2008 (thiel): created
+ *   22.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.frequencies.tf;
+package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
 
 /**
- * The factory of the TF-Node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfNodeFactory extends NodeFactory<TfNodeModel> {
+public class FilterFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TfNodeDialog();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TfNodeModel createNodeModel() {
-        return new TfNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<TfNodeModel> createNodeView(final int index, 
-            final TfNodeModel model) {
-
+    private FilterFactory() { }
+    
+    public static final FrequencyFilter createFilter(final String filterOption, 
+            final int termColIndex, final int filterColIndex, final int number, 
+            final double minVal, final double maxVal) {
+        if (filterOption.equals(FilterNodeModel.SELECTION_NUMBER)) {
+            return new KTermsFilter(termColIndex, filterColIndex, number);
+        } else if (filterOption.equals(FilterNodeModel.SELECTION_THRESHOLD)) {
+            return new ThresholdFilter(termColIndex, filterColIndex, minVal, 
+                    maxVal);
+        }
         return null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    
 }

@@ -33,6 +33,7 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequencyNodeModel;
 
 /**
@@ -44,10 +45,19 @@ import org.knime.ext.textprocessing.nodes.frequencies.FrequencyNodeModel;
 public class TfNodeModel extends FrequencyNodeModel {
 
     /**
+     * By default the relative tf value is computed.
+     */
+    public static final boolean DEF_RELATIVE = true;
+    
+    private SettingsModelBoolean m_relativeModel = 
+        TfNodeDialog.getRelativeModel();
+    
+    /**
      * Creates a new instance of <code>TfNodeModel</code>.
      */
     public TfNodeModel() {
-        super(TfCellFactory.COLNAME, TfCellFactory.INT_COL);
+        super(TfCellFactory.COLNAME_REL, false);
+        m_noOutputSpec = true;
     }
     
     /**
@@ -56,7 +66,8 @@ public class TfNodeModel extends FrequencyNodeModel {
     @Override
     protected void initCellFactory(final BufferedDataTable inData,
             final ExecutionContext exec) throws CanceledExecutionException {
-        m_cellFac = new TfCellFactory(getDocumentColIndex(), getTermColIndex());
+        m_cellFac = new TfCellFactory(getDocumentColIndex(), getTermColIndex(),
+                m_relativeModel.getBooleanValue());
     }
 
 
@@ -76,7 +87,7 @@ public class TfNodeModel extends FrequencyNodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_relativeModel.loadSettingsFrom(settings);
     }
 
 
@@ -85,7 +96,7 @@ public class TfNodeModel extends FrequencyNodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // Nothing to do ...
+        m_relativeModel.saveSettingsTo(settings);
     }
 
     /**
@@ -94,7 +105,7 @@ public class TfNodeModel extends FrequencyNodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_relativeModel.validateSettings(settings);
     }
 
     

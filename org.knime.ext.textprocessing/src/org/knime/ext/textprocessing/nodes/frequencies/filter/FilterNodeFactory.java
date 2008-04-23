@@ -19,44 +19,42 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   17.04.2008 (thiel): created
+ *   23.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.frequencies.tf;
+package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * The factory of the TF-Node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfNodeFactory extends NodeFactory<TfNodeModel> {
+public class FilterNodeFactory extends NodeFactory<FilterNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new TfNodeDialog();
+        return new FilterNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public TfNodeModel createNodeModel() {
-        return new TfNodeModel();
+    public FilterNodeModel createNodeModel() {
+        return new FilterNodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<TfNodeModel> createNodeView(final int index, 
-            final TfNodeModel model) {
-
+    public NodeView<FilterNodeModel> createNodeView(final int index, 
+            final FilterNodeModel model) {
         return null;
     }
 

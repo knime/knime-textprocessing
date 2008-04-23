@@ -127,6 +127,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.idf.IdfNodeFactory"
             id="org.knime.ext.textprocessing.nodes.frequencies.idf.IdfNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/frequencies"
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

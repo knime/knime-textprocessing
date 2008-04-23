@@ -19,60 +19,19 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   17.04.2008 (thiel): created
+ *   03.04.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.frequencies.tf;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-
 /**
- * The factory of the TF-Node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfNodeFactory extends NodeFactory<TfNodeModel> {
+public class TfConfigKeys {
 
     /**
-     * {@inheritDoc}
+     * The configuration key for the relative/absolute setting of TF 
+     * computation.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TfNodeDialog();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TfNodeModel createNodeModel() {
-        return new TfNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<TfNodeModel> createNodeView(final int index, 
-            final TfNodeModel model) {
-
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFG_KEY_RELATIVE = "Relative";
 }

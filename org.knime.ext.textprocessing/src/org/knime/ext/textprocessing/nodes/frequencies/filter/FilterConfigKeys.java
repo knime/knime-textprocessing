@@ -19,60 +19,34 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   17.04.2008 (thiel): created
+ *   03.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.frequencies.tf;
-
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
 /**
- * The factory of the TF-Node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfNodeFactory extends NodeFactory<TfNodeModel> {
+public class FilterConfigKeys {
 
     /**
-     * {@inheritDoc}
+     * The configuration key for the relative/absolute setting of TF 
+     * computation.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TfNodeDialog();
-    }
-
+    public static final String CFG_KEY_FILTERCOL = "FilterCol";
+    
     /**
-     * {@inheritDoc}
+     * The configuration key for the way of filtering (selection).
      */
-    @Override
-    public TfNodeModel createNodeModel() {
-        return new TfNodeModel();
-    }
-
+    public static final String CFG_KEY_SELECTION = "Selection";
+    
     /**
-     * {@inheritDoc}
+     * The configuration key for the min max threshold.
      */
-    @Override
-    public NodeView<TfNodeModel> createNodeView(final int index, 
-            final TfNodeModel model) {
-
-        return null;
-    }
-
+    public static final String CFG_KEY_MINMAX = "MinMax";
+    
     /**
-     * {@inheritDoc}
+     * The configuration key for the number of terms to filter.
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFG_KEY_NUMBER = "Number";
 }

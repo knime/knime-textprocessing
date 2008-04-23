@@ -56,7 +56,40 @@ public final class Frequencies {
     }
     
     /**
-     * Computes and returns the relative term frequency (tf) of the given terms 
+     * Computes and returns the absolute term frequency of the given term 
+     * and the document.
+     * 
+     * @param term The term to compute the tf value for.
+     * @param doc The document to compute the tf value with.
+     * @return The absolute term frequency value of the given term according 
+     * to the given document.
+     */
+    public static int absoluteTermFrequency(final Term term, 
+            final Document doc) {
+        int termCount = 0;
+        List<Section> sections = doc.getSections();
+        for (Section s : sections) {
+            List<Paragraph> paragraphs = s.getParagraphs();
+            for (Paragraph p : paragraphs) {
+                List<Sentence> sentences = p.getSentences();
+                for (Sentence sen : sentences) {
+                    List<Term> senTerms = sen.getTerms();
+                    for (Term t : senTerms) {
+                        if (t != null) {
+                            if (t.equalsWordsOnly(term)) {
+                                termCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return termCount;
+    }
+    
+    
+    /**
+     * Computes and returns the relative term frequency (tf) of the given term 
      * and the document. The tf value is computed by dividing the number of
      * occurrences of the given term in the given document by the number of
      * all words in the document.

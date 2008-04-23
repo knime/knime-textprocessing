@@ -64,6 +64,13 @@ public abstract class FrequencyNodeModel extends NodeModel {
     private boolean m_addIntCol = false;
     
     /**
+     * If no output spec has to be returned after the configure call, this
+     * flag has to be set true, otherwise an data table output spec is generated
+     * and returned.
+     */
+    protected boolean m_noOutputSpec = false;
+    
+    /**
      * The cell factory creating the cells containing a certain frequency value.
      */
     protected FrequencyCellFactory m_cellFac;
@@ -103,6 +110,9 @@ public abstract class FrequencyNodeModel extends NodeModel {
     protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[INDATA_INDEX]);
+        if (m_noOutputSpec) {
+            return new DataTableSpec[]{null};
+        }
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
     }
 

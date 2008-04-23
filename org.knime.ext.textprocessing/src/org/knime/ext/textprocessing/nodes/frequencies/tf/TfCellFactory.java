@@ -26,6 +26,7 @@ package org.knime.ext.textprocessing.nodes.frequencies.tf;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.IntCell;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
@@ -44,25 +45,47 @@ public class TfCellFactory extends FrequencyCellFactory {
     /**
      * The name of the column containing the tf value.
      */
-    public static final String COLNAME = "TF";
+    public static final String COLNAME_REL = "TF";
     
     /**
-     * The flag specifying that the column containing the tf values is a double 
-     * column.
+     * The name of the column containing the absolute tf value.
      */
-    public static final boolean INT_COL = false;
+    public static final String COLNAME_ABS = "TF absolute";
+    
+
+    private boolean m_relative = TfNodeModel.DEF_RELATIVE;
     
     
     /**
      * Creates new instance of <code>TfCellFactory</code> which computes
      * the tf value for each row and adds new column containing the values.
+     * If parameter <code>relative</code> is set <code>true</code> the relative
+     * term frequency is computed, otherwise the absolute.
      * 
      * @param documentCellIndex The column index containing the documents. 
      * @param termCellindex The column index containing the terms.
+     * @param relative if set <code>true</code> the relative
+     * term frequency is computed, otherwise the absolute.
      */
     public TfCellFactory(final int documentCellIndex,
-            final int termCellindex) {
-        super(documentCellIndex, termCellindex, COLNAME, INT_COL);
+            final int termCellindex, final boolean relative) {
+        super(documentCellIndex, termCellindex, getColName(relative),
+                getIntCol(relative));
+        m_relative = relative;
+    }
+    
+    private static boolean getIntCol(final boolean relative) {
+        if (relative) {
+            return false;
+        }
+        return true;
+    }
+    
+    private static String getColName(final boolean relative) {
+        if (relative) {
+            return COLNAME_REL;
+        }
+        return COLNAME_ABS;
     }
     
     /**
@@ -74,8 +97,12 @@ public class TfCellFactory extends FrequencyCellFactory {
         Document doc = ((DocumentValue)row.getCell(getDocumentColIndex()))
                         .getDocument(); 
         
-        DoubleCell freq = new DoubleCell(
-                Frequencies.relativeTermFrequency(term, doc));
+        DataCell freq;
+        if (m_relative) {
+            freq = new DoubleCell(Frequencies.relativeTermFrequency(term, doc));
+        } else {
+            freq = new IntCell(Frequencies.absoluteTermFrequency(term, doc));
+        }
         return new DataCell[]{freq};
     }
 }

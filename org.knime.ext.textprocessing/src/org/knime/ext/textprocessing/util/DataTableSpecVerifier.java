@@ -24,6 +24,7 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DoubleValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -50,12 +51,16 @@ public class DataTableSpecVerifier {
     private int m_documentCellIndex = -1;
 
     private int m_stringCellIndex = -1;
+    
+    private int m_numberCellIndex = -1;
 
     private int m_numTermCells = 0;
 
     private int m_numDocumentCells = 0;
 
     private int m_numStringCells = 0;
+    
+    private int m_numNumberCells = 0;
 
     /**
      * Creates a new instance of <code>DataTableSpecVerifier</code> with given
@@ -86,6 +91,10 @@ public class DataTableSpecVerifier {
                     StringValue.class)) {
                 m_numStringCells++;
                 m_stringCellIndex = i;
+            } else if (m_spec.getColumnSpec(i).getType().isCompatible(
+                    DoubleValue.class)) {
+                m_numberCellIndex = i;
+                m_numNumberCells++;
             }
 
         }
@@ -113,6 +122,13 @@ public class DataTableSpecVerifier {
     }
 
     /**
+     * @return the number cell index.
+     */
+    public int getNumberCellIndex() {
+        return m_numberCellIndex;
+    }
+    
+    /**
      * @return the number of term cells.
      */
     public int getNumTermCells() {
@@ -133,6 +149,13 @@ public class DataTableSpecVerifier {
         return m_numStringCells;
     }
 
+    /**
+     * @return the number of number cells cells.
+     */
+    public int getNumberNumberCells() {
+        return m_numNumberCells;
+    }    
+    
     private void throwException(final boolean throwException, final String msg)
             throws InvalidSettingsException {
         if (throwException) {
@@ -168,6 +191,7 @@ public class DataTableSpecVerifier {
 
         return valid;
     }
+       
 
     /**
      * Verifies the <code>DataTableSpec</code> and checks if it has exactly
@@ -256,6 +280,34 @@ public class DataTableSpecVerifier {
         return valid;
     }
 
+    /**
+     * Verifies the <code>DataTableSpec</code> and checks if it contains at 
+     * least the given number minimumNumberCells of columns containing 
+     * number cells. If so, true is returned, if not an 
+     * <code>InvalidSettingsException</code> is thrown.
+     * 
+     * @param minimumNumberCells The number of minimum columns containing 
+     * number cells to check for.
+     * @param throwException If true an exception is throw in case of an error,
+     * if false just false is returned.
+     * @return true if <code>DataTableSpec</code> contains at least
+     * the given number of columns containing number cells.
+     * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
+     * less than the specified number minimumNumberCells of 
+     * columns containing number cells.
+     */
+    public boolean verifyMinimumNumberCells(final int minimumNumberCells,
+            final boolean throwException) throws InvalidSettingsException {
+        boolean valid = true;
+
+        if (m_numNumberCells < minimumNumberCells) {
+            valid = false;
+            throwException(throwException, "There have to be at least "
+                    + minimumNumberCells + " columns containing number cells!");
+        }
+        return valid;
+    }    
+    
     /**
      * Verifies the <code>DataTableSpec</code> and checks if it contains
      * one columns with <code>TermCell</code>s only. If so, 

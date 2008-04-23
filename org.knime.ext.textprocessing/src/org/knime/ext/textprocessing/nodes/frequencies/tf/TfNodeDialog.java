@@ -19,60 +19,35 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   17.04.2008 (thiel): created
+ *   21.04.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.frequencies.tf;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 
 /**
- * The factory of the TF-Node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfNodeFactory extends NodeFactory<TfNodeModel> {
+public class TfNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * {@inheritDoc}
+     * @return Creates and returns new instance of a 
+     * <code>SettingsModelBoolean</code> containing the setting whether the
+     * term frequency has to be computed relative or absolute.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TfNodeDialog();
+    public static SettingsModelBoolean getRelativeModel() {
+        return new SettingsModelBoolean(TfConfigKeys.CFG_KEY_RELATIVE,
+                TfNodeModel.DEF_RELATIVE);
     }
-
+    
     /**
-     * {@inheritDoc}
+     * Creates new instance of <code>TfNodeDialog</code>.
      */
-    @Override
-    public TfNodeModel createNodeModel() {
-        return new TfNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<TfNodeModel> createNodeView(final int index, 
-            final TfNodeModel model) {
-
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
+    public TfNodeDialog() {
+        addDialogComponent(new DialogComponentBoolean(getRelativeModel(), 
+                "Relative frequency"));
     }
 }
