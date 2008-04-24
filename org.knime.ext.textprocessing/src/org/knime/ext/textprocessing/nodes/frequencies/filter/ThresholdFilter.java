@@ -33,6 +33,9 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 
 /**
+ * Filters rows accordant to a specified frequency column. If the frequency 
+ * value is less than the given minimum value or greater than the given
+ * maximum value, the row is filtered out.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -42,6 +45,17 @@ public class ThresholdFilter extends FrequencyFilter {
     
     private double m_max;
     
+    /**
+     * Creates a new instance of <code>FrequencyFilter</code> with the given
+     * index of the term column, of the frequency column to apply the filtering 
+     * to and the min and max values.
+     * 
+     * @param termColIndex The index of the term column.
+     * @param colIndex The index of the frequency column to apply the filtering 
+     * to.
+     * @param min The minimum value.
+     * @param max The maximum value.
+     */
     public ThresholdFilter(final int termColIndex, final int colIndex, 
             final double min, final double max) {
         super(colIndex, termColIndex);

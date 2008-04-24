@@ -40,24 +40,66 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 
 /**
+ * This abstract class provides methods to filter rows, like a
+ * {@link org.knime.base.node.preproc.filter.row.rowfilter.RowFilter} by
+ * taking various kinds of term frequencies into account. The index of the
+ * column containing the frequency has to be specified, as well as the index
+ * of the column containing the terms. Underlying implementations has
+ * to implement the abstract method 
+ * {@link FrequencyFilter#internalMatches(DataRow, int)}. In this method the 
+ * filtering strategy can be specified. Additionally the data table to filter
+ * can be preprocessed, by implementing the 
+ * {@link FrequencyFilter#preprocessData(BufferedDataTable, ExecutionContext)}
+ * method in a certain way. Preprocessing can be necessary or useful i.e.
+ * by sorting the data table before filtering.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public abstract class FrequencyFilter extends RowFilter {
 
+    /**
+     * The index of the column containing the frequency to applie the filter.
+     */
     protected int m_filterColIndex;
     
     private int m_termColIndex;
     
+    /**
+     * Creates a new instance of <code>FrequencyFilter</code> with given indices
+     * specifying the term column and the column to apply the filtering to.
+     * 
+     * @param filterColIndex The column to apply the filtering to.
+     * @param termColIndex The column containing the terms.
+     */
     public FrequencyFilter(final int filterColIndex, final int termColIndex) {
         m_filterColIndex = filterColIndex;
         m_termColIndex = termColIndex;
     }
     
+    /**
+     * Preprocesses the given data table and returns it as a new data table.
+     * 
+     * @param data The data table to preprocess.
+     * @param exec The <code>ExecutionContext</code> to use.
+     * @return The preprocessed data table.
+     * @throws CanceledExecutionException If user canceled the execution.
+     */
     public abstract DataTable preprocessData(
             final BufferedDataTable data, final ExecutionContext exec) 
-    throws CanceledExecutionException ;
+    throws CanceledExecutionException;
     
+    /**
+     * This method is called right after
+     * {@link FrequencyFilter#matches(DataRow, int)}. By implementing this 
+     * method the strategy of filtering can be specified. For rows that have 
+     * to be filtered out, <code>false</code> has to be returned, otherwise
+     * <code>true</code>. 
+     * 
+     * @param row The row to filter or not.
+     * @param rowIndex The index of the row.
+     * @return <code>true</code> if the row is not filtered <code>false</code>
+     * if the row has to be filtered.
+     */
     public abstract boolean internalMatches(final DataRow row, 
             final int rowIndex);
     

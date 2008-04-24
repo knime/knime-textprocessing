@@ -49,4 +49,9 @@ public class FilterConfigKeys {
      * The configuration key for the number of terms to filter.
      */
     public static final String CFG_KEY_NUMBER = "Number";
+    
+    /**
+     * The configuration key for the deep filtering setting.
+     */
+    public static final String CFG_KEY_DEEPFILTERING = "DeepFiltering";
 }

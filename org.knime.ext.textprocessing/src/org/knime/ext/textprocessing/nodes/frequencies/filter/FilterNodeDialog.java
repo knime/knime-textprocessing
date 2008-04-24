@@ -29,43 +29,74 @@ import javax.swing.event.ChangeListener;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentDoubleRange;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleRange;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
 
 /**
+ * The dialog class of the filter node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelString</code> containing the name of the column to 
+     * apply the filtering.
+     */
     public static final SettingsModelString getColModel() {
         return new SettingsModelString(FilterConfigKeys.CFG_KEY_FILTERCOL,
                 "");
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelString</code> containing the mode of filtering
+     */
     public static final SettingsModelString getSelectionModel() {
         return new SettingsModelString(FilterConfigKeys.CFG_KEY_SELECTION,
                 FilterNodeModel.DEF_SELECTION);
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelDoubleRange</code> containing the filter's min and 
+     * max value.
+     */
     public static final SettingsModelDoubleRange getMinMaxModel() {
         return new SettingsModelDoubleRange(FilterConfigKeys.CFG_KEY_MINMAX,
                 FilterNodeModel.DEF_MIN_THRESHOLD, 
                 FilterNodeModel.DEF_MAX_THRESHOLD);
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelIntegerBounded</code> containing the number k of terms
+     * to keep (the rest is filtered). 
+     */
     public static final SettingsModelIntegerBounded getNumberModel() {
         return new SettingsModelIntegerBounded(FilterConfigKeys.CFG_KEY_NUMBER,
                 FilterNodeModel.DEF_NUMBER, FilterNodeModel.MIN_NUMBER,
                 FilterNodeModel.MAX_NUMBER);
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelBoolean</code> specifying if deep filtering has to be 
+     * applied. 
+     */
+    public static final SettingsModelBoolean getDeepFilteringModel() {
+        return new SettingsModelBoolean(FilterConfigKeys.CFG_KEY_DEEPFILTERING,
+                FilterNodeModel.DEF_DEEP_FILTERING);
+    }
     
     private SettingsModelDoubleRange m_minMaxModel;
     
@@ -73,7 +104,21 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
     
     private SettingsModelString m_selectionModel;
     
+    /**
+     * Creates a new instance of <code>FilterNodeDialog</code>.
+     */
+    @SuppressWarnings("unchecked")
     public FilterNodeDialog() {
+        removeTab("Options");
+        createNewTabAt("Deep Filtering", 1);
+        DialogComponentBoolean comp = new DialogComponentBoolean(
+                getDeepFilteringModel(), "Deep filtering");
+        comp.setToolTipText(
+        "Be aware that deep filtering is more time consuming!");
+        addDialogComponent(comp);
+        
+        createNewTabAt("Filter Settings", 2);
+        
         // Column Selection
         addDialogComponent(new DialogComponentColumnNameSelection(
                 getColModel(), "Filter Column", 0, IntValue.class, 
@@ -126,7 +171,6 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
     }
     
     private class FilterOptionChangeListener implements ChangeListener {
-
         /**
          * {@inheritDoc}
          */

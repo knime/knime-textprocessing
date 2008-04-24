@@ -25,6 +25,8 @@ package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
 
 /**
+ * A simple factory which creates concrete implementations of 
+ * <code>FrequencyFilter</code>s conveniently.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -32,6 +34,26 @@ public class FilterFactory {
 
     private FilterFactory() { }
     
+    /**
+     * Creates and returns an instance of a concrete 
+     * <code>FrequencyFilter</code> implementation. The given 
+     * <code>filterOption</code> specifies which kind of 
+     * <code>FrequencyFilter</code> is created. The additional parameter
+     * specify the index of the column containing the terms, the column to apply
+     * the filtering to, the number of rows to keep and the min and max value.
+     * 
+     * @param filterOption Specifies which filter is created
+     * @param termColIndex The index of the column containing terms.
+     * @param filterColIndex The index of the column to apply the filter method 
+     * to.
+     * @param number The number of rows to keep (the rest of the rows is 
+     * filtered).
+     * @param minVal The min value of the filter column's number to be not 
+     * filtered.
+     * @param maxVal The max value of the filter column's number to be not 
+     * filtered.
+     * @return A new instance of <code>FrequencyFilter</code>.
+     */
     public static final FrequencyFilter createFilter(final String filterOption, 
             final int termColIndex, final int filterColIndex, final int number, 
             final double minVal, final double maxVal) {

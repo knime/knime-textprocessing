@@ -40,38 +40,76 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleRange;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
+ * The model class of the filter node. Providing all default settings of the
+ * filters, as well as the management of the filtering process.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class FilterNodeModel extends NodeModel {
 
+    /**
+     * Specifies the threshold filtering.
+     */
     public static final String SELECTION_THRESHOLD = "Threshold";
     
+    /**
+     * Specifies the number filtering. 
+     */
     public static final String SELECTION_NUMBER = "Number of terms";
     
+    /**
+     * The default filtering
+     */
     public static final String DEF_SELECTION = SELECTION_NUMBER;
     
     
+    /**
+     * The default number of numbe filtering.
+     */
     public static final int DEF_NUMBER = 1000;
     
+    /**
+     * The min number of number filtering.
+     */
     public static final int MIN_NUMBER = 0;
     
+    /**
+     * The max number of number filtering.
+     */
     public static final int MAX_NUMBER = Integer.MAX_VALUE;
 
     
+    /**
+     * The default minimum number of threshold filtering.
+     */
     public static final double DEF_MIN_THRESHOLD = 0.01;
     
+    /**
+     * The min minimum number of threshold filtering.
+     */
     public static final double MIN_MIN_THRESHOLD = 0;
     
+    /**
+     * The default maximum number of threshold filtering.
+     */
     public static final double DEF_MAX_THRESHOLD = 1.0;
     
+    /**
+     * The max maximum number of threshold filtering.
+     */
     public static final double MAX_MAX_THRESHOLD = 1000;
+    
+    /**
+     * The default settings for deep filtering.
+     */
+    public static final boolean DEF_DEEP_FILTERING = true;
     
     
     private SettingsModelString m_filterSelectionModel = 
@@ -85,8 +123,14 @@ public class FilterNodeModel extends NodeModel {
     private SettingsModelDoubleRange m_minMaxModel = 
         FilterNodeDialog.getMinMaxModel();
 
+    private SettingsModelBoolean m_deepFilteringModel = 
+        FilterNodeDialog.getDeepFilteringModel();
+    
     private int m_termColIndex = -1;
     
+    /**
+     * Creates an new instance of <code>FilterNodeModel</code>.
+     */
     public FilterNodeModel() {
         super(1, 1);
         
@@ -131,15 +175,20 @@ public class FilterNodeModel extends NodeModel {
                 filterColIndex, m_numberModel.getIntValue(), 
                 m_minMaxModel.getMinRange(), m_minMaxModel.getMaxRange());
         
+        DataTable preprocessedTable = filter.preprocessData(inData[0], exec);
         DataTable filteredTable;
         synchronized (this) {
-            filteredTable = new RowFilterTable(inData[0], filter);
+            filteredTable = new RowFilterTable(preprocessedTable, filter);
         }
         
         // Deep filtering
-        TermPurger purger = new TermPurger(filteredTable, exec);
+        if (m_deepFilteringModel.getBooleanValue()) {
+            TermPurger purger = new TermPurger(filteredTable, exec);
+            return new BufferedDataTable[]{purger.getPurgedDataTable()};
+        }
         
-        return new BufferedDataTable[]{purger.getPurgedDataTable()};
+        return new BufferedDataTable[]{
+                exec.createBufferedDataTable(filteredTable, exec)};
     }
 
     private void enableModels() {
@@ -181,6 +230,7 @@ public class FilterNodeModel extends NodeModel {
         m_colModel.saveSettingsTo(settings);
         m_numberModel.saveSettingsTo(settings);
         m_minMaxModel.saveSettingsTo(settings);
+        m_deepFilteringModel.saveSettingsTo(settings);
     }
 
     /**
@@ -193,6 +243,7 @@ public class FilterNodeModel extends NodeModel {
         m_colModel.validateSettings(settings);
         m_numberModel.validateSettings(settings);
         m_minMaxModel.validateSettings(settings);
+        m_deepFilteringModel.validateSettings(settings);
     }
 
     /**
@@ -205,6 +256,7 @@ public class FilterNodeModel extends NodeModel {
         m_colModel.loadSettingsFrom(settings);
         m_numberModel.loadSettingsFrom(settings);
         m_minMaxModel.loadSettingsFrom(settings);
+        m_deepFilteringModel.loadSettingsFrom(settings);
     }
     
     

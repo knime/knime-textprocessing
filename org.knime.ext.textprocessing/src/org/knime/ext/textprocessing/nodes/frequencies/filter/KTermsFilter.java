@@ -35,6 +35,8 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 
 /**
+ * Keeps a specified number k of rows and filters out the rest. The k rows that
+ * are kept are those with the highest value of a specified frequency.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -44,6 +46,16 @@ public class KTermsFilter extends FrequencyFilter {
     
     private int m_count = 0;
     
+    /**
+     * Creates a new instance of <code>KTermsFilter</code> with the given
+     * index of the term column, of the frequency column to apply the filtering 
+     * to and the number k of row to keep.
+     * 
+     * @param termColIndex The index of the term column.
+     * @param colIndex The index of the frequency column to apply the filtering 
+     * to.
+     * @param k The number k of rows to keep.
+     */
     public KTermsFilter(final int termColIndex, final int colIndex, 
             final int k) {
         super(colIndex, termColIndex);

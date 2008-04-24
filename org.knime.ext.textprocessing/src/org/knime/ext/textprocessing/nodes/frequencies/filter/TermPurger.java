@@ -49,6 +49,11 @@ import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
+ * Provides methods to purge terms out of documents based on the specified 
+ * bag of words data table. The data table contains terms and documents. All 
+ * terms of the documents which are not contained in the bag of words 
+ * (the term column of the data table) are purged from the documents, except 
+ * those which are unmodifiable. 
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -64,6 +69,17 @@ public class TermPurger {
     
     private ExecutionContext m_exec;
     
+    /**
+     * Creates a new instance of <code>TermPurger</code> with given bag of word 
+     * input data contained in the data table and an 
+     * <code>ExecutionContext</code> to create a <code>BufferedDataTable</code>
+     * and monitor the progress.
+     * 
+     * @param inData The input data table containing a bag of words.
+     * @param exec A execution context to monitor the progress.
+     * @throws InvalidSettingsException If the given data table contains no
+     * column with documents or terms.
+     */
     public TermPurger(final DataTable inData, final ExecutionContext exec) 
     throws InvalidSettingsException {
         m_inData = inData;
@@ -91,6 +107,13 @@ public class TermPurger {
         }
     }
     
+    /**
+     * Deletes all terms out of the documents which are not contained in the 
+     * specified bag of words, creates a new data table with the modified 
+     * documents and returns it.
+     * 
+     * @return A data table containing the modified documents.
+     */
     public BufferedDataTable getPurgedDataTable() {
         Hashtable<Document, Document> preprocessedDoc = 
             new Hashtable<Document, Document>();
