@@ -72,13 +72,6 @@ public class StopWordFilter implements Preprocessing {
     }
     
     /**
-     * @param stopwords The stop words to set.
-     */
-    public void setStopwords(final HashSet <String> stopwords) {
-        m_wordList = stopwords;
-    }
-    
-    /**
      * Returns true if given String is a stop word, false if not.
      * @param word String to check if it is a stop word.
      * @return True if given String is a stop word.
