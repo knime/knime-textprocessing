@@ -21,45 +21,58 @@
  * History
  *   24.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
+package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.knime.ext.textprocessing.data.PartOfSpeechTag;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeModel;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTagFilterNodeModel extends TagFilterNodeModel {
+public class AbnerTagFilterNodeFactory extends 
+NodeFactory<AbnerTagFilterNodeModel> {
 
-    public static Set<Tag> getTags() {
-        Set<Tag> tags = new HashSet<Tag>();
-        List<String> tagStrs = PartOfSpeechTag.asStringList();
-        for (String s : tagStrs) {
-            tags.add(PartOfSpeechTag.stringToTag(s));
-        }
-        return tags;
-    }
-    
     /**
      * {@inheritDoc}
      */
     @Override
-    protected TagBuilder getTagBuilder() {
-        return PartOfSpeechTag.UNKNOWN;
+    protected NodeDialogPane createNodeDialogPane() {
+        return new AbnerTagFilterNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected String getValidTagType() {
-        return PartOfSpeechTag.TAG_TYPE;
+    public AbnerTagFilterNodeModel createNodeModel() {
+        return new AbnerTagFilterNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<AbnerTagFilterNodeModel> createNodeView(final int index, 
+            final AbnerTagFilterNodeModel model) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
     }
 }

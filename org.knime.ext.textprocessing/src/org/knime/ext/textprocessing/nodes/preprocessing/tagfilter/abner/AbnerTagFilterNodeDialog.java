@@ -21,15 +21,24 @@
  * History
  *   24.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
+package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner;
+
+import java.util.Set;
+
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeDialog;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TagFilterConfigKeys {
+public class AbnerTagFilterNodeDialog extends TagFilterNodeDialog {
 
-    public static final String CFGKEY_STRICT = "Strict";
-    
-    public static final String CFGKEY_VALIDTAGS = "ValidTags";
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Set<Tag> getTags() {
+        return AbnerTagFilterNodeModel.getTags();
+    }
 }

@@ -21,7 +21,7 @@
  * History
  *   24.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
+package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
 import java.io.File;
 import java.io.IOException;

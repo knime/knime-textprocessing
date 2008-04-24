@@ -145,8 +145,14 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         int currRow = 1;
         RowIterator i = inData[0].iterator();
         while(i.hasNext()) {
-            DataRow row = i.next();
+            // report status
+            double progress = (double)currRow / (double)rowCount;
+            subExec.setProgress(progress, "Processing row " + currRow + " of " 
+                    + rowCount);
+            exec.checkCanceled();
+            currRow++;    
             
+            DataRow row = i.next();
             Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
             Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
                             getDocument();
@@ -216,15 +222,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                 terms = docTerms.get(newDoc);
             }
             terms.add(term);
-            docTerms.put(newDoc, terms);
-            
-            
-            // report status
-            double progress = (double)currRow / (double)rowCount;
-            subExec.setProgress(progress, "Processing row " + currRow + " of " 
-                    + rowCount);
-            exec.checkCanceled();
-            currRow++;             
+            docTerms.put(newDoc, terms);         
         }
         
         preprocessedDoc.clear();

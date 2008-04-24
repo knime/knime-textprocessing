@@ -23,43 +23,54 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.knime.ext.textprocessing.data.PartOfSpeechTag;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeModel;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTagFilterNodeModel extends TagFilterNodeModel {
-
-    public static Set<Tag> getTags() {
-        Set<Tag> tags = new HashSet<Tag>();
-        List<String> tagStrs = PartOfSpeechTag.asStringList();
-        for (String s : tagStrs) {
-            tags.add(PartOfSpeechTag.stringToTag(s));
-        }
-        return tags;
-    }
-    
+public class PosTagFilterNodeFactory extends NodeFactory<PosTagFilterNodeModel> 
+{
     /**
      * {@inheritDoc}
      */
     @Override
-    protected TagBuilder getTagBuilder() {
-        return PartOfSpeechTag.UNKNOWN;
+    protected NodeDialogPane createNodeDialogPane() {
+        return new PosTagFilterNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected String getValidTagType() {
-        return PartOfSpeechTag.TAG_TYPE;
+    public PosTagFilterNodeModel createNodeModel() {
+        return new PosTagFilterNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<PosTagFilterNodeModel> createNodeView(final int index, 
+            final PosTagFilterNodeModel model) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
     }
 }

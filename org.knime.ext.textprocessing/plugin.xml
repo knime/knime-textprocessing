@@ -132,6 +132,16 @@
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos.PosTagFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos.PosTagFilterNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner.AbnerTagFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner.AbnerTagFilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

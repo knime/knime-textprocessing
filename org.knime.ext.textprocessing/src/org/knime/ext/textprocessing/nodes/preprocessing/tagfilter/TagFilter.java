@@ -21,7 +21,7 @@
  * History
  *   24.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
+package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
 import java.util.List;
 import java.util.Set;
@@ -70,7 +70,7 @@ public class TagFilter implements Preprocessing {
             }
         }
         
-        if (m_strict && allValid) {
+        if (m_strict && allValid && oneValid) {
             return term;
         } else if (!m_strict && oneValid) {
             return term;

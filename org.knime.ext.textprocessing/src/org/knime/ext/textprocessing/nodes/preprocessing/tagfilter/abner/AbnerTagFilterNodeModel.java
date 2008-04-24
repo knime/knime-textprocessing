@@ -21,13 +21,13 @@
  * History
  *   24.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
+package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.knime.ext.textprocessing.data.PartOfSpeechTag;
+import org.knime.ext.textprocessing.data.BiomedicalNeTag;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeModel;
@@ -36,13 +36,13 @@ import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeM
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTagFilterNodeModel extends TagFilterNodeModel {
-
+public class AbnerTagFilterNodeModel extends TagFilterNodeModel {
+    
     public static Set<Tag> getTags() {
         Set<Tag> tags = new HashSet<Tag>();
-        List<String> tagStrs = PartOfSpeechTag.asStringList();
+        List<String> tagStrs = BiomedicalNeTag.asStringList();
         for (String s : tagStrs) {
-            tags.add(PartOfSpeechTag.stringToTag(s));
+            tags.add(BiomedicalNeTag.stringToTag(s));
         }
         return tags;
     }
@@ -52,7 +52,7 @@ public class PosTagFilterNodeModel extends TagFilterNodeModel {
      */
     @Override
     protected TagBuilder getTagBuilder() {
-        return PartOfSpeechTag.UNKNOWN;
+        return BiomedicalNeTag.UNKNOWN;
     }
 
     /**
@@ -60,6 +60,6 @@ public class PosTagFilterNodeModel extends TagFilterNodeModel {
      */
     @Override
     protected String getValidTagType() {
-        return PartOfSpeechTag.TAG_TYPE;
+        return BiomedicalNeTag.TAG_TYPE;
     }
 }
