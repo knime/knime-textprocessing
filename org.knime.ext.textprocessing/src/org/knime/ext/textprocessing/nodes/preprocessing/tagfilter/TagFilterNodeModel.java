@@ -40,11 +40,22 @@ import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 /**
+ * The abstract class <code>TagFilterNodeModel</code> provides a functionality
+ * to filter out terms with tags assigned that are not specified as valid.
+ * Underlying implementations have to implement
+ * {@link TagFilterNodeModel#getTagBuilder()} and 
+ * {@link TagFilterNodeModel#getValidTagType()}, to specify the valid type
+ * of the tags to consider during the filtering process as well as a
+ * {@link org.knime.ext.textprocessing.data.TagBuilder} that provides the set
+ * of valid tags.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
 
+    /**
+     * The default value of the "strict filtering" setting.
+     */
     public static final boolean DEF_STRICT = false;
     
     
@@ -55,8 +66,15 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
         TagFilterNodeDialog.getValidTagsModel();
     
     
+    /**
+     * @return A proper instance of <code>TagBuilder</code> that provides the
+     * set of valid tags.
+     */
     protected abstract TagBuilder getTagBuilder();
     
+    /**
+     * @return The type of the valid tags.
+     */
     protected abstract String getValidTagType();
     
     /**

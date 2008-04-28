@@ -37,23 +37,43 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 
 /**
+ * Provides the dialog components and the complete of the tag filter node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class TagFilterNodeDialog extends PreprocessingNodeSettingsPane {
+public abstract class TagFilterNodeDialog extends PreprocessingNodeSettingsPane 
+{
 
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelBoolean</code> which specifies if strict
+     * filtering is truned on or off.
+     */
     public static SettingsModelBoolean getStrictFilteringModel() {
         return new SettingsModelBoolean(TagFilterConfigKeys.CFGKEY_STRICT,
                 TagFilterNodeModel.DEF_STRICT);
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelStringArray</code> which contains the set of
+     * specified valid tags.
+     */
     public static SettingsModelStringArray getValidTagsModel() {
         return new SettingsModelStringArray(
                 TagFilterConfigKeys.CFGKEY_VALIDTAGS, new String[]{});
     }
     
+    /**
+     * @return The set of all tags which can be chosen as valid.
+     * This method has to be implemented by underlying implementations, to
+     * specify the set of all tags of a certain type. 
+     */
     protected abstract Set<Tag> getTags();
     
+    /**
+     * Creates a new instance of <code>TagFilterNodeDialog</code>.
+     */
     public TagFilterNodeDialog() {
         super();
         

@@ -24,12 +24,19 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
 /**
+ * Provides the configuration keys of the tag filter node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class TagFilterConfigKeys {
 
+    /**
+     * The configuration key for the strict filtering setting.
+     */
     public static final String CFGKEY_STRICT = "Strict";
     
+    /**
+     * The configuration key for the set of valid tags.
+     */
     public static final String CFGKEY_VALIDTAGS = "ValidTags";
 }

@@ -38,6 +38,9 @@ import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeM
  */
 public class PosTagFilterNodeModel extends TagFilterNodeModel {
 
+    /**
+     * @return The set of all tags which can be specified as valid.
+     */
     public static Set<Tag> getTags() {
         Set<Tag> tags = new HashSet<Tag>();
         List<String> tagStrs = PartOfSpeechTag.asStringList();

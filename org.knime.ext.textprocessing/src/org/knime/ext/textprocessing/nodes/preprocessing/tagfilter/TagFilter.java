@@ -34,6 +34,10 @@ import org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordF
 /**
  * A tag filter, filtering terms with not specified tags. 
  * See {@link StopWordFilter#preprocess(Term)} for details to filter terms.
+ * <code>TagFilter</code> implements <code>Preprocessing</code> and can be
+ * used as a preprocessing step. The preprocessing method 
+ * {@link StopWordFilter#preprocess(Term)} returns null if the term was filtered 
+ * out, an the given unmodified term if not. 
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -45,6 +49,16 @@ public class TagFilter implements Preprocessing {
     
     private boolean m_strict;
     
+    /**
+     * Creates a new instance of <code>TagFilter</code> with a given set of
+     * valid tags, the type of the valid tags and the flag which specifies
+     * of strict filtering is turned on or off.
+     * 
+     * @param validTags The set of valid tags.
+     * @param validTagType The type of the valid tags.
+     * @param strict If <code>true</code>, strict filtering is used otherwise
+     * not.
+     */
     public TagFilter(final Set<Tag> validTags, final String validTagType,
             final boolean strict) {
         m_validTags = validTags;
