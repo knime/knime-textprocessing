@@ -11,11 +11,15 @@
 	<fullDescription>
 	<intro>
         Computes the relative term frequency (tf) of each term according to each 
-        document and adds a column containing the tf value.	   
+        document and adds a column containing the tf value. The value is
+        computed by dividing the absolute frequency of a term according to a 
+        document by the number of all terms of that document.
 	</intro>
-
+        <option name="Relative frequency">
+             If relative frequency is checked, the relative term frequency is
+             computed, otherwise the absolute term frequency. 
+        </option>   
 	</fullDescription>
-		
 	<ports>
         <dataIn name="Terms and related documents input table" index="0">
         The input table which contains terms and documents.</dataIn>

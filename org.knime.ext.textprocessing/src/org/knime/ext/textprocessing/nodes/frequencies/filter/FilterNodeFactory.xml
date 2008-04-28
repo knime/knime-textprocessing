@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="./default.png" type="Learner">
+<knimeNode icon="./default.png" type="Manipulator">
 	<name>Frequency Filter</name>
 	
 	<shortDescription>
-		...
+	   Filters terms with a specified frequency value.
 	</shortDescription>
 	
 	<fullDescription>
 	<intro>
-        ...
+        Filters terms in the given bag of words (input data table) and if
+        specified in the documents as well, with a certain frequency value.
+        On the one hand minimum and maximum values can be defined to be
+        used for filtering. If the value of a specified frequency column
+        is less than the minimum or greater than the maximum value the term is
+        filtered. On the other hand a number k of terms to keep can be defined. 
+        Only those k terms with the highest frequency value are kept, the rest 
+        is filtered. 
 	</intro>
-
+        <option name="Deep filtering">
+             If deep filtering is checked, the terms contained inside
+             the documents are filtered too, this means that the documents are
+             changed, which is more time consuming.
+        </option>
+        <option name="Filter Column">
+             The column 
+        </option>
 	</fullDescription>
 		
 	<ports>
