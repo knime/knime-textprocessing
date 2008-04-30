@@ -147,6 +147,16 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.NamedEntityFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.NamedEntityFilterNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.ne.NamedEntityFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.ne.NamedEntityFilterNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/tagging"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

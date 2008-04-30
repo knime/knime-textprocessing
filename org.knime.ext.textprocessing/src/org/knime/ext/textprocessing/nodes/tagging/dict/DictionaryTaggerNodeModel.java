@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2008
+ * Copyright, 2003 - 2007
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -19,14 +19,18 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   28.02.2008 (Kilian Thiel): created
+ *   30.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.ner;
+package org.knime.ext.textprocessing.nodes.tagging.dict;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -40,39 +44,60 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger. 
- * Extends {@link org.knime.core.node.NodeModel} and provides methods to 
- * configure and execute the node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class AbnerTaggerNodeModel extends NodeModel {
+public class DictionaryTaggerNodeModel extends NodeModel {
 
     /**
      * The default value of the terms unmodifiable flag.
      */
     public static boolean DEFAULT_UNMODIFIABLE = true;
     
+    /**
+     * The default value of the case sensitive setting.
+     */
+    public static boolean DEFAULT_CASE_SENSITIVE = true;
+    
+    /**
+     * The default value of the default tag.
+     */
+    public static String DEFAULT_TAG = 
+        NamedEntityTag.UNKNOWN.getTag().getTagValue();
+    
     private int m_docColIndex = -1;
     
     private SettingsModelBoolean m_setUnmodifiableModel = 
-        AbnerTaggerNodeDialog.createSetUnmodifiableModel();
+        DictionaryTaggerNodeDialog.createSetUnmodifiableModel();
+    
+    private SettingsModelString m_tagModel = 
+        DictionaryTaggerNodeDialog.createTagModel();
+    
+    private SettingsModelString m_fileModel = 
+        DictionaryTaggerNodeDialog.createFileModel();
+    
+    private SettingsModelBoolean m_caseSensitiveModel = 
+        DictionaryTaggerNodeDialog.createCaseSensitiveModel();
     
     private DocumentDataTableBuilder m_dtBuilder;
     
+    
+    
     /**
-     * Creates a new instance of <code>AbnerTaggerNodeModel</code> with one
+     * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with one
      * table in and one out port.
      */
-    public AbnerTaggerNodeModel() {
+    public DictionaryTaggerNodeModel() {
         super(1, 1);
         m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
     }
@@ -92,19 +117,32 @@ public class AbnerTaggerNodeModel extends NodeModel {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
-    }  
+    }      
     
     /**
      * {@inheritDoc}
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            ExecutionContext exec) throws Exception {
+            final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
         
+        // Read file with named entities
+        Set<String> namedEntities = new HashSet<String>();
+        File file = new File(m_fileModel.getStringValue());
+        if (file.exists()) {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                namedEntities.add(line.trim());
+            }
+        }
+        
         List<Document> newDocuments = new ArrayList<Document>();
-        DocumentTagger tagger = new AbnerDocumentTagger(
-                m_setUnmodifiableModel.getBooleanValue());
+        DocumentTagger tagger = new DictionaryDocumentTagger(
+                m_setUnmodifiableModel.getBooleanValue(), namedEntities,
+                NamedEntityTag.stringToTag(m_tagModel.getStringValue()),
+                m_caseSensitiveModel.getBooleanValue());
         
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
@@ -124,7 +162,15 @@ public class AbnerTaggerNodeModel extends NodeModel {
         
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                 exec, newDocuments)};
-    }   
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() {
+        // Nothing to do ...
+    }
     
     /**
      * {@inheritDoc}
@@ -132,7 +178,10 @@ public class AbnerTaggerNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        m_setUnmodifiableModel.validateSettings(settings);
+        m_caseSensitiveModel.loadSettingsFrom(settings);
+        m_tagModel.loadSettingsFrom(settings);
+        m_fileModel.loadSettingsFrom(settings);
+        m_setUnmodifiableModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -140,6 +189,9 @@ public class AbnerTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_caseSensitiveModel.saveSettingsTo(settings);
+        m_tagModel.saveSettingsTo(settings);
+        m_fileModel.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
     }
 
@@ -149,16 +201,10 @@ public class AbnerTaggerNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        m_caseSensitiveModel.validateSettings(settings);
+        m_tagModel.validateSettings(settings);
+        m_fileModel.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
     }
 
     /**
@@ -168,12 +214,16 @@ public class AbnerTaggerNodeModel extends NodeModel {
     protected void saveInternals(final File nodeInternDir, 
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
+        // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-    }     
+    protected void loadInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // Nothing to do ...
+    }
 }

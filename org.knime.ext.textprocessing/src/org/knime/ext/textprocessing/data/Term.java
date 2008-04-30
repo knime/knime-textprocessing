@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 /**
  * Contains one or more words (at least one) and groups them to a meaning of 
  * a higher-level according to the grouping algorithms (like named entity
