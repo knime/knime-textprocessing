@@ -91,7 +91,7 @@ public class CaseConverter implements Preprocessing {
         for (Word w : words) {
             newWords.add(new Word(CaseConverter.convert(w.getWord(), m_case)));
         }
-        return new Term(newWords, term.getTags());
+        return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }    
     
 

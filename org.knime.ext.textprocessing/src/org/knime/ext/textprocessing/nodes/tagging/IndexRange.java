@@ -24,31 +24,62 @@
 package org.knime.ext.textprocessing.nodes.tagging;
 
 /**
+ * Provides start and stop indices for terms and words.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class IndexRange {
+class IndexRange {
     
-    private int m_start = -1;
+    private int m_startTermIndex = -1;
     
-    private int m_stop = -1;
+    private int m_stopTermIndex = -1;
     
-    public IndexRange(final int start, final int stop) {
-        m_start = start;
-        m_stop = stop;
+    private int m_startWordIndex = -1;
+    
+    private int m_stopWordIndex = -1;
+    
+    /**
+     * Creates a new instance of <code>IndexRange</code> with given start and
+     * stop indices of terms and words.
+     * 
+     * @param startTermIndex A term's start index.
+     * @param stopTermIndex A term's stop index.
+     * @param startWordIndex A word's start index.
+     * @param stopIndex A word's stop index.
+     */
+    IndexRange(final int startTermIndex, final int stopTermIndex,
+            final int startWordIndex, final int stopIndex) {
+        m_startTermIndex = startTermIndex;
+        m_stopTermIndex = stopTermIndex;
+        m_startWordIndex = startWordIndex;
+        m_stopWordIndex = stopIndex;
     }
 
     /**
-     * @return the start
+     * @return the startTermIndex
      */
-    public int getStart() {
-        return m_start;
+    public int getStartTermIndex() {
+        return m_startTermIndex;
     }
 
     /**
-     * @return the stop
+     * @return the stopTermIndex
      */
-    public int getStop() {
-        return m_stop;
+    public int getStopTermIndex() {
+        return m_stopTermIndex;
+    }
+
+    /**
+     * @return the startWordIndex
+     */
+    public int getStartWordIndex() {
+        return m_startWordIndex;
+    }
+
+    /**
+     * @return the stopWordIndex
+     */
+    public int getStopWordIndex() {
+        return m_stopWordIndex;
     }
 }

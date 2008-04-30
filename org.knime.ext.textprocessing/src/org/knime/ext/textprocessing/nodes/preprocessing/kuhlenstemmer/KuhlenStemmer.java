@@ -57,7 +57,7 @@ public class KuhlenStemmer implements Preprocessing {
         for (Word w : words) {
             newWords.add(new Word(KuhlenStemmer.stem(w.getWord())));
         }
-        return new Term(newWords, term.getTags());
+        return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
     
     /**

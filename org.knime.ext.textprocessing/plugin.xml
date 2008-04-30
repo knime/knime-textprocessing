@@ -142,6 +142,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner.AbnerTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner.AbnerTagFilterNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.NamedEntityFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.NamedEntityFilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

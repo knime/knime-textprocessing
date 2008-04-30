@@ -95,7 +95,7 @@ public class PosTaggerNodeModel extends NodeModel {
         checkDataTableSpec(inData[0].getDataTableSpec());
         
         List<Document> newDocuments = new ArrayList<Document>();
-        DocumentTagger tagger = new PosDocumentTagger();
+        DocumentTagger tagger = new PosDocumentTagger(false);
         
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();

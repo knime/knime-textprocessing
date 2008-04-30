@@ -476,7 +476,7 @@ public class DocumentBuilder {
                 Word w = new Word(s);
                 List<Word> termWords = new ArrayList<Word>();
                 termWords.add(w);
-                Term t = new Term(termWords);
+                Term t = new Term(termWords, new ArrayList<Tag>(), false);
                 terms.add(t);
             }
             return new Sentence(terms);

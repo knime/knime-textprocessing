@@ -58,7 +58,7 @@ public class PunctuationErasure implements Preprocessing {
             newWords.add(new Word(
                     PunctuationErasure.punctuationFilter(w.getWord())));
         }
-        return new Term(newWords, term.getTags());
+        return new Term(newWords, term.getTags(), term.isUnmodifiable());
     } 
     
     /**

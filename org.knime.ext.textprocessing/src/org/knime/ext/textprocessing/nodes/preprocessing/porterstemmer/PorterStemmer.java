@@ -57,7 +57,7 @@ public class PorterStemmer implements Preprocessing {
         for (Word w : words) {
             newWords.add(new Word(PorterStemmer.stem(w.getWord())));
         }
-        return new Term(newWords, term.getTags());
+        return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
     
     /**

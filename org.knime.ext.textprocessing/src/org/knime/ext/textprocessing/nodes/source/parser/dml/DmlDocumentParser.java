@@ -102,6 +102,11 @@ public class DmlDocumentParser extends DefaultHandler implements
      * The name of the word tag.
      */
     public static final String WORD = "word";
+
+    /**
+     * The name of the modifiability tag.
+     */
+    public static final String MODIFIABILITY = "modifiability";    
     
     /**
      * The name of the <i>tag</i> tag.
@@ -230,6 +235,8 @@ public class DmlDocumentParser extends DefaultHandler implements
     
     private List<Tag> m_tags;
     
+    private String m_modifiability;
+    
     private String m_annotation = "";
     
     
@@ -338,6 +345,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_tagType = "";
         } else if(m_lastTag.equals(TAG_VALUE)) {
             m_tagValue = "";
+        } else if (m_lastTag.equals(MODIFIABILITY)) { 
+            m_modifiability = "";
         } else if(m_lastTag.equals(TERM)) {
             m_words = new ArrayList<Word>();
             m_tags = new ArrayList<Tag>();
@@ -388,7 +397,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             }
         } else if(qName.equals(TERM)) {
             if (m_words != null && m_tags != null) {
-                Term t = new Term(m_words, m_tags);
+                boolean mod = new Boolean(m_modifiability.trim());
+                Term t = new Term(m_words, m_tags, mod);
                 m_currentDoc.addTerm(t);
             }
         } else if (qName.equals(SENTENCE)) {
@@ -429,6 +439,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_tagValue += new String(ch, start, length);
         } else if (m_lastTag.equals(FILENAME)) {
             m_docPath += new String(ch, start, length);
+        } else if (m_lastTag.equals(MODIFIABILITY)) {
+            m_modifiability +=  new String(ch, start, length);
         }
     }
     
@@ -546,7 +558,13 @@ public class DmlDocumentParser extends DefaultHandler implements
                         for (Term t : sn.getTerms()) {
                             atts.clear();
                             hd.startElement("", "", TERM, atts);
-
+                            
+                            // Modifiability
+                            hd.startElement("", "", MODIFIABILITY, atts);
+                            String mod = Boolean.toString(t.isUnmodifiable());
+                            hd.characters(mod.toCharArray(), 0, mod.length());
+                            hd.endElement("", "", MODIFIABILITY);
+                            
                             // Words
                             for (Word w : t.getWords()) {
                                 atts.clear();

@@ -208,7 +208,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
      * @param doc The document to get the serialization string for.
      * @return The serialization string for given <code>Document</code>.
      */
-    static String getSerializationString(final Document doc) {        
+    static String getSerializationString(final Document doc) {
         return DmlDocumentParser.documentAsDml(doc);
     }
 }

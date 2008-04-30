@@ -195,7 +195,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
         
         // tags
         if (str.length > 1) {
-            String tagStr = str[1]; 
+            String tagStr = str[1];
             String[] tagsArr = tagStr.split(TermCell.SEPARATOR);
             for (int i = 0; i < tagsArr.length; i++) {
                 String type = tagsArr[i];
@@ -205,7 +205,14 @@ public class TermCell extends DataCell implements StringValue, TermValue {
             }
         }
         
-        return new Term(words, tags);
+        // modifiability
+        boolean unmodifiable = false;
+        if (str.length > 2) {
+            String modifiabilityStr = str[2];
+            unmodifiable = new Boolean(modifiabilityStr);
+        }
+        
+        return new Term(words, tags, unmodifiable);
     }    
     
     /**
@@ -227,6 +234,9 @@ public class TermCell extends DataCell implements StringValue, TermValue {
             buf.append(t.getTagValue());
             buf.append(TermCell.SEPARATOR);
         }
+        buf.append(TermCell.TAG_SECTION);
+        buf.append(term.isUnmodifiable());
+        
         return buf.toString();
     }
 }

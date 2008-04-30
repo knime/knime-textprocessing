@@ -25,22 +25,20 @@ package org.knime.ext.textprocessing.nodes.tagging.pos;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import opennlp.tools.lang.english.PosTagger;
 import opennlp.tools.postag.POSDictionary;
 
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBuilder;
-import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.PartOfSpeechTag;
-import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
 /**
@@ -53,7 +51,7 @@ import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosDocumentTagger implements DocumentTagger {
+public class PosDocumentTagger extends AbstractDocumentTagger {
     
     private PosTagger m_tagger;
     
@@ -61,121 +59,51 @@ public class PosDocumentTagger implements DocumentTagger {
      * Creates a new instance of PosDocumentTagger and loads internally the
      * POS tagging model of the OpenNLP framework to POS tag the documents.
      * If the model file could not be loaded an <code>IOException</code> will
-     * be thrown.
+     * be thrown. If <code>setNeUnmodifiable</code> is set <code>true</code>
+     * all recognized terms are set to unmodifiable.
      * 
+     * @param setNeUnmodifiable If true all recognized terms are set 
+     * unmodifiable.
      * @throws IOException If the model file could not be loaded.
      */
-    public PosDocumentTagger() throws IOException {
-        //super(false);
+    public PosDocumentTagger(final boolean setNeUnmodifiable) 
+    throws IOException {
+        super(setNeUnmodifiable);
         OpenNlpModelPaths paths = OpenNlpModelPaths.getOpenNlpModelPaths();
         m_tagger = new PosTagger(paths.getPosTaggerModelFile(),
                 new POSDictionary(paths.getPosTaggerDictFile()));
     }
-    
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    protected List<Tag> getTags(String tag) {
-//        List<Tag> tags = new ArrayList<Tag>();
-//        tags.add(PartOfSpeechTag.stringToTag(tag));
-//        return tags;
-//    }
-//
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-//        List<String> words = new ArrayList<String>();
-//        for (Term t : sentence.getTerms()) {
-//            List<Word> wordList = t.getWords();
-//            for (Word w : wordList) {
-//                words.add(w.getWord());
-//            }
-//        }
-//        String[] wordsArr = words.toArray(new String[0]);
-//        String[] tagsArr = m_tagger.tag(wordsArr);
-//        
-//        List<TaggedEntity> entities = new ArrayList<TaggedEntity>();
-//        for (int i = 0; i < wordsArr.length; i++) {
-//            entities.add(new TaggedEntity(wordsArr[i], tagsArr[i]));
-//        }
-//        
-//        return entities;
-//    }
-    
-    
+
     /**
      * {@inheritDoc}
      */
-    public Document tag(final Document doc) {
-        DocumentBuilder db = new DocumentBuilder(doc);
-        for (Section s : doc.getSections()) {
-            for (Paragraph p : s.getParagraphs()) {
-                List<Sentence> newSentenceList = new ArrayList<Sentence>();
-                for (Sentence sn : p.getSentences()) {
-                    newSentenceList.add(tagSentence(sn));
-                }
-                db.addParagraph(new Paragraph(newSentenceList));
-            }
-            db.createNewSection(s.getAnnotation());
-        }
-        return db.createDocument();
+    @Override
+    protected List<Tag> getTags(final String tag) {
+        List<Tag> tags = new ArrayList<Tag>();
+        tags.add(PartOfSpeechTag.stringToTag(tag));
+        return tags;
     }
-    
-    private Sentence tagSentence(final Sentence s) {        
-        // Collect words to tag
-        Hashtable<String, Term> termCache = new Hashtable<String, Term>(); 
-        List<String> words = new ArrayList<String>();
-        for (Term t : s.getTerms()) {
-            // one term consists of one word (that's so amazing)
-            if (t.getWords().size() == 1) {
-                termCache.put(t.getWords().get(0).getWord(), t);
-                words.add(t.getWords().get(0).getWord());
-            }
-            // one term consists of more than one word.
-            // This granularity is destroyed and the new, better,
-            // democratic and freedom-loving term granularity is applied.
-            else if (t.getWords().size() > 1) {
-                List<Word> tempWords = t.getWords();
-                for (Word w : tempWords) {
-                    termCache.put(w.getWord(), null);
-                    words.add(w.getWord());
-                }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<TaggedEntity> tagEntities(final Sentence sentence) {
+        SortedSet<String> words = new TreeSet<String>();
+        for (Term t : sentence.getTerms()) {
+            for (Word w : t.getWords()) {
+                words.add(w.getWord());
             }
         }
         String[] wordsArr = words.toArray(new String[0]);
         String[] tagsArr = m_tagger.tag(wordsArr);
         
-        
-        // Now build up new list of terms
-        List<Term> newTermList = new ArrayList<Term>();
+        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(
+                tagsArr.length);
         for (int i = 0; i < wordsArr.length; i++) {
-            Term t = termCache.get(wordsArr[i]);
-            if (t == null) {
-                List<Word> newWords = new ArrayList<Word>();
-                newWords.add(new Word(wordsArr[i]));
-                List<Tag> newTags = new ArrayList<Tag>();
-                
-                Tag tag = PartOfSpeechTag.stringToTag(tagsArr[i]);
-                //LOGGER.info(tagsArr[i] + "->" + tag.getTagValue());
-                newTags.add(tag);
-                
-                Term newTerm = new Term(newWords, newTags); 
-                newTermList.add(newTerm);
-            } else {
-                List<Tag> tags = new ArrayList<Tag>();
-                tags.addAll(t.getTags());
-                
-                Tag tag = PartOfSpeechTag.stringToTag(tagsArr[i]);
-                //LOGGER.info(tagsArr[i] + "->" + tag.getTagValue());
-                tags.add(tag);
-                
-                Term newTerm = new Term(t.getWords(), tags); 
-                newTermList.add(newTerm);
-            }
+            taggedEntities.add(new TaggedEntity(wordsArr[i], tagsArr[i]));
         }
-        return new Sentence(newTermList);
-    }
+        
+        return taggedEntities;
+    }    
 }

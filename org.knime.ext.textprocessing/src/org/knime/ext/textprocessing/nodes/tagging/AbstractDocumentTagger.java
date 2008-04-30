@@ -95,7 +95,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      * @param sentence The sentence to analyze.
      * @return A list of recognized entities and the corresponding tags.
      */
-    protected abstract List<TaggedEntity> tagEntities(final Sentence sentence);    
+    protected abstract List<TaggedEntity> tagEntities(final Sentence sentence);
     
     /**
      * {@inheritDoc}
@@ -106,7 +106,10 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             for (Paragraph p : s.getParagraphs()) {
                 List<Sentence> newSentenceList = new ArrayList<Sentence>();
                 for (Sentence sn : p.getSentences()) {
-                    newSentenceList.add(tagSentence(sn));
+                    // tag sentence
+                    Sentence taggedSentence = tagSentence(sn);
+                    // add tagged sentence to document
+                    newSentenceList.add(taggedSentence);
                 }
                 db.addParagraph(new Paragraph(newSentenceList));
             }
@@ -116,6 +119,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     }
     
     private Sentence tagSentence(final Sentence s) {
+        // detect named entities
         List<TaggedEntity> entities = tagEntities(s);
         if (entities.size() <= 0) {
             return s;
@@ -131,6 +135,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             List<String> neWords = DefaultTokenization.tokenizeSentence(
                     entity.getEntity());
             
+            // build new term list with old term list, words of detected named
+            // entities and entity tag.
             termList = buildTermList(termList, neWords, entity.getTagString());
         }
         return new Sentence(termList);
@@ -146,71 +152,179 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             return oldList;
         }
         
-        // if start >= 0 means that there is a complete named entity contained
+        // if start >= 0 means that there is a named entity contained
         // in the list of terms, so the terms have to be rearranged.
-        for (int i = 0; i < startStopRanges.size(); i++) {
-            if (i > 0) {
-                oldList = newTermList;
-            }
-            newTermList = new ArrayList<Term>();
-            int start = startStopRanges.get(i).getStart();
-            int stop = startStopRanges.get(i).getStop();
+        int startStopIndex = 0;
+        newTermList = new ArrayList<Term>();
+        
+        // get the first start and stop indices
+        int startTermIndex = startStopRanges.get(startStopIndex)
+                            .getStartTermIndex();
+        int stopTermIndex = startStopRanges.get(startStopIndex)
+                            .getStopTermIndex();
+        int startWordIndex = startStopRanges.get(startStopIndex)
+                            .getStartWordIndex();
+        int stopWordIndex = startStopRanges.get(startStopIndex)
+                            .getStopWordIndex();
+
+        boolean endTerm = false;
+        // list to save term representing named entity at.
+        List<Word> namedEntity = new ArrayList<Word>(neWords.size());
+
+        // go through all the old term list
+        for (int t = 0; t < oldList.size(); t++) {
             
-            int neIndex = 0;
-            // list to save term representing named entity at.
-            List<Word> namedEntity = new ArrayList<Word>(neWords.size());
-            
-            for (int t = 0; t < oldList.size(); t++) {
-                // if we reached the interesting terms containing the named 
-                // entity
-                if (t >= start && t <= stop) {
+            // if we reached the interesting terms containing the named
+            // entity
+            if (t >= startTermIndex && t <= stopTermIndex) {
+                
+                // detected a named entity consist only of one term
+                // check if it has to be split up
+                if (startTermIndex == stopTermIndex) {
                     
-                    // split up terms only if searched named entity is 
-                    // represented by more than one term. If ne is represented
-                    // by only one term just add a tag.
-                    if (start == stop) {
+                    //
+                    // BUT does the term consist of of one or more words ?
+                    // If it consists of more words, it has to be split up,
+                    // if it consists only of one word just add the tags.
+                    //
+                    
+                    // the old term consists only of one word, so just add a tag
+                    // By the way, this is the _only_ situation an old tag is
+                    // kept and also assigned to the new term.
+                    if (oldList.get(t).getWords().size() == 1) {
                         List<Tag> tags = new ArrayList<Tag>();
                         tags.addAll(oldList.get(t).getTags());
                         tags.addAll(getTags(entityTag));
-                        Term newTerm = 
-                            new Term(oldList.get(t).getWords(), tags);
+                        // CREATE NEW TERM !!!
+                        Term newTerm = new Term(oldList.get(t).getWords(), 
+                                tags, m_setNeUnmodifiable);
                         newTermList.add(newTerm);
-                    } else {
-                        List<Word> words = oldList.get(t).getWords();
-                        for (Word w : words) {
-                            // we have to split the term up if the
-                            // words are not part of the named entity
-                            if (neIndex >= neWords.size()
-                                    || !w.getWord()
-                                            .equals(neWords.get(neIndex))) {
-                                List<Word> newWords = new ArrayList<Word>();
-                                newWords.add(w);
-                                Term newTerm = new Term(newWords);
-                                newTermList.add(newTerm);
-                            } else {
-                                namedEntity.add(w);
-                                neIndex++;
-
-                                // if named entity is complete add it as a term
-                                if (neIndex == neWords.size()) {
-                                    List<Tag> tags = getTags(entityTag);
-
+                        
+                    // the old term consists of more than one word so split it
+                    } else if (oldList.get(t).getWords().size() > 1) {
+                        List<Word> newWords = new ArrayList<Word>();
+                        for (int w = 0; w < oldList.get(t).getWords().size(); 
+                        w++) {
+                            // add word if index matches
+                            if (w >= startWordIndex && w <= stopWordIndex) {
+                                newWords.add(oldList.get(t).getWords().get(w));
+                                
+                                // if last word to add, create term and add it
+                                // to new list
+                                if (w == stopWordIndex) {
+                                    List<Tag> tags = new ArrayList<Tag>();
+                                    tags.addAll(getTags(entityTag));
                                     // CREATE NEW TERM !!!
-                                    Term newTerm = new Term(namedEntity, tags, 
+                                    Term newTerm = new Term(newWords, tags, 
                                             m_setNeUnmodifiable);
-
                                     newTermList.add(newTerm);
-                                    neIndex = 0;
+                                    endTerm = true;
                                 }
+                                
+                            // if word is not part of the named entity add it as
+                            // a term.
+                            } else {
+                                List<Word> newWord = new ArrayList<Word>();
+                                newWord.add(oldList.get(t).getWords().get(w));
+                                List<Tag> tags = new ArrayList<Tag>();
+                                // CREATE NEW TERM !!!
+                                Term newTerm = new Term(newWord, tags, false);
+                                newTermList.add(newTerm);
                             }
                         }
                     }
-                } 
-                // if we are before or after the interesting part just add the
-                // terms without rearrangement
-                else {
-                    newTermList.add(oldList.get(t));
-                }
+                    
+                    // reset new named entity list and go to the next found 
+                    // named entity range
+                    startStopIndex++;
+                    if (startStopIndex < startStopRanges.size()) {
+                        startTermIndex = startStopRanges.get(startStopIndex)
+                                        .getStartTermIndex();
+                        stopTermIndex = startStopRanges.get(startStopIndex)
+                                        .getStopTermIndex();
+                        startWordIndex = startStopRanges.get(startStopIndex)
+                                        .getStartWordIndex();
+                        stopWordIndex = startStopRanges.get(startStopIndex)
+                                        .getStopWordIndex();
+                        namedEntity.clear();
+                    }
+                    
+                // entity consists of more than one term, so split it up. 
+                } else {
+                    List<Word> words = oldList.get(t).getWords();
+                    for (int w = 0; w < words.size(); w++) {
+                        
+                        // if current term is start term
+                        if (t == startTermIndex) {
+                            // if word part if the named entity add it
+                            if (w >= startWordIndex) {
+                                namedEntity.add(words.get(w));
+                                
+                            // otherwise create a new term containing the word
+                            } else {
+                                List<Word> newWord = new ArrayList<Word>();
+                                newWord.add(words.get(w));
+                                List<Tag> tags = new ArrayList<Tag>();
+                                // CREATE NEW TERM !!!
+                                Term newTerm = new Term(newWord, tags, false);
+                                newTermList.add(newTerm);
+                            }
+                            
+                        // if current term is stop term
+                        } else if (w == stopWordIndex) {
+                            // add words as long as stopWordIndex is not reached
+                            if (w <= stopWordIndex) {
+                                namedEntity.add(words.get(w));
+                                
+                                // if last word is reached, create terma and
+                                // add it
+                                if (w == stopWordIndex) {
+                                    List<Tag> tags = new ArrayList<Tag>();
+                                    tags.addAll(getTags(entityTag));
+                                    // CREATE NEW TERM !!!
+                                    Term newTerm = new Term(namedEntity, tags, 
+                                            m_setNeUnmodifiable);
+                                    newTermList.add(newTerm);
+                                }
+                                
+                            // otherwise create a term for each word    
+                            } else {
+                                List<Word> newWord = new ArrayList<Word>();
+                                newWord.add(words.get(w));
+                                List<Tag> tags = new ArrayList<Tag>();
+                                // CREATE NEW TERM !!!
+                                Term newTerm = new Term(newWord, tags, false);
+                                newTermList.add(newTerm);
+                            }
+                            
+                        // if we are in between the start term and the stop term
+                        // just add all words to the new word list
+                        } else if (t > startTermIndex && t < stopTermIndex) {
+                            namedEntity.add(words.get(w));
+                        }
+                    }
+                    if (endTerm) {
+                        // next found term range
+                        endTerm = false;
+                        startStopIndex++;
+                        if (startStopIndex < startStopRanges.size()) {
+                            startTermIndex = startStopRanges.get(startStopIndex)
+                                            .getStartTermIndex();
+                            stopTermIndex = startStopRanges.get(startStopIndex)
+                                            .getStopTermIndex();
+                            startWordIndex = startStopRanges.get(startStopIndex)
+                                            .getStartWordIndex();
+                            stopWordIndex = startStopRanges.get(startStopIndex)
+                                            .getStopWordIndex();
+                            namedEntity.clear();
+                        }
+                    }
+                }               
+            }
+            // if we are before or after the interesting part just add the
+            // terms without rearrangement
+            else {
+                newTermList.add(oldList.get(t));
             }
         }
         return newTermList;
@@ -221,8 +335,10 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         List<IndexRange> ranges = new ArrayList<IndexRange>();
         int found = 0;
         boolean foundFlag = false;
-        int start = -1;
-        int stop = -1;
+        int startTermIndex = -1;
+        int stopTermIndex = -1;
+        int startWordIndex = -1;
+        int stopWordIndex = -1;
         
         // search all terms
         for (int t = 0; t < sentence.size(); t++) {
@@ -235,7 +351,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     // if "found" 0 means we are at the beginning of the named
                     // entity
                     if (found == 0) {
-                        start = t;
+                        startTermIndex = t;
+                        startWordIndex = w;
                     }
                     
                     found++;
@@ -243,11 +360,16 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     
                     // means we are at the end of the named entity
                     if (found == ne.size()) {
-                        stop = t;
+                        stopTermIndex = t;
+                        stopWordIndex = w;
                         
-                        ranges.add(new IndexRange(start, stop));
-                        start = -1;
-                        stop = -1;
+                        ranges.add(new IndexRange(startTermIndex, stopTermIndex,
+                                startWordIndex, stopWordIndex));
+                        
+                        startTermIndex = -1;
+                        stopTermIndex = -1;
+                        startWordIndex = -1;
+                        stopWordIndex = -1;
                         foundFlag = false;
                         found = 0;
                     }
@@ -255,13 +377,14 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     if (foundFlag) {
                         foundFlag = false;
                         found = 0;
-                        start = -1;
-                        stop = -1;
+                        startTermIndex = -1;
+                        stopTermIndex = -1;
+                        startWordIndex = -1;
+                        stopWordIndex = -1;
                     }
                 }
             }
         }
-
         return ranges;
     }    
 }
