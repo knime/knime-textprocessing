@@ -47,6 +47,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
@@ -82,6 +83,10 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     public static final String DEFAULT_SOURCE = "";    
     
+    /**
+     * The default document type.
+     */
+    public static final DocumentType DEFAULT_DOCTYPE = DocumentType.UNKNOWN;
     
     private static final NodeLogger LOGGER = 
         NodeLogger.getLogger(DocumentParserNodeModel.class);
@@ -97,6 +102,9 @@ public class DocumentParserNodeModel extends NodeModel {
     
     private SettingsModelString m_sourceModel = 
         DocumentParserNodeDialog.getSourceModel();    
+    
+    private SettingsModelString m_typeModel = 
+        DocumentParserNodeDialog.getTypeModel();
     
     private DocumentParser m_parser;
     
@@ -145,6 +153,10 @@ public class DocumentParserNodeModel extends NodeModel {
         String source = m_sourceModel.getStringValue();
         if (source != null && source.length() > 0) {
             m_parser.setDocumentSource(new DocumentSource(source));
+        }
+        DocumentType type = DocumentType.valueOf(m_typeModel.getStringValue());
+        if (type != null) {
+            m_parser.setDocumentType(type);
         }
         
         FileCollector fc = new FileCollector(dir, m_validExtensions, recursive);
@@ -211,6 +223,7 @@ public class DocumentParserNodeModel extends NodeModel {
         m_recursiveModel.loadSettingsFrom(settings);
         m_categoryModel.loadSettingsFrom(settings);
         m_sourceModel.loadSettingsFrom(settings);
+        m_typeModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -222,6 +235,7 @@ public class DocumentParserNodeModel extends NodeModel {
         m_recursiveModel.saveSettingsTo(settings);
         m_categoryModel.saveSettingsTo(settings);
         m_sourceModel.saveSettingsTo(settings);
+        m_typeModel.saveSettingsTo(settings);
     }
 
     /**
@@ -234,6 +248,7 @@ public class DocumentParserNodeModel extends NodeModel {
         m_recursiveModel.validateSettings(settings);
         m_categoryModel.validateSettings(settings);
         m_sourceModel.validateSettings(settings);
+        m_typeModel.validateSettings(settings);
     }
 
 }

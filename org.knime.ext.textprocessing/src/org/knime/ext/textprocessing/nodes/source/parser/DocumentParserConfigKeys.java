@@ -52,5 +52,10 @@ public class DocumentParserConfigKeys {
     /**
      * The configuration key of the source to set to the documents.
      */
-    public static final String CFGKEY_SOURCE = "Source";    
+    public static final String CFGKEY_SOURCE = "Source";
+    
+    /**
+     * The configuration key of the type of the document.
+     */
+    public static final String CFGKEY_DOCTYPE = "Type";
 }

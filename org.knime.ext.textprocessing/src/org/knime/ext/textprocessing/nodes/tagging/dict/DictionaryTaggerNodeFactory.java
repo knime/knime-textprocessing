@@ -28,6 +28,7 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * The factory class of the dictionary based named entity recognizer node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */

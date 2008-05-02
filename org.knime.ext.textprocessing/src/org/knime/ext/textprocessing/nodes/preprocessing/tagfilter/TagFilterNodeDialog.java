@@ -24,7 +24,8 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.ListSelectionModel;
@@ -83,11 +84,12 @@ public abstract class TagFilterNodeDialog extends PreprocessingNodeSettingsPane
         addDialogComponent(new DialogComponentBoolean(
                 getStrictFilteringModel(), "Strict filtering"));
         
-        Collection<String> tagStrs = new ArrayList<String>();
+        List<String> tagStrs = new ArrayList<String>();
         Set<Tag> validTags = getTags();
         for (Tag t : validTags) {
             tagStrs.add(t.getTagValue());
         }
+        Collections.sort(tagStrs);
         addDialogComponent(new DialogComponentStringListSelection(
                 getValidTagsModel(), "Tags", tagStrs, 
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION, true, 10));

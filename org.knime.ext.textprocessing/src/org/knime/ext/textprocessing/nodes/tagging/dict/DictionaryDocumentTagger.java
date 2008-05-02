@@ -34,21 +34,37 @@ import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 
 /**
+ * A dictionary based tagger providing methods to detect and tag named entities 
+ * in a given sentence. The named entities to detect have to be specified 
+ * when calling the constructor.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class DictionaryDocumentTagger extends AbstractDocumentTagger {
 
-    public Set<String> m_namedEntities;
+    private Set<String> m_namedEntities;
     
-    public Tag m_tag;
+    private Tag m_tag;
     
-    public boolean m_caseSensitve;
+    private boolean m_caseSensitve;
     
+    /**
+     * Creates a new instance of <code>DictionaryDocumentTagger</code> with 
+     * given flag to set found named entities unmodifiable, to ignore the case
+     * of the named entities to detect, the tag to assign to the found named 
+     * entities and the set of named entities to watch out for.
+     * 
+     * @param setUnmodifiable If <code>true</code> found named entities are set
+     * unmodifiable, otherwise not.
+     * @param namedEntities The set of named entities to watch out for.
+     * @param tag The tag to assign to found named entities.
+     * @param caseSensitive If <code>false</code> the case of named entities
+     * and words of the sentences are ignored, otherwise not.
+     */
     public DictionaryDocumentTagger(final boolean setUnmodifiable,
             final Set<String> namedEntities, final Tag tag, 
             final boolean caseSensitive) {
-        super(setUnmodifiable);
+        super(setUnmodifiable, caseSensitive);
         
         if (namedEntities == null) {
             throw new NullPointerException(

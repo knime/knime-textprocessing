@@ -29,8 +29,10 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentType;
 
 /**
  * Creates the dialog of the DocumentParserNode with a file chooser component,
@@ -85,7 +87,18 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 DocumentParserConfigKeys.CFGKEY_SOURCE, 
                 DocumentParserNodeModel.DEFAULT_SOURCE);
-    }    
+    }
+    
+    /**
+     * @return The 
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the document's type to set. 
+     */
+    static SettingsModelString getTypeModel() {
+        return new SettingsModelString(
+                DocumentParserConfigKeys.CFGKEY_DOCTYPE,
+                DocumentParserNodeModel.DEFAULT_DOCTYPE.toString());
+    }
     
     
     /**
@@ -106,6 +119,11 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
                 getCategoryModel(), "Document category"));
         
         addDialogComponent(new DialogComponentString(
-                getSourceModel(), "Document source"));        
+                getSourceModel(), "Document source"));
+        
+        String[] types = DocumentType.asStringList().toArray(new String[0]);
+        addDialogComponent(new DialogComponentStringSelection(
+                getTypeModel(), "Document Type", 
+                types));
     }
 }

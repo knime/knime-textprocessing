@@ -32,6 +32,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 
 /**
+ * The dialog class of the dictionary named entity recognizer node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -52,17 +53,33 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
                 DictionaryTaggerNodeModel.DEFAULT_UNMODIFIABLE);
     }
     
+    /**
+     * @return Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean}
+     * containing the flag specifying whether the search for named entities
+     * have to be done case sensitive or not.
+     */
     public static final SettingsModelBoolean createCaseSensitiveModel() {
         return new SettingsModelBoolean(
                 DictionaryTaggerConfigKeys.CFGKEY_CASE_SENSITIVE,
                 DictionaryTaggerNodeModel.DEFAULT_CASE_SENSITIVE);
     }
     
+    /**
+     * @return Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the file with the named entities to watch out for.
+     */
     public static final SettingsModelString createFileModel() {
         return new SettingsModelString(
                 DictionaryTaggerConfigKeys.CFGKEY_FILE, "");
     }
     
+    /**
+     * @return Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the tag to assign to each found named entity.
+     */
     public static final SettingsModelString createTagModel() {
         return new SettingsModelString(
                 DictionaryTaggerConfigKeys.CFGKEY_TAG, 

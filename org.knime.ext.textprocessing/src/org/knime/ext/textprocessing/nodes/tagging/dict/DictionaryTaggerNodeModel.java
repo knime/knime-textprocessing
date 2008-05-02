@@ -54,6 +54,7 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
+ * The model class of the dictionary based named entity recognizer.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
@@ -136,6 +137,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
             while ((line = br.readLine()) != null) {
                 namedEntities.add(line.trim());
             }
+            br.close();
         }
         
         List<Document> newDocuments = new ArrayList<Document>();

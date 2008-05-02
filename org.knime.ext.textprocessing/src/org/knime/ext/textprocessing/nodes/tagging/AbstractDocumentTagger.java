@@ -65,6 +65,11 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     protected boolean m_setNeUnmodifiable;
     
     /**
+     * The case sensitive flag.
+     */
+    protected boolean m_caseSensitive = true;
+    
+    /**
      * Constructor of <code>AbstractDocumentTagger</code> with the given flag
      * which specifies if recognized named entities have to be set unmodifiable 
      * or not.
@@ -74,6 +79,22 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     public AbstractDocumentTagger(final boolean setUnmodifiable) {
         m_setNeUnmodifiable = setUnmodifiable;
     }
+    
+    /**
+     * Constructor of <code>AbstractDocumentTagger</code> with the given flags
+     * specifying if recognized named entities have to be set unmodifiable 
+     * or not and if search for named entities is case sensitive or not.
+     * 
+     * @param setUnmodifiable If <code>true</code> recognized tags are set 
+     * unmodifiable.
+     * @param caseSensitive If <code>true</code> search for named entities is 
+     * done case sensitive, otherwise not.
+     */
+    public AbstractDocumentTagger(final boolean setUnmodifiable,
+            final boolean caseSensitive) {
+        m_setNeUnmodifiable = setUnmodifiable;
+        m_caseSensitive = caseSensitive;
+    }    
     
     /**
      * Creates proper tags out if the given string accordant to the underlying 
@@ -345,9 +366,18 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             List<Word> words = sentence.get(t).getWords();
             // search words of terms
             for (int w = 0; w < words.size(); w++) {
+                
+                // prepare word and ne for comparison (convert to lower case
+                // if case sensitivity is switched off)
+                String wordStr = words.get(w).getWord();
+                String neStr = ne.get(found);
+                if (!m_caseSensitive) {
+                    wordStr = wordStr.toLowerCase();
+                    neStr = neStr.toLowerCase();
+                }
+                
                 // if ne element at "found" equals the current word
-                if (found < ne.size() 
-                        && words.get(w).getWord().equals(ne.get(found))) {
+                if (found < ne.size() && wordStr.equals(neStr)) {
                     // if "found" 0 means we are at the beginning of the named
                     // entity
                     if (found == 0) {
