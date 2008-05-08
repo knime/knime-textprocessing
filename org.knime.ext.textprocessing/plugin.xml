@@ -157,6 +157,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/transformation"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

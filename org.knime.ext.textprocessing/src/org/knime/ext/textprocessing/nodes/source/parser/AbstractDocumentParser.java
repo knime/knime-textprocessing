@@ -95,7 +95,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
-    public abstract List<Document> parse(final InputStream is);
+    public abstract List<Document> parse(final InputStream is) throws Exception;
 
     /**
      * {@inheritDoc}

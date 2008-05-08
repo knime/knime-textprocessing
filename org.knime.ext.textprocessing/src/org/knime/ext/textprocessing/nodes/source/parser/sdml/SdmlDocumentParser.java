@@ -31,7 +31,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
@@ -200,22 +199,11 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
-    public List<Document> parse(InputStream is) {
-        try {
-            m_docs = new ArrayList<Document>();
-            SAXParserFactory fac = SAXParserFactory.newInstance();
-            fac.setValidating(true);
-            fac.newSAXParser().parse(is, this);
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("Could not instanciate parser");
-            LOGGER.info(e.getMessage());
-        } catch (SAXException e) {
-            LOGGER.error("Could not parse file");
-            LOGGER.info(e.getMessage());
-        } catch (IOException e) {
-            LOGGER.error("Could not read file");
-            LOGGER.info(e.getMessage());
-        }
+    public List<Document> parse(InputStream is) throws Exception {
+        m_docs = new ArrayList<Document>();
+        SAXParserFactory fac = SAXParserFactory.newInstance();
+        fac.setValidating(true);
+        fac.newSAXParser().parse(is, this);
         return m_docs;
     }
 

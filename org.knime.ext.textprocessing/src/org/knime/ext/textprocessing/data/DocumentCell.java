@@ -35,6 +35,7 @@ import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
+import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
 
@@ -48,7 +49,10 @@ import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
  */
 public class DocumentCell extends DataCell implements StringValue,
         DocumentValue {
-
+    
+    private static final NodeLogger LOGGER =
+        NodeLogger.getLogger(DocumentCell.class);
+    
     /**
      * Convenience access member for
      * <code>DataType.getType(DocumentCell.class)</code>.
@@ -171,7 +175,13 @@ public class DocumentCell extends DataCell implements StringValue,
     }
     
     private static DocumentCell createDocumentCell(final String str) {
-        Document d = DocumentCell.createDocument(str);
+        Document d;
+        try {
+            d = DocumentCell.createDocument(str);
+        } catch (Exception e) {
+            LOGGER.warn("Parse error: DocumentCell could not be created!");
+            return null;
+        }
         return new DocumentCell(d);
     }
     
@@ -190,8 +200,9 @@ public class DocumentCell extends DataCell implements StringValue,
      * instance for.
      * @return The instance of <code>Document</code> related to the given 
      * string.
+     * @throws Exception If document could not be parsed
      */
-    static Document createDocument(final String str) {
+    static Document createDocument(final String str) throws Exception {
         DocumentParser parser = new DmlDocumentParser();
         List<Document> docs = parser.parse(new ByteArrayInputStream(
                 str.getBytes()));

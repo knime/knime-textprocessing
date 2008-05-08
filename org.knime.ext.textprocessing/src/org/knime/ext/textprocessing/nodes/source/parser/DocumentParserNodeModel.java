@@ -180,7 +180,15 @@ public class DocumentParserNodeModel extends NodeModel {
                 is = new FileInputStream(f);
             }
             m_parser.setDocumentFilepath(f.getAbsolutePath());
-            docs.addAll(m_parser.parse(is));
+            
+            try {
+                docs.addAll(m_parser.parse(is));
+            } catch (Exception e) {
+                LOGGER.error("Could not parse file: " 
+                        + f.getAbsolutePath().toString());
+                setWarningMessage("Could not parse all file properly!");
+                throw e;
+            }
         }
         
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(exec, docs)};

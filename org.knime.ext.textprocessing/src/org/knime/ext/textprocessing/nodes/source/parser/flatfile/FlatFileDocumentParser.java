@@ -25,13 +25,11 @@ package org.knime.ext.textprocessing.nodes.source.parser.flatfile;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -53,9 +51,6 @@ import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
  * @author Kilian Thiel, University of Konstanz
  */
 public class FlatFileDocumentParser extends AbstractDocumentParser {
-
-    private static final NodeLogger LOGGER = 
-        NodeLogger.getLogger(FlatFileDocumentParser.class);
     
     private List<Document> m_docs;
     
@@ -88,32 +83,27 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      * {@inheritDoc}
      */
     @Override
-    public List<Document> parse(final InputStream is) {
+    public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
-        
+
         m_currentDoc = new DocumentBuilder();
         m_currentDoc.setDocumentFile(new File(m_docPath));
         m_currentDoc.setDocumentType(m_type);
         m_currentDoc.addDocumentCategory(m_category);
         m_currentDoc.addDocumentSource(m_source);
-        
+
         m_currentDoc.addTitle(m_docPath);
-        
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = null;
-            StringBuilder text = new StringBuilder();
-            while((line = br.readLine()) != null) {
-                text.append(line);
-            }
-            br.close();
-            m_currentDoc.addSection(text.toString(), SectionAnnotation.UNKNOWN);
-        } catch (IOException e) {
-            LOGGER.warn("Input stream could not be red!");
-            LOGGER.warn(e.getMessage());
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        StringBuilder text = new StringBuilder();
+        while ((line = br.readLine()) != null) {
+            text.append(line);
         }
-        
+        br.close();
+        m_currentDoc.addSection(text.toString(), SectionAnnotation.UNKNOWN);
+
         m_docs.add(m_currentDoc.createDocument());
         return m_docs;
-    }     
+    }  
 }

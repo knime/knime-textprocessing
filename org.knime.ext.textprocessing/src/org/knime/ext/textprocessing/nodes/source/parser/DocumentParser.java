@@ -52,8 +52,9 @@ public interface DocumentParser {
      * 
      * @param is the <code>InputStream</code> providing the data to parse. 
      * @return A list of documents parsed out of the input stream's data.
+     * @throws Exception If something is not working properly.
      */
-    public List<Document> parse(final InputStream is);
+    public List<Document> parse(final InputStream is) throws Exception;
     
     /**
      * @param category The category of the documents to set.

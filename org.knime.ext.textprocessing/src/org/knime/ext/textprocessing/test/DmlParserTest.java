@@ -26,7 +26,6 @@ package org.knime.ext.textprocessing.test;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
@@ -75,7 +74,7 @@ public class DmlParserTest {
                 }
             }
             
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
