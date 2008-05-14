@@ -59,7 +59,7 @@
       </node>
       <node
             category-path="/textprocessing/io"
-            factory-class="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodeFactory2"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodefactory">
       </node>
       <node

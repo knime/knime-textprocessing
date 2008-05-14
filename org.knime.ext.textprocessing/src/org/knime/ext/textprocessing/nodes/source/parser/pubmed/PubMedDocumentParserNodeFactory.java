@@ -35,7 +35,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PubMedDocumentParserNodeFactory2 extends 
+public class PubMedDocumentParserNodeFactory extends 
 NodeFactory<DocumentParserNodeModel> {
 
     /**
