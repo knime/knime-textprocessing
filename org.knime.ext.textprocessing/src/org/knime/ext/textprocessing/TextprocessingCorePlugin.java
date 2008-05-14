@@ -33,7 +33,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
-/**
  * The main plugin class to be used in the desktop.
  *
  * @author Kilian Thiel, University of Konstanz
