@@ -200,6 +200,12 @@ public class TermCell extends DataCell implements StringValue, TermValue {
             for (int i = 0; i < tagsArr.length; i++) {
                 String type = tagsArr[i];
                 i++;
+                
+                // if no tags are assigned, continue
+                if (i >= tagsArr.length) {
+                    continue;
+                }
+                
                 String value = tagsArr[i];
                 tags.add(TagFactory.getInstance().createTag(type, value));
             }

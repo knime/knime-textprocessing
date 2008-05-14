@@ -153,6 +153,13 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             currRow++;    
             
             DataRow row = i.next();
+            
+            // handle missing value (ignore rows with missing values)
+            if (row.getCell(m_termColIndex).isMissing()
+                    || row.getCell(m_documentColIndex).isMissing()) {                
+                continue;
+            }
+            
             Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
             Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
                             getDocument();

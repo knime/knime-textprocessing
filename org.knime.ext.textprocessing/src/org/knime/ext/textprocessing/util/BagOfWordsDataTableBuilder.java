@@ -121,6 +121,10 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
         int currRow = 1;
         
         for (DataCell d : keys) {
+            if (d == null) {
+                continue;
+            }
+            
             if (!d.getType().isCompatible(DocumentValue.class)) {
                 throw new IllegalArgumentException("DataCell is not " 
                         + "compatible with DocumentValue!");
@@ -128,6 +132,9 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
             
             Set<Term> terms = docTerms.get(d);
             for (Term t : terms) {
+                if (t == null) {
+                    continue;
+                }
                 exec.checkCanceled();
                 RowKey rowKey = new RowKey(new Integer(i).toString());
                 i++;
@@ -138,6 +145,7 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
                 } else {
                     termCell = (TermCell)termCache.getInstance(t);
                 }
+                
                 DataRow row = new DefaultRow(rowKey, termCell, d);
                 dc.addRowToTable(row);
             }
