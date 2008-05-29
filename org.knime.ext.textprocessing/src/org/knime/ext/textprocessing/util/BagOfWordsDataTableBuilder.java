@@ -50,10 +50,84 @@ import org.knime.ext.textprocessing.data.TermCell;
  */
 public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
 
+    private BufferedDataContainer m_dataContainer;
+    
+    private int m_keyCount = 0;
+    
+    private FullDataCellCache m_docCache;
+    
     /**
      * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
      */
-    public BagOfWordsDataTableBuilder() { }
+    public BagOfWordsDataTableBuilder() { }    
+    
+    /**
+     * @return The corresponding factory creating a certain kind of 
+     * <code>DataCell</code>s containing documents. 
+     */
+    protected abstract TextContainerDataCellFactory 
+        getDocumentCellDataFactory();
+    
+    protected abstract boolean validateDocumentCellType(
+            final DataCell documentCell);
+    
+    public synchronized void openNewDataTable(final ExecutionContext exec) {
+        if (m_dataContainer != null) {
+            m_dataContainer.close();
+            m_dataContainer = null;
+        }
+        m_keyCount = 0;
+        m_dataContainer = exec.createDataContainer(this.createDataTableSpec());
+        m_docCache = new FullDataCellCache(getDocumentCellDataFactory());
+    }
+
+    public synchronized void addRow(final Document document, final Term term, 
+            final ExecutionContext exec) throws IllegalArgumentException {
+        if (m_docCache == null) {
+            openNewDataTable(exec);
+        }
+        
+        DataCell documentCell = m_docCache.getInstance(document);
+        TermCell termCell = new TermCell(term);
+        addRow(documentCell, termCell, exec);
+    }
+    
+    public synchronized void addRow(final DataCell documentCell, 
+            final TermCell termCell, final ExecutionContext exec) 
+    throws IllegalArgumentException {
+        if (!documentCell.getType().isCompatible(DocumentValue.class)) {
+            throw new IllegalArgumentException(
+                    "Given document cell is not compatible to DocumentValue!");
+        }
+        if (!validateDocumentCellType(documentCell)) {
+            throw new IllegalArgumentException(
+                    "Type of given document cell is not a valid type!");            
+        }
+        
+        if (m_dataContainer == null) {
+            openNewDataTable(exec);
+        }
+        
+        RowKey rowKey = new RowKey(Integer.toString(m_keyCount));
+        m_keyCount++;
+        
+        DataRow row = new DefaultRow(rowKey, termCell, documentCell);
+        m_dataContainer.addRowToTable(row);
+    }
+    
+    public synchronized BufferedDataTable closeDataTable() {
+        if (m_dataContainer != null) {
+            m_keyCount = 0;
+            m_dataContainer.close();
+            BufferedDataContainer tmpContainer = m_dataContainer;
+            m_dataContainer = null;
+            m_docCache = null;
+            return tmpContainer.getTable();
+        }
+        return null;
+    }
+    
+    
     
     /**
      * Creates and returns a {@link org.knime.core.node.BufferedDataTable} 
@@ -75,11 +149,56 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * documents and terms
      * @throws CanceledExecutionException If execution was canceled.
      */
-    public abstract BufferedDataTable createDataTable(
-            final ExecutionContext exec, 
+    public BufferedDataTable createDataTable(final ExecutionContext exec,
             final Hashtable<Document, Set<Term>> docTerms, 
-            final boolean useTermCache) throws CanceledExecutionException;
+            final boolean useTermCache) throws CanceledExecutionException {
+      // create cache
+      FullDataCellCache docCache = new FullDataCellCache(
+              getDocumentCellDataFactory());
+      FullDataCellCache termCache = new FullDataCellCache(
+              new TermDataCellFactory());
+      
+      BufferedDataContainer dc =
+              exec.createDataContainer(this.createDataTableSpec());
 
+      int i = 1;
+      Set<Document> keys = docTerms.keySet();
+      int rowCount = keys.size();
+      int currRow = 1;
+      
+      for (Document d : keys) {
+          DataCell docCell = docCache.getInstance(d);
+          
+          Set<Term> terms = docTerms.get(d);
+          for (Term t : terms) {
+              exec.checkCanceled();
+              RowKey rowKey = new RowKey(new Integer(i).toString());
+              i++;
+              
+              TermCell termCell;
+              if (!useTermCache) {
+                  termCell = new TermCell(t);
+              } else {
+                  termCell = (TermCell)termCache.getInstance(t);
+              }
+              DataRow row = new DefaultRow(rowKey, termCell, docCell);
+              dc.addRowToTable(row);
+          }
+          
+          double progress = (double)currRow / (double)rowCount;
+          exec.setProgress(progress, "Creating Bow of document " + currRow 
+                  + " of " + rowCount);
+          exec.checkCanceled();
+          currRow++;           
+      }
+      dc.close();
+      
+      docTerms.clear();
+      docCache.reset();
+      termCache.reset();
+      
+      return dc.getTable();
+    }
     
 
     /**

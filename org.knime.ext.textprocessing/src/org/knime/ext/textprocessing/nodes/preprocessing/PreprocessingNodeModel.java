@@ -23,22 +23,23 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -72,7 +73,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     /**
      * The default setting for deep preprocessing (<code>false</code>).
      */
-    public static final boolean DEF_DEEP_PREPRO = false;
+    public static final boolean DEF_DEEP_PREPRO = true;
     
     private int m_documentColIndex = -1;
     
@@ -120,6 +121,40 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     protected abstract void initPreprocessing();
     
+    
+    private BufferedDataTable m_inData;
+    
+    private RowIterator m_rowIterator;
+    
+    private int m_rowCount = 0;
+    
+    private final List<DataRow> getNextDataTableChunk() {
+        if (m_inData == null) {
+            return new ArrayList<DataRow>();
+        }
+        if (m_rowIterator == null) {
+            m_rowIterator = m_inData.iterator();
+        }
+        
+        List<DataRow> rowList = new ArrayList<DataRow>();
+        Document lastDoc = null;
+        while(m_rowIterator.hasNext()) {
+            DataRow row = m_rowIterator.next();
+            Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
+            getDocument();
+            if (lastDoc == null || lastDoc.equals(doc)) {
+                rowList.add(row);
+                lastDoc = doc;
+            } else {
+                return rowList;
+            }
+        }
+        return rowList;
+    }
+    
+
+    
+    
     /**
      * {@inheritDoc}
      */
@@ -134,110 +169,152 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             throw new NullPointerException(
                     "Preprocessing instance may not be null!");
         }
+
+        m_dtBuilder.openNewDataTable(exec);
+        m_inData = inData[0];
+        m_rowIterator = m_inData.iterator();
+        m_rowCount = 0;
         
-        Hashtable<Document, Set<Term>> docTerms = 
-            new Hashtable<Document, Set<Term>>();
-        Hashtable<Document, Document> preprocessedDoc = 
-            new Hashtable<Document, Document>();
+        ThreadPool gtp = KNIMEConstants.GLOBAL_THREAD_POOL;
+        ThreadPool stp = gtp.createSubPool(gtp.getMaxThreads());
         
-        ExecutionMonitor subExec = exec.createSubProgress(0.5);
-        int rowCount = inData[0].getRowCount();
-        int currRow = 1;
-        RowIterator i = inData[0].iterator();
-        while(i.hasNext()) {
-            // report status
-            double progress = (double)currRow / (double)rowCount;
-            subExec.setProgress(progress, "Processing row " + currRow + " of " 
-                    + rowCount);
+        while(m_rowIterator.hasNext()) {
             exec.checkCanceled();
-            currRow++;    
+            List<DataRow> rowList = getNextDataTableChunk();
             
-            DataRow row = i.next();
-            
-            // handle missing value (ignore rows with missing values)
-            if (row.getCell(m_termColIndex).isMissing()
-                    || row.getCell(m_documentColIndex).isMissing()) {                
-                continue;
-            }
-            
-            Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-            Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
-                            getDocument();
-            Document newDoc = null;
-            
-            //
-            // do the preprocessing twist
-            //
-            
-            // is the term unmodifiable ???
-            if (!term.isUnmodifiable()) {
-                term = m_preprocessing.preprocess(term);
-                
-                // if term is null or empty continue with next term !
-                if (term == null || term.getText().length() <= 0) {
-                    continue;
-                }
-            }
-            // do we have to preprocess the documents itself too ?
-            if (m_deepPreproModel.getBooleanValue()) {                
-                // preprocess document only if it was not preprocessed till now
-                if (preprocessedDoc.containsKey(doc)) {
-                    newDoc = preprocessedDoc.get(doc);
-                } else {
-                    // preprocess doc here !!!
-                    DocumentBuilder builder = new DocumentBuilder(doc);
-                    List<Section> sections = doc.getSections();
-                    for (Section s : sections) {
-                        List<Paragraph> paragraphs = s.getParagraphs();
-                        for (Paragraph p : paragraphs) {
-                            List<Sentence> sentences = p.getSentences();
-                            for (Sentence sen : sentences) {
-                                List<Term> senTerms = sen.getTerms();
-                                for (Term t : senTerms) {
-                                    if (!t.isUnmodifiable()) {
-                                        t = m_preprocessing.preprocess(t);
-                                    }
-                                    if (t != null && t.getText().length() > 0) {
-                                        builder.addTerm(t);
-                                    }
-                                }
-                                builder.createNewSentence();
-                            }
-                            builder.createNewParagraph();
-                        }
-                        builder.createNewSection(s.getAnnotation());
-                    }
-                    newDoc = builder.createDocument();
-                    
-                    // add new document to cache
-                    preprocessedDoc.put(doc, newDoc);
-                }
-            } else {
-                // new doc is the same as the old doc
-                newDoc = doc;
-            }
-            
-            //
-            // save new document and term to hashtable
-            //
-            Set<Term> terms = null;
-            
-            // if no term available for the current document
-            if (!docTerms.containsKey(newDoc)) {
-                terms = new HashSet<Term>();
-            } else {
-                terms = docTerms.get(newDoc);
-            }
-            terms.add(term);
-            docTerms.put(newDoc, terms);         
+            // parallelize this !!!
+            Runnable r = new InternalRunnable(rowList, exec);
+            stp.submit(r);
         }
+        stp.waitForTermination();
         
-        preprocessedDoc.clear();
         // build data table
-        ExecutionContext subContext = exec.createSubExecutionContext(0.5);
-        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-                subContext, docTerms, false)};
+        return new BufferedDataTable[]{m_dtBuilder.closeDataTable()};
     }
+    
+    private synchronized void iterateRowCount() {
+        m_rowCount++;
+    }
+    
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData,
+//            final ExecutionContext exec) throws Exception {
+//        checkDataTableSpec(inData[0].getDataTableSpec());
+//        
+//        // initialize the underlying preprocessing
+//        initPreprocessing();
+//        if (m_preprocessing == null) {
+//            throw new NullPointerException(
+//                    "Preprocessing instance may not be null!");
+//        }
+//        
+//        Hashtable<Document, Set<Term>> docTerms = 
+//            new Hashtable<Document, Set<Term>>();
+//        Hashtable<Document, Document> preprocessedDoc = 
+//            new Hashtable<Document, Document>();
+//        
+//        ExecutionMonitor subExec = exec.createSubProgress(0.5);
+//        int rowCount = inData[0].getRowCount();
+//        int currRow = 1;
+//        RowIterator i = inData[0].iterator();
+//        while(i.hasNext()) {
+//            // report status
+//            double progress = (double)currRow / (double)rowCount;
+//            subExec.setProgress(progress, "Processing row " + currRow + " of " 
+//                    + rowCount);
+//            exec.checkCanceled();
+//            currRow++;    
+//            
+//            DataRow row = i.next();
+//            
+//            // handle missing value (ignore rows with missing values)
+//            if (row.getCell(m_termColIndex).isMissing()
+//                    || row.getCell(m_documentColIndex).isMissing()) {                
+//                continue;
+//            }
+//            
+//            Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+//            Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
+//                            getDocument();
+//            
+//            Document newDoc = null;
+//            
+//            //
+//            // do the preprocessing twist
+//            //
+//            
+//            // is the term unmodifiable ???
+//            if (!term.isUnmodifiable()) {
+//                term = m_preprocessing.preprocess(term);
+//                
+//                // if term is null or empty continue with next term !
+//                if (term == null || term.getText().length() <= 0) {
+//                    continue;
+//                }
+//            }
+//            // do we have to preprocess the documents itself too ?
+//            if (m_deepPreproModel.getBooleanValue()) {                
+//                // preprocess document only if it was not preprocessed till now
+//                if (preprocessedDoc.containsKey(doc)) {
+//                    newDoc = preprocessedDoc.get(doc);
+//                } else {
+//                    // preprocess doc here !!!
+//                    DocumentBuilder builder = new DocumentBuilder(doc);
+//                    List<Section> sections = doc.getSections();
+//                    for (Section s : sections) {
+//                        List<Paragraph> paragraphs = s.getParagraphs();
+//                        for (Paragraph p : paragraphs) {
+//                            List<Sentence> sentences = p.getSentences();
+//                            for (Sentence sen : sentences) {
+//                                List<Term> senTerms = sen.getTerms();
+//                                for (Term t : senTerms) {
+//                                    if (!t.isUnmodifiable()) {
+//                                        t = m_preprocessing.preprocess(t);
+//                                    }
+//                                    if (t != null && t.getText().length() > 0) {
+//                                        builder.addTerm(t);
+//                                    }
+//                                }
+//                                builder.createNewSentence();
+//                            }
+//                            builder.createNewParagraph();
+//                        }
+//                        builder.createNewSection(s.getAnnotation());
+//                    }
+//                    newDoc = builder.createDocument();
+//                    
+//                    // add new document to cache
+//                    preprocessedDoc.put(doc, newDoc);
+//                }
+//            } else {
+//                // new doc is the same as the old doc
+//                newDoc = doc;
+//            }
+//            
+//            //
+//            // save new document and term to hashtable
+//            //
+//            Set<Term> terms = null;
+//            
+//            // if no term available for the current document
+//            if (!docTerms.containsKey(newDoc)) {
+//                terms = new HashSet<Term>();
+//            } else {
+//                terms = docTerms.get(newDoc);
+//            }
+//            terms.add(term);
+//            docTerms.put(newDoc, terms);
+//        }
+//        
+//        preprocessedDoc.clear();
+//        // build data table
+//        ExecutionContext subContext = exec.createSubExecutionContext(0.5);
+//        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
+//                subContext, docTerms, false)};
+//    }
     
     
     /**
@@ -264,5 +341,105 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_deepPreproModel.validateSettings(settings);
-    }    
+    }
+    
+    
+    class InternalRunnable implements Runnable {
+
+        private List<DataRow> m_rowList;
+        
+        private ExecutionContext m_exec;
+        
+        public InternalRunnable(final List<DataRow> rowList, 
+                final ExecutionContext exec) {
+            m_rowList = rowList;
+            m_exec = exec;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void run() {
+            try {
+                processChunk();
+            } catch (CanceledExecutionException e) {
+                System.out.println("CANCEL !!!!!");
+            }
+        }
+        
+        private final void processChunk() throws CanceledExecutionException {
+            Document changedDocument = null;
+            int maxRows = m_inData.getRowCount();
+            
+            Iterator<DataRow> i = m_rowList.iterator();
+            while (i.hasNext()) {
+                double progress = (double)m_rowCount / (double)maxRows;
+                m_exec.setProgress(progress, "Processing row " + m_rowCount + " of "
+                        + maxRows);
+                m_exec.checkCanceled();
+                iterateRowCount();
+                
+                DataRow row = i.next();
+                
+                // handle missing value (ignore rows with missing values)
+                if (row.getCell(m_termColIndex).isMissing()
+                        || row.getCell(m_documentColIndex).isMissing()) {                
+                    continue;
+                }
+                
+                Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+                Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
+                                getDocument();
+                
+                //
+                // do the preprocessing twist
+                //
+                
+                // is the term unmodifiable ???
+                if (!term.isUnmodifiable()) {
+                    term = m_preprocessing.preprocess(term);
+                    
+                    // if term is null or empty continue with next term !
+                    if (term == null || term.getText().length() <= 0) {
+                        continue;
+                    }
+                }
+                // do we have to preprocess the documents itself too ?
+                if (m_deepPreproModel.getBooleanValue()) {                
+                    // preprocess document only if it was not preprocessed till now
+                    if (changedDocument == null) {
+                        // preprocess doc here !!!
+                        DocumentBuilder builder = new DocumentBuilder(doc);
+                        List<Section> sections = doc.getSections();
+                        for (Section s : sections) {
+                            List<Paragraph> paragraphs = s.getParagraphs();
+                            for (Paragraph p : paragraphs) {
+                                List<Sentence> sentences = p.getSentences();
+                                for (Sentence sen : sentences) {
+                                    List<Term> senTerms = sen.getTerms();
+                                    for (Term t : senTerms) {
+                                        if (!t.isUnmodifiable()) {
+                                            t = m_preprocessing.preprocess(t);
+                                        }
+                                        if (t != null && t.getText().length() > 0) {
+                                            builder.addTerm(t);
+                                        }
+                                    }
+                                    builder.createNewSentence();
+                                }
+                                builder.createNewParagraph();
+                            }
+                            builder.createNewSection(s.getAnnotation());
+                        }
+                        changedDocument = builder.createDocument();
+                    }
+                } else {
+                    // new doc is the same as the old doc
+                    changedDocument = doc;
+                }
+                // add new document and term to data table.
+                m_dtBuilder.addRow(changedDocument, term, m_exec);
+            }
+        }        
+    }
 }

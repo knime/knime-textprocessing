@@ -23,21 +23,10 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import java.util.Hashtable;
-import java.util.Set;
-
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.node.BufferedDataContainer;
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionContext;
-import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBlobCell;
-import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 
 /**
@@ -68,57 +57,22 @@ public class BagOfWordsBlobCellDataTableBuilder extends
     
     /**
      * {@inheritDoc}
+     * 
+     * This method creates a factory for <code>DocumentBlobCell</code>s.
      */
     @Override
-    public BufferedDataTable createDataTable(ExecutionContext exec,
-            Hashtable<Document, Set<Term>> docTerms, boolean useTermCache) 
-    throws CanceledExecutionException {
-      // create cache
-      FullDataCellCache docCache = new FullDataCellCache(
-              new DocumentBlobDataCellFactory());
-      FullDataCellCache termCache = new FullDataCellCache(
-              new TermDataCellFactory());
-      
-      BufferedDataContainer dc =
-              exec.createDataContainer(this.createDataTableSpec());
-
-      int i = 1;
-      Set<Document> keys = docTerms.keySet();
-      int rowCount = keys.size();
-      int currRow = 1;
-      
-      for (Document d : keys) {
-          DocumentBlobCell docCell = (DocumentBlobCell)docCache.getInstance(d);
-          
-          Set<Term> terms = docTerms.get(d);
-          for (Term t : terms) {
-              exec.checkCanceled();
-              RowKey rowKey = new RowKey(new Integer(i).toString());
-              i++;
-              
-              TermCell termCell;
-              if (!useTermCache) {
-                  termCell = new TermCell(t);
-              } else {
-                  termCell = (TermCell)termCache.getInstance(t);
-              }
-              DataRow row = new DefaultRow(rowKey, termCell, docCell);
-              dc.addRowToTable(row);
-          }
-          
-          double progress = (double)currRow / (double)rowCount;
-          exec.setProgress(progress, "Creating Bow of document " + currRow 
-                  + " of " + rowCount);
-          exec.checkCanceled();
-          currRow++;           
-      }
-      dc.close();
-      
-      docTerms.clear();
-      docCache.reset();
-      termCache.reset();
-      
-      return dc.getTable();
+    protected TextContainerDataCellFactory getDocumentCellDataFactory() {
+        return new DocumentBlobDataCellFactory();
     }
-  
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean validateDocumentCellType(final DataCell documentCell) {
+        if (documentCell instanceof DocumentBlobCell) {
+            return true;
+        }
+        return false;
+    }
 }
