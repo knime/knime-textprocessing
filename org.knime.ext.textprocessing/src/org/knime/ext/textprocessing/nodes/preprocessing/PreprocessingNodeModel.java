@@ -1,4 +1,4 @@
-/* ------------------------------------------------------------------
+ /* ------------------------------------------------------------------
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
@@ -125,8 +125,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected final BufferedDataTable[] execute(
+            final BufferedDataTable[] inData, final ExecutionContext exec) 
+    throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
         
         // initialize the underlying preprocessing
