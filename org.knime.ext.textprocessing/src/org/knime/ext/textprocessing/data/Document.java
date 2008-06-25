@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   13.02.2008 (thiel): created
  */
@@ -27,30 +27,32 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
- * Contains the documents text as with all its 
- * {@link org.knime.ext.textprocessing.data.Section}s, which are, i.e. title, 
- * abstract, chapters, etc. These 
+ * Contains the documents text as with all its
+ * {@link org.knime.ext.textprocessing.data.Section}s, which are, i.e. title,
+ * abstract, chapters, etc. These
  * {@link org.knime.ext.textprocessing.data.Section}s consist of
  * {@link org.knime.ext.textprocessing.data.Paragraph}s which contain
  * {@link org.knime.ext.textprocessing.data.Sentence}s containing
- * {@link org.knime.ext.textprocessing.data.Term}s. A term finally is 
+ * {@link org.knime.ext.textprocessing.data.Term}s. A term finally is
  * represented by one or more {@link org.knime.ext.textprocessing.data.Word}s.
  * Additionally {@link org.knime.ext.textprocessing.data.Author}s, a
  * {@link org.knime.ext.textprocessing.data.PublicationDate}, a
  * {@link org.knime.ext.textprocessing.data.DocumentSource}, a
  * {@link org.knime.ext.textprocessing.data.DocumentCategory} and a
- * {@link org.knime.ext.textprocessing.data.DocumentType} can be assigned to 
+ * {@link org.knime.ext.textprocessing.data.DocumentType} can be assigned to
  * a <code>Document</code> in order to specify more details.
  * <br/><br/>
  * To create instances of <code>Document</code> use the
- * {@link org.knime.ext.textprocessing.data.DocumentBuilder} which provides 
+ * {@link org.knime.ext.textprocessing.data.DocumentBuilder} which provides
  * methods to add text and finally build a new <code>Document</code> instance
- * out of it. 
- * 
+ * out of it.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Document implements TextContainer {
@@ -59,85 +61,94 @@ public class Document implements TextContainer {
      * The default document type value (UNKNOWN).
      */
     public static final DocumentType DEFAULT_TYPE = DocumentType.UNKNOWN;
-    
-    
+
+
     private List<Section> m_sections;
-    
+
     private DocumentType m_type;
-    
+
     private Set<Author> m_authors;
-    
+
     private Set<DocumentSource> m_sources;
-    
+
     private Set<DocumentCategory> m_categories;
-    
+
     private PublicationDate m_pubDate;
-    
+
     private File m_docFile;
-    
-    
+
     /**
-     * Creates a new instance of <code>Document</code> with the given 
-     * parameters, like the documents sections, type, authors, sources, 
-     * categories, publication date and the file of the document to set. 
-     * If any of these parameters is <code>null</code> a 
-     * <code>NullPointerException</code> is thrown. 
-     * 
+     * Length of the document in terms.
+     */
+    private int m_length = -1;
+
+    /**
+     * Cache of the hash code.
+     */
+    private int m_hashCode = -1;
+
+    /**
+     * Creates a new instance of <code>Document</code> with the given
+     * parameters, like the documents sections, type, authors, sources,
+     * categories, publication date and the file of the document to set.
+     * If any of these parameters is <code>null</code> a
+     * <code>NullPointerException</code> is thrown.
+     *
      * @param sections The sections of the document to set. Sections are i.e.
      * title, abstract chapters, etc.
-     * @param type The type of the document to set, i.e. book, transaction 
+     * @param type The type of the document to set, i.e. book, transaction
      * or proceeding.
      * @param authors The authors of the document.
-     * @param sources The sources of a document to set, specifying where the 
+     * @param sources The sources of a document to set, specifying where the
      * documents stems from, i.e. Reuters, PubMed, etc.
      * @param categories The categories of a document to set, specifying roughly
-     * the topic of the document, i.e. breast cancer, presidential elections. 
+     * the topic of the document, i.e. breast cancer, presidential elections.
      * @param date The documents publication date to set.
-     * @param documentFile The file containing the document. 
-     * @throws NullPointerException If any of the parameters are set 
+     * @param documentFile The file containing the document.
+     * @throws NullPointerException If any of the parameters are set
      * <code>null</code>.
      */
     Document(final List<Section> sections, final DocumentType type,
-            final Set<Author> authors, final Set<DocumentSource> sources, 
+            final Set<Author> authors, final Set<DocumentSource> sources,
             final Set<DocumentCategory> categories, final PublicationDate date,
             final File documentFile) throws NullPointerException {
-        
+
         // sections
         if (sections == null) {
             throw new NullPointerException(
                     "The list of sections may not be null!");
         }
-        
+
         // type
         if (type == null) {
             throw new NullPointerException(
                     "The document type may not be null!");
         }
-        
+
         // authors
         if (authors == null) {
             throw new NullPointerException(
                     "The set of authors may not be null!");
         }
-        
+
         // sources
         if (sources == null) {
             throw new NullPointerException(
-                    "The set of sources may not be null!");            
+                    "The set of sources may not be null!");
         }
-        
+
         // categories
         if (categories == null) {
             throw new NullPointerException(
-                    "The set of categories may not be null!");            
-        }        
+                    "The set of categories may not be null!");
+        }
 
         // date
         if (date == null) {
             throw new NullPointerException(
-                    "The publication date may not be null!");            
+                    "The publication date may not be null!");
         }
-        
+
         m_docFile = documentFile;
         m_pubDate = date;
         m_categories = categories;
@@ -149,44 +160,44 @@ public class Document implements TextContainer {
 
     /**
      * Creates a new instance of <code>Document</code> with a given list of
-     * sections which may not be <code>null</code>, otherwise a 
+     * sections which may not be <code>null</code>, otherwise a
      * <code>NullPointerException</code> will be thrown.
-     * 
-     * @param sections The sections of the document to set. Sections are i.e.
-     * title, abstract chapters, etc. 
-     * @throws NullPointerException If the given list of sections to set is 
-     * <code>null</code>.
-     */
-    Document(final List<Section> sections) 
-    throws NullPointerException {        
-        this(sections, DEFAULT_TYPE, new HashSet<Author>(), 
-                new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(), 
-                new PublicationDate(), null);
-    }
-    
-    
-    /**
-     * Creates a new instance of <code>Document</code> with a given list of
-     * sections, the authors of the document, the publication date and a file 
-     * containing the document's text to set. None of the given parameters 
-     * may be <code>null</code>, otherwise a <code>NullPointerException</code> 
-     * will be thrown.
-     * 
+     *
      * @param sections The sections of the document to set. Sections are i.e.
      * title, abstract chapters, etc.
-     * @param authors The authors of the document. 
-     * @param date The documents publication date to set.
-     * @param documentFile The file containing the document. 
-     * @throws NullPointerException If any of the parameters are set 
+     * @throws NullPointerException If the given list of sections to set is
      * <code>null</code>.
      */
-    Document(final List<Section> sections, final Set<Author> authors, 
-            final PublicationDate date, final File documentFile) {
-        this(sections, DEFAULT_TYPE, authors, 
-                new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(), 
-                date, documentFile);        
+    Document(final List<Section> sections)
+    throws NullPointerException {
+        this(sections, DEFAULT_TYPE, new HashSet<Author>(),
+                new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(),
+                new PublicationDate(), null);
     }
-            
+
+
+    /**
+     * Creates a new instance of <code>Document</code> with a given list of
+     * sections, the authors of the document, the publication date and a file
+     * containing the document's text to set. None of the given parameters
+     * may be <code>null</code>, otherwise a <code>NullPointerException</code>
+     * will be thrown.
+     *
+     * @param sections The sections of the document to set. Sections are i.e.
+     * title, abstract chapters, etc.
+     * @param authors The authors of the document.
+     * @param date The documents publication date to set.
+     * @param documentFile The file containing the document.
+     * @throws NullPointerException If any of the parameters are set
+     * <code>null</code>.
+     */
+    Document(final List<Section> sections, final Set<Author> authors,
+            final PublicationDate date, final File documentFile) {
+        this(sections, DEFAULT_TYPE, authors,
+                new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(),
+                date, documentFile);
+    }
+
 
     /**
      * @return the sections of the document.
@@ -236,13 +247,13 @@ public class Document implements TextContainer {
     public File getDocFile() {
         return m_docFile;
     }
-    
-    
+
+
     /**
-     * Returns all {@link org.knime.ext.textprocessing.data.Section}s with the 
-     * specified {@link org.knime.ext.textprocessing.data.SectionAnnotation} as 
-     * list. If no sections can be found, an empty list is returned. 
-     * 
+     * Returns all {@link org.knime.ext.textprocessing.data.Section}s with the
+     * specified {@link org.knime.ext.textprocessing.data.SectionAnnotation} as
+     * list. If no sections can be found, an empty list is returned.
+     *
      * @param annotation The annotation of the sections to return.
      * @return a list of sections with the given annotation assigned.
      * If no sections can be found, an empty list is returned.
@@ -256,15 +267,15 @@ public class Document implements TextContainer {
         }
         return sections;
     }
-    
+
     /**
-     * Returns the text of all 
-     * {@link org.knime.ext.textprocessing.data.Section}s with the specified 
+     * Returns the text of all
+     * {@link org.knime.ext.textprocessing.data.Section}s with the specified
      * {@link org.knime.ext.textprocessing.data.SectionAnnotation} as string.
      * If no sections can be found an empty string is returned.
-     * 
+     *
      * @param annotation The annotation of the sections to find.
-     * @return the text of the sections with the given annotation assigned as 
+     * @return the text of the sections with the given annotation assigned as
      * string. If no sections can be found, an empty string is returned.
      */
     public String getSectionText(final SectionAnnotation annotation) {
@@ -277,9 +288,9 @@ public class Document implements TextContainer {
             }
         }
         return sb.toString();
-    }    
-    
-    
+    }
+
+
     /**
      * @return The title of the document, if a section with "Title" annotation
      * exists, otherwise an empty string.
@@ -287,16 +298,34 @@ public class Document implements TextContainer {
     public String getTitle() {
         return getSectionText(SectionAnnotation.TITLE);
     }
-    
+
     /**
-     * @return The abstract of the document, if a section with "Abstract" 
+     * @return the length of the document in terms.
+     */
+    public int getLength() {
+        if (m_length == -1) {
+            m_length = 0;
+            for (Section section : m_sections) {
+                for (Paragraph paragraph : section.getParagraphs()) {
+                    for (Sentence sentence : paragraph.getSentences()) {
+                        m_length += sentence.getTerms().size();
+                    }
+                }
+            }
+        }
+
+        return m_length;
+    }
+
+    /**
+     * @return The abstract of the document, if a section with "Abstract"
      * annotation exists, otherwise an empty string.
      */
     public String getAbstract() {
         return getSectionText(SectionAnnotation.ABSTRACT);
-    }    
-    
-    
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -310,7 +339,7 @@ public class Document implements TextContainer {
         }
         return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -325,8 +354,8 @@ public class Document implements TextContainer {
         }
         return sb.toString();
     }
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
@@ -338,9 +367,8 @@ public class Document implements TextContainer {
             return false;
         }
         Document d = (Document)o;
-        if (!d.getSections().equals(m_sections)) {
-            return false;
-        } else if (!d.getAuthors().equals(m_authors)) {
+
+        if (!d.getAuthors().equals(m_authors)) {
             return false;
         } else if (!d.getPubDate().equals(m_pubDate)) {
             return false;
@@ -352,41 +380,98 @@ public class Document implements TextContainer {
             return false;
         } else if (!d.getType().equals(m_type)) {
             return false;
+        } else if (!d.getSections().equals(m_sections)) {
+            return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public int hashCode() {
-        int fac = 119;
-        int div = 19;
-        int hash = 0;
-        for (Section s : m_sections) {
-            hash += fac * s.hashCode() / div; 
+        if (m_hashCode == -1) {
+            m_hashCode = 0;
+            int fac = 119;
+            int div = 19;
+
+            for (Section s : m_sections) {
+                m_hashCode += fac * s.hashCode() / div;
+            }
+            for (Author a : m_authors) {
+                m_hashCode += fac / div * a.hashCode();
+            }
+            for (DocumentSource s : m_sources) {
+                m_hashCode += fac / div * s.hashCode();
+            }
+            for (DocumentCategory c : m_categories) {
+                m_hashCode += fac / div * c.hashCode();
+            }
+            if (m_pubDate != null) {
+                m_hashCode += fac / div * m_pubDate.hashCode();
+            }
+            if (m_type != null) {
+                m_hashCode += fac / div * m_type.hashCode();
+            }
+            if (m_docFile != null) {
+                m_hashCode += fac / div * m_docFile.hashCode();
+            }
         }
-        for (Author a : m_authors) {
-            hash += fac / div * a.hashCode();
+
+        return m_hashCode;
+    }
+
+    /**
+     * @return a read-only iterator on the sentences of this document.
+     */
+    public Iterator<Sentence> sentenceIterator() {
+        return new SentenceIterator(this);
+    }
+
+    /**
+     * Read-only iterator over a document's sentences.
+     * @author Pierre-Francois Laquerre, University of Konstanz
+     */
+    private class SentenceIterator implements Iterator<Sentence> {
+        private List<Sentence> m_sentences;
+        private ListIterator<Sentence> m_iterator;
+
+        /**
+         * @param doc the document to iterate over
+         */
+        public SentenceIterator(final Document doc) {
+            m_sentences = new ArrayList<Sentence>();
+
+            for (Section s : doc.getSections()) {
+                for (Paragraph p : s.getParagraphs()) {
+                    m_sentences.addAll(p.getSentences());
+                }
+            }
+
+            m_iterator = m_sentences.listIterator();
         }
-        for (DocumentSource s : m_sources) {
-            hash += fac / div * s.hashCode();
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasNext() {
+            return m_iterator.hasNext();
         }
-        for (DocumentCategory c : m_categories) {
-            hash += fac / div * c.hashCode();
+
+        /**
+         * {@inheritDoc}
+         */
+        public Sentence next() {
+            return m_iterator.next();
         }
-        if (m_pubDate != null) {
-            hash += fac / div * m_pubDate.hashCode();
+
+        /**
+         * {@inheritDoc}
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
-        if (m_type != null) {
-            hash += fac / div * m_type.hashCode();
-        }
-        if (m_docFile != null) {
-            hash += fac / div * m_docFile.hashCode();
-        }
-        
-        return hash;
-    }    
+    }
 }

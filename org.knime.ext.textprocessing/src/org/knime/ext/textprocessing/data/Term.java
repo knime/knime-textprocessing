@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   12.02.2008 (Kilian Thiel): created
  */
@@ -29,15 +29,15 @@ import java.util.List;
 
 
 /**
- * Contains one or more words (at least one) and groups them to a meaning of 
+ * Contains one or more words (at least one) and groups them to a meaning of
  * a higher-level according to the grouping algorithms (like named entity
- * recognition, protein or gene name recognition, etc.). In addition a list of 
- * {@link org.knime.ext.textprocessing.data.Tag}s can be assigned to a 
- * <code>Term</code>, which label the different meanings of it, i.e. 
- * Part-Of-Speech tags, Named Entity tags, etc. Further a term can be set 
- * unmodifiable with the effect that it may not be filtered out or transformed 
- * in any way by any node. 
- * 
+ * recognition, protein or gene name recognition, etc.). In addition a list of
+ * {@link org.knime.ext.textprocessing.data.Tag}s can be assigned to a
+ * <code>Term</code>, which label the different meanings of it, i.e.
+ * Part-Of-Speech tags, Named Entity tags, etc. Further a term can be set
+ * unmodifiable with the effect that it may not be filtered out or transformed
+ * in any way by any node.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Term implements TextContainer {
@@ -46,65 +46,67 @@ public class Term implements TextContainer {
      * The default string which separates the words, the term contains. This
      * separator is used i.e. in
      * {@link org.knime.ext.textprocessing.data.Term#getText()} to separate the
-     * words and create a single string representing the term. 
+     * words and create a single string representing the term.
      */
     public static final String WORD_SEPARATOR = " ";
-    
+
     private List<Word> m_words;
-    
+
     private List<Tag> m_tags;
-    
+
     private boolean m_unmodifiable = false;
-    
+
+    private int m_hashCode = -1;
+
     /**
-     * Creates a new instance of <code>Term</code> with the given list of 
-     * {@link org.knime.ext.textprocessing.data.Word}s representing the term, 
-     * the list of {@link org.knime.ext.textprocessing.data.Tag}s and the 
+     * Creates a new instance of <code>Term</code> with the given list of
+     * {@link org.knime.ext.textprocessing.data.Word}s representing the term,
+     * the list of {@link org.knime.ext.textprocessing.data.Tag}s and the
      * unmodifiable flag.
-     * 
+     *
      * @param words The list of words the term consist of.
      * @param tags The tags representing the meanings of the term.
      * @param unmodifiable If set <code>true</code> the term is set unmodifiable
-     * and is not affected by filter or transformer nodes. 
+     * and is not affected by filter or transformer nodes.
      * @throws NullPointerException Will be thrown if the word list is null.
      */
-    public Term(final List<Word> words, final List<Tag> tags, 
+    public Term(final List<Word> words, final List<Tag> tags,
             final boolean unmodifiable) throws NullPointerException {
         if (words == null) {
             throw new NullPointerException("The ist of words may not be null!");
         }
         m_words = words;
-        
+
         if (tags == null) {
             m_tags = new ArrayList<Tag>(0);
         } else {
             m_tags = tags;
         }
-        
+
         m_unmodifiable = unmodifiable;
     }
-    
+
 //    /**
-//     * Creates a new instance of <code>Term</code> with the given list of 
-//     * {@link org.knime.ext.textprocessing.data.Word}s representing the term 
-//     * and the list of {@link org.knime.ext.textprocessing.data.Tag}s. The 
+//     * Creates a new instance of <code>Term</code> with the given list of
+//     * {@link org.knime.ext.textprocessing.data.Word}s representing the term
+//     * and the list of {@link org.knime.ext.textprocessing.data.Tag}s. The
 //     * unmodifiable flag of the term is set <code>false</code> by default.
-//     * 
+//     *
 //     * @param words The list of words the term consist of.
 //     * @param tags The tags representing the meanings of the term.
 //     * @throws NullPointerException Will be thrown if the word list is null.
 //     */
-//    public Term(final List<Word> words, final List<Tag> tags) 
+//    public Term(final List<Word> words, final List<Tag> tags)
 //    throws NullPointerException {
 //        this(words, tags, false);
 //    }
 //
 //    /**
-//     * Creates a new instance of <code>Term</code> with the given list of 
+//     * Creates a new instance of <code>Term</code> with the given list of
 //     * {@link org.knime.ext.textprocessing.data.Word}s representing the term.
 //     * {@link org.knime.ext.textprocessing.data.Tag}s are not be assigned and
 //     * the unmodifiable flag of the term is set <code>false</code> by default.
-//     * 
+//     *
 //     * @param words The list of words the term consist of.
 //     */
 //    public Term(final List<Word> words) {
@@ -112,8 +114,8 @@ public class Term implements TextContainer {
 //    }
 
     /**
-     * @return the unmodifiable list of 
-     * {@link org.knime.ext.textprocessing.data.Word}s the 
+     * @return the unmodifiable list of
+     * {@link org.knime.ext.textprocessing.data.Word}s the
      * {@link org.knime.ext.textprocessing.data.Word}sterm consist of.
      */
     public List<Word> getWords() {
@@ -121,8 +123,8 @@ public class Term implements TextContainer {
     }
 
     /**
-     * @return the unmodifiable list of 
-     * {@link org.knime.ext.textprocessing.data.Tag}s assigned to the term. 
+     * @return the unmodifiable list of
+     * {@link org.knime.ext.textprocessing.data.Tag}s assigned to the term.
      */
     public List<Tag> getTags() {
         return Collections.unmodifiableList(m_tags);
@@ -148,7 +150,7 @@ public class Term implements TextContainer {
         }
         return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -169,7 +171,7 @@ public class Term implements TextContainer {
         sb.append("]");
         return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -181,6 +183,7 @@ public class Term implements TextContainer {
             return false;
         }
         Term t = (Term)o;
+
         if (!t.getWords().equals(getWords())) {
             return false;
         }
@@ -190,21 +193,21 @@ public class Term implements TextContainer {
         if (t.isUnmodifiable() != m_unmodifiable) {
             return false;
         }
-        
+
         return true;
     }
 
     /**
-     * Compares <code>this</code> with the given object. Returns 
+     * Compares <code>this</code> with the given object. Returns
      * <code>true</code> if given object is an instance of a <code>Term</code>
      * and if the list of words of the given term is equal to the internal list
      * of words. Otherwise <code>false</code> is returned. Attributes like
-     * tags or modifiability is not compared, therefore use 
+     * tags or modifiability is not compared, therefore use
      * {@link Term#equals(Object)}.
-     * 
+     *
      * @param o The object to compare with.
-     * @return <code>true</code> if given object is an instance of 
-     * <code>Term</code> and the list of words is equal to the list of words of 
+     * @return <code>true</code> if given object is an instance of
+     * <code>Term</code> and the list of words is equal to the list of words of
      * the given term.
      */
     public boolean equalsWordsOnly(final Object o) {
@@ -217,24 +220,30 @@ public class Term implements TextContainer {
         if (!t.getWords().equals(getWords())) {
             return false;
         }
-        
+
         return true;
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public int hashCode() {
-        int fac = 119;
-        int hash = 0;
-        for (Word w : m_words) {
-            hash += fac * w.hashCode();
+        if (m_hashCode == -1) {
+            m_hashCode = 0;
+            int fac = 119;
+
+            for (Word w : m_words) {
+                m_hashCode += fac * w.hashCode();
+            }
+
+            for (Tag t : m_tags) {
+                m_hashCode -= fac * t.hashCode();
+            }
+
+            m_hashCode += fac * new Boolean(m_unmodifiable).hashCode();
         }
-        for (Tag t : m_tags) {
-            hash -= fac * t.hashCode();
-        }        
-        hash += fac * new Boolean(m_unmodifiable).hashCode();
-        return hash;
+
+        return m_hashCode;
     }
 }

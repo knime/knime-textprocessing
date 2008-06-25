@@ -1,4 +1,4 @@
- /* ------------------------------------------------------------------
+/* ------------------------------------------------------------------
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   19.03.2008 (Kilian Thiel): created
  */
@@ -28,6 +28,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -56,15 +57,15 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  * which apply filtering or modification of terms. Classes which extend
  * <code>PreprocessingNodeModel</code>  have to implement the method
  * {@link PreprocessingNodeModel#initPreprocessing()} and take care of a
- * proper initialization of the used 
- * {@link org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing} 
+ * proper initialization of the used
+ * {@link org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing}
  * instance. A stop word filter i.e. requires a file containing the stop words,
  * a case converter requires information about the case to convert the terms to
- * and so on. The configure and execute procedure is done by the 
+ * and so on. The configure and execute procedure is done by the
  * <code>PreprocessingNodeModel</code>, classes extending this model do not
  * need to care about that. Once the used <code>Preprocessing</code> instance
  * is initialized properly the rest is done automatically.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public abstract class PreprocessingNodeModel extends NodeModel {
@@ -73,30 +74,30 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * The default setting for deep preprocessing (<code>false</code>).
      */
     public static final boolean DEF_DEEP_PREPRO = true;
-    
+
     private int m_documentColIndex = -1;
-    
+
     private int m_termColIndex = -1;
-    
-    private BagOfWordsDataTableBuilder m_dtBuilder = 
+
+    private BagOfWordsDataTableBuilder m_dtBuilder =
         DataTableBuilderFactory.createBowDataTableBuilder();
-    
-    private SettingsModelBoolean m_deepPreproModel = 
+
+    private SettingsModelBoolean m_deepPreproModel =
         PreprocessingNodeSettingsPane.getDeepPrepressingModel();
-    
+
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.
      */
     protected Preprocessing m_preprocessing;
-    
+
     /**
      * The constructor of <code>PreprocessingNodeModel</code>.
      */
     public PreprocessingNodeModel() {
         super(1, 1);
     }
-    
-    private final void checkDataTableSpec(final DataTableSpec spec) 
+
+    private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyDocumentCell(true);
@@ -104,7 +105,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -119,29 +120,29 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * Initializes the <code>Preprocessing</code> instance.
      */
     protected abstract void initPreprocessing();
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected final BufferedDataTable[] execute(
-            final BufferedDataTable[] inData, final ExecutionContext exec) 
+            final BufferedDataTable[] inData, final ExecutionContext exec)
     throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        
+
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {
             throw new NullPointerException(
                     "Preprocessing instance may not be null!");
         }
-        
-        Hashtable<Document, Set<Term>> docTerms = 
+
+        Hashtable<Document, Set<Term>> docTerms =
             new Hashtable<Document, Set<Term>>();
-        Hashtable<Document, Document> preprocessedDoc = 
+        Hashtable<Document, Document> preprocessedDoc =
             new Hashtable<Document, Document>();
-        
+
         ExecutionMonitor subExec = exec.createSubProgress(0.5);
         int rowCount = inData[0].getRowCount();
         int currRow = 1;
@@ -149,44 +150,45 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         while(i.hasNext()) {
             // report status
             double progress = (double)currRow / (double)rowCount;
-            subExec.setProgress(progress, "Processing row " + currRow + " of " 
+            subExec.setProgress(progress, "Processing row " + currRow + " of "
                     + rowCount);
             exec.checkCanceled();
-            currRow++;    
-            
+            currRow++;
+
             DataRow row = i.next();
-            
+
+            DataCell termcell = row.getCell(m_termColIndex);
+            DataCell doccell = row.getCell(m_documentColIndex);
+
             // handle missing value (ignore rows with missing values)
-            if (row.getCell(m_termColIndex).isMissing()
-                    || row.getCell(m_documentColIndex).isMissing()) {                
+            if (termcell.isMissing() || doccell.isMissing()) {
                 continue;
             }
-            
-            Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-            Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).
+
+            Term term = ((TermValue)termcell).getTermValue();
+            Document doc = ((DocumentValue)doccell).
                             getDocument();
-            
+
             Document newDoc = null;
-            
+
             //
             // do the preprocessing twist
             //
-            
+
             // is the term unmodifiable ???
             if (!term.isUnmodifiable()) {
                 term = m_preprocessing.preprocess(term);
-                
+
                 // if term is null or empty continue with next term !
                 if (term == null || term.getText().length() <= 0) {
                     continue;
                 }
             }
             // do we have to preprocess the documents itself too ?
-            if (m_deepPreproModel.getBooleanValue()) {                
+            if (m_deepPreproModel.getBooleanValue()) {
                 // preprocess document only if it was not preprocessed till now
-                if (preprocessedDoc.containsKey(doc)) {
-                    newDoc = preprocessedDoc.get(doc);
-                } else {
+                newDoc = preprocessedDoc.get(doc);
+                if (newDoc == null) {
                     // preprocess doc here !!!
                     DocumentBuilder builder = new DocumentBuilder(doc);
                     List<Section> sections = doc.getSections();
@@ -211,7 +213,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                         builder.createNewSection(s.getAnnotation());
                     }
                     newDoc = builder.createDocument();
-                    
+
                     // add new document to cache
                     preprocessedDoc.put(doc, newDoc);
                 }
@@ -219,30 +221,27 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                 // new doc is the same as the old doc
                 newDoc = doc;
             }
-            
+
             //
             // save new document and term to hashtable
             //
-            Set<Term> terms = null;
-            
-            // if no term available for the current document
-            if (!docTerms.containsKey(newDoc)) {
+            Set<Term> terms = docTerms.get(newDoc);
+            if (terms == null) {
                 terms = new HashSet<Term>();
-            } else {
-                terms = docTerms.get(newDoc);
             }
+
             terms.add(term);
             docTerms.put(newDoc, terms);
         }
-        
+
         preprocessedDoc.clear();
         // build data table
         ExecutionContext subContext = exec.createSubExecutionContext(0.5);
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                 subContext, docTerms, false)};
     }
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
