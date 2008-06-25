@@ -44,6 +44,13 @@
             name="Frequencies"
             path="/textprocessing">
       </category>
+      <category
+            description="Contains misc nodes of the textprocessing plugin"
+            icon="icons/missing.gif"
+            level-id="misc"
+            name="Misc"
+            path="/textprocessing">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -161,6 +168,11 @@
             category-path="/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/misc"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.categorytoclass.CategoryToClassNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.misc.categorytoclass.CategoryToClassNodeFactory">
       </node>
    </extension>
    <extension

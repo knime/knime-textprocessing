@@ -93,6 +93,16 @@ public class DmlDocumentParser extends DefaultHandler implements
     public static final String FILENAME = "filename";
     
     /**
+     * The document's category.
+     */
+    public static final String CATEGORY = "category";
+    
+    /**
+     * The document's source.
+     */
+    public static final String SOURCE = "source";
+    
+    /**
      * The name of the term tag.
      */    
     public static final String TERM = "term";
@@ -203,7 +213,11 @@ public class DmlDocumentParser extends DefaultHandler implements
     
     private DocumentCategory m_category;
     
+    private String m_currentCategory = "";
+    
     private DocumentSource m_source;
+    
+    private String m_currentSource = "";
     
     private DocumentType m_type;
     
@@ -342,6 +356,10 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_annotation = attributes.getValue(ANNOTATION);
         } else if (m_lastTag.equals(FILENAME)) {
             m_docPath = "";
+        } else if (m_lastTag.equals(CATEGORY)) {
+            m_currentCategory = "";
+        } else if (m_lastTag.equals(SOURCE)) {
+            m_currentSource = "";
         }
     }
     
@@ -401,6 +419,12 @@ public class DmlDocumentParser extends DefaultHandler implements
             if (f.exists()) {
                 m_currentDoc.setDocumentFile(f);
             }
+        } else if (qName.equals(CATEGORY)) {
+            DocumentCategory cat = new DocumentCategory(m_currentCategory);
+            m_currentDoc.addDocumentCategory(cat);
+        } else if (qName.equals(SOURCE)) {
+            DocumentSource source = new DocumentSource(m_currentSource);
+            m_currentDoc.addDocumentSource(source);
         } 
     }
     
@@ -429,12 +453,13 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_docPath += new String(ch, start, length);
         } else if (m_lastTag.equals(MODIFIABILITY)) {
             m_modifiability +=  new String(ch, start, length);
+        } else if (m_lastTag.equals(CATEGORY)) {
+            m_currentCategory +=  new String(ch, start, length);
+        } else if (m_lastTag.equals(SOURCE)) {
+            m_currentSource +=  new String(ch, start, length);
         }
     }
-    
-    
-    
-    
+
     
     
     
@@ -471,6 +496,24 @@ public class DmlDocumentParser extends DefaultHandler implements
                 hd.characters(doc.getDocFile().getAbsolutePath().toCharArray(),
                         0, doc.getDocFile().getAbsolutePath().length());
                 hd.endElement("", "", FILENAME);
+            }
+            
+            // DocumentCategroy
+            for (DocumentCategory cat : doc.getCategories()) {
+                atts.clear();
+                hd.startElement("", "", CATEGORY, atts);
+                hd.characters(cat.getCategoryName().toCharArray(),
+                        0, cat.getCategoryName().length());
+                hd.endElement("", "", CATEGORY);                
+            }
+            
+            // DocumentSource
+            for (DocumentSource source : doc.getSources()) {
+                atts.clear();
+                hd.startElement("", "", SOURCE, atts);
+                hd.characters(source.getSourceName().toCharArray(),
+                        0, source.getSourceName().length());
+                hd.endElement("", "", SOURCE);                
             }
             
             // Authors

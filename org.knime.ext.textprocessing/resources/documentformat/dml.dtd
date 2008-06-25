@@ -20,13 +20,16 @@
 	==================================================================
 -->
 
-<!ELEMENT Document (Authors?,PublicationDate?,Section+,Filename?)>
+<!ELEMENT Document (Category*,Source*,Authors?,PublicationDate?,Section+,Filename?)>
+
+<!ELEMENT Category (#PCDATA)>
+<!ELEMENT Source (#PCDATA)>
+<!ELEMENT Filename (#PCDATA)>
 
 <!ELEMENT Authors (Author*)>
 <!ELEMENT Author (Firstname?, Lastname)>
 <!ELEMENT Firstname (#PCDATA)>
 <!ELEMENT Lastname (#PCDATA)>
-<!ELEMENT Filename (#PCDATA)>
 
 <!ELEMENT PublicationDate (Day?, Month?, Year)>
 <!ELEMENT Day (#PCDATA)>
