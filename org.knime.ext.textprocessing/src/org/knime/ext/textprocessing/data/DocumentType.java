@@ -56,4 +56,21 @@ public enum DocumentType {
         }
         return list;
     }
+    
+    /**
+     * Returns the proper <code>DocumentType</code> accordant to the given
+     * string.
+     * 
+     * @param str The string to get the proper <code>DocumentType</code> for.
+     * @return The proper <code>DocumentType</code> accordant to the given
+     * string.
+     */
+    public static DocumentType stringToDocumentType(final String str) {
+        for (DocumentType type : values()) {
+            if (type.toString().equals(str)) {
+                return DocumentType.valueOf(str);
+            }
+        }
+        return DocumentType.UNKNOWN;
+    }    
 }

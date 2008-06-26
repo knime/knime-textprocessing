@@ -103,6 +103,11 @@ public class DmlDocumentParser extends DefaultHandler implements
     public static final String SOURCE = "source";
     
     /**
+     * The document's type.
+     */
+    public static final String DOCUMENT_TYPE = "documenttype";
+    
+    /**
      * The name of the term tag.
      */    
     public static final String TERM = "term";
@@ -220,6 +225,8 @@ public class DmlDocumentParser extends DefaultHandler implements
     private String m_currentSource = "";
     
     private DocumentType m_type;
+    
+    private String m_currentType = "";
     
     private String m_docPath;
     
@@ -360,6 +367,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_currentCategory = "";
         } else if (m_lastTag.equals(SOURCE)) {
             m_currentSource = "";
+        } else if (m_lastTag.equals(DOCUMENT_TYPE)) {
+            m_currentType = "";
         }
     }
     
@@ -425,7 +434,13 @@ public class DmlDocumentParser extends DefaultHandler implements
         } else if (qName.equals(SOURCE)) {
             DocumentSource source = new DocumentSource(m_currentSource);
             m_currentDoc.addDocumentSource(source);
-        } 
+        } else if (qName.equals(DOCUMENT_TYPE)) {
+            if (m_type == null) {
+                DocumentType type =
+                        DocumentType.stringToDocumentType(m_currentType);
+                m_currentDoc.setDocumentType(type);
+            }
+        }
     }
     
     /**
@@ -457,6 +472,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_currentCategory +=  new String(ch, start, length);
         } else if (m_lastTag.equals(SOURCE)) {
             m_currentSource +=  new String(ch, start, length);
+        } else if (m_lastTag.equals(DOCUMENT_TYPE)) {
+            m_currentType +=  new String(ch, start, length);
         }
     }
 
@@ -514,6 +531,15 @@ public class DmlDocumentParser extends DefaultHandler implements
                 hd.characters(source.getSourceName().toCharArray(),
                         0, source.getSourceName().length());
                 hd.endElement("", "", SOURCE);                
+            }
+            
+            // Document Type
+            if (doc.getType() != null) {
+                atts.clear();
+                hd.startElement("", "", DOCUMENT_TYPE, atts);
+                hd.characters(doc.getType().toString().toCharArray(),
+                        0, doc.getType().toString().length());
+                hd.endElement("", "", DOCUMENT_TYPE);                
             }
             
             // Authors

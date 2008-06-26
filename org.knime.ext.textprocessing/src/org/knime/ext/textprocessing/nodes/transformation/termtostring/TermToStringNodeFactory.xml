@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./default.png" type="Manipulator">
+    <name>Term to string</name>
+    <shortDescription>Converts terms to strings and adds a new column containing
+    these strings.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node allows you to add a string column to each row containing
+            a term. The column will contain the value of the term converted into 
+            a string.
+        </intro>
+    </fullDescription>
+        
+    <ports>
+        <dataIn name="Term input table" index="0">
+        An input data table containing term cells.
+        </dataIn>
+        <dataOut name="Term output table" index="0">
+        An output table containing the input data with an additional string
+        cell column.
+        </dataOut>
+    </ports>
+</knimeNode>
