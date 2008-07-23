@@ -313,7 +313,9 @@ public class DocumentBuilder {
         if (m_sentences == null) {
             m_sentences = new ArrayList<Sentence>();
         }
-        m_sentences.add(s);
+        if (s != null) {
+            m_sentences.add(s);
+        }
     }
     
     /**
@@ -341,8 +343,10 @@ public class DocumentBuilder {
         Paragraph p = internalAddParagraph(paragraph);
         if (m_paragraphs == null) {
             m_paragraphs = new ArrayList<Paragraph>();
+        } 
+        if (p != null) { 
+            m_paragraphs.add(p);
         }
-        m_paragraphs.add(p);
     }
     
     /**
@@ -373,8 +377,10 @@ public class DocumentBuilder {
         Section s = internalAddSection(section, annotation);
         if (m_sections == null) {
             m_sections = new ArrayList<Section>();
+        } 
+        if (s != null) {
+            m_sections.add(s);
         }
-        m_sections.add(s);
     }
 
     /**
@@ -387,14 +393,7 @@ public class DocumentBuilder {
             m_sections.add(section);
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     /**
      * Tokenizes the given string and creates a section out of it. The given 
@@ -407,7 +406,7 @@ public class DocumentBuilder {
      */
     private Section internalAddSection(final String section, 
             final SectionAnnotation annotation) {
-        if (section != null && section.length() > 0) {
+        if (section != null && section.length() > 0 && !section.equals("")) {
             List<String> strSentences =
                     DefaultTokenization.detectSentences(section);
             List<Sentence> sentences = new ArrayList<Sentence>();
