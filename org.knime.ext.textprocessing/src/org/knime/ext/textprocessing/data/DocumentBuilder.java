@@ -25,6 +25,7 @@ package org.knime.ext.textprocessing.data;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -484,7 +485,12 @@ public class DocumentBuilder {
         return null;
     }
         
-    
+    /**
+     * @return an unmodifiable list of all current sections.
+     */
+    public List<Section> getSections() {
+        return Collections.unmodifiableList(m_sections);
+    }
     
     
     

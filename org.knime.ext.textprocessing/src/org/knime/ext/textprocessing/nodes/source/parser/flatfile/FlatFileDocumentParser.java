@@ -34,7 +34,10 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.Paragraph;
+import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
+import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 
 /**
@@ -92,8 +95,6 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         m_currentDoc.addDocumentCategory(m_category);
         m_currentDoc.addDocumentSource(m_source);
 
-        m_currentDoc.addTitle(m_docPath);
-
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         String line = null;
         StringBuilder text = new StringBuilder();
@@ -103,6 +104,23 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         br.close();
         m_currentDoc.addSection(text.toString(), SectionAnnotation.UNKNOWN);
 
+        String firstSentence = null;
+        List<Section> sections = m_currentDoc.getSections();
+        if (sections != null && sections.size() > 0) {
+            List<Paragraph> paragraphs = sections.get(0).getParagraphs();
+            if (paragraphs != null && paragraphs.size() > 0) {
+                List<Sentence> sentences = paragraphs.get(0).getSentences();
+                if (sentences != null && sentences.size() > 0) {
+                    firstSentence = sentences.get(0).getText();
+                }
+            }
+        }
+        if (firstSentence != null) {
+            m_currentDoc.addTitle(firstSentence);
+        } else {
+            m_currentDoc.addTitle(m_docPath);
+        }
+        
         m_docs.add(m_currentDoc.createDocument());
         return m_docs;
     }  
