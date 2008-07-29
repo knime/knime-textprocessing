@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./default.png" type="Manipulator">
+    <name>Strings To Document</name>
+    <shortDescription>Converts the specified strings to documents.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Converts the specified strings to documents. For each row a document
+            will be created and attached to that row. The strings of the
+            specified columns will be used as title, authors, abstract, 
+            full text and so on.
+        </intro>
+    </fullDescription>
+        
+    <ports>
+        <dataIn name="String input table" index="0">
+        An input data table containing string cells.
+        </dataIn>
+        <dataOut name="String and document output table" index="0">
+        An output table containing the strings of the data of the input table as
+        well as the created documents in an additional column.
+        </dataOut>
+    </ports>
+</knimeNode>
