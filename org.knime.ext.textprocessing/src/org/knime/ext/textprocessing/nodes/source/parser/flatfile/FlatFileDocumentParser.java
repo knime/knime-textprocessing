@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   20.02.2008 (Kilian Thiel): created
  */
@@ -38,41 +38,42 @@ import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 
 /**
- * Implements the 
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} 
+ * Implements the
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
  * interface. The provided method
  * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
- * is able to read the data of the given input stream and store it as a 
+ * is able to read the data of the given input stream and store it as a
  * {@link org.knime.ext.textprocessing.data.Document}s full text. The title
  * of the document is the absolut name of the file containing the text data.
  * The file name has to be set before calling the parser method, otherwise no
- * title will be set. The complete data of the input stream is set as full text. 
- * 
+ * title will be set. The complete data of the input stream is set as full text.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FlatFileDocumentParser extends AbstractDocumentParser {
-    
+
     private List<Document> m_docs;
-    
+
     private DocumentBuilder m_currentDoc;
-    
-    
+
+
     /**
-     * Creates a new instance of <code>FlatFileDocumentParser</code>. 
-     * The document source, category and file path will be set to 
+     * Creates a new instance of <code>FlatFileDocumentParser</code>.
+     * The document source, category and file path will be set to
      * <code>null</code> by default.
      */
     public FlatFileDocumentParser() {
         super(null, null, null);
     }
-    
+
     /**
      * Creates a new instance of <code>FlatFileDocumentParser</code>. The given
      * source, category and file path is set to the created documents.
-     * 
+     *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
@@ -100,7 +101,14 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         StringBuilder text = new StringBuilder();
         while ((line = br.readLine()) != null) {
             text.append(line);
+            text.append(Term.WORD_SEPARATOR);
         }
+
+        int len = text.length();
+        if (len > 0) {
+            text.delete(len - (Term.WORD_SEPARATOR.length() + 1), len);
+        }
+
         br.close();
         m_currentDoc.addSection(text.toString(), SectionAnnotation.UNKNOWN);
 
@@ -120,8 +128,8 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         } else {
             m_currentDoc.addTitle(m_docPath);
         }
-        
+
         m_docs.add(m_currentDoc.createDocument());
         return m_docs;
-    }  
+    }
 }
