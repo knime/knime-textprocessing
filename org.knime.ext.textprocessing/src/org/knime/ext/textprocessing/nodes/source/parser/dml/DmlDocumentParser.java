@@ -507,7 +507,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             hd.startElement("", "", DOCUMENT, atts);
 
             // Filename
-            if (doc.getDocFile().length() > 0) {
+            if (doc.getDocFile() != null && doc.getDocFile().length() > 0) {
                 atts.clear();
                 hd.startElement("", "", FILENAME, atts);
                 hd.characters(doc.getDocFile().getAbsolutePath().toCharArray(),
