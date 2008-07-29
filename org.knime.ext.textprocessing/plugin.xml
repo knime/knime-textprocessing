@@ -179,6 +179,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termtostring.TermToStringNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.termtostring.TermToStringNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/transformation"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
