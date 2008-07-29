@@ -63,7 +63,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
         // Set title
         if (m_config.getTitleStringIndex() >= 0) {
             DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
-            if (titleCell.getType().isCompatible(StringValue.class)) {
+            if (!titleCell.isMissing() && 
+                    titleCell.getType().isCompatible(StringValue.class)) {
                 String title = ((StringValue)titleCell).getStringValue();
                 docBuilder.addTitle(title);
             }
@@ -71,7 +72,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
         // Set authors
         if (m_config.getAuthorsStringIndex() >= 0) {
             DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
-            if (auhorsCell.getType().isCompatible(StringValue.class)) {
+            if (!auhorsCell.isMissing() &&
+                    auhorsCell.getType().isCompatible(StringValue.class)) {
                 String authors = ((StringValue)auhorsCell).getStringValue();
                 String[]authorsArr = authors.split(
                         m_config.getAuthorsSplitChar());
