@@ -79,7 +79,7 @@ public class TermToStringCellFactory implements CellFactory {
     public void setProgress(final int curRowNr, final int rowCount, 
             final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Addig class of row: " + curRowNr 
+        exec.setProgress(prog, "Processing row: " + curRowNr 
                 + " of " + rowCount + " rows");
     }
 }

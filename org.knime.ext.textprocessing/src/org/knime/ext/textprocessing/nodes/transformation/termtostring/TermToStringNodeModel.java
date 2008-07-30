@@ -51,6 +51,9 @@ public class TermToStringNodeModel extends NodeModel {
     
     private int m_termColIndex = -1;    
     
+    /**
+     * Creates a new instance of <code>TermToStringNodeModel</code>.
+     */
     public TermToStringNodeModel() {
         super(1, 1);
     }
