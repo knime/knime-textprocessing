@@ -149,7 +149,13 @@ public class Document implements TextContainer {
                     "The publication date may not be null!");
         }
 
-        m_docFile = documentFile;
+        // file (if null create empty file instance)
+        if (documentFile == null) {
+            m_docFile = new File("DummyFileName");
+        } else {
+            m_docFile = documentFile;
+        }
+        
         m_pubDate = date;
         m_categories = categories;
         m_sources = sources;
@@ -368,19 +374,26 @@ public class Document implements TextContainer {
         }
         Document d = (Document)o;
 
-        if (!d.getAuthors().equals(m_authors)) {
+        if ((d.getAuthors() == null && m_authors != null) 
+            || !d.getAuthors().equals(m_authors)) {
             return false;
-        } else if (!d.getPubDate().equals(m_pubDate)) {
+        } else if ((d.getPubDate() == null && m_pubDate != null) 
+            || !d.getPubDate().equals(m_pubDate)) {
             return false;
-        } else if (!d.getDocFile().equals(m_docFile)) {
+        } else if ((d.getDocFile() == null && m_docFile != null) 
+            || !d.getDocFile().equals(m_docFile)) {
             return false;
-        } else if (!d.getSources().equals(m_sources)) {
+        } else if ((d.getSources() == null && m_sources != null) 
+                || !d.getSources().equals(m_sources)) {
             return false;
-        } else if (!d.getCategories().equals(m_categories)) {
+        } else if ((d.getCategories() == null && m_categories != null) 
+                || !d.getCategories().equals(m_categories)) {
             return false;
-        } else if (!d.getType().equals(m_type)) {
+        } else if ((d.getType() == null && m_type != null) 
+                || !d.getType().equals(m_type)) {
             return false;
-        } else if (!d.getSections().equals(m_sections)) {
+        } else if ((d.getSections() == null && m_sections != null) 
+                || !d.getSections().equals(m_sections)) {
             return false;
         }
 
