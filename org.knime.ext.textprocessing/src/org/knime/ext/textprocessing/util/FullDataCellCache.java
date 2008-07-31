@@ -77,11 +77,15 @@ public class FullDataCellCache extends DataCellCache {
     @Override
     public DataCell getInstance(final TextContainer tc) {
         DataCell dc;
-        if (m_cache.contains(tc)) {
-            dc = m_cache.get(tc);
-        } else {
+        dc = m_cache.get(tc);
+        if (dc == null) {
             dc = m_dcFac.createDataCell(tc);
             m_cache.put(tc, dc);
+            
+            // DEBUG
+            if ((m_cache.size() % 10) == 0) {
+                System.out.println("Cache size: " + m_cache.size());
+            }
         }
         return dc;
     }
