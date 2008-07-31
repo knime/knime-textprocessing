@@ -35,6 +35,8 @@ import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
+import org.knime.ext.textprocessing.util.FullDataCellCache;
 
 /**
  * 
@@ -44,6 +46,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
 
     private StringsToDocumentConfig m_config;
     
+    private FullDataCellCache m_cache;
+    
     public StringsToDocumentCellFactory(final StringsToDocumentConfig config) 
     throws IllegalArgumentException {
         if (config == null) {
@@ -51,6 +55,7 @@ public class StringsToDocumentCellFactory implements CellFactory {
                     "Configuration object may not be null!");
         }
         m_config = config;
+        m_cache = new FullDataCellCache(new DocumentBlobDataCellFactory());
     }
     
     /**
@@ -100,8 +105,7 @@ public class StringsToDocumentCellFactory implements CellFactory {
         }
         
         Document doc = docBuilder.createDocument();
-        DocumentCell newCell = new DocumentCell(doc);
-        return new DataCell[]{newCell};
+        return new DataCell[]{m_cache.getInstance(doc)};
     }
 
     /**
