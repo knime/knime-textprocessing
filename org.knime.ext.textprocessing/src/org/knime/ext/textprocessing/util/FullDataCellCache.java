@@ -81,11 +81,6 @@ public class FullDataCellCache extends DataCellCache {
         if (dc == null) {
             dc = m_dcFac.createDataCell(tc);
             m_cache.put(tc, dc);
-            
-            // DEBUG
-            if ((m_cache.size() % 10) == 0) {
-                System.out.println("Cache size: " + m_cache.size());
-            }
         }
         return dc;
     }
