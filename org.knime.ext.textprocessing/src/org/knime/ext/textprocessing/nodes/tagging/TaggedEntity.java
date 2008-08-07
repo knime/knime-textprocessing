@@ -33,7 +33,7 @@ package org.knime.ext.textprocessing.nodes.tagging;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TaggedEntity implements Comparable<TaggedEntity> {
+public class TaggedEntity {
 
     private String m_entity;
 
@@ -68,7 +68,8 @@ public class TaggedEntity implements Comparable<TaggedEntity> {
     /**
      * {@inheritDoc}
      */
-    public int compareTo(final TaggedEntity o) {
-        return m_entity.compareTo(o.m_entity);
+    @Override
+    public String toString() {
+        return m_entity + "[" + m_tag + "]";
     }
 }
