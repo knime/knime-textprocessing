@@ -29,10 +29,20 @@
         <option name="Tags">
              The tags to use as valid tags.
         </option>
+        
+        <option name="Document column">
+              Specifies the column containing the documents to preprocess.
+        </option>
         <option name="Deep preprocessing">
              If deep preprocessing is checked, the terms contained inside
-             the documents are filtered too, this means that the documents are
+             the documents are converted too, this means that the documents are
              changed, which is more time consuming. 
+        </option>
+        <option name="Append original document">
+            If append original document is checked, the documents contained in
+            the input document column are appended as extra column. This
+            enables later on a mapping of preprocessed documents to original
+            documents.  
         </option>
     </fullDescription>
         

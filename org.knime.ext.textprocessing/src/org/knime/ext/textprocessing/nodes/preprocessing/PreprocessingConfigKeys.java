@@ -34,4 +34,14 @@ public class PreprocessingConfigKeys {
      * The configuration key for the deep preprcessing setting.
      */
     public static final String CFG_KEY_DEEP_PREPRO = "DeepPreprocessing";
+    
+    /**
+     * The configuration key for appending the incoming document.
+     */
+    public static final String CFG_KEY_APPEND_INCOMING = "AppendIncomingDoc";
+    
+    /**
+     * The configuration key for the column containing he documents to process.
+     */
+    public static final String CFG_KEY_DOCUMENT_COL = "DocCol";
 }

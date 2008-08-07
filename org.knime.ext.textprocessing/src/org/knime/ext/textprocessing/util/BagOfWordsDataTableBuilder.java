@@ -28,6 +28,8 @@ import java.util.Set;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
@@ -49,17 +51,20 @@ import org.knime.ext.textprocessing.data.TermCell;
  * @author Kilian Thiel, University of Konstanz
  */
 public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
-
-    private BufferedDataContainer m_dataContainer;
-    
-    private int m_keyCount = 0;
-    
-    private FullDataCellCache m_docCache;
     
     /**
      * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
      */
     public BagOfWordsDataTableBuilder() { }    
+    
+    /**
+     * @param appendExtraDocCol if <code>true</code> an extra document column 
+     * will be appended.
+     * @return The <code>DataTableSpec</code> of the data table build by the
+     * underlying implementation.
+     */
+    public abstract DataTableSpec createDataTableSpec(
+            final boolean appendExtraDocCol);    
     
     /**
      * @return The corresponding factory creating a certain kind of 
@@ -68,65 +73,16 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
     protected abstract TextContainerDataCellFactory 
         getDocumentCellDataFactory();
     
+    /**
+     * Validates the cell type of a document i.e. underlying implementations ca
+     * validate for <code>BlobCell</code> or usual <code>DataCell</code>s etc. 
+     * @param documentCell The <code>DataCell</code> to validate.
+     * @return <code>false</code> if given <code>DataCell</code> has not a
+     * valid type, otherwise <code>true</code>.
+     */
     protected abstract boolean validateDocumentCellType(
             final DataCell documentCell);
-    
-    public synchronized void openNewDataTable(final ExecutionContext exec) {
-        if (m_dataContainer != null) {
-            m_dataContainer.close();
-            m_dataContainer = null;
-        }
-        m_keyCount = 0;
-        m_dataContainer = exec.createDataContainer(this.createDataTableSpec());
-        m_docCache = new FullDataCellCache(getDocumentCellDataFactory());
-    }
 
-    public synchronized void addRow(final Document document, final Term term, 
-            final ExecutionContext exec) throws IllegalArgumentException {
-        if (m_docCache == null) {
-            openNewDataTable(exec);
-        }
-        
-        DataCell documentCell = m_docCache.getInstance(document);
-        TermCell termCell = new TermCell(term);
-        addRow(documentCell, termCell, exec);
-    }
-    
-    public synchronized void addRow(final DataCell documentCell, 
-            final TermCell termCell, final ExecutionContext exec) 
-    throws IllegalArgumentException {
-        if (!documentCell.getType().isCompatible(DocumentValue.class)) {
-            throw new IllegalArgumentException(
-                    "Given document cell is not compatible to DocumentValue!");
-        }
-        if (!validateDocumentCellType(documentCell)) {
-            throw new IllegalArgumentException(
-                    "Type of given document cell is not a valid type!");            
-        }
-        
-        if (m_dataContainer == null) {
-            openNewDataTable(exec);
-        }
-        
-        RowKey rowKey = new RowKey(Integer.toString(m_keyCount));
-        m_keyCount++;
-        
-        DataRow row = new DefaultRow(rowKey, termCell, documentCell);
-        m_dataContainer.addRowToTable(row);
-    }
-    
-    public synchronized BufferedDataTable closeDataTable() {
-        if (m_dataContainer != null) {
-            m_keyCount = 0;
-            m_dataContainer.close();
-            BufferedDataContainer tmpContainer = m_dataContainer;
-            m_dataContainer = null;
-            m_docCache = null;
-            return tmpContainer.getTable();
-        }
-        return null;
-    }
-    
     
     
     /**
@@ -148,9 +104,44 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * @return The <code>BufferedDataTable</code> containing the given 
      * documents and terms
      * @throws CanceledExecutionException If execution was canceled.
+     */    
+    public BufferedDataTable createDataTable(final ExecutionContext exec,
+            final Hashtable<Document, Set<Term>> docTerms, 
+            final boolean useTermCache) throws CanceledExecutionException {
+        return createDataTable(exec, docTerms, null, useTermCache);
+    }
+    
+    
+    /**
+     * Creates and returns a {@link org.knime.core.node.BufferedDataTable} 
+     * containing the given preprocessed documents the corresponding terms
+     * as well as the original documents (provided as <code>DataCell</code>). 
+     * The key-column is the column containing the documents of the hash table
+     * <code>docTerms</code>, according to this key documents the given terms
+     * are stored in a column too. Additional to that, the original documents
+     * can be provided in the has table <code>docDocCell</code>, if that table
+     * is not null, the given <code>DataCell</code>s are added in an additional
+     * column according to their keys.
+     * 
+     * @param exec The <code>ExecutionContext</code> to create the 
+     * <code>BufferedDataTable</code> with.
+     * @param docTerms The  
+     * {@link org.knime.ext.textprocessing.data.Document}s and the corresponding 
+     * set of {@link org.knime.ext.textprocessing.data.Term}s.
+     * @param docDocCell Containing the original documents as 
+     * <code>DataCell</code>s. If it is not null, the original documents are
+     * applied as additional column.
+     * @param useTermCache If set true the created <code>TermCell</code>s are
+     * cached during creation of the data table. This means that a cell
+     * holding a certain term exists only once. An other cell  holding the
+     * same term is only a reference to the first cell.
+     * @return The <code>BufferedDataTable</code> containing the given 
+     * documents and terms
+     * @throws CanceledExecutionException If execution was canceled.
      */
     public BufferedDataTable createDataTable(final ExecutionContext exec,
             final Hashtable<Document, Set<Term>> docTerms, 
+            final Hashtable<Document, DataCell> docDocCell,
             final boolean useTermCache) throws CanceledExecutionException {
       // create cache
       FullDataCellCache docCache = new FullDataCellCache(
@@ -158,8 +149,12 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
       FullDataCellCache termCache = new FullDataCellCache(
               new TermDataCellFactory());
       
-      BufferedDataContainer dc =
-              exec.createDataContainer(this.createDataTableSpec());
+      boolean appendExtraDocCol = false;
+      if (docDocCell != null && docTerms.size() == docDocCell.size()) {
+          appendExtraDocCol = true;
+      }
+      BufferedDataContainer dc = exec.createDataContainer(
+              this.createDataTableSpec(appendExtraDocCol));
 
       int i = 1;
       Set<Document> keys = docTerms.keySet();
@@ -168,6 +163,12 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
       
       for (Document d : keys) {
           DataCell docCell = docCache.getInstance(d);
+          
+          // get data cell containing original document
+          DataCell docCell2 = null;
+          if (appendExtraDocCol) {
+               docCell2 = docDocCell.get(d);
+          }
           
           Set<Term> terms = docTerms.get(d);
           for (Term t : terms) {
@@ -181,7 +182,17 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
               } else {
                   termCell = (TermCell)termCache.getInstance(t);
               }
-              DataRow row = new DefaultRow(rowKey, termCell, docCell);
+                            
+              DataRow row;
+              if (appendExtraDocCol) {
+                  if (docCell2 == null) {
+                      docCell2 = DataType.getMissingCell();
+                  }
+                  row = new DefaultRow(rowKey, termCell, docCell, docCell2);
+              } else {
+                  row = new DefaultRow(rowKey, termCell, docCell);
+              }
+              
               dc.addRowToTable(row);
           }
           

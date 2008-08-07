@@ -40,6 +40,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -71,9 +72,15 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 public abstract class PreprocessingNodeModel extends NodeModel {
 
     /**
-     * The default setting for deep preprocessing (<code>false</code>).
+     * The default setting for deep preprocessing (<code>true</code>).
      */
     public static final boolean DEF_DEEP_PREPRO = true;
+    
+    /**
+     * The default setting for appending the incoming document 
+     * (<code>true</code>).
+     */
+    public static final boolean DEF_APPEND_INCOMING = true;
 
     private int m_documentColIndex = -1;
 
@@ -84,6 +91,12 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_deepPreproModel =
         PreprocessingNodeSettingsPane.getDeepPrepressingModel();
+    
+    private SettingsModelBoolean m_appendIncomingModel =
+        PreprocessingNodeSettingsPane.getAppendIncomingDocument();
+    
+    private SettingsModelString m_documentColModel =
+        PreprocessingNodeSettingsPane.getDocumentColumnModel();
 
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.
@@ -100,7 +113,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
@@ -113,7 +126,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
+        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec(
+                m_appendIncomingModel.getBooleanValue())};
     }
 
     /**
@@ -131,6 +145,10 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
+        String docColName = m_documentColModel.getStringValue();
+        m_documentColIndex = 
+            inData[0].getDataTableSpec().findColumnIndex(docColName);
+        
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {
@@ -142,6 +160,12 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             new Hashtable<Document, Set<Term>>();
         Hashtable<Document, Document> preprocessedDoc =
             new Hashtable<Document, Document>();
+        
+        Hashtable<Document, DataCell> preprocessedDocDocumentCell = null;
+        if (m_appendIncomingModel.getBooleanValue()) {
+            preprocessedDocDocumentCell = 
+                new Hashtable<Document, DataCell>();
+        }
 
         ExecutionMonitor subExec = exec.createSubProgress(0.5);
         int rowCount = inData[0].getRowCount();
@@ -232,13 +256,19 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
             terms.add(term);
             docTerms.put(newDoc, terms);
+            
+            // save preprocessed document and original documentcell to hashtable
+            if (preprocessedDocDocumentCell != null) {
+                preprocessedDocDocumentCell.put(newDoc, doccell);
+            }
         }
 
         preprocessedDoc.clear();
         // build data table
         ExecutionContext subContext = exec.createSubExecutionContext(0.5);
+        
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-                subContext, docTerms, false)};
+                subContext, docTerms, preprocessedDocDocumentCell, false)};
     }
 
 
@@ -249,6 +279,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_deepPreproModel.loadSettingsFrom(settings);
+        m_appendIncomingModel.loadSettingsFrom(settings);
+        m_documentColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -257,6 +289,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_deepPreproModel.saveSettingsTo(settings);
+        m_appendIncomingModel.saveSettingsTo(settings);
+        m_documentColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -266,5 +300,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_deepPreproModel.validateSettings(settings);
+        m_appendIncomingModel.validateSettings(settings);
+        m_documentColModel.validateSettings(settings);
     }
 }

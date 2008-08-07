@@ -26,6 +26,7 @@ package org.knime.ext.textprocessing.util;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.TermCell;
 
@@ -37,6 +38,34 @@ public class BagOfWordsCellDataTableBuilder extends BagOfWordsDataTableBuilder {
 
     /**
      * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
+     * containing minimum one column of type <code>DocumentCell</code> to
+     * store text documents and one column of type <code>TermCell</code>
+     * representing the terms contained by a certain document.
+     * @param appendExtraDocCol if set <code>true</code> an additional column
+     * containing <code>DocumentCell</code> is appended.
+     * 
+     * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
+     *         with one column of type <code>DocumentListCell</code> and one
+     *         column of type <code>TermCell</code>.
+     */
+    public DataTableSpec createDataTableSpec(final boolean appendExtraDocCol) {
+        // create DataTableSpec for output DataTable
+        DataColumnSpecCreator docs =
+                new DataColumnSpecCreator("Document", DocumentBlobCell.TYPE);
+        DataColumnSpecCreator docs2 =
+            new DataColumnSpecCreator("Orig Document", DocumentBlobCell.TYPE);        
+        DataColumnSpecCreator terms =
+            new DataColumnSpecCreator("Term", TermCell.TYPE);
+        
+        if (!appendExtraDocCol) {
+            return new DataTableSpec(terms.createSpec(), docs.createSpec());
+        }
+        return new DataTableSpec(terms.createSpec(), docs.createSpec(), 
+                docs2.createSpec());
+    }
+    
+    /**
+     * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
      * containing one column of type <code>DocumentCell</code> to
      * store text documents and one column of type <code>TermCell</code>
      * representing the terms contained by a certain document. 
@@ -46,12 +75,7 @@ public class BagOfWordsCellDataTableBuilder extends BagOfWordsDataTableBuilder {
      *         column of type <code>TermCell</code>.
      */
     public DataTableSpec createDataTableSpec() {
-        // create DataTableSpec for output DataTable
-        DataColumnSpecCreator docs =
-                new DataColumnSpecCreator("Document", DocumentCell.TYPE);
-        DataColumnSpecCreator terms =
-            new DataColumnSpecCreator("Term", TermCell.TYPE);
-        return new DataTableSpec(terms.createSpec(), docs.createSpec());
+        return createDataTableSpec(false);
     }
     
     /**

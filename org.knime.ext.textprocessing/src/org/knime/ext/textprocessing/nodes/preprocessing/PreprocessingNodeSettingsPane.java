@@ -25,7 +25,10 @@ package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane}
@@ -47,17 +50,51 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     }
     
     /**
+     * @return Creates and returns the boolean settings model which contains
+     * the flag if the incoming original documents have to be applied in an
+     * extra column.
+     */
+    public static SettingsModelBoolean getAppendIncomingDocument() {
+        return new SettingsModelBoolean(
+                PreprocessingConfigKeys.CFG_KEY_APPEND_INCOMING,
+                PreprocessingNodeModel.DEF_APPEND_INCOMING);
+    }
+    
+    /**
+     * @return Creates and returns the string settings model containing
+     * the name of the column with the documents to preprocess.
+     */
+    public static SettingsModelString getDocumentColumnModel() {
+        return new SettingsModelString(
+                PreprocessingConfigKeys.CFG_KEY_DOCUMENT_COL,
+                "Document");
+    }
+    
+    /**
      * Creates new instance of <code>PreprocessingNodeSettingsPane</code>.
      */
+    @SuppressWarnings("unchecked")
     public PreprocessingNodeSettingsPane() {
         removeTab("Options");
-        createNewTabAt("Deep Preprocessing", 1);
+        createNewTabAt("Preprocessing", 1);
         
-        DialogComponentBoolean comp = new DialogComponentBoolean(
+        DialogComponentColumnNameSelection comp3 = 
+            new DialogComponentColumnNameSelection(getDocumentColumnModel(), 
+                    "Document column", 0, DocumentValue.class);
+        comp3.setToolTipText(
+                "Column has to contain documents to preprocess!");
+        addDialogComponent(comp3);        
+        
+        DialogComponentBoolean comp1 = new DialogComponentBoolean(
                 getDeepPrepressingModel(), "Deep preprocessing");
-        comp.setToolTipText(
+        comp1.setToolTipText(
                 "Be aware that deep preprocessing is more time consuming!");
+        addDialogComponent(comp1);
         
-        addDialogComponent(comp);
+        DialogComponentBoolean comp2 = new DialogComponentBoolean(
+                getAppendIncomingDocument(), "Append original document");
+        comp2.setToolTipText(
+                "The original incoming documents will be appended!");
+        addDialogComponent(comp2);
     }
 }
