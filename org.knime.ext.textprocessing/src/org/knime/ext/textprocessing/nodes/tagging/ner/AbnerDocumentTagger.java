@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   27.02.2008 (Kilian Thiel): created
  */
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
+import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
@@ -37,32 +38,32 @@ import abner.Tagger;
 /**
  * <code>AbnerDocumentTagger</code> is a concrete implementation of
  * {@link org.knime.ext.textprocessing.nodes.tagging.DocumentTagger} and
- * extends 
+ * extends
  * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger}.
  * The method {@link AbnerDocumentTagger#tagEntities(Sentence)} recognizes
- * biomedical named entities by using ABNER (A Biomedical Named Entity 
- * Recognizer). For more details about ABNER see 
+ * biomedical named entities by using ABNER (A Biomedical Named Entity
+ * Recognizer). For more details about ABNER see
  * (http://pages.cs.wisc.edu/~bsettles/abner/).
  * The method {@link AbnerDocumentTagger#getTags(String)} returns tag of the
  * type {@link org.knime.ext.textprocessing.data.BiomedicalNeTag}.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class AbnerDocumentTagger extends AbstractDocumentTagger {
 
     private Tagger m_tagger;
-    
+
     /**
      * Creates a new instance of <code>AbnerDocumentTagger</code> with given
      * flag specifying if recognized named entities is set unmodifiable.
-     * 
+     *
      * @param setNeUnmodifiable The unmodifiable flag to set.
      */
     public AbnerDocumentTagger(final boolean setNeUnmodifiable) {
         super(setNeUnmodifiable);
         m_tagger = new Tagger(Tagger.BIOCREATIVE);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -84,5 +85,13 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
             entities.add(new TaggedEntity(nes[0][i], nes[1][i]));
         }
         return entities;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void preprocess(final Document doc) {
+        // no preprocessing required
     }
 }

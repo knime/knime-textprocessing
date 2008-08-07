@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   29.02.2008 (Kilian Thiel): created
  */
@@ -29,20 +29,20 @@ package org.knime.ext.textprocessing.nodes.tagging;
  * a part of speech tag (POS) or a named entity tag (ABNER) etc.
  * External tagger, like ABNER (A Biomedical Named Entity Recognizer) or the
  * OpenNLP POS tagger return their results in various kinds. This class helps
- * to unify the different results and enable an unique way of accessing them.  
- * 
+ * to unify the different results and enable an unique way of accessing them.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TaggedEntity {
-    
+public class TaggedEntity implements Comparable<TaggedEntity> {
+
     private String m_entity;
-    
+
     private String m_tag;
-    
+
     /**
      * Creates a new instance of <code>TaggedEntity</code> with given entity
      * (a term as string) and tag as string.
-     * 
+     *
      * @param entity The term entity to set.
      * @param tagString The tag string to set.
      */
@@ -63,5 +63,12 @@ public class TaggedEntity {
      */
     public String getTagString() {
         return m_tag;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(final TaggedEntity o) {
+        return m_entity.compareTo(o.m_entity);
     }
 }
