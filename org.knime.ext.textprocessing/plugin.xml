@@ -189,6 +189,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/transformation"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
