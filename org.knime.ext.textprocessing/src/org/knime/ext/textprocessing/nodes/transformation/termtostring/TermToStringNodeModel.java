@@ -61,7 +61,7 @@ public class TermToStringNodeModel extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
     }
