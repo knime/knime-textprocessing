@@ -31,11 +31,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
-import org.knime.core.data.container.DataContainer;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.BufferedDataTableHolder;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
@@ -45,15 +44,18 @@ import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPane;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewerNodeModel extends NodeModel {
+public class DocumentViewerNodeModel extends NodeModel 
+implements BufferedDataTableHolder {
 
     private static final int INPUT_INDEX = 0;
     
@@ -61,10 +63,7 @@ public class DocumentViewerNodeModel extends NodeModel {
     
     private Set<Document> m_documents;
     
-    private DataTable m_data;
-    
-    private static final String INDATA_FILE = 
-        "DocumentViewerNodeModelInData.dat";
+    private BufferedDataTable m_data;
 
     private static final String SETTINGS_FILE = 
         "DocumentViewerNodeModelSettings.dat";    
@@ -72,6 +71,9 @@ public class DocumentViewerNodeModel extends NodeModel {
     private static final String INTERNAL_MODEL = "DocViewerModel";
     
     private static final String DOCUMENT_INDEX = "DocIndex";
+    
+    private SettingsModelString m_documentColModel =
+        FrequenciesNodeSettingsPane.getDocumentColumnModel();    
     
     /**
      * Creates new instance of <code>DocumentViewerNodeModel</code>.
@@ -88,7 +90,7 @@ public class DocumentViewerNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(
                 inSpecs[INPUT_INDEX]);
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         m_documentCellindex = verifier.getDocumentCellIndex();
         return new DataTableSpec[]{};
     }
@@ -99,6 +101,10 @@ public class DocumentViewerNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
+        
+        m_documentCellindex = inData[0].getDataTableSpec().findColumnIndex(
+                m_documentColModel.getStringValue());
+        
         m_documents = new HashSet<Document>();
         m_data = inData[INPUT_INDEX];
         buildDocumentSet();
@@ -123,9 +129,29 @@ public class DocumentViewerNodeModel extends NodeModel {
      * @return the set of documents to display.
      */
     Set<Document> getDocuments() {
-        
         return m_documents;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedDataTable[] getInternalTables() {
+        return new BufferedDataTable[] {m_data};
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setInternalTables(final BufferedDataTable[] tables) {
+        if (tables.length != 1) {
+            throw new IllegalArgumentException();
+        }
+        m_data = tables[0];
+        buildDocumentSet();
+    }    
+    
     
     /**
      * {@inheritDoc}
@@ -134,9 +160,6 @@ public class DocumentViewerNodeModel extends NodeModel {
     protected void loadInternals(final File nodeInternDir, 
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
-        m_data = 
-            DataContainer.readFromZip(new File(nodeInternDir, INDATA_FILE));
-        
         File file = new File(nodeInternDir, SETTINGS_FILE);
         FileInputStream fis = new FileInputStream(file);
         ModelContentRO modelContent = ModelContent.loadFromXML(fis);        
@@ -160,7 +183,7 @@ public class DocumentViewerNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_documentColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -179,9 +202,6 @@ public class DocumentViewerNodeModel extends NodeModel {
     protected void saveInternals(final File nodeInternDir, 
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
-        DataContainer.writeToZip(m_data, new File(nodeInternDir, 
-                INDATA_FILE), exec);
-        
         // Save tree
         ModelContent modelContent = new ModelContent(INTERNAL_MODEL);
 
@@ -199,7 +219,7 @@ public class DocumentViewerNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // Nothing to do ...
+        m_documentColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -208,6 +228,6 @@ public class DocumentViewerNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_documentColModel.validateSettings(settings);
     }
 }

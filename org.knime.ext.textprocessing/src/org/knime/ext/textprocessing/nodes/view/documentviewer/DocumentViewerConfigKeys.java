@@ -19,59 +19,18 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   05.08.2008 (thiel): created
+ *   08.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
-
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewerNodeFactory extends 
-NodeFactory<DocumentViewerNodeModel> {
-
+public class DocumentViewerConfigKeys {
+    
     /**
-     * {@inheritDoc}
+     * The configuration key for the column containing he documents to process.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentViewerNodeDialog();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DocumentViewerNodeModel createNodeModel() {
-        return new DocumentViewerNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<DocumentViewerNodeModel> createNodeView(final int index, 
-            final DocumentViewerNodeModel model) {
-        return new DocumentViewerNodeView(model);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFG_KEY_DOCUMENT_COL = "DocCol";
 }

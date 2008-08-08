@@ -21,7 +21,7 @@
  * History
  *   08.08.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.frequencies;
+package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -32,31 +32,31 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class FrequenciesNodeSettingsPane extends DefaultNodeSettingsPane {
+public class DocumentViewerNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * @return Creates and returns the string settings model containing
-     * the name of the column with the documents to compute the frequencies.
+     * the name of the column with the documents to preprocess.
      */
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(
-                FrequenciesConfigKeys.CFG_KEY_DOCUMENT_COL,
+                DocumentViewerConfigKeys.CFG_KEY_DOCUMENT_COL,
                 "Document");
     }
     
     /**
-     * Creates new instance of <code>FrequenciesNodeSettingsPane</code>.
+     * Creates new instance of <code>DocumentViewerNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
-    public FrequenciesNodeSettingsPane() {
+    public DocumentViewerNodeDialog() {
         removeTab("Options");
-        createNewTabAt("Document Col", 1);
+        createNewTabAt("Preprocessing", 1);
         
         DialogComponentColumnNameSelection comp1 = 
             new DialogComponentColumnNameSelection(getDocumentColumnModel(), 
                     "Document column", 0, DocumentValue.class);
         comp1.setToolTipText(
-                "Column has to contain documents to compute frequiency of!");
-        addDialogComponent(comp1);        
+                "Column has to contain documents to preprocess!");
+        addDialogComponent(comp1);
     }
 }
