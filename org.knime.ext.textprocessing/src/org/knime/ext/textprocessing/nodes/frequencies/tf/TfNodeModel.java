@@ -87,6 +87,7 @@ public class TfNodeModel extends FrequencyNodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
         m_relativeModel.loadSettingsFrom(settings);
     }
 
@@ -96,6 +97,7 @@ public class TfNodeModel extends FrequencyNodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
         m_relativeModel.saveSettingsTo(settings);
     }
 
@@ -105,6 +107,7 @@ public class TfNodeModel extends FrequencyNodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        super.validateSettings(settings);
         m_relativeModel.validateSettings(settings);
     }
 

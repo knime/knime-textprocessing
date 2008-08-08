@@ -39,7 +39,7 @@ public class IdfNodeFactory extends NodeFactory<IdfNodeModel> {
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new IdfNodeDialog();
     }
 
     /**
@@ -72,6 +72,6 @@ public class IdfNodeFactory extends NodeFactory<IdfNodeModel> {
      */
     @Override
     protected boolean hasDialog() {
-        return false;
+        return true;
     }
 }

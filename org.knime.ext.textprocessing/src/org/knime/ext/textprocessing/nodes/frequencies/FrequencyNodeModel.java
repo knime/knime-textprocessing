@@ -34,6 +34,9 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -62,6 +65,10 @@ public abstract class FrequencyNodeModel extends NodeModel {
     private String m_colName;
     
     private boolean m_addIntCol = false;
+    
+    private SettingsModelString m_documentColModel =
+        FrequenciesNodeSettingsPane.getDocumentColumnModel();
+    
     
     /**
      * If no output spec has to be returned after the configure call, this
@@ -119,7 +126,7 @@ public abstract class FrequencyNodeModel extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec) 
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
@@ -145,6 +152,9 @@ public abstract class FrequencyNodeModel extends NodeModel {
     protected final BufferedDataTable[] execute(BufferedDataTable[] inData,
             ExecutionContext exec) throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
+        
+        m_documentColIndex = inDataTable.getDataTableSpec().findColumnIndex(
+                m_documentColModel.getStringValue());
         
         // initializes the corresponding cell factory
         initCellFactory(inDataTable, exec);
@@ -175,5 +185,31 @@ public abstract class FrequencyNodeModel extends NodeModel {
      */
     public int getTermColIndex() {
         return m_termColIndex;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        m_documentColModel.loadSettingsFrom(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_documentColModel.saveSettingsTo(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        m_documentColModel.validateSettings(settings);
     }
 }

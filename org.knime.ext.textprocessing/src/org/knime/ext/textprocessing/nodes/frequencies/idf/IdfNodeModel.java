@@ -67,7 +67,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        super.loadValidatedSettingsFrom(settings);
     }
 
     /**
@@ -83,7 +83,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // Nothing to do ...
+        super.saveSettingsTo(settings);
     }
 
     /**
@@ -92,7 +92,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        super.validateSettings(settings);
     }
 
     

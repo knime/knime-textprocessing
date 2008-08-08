@@ -21,38 +21,20 @@
  * History
  *   21.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.frequencies.tf;
+package org.knime.ext.textprocessing.nodes.frequencies.idf;
 
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPane;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfNodeDialog extends FrequenciesNodeSettingsPane {
-
-    /**
-     * @return Creates and returns new instance of a 
-     * <code>SettingsModelBoolean</code> containing the setting whether the
-     * term frequency has to be computed relative or absolute.
-     */
-    public static SettingsModelBoolean getRelativeModel() {
-        return new SettingsModelBoolean(TfConfigKeys.CFG_KEY_RELATIVE,
-                TfNodeModel.DEF_RELATIVE);
-    }
+public class IdfNodeDialog extends FrequenciesNodeSettingsPane {
     
     /**
      * Creates new instance of <code>IdfNodeDialog</code>.
      */
-    public TfNodeDialog() {
+    public IdfNodeDialog() {
         super();
-        
-        createNewTab("TF options");
-        setSelected("TF options");
-        
-        addDialogComponent(new DialogComponentBoolean(getRelativeModel(), 
-                "Relative frequency"));
     }
 }
