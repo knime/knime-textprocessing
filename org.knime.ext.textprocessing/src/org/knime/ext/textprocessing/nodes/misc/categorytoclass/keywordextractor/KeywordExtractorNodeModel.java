@@ -192,7 +192,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
 
         subDoc.setProgress(0.1, "Clustering the frequent terms");
         Set<Term> frequentTerms = e.getTopFrequentTerms();
-        m_logger.info("Frequent terms: " + frequentTerms.toString());
+        m_logger.debug("Frequent terms: " + frequentTerms.toString());
 
 
         ClusteringAlgorithm<Term> c = new GreedyClustering<Term>();
@@ -207,9 +207,9 @@ public class KeywordExtractorNodeModel extends NodeModel {
         SimilarityMeasure<Term> sim = new OrCombination<Term>(measures);
 
         Set<Cluster<Term>> clusters = c.cluster(frequentTerms, sim);
-        m_logger.info("Clusters");
+        m_logger.debug("Clusters");
         for (Cluster<Term> cluster : clusters) {
-            m_logger.info(cluster);
+            m_logger.debug(cluster);
         }
 
         subDoc.setProgress(0.8, "Calculating the chi square values");
