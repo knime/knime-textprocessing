@@ -31,8 +31,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.knime.core.data.DataRow;
+import org.knime.core.data.RowIterator;
+import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
@@ -374,5 +380,66 @@ public class DocumentUtil {
      */
     private static int sumOverOne(final int n) {
         return (n * (n+1)) / 2;
+    }
+
+    /**
+     * @param terms a list of terms
+     * @return the same terms but without tags
+     */
+    public static List<Term> stripTermTags(final List<Term> terms) {
+        List<Term> tagless = new ArrayList<Term>(terms.size());
+
+        for (Term t : terms) {
+            tagless.add(new Term(t.getWords(), null, t.isUnmodifiable()));
+        }
+
+        return tagless;
+    }
+
+    /**
+     * @param data the data table
+     * @param exec an execution monitor to report on the progress
+     * @param documentColumnName the name of the document column. If it does not
+     * exist, this function will attempt to use the first Document column cell
+     * it can find.
+     * @return a set of unique documents extracted from the data table
+     * @throws CanceledExecutionException if the execution is cancelled
+     */
+    public static Set<Document> extractUniqueDocuments(
+            final BufferedDataTable data, final ExecutionMonitor exec,
+            final String documentColumnName)
+            throws CanceledExecutionException {
+        DataTableSpecVerifier verifier =
+            new DataTableSpecVerifier(data.getDataTableSpec());
+
+        int documentColIndex = data.getDataTableSpec().findColumnIndex(
+                documentColumnName);
+
+        if (documentColIndex == -1) {
+            documentColIndex = verifier.getDocumentCellIndex();
+            if (documentColIndex == -1) {
+                throw new IllegalStateException("No document cell was found.");
+            }
+        }
+
+        Set<Document> docs = new HashSet<Document>();
+        RowIterator it = data.iterator();
+        int n = data.getRowCount();
+        int i = 1;
+        while (it.hasNext()) {
+            exec.checkCanceled();
+            double progress = (double)i / (double)n;
+            exec.setProgress(progress, "Processing row " + i + " of " + n);
+
+            DataRow row = it.next();
+
+            if (!row.getCell(documentColIndex).isMissing()) {
+                docs.add(((DocumentValue)row.getCell(documentColIndex))
+                        .getDocument());
+            }
+            ++i;
+        }
+
+        return docs;
     }
 }

@@ -146,9 +146,6 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         return db.createDocument();
     }
 
-//    private final Comparator<List<String>> m_comparator =
-//        Collections.reverseOrder(new ListComparator<String>());
-
     private Sentence tagSentence(final Sentence s) {
         // detect named entities
         List<TaggedEntity> entities = tagEntities(s);
@@ -156,29 +153,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             return s;
         }
 
-//        // tokenize them into words
-//        // sort by descending order of length to prioritize entities with more
-//        // words (this is done in case we have nested entities)
-//        SortedMap<List<String>, TaggedEntity> te =
-//            new TreeMap<List<String>, TaggedEntity>(m_comparator);
-//
-//        for (TaggedEntity entity : entities) {
-//            List<String> words =
-//                DefaultTokenization.tokenizeSentence(entity.getEntity());
-//            te.put(words, entity);
-//        }
-
         // Collect words and terms
         List<Term> termList = s.getTerms();
-
-//        for (Entry<List<String>, TaggedEntity> e : te.entrySet()) {
-//            List<String> neWords = e.getKey();
-//            String tagstr = e.getValue().getTagString();
-//
-//            // build a new term list with the old term list, words of detected
-//            // tagged entities and the associated tags
-//            termList = buildTermList(termList, neWords, tagstr);
-//        }
 
         // go through all recognized named entities and rearrange terms
         for (TaggedEntity entity : entities) {
@@ -195,21 +171,6 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
         return new Sentence(termList);
     }
-
-    /**
-     * Compares lists based on their size.
-     *
-     * @author Pierre-Francois Laquerre, University of Konstanz
-     */
-//    private class ListComparator<T> implements Comparator<List<T>> {
-//
-//        /**
-//         * {@inheritDoc}
-//         */
-//        public int compare(final List<T> l1, final List<T> l2) {
-//            return l1.size() - l2.size();
-//        }
-//    }
 
     private List<Term> buildTermList(final List<Term> oldTermList,
             final List<String> neWords, final String entityTag) {
