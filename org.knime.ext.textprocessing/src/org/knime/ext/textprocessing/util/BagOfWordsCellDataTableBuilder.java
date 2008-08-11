@@ -48,6 +48,7 @@ public class BagOfWordsCellDataTableBuilder extends BagOfWordsDataTableBuilder {
      *         with one column of type <code>DocumentListCell</code> and one
      *         column of type <code>TermCell</code>.
      */
+    @Override
     public DataTableSpec createDataTableSpec(final boolean appendExtraDocCol) {
         // create DataTableSpec for output DataTable
         DataColumnSpecCreator docs =

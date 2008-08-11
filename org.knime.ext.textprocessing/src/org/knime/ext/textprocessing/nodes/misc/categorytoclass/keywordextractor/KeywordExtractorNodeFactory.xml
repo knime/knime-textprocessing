@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./default.png" type="Other">
+    <name>Keyword Extractor</name>
+    <shortDescription>Extracts relevant keywords from documents.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node analyses documents and extracts relevant keywords 
+            using cooccurrence statistics as described in 
+            "Keyword extraction from a single document using word co-occurrence
+            statistical information" by Y.Matsuo and M. Ishizuka.
+            <br />
+            First, the most frequent terms (see node settings) are extracted and
+            then clustered together using the Jensen-Shannon divergence and 
+            Mutual Information measures. Once this is done, each term is ranked 
+            in decreasing order of the deviation between their expected cluster 
+            cooccurrence and the actual observed cooccurrence value. The terms 
+            with the highest divergence are returned as keywords.
+            <br />
+            A term can be considered as member of a cluster if it is similar to 
+            all the terms inside it according to at least one of the similarity 
+            measures. If more than one cluster meets this condition, the 
+            one with the highest average score will be used. If no cluster 
+            is similar, a new one is created.
+            <br /> 
+            Setting the console's output level to INFO will make this node 
+            display the contents of the clusters.
+        </intro>
+        <option name="Number of keywords to extract">
+             The number of keywords to extract per document.
+        </option>
+        <option name="Percentage of unique terms in the document to use for the 
+        chi-square measures">
+             The percentage of the set of unique terms in the document to use 
+             for the term clusters.
+             The article this node is based on provides 30% as a rule of thumb.
+        </option>
+        <option name="Ignore tags">
+             If this option is checked, the node will only compare terms based 
+             on their word content. In other words, tags and any other meta 
+             information will be ignored.
+             This will not affect the output documents, only the way they are 
+             analysed.
+        </option>
+        <option name="Pointwise mutual information threshold">
+            Terms whose pointwise mutual information score is greater than or 
+            equal to this value will be considered as similar and thus clustered
+             together.
+            <br />
+            This similarity measure typically ranges from 0 to infinity but has 
+            been normalized from 0 to 1 using arctan(value)/(pi/2).
+        </option>
+        <option name="Normalized L1 norm threshold">
+            Terms whose normalized L1 norm score is greater than or 
+            equal to this value will be considered as similar and thus clustered
+             together.
+            <br />
+            This similarity measure ranges from 0 to 1 inclusively.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <dataIn name="Documents input table" index="0">
+        The input table which contains the documents to analyse.</dataIn>
+        <dataOut name="Keywords output table" index="0">
+        The output table which contains (keyword term, deviation value, 
+        associated document) tuples.
+        </dataOut>
+    </ports>
+</knimeNode>

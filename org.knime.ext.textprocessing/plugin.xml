@@ -194,6 +194,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/misc"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.categorytoclass.keywordextractor.KeywordExtractorNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.misc.categorytoclass.keywordextractor.KeywordExtractorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
