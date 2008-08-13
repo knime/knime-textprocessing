@@ -23,13 +23,13 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataCellDataInput;
+import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
@@ -147,18 +147,19 @@ public class TermCell extends DataCell implements StringValue, TermValue {
         /**
          * {@inheritDoc}
          */
-        public void serialize(final TermCell cell, 
-                final DataOutput output) throws IOException {
-            output.writeUTF(cell.getSerializationString());
+        @Override
+        public TermCell deserialize(DataCellDataInput input) throws IOException {
+            String s = input.readUTF();
+            return TermCell.createTermCell(s);
         }
-        
+
         /**
          * {@inheritDoc}
          */
-        public TermCell deserialize(final DataInput input) 
-            throws IOException {
-            String s = input.readUTF();
-            return TermCell.createTermCell(s);
+        @Override
+        public void serialize(TermCell cell, DataCellDataOutput output)
+                throws IOException {
+            output.writeUTF(cell.getSerializationString());
         }
     }
     

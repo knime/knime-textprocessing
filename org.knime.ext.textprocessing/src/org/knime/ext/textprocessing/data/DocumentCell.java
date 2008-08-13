@@ -25,12 +25,12 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataCellDataInput;
+import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
@@ -159,18 +159,20 @@ public class DocumentCell extends DataCell implements StringValue,
         /**
          * {@inheritDoc}
          */
-        public void serialize(final DocumentCell cell, 
-                final DataOutput output) throws IOException {
-            output.writeUTF(cell.getSerializationString());
+        @Override
+        public DocumentCell deserialize(DataCellDataInput input)
+                throws IOException {
+            String s = input.readUTF();
+            return DocumentCell.createDocumentCell(s);
         }
 
         /**
          * {@inheritDoc}
          */
-        public DocumentCell deserialize(final DataInput input) 
-            throws IOException {
-            String s = input.readUTF();
-            return DocumentCell.createDocumentCell(s);
+        @Override
+        public void serialize(DocumentCell cell, DataCellDataOutput output)
+                throws IOException {
+            output.writeUTF(cell.getSerializationString());
         }
     }
     
