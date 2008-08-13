@@ -148,7 +148,8 @@ public class TermCell extends DataCell implements StringValue, TermValue {
          * {@inheritDoc}
          */
         @Override
-        public TermCell deserialize(DataCellDataInput input) throws IOException {
+        public TermCell deserialize(final DataCellDataInput input) 
+        throws IOException {
             String s = input.readUTF();
             return TermCell.createTermCell(s);
         }
@@ -157,8 +158,8 @@ public class TermCell extends DataCell implements StringValue, TermValue {
          * {@inheritDoc}
          */
         @Override
-        public void serialize(TermCell cell, DataCellDataOutput output)
-                throws IOException {
+        public void serialize(final TermCell cell, 
+                final DataCellDataOutput output) throws IOException {
             output.writeUTF(cell.getSerializationString());
         }
     }

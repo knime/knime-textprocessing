@@ -160,7 +160,7 @@ public class DocumentCell extends DataCell implements StringValue,
          * {@inheritDoc}
          */
         @Override
-        public DocumentCell deserialize(DataCellDataInput input)
+        public DocumentCell deserialize(final DataCellDataInput input)
                 throws IOException {
             String s = input.readUTF();
             return DocumentCell.createDocumentCell(s);
@@ -170,7 +170,8 @@ public class DocumentCell extends DataCell implements StringValue,
          * {@inheritDoc}
          */
         @Override
-        public void serialize(DocumentCell cell, DataCellDataOutput output)
+        public void serialize(final DocumentCell cell, 
+                final DataCellDataOutput output)
                 throws IOException {
             output.writeUTF(cell.getSerializationString());
         }

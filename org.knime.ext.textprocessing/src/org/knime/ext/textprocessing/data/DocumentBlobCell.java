@@ -160,7 +160,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
          * {@inheritDoc}
          */
         @Override
-        public DocumentBlobCell deserialize(DataCellDataInput input)
+        public DocumentBlobCell deserialize(final DataCellDataInput input)
                 throws IOException {
             String s = input.readUTF();
             return DocumentBlobCell.createDocumentCell(s);
@@ -170,7 +170,8 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
          * {@inheritDoc}
          */
         @Override
-        public void serialize(DocumentBlobCell cell, DataCellDataOutput output)
+        public void serialize(final DocumentBlobCell cell, 
+                final DataCellDataOutput output)
                 throws IOException {
             output.writeUTF(cell.getSerializationString());
         }
