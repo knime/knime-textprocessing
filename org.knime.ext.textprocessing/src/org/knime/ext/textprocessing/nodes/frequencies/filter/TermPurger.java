@@ -77,6 +77,8 @@ public class TermPurger {
      * 
      * @param inData The input data table containing a bag of words.
      * @param exec A execution context to monitor the progress.
+     * @param documentColumnName The name of the column containing the documents
+     * to apply the filtering to.
      * @throws InvalidSettingsException If the given data table contains no
      * column with documents or terms.
      */
