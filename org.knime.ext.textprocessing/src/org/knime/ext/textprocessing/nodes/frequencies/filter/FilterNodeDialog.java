@@ -39,6 +39,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelDoubleRange;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
+import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 
 /**
  * The dialog class of the filter node.
@@ -97,6 +99,17 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelBoolean(FilterConfigKeys.CFG_KEY_DEEPFILTERING,
                 FilterNodeModel.DEF_DEEP_FILTERING);
     }
+
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelBoolean</code> specifying if modification of 
+     * unmodifiable terms is done. 
+     */
+    public static final SettingsModelBoolean getModifyUnmodifiableModel() {
+        return new SettingsModelBoolean(
+                FilterConfigKeys.CFG_KEY_MODIFY_UNMODIFIABLE,
+                FilterNodeModel.DEF_MODIFY_UNMODIFIABLE);
+    }    
     
     private SettingsModelDoubleRange m_minMaxModel;
     
@@ -115,14 +128,26 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
                 getDeepFilteringModel(), "Deep filtering");
         comp.setToolTipText(
         "Be aware that deep filtering is more time consuming!");
+        
+        DialogComponentColumnNameSelection comp3 = 
+            new DialogComponentColumnNameSelection(
+                    PreprocessingNodeSettingsPane.getDocumentColumnModel(), 
+                    "Document column", 0, DocumentValue.class);
+        addDialogComponent(comp3);
+        
+        
         addDialogComponent(comp);
+                createNewTabAt("Filter Settings", 2);
         
-        createNewTabAt("Filter Settings", 2);
-        
+        // Modify Unmodifiable
+        addDialogComponent(new DialogComponentBoolean(
+                getModifyUnmodifiableModel(), "Filter unmodifiable terms"));
+                
         // Column Selection
         addDialogComponent(new DialogComponentColumnNameSelection(
-                getColModel(), "Filter Column", 0, IntValue.class, 
+                getColModel(), "Filter column", 0, IntValue.class, 
                 DoubleValue.class));
+        
         
         // Filter Option
         ButtonGroupEnumInterface[] filteringOptions = new FilteringOptions[2];

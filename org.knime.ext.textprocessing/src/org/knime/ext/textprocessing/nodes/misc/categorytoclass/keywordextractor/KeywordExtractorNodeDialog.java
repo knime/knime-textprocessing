@@ -61,6 +61,7 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
     /**
      * Creates a basic dialog for the Keyword Extractor node
      */
+    @SuppressWarnings("unchecked")
     public KeywordExtractorNodeDialog() {
         super();
 

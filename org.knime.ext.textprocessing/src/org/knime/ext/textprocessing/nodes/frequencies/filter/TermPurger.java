@@ -80,16 +80,23 @@ public class TermPurger {
      * @throws InvalidSettingsException If the given data table contains no
      * column with documents or terms.
      */
-    public TermPurger(final DataTable inData, final ExecutionContext exec) 
+    public TermPurger(final DataTable inData, final ExecutionContext exec,
+            final String documentColumnName) 
     throws InvalidSettingsException {
         m_inData = inData;
         
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(
                 inData.getDataTableSpec());
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-        m_docColIndex = verifier.getDocumentCellIndex();
+        m_docColIndex = inData.getDataTableSpec().findColumnIndex(
+                documentColumnName);
+        if (!inData.getDataTableSpec().getColumnSpec(m_docColIndex).getType()
+                .isCompatible(DocumentValue.class)) {
+            throw new InvalidSettingsException("Specified column name \"" 
+                    + documentColumnName + "\" contains no document values!");
+        }
         m_exec = exec;
         
         cacheTerms();

@@ -44,6 +44,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleRange;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -111,6 +112,10 @@ public class FilterNodeModel extends NodeModel {
      */
     public static final boolean DEF_DEEP_FILTERING = true;
     
+    /**
+     * The default setting for modification of unmodifiable terms.
+     */
+    public static final boolean DEF_MODIFY_UNMODIFIABLE = false;
     
     private SettingsModelString m_filterSelectionModel = 
         FilterNodeDialog.getSelectionModel();
@@ -125,6 +130,12 @@ public class FilterNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_deepFilteringModel = 
         FilterNodeDialog.getDeepFilteringModel();
+    
+    private SettingsModelBoolean m_modifyUnmodifiableModel = 
+        FilterNodeDialog.getModifyUnmodifiableModel();    
+    
+    private SettingsModelString m_documentColModel =
+        PreprocessingNodeSettingsPane.getDocumentColumnModel();    
     
     private int m_termColIndex = -1;
     
@@ -173,7 +184,8 @@ public class FilterNodeModel extends NodeModel {
         FrequencyFilter filter = FilterFactory.createFilter(
                 m_filterSelectionModel.getStringValue(), m_termColIndex, 
                 filterColIndex, m_numberModel.getIntValue(), 
-                m_minMaxModel.getMinRange(), m_minMaxModel.getMaxRange());
+                m_minMaxModel.getMinRange(), m_minMaxModel.getMaxRange(),
+                m_modifyUnmodifiableModel.getBooleanValue());
         
         DataTable preprocessedTable = filter.preprocessData(inData[0], exec);
         DataTable filteredTable;
@@ -183,7 +195,8 @@ public class FilterNodeModel extends NodeModel {
         
         // Deep filtering
         if (m_deepFilteringModel.getBooleanValue()) {
-            TermPurger purger = new TermPurger(filteredTable, exec);
+            TermPurger purger = new TermPurger(filteredTable, exec, 
+                    m_documentColModel.getStringValue());
             return new BufferedDataTable[]{purger.getPurgedDataTable()};
         }
         
@@ -231,6 +244,8 @@ public class FilterNodeModel extends NodeModel {
         m_numberModel.saveSettingsTo(settings);
         m_minMaxModel.saveSettingsTo(settings);
         m_deepFilteringModel.saveSettingsTo(settings);
+        m_modifyUnmodifiableModel.saveSettingsTo(settings);
+        m_documentColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -244,6 +259,8 @@ public class FilterNodeModel extends NodeModel {
         m_numberModel.validateSettings(settings);
         m_minMaxModel.validateSettings(settings);
         m_deepFilteringModel.validateSettings(settings);
+        m_modifyUnmodifiableModel.validateSettings(settings);
+        m_documentColModel.validateSettings(settings);
     }
 
     /**
@@ -257,6 +274,8 @@ public class FilterNodeModel extends NodeModel {
         m_numberModel.loadSettingsFrom(settings);
         m_minMaxModel.loadSettingsFrom(settings);
         m_deepFilteringModel.loadSettingsFrom(settings);
+        m_modifyUnmodifiableModel.loadSettingsFrom(settings);
+        m_documentColModel.loadSettingsFrom(settings);
     }
     
     

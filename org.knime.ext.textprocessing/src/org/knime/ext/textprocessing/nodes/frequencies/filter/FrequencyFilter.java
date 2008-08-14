@@ -64,6 +64,26 @@ public abstract class FrequencyFilter extends RowFilter {
     
     private int m_termColIndex;
     
+    private boolean m_modifyUnmodifiable = false;
+    
+    /**
+     * Creates a new instance of <code>FrequencyFilter</code> with given indices
+     * specifying the term column, the column to apply the filtering to and the
+     * flag enabling the filtering of unmodifiable terms.
+     * 
+     * @param filterColIndex The column to apply the filtering to.
+     * @param termColIndex The column containing the terms.
+     * @param modifyUnmodifiable if set <code>true</code>, unmodifiable terms 
+     * are modified or filtered even if they are set unmodifiable, otherwise 
+     * not.
+     */
+    public FrequencyFilter(final int filterColIndex, final int termColIndex,
+            final boolean modifyUnmodifiable) {
+        m_filterColIndex = filterColIndex;
+        m_termColIndex = termColIndex;
+        m_modifyUnmodifiable = modifyUnmodifiable;
+    }
+    
     /**
      * Creates a new instance of <code>FrequencyFilter</code> with given indices
      * specifying the term column and the column to apply the filtering to.
@@ -72,8 +92,7 @@ public abstract class FrequencyFilter extends RowFilter {
      * @param termColIndex The column containing the terms.
      */
     public FrequencyFilter(final int filterColIndex, final int termColIndex) {
-        m_filterColIndex = filterColIndex;
-        m_termColIndex = termColIndex;
+        this(filterColIndex, termColIndex, false);
     }
     
     /**
@@ -113,7 +132,7 @@ public abstract class FrequencyFilter extends RowFilter {
         DataCell cell = row.getCell(m_termColIndex);
         if (cell.getType().isCompatible(TermValue.class)) {
             Term t = ((TermValue)cell).getTermValue();
-            if (t.isUnmodifiable()) {
+            if (t.isUnmodifiable() && !m_modifyUnmodifiable) {
                 return true;
             }
         }

@@ -54,4 +54,16 @@ public class FilterConfigKeys {
      * The configuration key for the deep filtering setting.
      */
     public static final String CFG_KEY_DEEPFILTERING = "DeepFiltering";
+    
+    /**
+     * The configuration key for the setting, specifying if unmodifiable terms 
+     * have to be filtered too.
+     */
+    public static final String CFG_KEY_MODIFY_UNMODIFIABLE = 
+        "MofiyUnmodifiable";
+    
+    /**
+     * The configuration key for the column containing he documents to process.
+     */
+    public static final String CFG_KEY_DOCUMENT_COL = "DocCol";    
 }

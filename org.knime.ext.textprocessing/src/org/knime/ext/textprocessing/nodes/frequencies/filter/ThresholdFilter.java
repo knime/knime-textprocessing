@@ -55,10 +55,14 @@ public class ThresholdFilter extends FrequencyFilter {
      * to.
      * @param min The minimum value.
      * @param max The maximum value.
+     * @param modifyUnmodifiable if set <code>true</code>, unmodifiable terms 
+     * are modified or filtered even if they are set unmodifiable, otherwise 
+     * not.
      */
     public ThresholdFilter(final int termColIndex, final int colIndex, 
-            final double min, final double max) {
-        super(colIndex, termColIndex);
+            final double min, final double max, 
+            final boolean modifyUnmodifiable) {
+        super(colIndex, termColIndex, modifyUnmodifiable);
         m_min = min;
         m_max = max;
     }

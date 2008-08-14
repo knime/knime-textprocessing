@@ -55,10 +55,13 @@ public class KTermsFilter extends FrequencyFilter {
      * @param colIndex The index of the frequency column to apply the filtering 
      * to.
      * @param k The number k of rows to keep.
+     * @param modifyUnmodifiable if set <code>true</code>, unmodifiable terms 
+     * are modified or filtered even if they are set unmodifiable, otherwise 
+     * not.
      */
     public KTermsFilter(final int termColIndex, final int colIndex, 
-            final int k) {
-        super(colIndex, termColIndex);
+            final int k, final boolean modifyUnmodifiable) {
+        super(colIndex, termColIndex, modifyUnmodifiable);
         m_k = k;
     }
 

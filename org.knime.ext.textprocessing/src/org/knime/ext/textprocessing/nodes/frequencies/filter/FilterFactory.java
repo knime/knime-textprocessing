@@ -52,16 +52,21 @@ public class FilterFactory {
      * filtered.
      * @param maxVal The max value of the filter column's number to be not 
      * filtered.
+     * @param modifyUnmodifiable if set <code>true</code>, unmodifiable terms 
+     * are modified or filtered even if they are set unmodifiable, otherwise 
+     * not.
      * @return A new instance of <code>FrequencyFilter</code>.
      */
     public static final FrequencyFilter createFilter(final String filterOption, 
             final int termColIndex, final int filterColIndex, final int number, 
-            final double minVal, final double maxVal) {
+            final double minVal, final double maxVal, 
+            final boolean modifyUnmodifiable) {
         if (filterOption.equals(FilterNodeModel.SELECTION_NUMBER)) {
-            return new KTermsFilter(termColIndex, filterColIndex, number);
+            return new KTermsFilter(termColIndex, filterColIndex, number, 
+                    modifyUnmodifiable);
         } else if (filterOption.equals(FilterNodeModel.SELECTION_THRESHOLD)) {
             return new ThresholdFilter(termColIndex, filterColIndex, minVal, 
-                    maxVal);
+                    maxVal, modifyUnmodifiable);
         }
         return null;
     }
