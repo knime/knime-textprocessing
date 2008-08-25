@@ -197,7 +197,7 @@
       <node
             category-path="/textprocessing/misc"
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.misc.categorytoclass.keywordextractor.KeywordExtractorNodeFactory">
+            id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory">
       </node>
    </extension>
    <extension
