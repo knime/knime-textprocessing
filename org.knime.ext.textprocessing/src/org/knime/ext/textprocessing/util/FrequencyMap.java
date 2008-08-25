@@ -23,10 +23,11 @@
 package org.knime.ext.textprocessing.util;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Wrapper around a map to keep track of frequency counts. Will return a default
- * value when get() is called on a non-existent key.
+ * value of 0 when get() is called on a non-existent key.
  *
  * @author Pierre-Francois Laquerre, University of Konstanz
  * @param <K> the type of the keys
@@ -56,6 +57,20 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
     @Override
     public Integer getDefaultValue() {
         return m_defaultValue;
+    }
+
+    /**
+     * @param keys the keys to search for
+     * @return the total frequencies of the elements in the set
+     */
+    public Integer getTotalFrequency(final Set<K> keys) {
+        int freqs = 0;
+
+        for (K k : keys) {
+            freqs += this.get(k);
+        }
+
+        return freqs;
     }
 
     /**

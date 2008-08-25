@@ -88,7 +88,8 @@ public class DocumentUtil {
                 for (Sentence sen : p.getSentences()) {
                     List<Term> senTerms = sen.getTerms();
                     for (Term t : senTerms) {
-                        builder.addTerm(new Term(t.getWords(), null, true));
+                        builder.addTerm(new Term(
+                                t.getWords(), null, t.isUnmodifiable()));
                     }
                     builder.createNewSentence();
                 }

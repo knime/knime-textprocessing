@@ -22,6 +22,7 @@
  */
 package org.knime.ext.textprocessing.util.similarity;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.util.clustering.Cluster;
@@ -110,10 +111,12 @@ public abstract class SimilarityMeasure<T> {
     /**
      * @param e the element to compare
      * @param clusters the set of clusters to search through
-     * @return the most similar cluster, null if none was found
+     * @return the most similar cluster
+     * @throws NoSuchElementException if none of the clusters are similar to e
      */
     public Cluster<T> getMostSimilar(
-            final T e, final Set<Cluster<T>> clusters) {
+            final T e, final Set<Cluster<T>> clusters)
+            throws NoSuchElementException {
         double maxval = getLowerBound();
         Cluster<T> maxcluster = null;
 
@@ -125,6 +128,10 @@ public abstract class SimilarityMeasure<T> {
                     maxcluster = c;
                 }
             }
+        }
+
+        if (maxcluster == null) {
+            throw new NoSuchElementException();
         }
 
         return maxcluster;

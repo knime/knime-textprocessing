@@ -58,6 +58,21 @@ public class UnorderedPair<T> {
     }
 
     /**
+     * @param e the element to look for
+     * @return the other element in the pair
+     */
+    public T getOther(final T e) {
+        if (m_first.equals(e)) {
+            return m_second;
+        } else if (m_second.equals(e)) {
+            return m_first;
+        } else {
+            throw new IllegalArgumentException(
+                    "This element is not in the pair.");
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -85,6 +100,14 @@ public class UnorderedPair<T> {
         }
 
         return false;
+    }
+
+    /**
+     * @param e the element to look for
+     * @return true if the element is contained in the pair
+     */
+    public boolean contains(final T e) {
+        return m_first.equals(e) || m_second.equals(e);
     }
 
     /**

@@ -22,6 +22,7 @@
  */
 package org.knime.ext.textprocessing.util.similarity;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.util.clustering.Cluster;
@@ -111,13 +112,12 @@ public class OrCombination<T> extends SimilarityMeasure<T> {
      * the elements in it are considered similar by at least one submeasure. The
      * highest total similarity will then be used to determine which one to pick
      *
-     * @param e the element to compare
-     * @param clusters the set of clusters to search through
-     * @return the most similar cluster, null if none were above the threshold
+     * {@inheritDoc}
      */
     @Override
     public Cluster<T> getMostSimilar(
-            final T e, final Set<Cluster<T>> clusters) {
+            final T e, final Set<Cluster<T>> clusters)
+            throws NoSuchElementException {
         double maxvalue = m_lowerbound;
         Cluster<T> maxcluster = null;
 
@@ -151,6 +151,10 @@ public class OrCombination<T> extends SimilarityMeasure<T> {
                     maxcluster = c;
                 }
             }
+        }
+
+        if (maxcluster == null) {
+            throw new NoSuchElementException();
         }
 
         return maxcluster;

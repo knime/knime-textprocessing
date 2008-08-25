@@ -101,19 +101,21 @@ public class KeywordExtractorNodeModel extends NodeModel {
     private SettingsModelBoolean m_ignoreTermTags =
         KeywordExtractorNodeDialog.createSetIgnoreTermTagsModel();
 
+    /**
+     * Which column holds the documents to analyse?
+     */
     private SettingsModelString m_documentColumnName =
         KeywordExtractorNodeDialog.createSetDocumentColumnNameModel();
 
     /**
-     * Inclusive threshold over which two probability distributions are
-     * considered as similar.
+     * Inclusive threshold over which two terms are considered as similar.
      */
     private SettingsModelDoubleBounded m_PMIThreshold =
         KeywordExtractorNodeDialog.createSetPMIThresholdModel();
 
     /**
-     * Inclusive threshold over which two probability distributions are
-     * considered as similar.
+     * Inclusive threshold over which two cooccurrence probability distributions
+     *  are considered as similar.
      */
     private SettingsModelDoubleBounded m_L1Threshold =
         KeywordExtractorNodeDialog.createSetL1ThresholdModel();
@@ -187,13 +189,15 @@ public class KeywordExtractorNodeModel extends NodeModel {
     private final Map<Term, Double> extractKeywords(
             final Document doc, final ExecutionMonitor subDoc) {
         subDoc.setProgress(0.0, "Analysing the document");
+
         TermEvent e =
-            new TermEvent(doc, m_frequentTermsProportion.getIntValue());
+            new TermEvent(doc, (double)m_frequentTermsProportion.getIntValue()/100);
 
         subDoc.setProgress(0.1, "Clustering the frequent terms");
         Set<Term> frequentTerms = e.getTopFrequentTerms();
-        m_logger.debug("Frequent terms: " + frequentTerms.toString());
-
+        if (m_logger.isDebugEnabled()) {
+            m_logger.debug("Frequent terms: " + frequentTerms.toString());
+        }
 
         ClusteringAlgorithm<Term> c = new GreedyClustering<Term>();
 
@@ -207,9 +211,11 @@ public class KeywordExtractorNodeModel extends NodeModel {
         SimilarityMeasure<Term> sim = new OrCombination<Term>(measures);
 
         Set<Cluster<Term>> clusters = c.cluster(frequentTerms, sim);
-        m_logger.debug("Clusters");
-        for (Cluster<Term> cluster : clusters) {
-            m_logger.debug(cluster);
+        if (m_logger.isDebugEnabled()) {
+            m_logger.debug("Clusters");
+            for (Cluster<Term> cluster : clusters) {
+                m_logger.debug(cluster);
+            }
         }
 
         subDoc.setProgress(0.8, "Calculating the chi square values");
@@ -241,6 +247,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
         // How many cooccurrences per cluster?
         FrequencyMap<Cluster<Term>> clusternbcoocs =
             DocumentUtil.getClusterNbCoocs(clusters, doc);
+
         // How many times does a specific term cooccur with a given cluster?
         Map<Cluster<Term>, FrequencyMap<Term>> clustercoocs =
             DocumentUtil.getClusterCoocs(clusters, doc);

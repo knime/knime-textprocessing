@@ -23,6 +23,7 @@
 package org.knime.ext.textprocessing.util.clustering;
 
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.util.similarity.SimilarityMeasure;
@@ -45,11 +46,10 @@ public class GreedyClustering<T> implements ClusteringAlgorithm<T> {
         Set<Cluster<T>> clusters = new HashSet<Cluster<T>>();
 
         for (T e : elements) {
-            Cluster<T> maxcluster = measure.getMostSimilar(e, clusters);
-
-            if (maxcluster != null) {
+            try {
+                Cluster<T> maxcluster = measure.getMostSimilar(e, clusters);
                 maxcluster.add(e);
-            } else {
+            } catch (NoSuchElementException ex) {
                 Cluster<T> cluster = new Cluster<T>();
                 cluster.add(e);
                 clusters.add(cluster);

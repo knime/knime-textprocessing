@@ -33,7 +33,7 @@ import org.knime.ext.textprocessing.util.Maps;
 import org.knime.ext.textprocessing.util.UnorderedPair;
 
 /**
- * Analyses and provides statistics for Document objects.
+ * Analyses and provides term (co)occurrence frequency statistics for Documents.
  *
  * @author Pierre-Francois Laquerre, University of Konstanz
  */
@@ -47,26 +47,45 @@ public class TermEvent extends Event<Term> {
     private FrequencyMap<Term> m_totalcoocs;
 
     /**
-     * Longer documents make holding the complete cooccurrence table in memory
-     * impossible.
      * @param doc the document to analyse
-     * @param frequentTermsProportion the percentage of unique terms to consider
+     * @param nrFrequentTerms the number of unique terms to consider
      * when building the cooccurrence table (for conditional probabilities)
      */
-    public TermEvent(final Document doc, final int frequentTermsProportion) {
-        if (frequentTermsProportion < 0 || frequentTermsProportion > 100) {
-            throw new IllegalArgumentException("The frequent terms proportion" +
-            		" must be between 0 and 100 inclusively");
+    public TermEvent(final Document doc, final int nrFrequentTerms) {
+        if (nrFrequentTerms <= 0) {
+            throw new IllegalArgumentException("The number of frequent terms " +
+            		" must be strictly positive");
         }
 
+        init(doc);
+        cacheCoocs(doc, nrFrequentTerms);
+    }
+
+    /**
+     * @param doc the document to analyse
+     * @param frequentTermsProportion the proportion of the number of unique
+     * terms to consider when building the cooccurrence table
+     */
+    public TermEvent(final Document doc, final double frequentTermsProportion) {
+        if (frequentTermsProportion < 0 || frequentTermsProportion > 1) {
+            throw new IllegalArgumentException("frequentTermsProportion must " +
+            		"be between 0 and 1");
+        }
+
+        init(doc);
+        int n = (int)Math.floor(m_terms.size() * frequentTermsProportion);
+        cacheCoocs(doc, n);
+    }
+
+    private void init(final Document doc) {
         m_documentLength = doc.getLength();
         m_frequencies = DocumentUtil.getTermFrequencies(doc);
         m_terms = Collections.unmodifiableSet(m_frequencies.keySet());
+    }
 
-        int n = (int)Math.floor(
-                (double)m_terms.size() * frequentTermsProportion / 100.00);
+    private void cacheCoocs(final Document doc, final int nrFrequentTerms) {
         m_topFrequentTerms =  Collections.unmodifiableSet(
-                Maps.getTopValues(m_frequencies, n).keySet());
+                Maps.getTopValues(m_frequencies, nrFrequentTerms).keySet());
 
         m_cooccurrences = DocumentUtil.getTermCooccurrences(doc, m_topFrequentTerms);
         m_totalcoocs = DocumentUtil.getTotalCoocs(doc, m_topFrequentTerms);

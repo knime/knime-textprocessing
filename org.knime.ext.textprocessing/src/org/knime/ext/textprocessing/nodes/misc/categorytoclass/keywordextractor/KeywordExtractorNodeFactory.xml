@@ -12,29 +12,36 @@
             statistical information" by Y.Matsuo and M. Ishizuka.
             <br />
             First, the most frequent terms (see node settings) are extracted and
-            then clustered together using the Jensen-Shannon divergence and 
-            Mutual Information measures. Once this is done, each term is ranked 
-            in decreasing order of the deviation between their expected cluster 
-            cooccurrence and the actual observed cooccurrence value. The terms 
-            with the highest divergence are returned as keywords.
+            then clustered together using the pointwise mutual information and 
+            a normalized version of the L1 norm as measures of distance between 
+            their cooccurrence probability distributions.
             <br />
             A term can be considered as member of a cluster if it is similar to 
             all the terms inside it according to at least one of the similarity 
             measures. If more than one cluster meets this condition, the 
             one with the highest average score will be used. If no cluster 
             is similar, a new one is created.
+            <br />
+            Once this is done, each term is ranked  
+            in decreasing order of the deviation between their expected cluster 
+            cooccurrence and the actual observed cooccurrence value. The terms 
+            with the highest divergence are returned as keywords.
             <br /> 
             Setting the console's output level to DEBUG will make this node 
-            display the contents of the clusters and also the similarity between
+            display the set of frequent terms, the distance between them during 
+            the clustering phase and the final clusters.
              terms.
         </intro>
+        <option name="Document column">
+            The name of the column which contains the documents to analyse.
+        </option>
         <option name="Number of keywords to extract">
              The number of keywords to extract per document.
         </option>
         <option name="Percentage of unique terms in the document to use for the 
         chi-square measures">
-             The percentage of the set of unique terms in the document to use 
-             for the term clusters.
+             The percentage of the set of unique terms in the document to use to
+              build the term clusters.
              The article this node is based on provides 30% as a rule of thumb.
         </option>
         <option name="Ignore tags">
@@ -50,14 +57,19 @@
              together.
             <br />
             This similarity measure typically ranges from 0 to infinity but has 
-            been normalized from 0 to 1 using arctan(value)/(pi/2).
+            been normalized from 0 to 1 using arctan(value)/(pi/2). It measures 
+            the discrepancy between the actual cooccurrence probability and the 
+            one if both terms were completely independent.
         </option>
         <option name="Normalized L1 norm threshold">
             Terms whose normalized L1 norm score is greater than or 
             equal to this value will be considered as similar and thus clustered
              together.
             <br />
-            This similarity measure ranges from 0 to 1 inclusively.
+            This similarity measure ranges from 0 to 1 inclusively. It measures 
+            the similarity between the cooccurrence probability of every term in
+             the document with the terms (P(t|first term) vs P(t|second term) 
+            for every possible t).
         </option>
     </fullDescription>
         

@@ -57,7 +57,6 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
     private static final double DEFAULT_L1_THRESHOLD = 0.4;
     private static final String DEFAULT_DOCUMENT_COLUMN_NAME = "Document";
 
-
     /**
      * Creates a basic dialog for the Keyword Extractor node
      */
@@ -67,7 +66,7 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentColumnNameSelection(
                 createSetDocumentColumnNameModel(),
-                "Document column", 0, DocumentValue.class));
+                "Document column:", 0, DocumentValue.class));
 
         addDialogComponent(new DialogComponentNumber(
                 createSetNrKeywordsModel(),
@@ -80,7 +79,7 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(
                 createSetIgnoreTermTagsModel(),
-                    "Ignore tags:"));
+                    "Ignore tags"));
 
         addDialogComponent(new DialogComponentNumber(
                 createSetPMIThresholdModel(),

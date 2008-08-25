@@ -90,11 +90,12 @@ public class Maps {
     }
 
     /**
-     * Only keeps elements in 'map' which matches a given condition.
+     * Only keeps elements in 'map' which match a given condition.
      *
      * @param <M> the type of the map
      * @param <K> the key type
      * @param <V> the value type
+     *
      * @param map the map to modify
      * @param cond the condition that must be met for an element to be kept
      */

@@ -46,14 +46,14 @@ public abstract class Event<T> {
     /**
      * @param x the outcome
      * @param given the outcome to use as a given
-     * @return the conditional probability of 'x' given 'given' (P(x|given))
+     * @return P(x|given)
      */
     public abstract double getConditionalProbability(final T x, final T given);
 
     /**
      * @param x the first value
      * @param y the second value
-     * @return the probability of both events occurring (P(x INTERSECT y))
+     * @return P(x INTERSECT y)
      */
     public double getJointProbability(final T x, final T y) {
         return getConditionalProbability(y, x) * getProbability(x);

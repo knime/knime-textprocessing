@@ -69,6 +69,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clear() {
         m_innermap.clear();
     }
@@ -76,6 +77,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean containsKey(final Object key) {
         return m_innermap.containsKey(key);
     }
@@ -83,6 +85,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean containsValue(final Object value) {
         return m_innermap.containsValue(value);
     }
@@ -90,6 +93,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Entry<K, V>> entrySet() {
         return m_innermap.entrySet();
     }
@@ -97,6 +101,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V get(final Object key) {
         V value = m_innermap.get(key);
         if (value == null) {
@@ -114,6 +119,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEmpty() {
         return m_innermap.isEmpty();
     }
@@ -121,6 +127,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<K> keySet() {
         return m_innermap.keySet();
     }
@@ -128,6 +135,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V put(final K key, final V value) {
         return m_innermap.put(key, value);
     }
@@ -135,6 +143,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putAll(final Map<? extends K, ? extends V> m) {
         m_innermap.putAll(m);
     }
@@ -142,6 +151,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V remove(final Object key) {
         return m_innermap.remove(key);
     }
@@ -149,6 +159,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int size() {
         return m_innermap.size();
     }
@@ -156,6 +167,7 @@ public abstract class DefaultMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<V> values() {
         return m_innermap.values();
     }
