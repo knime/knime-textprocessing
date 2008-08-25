@@ -20,7 +20,7 @@
  * History
  *   Jun 16, 2008 (Pierre-Francois Laquerre): created
  */
-package org.knime.ext.textprocessing.nodes.misc.categorytoclass.keywordextractor;
+package org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;

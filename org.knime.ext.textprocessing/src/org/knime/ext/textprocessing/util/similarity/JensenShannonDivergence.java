@@ -22,7 +22,7 @@
  */
 package org.knime.ext.textprocessing.util.similarity;
 
-import org.knime.ext.textprocessing.nodes.misc.categorytoclass.keywordextractor.Event;
+import org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.Event;
 
 /**
  * Calculates the Jensen-Shannon divergence between the conditional

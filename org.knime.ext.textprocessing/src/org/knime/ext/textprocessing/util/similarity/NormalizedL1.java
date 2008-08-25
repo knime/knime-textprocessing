@@ -23,7 +23,7 @@
 package org.knime.ext.textprocessing.util.similarity;
 
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.nodes.misc.categorytoclass.keywordextractor.Event;
+import org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.Event;
 
 /**
  * L1 norm: if the conditional probability of all possible outcomes of a
