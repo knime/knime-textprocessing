@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   15.02.2008 (thiel): created
  */
@@ -33,46 +33,46 @@ import org.knime.ext.textprocessing.data.DocumentType;
 
 /**
  * All parser, parsing various document formats, like Reuters, PubMed, etc.
- * and create {@link org.knime.ext.textprocessing.data.Document} instances, 
+ * and create {@link org.knime.ext.textprocessing.data.Document} instances,
  * have to implement this interface, to enable compatibility with
- * classes using different parsers. The interface provides the method 
+ * classes using different parsers. The interface provides the method
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}.
- * Underlying implementations have to use the given <code>InputStream</code> 
- * and, parse its data and create a list of 
+ * Underlying implementations have to use the given <code>InputStream</code>
+ * and, parse its data and create a list of
  * {@link org.knime.ext.textprocessing.data.Document}s which is then returned.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public interface DocumentParser {
 
     /**
-     * Parses the data of the given <code>InputStream</code> and creates 
-     * instances of {@link org.knime.ext.textprocessing.data.Document}s, which 
-     * are finally returned as a list. 
-     * 
-     * @param is the <code>InputStream</code> providing the data to parse. 
+     * Parses the data of the given <code>InputStream</code> and creates
+     * instances of {@link org.knime.ext.textprocessing.data.Document}s, which
+     * are finally returned as a list.
+     *
+     * @param is the <code>InputStream</code> providing the data to parse.
      * @return A list of documents parsed out of the input stream's data.
      * @throws Exception If something is not working properly.
      */
     public List<Document> parse(final InputStream is) throws Exception;
-    
+
     /**
      * @param category The category of the documents to set.
      */
-    public void setDocumentCategroy(final DocumentCategory category);
+    public void setDocumentCategory(final DocumentCategory category);
 
     /**
      * @param source The source of the documents to set.
      */
     public void setDocumentSource(final DocumentSource source);
-    
+
     /**
      * @param type The type of the documents to set.
      */
     public void setDocumentType(final DocumentType type);
-    
+
     /**
      * @param filePath The path to the file containing the document.
      */
-    public void setDocumentFilepath(final String filePath); 
+    public void setDocumentFilepath(final String filePath);
 }

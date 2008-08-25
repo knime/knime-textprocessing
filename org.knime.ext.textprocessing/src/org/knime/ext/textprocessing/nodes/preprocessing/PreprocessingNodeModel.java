@@ -25,7 +25,6 @@ package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Set;
 
 import org.knime.core.data.DataCell;
@@ -75,9 +74,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * The default setting for deep preprocessing (<code>true</code>).
      */
     public static final boolean DEF_DEEP_PREPRO = true;
-    
+
     /**
-     * The default setting for appending the incoming document 
+     * The default setting for appending the incoming document
      * (<code>true</code>).
      */
     public static final boolean DEF_APPEND_INCOMING = true;
@@ -91,10 +90,10 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_deepPreproModel =
         PreprocessingNodeSettingsPane.getDeepPrepressingModel();
-    
+
     private SettingsModelBoolean m_appendIncomingModel =
         PreprocessingNodeSettingsPane.getAppendIncomingDocument();
-    
+
     private SettingsModelString m_documentColModel =
         PreprocessingNodeSettingsPane.getDocumentColumnModel();
 
@@ -146,9 +145,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
         String docColName = m_documentColModel.getStringValue();
-        m_documentColIndex = 
+        m_documentColIndex =
             inData[0].getDataTableSpec().findColumnIndex(docColName);
-        
+
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {
@@ -160,10 +159,10 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             new Hashtable<Document, Set<Term>>();
         Hashtable<Document, Document> preprocessedDoc =
             new Hashtable<Document, Document>();
-        
+
         Hashtable<Document, DataCell> preprocessedDocDocumentCell = null;
         if (m_appendIncomingModel.getBooleanValue()) {
-            preprocessedDocDocumentCell = 
+            preprocessedDocDocumentCell =
                 new Hashtable<Document, DataCell>();
         }
 
@@ -215,14 +214,10 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                 if (newDoc == null) {
                     // preprocess doc here !!!
                     DocumentBuilder builder = new DocumentBuilder(doc);
-                    List<Section> sections = doc.getSections();
-                    for (Section s : sections) {
-                        List<Paragraph> paragraphs = s.getParagraphs();
-                        for (Paragraph p : paragraphs) {
-                            List<Sentence> sentences = p.getSentences();
-                            for (Sentence sen : sentences) {
-                                List<Term> senTerms = sen.getTerms();
-                                for (Term t : senTerms) {
+                    for (Section s : doc.getSections()) {
+                        for (Paragraph p : s.getParagraphs()) {
+                            for (Sentence sen : p.getSentences()) {
+                                for (Term t : sen.getTerms()) {
                                     if (!t.isUnmodifiable()) {
                                         t = m_preprocessing.preprocess(t);
                                     }
@@ -256,7 +251,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
             terms.add(term);
             docTerms.put(newDoc, terms);
-            
+
             // save preprocessed document and original documentcell to hashtable
             if (preprocessedDocDocumentCell != null) {
                 preprocessedDocDocumentCell.put(newDoc, doccell);
@@ -266,7 +261,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         preprocessedDoc.clear();
         // build data table
         ExecutionContext subContext = exec.createSubExecutionContext(0.5);
-        
+
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                 subContext, docTerms, preprocessedDocDocumentCell, false)};
     }

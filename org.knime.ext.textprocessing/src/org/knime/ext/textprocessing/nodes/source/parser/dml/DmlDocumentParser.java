@@ -673,7 +673,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
-    public void setDocumentCategroy(final DocumentCategory category) {
+    public void setDocumentCategory(final DocumentCategory category) {
         m_category = category;
     }
 

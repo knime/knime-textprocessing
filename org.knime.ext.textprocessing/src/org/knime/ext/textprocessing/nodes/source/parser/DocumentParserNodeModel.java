@@ -148,7 +148,7 @@ public class DocumentParserNodeModel extends NodeModel {
         boolean recursive = m_recursiveModel.getBooleanValue();
         String category = m_categoryModel.getStringValue();
         if (category != null && category.length() > 0) {
-            m_parser.setDocumentCategroy(new DocumentCategory(category));
+            m_parser.setDocumentCategory(new DocumentCategory(category));
         }
         String source = m_sourceModel.getStringValue();
         if (source != null && source.length() > 0) {

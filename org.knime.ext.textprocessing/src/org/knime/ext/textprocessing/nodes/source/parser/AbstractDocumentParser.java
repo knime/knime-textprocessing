@@ -36,7 +36,7 @@ import org.knime.ext.textprocessing.data.DocumentType;
  * interface
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}, 
  * such as
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentCategroy(DocumentCategory)},
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentCategory(DocumentCategory)},
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentSource(DocumentSource)},
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentFilepath(String)}
  * and
@@ -100,7 +100,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
-    public void setDocumentCategroy(final DocumentCategory category) {
+    public void setDocumentCategory(final DocumentCategory category) {
         m_category = category;
     }
 
