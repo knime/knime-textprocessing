@@ -136,8 +136,7 @@ public class DBScanClusteringAlgorithm<T> implements ClusteringAlgorithm<T> {
             T e = it.next();
             set.remove(e);
             return e;
-        } else {
-            return null;
-        }
+        }   
+        return null;
     }
 }
