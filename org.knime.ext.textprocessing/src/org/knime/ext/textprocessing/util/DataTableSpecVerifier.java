@@ -306,6 +306,34 @@ public class DataTableSpecVerifier {
                     + minimumDocCells + " columns containing DocumentCells !");
         }
         return valid;
+    }
+    
+    /**
+     * Verifies the <code>DataTableSpec</code> and checks if it contains at 
+     * least the given number minimumTermCells of columns containing 
+     * <code>TermCell</code>s. If so, true is returned, if not an 
+     * <code>InvalidSettingsException</code> is thrown.
+     * 
+     * @param minimumTermCells The number of minimum columns containing 
+     * <code>TermCell</code>s to check for.
+     * @param throwException If true an exception is throw in case of an error,
+     * if false just false is returned.
+     * @return true if <code>DataTableSpec</code> contains at least
+     * the given number of columns containing <code>TermCell</code>s.
+     * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
+     * less than the specified number minimumTermCells of 
+     * columns containing <code>TermCell</code>s.
+     */
+    public boolean verifyMinimumTermCells(final int minimumTermCells,
+            final boolean throwException) throws InvalidSettingsException {
+        boolean valid = true;
+
+        if (m_numTermCells < minimumTermCells) {
+            valid = false;
+            throwException(throwException, "There have to be at least "
+                    + minimumTermCells + " columns containing TermCells !");
+        }
+        return valid;
     }    
 
     /**
