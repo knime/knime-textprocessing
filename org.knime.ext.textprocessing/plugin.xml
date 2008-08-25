@@ -199,6 +199,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory"
             id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/misc"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

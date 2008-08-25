@@ -144,4 +144,11 @@ public class TermEvent extends Event<Term> {
     public int getNrCooccurrences(final Term t1, final Term t2) {
         return m_cooccurrences.get(UnorderedPair.makePair(t1, t2));
     }
+    
+    /**
+     * @return all terms contained in the document
+     */
+    public Set<Term> getTerms() {
+        return m_terms;
+    }    
 }
