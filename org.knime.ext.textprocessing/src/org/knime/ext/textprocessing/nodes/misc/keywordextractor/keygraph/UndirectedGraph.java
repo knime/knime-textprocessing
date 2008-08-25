@@ -141,12 +141,11 @@ public class UndirectedGraph<NodeType, WeightType> {
             if (!visited.contains(n)) {
                 if (n.equals(n2)) {
                     return true;
-                } else {
-                    visited.add(n);
-                    Set<NodeType> neighbours = getNeighbours(n);
-                    neighbours.removeAll(visited);
-                    unvisited.addAll(neighbours);
                 }
+                visited.add(n);
+                Set<NodeType> neighbours = getNeighbours(n);
+                neighbours.removeAll(visited);
+                unvisited.addAll(neighbours);
             }
         }
 
