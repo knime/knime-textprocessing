@@ -31,6 +31,7 @@ import org.knime.core.data.RowKey;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 
@@ -42,14 +43,25 @@ public class TermToStringCellFactory implements CellFactory {
 
     private int m_termColIndex = -1;
     
+    private String m_newColName;
+    
     /**
      * Creates a new instance of <code>TermToStringCellFactory</code> with the
-     * given index of the term cell column.
+     * given index of the term cell column and the name of the column to append.
      * 
      * @param termColindex The index of the term cell column.
+     * @param newColName The name of the column to append.
+     * @throws InvalidSettingsException if the given index of the term column
+     * is less than zero.
      */
-    public TermToStringCellFactory(final int termColindex) {
+    public TermToStringCellFactory(final int termColindex, 
+            final String newColName) throws InvalidSettingsException {
+        if (termColindex < 0) {
+            throw new InvalidSettingsException(
+                    "The specified term column index is not valid!");
+        }
         m_termColIndex = termColindex;
+        m_newColName = newColName;
     }
     
     /**
@@ -67,7 +79,7 @@ public class TermToStringCellFactory implements CellFactory {
      */
     @Override
     public DataColumnSpec[] getColumnSpecs() {
-        DataColumnSpec strCol = new DataColumnSpecCreator("Term as String", 
+        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName, 
                 StringCell.TYPE).createSpec();
         return new DataColumnSpec[]{strCol};
     }

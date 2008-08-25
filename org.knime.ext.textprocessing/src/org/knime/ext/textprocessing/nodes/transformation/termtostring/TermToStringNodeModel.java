@@ -39,6 +39,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -49,7 +50,12 @@ public class TermToStringNodeModel extends NodeModel {
 
     private static final int INDATA_INDEX = 0;
     
-    private int m_termColIndex = -1;    
+    private int m_termColIndex = -1;
+    
+    private String m_newColName;
+    
+    private SettingsModelString m_termColModel = 
+        TermToStringNodeDialog.getTermColModel();
     
     /**
      * Creates a new instance of <code>TermToStringNodeModel</code>.
@@ -61,14 +67,27 @@ public class TermToStringNodeModel extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyMinimumDocumentCells(1, true);
-        verifier.verifyTermCell(true);
-        m_termColIndex = verifier.getTermCellIndex();
+        verifier.verifyMinimumTermCells(1, true);
     }
     
     private DataTableSpec createDataTableSpec(
             final DataTableSpec inDataSpec) {
-        DataColumnSpec strCol = new DataColumnSpecCreator("Term as String", 
+        
+        String termCol = m_termColModel.getStringValue();
+        if (termCol.isEmpty()) {
+            termCol = "Term as String";
+        } else {
+            termCol += " as String";
+        }
+        
+        int count = 1;
+        m_newColName = termCol;
+        while (inDataSpec.containsName(m_newColName)) {
+            m_newColName = termCol + " " + count;
+            count++;
+        }
+        
+        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName, 
                 StringCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(strCol));
     }
@@ -89,12 +108,16 @@ public class TermToStringNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        
+                
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
+        
+        // find index of term column
+        m_termColIndex = inDataTable.getDataTableSpec().findColumnIndex(
+                m_termColModel.getStringValue());
         
         // initializes the corresponding cell factory
         TermToStringCellFactory cellFac = new TermToStringCellFactory(
-                m_termColIndex);
+                m_termColIndex, m_newColName);
         
         // compute frequency and add column
         ColumnRearranger rearranger = new ColumnRearranger(
@@ -112,7 +135,7 @@ public class TermToStringNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_termColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -128,7 +151,7 @@ public class TermToStringNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // Nothing to do ...
+        m_termColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -137,7 +160,7 @@ public class TermToStringNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_termColModel.validateSettings(settings);
     }
 
     /**

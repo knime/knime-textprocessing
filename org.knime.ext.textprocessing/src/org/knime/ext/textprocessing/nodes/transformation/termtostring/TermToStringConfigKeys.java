@@ -19,58 +19,19 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   26.06.2008 (thiel): created
+ *   25.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.termtostring;
-
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermToStringNodeFactory extends NodeFactory<TermToStringNodeModel> {
+public class TermToStringConfigKeys {
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the term column.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TermToStringNodeDialog();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TermToStringNodeModel createNodeModel() {
-        return new TermToStringNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<TermToStringNodeModel> createNodeView(final int index, 
-            final TermToStringNodeModel model) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFGKEY_TERMCOL = "TermColumn";
+    
 }

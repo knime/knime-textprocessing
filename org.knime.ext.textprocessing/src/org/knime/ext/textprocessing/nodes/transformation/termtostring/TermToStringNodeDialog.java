@@ -19,58 +19,37 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   26.06.2008 (thiel): created
+ *   25.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.termtostring;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.TermValue;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermToStringNodeFactory extends NodeFactory<TermToStringNodeModel> {
+public class TermToStringNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * {@inheritDoc}
+     * @return Creates and returns an instance of 
+     * <code>SettingsModelString</code> specifying the column which has to
+     * be used as title column.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TermToStringNodeDialog();
+    public static final SettingsModelString getTermColModel() {
+        return new SettingsModelString(
+                TermToStringConfigKeys.CFGKEY_TERMCOL, "");
     }
-
+    
     /**
-     * {@inheritDoc}
+     * Creates a new instance of <code>TermToStringNodeDialog</code>.
      */
-    @Override
-    public TermToStringNodeModel createNodeModel() {
-        return new TermToStringNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<TermToStringNodeModel> createNodeView(final int index, 
-            final TermToStringNodeModel model) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
+    @SuppressWarnings("unchecked")
+    public TermToStringNodeDialog() {
+        addDialogComponent(new DialogComponentColumnNameSelection(
+                getTermColModel(), "Term Column", 0, TermValue.class));
     }
 }
