@@ -55,7 +55,15 @@ public class DocumentViewPanel extends JPanel {
     
     private Document m_doc;
     
-    public DocumentViewPanel(final Document doc) throws IllegalArgumentException {
+    /**
+     * Creates new instance of <code>DocumentViewPanel</code> with given 
+     * document to display.
+     * 
+     * @param doc The document to display.
+     * @throws IllegalArgumentException If given document is <code>null</code>.
+     */
+    public DocumentViewPanel(final Document doc) 
+    throws IllegalArgumentException {
         if (doc == null) {
             throw new IllegalArgumentException("Document may not be null!");
         }

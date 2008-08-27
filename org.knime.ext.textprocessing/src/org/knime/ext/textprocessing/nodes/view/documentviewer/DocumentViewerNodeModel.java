@@ -41,6 +41,7 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.ModelContent;
 import org.knime.core.node.ModelContentRO;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -56,7 +57,10 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  */
 public class DocumentViewerNodeModel extends NodeModel 
 implements BufferedDataTableHolder {
-
+    
+    private static final NodeLogger LOGGER =
+        NodeLogger.getLogger(DocumentViewerNodeModel.class);
+    
     private static final int INPUT_INDEX = 0;
     
     private int m_documentCellindex = -1;
@@ -74,6 +78,8 @@ implements BufferedDataTableHolder {
     
     private SettingsModelString m_documentColModel =
         FrequenciesNodeSettingsPane.getDocumentColumnModel();    
+    
+    private ExecutionContext m_exec;
     
     /**
      * Creates new instance of <code>DocumentViewerNodeModel</code>.
@@ -102,6 +108,7 @@ implements BufferedDataTableHolder {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         
+        m_exec = exec;
         m_documentCellindex = inData[0].getDataTableSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
         
@@ -111,17 +118,28 @@ implements BufferedDataTableHolder {
         return new BufferedDataTable[]{};
     }
 
-    private void buildDocumentSet() {
+    private void buildDocumentSet() throws CanceledExecutionException {
         if (m_documents == null) {
             m_documents = new HashSet<Document>();
         }
         
-        RowIterator it = m_data.iterator();
+        int rowCount = 1;
+        int rows = m_data.getRowCount();
+        
+        RowIterator it = m_data.iterator();        
         while(it.hasNext()) {
             DataRow row = it.next();
             Document doc = ((DocumentValue)row.getCell(m_documentCellindex))
                             .getDocument();
             m_documents.add(doc);
+            
+            if (m_exec != null) {
+                m_exec.checkCanceled();
+                double prog = (double)rows / (double)rowCount;
+                m_exec.setProgress(prog, "Caching row " + rowCount + " of "
+                        + rows);
+                rowCount++;
+            }
         }
     }
     
@@ -149,7 +167,12 @@ implements BufferedDataTableHolder {
             throw new IllegalArgumentException();
         }
         m_data = tables[0];
-        buildDocumentSet();
+        try {
+            buildDocumentSet();
+        } catch (CanceledExecutionException e) {
+            LOGGER.warn(
+                    "Could not load internal table, execution was canceled!");
+        }
     }    
     
     

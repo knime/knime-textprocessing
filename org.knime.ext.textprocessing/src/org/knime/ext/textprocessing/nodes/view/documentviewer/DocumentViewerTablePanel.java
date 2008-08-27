@@ -19,53 +19,47 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   27.06.2008 (thiel): created
+ *   27.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
+import java.util.Set;
 
-import javax.swing.JPanel;
+import javax.swing.JFrame;
 
-import org.knime.core.node.NodeView;
+import org.knime.core.node.KNIMEConstants;
+import org.knime.ext.textprocessing.data.Document;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
-    
+public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
+
     /**
-     * Creates a new instance of <code>DocumentViewerNodeView</code>.
+     * Creates a new instance of <code>DocumentViewerTablePanel</code> with
+     * the given set of documents to display.
      * 
-     * @param model The model holding the documents to dosplay.
+     * @param documents The set of documents to display.
      */
-    public DocumentViewerNodeView(final DocumentViewerNodeModel model) {
-        super(model);
-        JPanel panel = new DocumentViewerTablePanel(model.getDocuments());
-        setComponent(panel);
+    public DocumentViewerTablePanel(final Set<Document> documents) {
+        super(documents);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void modelChanged() {
-        // Nothing to do ...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onClose() {
-        // Nothing to do ...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onOpen() {
-        // Nothing to do ...
+    protected void onClick(final int rowIndex, final Document document) {
+        JFrame detailsFrame = new JFrame("Details: " + document.getTitle());
+        if (KNIMEConstants.KNIME16X16 != null) {
+            detailsFrame.setIconImage(
+                    KNIMEConstants.KNIME16X16.getImage());
+        }
+        
+        detailsFrame.setContentPane(
+                new DocumentViewPanel(document));
+        detailsFrame.pack();
+        detailsFrame.setVisible(true);
     }
 }
