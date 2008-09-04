@@ -25,5 +25,11 @@
         <dataIn name="Terms and related documents input table" index="0">
         The input table which contains terms and documents.</dataIn>
 	</ports>	
+	
+    <views>
+        <view index="0" name="Document View">
+            Displays the data of a document.
+        </view>
+    </views>	
 </knimeNode>
 
