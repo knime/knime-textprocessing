@@ -214,8 +214,10 @@ implements BufferedDataTableHolder {
      */
     @Override
     protected void reset() {
-        m_documents.clear();
-        m_documents = null;
+        if (m_documents != null) {
+            m_documents.clear();
+            m_documents = null;
+        }
     }
 
     /**

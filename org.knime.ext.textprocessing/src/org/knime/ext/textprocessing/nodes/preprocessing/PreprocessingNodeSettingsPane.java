@@ -92,9 +92,9 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         addDialogComponent(comp1);
         
         DialogComponentBoolean comp2 = new DialogComponentBoolean(
-                getAppendIncomingDocument(), "Append original document");
+                getAppendIncomingDocument(), "Append unchanged document");
         comp2.setToolTipText(
-                "The original incoming documents will be appended!");
+                "The unchanged incoming documents will be appended!");
         addDialogComponent(comp2);
     }
 }
