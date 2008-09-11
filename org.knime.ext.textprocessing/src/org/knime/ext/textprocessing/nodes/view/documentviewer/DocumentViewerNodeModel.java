@@ -30,9 +30,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowIterator;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
 import org.knime.core.node.CanceledExecutionException;
@@ -47,8 +45,8 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPane;
+import org.knime.ext.textprocessing.util.DataStructureUtil;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -114,33 +112,9 @@ implements BufferedDataTableHolder {
         
         m_documents = new HashSet<Document>();
         m_data = inData[INPUT_INDEX];
-        buildDocumentSet();
+        m_documents = DataStructureUtil.buildDocumentSet(m_data, 
+                m_documentCellindex, m_exec);
         return new BufferedDataTable[]{};
-    }
-
-    private void buildDocumentSet() throws CanceledExecutionException {
-        if (m_documents == null) {
-            m_documents = new HashSet<Document>();
-        }
-        
-        int rowCount = 1;
-        int rows = m_data.getRowCount();
-        
-        RowIterator it = m_data.iterator();        
-        while(it.hasNext()) {
-            DataRow row = it.next();
-            Document doc = ((DocumentValue)row.getCell(m_documentCellindex))
-                            .getDocument();
-            m_documents.add(doc);
-            
-            if (m_exec != null) {
-                m_exec.checkCanceled();
-                double prog = (double)rows / (double)rowCount;
-                m_exec.setProgress(prog, "Caching row " + rowCount + " of "
-                        + rows);
-                rowCount++;
-            }
-        }
     }
     
     /**
@@ -168,7 +142,8 @@ implements BufferedDataTableHolder {
         }
         m_data = tables[0];
         try {
-            buildDocumentSet();
+            m_documents = DataStructureUtil.buildDocumentSet(m_data, 
+                    m_documentCellindex, m_exec);
         } catch (CanceledExecutionException e) {
             LOGGER.warn(
                     "Could not load internal table, execution was canceled!");
@@ -197,7 +172,8 @@ implements BufferedDataTableHolder {
             throw ioe;
         }
         
-        buildDocumentSet();
+        m_documents = DataStructureUtil.buildDocumentSet(m_data, 
+                m_documentCellindex, m_exec);
     }
 
     /**
