@@ -186,7 +186,7 @@ public class DocumentParserNodeModel extends NodeModel {
             } catch (Exception e) {
                 LOGGER.error("Could not parse file: " 
                         + f.getAbsolutePath().toString());
-                setWarningMessage("Could not parse all file properly!");
+                setWarningMessage("Could not parse all files properly!");
                 throw e;
             }
         }
