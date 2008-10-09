@@ -51,12 +51,15 @@ public class BagOfWordsBlobCellDataTableBuilder extends
     @Override
     public DataTableSpec createDataTableSpec(final boolean appendExtraDocCol) {
         // create DataTableSpec for output DataTable
-        DataColumnSpecCreator docs =
-                new DataColumnSpecCreator("Document", DocumentBlobCell.TYPE);
-        DataColumnSpecCreator docs2 =
-            new DataColumnSpecCreator("Orig Document", DocumentBlobCell.TYPE);        
-        DataColumnSpecCreator terms =
-            new DataColumnSpecCreator("Term", TermCell.TYPE);
+        DataColumnSpecCreator docs = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                DocumentBlobCell.TYPE);
+        DataColumnSpecCreator docs2 = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME, 
+                DocumentBlobCell.TYPE);        
+        DataColumnSpecCreator terms = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
+                TermCell.TYPE);
         
         if (!appendExtraDocCol) {
             return new DataTableSpec(terms.createSpec(), docs.createSpec());

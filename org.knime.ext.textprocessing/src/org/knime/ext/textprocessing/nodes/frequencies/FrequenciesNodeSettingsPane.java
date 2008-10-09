@@ -27,6 +27,7 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.BagOfWordsBlobCellDataTableBuilder;
 
 /**
  * 
@@ -41,7 +42,7 @@ public class FrequenciesNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(
                 FrequenciesConfigKeys.CFG_KEY_DOCUMENT_COL,
-                "Document");
+                BagOfWordsBlobCellDataTableBuilder.DEF_DOCUMENT_COLNAME);
     }
     
     /**

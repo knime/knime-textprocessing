@@ -51,12 +51,14 @@ import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
+import org.knime.ext.textprocessing.util.FullDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 import org.knime.ext.textprocessing.util.clustering.ClusteringAlgorithm;
@@ -310,6 +312,9 @@ public class KeywordExtractorNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
             exec.createDataContainer(createDataTableSpec());
+        FullDataCellCache docCache = new FullDataCellCache(
+                new DocumentBlobDataCellFactory());        
+        
         int rowid = 0;
         for (Entry<Document, Map<Term, Double>> e : keywords.entrySet()) {
             exec.checkCanceled();
@@ -320,7 +325,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
                         new DataCell[]{
                             new TermCell(kw.getKey()),
                             new DoubleCell(kw.getValue()),
-                            new DocumentCell(doc)});
+                            docCache.getInstance(doc)});
                 con.addRowToTable(row);
                 rowid++;
             }
@@ -381,7 +386,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
         DataColumnSpecCreator chivalues =
             new DataColumnSpecCreator("Chi value", DoubleCell.TYPE);
         DataColumnSpecCreator docs =
-            new DataColumnSpecCreator("Document", DocumentCell.TYPE);
+            new DataColumnSpecCreator("Document", DocumentBlobCell.TYPE);
         return new DataTableSpec(
                 keywords.createSpec(),
                 chivalues.createSpec(),

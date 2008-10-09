@@ -54,14 +54,16 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.Pair;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.TermEvent;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
+import org.knime.ext.textprocessing.util.FullDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
 import org.knime.ext.textprocessing.util.UnorderedPair;
 
@@ -419,16 +421,21 @@ public class KeygraphNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
                 exec.createDataContainer(createDataTableSpec());
+        FullDataCellCache docCache = new FullDataCellCache(
+                new DocumentBlobDataCellFactory());
+        
         int rowid = 0;
         for (Entry<Document, Map<Term, Integer>> e : keywords.entrySet()) {
             exec.checkCanceled();
             Document doc = e.getKey();
             for (Entry<Term, Integer> kw : e.getValue().entrySet()) {
                 DefaultRow row =
-                        new DefaultRow(new RowKey(Integer.toString(rowid)),
-                                new DataCell[]{new TermCell(kw.getKey()),
+                        new DefaultRow(
+                                new RowKey(Integer.toString(rowid)),
+                                new DataCell[]{
+                                        new TermCell(kw.getKey()),
                                         new DoubleCell(kw.getValue()),
-                                        new DocumentCell(doc)});
+                                        docCache.getInstance(doc)});
                 con.addRowToTable(row);
                 rowid++;
             }
@@ -490,7 +497,7 @@ public class KeygraphNodeModel extends NodeModel {
         DataColumnSpecCreator chivalues =
                 new DataColumnSpecCreator("Score", DoubleCell.TYPE);
         DataColumnSpecCreator docs =
-                new DataColumnSpecCreator("Document", DocumentCell.TYPE);
+                new DataColumnSpecCreator("Document", DocumentBlobCell.TYPE);
         return new DataTableSpec(keywords.createSpec(), chivalues.createSpec(),
                 docs.createSpec());
     }

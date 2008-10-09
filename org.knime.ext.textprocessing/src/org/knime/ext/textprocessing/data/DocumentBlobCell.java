@@ -59,7 +59,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
      * 
      * @see DataType#getType(Class)
      */
-    public static final DataType TYPE = DataType.getType(DocumentCell.class);
+    public static final DataType TYPE = DataType.getType(DocumentBlobCell.class);
 
     /**
      * Returns the preferred value class of this cell implementation. This

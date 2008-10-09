@@ -53,6 +53,21 @@ import org.knime.ext.textprocessing.data.TermCell;
 public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
     
     /**
+     * The default document column name in bow data tables.
+     */
+    public static final String DEF_DOCUMENT_COLNAME = "Document";
+    
+    /**
+     * The default original document column name in bow data tables.
+     */
+    public static final String DEF_ORIG_DOCUMENT_COLNAME = "Orig Document";
+    
+    /**
+     * The default term column name in bow data tables.
+     */
+    public static final String DEF_TERM_COLNAME = "Term";
+    
+    /**
      * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
      */
     public BagOfWordsDataTableBuilder() { }    

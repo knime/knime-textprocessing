@@ -40,6 +40,11 @@ import org.knime.ext.textprocessing.data.Document;
 public abstract class DocumentDataTableBuilder implements DataTableBuilder {
 
     /**
+     * The default document column name in document data tables.
+     */
+    public static final String DEF_DOCUMENT_COLNAME = "Document";
+    
+    /**
      * Empty constructor of <code>DocumentDataTableBuilder</code>.
      */
     public DocumentDataTableBuilder() { }
