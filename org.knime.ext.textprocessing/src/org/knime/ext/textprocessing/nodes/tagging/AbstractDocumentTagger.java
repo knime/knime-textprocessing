@@ -120,8 +120,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
     /**
      * Preprocesses a document before tagging. This is where a tagger would
-     * build a private model for use in tagEntities(Sentence).
-     * @param doc
+     * build a private model to use for tagging entities in the method 
+     * tagEntities(Sentence).
+     * @param doc The document to tag.
      */
     protected abstract void preprocess(final Document doc);
 
@@ -211,7 +212,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             // entity
             if (t >= startTermIndex && t <= stopTermIndex) {
 
-                // detected a named entity consist only of one term
+                // detected a named entity consisting only of one term
                 // check if it has to be split up
                 if (startTermIndex == stopTermIndex) {
 
@@ -296,7 +297,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
                         // if current term is start term
                         if (t == startTermIndex) {
-                            // if word part if the named entity add it
+                            // if word is part of the named entity add it
                             if (w >= startWordIndex) {
                                 namedEntity.add(words.get(w));
 
@@ -312,12 +313,12 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                             }
 
                             // if current term is stop term
-                        } else if (w == stopWordIndex) {
+                        } else if (t == stopTermIndex) {
                             // add words as long as stopWordIndex is not reached
                             if (w <= stopWordIndex) {
                                 namedEntity.add(words.get(w));
 
-                                // if last word is reached, create terma and
+                                // if last word is reached, create term and
                                 // add it
                                 if (w == stopWordIndex) {
                                     List<Tag> tags = new ArrayList<Tag>();
@@ -340,8 +341,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                             }
 
                             // if we are in between the start term and the stop
-                            // term
-                            // just add all words to the new word list
+                            // term just add all words to the new word list
                         } else if (t > startTermIndex && t < stopTermIndex) {
                             namedEntity.add(words.get(w));
                         }

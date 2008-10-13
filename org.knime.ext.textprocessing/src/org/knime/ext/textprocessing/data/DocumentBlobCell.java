@@ -105,10 +105,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
         if (dc == null) {
             return false;
         }
-        if (!(dc instanceof DocumentCell)) {
-            return false;
-        }
-        DocumentCell d = (DocumentCell)dc;
+        DocumentBlobCell d = (DocumentBlobCell)dc;
 
         if (!d.getDocument().equals(m_document)) {
             return false;

@@ -204,6 +204,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory"
             id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/io"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
