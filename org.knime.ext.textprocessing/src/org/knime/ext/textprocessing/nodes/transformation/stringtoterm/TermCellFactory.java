@@ -45,6 +45,13 @@ public class TermCellFactory implements CellFactory {
 
     private int m_colIndex;
     
+    /**
+     * Creates new instance of <code>TermCellFactory</code> with given index
+     * of column containing the strings to convert to terms.
+     * 
+     * @param colIndex The index of the column containing the string to
+     * convert to terms.
+     */
     public TermCellFactory(final int colIndex) {
         if (colIndex < 0) {
             throw new IllegalArgumentException("Given column index " 
