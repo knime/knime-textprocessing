@@ -30,6 +30,7 @@ import java.util.HashSet;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * A stop word filter, filtering strings contained in the given set of stop 
@@ -38,7 +39,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class StopWordFilter implements Preprocessing {
+public class StopWordFilter implements Preprocessing, StringPreprocessing {
 
     private HashSet < String > m_wordList;
     
@@ -95,5 +96,23 @@ public class StopWordFilter implements Preprocessing {
             return null;
         }
         return term;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String preprocessString(final String str) {
+        String t;
+        if (m_caseSensitive) {
+            t = str;
+        } else {
+            t = str.toLowerCase();
+        }
+        
+        if (isStopWord(t)) {
+            return null;
+        }
+        return str;
     }
 }

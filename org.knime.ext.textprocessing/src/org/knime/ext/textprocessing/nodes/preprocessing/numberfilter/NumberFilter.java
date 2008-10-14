@@ -25,12 +25,13 @@ package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NumberFilter implements Preprocessing {
+public class NumberFilter implements Preprocessing, StringPreprocessing {
 
     private static String numbers = "^[-+]?[\\d.,]+";
     
@@ -57,5 +58,14 @@ public class NumberFilter implements Preprocessing {
             return null;
         }
         return term;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String preprocessString(final String str) {
+        return NumberFilter.numberFilter(str);
     }
 }

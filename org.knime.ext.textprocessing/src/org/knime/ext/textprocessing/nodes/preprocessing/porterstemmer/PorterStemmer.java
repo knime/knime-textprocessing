@@ -33,12 +33,13 @@ import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PorterStemmer implements Preprocessing {
+public class PorterStemmer implements Preprocessing, StringPreprocessing {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(
             PorterStemmer.class);
@@ -59,6 +60,14 @@ public class PorterStemmer implements Preprocessing {
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String preprocessString(final String str) {
+        return PorterStemmer.stem(str);
+    }    
     
     /**
      * Returns the stemed version of str.

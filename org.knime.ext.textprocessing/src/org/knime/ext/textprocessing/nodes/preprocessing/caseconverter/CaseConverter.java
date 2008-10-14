@@ -29,12 +29,13 @@ import java.util.List;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class CaseConverter implements Preprocessing {
+public class CaseConverter implements Preprocessing, StringPreprocessing {
 
     /**
      * Constant for lower case conversion.
@@ -94,6 +95,13 @@ public class CaseConverter implements Preprocessing {
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }    
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String preprocessString(final String str) {
+        return CaseConverter.convert(str, m_case);
+    }
 
     /**
      * Converts the case of the given string to lower or upper case depending

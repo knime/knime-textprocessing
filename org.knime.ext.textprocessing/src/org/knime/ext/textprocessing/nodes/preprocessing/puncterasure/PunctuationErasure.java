@@ -32,12 +32,13 @@ import java.util.List;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PunctuationErasure implements Preprocessing {
+public class PunctuationErasure implements Preprocessing, StringPreprocessing {
 
     private static String punctMarks = 
         "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]+";
@@ -69,5 +70,13 @@ public class PunctuationErasure implements Preprocessing {
      */
     public static String punctuationFilter(final String str) {
         return str.replaceAll(punctMarks, replacement);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String preprocessString(final String str) {
+        return PunctuationErasure.punctuationFilter(str);
     }
 }
