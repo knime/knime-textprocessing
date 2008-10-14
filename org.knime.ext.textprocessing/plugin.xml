@@ -210,6 +210,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/transformation"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.stringtoterm.StringToTermNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.stringtoterm.TermToStringNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
