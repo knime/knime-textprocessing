@@ -45,7 +45,7 @@
         
     <ports>
         <dataIn name="String input table" index="0">
-        An input data table containing string cells.
+        An input data table containing string cells.ht
         </dataIn>
         <dataOut name="String and document output table" index="0">
         An output table containing the strings of the data of the input table as
