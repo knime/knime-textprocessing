@@ -62,6 +62,12 @@ public class Document implements TextContainer {
      */
     public static final DocumentType DEFAULT_TYPE = DocumentType.UNKNOWN;
 
+    /**
+     * The default document file 
+     * (System.getProperty("user.home") + "NoFileSpecified")):
+     */
+    public static final File DEFAULT_FILE = new File(
+            System.getProperty("user.home") + "/NoFileSpecified.txt");
 
     private List<Section> m_sections;
 
@@ -151,7 +157,7 @@ public class Document implements TextContainer {
 
         // file (if null create empty file instance)
         if (documentFile == null) {
-            m_docFile = new File("DummyFileName");
+            m_docFile = DEFAULT_FILE;
         } else {
             m_docFile = documentFile;
         }

@@ -8,9 +8,39 @@
         <intro>
             Converts the specified strings to documents. For each row a document
             will be created and attached to that row. The strings of the
-            specified columns will be used as title, authors, abstract, 
-            full text and so on.
+            specified columns will be used as title, authors, and 
+            full text. Furthermore the specified category, source type and
+            date is set to the documents too
         </intro>
+        
+        <option name="Title">
+            Specifies the column containing the string which is used as title.
+        </option>
+        <option name="Full text">
+            Specifies the column containing the string which is used as text.
+        </option>
+        <option name="Authors">
+            Specifies the column containing the string which is split up
+            and used as author names.
+        </option>
+        <option name="Author name separator">
+            Specifies the string separating the author names.
+        </option>
+        <option name="Document source">
+            Specifies the source which is set to all documents.
+        </option>
+        <option name="Document category">
+            Specifies the category which is set to all documents.
+        </option>
+        <option name="Document type">
+            Specifies the type which is set to all documents.
+        </option>
+        <option name="Publication date">
+            Specifies the publication as which is set to all documents.
+            The date has to be formatted like "dd-mm-yyy". Two digits
+            to specify the day, two to specify the month and four to
+            specify the year. The specified date has to be a valid date.
+        </option>
     </fullDescription>
         
     <ports>

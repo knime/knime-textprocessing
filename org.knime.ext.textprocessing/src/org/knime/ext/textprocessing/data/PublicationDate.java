@@ -333,4 +333,13 @@ Comparable<PublicationDate> {
     public int getYear() {
         return m_year;
     }
+    
+    /**
+     * @return The todays date formatted like "dd-MM-yyy".
+     */
+    public static final String getToday() {
+        Date today = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        return format.format(today);
+    }
 }

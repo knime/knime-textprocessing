@@ -32,10 +32,40 @@ public class StringsToDocumentConfigKeys {
     /**
      * The configuration key of the title column.
      */
-    public static final String CFGKEY_TITLECOL = "TitleCol";    
+    public static final String CFGKEY_TITLECOL = "TitleCol";
 
+    /**
+     * The configuration key of the text column.
+     */
+    public static final String CFGKEY_TEXTCOL = "TextCol";    
+    
     /**
      * The configuration key of the authors column.
      */
-    public static final String CFGKEY_AUTHORSCOL = "AuthorsCol";    
+    public static final String CFGKEY_AUTHORSCOL = "AuthorsCol";
+    
+    /**
+     * The configuration key of the author name split string.
+     */
+    public static final String CFGKEY_AUTHORSPLIT_STR = "AuthorSplitChar";
+
+    /**
+     * The configuration key of the document source.
+     */
+    public static final String CFGKEY_DOCSOURCE = "DocumentSource";
+    
+    /**
+     * The configuration key of the document category.
+     */
+    public static final String CFGKEY_DOCCAT = "DocumentCategory";
+    
+    /**
+     * The configuration key of the document type.
+     */
+    public static final String CFGKEY_DOCTYPE = "DocumentType";
+    
+    /**
+     * The configuration key of the publication date.
+     */
+    public static final String CFGKEY_PUBDATE = "PublicationDate";
 }

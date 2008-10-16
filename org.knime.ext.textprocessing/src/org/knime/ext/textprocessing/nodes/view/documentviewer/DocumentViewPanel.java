@@ -26,8 +26,6 @@ package org.knime.ext.textprocessing.nodes.view.documentviewer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +33,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
 import org.knime.ext.textprocessing.data.Author;
@@ -48,7 +47,7 @@ import org.knime.ext.textprocessing.data.Section;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewPanel extends JPanel {
+public class DocumentViewPanel extends JSplitPane {
 
     private static final int MAX_COLS = 500;
     private static final int MAX_ROWS = 30;
@@ -64,6 +63,8 @@ public class DocumentViewPanel extends JPanel {
      */
     public DocumentViewPanel(final Document doc) 
     throws IllegalArgumentException {
+        super(JSplitPane.VERTICAL_SPLIT);
+        
         if (doc == null) {
             throw new IllegalArgumentException("Document may not be null!");
         }
@@ -72,35 +73,17 @@ public class DocumentViewPanel extends JPanel {
     }
     
     private void displayDoc() {
-        setLayout(new GridBagLayout());
-        
         JPanel mainPanel = createMainPanel();
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 100;
-        gbc.weighty = 100;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        add(mainPanel, gbc);
-     
         JPanel authorPanel = createAuthorPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 10;
-        gbc.weighty = 10;
-        gbc.fill = GridBagConstraints.BOTH;
-        add(authorPanel, gbc);
-
         JPanel infoPanel = createInfoPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 10;
-        gbc.weighty = 10;
-        gbc.fill = GridBagConstraints.BOTH;
-        add(infoPanel, gbc);
+        
+        JSplitPane bottomPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        bottomPane.setTopComponent(authorPanel);
+        bottomPane.setBottomComponent(infoPanel);
+        bottomPane.setResizeWeight(0.5);
+        
+        setTopComponent(mainPanel);
+        setBottomComponent(bottomPane);
     }
     
     private JPanel createMainPanel() {
@@ -138,7 +121,7 @@ public class DocumentViewPanel extends JPanel {
             buffer.append("<br/>");
             buffer.append("<hr>");
             buffer.append("<h3>");
-            buffer.append(s.getAnnotation().toString());
+            buffer.append("Section: " + s.getAnnotation().toString());
             buffer.append("</h3>");
             
             List<Paragraph> paras = s.getParagraphs();
