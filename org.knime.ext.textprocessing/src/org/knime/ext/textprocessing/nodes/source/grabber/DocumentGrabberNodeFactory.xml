@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 1.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="./default.png" type="Source">
+<knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Source">
     <name>Document Grabber</name>
     <shortDescription>Downloads and parsers documents.
     </shortDescription>
