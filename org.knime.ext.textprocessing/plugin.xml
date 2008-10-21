@@ -21,7 +21,7 @@
             description="Tagger nodes (POS, NER)"
             icon="icons/missing.gif"
             level-id="tagging"
-            name="Tagging"
+            name="Enrichment"
             path="/textprocessing">
       </category>
       <category
