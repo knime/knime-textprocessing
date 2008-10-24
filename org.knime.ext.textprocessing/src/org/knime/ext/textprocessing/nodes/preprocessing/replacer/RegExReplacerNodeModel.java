@@ -39,8 +39,14 @@ import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
  */
 public class RegExReplacerNodeModel extends PreprocessingNodeModel {
 
+    /**
+     * The default regular expression (an empty string).
+     */
     public static final String DEFAULT_REGEX = "";
 
+    /**
+     * The default replacement (an empty string).
+     */
     public static final String DEFAULT_REPLACEMENT = "";
 
 
