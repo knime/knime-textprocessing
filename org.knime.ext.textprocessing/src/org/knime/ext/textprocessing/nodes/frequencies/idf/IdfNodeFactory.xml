@@ -17,7 +17,7 @@
         where f(D) is the number of all documents and f(d, ti) is the number of
         documents containing term ti.
 	</intro>
-    <option name="Document Col">
+    <option name="Document Column">
        Specifies the document column to use for frequency couting.
     </option>
 

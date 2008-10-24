@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   06.05.2008 (thiel): created
  */
@@ -35,23 +35,23 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  * Provides the dialog of the document vector node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of 
-     * <code>SettingsModelBoolean</code> specifying of a bitvector have to
+     * @return Creates and returns an instance of
+     * <code>SettingsModelBoolean</code> specifying if a bitvector have to
      * be created or not.
      */
     public static final SettingsModelBoolean getBooleanModel() {
         return new SettingsModelBoolean(TermVectorConfigKeys.CFGKEY_BOOLEAN,
                 TermVectorNodeModel.DEFAULT_BOOLEAN);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> containing the name of the column with
      * the vector values to use.
      */
@@ -60,11 +60,20 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
                 TermVectorConfigKeys.CFGKEY_VALUE_COL,
                 TermVectorNodeModel.DEFAULT_COL);
     }
-    
+
+    /**
+     * @return Creates and returns an instance of
+     * <code>SettingsModelBoolean</code> specifying if tags are ignored or not.
+     */
+    public static final SettingsModelBoolean getIgnoreTagsModel() {
+        return new SettingsModelBoolean(TermVectorConfigKeys.CFGKEY_IGNORE_TAGS,
+                TermVectorNodeModel.DEFAULT_IGNORE_TAGS);
+    }
+
     private SettingsModelString m_columnModel;
-    
+
     private SettingsModelBoolean m_booleanModel;
-    
+
     /**
      * Creates a new instance of <code>TermVectorNodeDialog</code>.
      */
@@ -73,16 +82,19 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
         m_columnModel = getColumnModel();
         m_booleanModel = getBooleanModel();
         m_booleanModel.addChangeListener(new InternalChangeListener());
-        
+
+        addDialogComponent(new DialogComponentBoolean(
+                getIgnoreTagsModel(), "Ignore Tags"));
+
         addDialogComponent(new DialogComponentBoolean(
                 m_booleanModel, "Bitvector"));
-        
+
         addDialogComponent(new DialogComponentColumnNameSelection(
                 m_columnModel, "Vector value", 0, DoubleValue.class));
-        
+
         checkUncheck();
     }
-    
+
     private void checkUncheck() {
         if (m_booleanModel.getBooleanValue()) {
             m_columnModel.setEnabled(false);
@@ -90,11 +102,11 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
             m_columnModel.setEnabled(true);
         }
     }
-    
+
     /**
-     * Listens to changed and enables / disables the model of the column 
+     * Listens to changed and enables / disables the model of the column
      * selection drop down box.
-     * 
+     *
      * @author Kilian Thiel, University of Konstanz
      */
     class InternalChangeListener implements ChangeListener {

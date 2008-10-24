@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Manipulator">
+<knimeNode icon="../../../../../../../../icons/TextProcVectors.png" type="Manipulator">
     <name>Term vector</name>
     <shortDescription>Creates a term vector for each term.
     </shortDescription>
@@ -11,6 +11,9 @@
             the feature vectors can be specified as boolean values or as 
             values of a specified column i.e. an tf*idf column.
         </intro>
+        <option name="Ignore tags">
+             If checked tags are ignored when comparing terms.
+        </option>
         <option name="Bitvector">
              If checked an bitvector will be created indicating whether a 
              certain document contains a term or not.

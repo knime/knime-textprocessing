@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Replacer</name>
+    <shortDescription>Replaces pattern in terms matching the specified
+    regular expression.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+        	Replaces all pattern in all terms matching the specified regular 
+        	expression with the specified replacement.
+		</intro>
+
+        <option name="Regular expression">
+              Specifies the regular expression to find matching pattern to 
+              replace.
+        </option>
+        <option name="Replacement">
+              Specifies the replacement to replace matching pattern with.
+        </option>
+        <option name="Document column">
+              Specifies the column containing the documents to preprocess.
+        </option>
+        <option name="Deep preprocessing">
+             If deep preprocessing is checked, the terms contained inside
+             the documents are converted too, this means that the documents are
+             changed, which is more time consuming. 
+        </option>
+        <option name="Append original document">
+            If append original document is checked, the documents contained in
+            the input document column are appended as extra column. This
+            enables later on a mapping of preprocessed documents to original
+            documents.  
+        </option>
+	</fullDescription>
+		
+    <ports>
+        <dataIn name="Terms and related documents input table" index="0">
+        The input table which contains the terms to convert.</dataIn>
+        <dataOut name="Filtered terms and related documents output table" index="0">
+        The output table which contains the preprocessed terms.
+        </dataOut>
+    </ports>
+</knimeNode>

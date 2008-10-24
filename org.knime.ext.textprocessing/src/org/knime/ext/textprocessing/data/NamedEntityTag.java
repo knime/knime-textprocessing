@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2008 (thiel): created
  */
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public enum NamedEntityTag implements TagBuilder {
@@ -41,14 +41,14 @@ public enum NamedEntityTag implements TagBuilder {
     COMPANY,
     /** A date */
     DATE;
-    
+
     private final Tag m_tag;
-    
+
     /**
      * The constant for ABNER tag types.
      */
     public static final String TAG_TYPE = "NE";
-    
+
     /**
      * Creates new instance of <code>NamedEntityTag</code> and
      * {@link org.knime.ext.textprocessing.data.Tag} with the specified
@@ -57,18 +57,18 @@ public enum NamedEntityTag implements TagBuilder {
     private NamedEntityTag() {
         m_tag = new Tag(name(), TAG_TYPE);
     }
-    
+
     /**
-     * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding 
+     * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
      * to the specified <code>NamedEntityTag</code>.
      */
     public Tag getTag() {
         return m_tag;
     }
-        
+
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     public static List<String> asStringList() {
@@ -79,18 +79,18 @@ public enum NamedEntityTag implements TagBuilder {
         }
         return list;
     }
-    
+
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to 
-     * the given string. If no corresponding 
-     * {@link org.knime.ext.textprocessing.data.Tag} is available the 
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to
+     * the given string. If no corresponding
+     * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     * @param str The string representing a 
-     * {@link org.knime.ext.textprocessing.data.Tag}. 
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to 
+     * @param str The string representing a
+     * {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to
      * the given string.
      */
-    public static Tag stringToTag(final String str) {        
+    public static Tag stringToTag(final String str) {
         for (NamedEntityTag ne : values()) {
             if (ne.getTag().getTagValue().equals(str)) {
                 return ne.getTag();
@@ -98,11 +98,11 @@ public enum NamedEntityTag implements TagBuilder {
         }
         return NamedEntityTag.UNKNOWN.getTag();
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public Tag buildTag(String type, String value) {
+    public Tag buildTag(final String type, final String value) {
         if (type.equals(TAG_TYPE)) {
             return NamedEntityTag.stringToTag(value);
         }
@@ -115,5 +115,12 @@ public enum NamedEntityTag implements TagBuilder {
      */
     public static TagBuilder getDefault() {
         return NamedEntityTag.UNKNOWN;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getType() {
+        return TAG_TYPE;
     }
 }

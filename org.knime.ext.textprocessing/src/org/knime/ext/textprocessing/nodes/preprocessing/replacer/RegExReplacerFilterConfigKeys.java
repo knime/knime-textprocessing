@@ -19,29 +19,23 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   06.05.2008 (thiel): created
+ *   14.08.2007 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.termvector;
+package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
 
 /**
- * Provides the configuration keys for the document vector node.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermVectorConfigKeys {
+public class RegExReplacerFilterConfigKeys {
 
     /**
-     * The configuration key of the boolean value setting.
+     * Config Key for the regular expression.
      */
-    public static final String CFGKEY_BOOLEAN = "Boolean";
+    public static final String CFGKEY_REGEX = "RegEx";
 
     /**
-     * The configuration key of the column value setting.
+     * Config Key for the replacement.
      */
-    public static final String CFGKEY_VALUE_COL = "Value_Col";
-
-    /**
-     * The configuration key of the flag specifying if tags are ignored or not.
-     */
-    public static final String CFGKEY_IGNORE_TAGS = "Ignore Tags";
+    public static final String CFGKEY_REPLACEMENT = "Replacement";
 }
