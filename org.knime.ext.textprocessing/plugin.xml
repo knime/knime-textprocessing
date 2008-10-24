@@ -12,12 +12,13 @@
       </category>
       <category
             description="Textprocessing IO nodes"
-            icon="icons/io.png"
+            icon="icons/missing.gif"
             level-id="io"
             name="IO"
             path="/textprocessing">
       </category>
       <category
+            after="io"
             description="Tagger nodes (POS, NER)"
             icon="icons/missing.gif"
             level-id="tagging"
@@ -25,6 +26,7 @@
             path="/textprocessing">
       </category>
       <category
+            after="tagging"
             description="Transformation nodes"
             icon="icons/missing.gif"
             level-id="transformation"
@@ -32,12 +34,14 @@
             path="/textprocessing">
       </category>
       <category
+            after="transformation"
             icon="icons/missing.gif"
             level-id="preprocessing"
             name="Preprocessing"
             path="/textprocessing">
       </category>
       <category
+            after="preprocessing"
             description="Contains nodes that compute several kinds of frequencies"
             icon="icons/missing.gif"
             level-id="frequencies"
@@ -45,6 +49,7 @@
             path="/textprocessing">
       </category>
       <category
+            after="frequencies"
             description="Contains misc nodes of the textprocessing plugin"
             icon="icons/missing.gif"
             level-id="misc"
