@@ -25,9 +25,9 @@
     </fullDescription>
         
     <ports>
-        <dataIn name="Documents input table" index="0">The input table
-        containing the bag of words.</dataIn>    
-        <dataOut name="Terms output table" index="0">An output table
-        containing the terms with the related term vectors.</dataOut>
+        <inPort name="Documents input table" index="0">The input table
+        containing the bag of words.</inPort>    
+        <outPort name="Terms output table" index="0">An output table
+        containing the terms with the related term vectors.</outPort>
     </ports>
 </knimeNode>

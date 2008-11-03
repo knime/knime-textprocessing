@@ -16,9 +16,9 @@
     </fullDescription>
         
     <ports>
-        <dataIn name="Documents input table" index="0">The input table
-        containing the documents to tag.</dataIn>    
-        <dataOut name="Documents output table" index="0">An output table
-        containing the tagged documents.</dataOut>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
     </ports>
 </knimeNode>

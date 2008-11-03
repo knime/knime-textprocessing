@@ -41,10 +41,10 @@
 	</fullDescription>
 		
     <ports>
-        <dataIn name="Terms and related documents input table" index="0">
-        The input table which contains the terms to filter.</dataIn>
-        <dataOut name="Filtered terms and related documents output table" index="0">
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains the terms to filter.</inPort>
+        <outPort name="Filtered terms and related documents output table" index="0">
         The output table which contains the filtered terms.
-        </dataOut>
+        </outPort>
     </ports>
 </knimeNode>

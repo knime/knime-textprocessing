@@ -28,13 +28,13 @@
 	</fullDescription>
 		
 	<ports>
-        <dataIn name="Terms and related documents input table" index="0">
+        <inPort name="Terms and related documents input table" index="0">
         The input table which contains the terms and the documents as a bag
         of words.
-        </dataIn>
-   		<dataOut name="Preprocessed terms and related documents output table" index="0">
+        </inPort>
+   		<outPort name="Preprocessed terms and related documents output table" index="0">
    		The output table which contains the preprocessed terms and the documents
    		as a bag of words.
-   		</dataOut>
+   		</outPort>
 	</ports>
 </knimeNode>
