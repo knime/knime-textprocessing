@@ -15,11 +15,11 @@
 	</fullDescription>
 		
 	<ports>
-        <dataIn name="Table containing the strings" index="0">
+        <inPort name="Table containing the strings" index="0">
             The input table containing the strings to convert.
-        </dataIn>
-        <dataOut name="Table with converted terms" index="0">
+        </inPort>
+        <outPort name="Table with converted terms" index="0">
         	The output table containing the converted terms.
-        </dataOut>
+        </outPort>
 	</ports>
 </knimeNode>
