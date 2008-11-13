@@ -175,6 +175,16 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         m_origDocumentColIndex =
             inData[0].getDataTableSpec().findColumnIndex(origDocColName);
 
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
+        if (m_origDocumentColIndex < 0) {
+            throw new InvalidSettingsException(
+                   "Index of specified original document column is not valid!" 
+                    + " Check your settings!");
+        }        
 
         // initialize the underlying preprocessing
         initPreprocessing();
