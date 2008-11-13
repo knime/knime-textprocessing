@@ -22,8 +22,8 @@
 
 	</fullDescription>
 	<ports>
-        <dataIn name="Terms and related documents input table" index="0">
-        The input table which contains terms and documents.</dataIn>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains terms and documents.</inPort>
 	</ports>	
 	
     <views>

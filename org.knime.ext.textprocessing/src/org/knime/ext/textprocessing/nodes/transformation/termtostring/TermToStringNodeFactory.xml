@@ -14,12 +14,12 @@
     </fullDescription>
         
     <ports>
-        <dataIn name="Term input table" index="0">
+        <inPort name="Term input table" index="0">
         An input data table containing term cells.
-        </dataIn>
-        <dataOut name="Term output table" index="0">
+        </inPort>
+        <outPort name="Term output table" index="0">
         An output table containing the input data with an additional string
         cell column.
-        </dataOut>
+        </outPort>
     </ports>
 </knimeNode>

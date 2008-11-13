@@ -29,7 +29,7 @@
     </fullDescription>
         
     <ports>
-        <dataOut name="Documents output table" index="0">An output table
-        containing the parsed document data.</dataOut>
+        <outPort name="Documents output table" index="0">An output table
+        containing the parsed document data.</outPort>
     </ports>
 </knimeNode>

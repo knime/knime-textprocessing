@@ -18,11 +18,11 @@
     </fullDescription>
         
     <ports>
-        <dataIn name="Document input table" index="0">
+        <inPort name="Document input table" index="0">
         An input data table containing document cells.
-        </dataIn>
-        <dataOut name="Documents output table" index="0">
+        </inPort>
+        <outPort name="Documents output table" index="0">
         An output table containing the input data with an additional class column.
-        </dataOut>
+        </outPort>
     </ports>
 </knimeNode>

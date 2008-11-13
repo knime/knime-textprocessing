@@ -70,11 +70,11 @@
     </fullDescription>
         
     <ports>
-        <dataIn name="Documents input table" index="0">
-        The input table which contains the documents to analyse.</dataIn>
-        <dataOut name="Keywords output table" index="0">
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents to analyse.</inPort>
+        <outPort name="Keywords output table" index="0">
         The output table which contains (keyword term, score, 
         associated document) tuples.
-        </dataOut>
+        </outPort>
     </ports>
 </knimeNode>
