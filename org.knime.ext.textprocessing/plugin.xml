@@ -230,9 +230,18 @@
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.knime.workbench.ui.preferences"
+            class="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
+            id="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
+            name="Textprocessing">
+      </page>
    </extension>
    
 </plugin>
