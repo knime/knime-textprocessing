@@ -23,6 +23,10 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +44,7 @@ import java.util.List;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Term implements TextContainer {
+public class Term implements TextContainer, Serializable {
 
     /**
      * The default string which separates the words, the term contains. This
@@ -246,4 +250,28 @@ public class Term implements TextContainer {
 
         return m_hashCode;
     }
+    
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        out.writeObject(TermCell.getSerializationString(this));
+    }
+
+    
+    private void readObject(final ObjectInputStream in) 
+    throws IOException, ClassNotFoundException {
+        Object o = in.readObject();
+        if (!(o instanceof String)) {
+            throw new ClassNotFoundException(
+                    "Serialized object is not a String!");
+        }
+        String termStr = (String)o;
+        try {            
+            Term term = TermCell.createTerm(termStr);
+            m_tags = term.getTags();
+            m_unmodifiable = term.isUnmodifiable();
+            m_words = term.getWords();
+        } catch (Exception e) {
+            throw new IOException("Could not deserialize term! " 
+                    + e.getMessage()); 
+        }
+    }    
 }

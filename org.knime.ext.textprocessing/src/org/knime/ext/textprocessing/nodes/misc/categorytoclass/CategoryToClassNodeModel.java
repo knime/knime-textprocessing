@@ -39,6 +39,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -49,7 +50,8 @@ public class CategoryToClassNodeModel extends NodeModel {
 
     private static final int INDATA_INDEX = 0;
     
-    private int m_documentCellIndex = -1;
+    private SettingsModelString m_documentCol = 
+        CategoryToClassNodeDialog.getDocumentColModel();
     
     /**
      * Creates a new instance of <code>CategoryToClassNodeModel</code>.
@@ -73,8 +75,7 @@ public class CategoryToClassNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(
                 inSpecs[INDATA_INDEX]);
-        verifier.verifyDocumentCell(true);
-        m_documentCellIndex = verifier.getDocumentCellIndex();
+        verifier.verifyMinimumDocumentCells(1, true);
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
     }
 
@@ -86,9 +87,12 @@ public class CategoryToClassNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
         
+        int docCellIndex = inData[0].getDataTableSpec().findColumnIndex(
+                m_documentCol.getStringValue());
+        
         // initializes the corresponding cell factory
         DocumentClassCellFactory cellFac = new DocumentClassCellFactory(
-                m_documentCellIndex);
+                docCellIndex);
         
         // compute frequency and add column
         ColumnRearranger rearranger = new ColumnRearranger(
@@ -105,7 +109,7 @@ public class CategoryToClassNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // Nothing to do ...
+        m_documentCol.saveSettingsTo(settings);
     }
 
     /**
@@ -114,7 +118,7 @@ public class CategoryToClassNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_documentCol.validateSettings(settings);
     }
     
     /**
@@ -123,7 +127,7 @@ public class CategoryToClassNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_documentCol.loadSettingsFrom(settings);
     }    
     
     /**

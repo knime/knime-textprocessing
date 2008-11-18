@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -243,14 +244,16 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(conn.getInputStream()));
         OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
-    
+        OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
+        
         // Transfer bytes from in to out
         String line;
         while ((line = in.readLine()) != null) {
-            out.write(line.getBytes());
+            writer.write(line);
         }
         
         in.close();
+        writer.close();
         out.close();
     }
     

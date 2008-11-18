@@ -39,7 +39,7 @@ NodeFactory<CategoryToClassNodeModel> {
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new CategoryToClassNodeDialog();
     }
 
     /**
@@ -72,6 +72,6 @@ NodeFactory<CategoryToClassNodeModel> {
      */
     @Override
     protected boolean hasDialog() {
-        return false;
+        return true;
     }
 }
