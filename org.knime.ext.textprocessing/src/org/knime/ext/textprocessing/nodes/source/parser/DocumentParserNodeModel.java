@@ -257,6 +257,15 @@ public class DocumentParserNodeModel extends NodeModel {
         m_categoryModel.validateSettings(settings);
         m_sourceModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
+        
+        // check selected directory
+        String dir = ((SettingsModelString)m_pathModel.
+                createCloneWithValidatedValue(settings)).getStringValue();
+        File f = new File(dir);
+        if (!f.isDirectory() || !f.exists() || !f.canRead()) {
+            throw new InvalidSettingsException("Selected directory: " 
+                    + dir + " is not valid!");
+        }
     }
 
 }

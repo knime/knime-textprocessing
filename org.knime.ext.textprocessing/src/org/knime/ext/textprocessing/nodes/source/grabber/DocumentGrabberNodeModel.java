@@ -193,6 +193,15 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_directoryModel.validateSettings(settings);
         m_maxResultsModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
+        
+        // check selected directory
+        String dir = ((SettingsModelString)m_directoryModel.
+                createCloneWithValidatedValue(settings)).getStringValue();
+        File f = new File(dir);
+        if (!f.isDirectory() || !f.exists() || !f.canWrite()) {
+            throw new InvalidSettingsException("Selected directory: " 
+                    + dir + " is not valid!");
+        }
     }
 
     /**

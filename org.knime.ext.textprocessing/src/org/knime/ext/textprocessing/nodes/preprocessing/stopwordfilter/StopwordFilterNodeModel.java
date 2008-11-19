@@ -126,6 +126,15 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
         super.validateSettings(settings);
         m_fileModel.validateSettings(settings);
         m_caseModel.validateSettings(settings);
+        
+        // check selected file
+        String file = ((SettingsModelString)m_fileModel.
+                createCloneWithValidatedValue(settings)).getStringValue();
+        File f = new File(file);
+        if (!f.isFile() || !f.exists() || !f.canRead()) {
+            throw new InvalidSettingsException("Selected Stopword file: " 
+                    + file + " is not valid!");
+        }        
     }    
     
 
