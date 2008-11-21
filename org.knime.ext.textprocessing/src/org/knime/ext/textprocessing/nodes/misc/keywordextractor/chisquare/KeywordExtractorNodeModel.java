@@ -192,8 +192,8 @@ public class KeywordExtractorNodeModel extends NodeModel {
             final Document doc, final ExecutionMonitor subDoc) {
         subDoc.setProgress(0.0, "Analysing the document");
 
-        TermEvent e =
-            new TermEvent(doc, (double)m_frequentTermsProportion.getIntValue()/100);
+        TermEvent e = new TermEvent(doc, 
+                (double)m_frequentTermsProportion.getIntValue()/100);
 
         subDoc.setProgress(0.1, "Clustering the frequent terms");
         Set<Term> frequentTerms = e.getTopFrequentTerms();

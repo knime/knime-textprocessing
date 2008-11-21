@@ -198,8 +198,8 @@ public class KeygraphNodeModel extends NodeModel {
                 getTermFrequenciesPerSentence(doc);
 
         progress.checkCanceled();
-        progress
-                .setProgress(0.1, "Adding and linking the high frequency terms");
+        progress.setProgress(0.1, 
+                "Adding and linking the high frequency terms");
         List<Term> highFrequencyTerms =
                 new ArrayList<Term>(ev.getTopFrequentTerms());
         UndirectedGraph<Term, Integer> keyGraph =
@@ -215,6 +215,7 @@ public class KeygraphNodeModel extends NodeModel {
         Map<UnorderedPair<Term>, Integer> hfLinks =
                 new HashMap<UnorderedPair<Term>, Integer>();
         for (int it1 = 0; it1 < highFrequencyTerms.size(); it1++) {
+            progress.checkCanceled();
             Term t1 = highFrequencyTerms.get(it1);
 
             for (int it2 = it1 + 1; it2 < highFrequencyTerms.size(); it2++) {
@@ -231,9 +232,11 @@ public class KeygraphNodeModel extends NodeModel {
         // Add the |HF| - 1 top links to the graph
         hfLinks = Maps.getTopValues(hfLinks, highFrequencyTerms.size() - 1);
         for (Entry<UnorderedPair<Term>, Integer> edge : hfLinks.entrySet()) {
+            progress.checkCanceled();
+            
             UnorderedPair<Term> pair = edge.getKey();
-            keyGraph
-                    .addEdge(pair.getFirst(), pair.getSecond(), edge.getValue());
+            keyGraph.addEdge(pair.getFirst(), pair.getSecond(), 
+                    edge.getValue());
         }
 
         progress.checkCanceled();
@@ -244,8 +247,8 @@ public class KeygraphNodeModel extends NodeModel {
         progress.setProgress(0.3, "Finding clusters");
         Set<Set<Term>> clusters = keyGraph.getConnectedSubgraphs();
         if (m_logger.isDebugEnabled()) {
-            m_logger
-                    .debug(("Found " + clusters.size() + " clusters: " + clusters));
+            m_logger.debug(("Found " + clusters.size() + " clusters: " 
+                    + clusters));
         }
 
         progress.checkCanceled();
@@ -259,6 +262,8 @@ public class KeygraphNodeModel extends NodeModel {
 
             for (Entry<Sentence, FrequencyMap<Term>> ent : termFrequencies
                     .entrySet()) {
+                progress.checkCanceled();
+                
                 Sentence sen = ent.getKey();
                 FrequencyMap<Term> freqs = ent.getValue();
 
@@ -284,6 +289,8 @@ public class KeygraphNodeModel extends NodeModel {
                 new HashMap<Pair<Term, Set<Term>>, Integer>();
         for (Term t : ev.getTerms()) {
             for (Set<Term> cluster : clusters) {
+                progress.checkCanceled();
+                
                 int based = 0;
                 for (FrequencyMap<Term> freqs : termFrequencies.values()) {
                     int termfreq = freqs.get(t);
@@ -302,15 +309,13 @@ public class KeygraphNodeModel extends NodeModel {
         // Calculate keys
         Map<Term, Double> keys = new HashMap<Term, Double>();
         for (Term t : ev.getTerms()) {
+            progress.checkCanceled();
+            
             double prob = 1.0;
-
             for (Set<Term> cluster : clusters) {
-                prob *=
-                        1.0
-                                - (double)basedvalues
-                                        .get(new Pair<Term, Set<Term>>(t,
-                                                cluster))
-                                / neighbourvalues.get(cluster);
+                prob *= 1.0 - (double)basedvalues.get(
+                        new Pair<Term, Set<Term>>(t,cluster)) 
+                        / neighbourvalues.get(cluster);
             }
 
             keys.put(t, 1 - prob);
@@ -331,6 +336,8 @@ public class KeygraphNodeModel extends NodeModel {
 
         // Find new edges to add
         for (Term hk : highkey) {
+            progress.checkCanceled();
+            
             Map<UnorderedPair<Term>, Integer> columns =
                     new HashMap<UnorderedPair<Term>, Integer>();
 
@@ -346,6 +353,8 @@ public class KeygraphNodeModel extends NodeModel {
             // For each cluster,
             // add the highest column connecting the term to the cluster
             for (Set<Term> cluster : clusters) {
+                progress.checkCanceled();
+                
                 int maxWeight = -1;
                 UnorderedPair<Term> maxEdge = null;
 
@@ -369,8 +378,9 @@ public class KeygraphNodeModel extends NodeModel {
         // simply the sum of the column score for each edge connected to it
         Map<Term, Integer> scores = new HashMap<Term, Integer>();
         for (Term node : keyGraph.getNodes()) {
+            progress.checkCanceled();
+            
             int score = 0;
-
             Set<Term> neighbours = keyGraph.getNeighbours(node);
             // only keep the neighbours from HF
             neighbours.retainAll(highFrequencyTerms);
