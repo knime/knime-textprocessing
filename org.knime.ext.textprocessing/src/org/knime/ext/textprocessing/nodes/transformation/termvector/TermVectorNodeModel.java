@@ -91,13 +91,13 @@ public class TermVectorNodeModel extends NodeModel {
 
     private int m_termColIndex = -1;
 
-    private SettingsModelString m_colModel =
+    private final SettingsModelString m_colModel =
         TermVectorNodeDialog.getColumnModel();
 
-    private SettingsModelBoolean m_booleanModel =
+    private final SettingsModelBoolean m_booleanModel =
         TermVectorNodeDialog.getBooleanModel();
 
-    private SettingsModelBoolean m_ignoreTagsModel =
+    private final SettingsModelBoolean m_ignoreTagsModel =
         TermVectorNodeDialog.getIgnoreTagsModel();
 
     /**
@@ -181,10 +181,9 @@ public class TermVectorNodeModel extends NodeModel {
         List<Double> featureVector = initFeatureVector(
                 featureIndexTable.size());
 
-        int numberOfRows = sortedTable.getRowCount();
-        int currRow = 1;
         it = sortedTable.iterator();
         while (it.hasNext()) {
+            exec.checkCanceled();
             DataRow row = it.next();
             Document currDoc = ((DocumentValue)row.getCell(m_documentColIndex))
                                 .getDocument();
@@ -213,14 +212,10 @@ public class TermVectorNodeModel extends NodeModel {
             int index = featureIndexTable.get(currDoc);
             featureVector.set(index, currValue);
 
-            // if last row, add feature vector to table
-            if (currRow == numberOfRows) {
-                dc.addRowToTable(createDataRow(lastTerm, featureVector));
-            }
-
             lastTerm = currTerm;
-            currRow++;
         }
+        // add last term to data container
+        dc.addRowToTable(createDataRow(lastTerm, featureVector));
 
         dc.close();
         featureIndexTable.clear();
