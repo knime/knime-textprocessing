@@ -63,7 +63,7 @@ public class DocumentViewPanel extends JSplitPane {
 
     private static final boolean HILITE_TAGS = false;
 
-    private Document m_doc;
+    private final Document m_doc;
 
     private JEditorPane m_fulltextPane;
 
@@ -291,6 +291,11 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
 
+    /**
+     * Sets (un-)hilited text when action was performed.
+     *
+     * @author Kilian Thiel, University of Konstanz
+     */
     class HiliteActionListener implements ActionListener {
 
         /**
