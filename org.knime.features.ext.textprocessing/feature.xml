@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing"
       label="KNIME Textprocessing Nodes"
-      version="2.1.0.0010000"
+      version="2.0.1.0010000"
       provider-name="Chair for Bioinformatics and Information Mining, Prof. Berthold, University of Konstanz, Germany"
       plugin="org.knime.ext.textprocessing">
 
@@ -459,7 +459,7 @@ Public License instead of this License.
    </license>
 
    <url>
-      <update label="KNIME Beta Extensions" url="http://www.knime.org/update_2.x/beta"/>
+      <update label="KNIME Labs" url="http://www.knime.org/update_2.x/labs"/>
    </url>
 
    <plugin
