@@ -41,7 +41,13 @@ public class PreprocessingConfigKeys {
     public static final String CFG_KEY_APPEND_INCOMING = "AppendIncomingDoc";
     
     /**
-     * The configuration key for the column containing he documents to process.
+     * The configuration key for the column containing the documents to process.
      */
     public static final String CFG_KEY_DOCUMENT_COL = "DocCol";
+    
+    /**
+     * The configuration key for the column containing the original documents
+     * to append unchanged (if specified).
+     */
+    public static final String CFG_KEY_ORIGDOCUMENT_COL = "OriginalDocCol";
 }

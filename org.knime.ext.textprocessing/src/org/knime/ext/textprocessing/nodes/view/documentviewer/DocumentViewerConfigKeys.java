@@ -17,18 +17,18 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   08.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentViewerConfigKeys {
-    
+
     /**
      * The configuration key for the column containing he documents to process.
      */

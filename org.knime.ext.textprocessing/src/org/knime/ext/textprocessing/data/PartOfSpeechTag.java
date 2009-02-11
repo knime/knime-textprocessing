@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   21.12.2006 (Kilian Thiel): created
  */
@@ -33,14 +33,14 @@ import java.util.regex.Pattern;
  * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag#getTag()}, i.e:
  * <br><br>
  * <code>Tag t = PartOfSpeechTag.NN.getTag();</code>
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public enum PartOfSpeechTag implements TagBuilder {
 
     /** Unkown type. */
     UNKNOWN,
-    
+
     //
     /// all penn-treebank tags
     //
@@ -106,7 +106,7 @@ public enum PartOfSpeechTag implements TagBuilder {
     POS,
     /** Adverb, comparative. **/
     RBR,
-    /** with the comparative ending -er, 
+    /** with the comparative ending -er,
      * with a strictly comparative meaning. **/
     Adverbs,
     /** Adverb, superlative. **/
@@ -120,14 +120,14 @@ public enum PartOfSpeechTag implements TagBuilder {
     /** Wh-adverb. **/
     WRB;
 
-    
+
     private final Tag m_tag;
-    
+
     /**
      * The constant for POS tag types.
      */
     public static final String TAG_TYPE = "POS";
-    
+
     /**
      * Creates new instance of <code>PartOfSpeechTag</code> and
      * {@link org.knime.ext.textprocessing.data.Tag} with the specified
@@ -136,18 +136,18 @@ public enum PartOfSpeechTag implements TagBuilder {
     private PartOfSpeechTag() {
         m_tag = new Tag(name(), TAG_TYPE);
     }
-    
+
     /**
-     * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding 
+     * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
      * to the specified <code>PartOfSpeechTag</code>.
      */
     public Tag getTag() {
         return m_tag;
     }
-    
+
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     public static List<String> asStringList() {
@@ -157,23 +157,23 @@ public enum PartOfSpeechTag implements TagBuilder {
             list.add(values[i].name());
         }
         return list;
-    }   
-    
+    }
+
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to 
-     * the given string. If no corresponding 
-     * {@link org.knime.ext.textprocessing.data.Tag} is available the 
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to
+     * the given string. If no corresponding
+     * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     * @param str The string representing a 
-     * {@link org.knime.ext.textprocessing.data.Tag}. 
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to 
+     * @param str The string representing a
+     * {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to
      * the given string.
      */
     public static Tag stringToTag(final String str) {
         if (isSymbol(str)) {
             return PartOfSpeechTag.SYM.getTag();
         }
-        
+
         for (PartOfSpeechTag pos : values()) {
             if (pos.getTag().getTagValue().equals(str)) {
                 return pos.getTag();
@@ -184,30 +184,37 @@ public enum PartOfSpeechTag implements TagBuilder {
 
     private static Pattern m_symbolPattern = Pattern.compile(
             "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]");
-    
+
     private static boolean isSymbol(final String str) {
         if (m_symbolPattern.matcher(str).matches()) {
             return true;
         }
         return false;
     }
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
-    public Tag buildTag(String type, String value) {
+    public Tag buildTag(final String type, final String value) {
         if (type.equals(TAG_TYPE)) {
             return PartOfSpeechTag.stringToTag(value);
         }
         return null;
     }
-    
+
     /**
      * @return The default "UNKNOWN" <code>PartOfSpeechTag</code> as
      * <code>TagBuilder</code>.
      */
     public static TagBuilder getDefault() {
         return PartOfSpeechTag.UNKNOWN;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getType() {
+        return TAG_TYPE;
     }
 }

@@ -12,19 +12,21 @@
       </category>
       <category
             description="Textprocessing IO nodes"
-            icon="icons/io.png"
+            icon="icons/missing.gif"
             level-id="io"
             name="IO"
             path="/textprocessing">
       </category>
       <category
+            after="io"
             description="Tagger nodes (POS, NER)"
             icon="icons/missing.gif"
             level-id="tagging"
-            name="Tagging"
+            name="Enrichment"
             path="/textprocessing">
       </category>
       <category
+            after="tagging"
             description="Transformation nodes"
             icon="icons/missing.gif"
             level-id="transformation"
@@ -32,12 +34,14 @@
             path="/textprocessing">
       </category>
       <category
+            after="transformation"
             icon="icons/missing.gif"
             level-id="preprocessing"
             name="Preprocessing"
             path="/textprocessing">
       </category>
       <category
+            after="preprocessing"
             description="Contains nodes that compute several kinds of frequencies"
             icon="icons/missing.gif"
             level-id="frequencies"
@@ -45,6 +49,7 @@
             path="/textprocessing">
       </category>
       <category
+            after="frequencies"
             description="Contains misc nodes of the textprocessing plugin"
             icon="icons/missing.gif"
             level-id="misc"
@@ -204,12 +209,39 @@
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory"
             id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/io"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/transformation"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.stringtoterm.StringToTermNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.stringtoterm.TermToStringNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/preprocessing"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.knime.workbench.ui.preferences"
+            class="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
+            id="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
+            name="Textprocessing">
+      </page>
    </extension>
    
 </plugin>

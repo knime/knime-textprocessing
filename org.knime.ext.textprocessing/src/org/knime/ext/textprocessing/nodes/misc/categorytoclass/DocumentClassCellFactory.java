@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.06.2008 (thiel): created
  */
@@ -42,25 +42,25 @@ import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentClassCellFactory implements CellFactory {
 
     private static final String UNDEFINED = "undefined";
-    
+
     private int m_documentCellIndex = -1;
-    
+
     /**
      * Creates a new instance of <code>DocumentClassCellFactory</code> with
      * given index of the column containing <code>DocumentCell</code>s.
      * @param documentCellIndex the index of the column containing
-     * <code>DocumentCell</code>s. 
+     * <code>DocumentCell</code>s.
      */
     public DocumentClassCellFactory(final int documentCellIndex) {
         m_documentCellIndex = documentCellIndex;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -69,18 +69,18 @@ public class DocumentClassCellFactory implements CellFactory {
         StringCell classCell;
         Document doc = ((DocumentValue)row.getCell(m_documentCellIndex))
                         .getDocument();
-        
+
         Set<DocumentCategory> cats = doc.getCategories();
         List<DocumentCategory> catsList = new ArrayList<DocumentCategory>(cats);
         Collections.sort(catsList, new Comparator <DocumentCategory>() {
-            public int compare(DocumentCategory o1, DocumentCategory o2) {
+            public int compare(final DocumentCategory o1, final DocumentCategory o2) {
                 if (o1 != null && o2 != null) {
                     return o1.getCategoryName().compareTo(o2.getCategoryName());
                 }
                 return 0;
             }
         });
-        
+
         String cat = UNDEFINED;
         if (catsList.size() > 0) {
             cat = catsList.get(0).getCategoryName();
@@ -94,7 +94,7 @@ public class DocumentClassCellFactory implements CellFactory {
      */
     @Override
     public DataColumnSpec[] getColumnSpecs() {
-        DataColumnSpec classCell = new DataColumnSpecCreator("Document class", 
+        DataColumnSpec classCell = new DataColumnSpecCreator("Document class",
                     StringCell.TYPE).createSpec();
         return new DataColumnSpec[]{classCell};
     }
@@ -103,10 +103,10 @@ public class DocumentClassCellFactory implements CellFactory {
      * {@inheritDoc}
      */
     @Override
-    public void setProgress(int curRowNr, int rowCount, RowKey lastKey,
-            ExecutionMonitor exec) {
+    public void setProgress(final int curRowNr, final int rowCount, final RowKey lastKey,
+            final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Addig class of row: " + curRowNr 
+        exec.setProgress(prog, "Addig class of row: " + curRowNr
                 + " of " + rowCount + " rows");
     }
 }

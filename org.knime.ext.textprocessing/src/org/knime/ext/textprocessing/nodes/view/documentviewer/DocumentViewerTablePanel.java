@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   27.08.2008 (thiel): created
  */
@@ -31,7 +31,7 @@ import org.knime.core.node.KNIMEConstants;
 import org.knime.ext.textprocessing.data.Document;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
@@ -39,13 +39,13 @@ public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
     /**
      * Creates a new instance of <code>DocumentViewerTablePanel</code> with
      * the given set of documents to display.
-     * 
+     *
      * @param documents The set of documents to display.
      */
     public DocumentViewerTablePanel(final Set<Document> documents) {
         super(documents);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -56,7 +56,7 @@ public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
             detailsFrame.setIconImage(
                     KNIMEConstants.KNIME16X16.getImage());
         }
-        
+
         detailsFrame.setContentPane(
                 new DocumentViewPanel(document));
         detailsFrame.pack();

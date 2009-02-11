@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   26.06.2008 (thiel): created
  */
@@ -36,25 +36,25 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermToStringCellFactory implements CellFactory {
 
     private int m_termColIndex = -1;
-    
+
     private String m_newColName;
-    
+
     /**
      * Creates a new instance of <code>TermToStringCellFactory</code> with the
      * given index of the term cell column and the name of the column to append.
-     * 
+     *
      * @param termColindex The index of the term cell column.
      * @param newColName The name of the column to append.
      * @throws InvalidSettingsException if the given index of the term column
      * is less than zero.
      */
-    public TermToStringCellFactory(final int termColindex, 
+    public TermToStringCellFactory(final int termColindex,
             final String newColName) throws InvalidSettingsException {
         if (termColindex < 0) {
             throw new InvalidSettingsException(
@@ -63,7 +63,7 @@ public class TermToStringCellFactory implements CellFactory {
         m_termColIndex = termColindex;
         m_newColName = newColName;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -79,7 +79,7 @@ public class TermToStringCellFactory implements CellFactory {
      */
     @Override
     public DataColumnSpec[] getColumnSpecs() {
-        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName, 
+        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName,
                 StringCell.TYPE).createSpec();
         return new DataColumnSpec[]{strCol};
     }
@@ -88,10 +88,10 @@ public class TermToStringCellFactory implements CellFactory {
      * {@inheritDoc}
      */
     @Override
-    public void setProgress(final int curRowNr, final int rowCount, 
+    public void setProgress(final int curRowNr, final int rowCount,
             final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Processing row: " + curRowNr 
+        exec.setProgress(prog, "Processing row: " + curRowNr
                 + " of " + rowCount + " rows");
     }
 }

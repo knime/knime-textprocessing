@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.06.2008 (thiel): created
  */
@@ -39,32 +39,34 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class CategoryToClassNodeModel extends NodeModel {
 
     private static final int INDATA_INDEX = 0;
-    
-    private int m_documentCellIndex = -1;
-    
+
+    private SettingsModelString m_documentCol =
+        CategoryToClassNodeDialog.getDocumentColModel();
+
     /**
      * Creates a new instance of <code>CategoryToClassNodeModel</code>.
      */
     public CategoryToClassNodeModel() {
         super(1, 1);
     }
-    
+
     private final DataTableSpec createDataTableSpec(
             final DataTableSpec inDataSpec) {
-        DataColumnSpec classCol = new DataColumnSpecCreator("Document class", 
+        DataColumnSpec classCol = new DataColumnSpecCreator("Document class",
                 StringCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(classCol));
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -73,8 +75,7 @@ public class CategoryToClassNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(
                 inSpecs[INDATA_INDEX]);
-        verifier.verifyDocumentCell(true);
-        m_documentCellIndex = verifier.getDocumentCellIndex();
+        verifier.verifyMinimumDocumentCells(1, true);
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
     }
 
@@ -85,18 +86,21 @@ public class CategoryToClassNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
-        
+
+        int docCellIndex = inData[0].getDataTableSpec().findColumnIndex(
+                m_documentCol.getStringValue());
+
         // initializes the corresponding cell factory
         DocumentClassCellFactory cellFac = new DocumentClassCellFactory(
-                m_documentCellIndex);
-        
+                docCellIndex);
+
         // compute frequency and add column
         ColumnRearranger rearranger = new ColumnRearranger(
                 inDataTable.getDataTableSpec());
         rearranger.append(cellFac);
-        
+
         return new BufferedDataTable[] {
-                exec.createColumnRearrangeTable(inDataTable, rearranger, 
+                exec.createColumnRearrangeTable(inDataTable, rearranger,
                 exec)};
     }
 
@@ -105,7 +109,7 @@ public class CategoryToClassNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // Nothing to do ...
+        m_documentCol.saveSettingsTo(settings);
     }
 
     /**
@@ -114,23 +118,23 @@ public class CategoryToClassNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
+        m_documentCol.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // Nothing to do ...
-    }    
-    
+        m_documentCol.loadSettingsFrom(settings);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -148,7 +152,7 @@ public class CategoryToClassNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...

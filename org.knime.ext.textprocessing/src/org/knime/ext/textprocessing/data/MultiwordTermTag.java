@@ -111,4 +111,11 @@ public enum MultiwordTermTag implements TagBuilder {
     public static TagBuilder getDefault() {
         return MultiwordTermTag.UNKNOWN;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getType() {
+        return TAG_TYPE;
+    }
 }

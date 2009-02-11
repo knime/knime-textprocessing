@@ -207,6 +207,15 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         m_tagModel.validateSettings(settings);
         m_fileModel.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
+        
+        // check selected file
+        String file = ((SettingsModelString)m_fileModel.
+                createCloneWithValidatedValue(settings)).getStringValue();
+        File f = new File(file);
+        if (!f.isFile() || !f.exists() || !f.canRead()) {
+            throw new InvalidSettingsException("Selected file: " 
+                    + file + " is not valid!");
+        }  
     }
 
     /**

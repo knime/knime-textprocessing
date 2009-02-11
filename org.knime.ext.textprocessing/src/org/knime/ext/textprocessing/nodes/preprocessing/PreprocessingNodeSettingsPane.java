@@ -23,12 +23,15 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.BagOfWordsBlobCellDataTableBuilder;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane}
@@ -67,7 +70,17 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(
                 PreprocessingConfigKeys.CFG_KEY_DOCUMENT_COL,
-                "Document");
+                BagOfWordsBlobCellDataTableBuilder.DEF_DOCUMENT_COLNAME);
+    }
+    
+    /**
+     * @return Creates and returns the string settings model containing
+     * the name of the column with the original documents to append unchanged.
+     */
+    public static SettingsModelString getOrigDocumentColumnModel() {
+        return new SettingsModelString(
+                PreprocessingConfigKeys.CFG_KEY_ORIGDOCUMENT_COL,
+                BagOfWordsBlobCellDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME);
     }
     
     /**
@@ -77,24 +90,48 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public PreprocessingNodeSettingsPane() {
         removeTab("Options");
         createNewTabAt("Preprocessing", 1);
-        
-        DialogComponentColumnNameSelection comp3 = 
-            new DialogComponentColumnNameSelection(getDocumentColumnModel(), 
-                    "Document column", 0, DocumentValue.class);
-        comp3.setToolTipText(
-                "Column has to contain documents to preprocess!");
-        addDialogComponent(comp3);        
-        
+          
+        // document to preprocess and deep preprocessing
+        SettingsModelBoolean deepPreproModel = getDeepPrepressingModel();
         DialogComponentBoolean comp1 = new DialogComponentBoolean(
-                getDeepPrepressingModel(), "Deep preprocessing");
+                deepPreproModel, "Deep preprocessing");
         comp1.setToolTipText(
                 "Be aware that deep preprocessing is more time consuming!");
         addDialogComponent(comp1);
+
+        SettingsModelString documentColModel = getDocumentColumnModel();
+        DialogComponentColumnNameSelection comp3 = 
+            new DialogComponentColumnNameSelection(documentColModel, 
+                    "Document column", 0, DocumentValue.class);
+        comp3.setToolTipText(
+                "Column has to contain documents to preprocess!");
+        addDialogComponent(comp3);
+
+        ChangeListener cl1 = new DefaultSwitchEventListener(
+                documentColModel, deepPreproModel);
+        deepPreproModel.addChangeListener(cl1);
         
+        // original document to append and append setting
+        SettingsModelBoolean appendOrigDocModel = getAppendIncomingDocument(); 
         DialogComponentBoolean comp2 = new DialogComponentBoolean(
-                getAppendIncomingDocument(), "Append unchanged document");
+                appendOrigDocModel, "Append unchanged documents");
         comp2.setToolTipText(
                 "The unchanged incoming documents will be appended!");
         addDialogComponent(comp2);
+        
+        SettingsModelString origDocColModel = getOrigDocumentColumnModel();
+        DialogComponentColumnNameSelection comp4 = 
+            new DialogComponentColumnNameSelection(origDocColModel, 
+                    "Original Document column", 0, DocumentValue.class);
+        comp4.setToolTipText("Column has to contain the original documents " 
+                + "to append unchanged!");
+        addDialogComponent(comp4);
+        
+        ChangeListener cl2 = new DefaultSwitchEventListener(
+                origDocColModel, appendOrigDocModel);
+        appendOrigDocModel.addChangeListener(cl2);
+        
+        cl1.stateChanged(null);
+        cl2.stateChanged(null);
     }
 }

@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   08.08.2008 (thiel): created
  */
@@ -28,7 +28,7 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermVectorNodeFactory extends NodeFactory<TermVectorNodeModel> {
@@ -53,7 +53,7 @@ public class TermVectorNodeFactory extends NodeFactory<TermVectorNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<TermVectorNodeModel> createNodeView(final int index, 
+    public NodeView<TermVectorNodeModel> createNodeView(final int index,
             final TermVectorNodeModel model) {
         return null;
     }

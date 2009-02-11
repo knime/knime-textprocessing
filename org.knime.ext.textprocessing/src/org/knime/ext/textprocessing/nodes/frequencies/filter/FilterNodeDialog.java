@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   21.04.2008 (thiel): created
  */
@@ -44,56 +44,56 @@ import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSetting
 
 /**
  * The dialog class of the filter node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns a new instance of 
-     * <code>SettingsModelString</code> containing the name of the column to 
+     * @return Creates and returns a new instance of
+     * <code>SettingsModelString</code> containing the name of the column to
      * apply the filtering.
      */
     public static final SettingsModelString getColModel() {
         return new SettingsModelString(FilterConfigKeys.CFG_KEY_FILTERCOL,
                 "");
     }
-    
+
     /**
-     * @return Creates and returns a new instance of 
+     * @return Creates and returns a new instance of
      * <code>SettingsModelString</code> containing the mode of filtering
      */
     public static final SettingsModelString getSelectionModel() {
         return new SettingsModelString(FilterConfigKeys.CFG_KEY_SELECTION,
                 FilterNodeModel.DEF_SELECTION);
     }
-    
+
     /**
-     * @return Creates and returns a new instance of 
-     * <code>SettingsModelDoubleRange</code> containing the filter's min and 
+     * @return Creates and returns a new instance of
+     * <code>SettingsModelDoubleRange</code> containing the filter's min and
      * max value.
      */
     public static final SettingsModelDoubleRange getMinMaxModel() {
         return new SettingsModelDoubleRange(FilterConfigKeys.CFG_KEY_MINMAX,
-                FilterNodeModel.DEF_MIN_THRESHOLD, 
+                FilterNodeModel.DEF_MIN_THRESHOLD,
                 FilterNodeModel.DEF_MAX_THRESHOLD);
     }
-    
+
     /**
-     * @return Creates and returns a new instance of 
+     * @return Creates and returns a new instance of
      * <code>SettingsModelIntegerBounded</code> containing the number k of terms
-     * to keep (the rest is filtered). 
+     * to keep (the rest is filtered).
      */
     public static final SettingsModelIntegerBounded getNumberModel() {
         return new SettingsModelIntegerBounded(FilterConfigKeys.CFG_KEY_NUMBER,
                 FilterNodeModel.DEF_NUMBER, FilterNodeModel.MIN_NUMBER,
                 FilterNodeModel.MAX_NUMBER);
     }
-    
+
     /**
-     * @return Creates and returns a new instance of 
-     * <code>SettingsModelBoolean</code> specifying if deep filtering has to be 
-     * applied. 
+     * @return Creates and returns a new instance of
+     * <code>SettingsModelBoolean</code> specifying if deep filtering has to be
+     * applied.
      */
     public static final SettingsModelBoolean getDeepFilteringModel() {
         return new SettingsModelBoolean(FilterConfigKeys.CFG_KEY_DEEPFILTERING,
@@ -101,22 +101,22 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns a new instance of 
-     * <code>SettingsModelBoolean</code> specifying if modification of 
-     * unmodifiable terms is done. 
+     * @return Creates and returns a new instance of
+     * <code>SettingsModelBoolean</code> specifying if modification of
+     * unmodifiable terms is done.
      */
     public static final SettingsModelBoolean getModifyUnmodifiableModel() {
         return new SettingsModelBoolean(
                 FilterConfigKeys.CFG_KEY_MODIFY_UNMODIFIABLE,
                 FilterNodeModel.DEF_MODIFY_UNMODIFIABLE);
-    }    
-    
-    private SettingsModelDoubleRange m_minMaxModel;
-    
-    private SettingsModelIntegerBounded m_numberModel;
-    
-    private SettingsModelString m_selectionModel;
-    
+    }
+
+    private final SettingsModelDoubleRange m_minMaxModel;
+
+    private final SettingsModelIntegerBounded m_numberModel;
+
+    private final SettingsModelString m_selectionModel;
+
     /**
      * Creates a new instance of <code>FilterNodeDialog</code>.
      */
@@ -128,42 +128,42 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
                 getDeepFilteringModel(), "Deep filtering");
         comp.setToolTipText(
         "Be aware that deep filtering is more time consuming!");
-        
-        DialogComponentColumnNameSelection comp3 = 
+
+        DialogComponentColumnNameSelection comp3 =
             new DialogComponentColumnNameSelection(
-                    PreprocessingNodeSettingsPane.getDocumentColumnModel(), 
+                    PreprocessingNodeSettingsPane.getDocumentColumnModel(),
                     "Document column", 0, DocumentValue.class);
         addDialogComponent(comp3);
-        
-        
+
+
         addDialogComponent(comp);
                 createNewTabAt("Filter Settings", 2);
-        
+
         // Modify Unmodifiable
         addDialogComponent(new DialogComponentBoolean(
                 getModifyUnmodifiableModel(), "Filter unmodifiable terms"));
-                
+
         // Column Selection
         addDialogComponent(new DialogComponentColumnNameSelection(
-                getColModel(), "Filter column", 0, IntValue.class, 
+                getColModel(), "Filter column", 0, IntValue.class,
                 DoubleValue.class));
-        
-        
+
+
         // Filter Option
         ButtonGroupEnumInterface[] filteringOptions = new FilteringOptions[2];
         filteringOptions[0] = new FilteringOptions(
                 FilterNodeModel.SELECTION_THRESHOLD);
         filteringOptions[1] = new FilteringOptions(
                 FilterNodeModel.SELECTION_NUMBER);
-        
+
         m_selectionModel = getSelectionModel();
         m_selectionModel.addChangeListener(new FilterOptionChangeListener());
-        
-        DialogComponentButtonGroup filterOptionButtons = 
-            new DialogComponentButtonGroup(m_selectionModel, "Filtering by", 
+
+        DialogComponentButtonGroup filterOptionButtons =
+            new DialogComponentButtonGroup(m_selectionModel, "Filtering by",
                     false, filteringOptions);
         addDialogComponent(filterOptionButtons);
-        
+
         // Min Max Settings
         createNewGroup("Min Max Settings");
         m_minMaxModel = getMinMaxModel();
@@ -172,17 +172,17 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
                 FilterNodeModel.MAX_MAX_THRESHOLD, 0.1, "");
         addDialogComponent(minMax);
         closeCurrentGroup();
-        
+
         // Number Settings
         m_numberModel = getNumberModel();
         createNewGroup("Number Settings");
-        addDialogComponent(new DialogComponentNumber(m_numberModel, "Number", 
-                0.1));
+        addDialogComponent(new DialogComponentNumber(m_numberModel, "Number",
+                100));
         closeCurrentGroup();
-        
+
         enableModels();
     }
-    
+
     private void enableModels() {
         if (m_selectionModel.getStringValue().equals(
                 FilterNodeModel.SELECTION_NUMBER)) {
@@ -191,10 +191,10 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         } else if (m_selectionModel.getStringValue().equals(
                 FilterNodeModel.SELECTION_THRESHOLD)) {
             m_numberModel.setEnabled(false);
-            m_minMaxModel.setEnabled(true);            
+            m_minMaxModel.setEnabled(true);
         }
     }
-    
+
     private class FilterOptionChangeListener implements ChangeListener {
         /**
          * {@inheritDoc}
@@ -203,15 +203,15 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
             enableModels();
         }
     }
-    
+
     private class FilteringOptions implements ButtonGroupEnumInterface {
 
-        private String m_selection;
-        
+        private final String m_selection;
+
         private FilteringOptions(final String selection) {
             m_selection = selection;
         }
-        
+
         /**
          * {@inheritDoc}
          */

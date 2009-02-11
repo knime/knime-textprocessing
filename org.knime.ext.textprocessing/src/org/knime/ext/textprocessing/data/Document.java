@@ -24,6 +24,10 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -55,13 +59,19 @@ import java.util.Set;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Document implements TextContainer {
+public class Document implements TextContainer, Serializable {
 
     /**
      * The default document type value (UNKNOWN).
      */
     public static final DocumentType DEFAULT_TYPE = DocumentType.UNKNOWN;
 
+    /**
+     * The default document file 
+     * (System.getProperty("user.home") + "NoFileSpecified")):
+     */
+    public static final File DEFAULT_FILE = new File(
+            System.getProperty("user.home") + "/NoFileSpecified.txt");
 
     private List<Section> m_sections;
 
@@ -151,7 +161,7 @@ public class Document implements TextContainer {
 
         // file (if null create empty file instance)
         if (documentFile == null) {
-            m_docFile = new File("DummyFileName");
+            m_docFile = DEFAULT_FILE;
         } else {
             m_docFile = documentFile;
         }
@@ -361,8 +371,41 @@ public class Document implements TextContainer {
         return sb.toString();
     }
 
+    /**
+     * Checks the parts of the given document for equality which are not user
+     * defined, such as all the <b>sections</b>, the <b>authors</b>, and
+     * the <b>publication date</b>. Beside sections, authors, and publication 
+     * date no other members are compared. If given document is considered
+     * as equal <code>true</code> is returned, otherwise <code>false</code>.
+     * 
+     * @param d The document to check for equality based on fixed document
+     * members.
+     * @return <code>true</code> if sections, authors, and publication date 
+     * of given document are equal, <code>false</code> otherwise. 
+     */
+    public boolean equalsContent(final Document d) {
+        if (d == null) {
+            return false;
+        }
+
+        if ((d.getAuthors() == null && m_authors != null) 
+            || !d.getAuthors().equals(m_authors)) {
+            return false;
+        } else if ((d.getSections() == null && m_sections != null) 
+                || !d.getSections().equals(m_sections)) {
+            return false;
+        } else if ((d.getPubDate() == null && m_pubDate != null) 
+            || !d.getPubDate().equals(m_pubDate)) {
+            return false;
+        } 
+
+        return true;
+    }
 
     /**
+     * Checks the complete document for equality. All members must match to
+     * consider the given document as equal.
+     * 
      * {@inheritDoc}
      */
     @Override
@@ -374,16 +417,7 @@ public class Document implements TextContainer {
         }
         Document d = (Document)o;
 
-        if ((d.getAuthors() == null && m_authors != null) 
-            || !d.getAuthors().equals(m_authors)) {
-            return false;
-        } else if ((d.getPubDate() == null && m_pubDate != null) 
-            || !d.getPubDate().equals(m_pubDate)) {
-            return false;
-        } else if ((d.getDocFile() == null && m_docFile != null) 
-            || !d.getDocFile().equals(m_docFile)) {
-            return false;
-        } else if ((d.getSources() == null && m_sources != null) 
+        if ((d.getSources() == null && m_sources != null) 
                 || !d.getSources().equals(m_sources)) {
             return false;
         } else if ((d.getCategories() == null && m_categories != null) 
@@ -392,10 +426,12 @@ public class Document implements TextContainer {
         } else if ((d.getType() == null && m_type != null) 
                 || !d.getType().equals(m_type)) {
             return false;
-        } else if ((d.getSections() == null && m_sections != null) 
-                || !d.getSections().equals(m_sections)) {
+        } else if ((d.getDocFile() == null && m_docFile != null) 
+            || !d.getDocFile().equals(m_docFile)) {
             return false;
-        }
+        } else if (!equalsContent(d)) {
+            return false;
+        } 
 
         return true;
     }
@@ -407,35 +443,65 @@ public class Document implements TextContainer {
     public int hashCode() {
         if (m_hashCode == -1) {
             m_hashCode = 0;
-            int fac = 119;
-            int div = 19;
+            int fac = 119 / 19;
 
             for (Section s : m_sections) {
-                m_hashCode += fac * s.hashCode() / div;
+                m_hashCode += fac * s.hashCode();
             }
             for (Author a : m_authors) {
-                m_hashCode += fac / div * a.hashCode();
+                m_hashCode += fac * a.hashCode();
             }
             for (DocumentSource s : m_sources) {
-                m_hashCode += fac / div * s.hashCode();
+                m_hashCode += fac * s.hashCode();
             }
             for (DocumentCategory c : m_categories) {
-                m_hashCode += fac / div * c.hashCode();
+                m_hashCode += fac * c.hashCode();
             }
             if (m_pubDate != null) {
-                m_hashCode += fac / div * m_pubDate.hashCode();
+                m_hashCode += fac * m_pubDate.hashCode();
             }
             if (m_type != null) {
-                m_hashCode += fac / div * m_type.hashCode();
+                m_hashCode += fac * m_type.hashCode();
             }
             if (m_docFile != null) {
-                m_hashCode += fac / div * m_docFile.hashCode();
+                m_hashCode += fac * m_docFile.hashCode();
             }
         }
 
         return m_hashCode;
     }
 
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        out.writeObject(DocumentCell.getSerializationString(this));
+    }
+
+    
+    private void readObject(final ObjectInputStream in) 
+    throws IOException, ClassNotFoundException {
+        Object o = in.readObject();
+        if (!(o instanceof String)) {
+            throw new ClassNotFoundException(
+                    "Serialized object is not a String!");
+        }
+        String docStr = (String)o;
+        try {            
+            Document doc = DocumentCell.createDocument(docStr);
+            m_authors = doc.getAuthors();
+            m_categories = doc.getCategories();
+            m_docFile = doc.getDocFile();
+            m_length = doc.getLength();
+            m_pubDate = doc.getPubDate();
+            m_sections = doc.getSections();
+            m_sources = doc.getSources();
+            m_type = doc.getType();
+        } catch (Exception e) {
+            throw new IOException("Could not deserialize document! " 
+                    + e.getMessage()); 
+        }
+    }
+    
+    
+    
     /**
      * @return a read-only iterator on the sentences of this document.
      */

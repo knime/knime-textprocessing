@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   08.08.2008 (thiel): created
  */
@@ -27,9 +27,10 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentViewerNodeDialog extends DefaultNodeSettingsPane {
@@ -41,9 +42,9 @@ public class DocumentViewerNodeDialog extends DefaultNodeSettingsPane {
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(
                 DocumentViewerConfigKeys.CFG_KEY_DOCUMENT_COL,
-                "Document");
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
     }
-    
+
     /**
      * Creates new instance of <code>DocumentViewerNodeDialog</code>.
      */
@@ -51,9 +52,9 @@ public class DocumentViewerNodeDialog extends DefaultNodeSettingsPane {
     public DocumentViewerNodeDialog() {
         removeTab("Options");
         createNewTabAt("Preprocessing", 1);
-        
-        DialogComponentColumnNameSelection comp1 = 
-            new DialogComponentColumnNameSelection(getDocumentColumnModel(), 
+
+        DialogComponentColumnNameSelection comp1 =
+            new DialogComponentColumnNameSelection(getDocumentColumnModel(),
                     "Document column", 0, DocumentValue.class);
         comp1.setToolTipText(
                 "Column has to contain documents to preprocess!");

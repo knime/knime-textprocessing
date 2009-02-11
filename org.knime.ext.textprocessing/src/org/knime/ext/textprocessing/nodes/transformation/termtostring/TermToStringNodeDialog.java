@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.08.2008 (thiel): created
  */
@@ -29,13 +29,13 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermToStringNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the column which has to
      * be used as title column.
      */
@@ -43,7 +43,7 @@ public class TermToStringNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 TermToStringConfigKeys.CFGKEY_TERMCOL, "");
     }
-    
+
     /**
      * Creates a new instance of <code>TermToStringNodeDialog</code>.
      */

@@ -25,7 +25,6 @@ package org.knime.ext.textprocessing.nodes.source.parser.pubmed;
 
 import java.io.File;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -287,9 +286,12 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 PublicationDate pubDate = PublicationDate.createPublicationDate(
                         year, m_month, day);
                 m_currentDoc.setPublicationDate(pubDate);
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 LOGGER.warn("Publication date could not be created!");
                 LOGGER.warn(e.getMessage());
+                
+                // set empty PublicationDate!
+                m_currentDoc.setPublicationDate(new PublicationDate());
             }
         } else if (name.equals(TITLE)) {
             if (m_journalTitle.length() > 0) {

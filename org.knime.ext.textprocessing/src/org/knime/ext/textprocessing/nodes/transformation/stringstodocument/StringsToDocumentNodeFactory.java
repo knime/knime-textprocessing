@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   29.07.2008 (thiel): created
  */
@@ -28,12 +28,12 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class StringsToDocumentNodeFactory extends 
+public class StringsToDocumentNodeFactory extends
 NodeFactory<StringsToDocumentNodeModel> {
-    
+
     /**
      * {@inheritDoc}
      */
@@ -54,7 +54,7 @@ NodeFactory<StringsToDocumentNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<StringsToDocumentNodeModel> createNodeView(final int index, 
+    public NodeView<StringsToDocumentNodeModel> createNodeView(final int index,
             final StringsToDocumentNodeModel model) {
         return null;
     }

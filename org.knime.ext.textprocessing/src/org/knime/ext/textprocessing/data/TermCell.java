@@ -100,9 +100,6 @@ public class TermCell extends DataCell implements StringValue, TermValue {
         if (dc == null) {
             return false;
         }
-        if (!(dc instanceof TermCell)) {
-            return false;
-        }
         TermCell t = (TermCell)dc;
         
         return t.getTermValue().equals(m_term);

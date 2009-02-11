@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.06.2008 (thiel): created
  */
@@ -28,10 +28,10 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class CategoryToClassNodeFactory extends 
+public class CategoryToClassNodeFactory extends
 NodeFactory<CategoryToClassNodeModel> {
 
     /**
@@ -39,7 +39,7 @@ NodeFactory<CategoryToClassNodeModel> {
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new CategoryToClassNodeDialog();
     }
 
     /**
@@ -54,7 +54,7 @@ NodeFactory<CategoryToClassNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<CategoryToClassNodeModel> createNodeView(final int index, 
+    public NodeView<CategoryToClassNodeModel> createNodeView(final int index,
             final CategoryToClassNodeModel model) {
         return null;
     }
@@ -72,6 +72,6 @@ NodeFactory<CategoryToClassNodeModel> {
      */
     @Override
     protected boolean hasDialog() {
-        return false;
+        return true;
     }
 }

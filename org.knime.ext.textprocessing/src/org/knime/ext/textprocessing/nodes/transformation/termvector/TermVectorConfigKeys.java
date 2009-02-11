@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   06.05.2008 (thiel): created
  */
@@ -25,7 +25,7 @@ package org.knime.ext.textprocessing.nodes.transformation.termvector;
 
 /**
  * Provides the configuration keys for the document vector node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermVectorConfigKeys {
@@ -34,9 +34,14 @@ public class TermVectorConfigKeys {
      * The configuration key of the boolean value setting.
      */
     public static final String CFGKEY_BOOLEAN = "Boolean";
-    
+
     /**
      * The configuration key of the column value setting.
      */
     public static final String CFGKEY_VALUE_COL = "Value_Col";
+
+    /**
+     * The configuration key of the flag specifying if tags are ignored or not.
+     */
+    public static final String CFGKEY_IGNORE_TAGS = "Ignore Tags";
 }

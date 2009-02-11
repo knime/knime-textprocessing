@@ -27,10 +27,13 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
+import org.knime.core.data.RowKey;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
@@ -51,6 +54,7 @@ import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.TermRowKeyTuple;
 
 /**
  * This class represents the super class of all text preprocessing node models
@@ -83,19 +87,19 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
     private int m_documentColIndex = -1;
 
+    private int m_origDocumentColIndex = -1;
+
     private int m_termColIndex = -1;
 
-    private BagOfWordsDataTableBuilder m_dtBuilder =
-        DataTableBuilderFactory.createBowDataTableBuilder();
+    private BagOfWordsDataTableBuilder m_dtBuilder;
 
-    private SettingsModelBoolean m_deepPreproModel =
-        PreprocessingNodeSettingsPane.getDeepPrepressingModel();
+    private SettingsModelBoolean m_deepPreproModel;
 
-    private SettingsModelBoolean m_appendIncomingModel =
-        PreprocessingNodeSettingsPane.getAppendIncomingDocument();
+    private SettingsModelBoolean m_appendIncomingModel;
 
-    private SettingsModelString m_documentColModel =
-        PreprocessingNodeSettingsPane.getDocumentColumnModel();
+    private SettingsModelString m_documentColModel;
+
+    private SettingsModelString m_origDocumentColModel;
 
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.
@@ -107,6 +111,26 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     public PreprocessingNodeModel() {
         super(1, 1);
+
+        m_dtBuilder = DataTableBuilderFactory.createBowDataTableBuilder();
+        m_deepPreproModel =
+            PreprocessingNodeSettingsPane.getDeepPrepressingModel();
+        m_appendIncomingModel =
+            PreprocessingNodeSettingsPane.getAppendIncomingDocument();
+        m_documentColModel =
+            PreprocessingNodeSettingsPane.getDocumentColumnModel();
+        m_origDocumentColModel =
+            PreprocessingNodeSettingsPane.getOrigDocumentColumnModel();
+
+        ChangeListener cl1 = new DefaultSwitchEventListener(m_documentColModel,
+                m_deepPreproModel);
+        m_deepPreproModel.addChangeListener(cl1);
+        cl1.stateChanged(null);
+
+        ChangeListener cl2 = new DefaultSwitchEventListener(
+                m_origDocumentColModel, m_appendIncomingModel);
+        m_appendIncomingModel.addChangeListener(cl2);
+        cl2.stateChanged(null);
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec)
@@ -114,7 +138,6 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
     }
 
@@ -144,9 +167,24 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
+        // search indices of document and original document columns.
         String docColName = m_documentColModel.getStringValue();
+        String origDocColName = m_origDocumentColModel.getStringValue();
         m_documentColIndex =
             inData[0].getDataTableSpec().findColumnIndex(docColName);
+        m_origDocumentColIndex =
+            inData[0].getDataTableSpec().findColumnIndex(origDocColName);
+
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
+        if (m_origDocumentColIndex < 0) {
+            throw new InvalidSettingsException(
+                   "Index of specified original document column is not valid!" 
+                    + " Check your settings!");
+        }        
 
         // initialize the underlying preprocessing
         initPreprocessing();
@@ -155,8 +193,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                     "Preprocessing instance may not be null!");
         }
 
-        Hashtable<Document, Set<Term>> docTerms =
-            new Hashtable<Document, Set<Term>>();
+        Hashtable<Document, Set<TermRowKeyTuple>> docTerms =
+            new Hashtable<Document, Set<TermRowKeyTuple>>();
         Hashtable<Document, Document> preprocessedDoc =
             new Hashtable<Document, Document>();
 
@@ -180,8 +218,10 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
             DataRow row = i.next();
 
+            RowKey rowKey = row.getKey();
             DataCell termcell = row.getCell(m_termColIndex);
             DataCell doccell = row.getCell(m_documentColIndex);
+            DataCell origDocCell = row.getCell(m_origDocumentColIndex);
 
             // handle missing value (ignore rows with missing values)
             if (termcell.isMissing() || doccell.isMissing()) {
@@ -189,9 +229,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             }
 
             Term term = ((TermValue)termcell).getTermValue();
-            Document doc = ((DocumentValue)doccell).
-                            getDocument();
-
+            Document doc = ((DocumentValue)doccell).getDocument();
             Document newDoc = null;
 
             //
@@ -244,17 +282,17 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             //
             // save new document and term to hashtable
             //
-            Set<Term> terms = docTerms.get(newDoc);
+            Set<TermRowKeyTuple> terms = docTerms.get(newDoc);
             if (terms == null) {
-                terms = new HashSet<Term>();
+                terms = new HashSet<TermRowKeyTuple>();
             }
 
-            terms.add(term);
+            terms.add(new TermRowKeyTuple(term, rowKey));
             docTerms.put(newDoc, terms);
 
             // save preprocessed document and original documentcell to hashtable
             if (preprocessedDocDocumentCell != null) {
-                preprocessedDocDocumentCell.put(newDoc, doccell);
+                preprocessedDocDocumentCell.put(newDoc, origDocCell);
             }
         }
 
@@ -276,6 +314,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         m_deepPreproModel.loadSettingsFrom(settings);
         m_appendIncomingModel.loadSettingsFrom(settings);
         m_documentColModel.loadSettingsFrom(settings);
+        m_origDocumentColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -286,6 +325,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         m_deepPreproModel.saveSettingsTo(settings);
         m_appendIncomingModel.saveSettingsTo(settings);
         m_documentColModel.saveSettingsTo(settings);
+        m_origDocumentColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -297,5 +337,6 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         m_deepPreproModel.validateSettings(settings);
         m_appendIncomingModel.validateSettings(settings);
         m_documentColModel.validateSettings(settings);
+        m_origDocumentColModel.validateSettings(settings);
     }
 }

@@ -17,14 +17,14 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.termtostring;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermToStringConfigKeys {
@@ -33,5 +33,5 @@ public class TermToStringConfigKeys {
      * The configuration key of the term column.
      */
     public static final String CFGKEY_TERMCOL = "TermColumn";
-    
+
 }

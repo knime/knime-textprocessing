@@ -17,7 +17,7 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   27.06.2008 (thiel): created
  */
@@ -29,14 +29,14 @@ import javax.swing.JPanel;
 import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
-    
+
     /**
      * Creates a new instance of <code>DocumentViewerNodeView</code>.
-     * 
+     *
      * @param model The model holding the documents to dosplay.
      */
     public DocumentViewerNodeView(final DocumentViewerNodeModel model) {
@@ -44,7 +44,7 @@ public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
         JPanel panel = new DocumentViewerTablePanel(model.getDocuments());
         setComponent(panel);
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -53,8 +53,9 @@ public class DocumentCellDataTableBuilder extends DocumentDataTableBuilder {
      */
     public DataTableSpec createDataTableSpec() {
         // create DataTableSpec for output DataTable
-        DataColumnSpecCreator dcscDocs =
-                new DataColumnSpecCreator("Document", DocumentCell.TYPE);
+        DataColumnSpecCreator dcscDocs = new DataColumnSpecCreator(
+                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                DocumentCell.TYPE);
         return new DataTableSpec(dcscDocs.createSpec());
     }    
     

@@ -17,14 +17,14 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   08.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.frequencies;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FrequenciesConfigKeys {
