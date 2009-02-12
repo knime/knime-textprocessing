@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2008
+ * Copyright, 2003 - 2009
  * University of Konstanz, Germany
  * and KNIME GmbH, Konstanz, Germany
  *
@@ -21,6 +21,7 @@
  *   24.10.2008 (kilian): created
  */
 package org.knime.ext.textprocessing.util;
+
 
 import org.knime.core.data.RowKey;
 import org.knime.ext.textprocessing.data.Term;
