@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../../../../../icons/TextProcDocumentView.png" type="Visualizer">
+	<name>Document Viewer</name>
+	
+	<shortDescription>
+		Displays all data of the given documents, like text, authors, 
+		publication date and so on. 
+	</shortDescription>
+	
+	<fullDescription>
+	<intro>
+        First a list of all document titles is shown. A double click on a
+        certain title opens an additional window, showing the details of the
+        selected document. All the information of the document are shown, 
+        which are, title, text, journal title, author names, publication date,
+        file name, category, source and type.
+	</intro>
+	<option name="Document Col">
+	   Specifies the document column containing the documents to show.
+	</option>
+
+	</fullDescription>
+	<ports>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains terms and documents.</inPort>
+	</ports>	
+	
+    <views>
+        <view index="0" name="Document View">
+            Displays the data of a document.
+        </view>
+    </views>	
+</knimeNode>
+

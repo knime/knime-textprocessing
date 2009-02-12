@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../../../../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Abner Filter</name>
+    <shortDescription>Filters terms with biomedical named entity tags not 
+    specified as valid.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Filters all terms contained in the given bag of words (input table) 
+            that have biomedical named entity (BNER) tags assigned which are 
+            not specified as valid. The terms are filtered out of the bag of 
+            words and the documents as well if deep preprocessing is checked.
+            <br />
+            To detect biomedical named entities, the ABNER 
+            (A Biomedical Named Entity Recognizer) Software is used
+            (see http://pages.cs.wisc.edu/~bsettles/abner/ for details).
+            <br />
+            A term is kept if at least one of its assigned BNER tags is a valid 
+            tag. If strict filtering is set, all assigned BNER tags of a term 
+            have to be valid. 
+        </intro>
+        
+        <option name="Strict filtering">
+             If strict filtering is checked, all tags (of a certain type) of the
+             term have to be valid. If setting is not checked, at least
+             one tag has to be valid.
+        </option>
+        <option name="Tags">
+             The tags to use as valid tags.
+        </option>
+        
+        <option name="Document column">
+              Specifies the column containing the documents to preprocess.
+        </option>
+        <option name="Deep preprocessing">
+             If deep preprocessing is checked, the terms contained inside
+             the documents are converted too, this means that the documents are
+             changed, which is more time consuming. 
+        </option>
+        <option name="Append original document">
+            If append original document is checked, the documents contained in
+            the input document column are appended as extra column. This
+            enables later on a mapping of preprocessed documents to original
+            documents.  
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains the terms to filter.</inPort>
+        <outPort name="Filtered terms and related documents output table" index="0">
+        The output table which contains the filtered terms.
+        </outPort>
+    </ports>
+</knimeNode>

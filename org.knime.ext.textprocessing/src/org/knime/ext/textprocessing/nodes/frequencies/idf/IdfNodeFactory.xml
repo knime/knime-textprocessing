@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../../../../../icons/TextProcFrequencies.png" type="Learner">
+	<name>IDF</name>
+	
+	<shortDescription>
+		Computes the inverse document frequency (idf) of each term according to 
+		the given set of documents and adds a column containing the idf value.
+	</shortDescription>
+	
+	<fullDescription>
+	<intro>
+        Computes the inverse document frequency (idf) of each term according to 
+        the given set of documents and adds a column containing the idf value.
+        The value for term ti is computed as follows: 
+        idf(ti) = log(1 + (f(D) / f(d, ti)), <br/>
+        where f(D) is the number of all documents and f(d, ti) is the number of
+        documents containing term ti.
+	</intro>
+    <option name="Document Column">
+       Specifies the document column to use for frequency couting.
+    </option>
+
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains terms and documents.</inPort>
+        <outPort name="Terms and documents output table" index="0">
+        The output table which contains terms documents and a corresponding 
+        frequency value.
+        </outPort>
+	</ports>	
+</knimeNode>
+
