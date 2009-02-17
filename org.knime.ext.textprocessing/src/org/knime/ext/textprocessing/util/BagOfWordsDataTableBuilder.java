@@ -204,7 +204,8 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
           appendExtraDocCol = true;
       }
       BufferedDataContainer dc = exec.createDataContainer(
-              this.createDataTableSpec(appendExtraDocCol));
+              BagOfWordsDataTableBuilder.createDataTableSpec(
+                      appendExtraDocCol));
 
       int i = 1;
       Set<Document> keys = docTerms.keySet();

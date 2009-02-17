@@ -51,7 +51,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelBoolean getDeepPrepressingModel() {
         return new SettingsModelBoolean(
                 PreprocessingConfigKeys.CFG_KEY_DEEP_PREPRO,
-                PreprocessingNodeModel.DEF_DEEP_PREPRO);
+                ThreadedPreprocessingNodeModel.DEF_DEEP_PREPRO);
     }
     
     /**
@@ -62,7 +62,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelBoolean getAppendIncomingDocument() {
         return new SettingsModelBoolean(
                 PreprocessingConfigKeys.CFG_KEY_APPEND_INCOMING,
-                PreprocessingNodeModel.DEF_APPEND_INCOMING);
+                ThreadedPreprocessingNodeModel.DEF_APPEND_INCOMING);
     }
     
     /**
