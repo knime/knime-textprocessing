@@ -23,14 +23,14 @@
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import opennlp.tools.lang.english.SentenceDetector;
 
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A tokenizer which is able to detect sentences and and provides a tokenization
@@ -63,7 +63,7 @@ public class OpenNlpSentenceTokenizer implements Tokenizer {
     /**
      * {@inheritDoc}
      */
-    public List<String> tokenize(final String text) {
+    public synchronized List<String> tokenize(final String text) {
         if (m_tokenizer != null) {
             return Arrays.asList(m_tokenizer.sentDetect(text));
         }

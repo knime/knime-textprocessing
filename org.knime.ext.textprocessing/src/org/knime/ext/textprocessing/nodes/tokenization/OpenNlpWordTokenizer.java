@@ -23,12 +23,12 @@
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
 /**
  * A tokenizer which is able to detect words and and provides a tokenization
@@ -60,7 +60,7 @@ public class OpenNlpWordTokenizer implements Tokenizer {
     /**
      * {@inheritDoc}
      */
-    public List<String> tokenize(final String sentence) {
+    public synchronized List<String> tokenize(final String sentence) {
         if (m_tokenizer != null) {
             return Arrays.asList(m_tokenizer.tokenize(sentence));
         }

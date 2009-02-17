@@ -33,13 +33,19 @@ package org.knime.ext.textprocessing.nodes.tokenization;
  */
 public final class DefaultTokenization {
         
+    private static OpenNlpWordTokenizer WORD_TOKENIZER = 
+        new OpenNlpWordTokenizer();
+    
+    private static OpenNlpSentenceTokenizer SENTENCE_TOKENIZER = 
+        new OpenNlpSentenceTokenizer();
+    
     private DefaultTokenization() { }
     
     public static final Tokenizer getSentenceTokenizer() {
-        return new OpenNlpSentenceTokenizer(); 
+        return SENTENCE_TOKENIZER;
     }
 
     public static final Tokenizer getWordTokenizer() {
-        return new OpenNlpWordTokenizer(); 
+        return WORD_TOKENIZER; 
     }
 }
