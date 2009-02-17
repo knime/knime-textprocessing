@@ -23,12 +23,19 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import java.util.List;
-
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentBlobCell;
+
+import java.util.List;
 
 /**
  * Provides convenient methods that create 
@@ -37,17 +44,22 @@ import org.knime.ext.textprocessing.data.Document;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class DocumentDataTableBuilder implements DataTableBuilder {
+public class DocumentDataTableBuilder implements DataTableBuilder {
 
     /**
      * The default document column name in document data tables.
      */
     public static final String DEF_DOCUMENT_COLNAME = "Document";
     
+    private final TextContainerDataCellFactory m_documentCellFac;
+    
     /**
      * Empty constructor of <code>DocumentDataTableBuilder</code>.
      */
-    public DocumentDataTableBuilder() { }
+    public DocumentDataTableBuilder() { 
+        m_documentCellFac =
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+    }
     
     /**
      * Creates and returns a {@link org.knime.core.node.BufferedDataTable} 
@@ -63,7 +75,44 @@ public abstract class DocumentDataTableBuilder implements DataTableBuilder {
      * documents. 
      * @throws CanceledExecutionException If execution was canceled.
      */
-    public abstract BufferedDataTable createDataTable(
-            final ExecutionContext exec, final List<Document> docs) 
-    throws CanceledExecutionException;
+    public BufferedDataTable createDataTable(ExecutionContext exec,
+            List<Document> docs) throws CanceledExecutionException {
+      // create cache
+      FullDataCellCache cache = new FullDataCellCache(m_documentCellFac);
+      
+      BufferedDataContainer dc =
+              exec.createDataContainer(this.createDataTableSpec());
+
+      int i = 1;
+      for (Document d : docs) {
+          exec.checkCanceled();
+          RowKey rowKey = new RowKey(new Integer(i).toString());
+          DocumentBlobCell docCell = (DocumentBlobCell)cache.getInstance(d);
+          DataRow row = new DefaultRow(rowKey, docCell);
+          dc.addRowToTable(row);
+          i++;
+      }
+      dc.close();
+
+      cache.reset();
+      docs.clear();
+      
+      return dc.getTable();
+    }
+
+    /**
+     * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
+     * containing just one column of type <code>Document(Blob)Cell</code> to
+     * store text documents.
+     * 
+     * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
+     *         with just one column of type <code>Document(Blob)Cell</code>.
+     */
+    public DataTableSpec createDataTableSpec() {
+        // create DataTableSpec for output DataTable
+        DataColumnSpecCreator dcscDocs = new DataColumnSpecCreator(
+                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                m_documentCellFac.getDataType());
+        return new DataTableSpec(dcscDocs.createSpec());
+    } 
 }

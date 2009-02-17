@@ -22,22 +22,22 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
  * @author kilian, University of Konstanz
  */
-public class RegExReplacerNodeModel extends PreprocessingNodeModel {
+public class RegExReplacerNodeModel extends ThreadedPreprocessingNodeModel {
 
     /**
      * The default regular expression (an empty string).

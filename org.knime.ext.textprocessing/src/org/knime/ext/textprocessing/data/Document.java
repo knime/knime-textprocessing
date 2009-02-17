@@ -416,7 +416,10 @@ public class Document implements TextContainer, Serializable {
             return false;
         }
         Document d = (Document)o;
-
+        if (this == d) {
+            return true;
+        }
+        
         if ((d.getSources() == null && m_sources != null) 
                 || !d.getSources().equals(m_sources)) {
             return false;

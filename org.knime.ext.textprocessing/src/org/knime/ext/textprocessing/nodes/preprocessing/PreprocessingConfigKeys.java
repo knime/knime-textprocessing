@@ -50,4 +50,9 @@ public class PreprocessingConfigKeys {
      * to append unchanged (if specified).
      */
     public static final String CFG_KEY_ORIGDOCUMENT_COL = "OriginalDocCol";
+    
+    /**
+     * The configuration key for the chunk size to use.
+     */
+    public static final String CFG_KEY_CHUNK_SIZE = "ChunkSize";
 }

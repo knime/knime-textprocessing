@@ -24,6 +24,7 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataType;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.TextContainer;
@@ -51,5 +52,20 @@ public class DocumentBlobDataCellFactory implements
             dc = new DocumentBlobCell((Document)tc);
         }
         return dc;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DataType getDataType() {
+        return DocumentBlobCell.TYPE;
+    }
+
+    @Override
+    public boolean validateCellType(final DataCell cell) {
+        if (cell instanceof DocumentBlobCell) {
+            return true;
+        }
+        return false;
     }
 }

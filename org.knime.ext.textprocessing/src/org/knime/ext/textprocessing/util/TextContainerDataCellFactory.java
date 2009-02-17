@@ -24,6 +24,7 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataType;
 import org.knime.ext.textprocessing.data.TextContainer;
 
 /**
@@ -56,4 +57,16 @@ public interface TextContainerDataCellFactory {
      */
     public DataCell createDataCell(final TextContainer tc);
 
+    /**
+     * Returns the type of the DataCell(s) which will be created by this
+     * factory.
+     * @return The data type of the cells this factory creates.
+     */
+    public DataType getDataType();
+    
+    /**
+     * Returns false if given data cell is not compatible with expected
+     * type.
+     */
+    public boolean validateCellType(final DataCell cell);
 }

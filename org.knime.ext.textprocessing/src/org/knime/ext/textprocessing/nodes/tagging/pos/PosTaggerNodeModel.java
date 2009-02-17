@@ -23,11 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.pos;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -42,9 +37,13 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The node model of the POS (part of speech) tagger. Extends 
@@ -65,7 +64,7 @@ public class PosTaggerNodeModel extends NodeModel {
      */
     public PosTaggerNodeModel() {
         super(1, 1);
-        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
+        m_dtBuilder = new DocumentDataTableBuilder();
     }
     
     /**

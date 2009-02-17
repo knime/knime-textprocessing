@@ -23,16 +23,16 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The model of the N chars filter model, specifying the proper preprocessing
@@ -40,7 +40,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilterNodeModel extends PreprocessingNodeModel {
+public class NCharsFilterNodeModel extends ThreadedPreprocessingNodeModel {
 
     /**
      * The minimum number of N to specify.

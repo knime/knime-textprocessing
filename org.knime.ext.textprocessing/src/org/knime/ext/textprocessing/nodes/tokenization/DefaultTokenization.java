@@ -23,7 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import java.util.List;
 
 
 /**
@@ -33,44 +32,14 @@ import java.util.List;
  * @author Kilian Thiel, University of Konstanz
  */
 public final class DefaultTokenization {
-    
-    /**
-     * The default sentence tokenizer.
-     */
-    public static final Tokenizer SENTENCE_TOKENIZER = 
-        new OpenNlpSentenceTokenizer();
-    
-    /**
-     * The default word tokenizer.
-     */
-    public static final Tokenizer WORD_TOKENIZER = 
-        new OpenNlpWordTokenizer();
-    
-    
+        
     private DefaultTokenization() { }
     
-    
-    /**
-     * Provides the default sentence tokenization, which detects sentences
-     * in the given text  and returns them as a list of strings, each sentences 
-     * as one string.
-     * 
-     * @param text The text to tokenize.
-     * @return The list of sentences as strings.
-     */
-    public static List<String> detectSentences(final String text) {
-        return SENTENCE_TOKENIZER.tokenize(text);
+    public static final Tokenizer getSentenceTokenizer() {
+        return new OpenNlpSentenceTokenizer(); 
     }
-    
-    /**
-     * Provides the default word tokenization, which detects the words of the
-     * given sentence and returns them as a list of strings, each word as one
-     * string.
-     * 
-     * @param sentence The sentence to tokenize.
-     * @return The tokenzied sentence as a list of tokens.
-     */
-    public static List<String> tokenizeSentence(final String sentence) {
-        return WORD_TOKENIZER.tokenize(sentence);
+
+    public static final Tokenizer getWordTokenizer() {
+        return new OpenNlpWordTokenizer(); 
     }
 }

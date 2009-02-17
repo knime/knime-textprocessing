@@ -23,13 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -38,13 +31,20 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class StopwordFilterNodeModel extends PreprocessingNodeModel {
+public class StopwordFilterNodeModel extends ThreadedPreprocessingNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger
     .getLogger(StopwordFilterNodeModel.class);

@@ -27,7 +27,7 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsBlobCellDataTableBuilder;
+import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 
 /**
  * 
@@ -43,7 +43,7 @@ public class CategoryToClassNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelString getDocumentColModel() {
         return new SettingsModelString(
                 CategoryToClassConfigKeys.CFG_KEY_DOCUMENT_COL, 
-                BagOfWordsBlobCellDataTableBuilder.DEF_DOCUMENT_COLNAME);
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
     }
     
     /**

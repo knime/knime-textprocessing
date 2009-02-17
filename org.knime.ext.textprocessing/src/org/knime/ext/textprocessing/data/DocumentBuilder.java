@@ -23,14 +23,15 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
 /**
  * A utility class which helps building up a 
@@ -86,7 +87,11 @@ public class DocumentBuilder {
     private Set<DocumentCategory> m_categories = 
         new HashSet<DocumentCategory>();
     
+    private Tokenizer m_sentenceTokenizer = 
+        DefaultTokenization.getSentenceTokenizer();
     
+    private Tokenizer m_wordTokenizer = 
+        DefaultTokenization.getWordTokenizer();
     
     /**
      * Creates new empty instance of <code>DocumentBuilder</code>.
@@ -407,8 +412,7 @@ public class DocumentBuilder {
     private Section internalAddSection(final String section, 
             final SectionAnnotation annotation) {
         if (section != null && section.length() > 0 && !section.equals("")) {
-            List<String> strSentences =
-                    DefaultTokenization.detectSentences(section);
+            List<String> strSentences = m_sentenceTokenizer.tokenize(section);
             List<Sentence> sentences = new ArrayList<Sentence>();
             for (String s : strSentences) {
                 sentences.add(internalAddSentence(s));
@@ -430,8 +434,7 @@ public class DocumentBuilder {
      */
     private Paragraph internalAddParagraph(final String paragraph) {
         if (paragraph != null && paragraph.length() > 0) {
-            List<String> strSentences =
-                    DefaultTokenization.detectSentences(paragraph);
+            List<String> strSentences = m_sentenceTokenizer.tokenize(paragraph);
             List<Sentence> sentences = new ArrayList<Sentence>();
             for (String s : strSentences) {
                 sentences.add(internalAddSentence(s));
@@ -450,7 +453,7 @@ public class DocumentBuilder {
      */
     private Sentence internalAddSentence(final String sentence) {
         if (sentence != null) {
-            List<String> tokens = DefaultTokenization.tokenizeSentence(sentence);
+            List<String> tokens = m_wordTokenizer.tokenize(sentence);
             return internalAddSentence(tokens);
         }
         return null;
@@ -490,57 +493,4 @@ public class DocumentBuilder {
     public List<Section> getSections() {
         return Collections.unmodifiableList(m_sections);
     }
-    
-    
-    
-    
-//    /**
-//     * Creates the word cache by running through all words of the document and 
-//     * storing them as keys into the cache <code>Hashtable</code>, which is 
-//     * returned. As values a list of term is build, containing all the terms 
-//     * which consist of the current word. 
-//     * 
-//     * @param doc The document containing the text to build the cache out of.
-//     * @return The word cache as <code>Hashtable</code> with words as keys
-//     * and a lists of terms, containing the words as values.
-//     */
-//    public static Hashtable<Word, List<Term>> buildWordCache(
-//            final Document doc) {
-//        List<Section> sections = doc.getSections();
-//        Hashtable<Word, List<Term>> cache = new Hashtable<Word, List<Term>>();
-//        
-//        // Through all sections
-//        for (Section s : sections) {
-//            
-//            // Through all paragraphs
-//            List<Paragraph> paragraphs = s.getParagraphs();
-//            for (Paragraph p : paragraphs) {
-//                
-//                // Through all sentences
-//                List<Sentence> sentences = p.getSentences();
-//                for (Sentence sn : sentences) {
-//                    
-//                    // Through all terms
-//                    List<Term> terms = sn.getTerms();
-//                    for (Term t : terms) {
-//                        
-//                        // Through all words
-//                        List<Word> words = t.getWords();
-//                        for (Word w : words) {
-//                            
-//                            // word exists in cache add term to trm list
-//                            if (cache.containsKey(w)) {
-//                                cache.get(w).add(t);
-//                            } else {
-//                                List<Term> list = new ArrayList<Term>();
-//                                list.add(t);
-//                                cache.put(w, list);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return cache;
-//    }
 }

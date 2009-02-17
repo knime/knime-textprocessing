@@ -24,6 +24,7 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataType;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.TextContainer;
@@ -52,4 +53,16 @@ public class DocumentDataCellFactory implements TextContainerDataCellFactory {
         return dc;
     }
 
+    @Override
+    public DataType getDataType() {
+        return DocumentCell.TYPE;
+    }
+
+    @Override
+    public boolean validateCellType(final DataCell cell) {
+        if (cell instanceof DocumentCell) {
+            return true;
+        }
+        return false;
+    }
 }

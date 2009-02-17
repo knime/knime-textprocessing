@@ -24,10 +24,6 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
@@ -38,6 +34,10 @@ import org.knime.core.data.StringValue;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A {@link org.knime.core.data.DataCell} implementation holding a 

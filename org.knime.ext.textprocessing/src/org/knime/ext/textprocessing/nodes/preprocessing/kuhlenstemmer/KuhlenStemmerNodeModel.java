@@ -23,18 +23,18 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class KuhlenStemmerNodeModel extends PreprocessingNodeModel {
+public class KuhlenStemmerNodeModel extends ThreadedPreprocessingNodeModel {
 
     /**
      * {@inheritDoc}

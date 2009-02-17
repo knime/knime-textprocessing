@@ -23,11 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -42,8 +37,12 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
-import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -110,7 +109,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     public DocumentGrabberNodeModel() {
         super(0, 1);
-        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
+        m_dtBuilder = new DocumentDataTableBuilder();
     }
     
 

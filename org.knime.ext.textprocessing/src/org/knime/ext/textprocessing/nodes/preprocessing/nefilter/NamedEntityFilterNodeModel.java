@@ -23,23 +23,23 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.nefilter;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The model of the named entity filter node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NamedEntityFilterNodeModel extends PreprocessingNodeModel {
+public class NamedEntityFilterNodeModel extends ThreadedPreprocessingNodeModel {
 
     /**
      * The default setting of filtering of modifiable terms.

@@ -160,6 +160,9 @@ public class Term implements TextContainer, Serializable {
             return false;
         }
         Term t = (Term)o;
+        if (this == t) {
+            return true;
+        }
 
         if (!t.getWords().equals(getWords())) {
             return false;

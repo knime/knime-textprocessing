@@ -23,15 +23,17 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsBlobCellDataTableBuilder;
+import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+
+import javax.swing.event.ChangeListener;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane}
@@ -70,7 +72,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(
                 PreprocessingConfigKeys.CFG_KEY_DOCUMENT_COL,
-                BagOfWordsBlobCellDataTableBuilder.DEF_DOCUMENT_COLNAME);
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
     }
     
     /**
@@ -80,7 +82,15 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelString getOrigDocumentColumnModel() {
         return new SettingsModelString(
                 PreprocessingConfigKeys.CFG_KEY_ORIGDOCUMENT_COL,
-                BagOfWordsBlobCellDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME);
+                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME);
+    }
+    
+    public static SettingsModelIntegerBounded getChunkSizeModel() {
+        return new SettingsModelIntegerBounded(
+                PreprocessingConfigKeys.CFG_KEY_CHUNK_SIZE,
+                ThreadedPreprocessingNodeModel.DEF_CHUNK_SIZE,
+                ThreadedPreprocessingNodeModel.MIN_CHUNK_SIZE,
+                ThreadedPreprocessingNodeModel.MAX_CHUNK_SIZE);
     }
     
     /**
@@ -91,7 +101,11 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         removeTab("Options");
         createNewTabAt("Preprocessing", 1);
           
+        //
         // document to preprocess and deep preprocessing
+        //
+        createNewGroup("Deep preprocessing");
+        
         SettingsModelBoolean deepPreproModel = getDeepPrepressingModel();
         DialogComponentBoolean comp1 = new DialogComponentBoolean(
                 deepPreproModel, "Deep preprocessing");
@@ -111,7 +125,13 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
                 documentColModel, deepPreproModel);
         deepPreproModel.addChangeListener(cl1);
         
+        closeCurrentGroup();
+        
+        //
         // original document to append and append setting
+        //
+        createNewGroup("Appending");
+        
         SettingsModelBoolean appendOrigDocModel = getAppendIncomingDocument(); 
         DialogComponentBoolean comp2 = new DialogComponentBoolean(
                 appendOrigDocModel, "Append unchanged documents");
@@ -133,5 +153,17 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         
         cl1.stateChanged(null);
         cl2.stateChanged(null);
+        
+        closeCurrentGroup();
+        
+        //
+        // chunk size
+        //
+        createNewGroup("Chunking");
+        
+        addDialogComponent(new DialogComponentNumber(
+                getChunkSizeModel(), "Chunk size", 1000));
+        
+        closeCurrentGroup();
     }
 }

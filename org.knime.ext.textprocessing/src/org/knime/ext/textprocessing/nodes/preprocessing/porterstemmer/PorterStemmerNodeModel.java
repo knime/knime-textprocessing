@@ -23,18 +23,18 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PorterStemmerNodeModel extends PreprocessingNodeModel {
+public class PorterStemmerNodeModel extends ThreadedPreprocessingNodeModel {
 
     /**
      * {@inheritDoc}

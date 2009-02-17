@@ -23,15 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
-
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -48,8 +39,16 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 
 /**
@@ -124,7 +123,7 @@ public class DocumentParserNodeModel extends NodeModel {
         super(0, 1);
         m_parser = parser;
         m_validExtensions = Arrays.asList(validFileExtensions);
-        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
+        m_dtBuilder = new DocumentDataTableBuilder();
     }
     
     /**

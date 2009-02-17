@@ -35,6 +35,7 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
 /**
  * The abstract class <code>AbstractDocumentTagger</code> implements the
@@ -68,6 +69,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      * The case sensitive flag.
      */
     protected boolean m_caseSensitive = true;
+    
+    protected Tokenizer m_wordTokenizer = 
+        DefaultTokenization.getWordTokenizer();
 
     /**
      * Constructor of <code>AbstractDocumentTagger</code> with the given flag
@@ -161,8 +165,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         for (TaggedEntity entity : entities) {
             // named entity can contain one or more words, so they have to be
             // tokenized by the default tokenizer to create words out of them.
-            List<String> neWords = DefaultTokenization.tokenizeSentence(
-                    entity.getEntity());
+            List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
 
             // build new term list with old term list, words of detected named
             // entities and entity tag.

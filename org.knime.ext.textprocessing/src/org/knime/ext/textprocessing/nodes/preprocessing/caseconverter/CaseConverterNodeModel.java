@@ -23,22 +23,22 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.caseconverter;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class CaseConverterNodeModel extends PreprocessingNodeModel {
+public class CaseConverterNodeModel extends ThreadedPreprocessingNodeModel {
 
     /**
      * The default case to convert to (lower case).

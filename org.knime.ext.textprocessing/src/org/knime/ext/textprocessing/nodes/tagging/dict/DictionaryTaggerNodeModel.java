@@ -23,15 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -49,9 +40,17 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The model class of the dictionary based named entity recognizer.
@@ -100,7 +99,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
      */
     public DictionaryTaggerNodeModel() {
         super(1, 1);
-        m_dtBuilder = DataTableBuilderFactory.createDocumentDataTableBuilder();
+        m_dtBuilder = new DocumentDataTableBuilder();
     }
     
     /**

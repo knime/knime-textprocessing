@@ -24,6 +24,7 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataType;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.TextContainer;
@@ -52,4 +53,16 @@ public class TermDataCellFactory implements TextContainerDataCellFactory {
         return dc;
     }
 
+    @Override
+    public DataType getDataType() {
+        return TermCell.TYPE;
+    }
+
+    @Override
+    public boolean validateCellType(final DataCell cell) {
+        if (cell instanceof TermCell) {
+            return true;
+        }
+        return false;
+    }
 }

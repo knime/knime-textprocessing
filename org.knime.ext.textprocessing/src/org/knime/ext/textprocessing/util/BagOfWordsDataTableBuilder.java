@@ -23,10 +23,8 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import java.util.Hashtable;
-import java.util.Set;
-
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
@@ -41,6 +39,9 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 
+import java.util.Hashtable;
+import java.util.Set;
+
 /**
  * Provides convenient methods that create
  * {@link org.knime.core.node.BufferedDataTable}s containing
@@ -50,7 +51,7 @@ import org.knime.ext.textprocessing.data.TermCell;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
+public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
 
     /**
      * The default document column name in bow data tables.
@@ -66,29 +67,59 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * The default term column name in bow data tables.
      */
     public static final String DEF_TERM_COLNAME = "Term";
+    
+    private final TextContainerDataCellFactory m_documentCellFac;
 
     /**
      * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
      */
     public BagOfWordsDataTableBuilder() {
-        // Empty constructor
+        m_documentCellFac = 
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
     }
 
     /**
-     * @param appendExtraDocCol if <code>true</code> an extra document column
-     * will be appended.
-     * @return The <code>DataTableSpec</code> of the data table build by the
-     * underlying implementation.
+     * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
+     * containing minimum one column of type <code>DocumentCell</code> to
+     * store text documents and one column of type <code>TermCell</code>
+     * representing the terms contained by a certain document.
+     * @param appendExtraDocCol if set <code>true</code> an additional column
+     * containing <code>DocumentCell</code> is appended.
+     * 
+     * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
+     *         with one column of type <code>DocumentListCell</code> and one
+     *         column of type <code>TermCell</code>.
      */
-    public abstract DataTableSpec createDataTableSpec(
-            final boolean appendExtraDocCol);
+    public static final DataTableSpec createDataTableSpec(
+            final boolean appendExtraDocCol) {
+        TextContainerDataCellFactory documentCellFac = 
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        
+        // create DataTableSpec for output DataTable
+        DataColumnSpecCreator docs = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                documentCellFac.getDataType());
+        DataColumnSpecCreator docs2 = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME, 
+                documentCellFac.getDataType());        
+        DataColumnSpecCreator terms = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
+                TermCell.TYPE);
+        
+        if (!appendExtraDocCol) {
+            return new DataTableSpec(terms.createSpec(), docs.createSpec());
+        }
+        return new DataTableSpec(terms.createSpec(), docs.createSpec(), 
+                docs2.createSpec());
+    }
 
     /**
      * @return The corresponding factory creating a certain kind of
      * <code>DataCell</code>s containing documents.
      */
-    protected abstract TextContainerDataCellFactory
-        getDocumentCellDataFactory();
+    protected final TextContainerDataCellFactory getDocumentCellDataFactory() {
+        return m_documentCellFac;
+    }
 
     /**
      * Validates the cell type of a document i.e. underlying implementations ca
@@ -97,8 +128,10 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * @return <code>false</code> if given <code>DataCell</code> has not a
      * valid type, otherwise <code>true</code>.
      */
-    protected abstract boolean validateDocumentCellType(
-            final DataCell documentCell);
+    protected final boolean validateDocumentCellType(
+            final DataCell documentCell) {
+        return m_documentCellFac.validateCellType(documentCell);
+    }
 
 
 
@@ -308,5 +341,10 @@ public abstract class BagOfWordsDataTableBuilder implements DataTableBuilder {
         docTerms.clear();
 
         return dc.getTable();
+    }
+
+    @Override
+    public DataTableSpec createDataTableSpec() {
+        return BagOfWordsDataTableBuilder.createDataTableSpec(false);
     }
 }

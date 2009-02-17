@@ -23,13 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -47,8 +40,14 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
-import org.knime.ext.textprocessing.util.DataTableBuilderFactory;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * The model class of the Bag of word creator node. The method
@@ -75,7 +74,7 @@ public class BagOfWordsNodeModel extends NodeModel {
      */
     public BagOfWordsNodeModel() {
         super(1, 1);
-        m_dtBuilder = DataTableBuilderFactory.createBowDataTableBuilder();
+        m_dtBuilder = new BagOfWordsDataTableBuilder();
     }
 
     /**

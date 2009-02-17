@@ -45,8 +45,18 @@ public class DocumentValueComparator extends DataValueComparator {
      */
     @Override
     protected int compareDataValues(final DataValue v1, final DataValue v2) {
-        String str1 = ((DocumentValue)v1).getDocument().getText();
-        String str2 = ((DocumentValue)v2).getDocument().getText();
+        if (v1 == v2) {
+            return 0;
+        }
+        String str1 = ((DocumentValue)v1).getDocument().getTitle();
+        String str2 = ((DocumentValue)v2).getDocument().getTitle();
+        int res = str1.compareTo(str2);
+        if (res != 0) {
+            return res;
+        }
+        
+        str1 = ((DocumentValue)v1).getDocument().getText();
+        str2 = ((DocumentValue)v2).getDocument().getText();
         return str1.compareTo(str2);
     }
 }
