@@ -55,4 +55,10 @@ public class PreprocessingConfigKeys {
      * The configuration key for the chunk size to use.
      */
     public static final String CFG_KEY_CHUNK_SIZE = "ChunkSize";
+    
+    /**
+     * The configuration key for the "preprocess unmodifiable terms" flag.
+     */
+    public static final String CFG_KEY_PREPRO_UNMODIFIABLE = 
+        "Preprocess Unmodifiable";
 }

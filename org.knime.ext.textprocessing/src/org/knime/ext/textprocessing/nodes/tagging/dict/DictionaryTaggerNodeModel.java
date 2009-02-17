@@ -109,6 +109,12 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
+        File file = new File(m_fileModel.getStringValue());
+        if (!file.exists() || !file.canRead()) {
+            throw new InvalidSettingsException(
+                    "Specified dictionary file does not exist!");
+        }
+        
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
@@ -137,6 +143,9 @@ public class DictionaryTaggerNodeModel extends NodeModel {
                 namedEntities.add(line.trim());
             }
             br.close();
+        } else {
+            throw new InvalidSettingsException(
+                    "Specified dictionary file does not exist!");
         }
         
         List<Document> newDocuments = new ArrayList<Document>();

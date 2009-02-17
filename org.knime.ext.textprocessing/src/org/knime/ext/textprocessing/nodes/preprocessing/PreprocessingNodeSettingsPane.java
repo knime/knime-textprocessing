@@ -93,6 +93,12 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
                 ThreadedPreprocessingNodeModel.MAX_CHUNK_SIZE);
     }
     
+    public static SettingsModelBoolean getPreprocessUnmodifiableModel() {
+        return new SettingsModelBoolean(
+                PreprocessingConfigKeys.CFG_KEY_PREPRO_UNMODIFIABLE,
+                ThreadedPreprocessingNodeModel.DEF_PREPRO_UNMODIFIABLE);
+    }
+    
     /**
      * Creates new instance of <code>PreprocessingNodeSettingsPane</code>.
      */
@@ -100,7 +106,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public PreprocessingNodeSettingsPane() {
         removeTab("Options");
         createNewTabAt("Preprocessing", 1);
-          
+                
         //
         // document to preprocess and deep preprocessing
         //
@@ -163,6 +169,17 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         
         addDialogComponent(new DialogComponentNumber(
                 getChunkSizeModel(), "Chunk size", 1000));
+        
+        closeCurrentGroup();
+        
+        //
+        // preprocess unmodifiable terms
+        //
+        createNewGroup("Unmodifiable policy");
+        
+        addDialogComponent(new DialogComponentBoolean(
+                getPreprocessUnmodifiableModel(), 
+                "Ignore unmodifiable flag"));
         
         closeCurrentGroup();
     }

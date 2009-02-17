@@ -82,6 +82,11 @@ import javax.swing.event.ChangeListener;
 public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
 
     /**
+     * The default settings for prerprocessing unmodifiable terms.
+     */
+    public static final boolean DEF_PREPRO_UNMODIFIABLE = false;
+    
+    /**
      * The default setting for deep preprocessing (<code>true</code>).
      */
     public static final boolean DEF_DEEP_PREPRO = true;
@@ -125,6 +130,8 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     private SettingsModelString m_origDocumentColModel;
     
     private SettingsModelIntegerBounded m_chunkSize;
+    
+    private SettingsModelBoolean m_preproUnModifiable;
 
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.
@@ -171,6 +178,8 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_origDocumentColModel =
             PreprocessingNodeSettingsPane.getOrigDocumentColumnModel();
         m_chunkSize = PreprocessingNodeSettingsPane.getChunkSizeModel();
+        m_preproUnModifiable = 
+            PreprocessingNodeSettingsPane.getPreprocessUnmodifiableModel();
         
         ChangeListener cl1 = new DefaultSwitchEventListener(m_documentColModel,
                 m_deepPreproModel);
@@ -291,6 +300,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
                 // just catch ...
             }
             
+            boolean ignoreUnMod = m_preproUnModifiable.getBooleanValue();
             DataCell newDocCell = null;            
             Iterator<DataRow> i = m_chunk.iterator();
             while (i.hasNext()) {
@@ -318,7 +328,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
                 // do the preprocessing twist
                 //
                 // is the term unmodifiable ???
-                if (!term.isUnmodifiable()) {
+                if (!term.isUnmodifiable() || ignoreUnMod) {
                     term = m_preprocessing.preprocess(term);
 
                     // if term is null or empty continue with next term !
@@ -396,6 +406,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_documentColModel.loadSettingsFrom(settings);
         m_origDocumentColModel.loadSettingsFrom(settings);
         m_chunkSize.loadSettingsFrom(settings);
+        m_preproUnModifiable.loadSettingsFrom(settings);
     }
 
     /**
@@ -408,6 +419,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_documentColModel.saveSettingsTo(settings);
         m_origDocumentColModel.saveSettingsTo(settings);
         m_chunkSize.saveSettingsTo(settings);
+        m_preproUnModifiable.saveSettingsTo(settings);
     }
 
     /**
@@ -421,5 +433,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_documentColModel.validateSettings(settings);
         m_origDocumentColModel.validateSettings(settings);
         m_chunkSize.validateSettings(settings);
+        m_preproUnModifiable.validateSettings(settings);
     }
 }
