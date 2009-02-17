@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.event.ChangeListener;
 
@@ -142,7 +143,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     
     private int m_noRows = 0;
     
-    private int m_currRow = 0;
+    private AtomicInteger m_currRow = new AtomicInteger(0);
     
     private ExecutionContext m_exec;
 
@@ -363,9 +364,9 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     }
     
     private void setProgress() {
-        m_currRow++;
-        double prog = (double)m_currRow / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocesing row " + m_currRow + " of " 
+        int curr = m_currRow.incrementAndGet();
+        double prog = (double)curr / (double)m_noRows;
+        m_exec.setProgress(prog, "Preprocesing row " + curr + " of " 
                 + m_noRows);
     }
     
