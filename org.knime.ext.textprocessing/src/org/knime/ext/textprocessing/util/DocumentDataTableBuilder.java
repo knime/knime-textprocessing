@@ -79,7 +79,6 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
             List<Document> docs) throws CanceledExecutionException {
       // create cache
       FullDataCellCache cache = new FullDataCellCache(m_documentCellFac);
-      
       BufferedDataContainer dc =
               exec.createDataContainer(this.createDataTableSpec());
 
@@ -114,5 +113,5 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
                 DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
                 m_documentCellFac.getDataType());
         return new DataTableSpec(dcscDocs.createSpec());
-    } 
+    }
 }

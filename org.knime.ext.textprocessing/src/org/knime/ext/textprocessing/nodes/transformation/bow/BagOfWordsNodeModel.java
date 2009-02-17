@@ -140,7 +140,7 @@ public class BagOfWordsNodeModel extends NodeModel {
 //               subContext, docTerms, false)};
 
        // Do reuse the DocumentCells of the previous DataTable
-       return new BufferedDataTable[]{m_dtBuilder.createReusedDataTable(
+       return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                subContext, docCellTerms, true)};
     }
 

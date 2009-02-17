@@ -138,6 +138,8 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     
     private TextContainerDataCellFactory m_termCellFac;
     
+    private BagOfWordsDataTableBuilder m_fac;
+    
     private Hashtable<Document, DataCell> m_preprocessedDocuments;
     
     
@@ -157,6 +159,8 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_termCellFac =
             TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        m_fac = new BagOfWordsDataTableBuilder();
+        
         
         m_deepPreproModel =
             PreprocessingNodeSettingsPane.getDeepPrepressingModel();
@@ -194,8 +198,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{
-                BagOfWordsDataTableBuilder.createDataTableSpec(
+        return new DataTableSpec[]{m_fac.createDataTableSpec(
                 m_appendIncomingModel.getBooleanValue())};
     }
 
@@ -244,8 +247,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         // initialize thread pool
         ThreadPool pool = 
             KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
-        m_dc = exec.createDataContainer(
-                BagOfWordsDataTableBuilder.createDataTableSpec(
+        m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
                         m_appendIncomingModel.getBooleanValue()));
         
         // handle chunks

@@ -27,14 +27,12 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
@@ -78,190 +76,6 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
     }
 
-    /**
-     * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
-     * containing minimum one column of type <code>DocumentCell</code> to
-     * store text documents and one column of type <code>TermCell</code>
-     * representing the terms contained by a certain document.
-     * @param appendExtraDocCol if set <code>true</code> an additional column
-     * containing <code>DocumentCell</code> is appended.
-     * 
-     * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
-     *         with one column of type <code>DocumentListCell</code> and one
-     *         column of type <code>TermCell</code>.
-     */
-    public static final DataTableSpec createDataTableSpec(
-            final boolean appendExtraDocCol) {
-        TextContainerDataCellFactory documentCellFac = 
-            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        
-        // create DataTableSpec for output DataTable
-        DataColumnSpecCreator docs = new DataColumnSpecCreator(
-                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, 
-                documentCellFac.getDataType());
-        DataColumnSpecCreator docs2 = new DataColumnSpecCreator(
-                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME, 
-                documentCellFac.getDataType());        
-        DataColumnSpecCreator terms = new DataColumnSpecCreator(
-                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
-                TermCell.TYPE);
-        
-        if (!appendExtraDocCol) {
-            return new DataTableSpec(terms.createSpec(), docs.createSpec());
-        }
-        return new DataTableSpec(terms.createSpec(), docs.createSpec(), 
-                docs2.createSpec());
-    }
-
-    /**
-     * @return The corresponding factory creating a certain kind of
-     * <code>DataCell</code>s containing documents.
-     */
-    protected final TextContainerDataCellFactory getDocumentCellDataFactory() {
-        return m_documentCellFac;
-    }
-
-    /**
-     * Validates the cell type of a document i.e. underlying implementations ca
-     * validate for <code>BlobCell</code> or usual <code>DataCell</code>s etc.
-     * @param documentCell The <code>DataCell</code> to validate.
-     * @return <code>false</code> if given <code>DataCell</code> has not a
-     * valid type, otherwise <code>true</code>.
-     */
-    protected final boolean validateDocumentCellType(
-            final DataCell documentCell) {
-        return m_documentCellFac.validateCellType(documentCell);
-    }
-
-
-
-    /**
-     * Creates and returns a {@link org.knime.core.node.BufferedDataTable}
-     * containing a column with the given documents and one with the terms.
-     * Each row consists of a {@link org.knime.ext.textprocessing.data.TermCell}
-     * {@link org.knime.ext.textprocessing.data.DocumentCell} tupel meaning that
-     * a term is contained in a document.
-     *
-     * @param exec The <code>ExecutionContext</code> to create the
-     * <code>BufferedDataTable</code> with.
-     * @param docTerms The
-     * {@link org.knime.ext.textprocessing.data.Document}s and the corresponding
-     * set of {@link org.knime.ext.textprocessing.data.Term}s.
-     * @param useTermCache If set true the created <code>TermCell</code>s are
-     * cached during creation of the data table. This means that a cell
-     * holding a certain term exists only once. An other cell  holding the
-     * same term is only a reference to the first cell.
-     * @return The <code>BufferedDataTable</code> containing the given
-     * documents and terms
-     * @throws CanceledExecutionException If execution was canceled.
-     */
-    public BufferedDataTable createDataTable(final ExecutionContext exec,
-            final Hashtable<Document, Set<TermRowKeyTuple>> docTerms,
-            final boolean useTermCache) throws CanceledExecutionException {
-        return createDataTable(exec, docTerms, null, useTermCache);
-    }
-
-
-    /**
-     * Creates and returns a {@link org.knime.core.node.BufferedDataTable}
-     * containing the given preprocessed documents the corresponding terms
-     * as well as the original documents (provided as <code>DataCell</code>).
-     * The key-column is the column containing the documents of the hash table
-     * <code>docTerms</code>, according to this key documents the given terms
-     * are stored in a column too. Additional to that, the original documents
-     * can be provided in the has table <code>docDocCell</code>, if that table
-     * is not null, the given <code>DataCell</code>s are added in an additional
-     * column according to their keys.
-     *
-     * @param exec The <code>ExecutionContext</code> to create the
-     * <code>BufferedDataTable</code> with.
-     * @param docTerms The
-     * {@link org.knime.ext.textprocessing.data.Document}s and the corresponding
-     * set of {@link org.knime.ext.textprocessing.data.Term}s.
-     * @param docDocCell Containing the original documents as
-     * <code>DataCell</code>s. If it is not null, the original documents are
-     * applied as additional column.
-     * @param useTermCache If set true the created <code>TermCell</code>s are
-     * cached during creation of the data table. This means that a cell
-     * holding a certain term exists only once. An other cell  holding the
-     * same term is only a reference to the first cell.
-     * @return The <code>BufferedDataTable</code> containing the given
-     * documents and terms
-     * @throws CanceledExecutionException If execution was canceled.
-     */
-    public BufferedDataTable createDataTable(final ExecutionContext exec,
-            final Hashtable<Document, Set<TermRowKeyTuple>> docTerms,
-            final Hashtable<Document, DataCell> docDocCell,
-            final boolean useTermCache) throws CanceledExecutionException {
-      // create cache
-      FullDataCellCache docCache = new FullDataCellCache(
-              getDocumentCellDataFactory());
-      FullDataCellCache termCache = new FullDataCellCache(
-              new TermDataCellFactory());
-
-      boolean appendExtraDocCol = false;
-      if (docDocCell != null && docTerms.size() == docDocCell.size()) {
-          appendExtraDocCol = true;
-      }
-      BufferedDataContainer dc = exec.createDataContainer(
-              BagOfWordsDataTableBuilder.createDataTableSpec(
-                      appendExtraDocCol));
-
-      int i = 1;
-      Set<Document> keys = docTerms.keySet();
-      int rowCount = keys.size();
-      int currRow = 1;
-
-      for (Document d : keys) {
-          DataCell docCell = docCache.getInstance(d);
-
-          // get data cell containing original document
-          DataCell docCell2 = null;
-          if (appendExtraDocCol) {
-               docCell2 = docDocCell.get(d);
-          }
-
-          Set<TermRowKeyTuple> terms = docTerms.get(d);
-          for (TermRowKeyTuple t : terms) {
-              exec.checkCanceled();
-              RowKey rowKey = t.getKey();
-              i++;
-
-              TermCell termCell;
-              if (!useTermCache) {
-                  termCell = new TermCell(t.getTerm());
-              } else {
-                  termCell = (TermCell)termCache.getInstance(t.getTerm());
-              }
-
-              DataRow row;
-              if (appendExtraDocCol) {
-                  if (docCell2 == null) {
-                      docCell2 = DataType.getMissingCell();
-                  }
-                  row = new DefaultRow(rowKey, termCell, docCell, docCell2);
-              } else {
-                  row = new DefaultRow(rowKey, termCell, docCell);
-              }
-
-              dc.addRowToTable(row);
-          }
-
-          double progress = (double)currRow / (double)rowCount;
-          exec.setProgress(progress, "Creating Bow of document " + currRow
-                  + " of " + rowCount);
-          exec.checkCanceled();
-          currRow++;
-      }
-      dc.close();
-
-      docTerms.clear();
-      docCache.reset();
-      termCache.reset();
-
-      return dc.getTable();
-    }
-
 
     /**
      * Creates and returns a new {@link org.knime.core.node.BufferedDataTable}
@@ -286,7 +100,7 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * @throws IllegalArgumentException If a data cell is not compatible with
      * <code>DocumentValue</code>.
      */
-    public BufferedDataTable createReusedDataTable(final ExecutionContext exec,
+    public BufferedDataTable createDataTable(final ExecutionContext exec,
             final Hashtable<DataCell, Set<Term>> docTerms,
             final boolean useTermCache) throws CanceledExecutionException,
             IllegalArgumentException {
@@ -345,7 +159,40 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
     }
 
     @Override
-    public DataTableSpec createDataTableSpec() {
-        return BagOfWordsDataTableBuilder.createDataTableSpec(false);
+    public final DataTableSpec createDataTableSpec() {
+        return createDataTableSpec(false);
+    }
+    
+ 
+    /**
+     * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
+     * containing minimum one column of type <code>DocumentCell</code> to
+     * store text documents and one column of type <code>TermCell</code>
+     * representing the terms contained by a certain document.
+     * @param appendExtraDocCol if set <code>true</code> an additional column
+     * containing <code>DocumentCell</code> is appended.
+     * 
+     * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
+     *         with one column of type <code>DocumentListCell</code> and one
+     *         column of type <code>TermCell</code>.
+     */
+    public final DataTableSpec createDataTableSpec(
+            final boolean appendExtraDocCol) {        
+        // create DataTableSpec for output DataTable
+        DataColumnSpecCreator docs = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                m_documentCellFac.getDataType());
+        DataColumnSpecCreator docs2 = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME, 
+                m_documentCellFac.getDataType());        
+        DataColumnSpecCreator terms = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
+                TermCell.TYPE);
+        
+        if (!appendExtraDocCol) {
+            return new DataTableSpec(terms.createSpec(), docs.createSpec());
+        }
+        return new DataTableSpec(terms.createSpec(), docs.createSpec(), 
+                docs2.createSpec());
     }
 }

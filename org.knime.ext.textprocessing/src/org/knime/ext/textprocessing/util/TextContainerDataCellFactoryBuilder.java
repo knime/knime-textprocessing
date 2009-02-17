@@ -33,10 +33,10 @@ public class TextContainerDataCellFactoryBuilder {
      */
     public static TextContainerDataCellFactory createDocumentCellFactory() {
         if (!TextprocessingPreferenceInitializer.useBlobCell()) {
-            LOGGER.info("Creating usual document cell factory!");
+            LOGGER.info("Creating document cell factory!");
             return new DocumentDataCellFactory();
         }
-        LOGGER.info("Creating blob document cell factory!");
+        LOGGER.info("Creating document blob cell factory!");
         return new DocumentBlobDataCellFactory();
     }
     
