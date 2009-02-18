@@ -31,17 +31,13 @@ import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -55,10 +51,7 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.event.ChangeListener;
@@ -67,7 +60,7 @@ import javax.swing.event.ChangeListener;
  * This class represents the super class of all text preprocessing node models
  * which apply filtering or modification of terms. Classes which extend
  * <code>PreprocessingNodeModel</code>  have to implement the method
- * {@link ThreadedPreprocessingNodeModel#initPreprocessing()} and take care of a
+ * {@link PreprocessingNodeModel#initPreprocessing()} and take care of a
  * proper initialization of the used
  * {@link org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing}
  * instance. A stop word filter i.e. requires a file containing the stop words,
@@ -79,7 +72,7 @@ import javax.swing.event.ChangeListener;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
+public abstract class PreprocessingNodeModel extends NodeModel {
 
     /**
      * The default settings for prerprocessing unmodifiable terms.
@@ -129,8 +122,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
 
     private SettingsModelString m_origDocumentColModel;
     
-    private SettingsModelIntegerBounded m_chunkSize;
-    
     private SettingsModelBoolean m_preproUnModifiable;
 
     /**
@@ -159,7 +150,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     /**
      * The constructor of <code>PreprocessingNodeModel</code>.
      */
-    public ThreadedPreprocessingNodeModel() {
+    public PreprocessingNodeModel() {
         super(1, 1);
 
         m_docCellFac = 
@@ -177,7 +168,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
             PreprocessingNodeSettingsPane.getDocumentColumnModel();
         m_origDocumentColModel =
             PreprocessingNodeSettingsPane.getOrigDocumentColumnModel();
-        m_chunkSize = PreprocessingNodeSettingsPane.getChunkSizeModel();
         m_preproUnModifiable = 
             PreprocessingNodeSettingsPane.getPreprocessUnmodifiableModel();
         
@@ -256,10 +246,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
             throw new NullPointerException(
                     "Preprocessing instance may not be null!");
         }
-        
-        // initialize thread pool
-        ThreadPool pool = 
-            KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
         m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
                         m_appendIncomingModel.getBooleanValue()));
         
@@ -268,129 +254,89 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_exec = exec;
         
         m_preprocessedDocuments = new Hashtable<Document, DataCell>();
-        Collection<DataRow> chunk = new ArrayList<DataRow>();
-        int chunkSize = m_chunkSize.getIntValue();
         int count = 0;
         
         RowIterator i = inData[0].iterator();
         while(i.hasNext()) {
             count++;
             DataRow row = i.next();
-            if (count == chunkSize) {
-                pool.submit(new PreproRunnable(chunk));
-                chunk = new ArrayList<DataRow>();
-                count = 0;
-            }
-            chunk.add(row);
+            
+            setProgress();
+            processRow(row);
         }
-        pool.submit(new PreproRunnable(chunk));
-        pool.waitForTermination();
         
         m_dc.close();
         return new BufferedDataTable[]{m_dc.getTable()};
     }
 
-    class PreproRunnable implements Runnable {
-        private Collection<DataRow> m_chunk;
         
-        PreproRunnable(final Collection<DataRow> rows) {
-            m_chunk = rows;
+    public void processRow(final DataRow row) {
+        DataCell newDocCell = null;
+        RowKey rowKey = row.getKey();
+        DataCell termcell = row.getCell(m_termColIndex);
+        DataCell doccell = row.getCell(m_documentColIndex);
+        DataCell origDocCell = row.getCell(m_origDocumentColIndex);
+
+        // handle missing value (ignore rows with missing values)
+        if (termcell.isMissing() || doccell.isMissing()) {
+            return;
         }
-        
-        public void run() {
-            try {
-                m_exec.checkCanceled();
-            } catch (CanceledExecutionException e) {
-                // just catch ...
+        Term term = ((TermValue)termcell).getTermValue();
+
+        //
+        // do the preprocessing twist
+        //
+        // is the term unmodifiable ???
+        if (!term.isUnmodifiable() || m_preproUnModifiable.getBooleanValue()) {
+            term = m_preprocessing.preprocess(term);
+
+            // if term is null or empty continue with next term !
+            if (term == null || term.getText().length() <= 0) {
+                return;
             }
-            
-            boolean ignoreUnMod = m_preproUnModifiable.getBooleanValue();
-            DataCell newDocCell = null;            
-            Iterator<DataRow> i = m_chunk.iterator();
-            while (i.hasNext()) {
-                try {
-                    m_exec.checkCanceled();
-                } catch (CanceledExecutionException e) {
-                    // just catch ...
-                }
-                setProgress();
-                
-                DataRow row = i.next();
+        }
+        // do we have to preprocess the documents itself too ?
+        if (m_deepPreproModel.getBooleanValue()) {
+            Document doc = ((DocumentValue)doccell).getDocument();
+            newDocCell = m_preprocessedDocuments.get(doc);
 
-                RowKey rowKey = row.getKey();
-                DataCell termcell = row.getCell(m_termColIndex);
-                DataCell doccell = row.getCell(m_documentColIndex);
-                DataCell origDocCell = row.getCell(m_origDocumentColIndex);
-
-                // handle missing value (ignore rows with missing values)
-                if (termcell.isMissing() || doccell.isMissing()) {
-                    continue;
-                }
-                Term term = ((TermValue)termcell).getTermValue();
-
-                //
-                // do the preprocessing twist
-                //
-                // is the term unmodifiable ???
-                if (!term.isUnmodifiable() || ignoreUnMod) {
-                    synchronized (m_preprocessing) {
-                        term = m_preprocessing.preprocess(term);
-                    }
-
-                    // if term is null or empty continue with next term !
-                    if (term == null || term.getText().length() <= 0) {
-                        continue;
-                    }
-                }
-                // do we have to preprocess the documents itself too ?
-                if (m_deepPreproModel.getBooleanValue()) {
-                    Document doc = ((DocumentValue)doccell).getDocument();
-                    newDocCell = m_preprocessedDocuments.get(doc);
-                    
-                    if (newDocCell == null) {
-                        // preprocess doc here !!!
-                        DocumentBuilder builder = new DocumentBuilder(doc);
-                        for (Section s : doc.getSections()) {
-                            for (Paragraph p : s.getParagraphs()) {
-                                for (Sentence sen : p.getSentences()) {
-                                    for (Term t : sen.getTerms()) {
-                                        if (!t.isUnmodifiable()) {
-                                            synchronized (m_preprocessing) {
-                                                t = m_preprocessing.preprocess(
-                                                        t);
-                                            }
-                                        }
-                                        if (t != null
-                                                && t.getText().length() > 0) {
-                                            builder.addTerm(t);
-                                        }
-                                    }
-                                    builder.createNewSentence();
+            if (newDocCell == null) {
+                // preprocess doc here !!!
+                DocumentBuilder builder = new DocumentBuilder(doc);
+                for (Section s : doc.getSections()) {
+                    for (Paragraph p : s.getParagraphs()) {
+                        for (Sentence sen : p.getSentences()) {
+                            for (Term t : sen.getTerms()) {
+                                if (!t.isUnmodifiable()) {
+                                    t = m_preprocessing.preprocess(t);
                                 }
-                                builder.createNewParagraph();
+                                if (t != null && t.getText().length() > 0) {
+                                    builder.addTerm(t);
+                                }
                             }
-                            builder.createNewSection(s.getAnnotation());
+                            builder.createNewSentence();
                         }
-                        Document newDoc = builder.createDocument();
-                        synchronized (m_docCellFac) {
-                            newDocCell = m_docCellFac.createDataCell(newDoc);
-                        }
-                        m_preprocessedDocuments.put(doc, newDocCell);
+                        builder.createNewParagraph();
                     }
-                } else {
-                    // new doc is the same as the old doc
-                    newDocCell = doccell;
+                    builder.createNewSection(s.getAnnotation());
                 }
-                addRowToContainer(rowKey, term, newDocCell, origDocCell);
+                Document newDoc = builder.createDocument();
+                newDocCell = m_docCellFac.createDataCell(newDoc);
+                m_preprocessedDocuments.put(doc, newDocCell);
             }
+        } else {
+            // new doc is the same as the old doc
+            newDocCell = doccell;
         }
+        addRowToContainer(rowKey, term, newDocCell, origDocCell);
     }
-    
+
     private void setProgress() {
         int curr = m_currRow.incrementAndGet();
         double prog = (double)curr / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocesing row " + curr + " of " 
-                + m_noRows);
+        m_exec
+                .setProgress(prog, "Preprocesing row " + curr + " of "
+                        + m_noRows);
     }
     
     private synchronized void addRowToContainer(RowKey rk, Term t, 
@@ -416,7 +362,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_appendIncomingModel.loadSettingsFrom(settings);
         m_documentColModel.loadSettingsFrom(settings);
         m_origDocumentColModel.loadSettingsFrom(settings);
-        m_chunkSize.loadSettingsFrom(settings);
         m_preproUnModifiable.loadSettingsFrom(settings);
     }
 
@@ -429,7 +374,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_appendIncomingModel.saveSettingsTo(settings);
         m_documentColModel.saveSettingsTo(settings);
         m_origDocumentColModel.saveSettingsTo(settings);
-        m_chunkSize.saveSettingsTo(settings);
         m_preproUnModifiable.saveSettingsTo(settings);
     }
 
@@ -443,7 +387,6 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
         m_appendIncomingModel.validateSettings(settings);
         m_documentColModel.validateSettings(settings);
         m_origDocumentColModel.validateSettings(settings);
-        m_chunkSize.validateSettings(settings);
         m_preproUnModifiable.validateSettings(settings);
     }
 }
