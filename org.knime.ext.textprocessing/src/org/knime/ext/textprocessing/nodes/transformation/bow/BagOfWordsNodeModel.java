@@ -23,10 +23,14 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
+import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -41,12 +45,15 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,7 +73,11 @@ public class BagOfWordsNodeModel extends NodeModel {
 
     private int m_documentColIndex = -1;
 
-    private BagOfWordsDataTableBuilder m_dtBuilder;
+    private BagOfWordsDataTableBuilder m_dtBuilder = 
+        new BagOfWordsDataTableBuilder();
+    
+    private TextContainerDataCellFactory m_termFac = 
+        TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     /**
      * Creates a new instance of <code>BagOfWordsNodeModel</code> with one in
@@ -74,7 +85,6 @@ public class BagOfWordsNodeModel extends NodeModel {
      */
     public BagOfWordsNodeModel() {
         super(1, 1);
-        m_dtBuilder = new BagOfWordsDataTableBuilder();
     }
 
     /**
@@ -102,46 +112,59 @@ public class BagOfWordsNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
-       Hashtable<Document, Set<Term>> docTerms =
-           new Hashtable<Document, Set<Term>>();
-       Hashtable<DataCell, Set<Term>> docCellTerms =
-           new Hashtable<DataCell, Set<Term>>();
+        // sort list of documents
+        ExecutionContext subExec = exec.createSubExecutionContext(0.3);
+        List<String> sortBy = new ArrayList<String>();
+        sortBy.add(inData[0].getDataTableSpec().getColumnSpec(
+                m_documentColIndex).getName());
+        BufferedDataTable sortedTable = new SortedTable(inData[0], sortBy,
+                new boolean[]{false}, false, subExec).getBufferedDataTable();
 
-       ExecutionMonitor subExec = exec.createSubProgress(0.5);
-       int rowCount = inData[0].getRowCount();
-       int currRow = 1;
-       RowIterator it = inData[0].iterator();
-       while (it.hasNext()) {
-           DataRow row = it.next();
+        // prepare data container
+        BufferedDataContainer bdc = exec.createDataContainer(
+                m_dtBuilder.createDataTableSpec());
 
-           // get terms for document
-           DocumentValue docCell =
-               (DocumentValue)row.getCell(m_documentColIndex);
-           Document doc = docCell.getDocument();
-           Set<Term> terms = setOfTerms(doc);
+        ExecutionContext subExec2 = exec.createSubExecutionContext(0.7);
+        Document currDoc = null;
+        Document lastDoc = null;
+        int rowCount = sortedTable.getRowCount();
+        int currRow = 1;
+        int rowId = 1;
+        RowIterator it = sortedTable.iterator();
+        while (it.hasNext()) {
+            DataRow row = it.next();
 
-           // add data cell and corresponding terms
-           docTerms.put(doc, terms);
-           docCellTerms.put(row.getCell(m_documentColIndex), terms);
+            // get terms for document
+            DataCell docCell = row.getCell(m_documentColIndex);
+            DocumentValue docVal = (DocumentValue)row
+                    .getCell(m_documentColIndex);
 
-           // report status
-           double progress = (double)currRow / (double)rowCount;
-           subExec.setProgress(progress, "Processing document " + currRow + " of "
-                   + rowCount);
-           exec.checkCanceled();
-           currRow++;
-       }
+            currDoc = docVal.getDocument();
+            if (lastDoc == null) {
+                lastDoc = currDoc;
+            }
+            if (!currDoc.equals(lastDoc)) {
+                lastDoc = currDoc;
 
-       // build data table
-       ExecutionContext subContext = exec.createSubExecutionContext(0.5);
+                Set<Term> terms = setOfTerms(currDoc);
+                for(Term t : terms) {
+                    RowKey key = RowKey.createRowKey(rowId);
+                    DataCell tc = m_termFac.createDataCell(t);
+                    DataRow newRow = new DefaultRow(key, tc, docCell);
+                    bdc.addRowToTable(newRow);
+                    rowId++;
+                }
+            }
 
-       // Do not reuse the DocumentCells of the previous DataTable
-//       return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-//               subContext, docTerms, false)};
-
-       // Do reuse the DocumentCells of the previous DataTable
-       return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-               subContext, docCellTerms, true)};
+            // report status
+            double progress = (double)currRow / (double)rowCount;
+            subExec2.setProgress(progress, "Processing document " + currRow
+                    + " of " + rowCount);
+            exec.checkCanceled();
+            currRow++;
+        }
+        bdc.close();
+        return new BufferedDataTable[]{bdc.getTable()};
     }
 
 

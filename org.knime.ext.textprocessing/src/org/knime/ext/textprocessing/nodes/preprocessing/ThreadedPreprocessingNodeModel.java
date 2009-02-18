@@ -287,7 +287,7 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
     }
 
     class PreproRunnable implements Runnable {
-        Collection<DataRow> m_chunk;
+        private Collection<DataRow> m_chunk;
         
         PreproRunnable(final Collection<DataRow> rows) {
             m_chunk = rows;
@@ -329,7 +329,9 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
                 //
                 // is the term unmodifiable ???
                 if (!term.isUnmodifiable() || ignoreUnMod) {
-                    term = m_preprocessing.preprocess(term);
+                    synchronized (m_preprocessing) {
+                        term = m_preprocessing.preprocess(term);
+                    }
 
                     // if term is null or empty continue with next term !
                     if (term == null || term.getText().length() <= 0) {
@@ -349,7 +351,10 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
                                 for (Sentence sen : p.getSentences()) {
                                     for (Term t : sen.getTerms()) {
                                         if (!t.isUnmodifiable()) {
-                                            t = m_preprocessing.preprocess(t);
+                                            synchronized (m_preprocessing) {
+                                                t = m_preprocessing.preprocess(
+                                                        t);
+                                            }
                                         }
                                         if (t != null
                                                 && t.getText().length() > 0) {
@@ -363,7 +368,9 @@ public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
                             builder.createNewSection(s.getAnnotation());
                         }
                         Document newDoc = builder.createDocument();
-                        newDocCell = m_docCellFac.createDataCell(newDoc);
+                        synchronized (m_docCellFac) {
+                            newDocCell = m_docCellFac.createDataCell(newDoc);
+                        }
                         m_preprocessedDocuments.put(doc, newDocCell);
                     }
                 } else {
