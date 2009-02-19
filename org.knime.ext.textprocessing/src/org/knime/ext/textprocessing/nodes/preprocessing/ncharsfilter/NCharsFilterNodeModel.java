@@ -29,7 +29,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
-import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import java.io.IOException;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilterNodeModel extends ThreadedPreprocessingNodeModel {
+public class NCharsFilterNodeModel extends PreprocessingNodeModel {
 
     /**
      * The minimum number of N to specify.

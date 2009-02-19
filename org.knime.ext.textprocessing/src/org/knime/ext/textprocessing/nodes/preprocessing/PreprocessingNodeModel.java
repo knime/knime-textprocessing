@@ -91,22 +91,6 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     public static final boolean DEF_APPEND_INCOMING = true;
     
     
-    /**
-     * The default chunk size.
-     */
-    public static final int DEF_CHUNK_SIZE = 2000;
-    
-    /**
-     * The minimal chunk size.
-     */
-    public static final int MIN_CHUNK_SIZE = 1;
-    
-    /**
-     * The maximal chunk size.
-     */
-    public static final int MAX_CHUNK_SIZE = Integer.MAX_VALUE;
-    
-    
 
     private int m_documentColIndex = -1;
 
@@ -206,11 +190,6 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     protected abstract void initPreprocessing();
 
-    @Override
-    protected void reset() {
-        m_currRow = new AtomicInteger(0);   
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -250,6 +229,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                         m_appendIncomingModel.getBooleanValue()));
         
         // handle chunks
+        m_currRow = new AtomicInteger(0);
         m_noRows = inData[0].getRowCount();
         m_exec = exec;
         
@@ -258,6 +238,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         
         RowIterator i = inData[0].iterator();
         while(i.hasNext()) {
+            exec.checkCanceled();
             count++;
             DataRow row = i.next();
             
@@ -334,8 +315,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     private void setProgress() {
         int curr = m_currRow.incrementAndGet();
         double prog = (double)curr / (double)m_noRows;
-        m_exec
-                .setProgress(prog, "Preprocesing row " + curr + " of "
+        m_exec.setProgress(prog, "Preprocesing row " + curr + " of "
                         + m_noRows);
     }
     

@@ -26,7 +26,6 @@ package org.knime.ext.textprocessing.nodes.preprocessing;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -51,7 +50,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelBoolean getDeepPrepressingModel() {
         return new SettingsModelBoolean(
                 PreprocessingConfigKeys.CFG_KEY_DEEP_PREPRO,
-                ThreadedPreprocessingNodeModel.DEF_DEEP_PREPRO);
+                PreprocessingNodeModel.DEF_DEEP_PREPRO);
     }
     
     /**
@@ -62,7 +61,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelBoolean getAppendIncomingDocument() {
         return new SettingsModelBoolean(
                 PreprocessingConfigKeys.CFG_KEY_APPEND_INCOMING,
-                ThreadedPreprocessingNodeModel.DEF_APPEND_INCOMING);
+                PreprocessingNodeModel.DEF_APPEND_INCOMING);
     }
     
     /**
@@ -96,7 +95,7 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
     public static SettingsModelBoolean getPreprocessUnmodifiableModel() {
         return new SettingsModelBoolean(
                 PreprocessingConfigKeys.CFG_KEY_PREPRO_UNMODIFIABLE,
-                ThreadedPreprocessingNodeModel.DEF_PREPRO_UNMODIFIABLE);
+                PreprocessingNodeModel.DEF_PREPRO_UNMODIFIABLE);
     }
     
     /**
@@ -165,12 +164,12 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         //
         // chunk size
         //
-        createNewGroup("Chunking");
-        
-        addDialogComponent(new DialogComponentNumber(
-                getChunkSizeModel(), "Chunk size", 1000));
-        
-        closeCurrentGroup();
+//        createNewGroup("Chunking");
+//        
+//        addDialogComponent(new DialogComponentNumber(
+//                getChunkSizeModel(), "Chunk size", 1000));
+//        
+//        closeCurrentGroup();
         
         //
         // preprocess unmodifiable terms

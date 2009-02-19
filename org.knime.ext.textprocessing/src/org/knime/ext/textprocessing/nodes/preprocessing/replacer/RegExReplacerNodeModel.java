@@ -28,7 +28,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ import java.io.IOException;
  *
  * @author kilian, University of Konstanz
  */
-public class RegExReplacerNodeModel extends ThreadedPreprocessingNodeModel {
+public class RegExReplacerNodeModel extends PreprocessingNodeModel {
 
     /**
      * The default regular expression (an empty string).

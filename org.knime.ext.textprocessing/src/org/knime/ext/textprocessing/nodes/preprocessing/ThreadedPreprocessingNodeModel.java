@@ -78,6 +78,7 @@ import javax.swing.event.ChangeListener;
  * is initialized properly the rest is done automatically.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated
  */
 public abstract class ThreadedPreprocessingNodeModel extends NodeModel {
 

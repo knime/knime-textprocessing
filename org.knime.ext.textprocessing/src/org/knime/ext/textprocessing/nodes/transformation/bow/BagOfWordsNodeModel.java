@@ -79,6 +79,8 @@ public class BagOfWordsNodeModel extends NodeModel {
     private TextContainerDataCellFactory m_termFac = 
         TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
+    private int m_rowId = 1;
+    
     /**
      * Creates a new instance of <code>BagOfWordsNodeModel</code> with one in
      * and one data table out port.
@@ -127,33 +129,24 @@ public class BagOfWordsNodeModel extends NodeModel {
         ExecutionContext subExec2 = exec.createSubExecutionContext(0.7);
         Document currDoc = null;
         Document lastDoc = null;
+        DataCell docCell = null;
         int rowCount = sortedTable.getRowCount();
         int currRow = 1;
-        int rowId = 1;
         RowIterator it = sortedTable.iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
 
             // get terms for document
-            DataCell docCell = row.getCell(m_documentColIndex);
+            docCell = row.getCell(m_documentColIndex);
             DocumentValue docVal = (DocumentValue)row
                     .getCell(m_documentColIndex);
 
             currDoc = docVal.getDocument();
-            if (lastDoc == null) {
-                lastDoc = currDoc;
-            }
-            if (!currDoc.equals(lastDoc)) {
+            if (lastDoc == null || !currDoc.equals(lastDoc)) {
                 lastDoc = currDoc;
 
                 Set<Term> terms = setOfTerms(currDoc);
-                for(Term t : terms) {
-                    RowKey key = RowKey.createRowKey(rowId);
-                    DataCell tc = m_termFac.createDataCell(t);
-                    DataRow newRow = new DefaultRow(key, tc, docCell);
-                    bdc.addRowToTable(newRow);
-                    rowId++;
-                }
+                addToBOW(terms, docCell, bdc);
             }
 
             // report status
@@ -163,10 +156,21 @@ public class BagOfWordsNodeModel extends NodeModel {
             exec.checkCanceled();
             currRow++;
         }
+        
         bdc.close();
         return new BufferedDataTable[]{bdc.getTable()};
     }
 
+    private void addToBOW(final Set<Term> terms, final DataCell docCell, 
+            final BufferedDataContainer bdc) {
+        for (Term t : terms) {
+            RowKey key = RowKey.createRowKey(m_rowId);
+            DataCell tc = m_termFac.createDataCell(t);
+            DataRow newRow = new DefaultRow(key, tc, docCell);
+            bdc.addRowToTable(newRow);
+            m_rowId++;
+        } 
+    }
 
     private Set<Term> setOfTerms(final Document doc) {
         Set<Term> termSet = null;

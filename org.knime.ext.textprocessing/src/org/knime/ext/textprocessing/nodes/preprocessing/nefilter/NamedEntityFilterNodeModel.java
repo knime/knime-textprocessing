@@ -29,7 +29,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.ext.textprocessing.nodes.preprocessing.ThreadedPreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,7 @@ import java.io.IOException;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NamedEntityFilterNodeModel extends ThreadedPreprocessingNodeModel {
+public class NamedEntityFilterNodeModel extends PreprocessingNodeModel {
 
     /**
      * The default setting of filtering of modifiable terms.
