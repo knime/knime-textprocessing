@@ -247,6 +247,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         }
         
         m_dc.close();
+        m_preprocessedDocuments.clear();
         return new BufferedDataTable[]{m_dc.getTable()};
     }
 
