@@ -49,11 +49,11 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.TermEvent;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
 import org.knime.ext.textprocessing.util.FullDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.UnorderedPair;
 
 import java.io.File;
@@ -434,7 +434,7 @@ public class KeygraphNodeModel extends NodeModel {
         BufferedDataContainer con =
                 exec.createDataContainer(createDataTableSpec());
         FullDataCellCache docCache = new FullDataCellCache(
-                new DocumentBlobDataCellFactory());
+               TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
         
         int rowid = 0;
         for (Entry<Document, Map<Term, Integer>> e : keywords.entrySet()) {
