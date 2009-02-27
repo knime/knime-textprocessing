@@ -28,7 +28,6 @@ import org.knime.base.node.preproc.filter.row.rowfilter.IncludeFromNowOn;
 import org.knime.base.node.preproc.filter.row.rowfilter.RowFilter;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -103,7 +102,7 @@ public abstract class FrequencyFilter extends RowFilter {
      * @return The preprocessed data table.
      * @throws CanceledExecutionException If user canceled the execution.
      */
-    public abstract DataTable preprocessData(
+    public abstract BufferedDataTable preprocessData(
             final BufferedDataTable data, final ExecutionContext exec) 
     throws CanceledExecutionException;
     

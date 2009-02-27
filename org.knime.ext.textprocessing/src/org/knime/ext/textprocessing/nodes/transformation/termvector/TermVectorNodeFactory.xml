@@ -7,15 +7,21 @@
     <fullDescription>
         <intro>
             This node creates a term vector for each term to
-            represent the terms by the vector space model. The values of
+            represent the terms in the document space. The values of
             the feature vectors can be specified as boolean values or as 
-            values of a specified column i.e. an tf*idf column.
+            values of a specified column i.e. an tf*idf column. The dimension
+            of the vectors will be equal to the number of distinct documents
+            in the BoW. 
         </intro>
+        
+        <option name="Document column">
+             The column containing the documents to use.
+        </option>           
         <option name="Ignore tags">
              If checked tags are ignored when comparing terms.
         </option>
         <option name="Bitvector">
-             If checked an bitvector will be created indicating whether a 
+             If checked a bitvector will be created indicating whether a 
              certain document contains a term or not.
         </option>
         <option name="Vector value">

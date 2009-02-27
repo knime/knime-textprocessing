@@ -45,12 +45,12 @@ public class TfCellFactory extends FrequencyCellFactory {
     /**
      * The name of the column containing the tf value.
      */
-    public static final String COLNAME_REL = "TF";
+    public static final String COLNAME_REL = "TF rel";
     
     /**
      * The name of the column containing the absolute tf value.
      */
-    public static final String COLNAME_ABS = "TF absolute";
+    public static final String COLNAME_ABS = "TF abs";
     
 
     private boolean m_relative = TfNodeModel.DEF_RELATIVE;
@@ -96,7 +96,6 @@ public class TfCellFactory extends FrequencyCellFactory {
         Term term = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
         Document doc = ((DocumentValue)row.getCell(getDocumentColIndex()))
                         .getDocument(); 
-        
         DataCell freq;
         if (m_relative) {
             freq = new DoubleCell(Frequencies.relativeTermFrequency(term, doc));

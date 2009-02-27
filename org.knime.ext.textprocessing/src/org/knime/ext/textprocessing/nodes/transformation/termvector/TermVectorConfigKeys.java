@@ -44,4 +44,9 @@ public class TermVectorConfigKeys {
      * The configuration key of the flag specifying if tags are ignored or not.
      */
     public static final String CFGKEY_IGNORE_TAGS = "Ignore Tags";
+    
+    /**
+     * The configuration key of the column containing the documents.
+     */
+    public static final String CFGKEY_DOC_COL = "Document_Column"; 
 }

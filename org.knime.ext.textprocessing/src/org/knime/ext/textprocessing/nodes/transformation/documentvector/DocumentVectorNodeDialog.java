@@ -23,15 +23,16 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Provides the dialog of the document vector node.
@@ -61,6 +62,18 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
                 DocumentVectorNodeModel.DEFAULT_COL);
     }
     
+    public static final SettingsModelString getDocumentColModel() {
+        return new SettingsModelString(DocumentVectorConfigKeys.CFGKEY_DOC_COL,
+                DocumentVectorNodeModel.DEFAULT_DOCUMENT_COLNAME);
+    }
+    
+    public static final SettingsModelBoolean getIgnoreTagsModel() {
+        return new SettingsModelBoolean(
+                DocumentVectorConfigKeys.CFGKEY_IGNORE_TAGS,
+                DocumentVectorNodeModel.DEFAULT_IGNORE_TAGS);
+    }
+    
+    
     private SettingsModelString m_columnModel;
     
     private SettingsModelBoolean m_booleanModel;
@@ -70,6 +83,13 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public DocumentVectorNodeDialog() {
+        addDialogComponent(new DialogComponentColumnNameSelection(
+                getDocumentColModel(), "Document column", 0, 
+                DocumentValue.class));
+        
+        addDialogComponent(new DialogComponentBoolean(
+                getIgnoreTagsModel(), "Ignore tags"));        
+        
         m_columnModel = getColumnModel();
         m_booleanModel = getBooleanModel();
         m_booleanModel.addChangeListener(new InternalChangeListener());
@@ -79,7 +99,7 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
         
         addDialogComponent(new DialogComponentColumnNameSelection(
                 m_columnModel, "Vector value", 0, DoubleValue.class));
-        
+                
         checkUncheck();
     }
     

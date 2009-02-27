@@ -23,16 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -56,11 +46,24 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * The model of the document vector node, creates a document feature vector
@@ -82,6 +85,20 @@ public class DocumentVectorNodeModel extends NodeModel {
      */
     public static final String DEFAULT_COL = "";
     
+    /**
+     * The default document column to use.
+     */
+    public static final String DEFAULT_DOCUMENT_COLNAME = 
+        BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME;
+    
+    /**
+     * The default value to ignore tags.
+     */
+    public static final boolean DEFAULT_IGNORE_TAGS = true;
+    
+    
+    private final TextContainerDataCellFactory m_documentCellFac;
+    
     private int m_documentColIndex = -1;
     
     private int m_termColIndex = -1;    
@@ -92,12 +109,20 @@ public class DocumentVectorNodeModel extends NodeModel {
     private SettingsModelBoolean m_booleanModel = 
         DocumentVectorNodeDialog.getBooleanModel();
     
+    private SettingsModelString m_docuColModel = 
+        DocumentVectorNodeDialog.getDocumentColModel();
+    
+    private SettingsModelBoolean m_ignoreTags = 
+        DocumentVectorNodeDialog.getIgnoreTagsModel();
+    
 
     /**
      * Creates a new instance of <code>DocumentVectorNodeModel</code>. 
      */
     public DocumentVectorNodeModel() {
         super(1, 1);
+        m_documentCellFac =
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();        
         m_booleanModel.addChangeListener(new InternalChangeListener());
         checkUncheck();
     }
@@ -115,9 +140,8 @@ public class DocumentVectorNodeModel extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec) 
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
     }
     
@@ -128,6 +152,12 @@ public class DocumentVectorNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
+        
+        boolean ignoreTags = m_ignoreTags.getBooleanValue();
+        
+        // document column index.
+        m_documentColIndex = inData[0].getSpec().findColumnIndex(
+                m_docuColModel.getStringValue());
         
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
@@ -142,12 +172,10 @@ public class DocumentVectorNodeModel extends NodeModel {
         
         // Sort the data table first by documents
         List<String> colList = new ArrayList<String>();
-        colList.add(inData[0].getDataTableSpec().getColumnSpec(
-                m_documentColIndex).getName());
-        boolean [] sortAsc = new boolean[colList.size()];
-        sortAsc[0] = true;
-        SortedTable sortedTable = new SortedTable(inData[0], colList, sortAsc, 
-                exec);
+        colList.add(m_docuColModel.getStringValue());
+        boolean [] sortAsc = new boolean[]{true};
+        BufferedDataTable sortedTable = new SortedTable(inData[0], colList, 
+                sortAsc, exec).getBufferedDataTable();
         
         // hash table holding an index for each feature
         Hashtable<String, Integer> featureIndexTable = 
@@ -159,8 +187,16 @@ public class DocumentVectorNodeModel extends NodeModel {
         while (it.hasNext()) {
             DataRow row = it.next();
             Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-            if (!featureIndexTable.containsKey(t.getText())) {
-                featureIndexTable.put(t.getText(), currIndex);
+            
+            String key = null;
+            // if tags have o be ignored
+            if (ignoreTags) {
+                key = t.getText();
+            } else {
+                key = t.toString();
+            }
+            if (key != null && !featureIndexTable.containsKey(key)) {
+                featureIndexTable.put(key, currIndex);
                 currIndex++;
             }
         }
@@ -196,8 +232,17 @@ public class DocumentVectorNodeModel extends NodeModel {
                 // create new feature vector
                 featureVector = initFeatureVector(featureIndexTable.size());
             }
+            
+            
             // add new term at certain index to feature vector
-            int index = featureIndexTable.get(currTerm.getText());
+            String key = "";
+            // if tags have o be ignored
+            if (ignoreTags) {
+                key = currTerm.getText();
+            } else {
+                key = currTerm.toString();
+            }
+            int index = featureIndexTable.get(key);
             featureVector.set(index, currValue);
             
             // if last row, add feature vector to table
@@ -221,7 +266,7 @@ public class DocumentVectorNodeModel extends NodeModel {
     private DataRow createDataRow(final Document doc, 
             final List<Double> featureVector) {
         DataCell[] cells = new DataCell[featureVector.size() + 1];
-        cells[0] = new DocumentCell(doc); 
+        cells[0] = m_documentCellFac.createDataCell(doc); 
         for (int i = 0; i < cells.length - 1; i++) {
             cells[i + 1] = new DoubleCell(featureVector.get(i)); 
         }
@@ -240,7 +285,9 @@ public class DocumentVectorNodeModel extends NodeModel {
         
         // add document column
         DataColumnSpecCreator columnSpecCreator =
-            new DataColumnSpecCreator("Document", DocumentCell.TYPE);
+            new DataColumnSpecCreator(
+                    DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                    m_documentCellFac.getDataType());
         columnSpecs[0] = columnSpecCreator.createSpec();        
         
         // add feature vector columns
@@ -278,6 +325,8 @@ public class DocumentVectorNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
+        m_docuColModel.loadSettingsFrom(settings);
+        m_ignoreTags.loadSettingsFrom(settings);
     }
 
     /**
@@ -287,6 +336,8 @@ public class DocumentVectorNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_colModel.saveSettingsTo(settings);
         m_booleanModel.saveSettingsTo(settings);
+        m_docuColModel.saveSettingsTo(settings);
+        m_ignoreTags.saveSettingsTo(settings);
     }
 
     /**
@@ -297,6 +348,8 @@ public class DocumentVectorNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
+        m_docuColModel.validateSettings(settings);
+        m_ignoreTags.validateSettings(settings);
     }
 
     

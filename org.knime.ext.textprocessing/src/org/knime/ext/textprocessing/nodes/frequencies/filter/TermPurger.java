@@ -23,23 +23,17 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTable;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
-import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
@@ -47,6 +41,14 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.FullDataCellCache;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
+
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides methods to purge terms out of documents based on the specified 
@@ -61,7 +63,7 @@ public class TermPurger {
 
     private Set<Term> m_terms;
     
-    private DataTable m_inData;
+    private BufferedDataTable m_inData;
     
     private int m_termColIndex;
     
@@ -82,8 +84,8 @@ public class TermPurger {
      * @throws InvalidSettingsException If the given data table contains no
      * column with documents or terms.
      */
-    public TermPurger(final DataTable inData, final ExecutionContext exec,
-            final String documentColumnName) 
+    public TermPurger(final BufferedDataTable inData, 
+            final ExecutionContext exec, final String documentColumnName) 
     throws InvalidSettingsException {
         m_inData = inData;
         
@@ -104,6 +106,13 @@ public class TermPurger {
         cacheTerms();
     }
     
+    /**
+     * Clears the cached terms.
+     */
+    public void cleaTerms() {
+        m_terms.clear();
+    }
+    
     private void cacheTerms() {
         m_terms = new HashSet<Term>();
         RowIterator it = m_inData.iterator();
@@ -122,13 +131,24 @@ public class TermPurger {
      * documents and returns it.
      * 
      * @return A data table containing the modified documents.
+     * @throws CanceledExecutionException If progress was canceled
      */
-    public BufferedDataTable getPurgedDataTable() {
+    public BufferedDataTable getPurgedDataTable() 
+    throws CanceledExecutionException {
         Hashtable<Document, Document> preprocessedDoc = 
             new Hashtable<Document, Document>();
         
+        ExecutionContext subExec = m_exec.createSubExecutionContext(0.7);
+        int currRow = 1;
+        int maxRows = m_inData.getRowCount();
         RowIterator it = m_inData.iterator();
         while (it.hasNext()) {
+            subExec.checkCanceled();
+            double prog = (double)currRow / (double)maxRows;
+            subExec.setProgress(prog, 
+                    "Preprocessing row " + currRow + " of " + maxRows);
+            currRow++;
+            
             DataRow row = it.next();
             Document origDoc = ((DocumentValue)row.getCell(m_docColIndex))
                             .getDocument();
@@ -144,14 +164,27 @@ public class TermPurger {
     }
     
     private BufferedDataTable createNewDataTable(
-            final Hashtable<Document, Document> preprocessedDoc) {
+            final Hashtable<Document, Document> preprocessedDoc) 
+    throws CanceledExecutionException {
+        
+        TextContainerDataCellFactory docCellFac = 
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        FullDataCellCache dataCellCache = new FullDataCellCache(docCellFac);
         
         BufferedDataContainer dc = m_exec.createDataContainer(
                 m_inData.getDataTableSpec());
         
-        
+        ExecutionContext subExec = m_exec.createSubExecutionContext(0.3);
+        int currRow = 1;
+        int maxRows = m_inData.getRowCount();
         RowIterator it = m_inData.iterator();
-        while (it.hasNext()) {
+        while (it.hasNext()) {      
+            m_exec.checkCanceled();
+            double prog = (double)currRow / (double)maxRows;
+            subExec.setProgress(prog, 
+                    "Adding row " + currRow + " of " + maxRows);
+            currRow++;            
+            
             DataRow row = it.next();
             Document origDoc = ((DocumentValue)row.getCell(m_docColIndex))
                             .getDocument();
@@ -161,7 +194,7 @@ public class TermPurger {
             DataCell[] cells = new DataCell[row.getNumCells()];
             for (int i = 0; i < row.getNumCells(); i++) {
                 if (i == m_docColIndex) {
-                    DocumentCell docCell = new DocumentCell(
+                    DataCell docCell = dataCellCache.getInstance(
                             preprocessedDoc.get(origDoc));
                     cells[i] = docCell;
                 } else {

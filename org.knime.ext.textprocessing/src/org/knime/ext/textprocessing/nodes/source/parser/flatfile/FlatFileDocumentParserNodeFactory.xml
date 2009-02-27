@@ -7,11 +7,11 @@
     <fullDescription>
         <intro>
             This node allows you to read flat ascii files and create a document
-            for each file. The documents title will be the absolut path of the
-            file and the full text the data contained in the file. 
+            for each file. The documents title will be the first sentence of the
+            file and the full text the remaining text contained in the file. 
             The specified directory will be searched for <b>all</b> files, 
             if recursive search is activated the subdirectories are going to be
-            search too. All contained files are parsed.
+            searched too. All contained files are parsed.
             The document data is stored in the outgoing data table.
         </intro>
         <option name="Document directory">
@@ -22,12 +22,14 @@
             files recursively.
         </option>
         <option name="Document category">
-            Specifies the category of the documents to set.
+            Specifies the category of the documents.
         </option>
         <option name="Document source">
-            Specifies the source of the documents to set. If no source is 
-            specified the PubMed default source "PubMed" is used by default.
+            Specifies the source of the documents.
         </option>
+        <option name="Document type">
+            Specifies the type of the documents.
+        </option>        
     </fullDescription>
         
     <ports>

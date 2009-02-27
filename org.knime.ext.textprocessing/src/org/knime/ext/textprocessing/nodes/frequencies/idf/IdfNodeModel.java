@@ -23,9 +23,10 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.idf;
 
-import java.io.File;
-import java.io.IOException;
-
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.def.DoubleCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -34,6 +35,9 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequencyNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The model of the IDF-Node, specifying the proper cell factory
@@ -47,7 +51,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
      * Creates a new instance of <code>IdfNodeModel</code>.
      */
     public IdfNodeModel() {
-        super(IdfCellFactory.COLNAME, IdfCellFactory.INT_COL);
+        super();
     }
     
     /**
@@ -114,5 +118,15 @@ public class IdfNodeModel extends FrequencyNodeModel {
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
+    }
+
+    @Override
+    protected DataTableSpec createDataTableSpec(DataTableSpec inDataSpec) {
+        DataColumnSpec freq = 
+            new DataColumnSpecCreator(
+                    DataTableSpec.getUniqueColumnName(
+                            inDataSpec, IdfCellFactory.COLNAME), 
+                            DoubleCell.TYPE).createSpec();
+        return new DataTableSpec(inDataSpec, new DataTableSpec(freq));
     }
 }

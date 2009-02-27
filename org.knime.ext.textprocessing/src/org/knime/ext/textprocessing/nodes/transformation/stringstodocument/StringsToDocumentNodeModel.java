@@ -23,13 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -45,6 +38,14 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -102,7 +103,9 @@ public class StringsToDocumentNodeModel extends NodeModel {
 
     private DataTableSpec createDataTableSpec(
             final DataTableSpec inDataSpec) {
-        DataColumnSpec strCol = new DataColumnSpecCreator("Document", 
+        DataColumnSpec strCol = new DataColumnSpecCreator(
+                DataTableSpec.getUniqueColumnName(inDataSpec, 
+                        DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME), 
                 DocumentCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(strCol));
     }    

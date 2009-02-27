@@ -19,8 +19,8 @@
 			specified query will be shown.
 		</option>
 		<option name="Database">
-			The database to download the resulting documents from, i.e.:
-			PubMed.
+			The database to send the query to and receive the resulting 
+			documents from, i.e.: PubMed.
 		</option>
 		<option name="Maximal results">
 			The number of maximal resulting documents to download and parse.
@@ -33,10 +33,10 @@
 			after parsing.
 		</option>
         <option name="Document category">
-            The category of the documents to set.
+            The category of the documents.
         </option>
         <option name="Document type">
-            The type of the documents to set.
+            The type of the documents.
         </option>
 	</fullDescription>
 		

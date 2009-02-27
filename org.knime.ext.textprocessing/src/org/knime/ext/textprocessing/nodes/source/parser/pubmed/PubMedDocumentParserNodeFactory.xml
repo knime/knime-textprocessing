@@ -11,7 +11,7 @@
             (http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_060101.dtd).
             The specified directory will be searched for xml, gz or zip files, 
             if recursive search is activated the subdirectories are going to be
-            search too. All the contained xml, gz or zip files are parsed.
+            searched too. All the contained xml, gz or zip files are parsed.
             The document data is stored in the outgoing data table.
         </intro>
         <option name="Document directory">
@@ -22,11 +22,14 @@
             files recursively.
         </option>
         <option name="Document category">
-            Specifies the category of the documents to set.
+            Specifies the category of the documents.
         </option>
         <option name="Document source">
-            Specifies the source of the documents to set. If no source is 
+            Specifies the source of the documents. If no source is 
             specified the PubMed default source "PubMed" is used by default.
+        </option>
+        <option name="Document type">
+            Specifies the type of the documents.
         </option>
     </fullDescription>
         

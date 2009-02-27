@@ -2,14 +2,14 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Learner">
     <name>Category to class</name>
-    <shortDescription>Adds a class column to each row, containing the category
-    string of the document in that particular row.
+    <shortDescription>Adds a class (string) column to each row, containing the 
+    category string of the document in that particular row.
     </shortDescription>
     <fullDescription>
         <intro>
-            This node allows you to add a class column to each row containing
+            This node allows you to add a class (string) column to each row containing
             a document cell. The value of the class is the
-            document's category. If no category is defined, the class value 
+            document's category as string. If no category is defined, the class value 
             will be set to "undefined". If more than one category is defined,
             the first category (of the list of alphabetically ordered categories
             is used as class value. If the input data table contains no

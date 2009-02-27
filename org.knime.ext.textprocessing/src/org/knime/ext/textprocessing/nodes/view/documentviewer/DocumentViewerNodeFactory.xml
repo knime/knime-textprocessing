@@ -2,12 +2,10 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../../../../../icons/TextProcDocumentView.png" type="Visualizer">
 	<name>Document Viewer</name>
-	
 	<shortDescription>
 		Displays all data of the given documents, like text, authors, 
 		publication date and so on. 
 	</shortDescription>
-	
 	<fullDescription>
 	<intro>
         First a list of all document titles is shown. A double click on a
@@ -28,7 +26,7 @@
 	
     <views>
         <view index="0" name="Document View">
-            Displays the data of a document.
+            Displays the data of the documents.
         </view>
     </views>	
 </knimeNode>

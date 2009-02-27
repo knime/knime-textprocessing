@@ -11,6 +11,19 @@
             terms can be set unmodifiable, meaning that the terms are not
             modified or filtered afterwards by any following node.
         </intro>
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+        <option name="Case sensitive">
+            If checked, case sensitive named entity recognition will be applied,
+            otherwise not. 
+        </option>
+        <option name="Selected File">
+            Specifies the location of the dictionary file.
+        </option>
+        <option name="Named entity tag">
+            Specifies the type of tag to use for tagging recognized named entities.
+        </option>
     </fullDescription>
         
     <ports>

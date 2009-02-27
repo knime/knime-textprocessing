@@ -7,15 +7,19 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            This node allows you to add a string column to each row containing
-            a term. The column will contain the value of the term converted into 
-            a string.
+            This node allows you to convert terms of a defined column into strings
+            and attach a new column containing the these strings. The tags
+            of the terms get lost, since only the words of the terms are
+            converted.
         </intro>
+        <option name="Term Column">
+            The column containing the terms to convert into strings.
+        </option>
     </fullDescription>
         
     <ports>
         <inPort name="Term input table" index="0">
-        An input data table containing term cells.
+            An input data table containing term cells.
         </inPort>
         <outPort name="Term output table" index="0">
         An output table containing the input data with an additional string

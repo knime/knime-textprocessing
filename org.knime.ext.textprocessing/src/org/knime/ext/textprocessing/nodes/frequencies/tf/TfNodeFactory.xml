@@ -15,14 +15,14 @@
         computed by dividing the absolute frequency of a term according to a 
         document by the number of all terms of that document.
 	</intro>
-	<option name="Document Column">
-	   Specifies the document column to use for frequency counting.
-	</option>
+	
     <option name="Relative frequency">
         If relative frequency is checked, the relative term frequency is
         computed, otherwise the absolute term frequency. 
-    </option>   
-    
+    </option>   	
+	<option name="Document Column">
+	   Specifies the document column to use for frequency counting.
+	</option>    
 	</fullDescription>
 	
 	<ports>

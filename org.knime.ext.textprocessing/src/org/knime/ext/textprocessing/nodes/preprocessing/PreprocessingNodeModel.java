@@ -51,7 +51,9 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.event.ChangeListener;
@@ -122,8 +124,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     
     private BagOfWordsDataTableBuilder m_fac;
     
-    private Hashtable<Document, DataCell> m_preprocessedDocuments;
+    private HashMap<Document, DataCell> m_preprocessedDocuments;
     
+    private HashMap<DataCell, Set<Term>> m_addedRows;
     
     private int m_noRows = 0;
     
@@ -233,7 +236,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         m_noRows = inData[0].getRowCount();
         m_exec = exec;
         
-        m_preprocessedDocuments = new Hashtable<Document, DataCell>();
+        m_preprocessedDocuments = new HashMap<Document, DataCell>();
+        m_addedRows = new HashMap<DataCell, Set<Term>>();
         int count = 0;
         
         RowIterator i = inData[0].iterator();
@@ -245,9 +249,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             setProgress();
             processRow(row);
         }
-        
         m_dc.close();
         m_preprocessedDocuments.clear();
+        m_addedRows.clear();
         return new BufferedDataTable[]{m_dc.getTable()};
     }
 
@@ -322,6 +326,19 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     
     private synchronized void addRowToContainer(RowKey rk, Term t, 
             DataCell preprocessedDoc, DataCell origDoc) {
+        Set<Term> terms = m_addedRows.get(preprocessedDoc);
+        if (terms == null) {
+            terms = new HashSet<Term>();
+        } else if (terms.contains(t)) {
+            // do not add row, since this preprocessed term has already been 
+            // added.
+            return;
+        }
+        // if term has not been added, memorize it
+        terms.add(t);
+        m_addedRows.put(preprocessedDoc, terms);
+        
+        // add row with or without unchanged document.
         DataRow row;
         if (m_appendIncomingModel.getBooleanValue()) {
             row = new DefaultRow(rk, m_termCellFac.createDataCell(t), 

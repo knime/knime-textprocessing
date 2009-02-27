@@ -23,9 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringtoterm;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -43,6 +40,9 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
@@ -88,7 +88,7 @@ public class StringToTermNodeModel extends NodeModel {
         int colIndex = bfd.getDataTableSpec().findColumnIndex(
                 m_stringColModel.getStringValue());
         
-        CellFactory fac = new TermCellFactory(colIndex);
+        CellFactory fac = new TermCellFactory(colIndex, bfd.getDataTableSpec());
         ColumnRearranger rearranger = new ColumnRearranger(
                 bfd.getDataTableSpec());
         rearranger.append(fac);
@@ -100,15 +100,16 @@ public class StringToTermNodeModel extends NodeModel {
     private static final DataTableSpec createDataTableSpec(
             final DataTableSpec inSpec) {
         return new DataTableSpec(inSpec,  
-                new DataTableSpec(getTermColumnSpec()));
+                new DataTableSpec(getTermColumnSpec(inSpec)));
     }
     
     /**
      * @return The column spec of the term column to append.
      */
-    static final DataColumnSpec getTermColumnSpec() {
-        return new DataColumnSpecCreator(TERM_COLNAME, 
-                TermCell.TYPE).createSpec();        
+    static final DataColumnSpec getTermColumnSpec(final DataTableSpec spec) {
+        return new DataColumnSpecCreator(
+                DataTableSpec.getUniqueColumnName(spec, TERM_COLNAME), 
+                TermCell.TYPE).createSpec();
     }
     
     /**

@@ -23,12 +23,10 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringtoterm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CellFactory;
@@ -36,6 +34,9 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.Word;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -45,6 +46,8 @@ public class TermCellFactory implements CellFactory {
 
     private int m_colIndex;
     
+    private DataTableSpec m_inSpec;
+    
     /**
      * Creates new instance of <code>TermCellFactory</code> with given index
      * of column containing the strings to convert to terms.
@@ -52,12 +55,17 @@ public class TermCellFactory implements CellFactory {
      * @param colIndex The index of the column containing the string to
      * convert to terms.
      */
-    public TermCellFactory(final int colIndex) {
+    public TermCellFactory(final int colIndex, final DataTableSpec inSpec) {
         if (colIndex < 0) {
             throw new IllegalArgumentException("Given column index " 
                     + colIndex + " is not valid!");
         }
+        if (inSpec == null) {
+            throw new IllegalArgumentException(
+                    "Given input spec is not valid!");            
+        }
         m_colIndex = colIndex;
+        m_inSpec = inSpec;
     }
     
     /**
@@ -77,7 +85,8 @@ public class TermCellFactory implements CellFactory {
      */
     @Override
     public DataColumnSpec[] getColumnSpecs() {
-        return new DataColumnSpec[]{StringToTermNodeModel.getTermColumnSpec()};
+        return new DataColumnSpec[]{
+                StringToTermNodeModel.getTermColumnSpec(m_inSpec)};
     }
 
     /**

@@ -23,15 +23,16 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.termvector;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Provides the dialog of the document vector node.
@@ -70,6 +71,11 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
                 TermVectorNodeModel.DEFAULT_IGNORE_TAGS);
     }
 
+    public static final SettingsModelString getDocColModel() {
+        return new SettingsModelString(TermVectorConfigKeys.CFGKEY_DOC_COL,
+                TermVectorNodeModel.DEFAULT_DOCUMENT_COLNAME);
+    }    
+    
     private SettingsModelString m_columnModel;
 
     private SettingsModelBoolean m_booleanModel;
@@ -79,6 +85,9 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public TermVectorNodeDialog() {
+        addDialogComponent(new DialogComponentColumnNameSelection(
+                getDocColModel(), "Document column", 0, DocumentValue.class));
+        
         m_columnModel = getColumnModel();
         m_booleanModel = getBooleanModel();
         m_booleanModel.addChangeListener(new InternalChangeListener());

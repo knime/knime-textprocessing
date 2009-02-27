@@ -23,9 +23,11 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.tf;
 
-import java.io.File;
-import java.io.IOException;
-
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.IntCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -35,6 +37,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequencyNodeModel;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The model of the TF-Node, specifying the proper cell factory
@@ -56,8 +61,7 @@ public class TfNodeModel extends FrequencyNodeModel {
      * Creates a new instance of <code>TfNodeModel</code>.
      */
     public TfNodeModel() {
-        super(TfCellFactory.COLNAME_REL, false);
-        m_noOutputSpec = true;
+        super();
     }
     
     /**
@@ -69,8 +73,6 @@ public class TfNodeModel extends FrequencyNodeModel {
         m_cellFac = new TfCellFactory(getDocumentColIndex(), getTermColIndex(),
                 m_relativeModel.getBooleanValue());
     }
-
-
 
 
     /**
@@ -130,5 +132,23 @@ public class TfNodeModel extends FrequencyNodeModel {
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
+    }
+
+    @Override
+    protected DataTableSpec createDataTableSpec(final DataTableSpec inDataSpec) {
+        DataColumnSpec freq;
+        if (m_relativeModel.getBooleanValue()) {
+            String colName = DataTableSpec.getUniqueColumnName(
+                    inDataSpec, TfCellFactory.COLNAME_REL);
+            freq = new DataColumnSpecCreator(colName, 
+                    DoubleCell.TYPE).createSpec();
+            
+        } else {
+            String colName = DataTableSpec.getUniqueColumnName(
+                    inDataSpec, TfCellFactory.COLNAME_ABS);
+            freq = new DataColumnSpecCreator(colName, 
+                    IntCell.TYPE).createSpec();
+        }
+        return new DataTableSpec(inDataSpec, new DataTableSpec(freq));
     }    
 }

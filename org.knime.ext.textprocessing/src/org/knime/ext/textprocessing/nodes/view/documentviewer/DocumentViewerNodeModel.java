@@ -23,13 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
@@ -48,6 +41,13 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPane;
 import org.knime.ext.textprocessing.util.DataStructureUtil;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
@@ -171,9 +171,6 @@ implements BufferedDataTableHolder {
             fis.close();
             throw ioe;
         }
-        
-        m_documents = DataStructureUtil.buildDocumentSet(m_data, 
-                m_documentCellindex, m_exec);
     }
 
     /**

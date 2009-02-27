@@ -6,11 +6,11 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            This node creates a bag of words (BoW) out of a set of documents.
+            This node creates a bag of words (BoW) of a set of documents.
             A BoW consists of at least two columns, one containing the
-            documents and one containing the terms. A row represents a tupel
-            of a term and a document, meaning that the term is contained in
-            the document. 
+            documents and one containing the terms occurring in the corresponding 
+            document. A row represents a tupel of a term contained in the
+            related document. 
         </intro>
     </fullDescription>
         

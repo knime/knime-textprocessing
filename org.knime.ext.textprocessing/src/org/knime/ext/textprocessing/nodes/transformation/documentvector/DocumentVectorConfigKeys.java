@@ -39,4 +39,14 @@ public class DocumentVectorConfigKeys {
      * The configuration key of the column value setting.
      */
     public static final String CFGKEY_VALUE_COL = "Value_Col";
+    
+    /**
+     * The configuration key of the column containing the documents.
+     */
+    public static final String CFGKEY_DOC_COL = "Document_Col";
+    
+    /**
+     * The configuration key of the ignore tags flag.
+     */
+    public static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";    
 }

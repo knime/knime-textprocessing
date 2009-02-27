@@ -23,16 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.termvector;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -60,7 +50,18 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * The model of the document vector node, creates a document feature vector
@@ -87,6 +88,13 @@ public class TermVectorNodeModel extends NodeModel {
      */
     public static final boolean DEFAULT_IGNORE_TAGS = true;
 
+    /**
+     * Default name of column containing the terms.
+     */
+    public static final String DEFAULT_DOCUMENT_COLNAME = 
+        BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME;
+    
+    
     private int m_documentColIndex = -1;
 
     private int m_termColIndex = -1;
@@ -99,6 +107,9 @@ public class TermVectorNodeModel extends NodeModel {
 
     private final SettingsModelBoolean m_ignoreTagsModel =
         TermVectorNodeDialog.getIgnoreTagsModel();
+    
+    private final SettingsModelString m_docColModel = 
+        TermVectorNodeDialog.getDocColModel();
 
     /**
      * Creates a new instance of <code>TermVectorNodeModel</code>.
@@ -122,9 +133,8 @@ public class TermVectorNodeModel extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyDocumentCell(true);
+        verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
     }
 
@@ -136,6 +146,9 @@ public class TermVectorNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
+        m_documentColIndex = inData[0].getSpec().findColumnIndex(
+                m_docColModel.getStringValue());
+        
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
         // specified !
@@ -309,6 +322,7 @@ public class TermVectorNodeModel extends NodeModel {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
         m_ignoreTagsModel.loadSettingsFrom(settings);
+        m_docColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -319,6 +333,7 @@ public class TermVectorNodeModel extends NodeModel {
         m_colModel.saveSettingsTo(settings);
         m_booleanModel.saveSettingsTo(settings);
         m_ignoreTagsModel.saveSettingsTo(settings);
+        m_docColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -330,6 +345,7 @@ public class TermVectorNodeModel extends NodeModel {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
         m_ignoreTagsModel.validateSettings(settings);
+        m_docColModel.validateSettings(settings);
     }
 
 

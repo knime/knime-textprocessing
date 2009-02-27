@@ -2,14 +2,13 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../../../../../../icons/TextProcDefault.png" type="Manipulator">
     <name>Abner Filter</name>
-    <shortDescription>Filters terms with biomedical named entity tags not 
-    specified as valid.
+    <shortDescription>Filters terms with certain biomedical named entity tags.
     </shortDescription>
     <fullDescription>
         <intro>
             Filters all terms contained in the given bag of words (input table) 
-            that have biomedical named entity (BNER) tags assigned which are 
-            not specified as valid. The terms are filtered out of the bag of 
+            with biomedical named entities (BNER) tags assigned, 
+            not specified in the dialog. The terms are filtered out of the bag of 
             words and the documents as well if deep preprocessing is checked.
             <br />
             To detect biomedical named entities, the ABNER 
@@ -22,27 +21,33 @@
         </intro>
         
         <option name="Strict filtering">
-             If strict filtering is checked, all tags (of a certain type) of the
-             term have to be valid. If setting is not checked, at least
-             one tag has to be valid.
+             If strict filtering is checked, terms need to have all specified 
+             tags applied. If  not checked, at least one tag has to be applied.
         </option>
         <option name="Tags">
-             The tags to use as valid tags.
+             The tags to filter for.
         </option>
-        
+
+        <option name="Deep preprocessing">
+             If deep preprocessing is checked, the terms contained inside
+             the documents are preprocessed too, this means that the documents 
+             themselves are changed too, which is more time consuming. 
+        </option>        
         <option name="Document column">
               Specifies the column containing the documents to preprocess.
         </option>
-        <option name="Deep preprocessing">
-             If deep preprocessing is checked, the terms contained inside
-             the documents are converted too, this means that the documents are
-             changed, which is more time consuming. 
+        <option name="Append unchanged documents">
+            If checked, the documents contained in the specified "Original 
+            Document column" are appended unchanged even if deep preprocessing
+            is checked. This helps to keep the original documents in the
+            output data table without the agonizing pain of joining.
         </option>
-        <option name="Append original document">
-            If append original document is checked, the documents contained in
-            the input document column are appended as extra column. This
-            enables later on a mapping of preprocessed documents to original
-            documents.  
+        <option name="Original Document column">
+              Specifies the column containing the original documents which
+              can be attached unchanged.
+        </option>        
+        <option name="Ignore unmodifiable tag">
+              If checked unmodifiable terms will be preprocessed too.
         </option>
     </fullDescription>
         

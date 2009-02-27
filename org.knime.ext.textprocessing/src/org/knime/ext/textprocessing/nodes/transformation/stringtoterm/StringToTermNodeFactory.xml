@@ -6,7 +6,7 @@
     </shortDescription>
     <fullDescription>
         <intro>
-			Converts the string of the specified string column to terms and
+			Converts the strings of the specified string column to terms and
 			appends a new column containing these terms.
 		</intro>
 		<option name="String column">

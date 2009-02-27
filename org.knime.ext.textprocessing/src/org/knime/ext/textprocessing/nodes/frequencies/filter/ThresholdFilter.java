@@ -25,7 +25,6 @@ package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTable;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.node.BufferedDataTable;
@@ -91,7 +90,7 @@ public class ThresholdFilter extends FrequencyFilter {
      * {@inheritDoc}
      */
     @Override
-    public DataTable preprocessData(final BufferedDataTable data,
+    public BufferedDataTable preprocessData(final BufferedDataTable data,
             final ExecutionContext exec) throws CanceledExecutionException {
         return data;
     }

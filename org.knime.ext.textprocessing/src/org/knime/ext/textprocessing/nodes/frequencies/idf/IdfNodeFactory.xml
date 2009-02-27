@@ -12,13 +12,13 @@
 	<intro>
         Computes the inverse document frequency (idf) of each term according to 
         the given set of documents and adds a column containing the idf value.
-        The value for term ti is computed as follows: 
-        idf(ti) = log(1 + (f(D) / f(d, ti)), <br/>
-        where f(D) is the number of all documents and f(d, ti) is the number of
-        documents containing term ti.
+        The value for term t is computed as follows: 
+        idf(t) = log(1 + (f(D) / f(d, t)), <br/>
+        where f(D) is the number of all documents and f(d, t) is the number of
+        documents containing term t.
 	</intro>
     <option name="Document Column">
-       Specifies the document column to use for frequency couting.
+       Specifies the document column to use for frequency counting.
     </option>
 
 	</fullDescription>

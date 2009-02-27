@@ -23,14 +23,7 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.base.node.preproc.filter.row.RowFilterTable;
-import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -46,6 +39,12 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * The model class of the filter node. Providing all default settings of the
@@ -187,21 +186,26 @@ public class FilterNodeModel extends NodeModel {
                 m_minMaxModel.getMinRange(), m_minMaxModel.getMaxRange(),
                 m_modifyUnmodifiableModel.getBooleanValue());
         
-        DataTable preprocessedTable = filter.preprocessData(inData[0], exec);
-        DataTable filteredTable;
+        ExecutionContext subExec1 = exec.createSubExecutionContext(0.3);
+        BufferedDataTable preprocessedTable = 
+            filter.preprocessData(inData[0], subExec1);
+        
+        BufferedDataTable filteredTable;
         synchronized (this) {
-            filteredTable = new RowFilterTable(preprocessedTable, filter);
+            filteredTable = exec.createBufferedDataTable(
+                    new RowFilterTable(preprocessedTable, filter), exec);
         }
         
         // Deep filtering
+        ExecutionContext subExec3 = exec.createSubExecutionContext(0.7);
         if (m_deepFilteringModel.getBooleanValue()) {
-            TermPurger purger = new TermPurger(filteredTable, exec, 
+            TermPurger purger = new TermPurger(filteredTable, subExec3, 
                     m_documentColModel.getStringValue());
             return new BufferedDataTable[]{purger.getPurgedDataTable()};
         }
         
         return new BufferedDataTable[]{
-                exec.createBufferedDataTable(filteredTable, exec)};
+                exec.createBufferedDataTable(filteredTable, subExec3)};
     }
 
     private void enableModels() {

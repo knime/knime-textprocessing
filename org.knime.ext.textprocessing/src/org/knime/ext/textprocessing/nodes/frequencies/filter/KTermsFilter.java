@@ -23,16 +23,15 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Keeps a specified number k of rows and filters out the rest. The k rows that
@@ -82,7 +81,7 @@ public class KTermsFilter extends FrequencyFilter {
      * @throws CanceledExecutionException 
      */
     @Override
-    public DataTable preprocessData(final BufferedDataTable data,
+    public BufferedDataTable preprocessData(final BufferedDataTable data,
             final ExecutionContext exec) throws CanceledExecutionException {
         DataTableSpec spec = data.getDataTableSpec();
         
@@ -92,6 +91,7 @@ public class KTermsFilter extends FrequencyFilter {
         boolean[] sortAsc = new boolean[1];
         sortAsc[0] = false;
         
-        return new SortedTable(data, colName, sortAsc, exec);
+        return new SortedTable(data, colName, sortAsc, exec).
+                    getBufferedDataTable();
     }   
 }
