@@ -23,17 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.dml;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.SAXParserFactory;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -52,6 +41,18 @@ import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -255,7 +256,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     
     private List<Tag> m_tags;
     
-    private String m_modifiability;
+    private String m_modifiability = "";
     
     private String m_annotation = "";
     

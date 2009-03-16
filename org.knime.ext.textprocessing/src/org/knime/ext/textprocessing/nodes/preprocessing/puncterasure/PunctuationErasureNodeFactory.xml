@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Manipulator">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
     <name>Punctuation Erasure</name>
     <shortDescription>Erases the punctuation characters of terms.
     </shortDescription>
