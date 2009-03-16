@@ -27,7 +27,6 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
@@ -82,14 +81,6 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 PreprocessingConfigKeys.CFG_KEY_ORIGDOCUMENT_COL,
                 BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME);
-    }
-    
-    public static SettingsModelIntegerBounded getChunkSizeModel() {
-        return new SettingsModelIntegerBounded(
-                PreprocessingConfigKeys.CFG_KEY_CHUNK_SIZE,
-                ThreadedPreprocessingNodeModel.DEF_CHUNK_SIZE,
-                ThreadedPreprocessingNodeModel.MIN_CHUNK_SIZE,
-                ThreadedPreprocessingNodeModel.MAX_CHUNK_SIZE);
     }
     
     public static SettingsModelBoolean getPreprocessUnmodifiableModel() {
