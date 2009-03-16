@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Punctuation Erasure</name>
+    <shortDescription>Erases the punctuation characters of terms.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+        	This node allows you to erase punctuation characters of terms.
+        	The preprocessed terms are stored in the outgoing DataTable, 
+        	as well as the documents containing these terms.
+		</intro>
+		
+        <option name="Deep preprocessing">
+             If deep preprocessing is checked, the terms contained inside
+             the documents are preprocessed too, this means that the documents 
+             themselves are changed too, which is more time consuming. 
+        </option>        
+        <option name="Document column">
+              Specifies the column containing the documents to preprocess.
+        </option>
+        <option name="Append unchanged documents">
+            If checked, the documents contained in the specified "Original 
+            Document column" are appended unchanged even if deep preprocessing
+            is checked. This helps to keep the original documents in the
+            output data table without the agonizing pain of joining.
+        </option>
+        <option name="Original Document column">
+              Specifies the column containing the original documents which
+              can be attached unchanged.
+        </option>        
+        <option name="Ignore unmodifiable tag">
+              If checked unmodifiable terms will be preprocessed too.
+        </option>
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains the terms and the documents as a bag
+        of words.
+        </inPort>
+   		<outPort name="Preprocessed terms and related documents output table" index="0">
+   		The output table which contains the preprocessed terms and the documents
+   		as a bag of words.
+   		</outPort>
+	</ports>
+</knimeNode>

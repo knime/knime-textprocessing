@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../../../../../icons/TextProcDefault.png" type="Learner">
+    <name>Category to class</name>
+    <shortDescription>Adds a class (string) column to each row, containing the 
+    category string of the document in that particular row.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node allows you to add a class (string) column to each row containing
+            a document cell. The value of the class is the
+            document's category as string. If no category is defined, the class value 
+            will be set to "undefined". If more than one category is defined,
+            the first category (of the list of alphabetically ordered categories
+            is used as class value. If the input data table contains no
+            document cells the node can not be executed. 
+        </intro>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Document input table" index="0">
+        An input data table containing document cells.
+        </inPort>
+        <outPort name="Documents output table" index="0">
+        An output table containing the input data with an additional class column.
+        </outPort>
+    </ports>
+</knimeNode>
