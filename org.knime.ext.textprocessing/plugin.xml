@@ -227,6 +227,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/transformation"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
