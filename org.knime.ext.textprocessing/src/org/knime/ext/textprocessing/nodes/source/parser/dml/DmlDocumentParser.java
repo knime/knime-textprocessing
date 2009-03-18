@@ -696,7 +696,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     public static String stripNonValidXMLCharacters(final String in) {
         StringBuffer out = new StringBuffer();
         char curr;
-        if (in == null || ("".equals(in))) {
+        if (in == null || (in.equals(""))) {
             return "";
         }
         for (int i = 0; i < in.length(); i++) {
