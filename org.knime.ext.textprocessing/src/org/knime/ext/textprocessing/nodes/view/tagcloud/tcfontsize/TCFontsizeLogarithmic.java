@@ -29,13 +29,6 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize;
 public class TCFontsizeLogarithmic implements TCFontsize {
 
     /**
-     * nothing to do.
-     */
-    public TCFontsizeLogarithmic() {
-        // nothing to do
-    }
-
-    /**
      * {@inheritDoc}
      */
     public double getSize(final double minf, final double maxf,

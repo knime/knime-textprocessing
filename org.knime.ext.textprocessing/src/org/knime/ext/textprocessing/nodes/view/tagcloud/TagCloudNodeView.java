@@ -85,5 +85,4 @@ public class TagCloudNodeView extends NodeView<TagCloudNodeModel>  {
     protected void onOpen() {
         //nothing to do
     }
-
 }

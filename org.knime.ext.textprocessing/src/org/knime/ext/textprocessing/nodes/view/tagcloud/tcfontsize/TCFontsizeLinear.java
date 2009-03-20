@@ -29,18 +29,10 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize;
 public class TCFontsizeLinear implements TCFontsize {
 
     /**
-     * nothing to do.
-     */
-    public TCFontsizeLinear() {
-        // nothing to do
-    }
-
-    /**
      * {@inheritDoc}
      */
     public double getSize(final double minf, final double maxf,
             final double minv, final double maxv, final double value) {
         return ((value - minv) * (maxf - minf) / (maxv - minv)) + minf;
     }
-
 }

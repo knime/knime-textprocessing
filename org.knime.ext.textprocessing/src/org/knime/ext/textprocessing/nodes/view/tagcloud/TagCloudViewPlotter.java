@@ -278,8 +278,6 @@ public class TagCloudViewPlotter extends AbstractPlotter {
         }
     }
 
-
-
     /**
      * {@inheritDoc}
      */
@@ -292,5 +290,4 @@ public class TagCloudViewPlotter extends AbstractPlotter {
         repaint();
         revalidate();
     }
-
 }

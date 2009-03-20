@@ -517,7 +517,6 @@ public class TagCloudFontStyleTab extends PropertiesTab {
      */
     private void setcalcID(final int calcID) {
         m_calcType.setSelectedIndex(calcID);
-
     }
 
     /**
@@ -525,7 +524,5 @@ public class TagCloudFontStyleTab extends PropertiesTab {
      */
     private void setBold(final int bold) {
         m_boldSlider.setValue(bold);
-
     }
-
 }

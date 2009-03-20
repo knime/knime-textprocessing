@@ -29,13 +29,6 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize;
 public class TCFontsizeExponential implements TCFontsize {
 
     /**
-     */
-   public TCFontsizeExponential() {
-
-        // nothing to do
-    }
-
-    /**
      * {@inheritDoc}
      */
     public double getSize(final double minf, final double maxf,
@@ -44,5 +37,4 @@ public class TCFontsizeExponential implements TCFontsize {
                 / (Math.exp(maxv) - Math.exp(minv)))
                 + minf;
     }
-
 }

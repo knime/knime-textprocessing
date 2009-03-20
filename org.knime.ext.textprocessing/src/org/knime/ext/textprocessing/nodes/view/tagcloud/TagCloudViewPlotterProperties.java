@@ -22,11 +22,11 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
-import java.awt.Color;
-import java.util.Map;
-
 import org.knime.base.node.viz.plotter.AbstractPlotterProperties;
 import org.knime.base.node.viz.plotter.props.ColorLegendTab;
+
+import java.awt.Color;
+import java.util.Map;
 
 /**
  * The properties contains element to interact with the view.
@@ -91,7 +91,6 @@ public class TagCloudViewPlotterProperties extends AbstractPlotterProperties {
         } else {
             m_colorLegend.update(colorMapping);
         }
-
     }
 
     /**

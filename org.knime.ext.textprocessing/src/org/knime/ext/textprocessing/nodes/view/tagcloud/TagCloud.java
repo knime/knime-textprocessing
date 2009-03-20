@@ -52,22 +52,19 @@ import java.util.LinkedList;
  * @author Iris Adae, University of Konstanz
  */
 public class TagCloud extends AbstractTagCloud<TagCloudData> {
-
     /**
      * The serialVersionUID.
      */
     private static final long serialVersionUID = 8141006637646515497L;
 
-
-
     /** horizontal position of the next term. */
-    private int m_nextposx,
+    private int m_nextposx;
 
     /** vertical position of the next line. */
-    m_nextposy,
+    private int m_nextposy;
 
     /** Height of the current line. */
-    m_nextysize;
+    private int m_nextysize;
 
 
     /** stores the kind of tagcloud.
@@ -242,7 +239,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      *
      * @author Iris Adae, University of Konstanz
      */
-    public class InsidePlaces {
+    class InsidePlaces {
         /**indicates where in the rectangle the label should be placed. */
        private Placetype m_type;
 
@@ -290,16 +287,16 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         right
     }
 
-    /** Creates a new tagcloud view.
-     * The most important words, will be shown in the middle of the cloud
-     * and the others around.
-     *
+    /**
+     * Creates a new tagcloud view. The most important words, will be shown in
+     * the middle of the cloud and the others around.
+     * 
      * @param width the preferred maximum width of the tagcloud
      * @param height the preferred maximum height of the tagcloud
-     * @return true if the data could be fit inside the given
-     * rectangle, otherwise false
+     * @return true if the data could be fit inside the given rectangle,
+     *         otherwise false
      */
-    private boolean createInsideOutTable(final double width,
+    private boolean createInsideOutTable(final double width, 
             final double height) {
         LinkedList<InsidePlaces> placequ = new LinkedList<InsidePlaces>();
         boolean lastlabelfoundaplace = true;
@@ -313,44 +310,44 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
             dataheight = tcd.getHeight();
             datawidth = tcd.getWidth() + BOUNDLABEL;
             if (w * 2 > datawidth && h * 2 > dataheight) {
-            tcd.setXY(0, 0);
-            // the area above will be inserted
-            placequ.addLast(new InsidePlaces(Placetype.top,
-                    new Rectangle2D.Double(tcd.getWidth() / 2 - w,
-                            (-1) * h, 2 * w, h)));
+                tcd.setXY(0, 0);
+                // the area above will be inserted
+                placequ.addLast(new InsidePlaces(Placetype.top,
+                        new Rectangle2D.Double(tcd.getWidth() / 2 - w,
+                                (-1) * h, 2 * w, h)));
 
-            // the area in the right will be inserted
-            placequ.add(new InsidePlaces(Placetype.right,
-                    new Rectangle2D.Double(tcd.getWidth(), 0,
-                            w - datawidth / 2, tcd.getHeight())));
+                // the area in the right will be inserted
+                placequ.add(new InsidePlaces(Placetype.right,
+                        new Rectangle2D.Double(tcd.getWidth(), 0, w - datawidth
+                                / 2, tcd.getHeight())));
 
-            // the area below will be inserted
-            placequ.addLast(new InsidePlaces(Placetype.bottom,
-                    new Rectangle2D.Double(datawidth / 2 - w,
-                            tcd.getHeight(), 2 * w, h - tcd.getHeight())));
+                // the area below will be inserted
+                placequ.addLast(new InsidePlaces(Placetype.bottom,
+                        new Rectangle2D.Double(datawidth / 2 - w, tcd
+                                .getHeight(), 2 * w, h - tcd.getHeight())));
 
-            // the area left of the label will be inserted
-            placequ.addLast(new InsidePlaces(Placetype.left,
-                    new Rectangle2D.Double(datawidth / 2 - w, 0,
-                            w - datawidth / 2, tcd.getHeight())));
+                // the area left of the label will be inserted
+                placequ.addLast(new InsidePlaces(Placetype.left,
+                        new Rectangle2D.Double(datawidth / 2 - w, 0, w
+                                - datawidth / 2, tcd.getHeight())));
             } else {
                 // if the first term already was to big, the method ends.
                 lastlabelfoundaplace = false;
             }
         }
-        // as the four  initializations are done, we are now going to place
+        // as the four initializations are done, we are now going to place
         // all other labels
-       for (int count = 1; count < dataarray.length && lastlabelfoundaplace;
-                       count++) {
+        for (int count = 1; count < dataarray.length && lastlabelfoundaplace; 
+        count++) {
             TagCloudData tcd = dataarray[count];
             dataheight = tcd.getHeight();
-                            // to get a nicer view, we put some free space
-                            // between two term.
+            // to get a nicer view, we put some free space
+            // between two term.
             datawidth = tcd.getWidth() + BOUNDLABEL;
             InsidePlaces now;
             Rectangle2D.Double rect = new Rectangle2D.Double();
-            LinkedList<InsidePlaces> zwischenspeicher =
-                    new LinkedList<InsidePlaces>();
+            LinkedList<InsidePlaces> zwischenspeicher = 
+                new LinkedList<InsidePlaces>();
             lastlabelfoundaplace = false;
 
             while ((!lastlabelfoundaplace) && !(placequ.isEmpty())) {
@@ -361,8 +358,8 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                 lastlabelfoundaplace = tcd.fitsin(rect);
             }
 
-            if (lastlabelfoundaplace) {     // if there was a space
-                //we know use the placetype to goon further
+            if (lastlabelfoundaplace) { // if there was a space
+                // we know use the placetype to goon further
 
                 now = zwischenspeicher.removeLast();
                 placequ.addAll(zwischenspeicher);
@@ -386,9 +383,9 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                                     rect.height - tcd.getHeight()))));
 
                     placequ.addLast((new InsidePlaces(Placetype.right,
-                            new Rectangle2D.Double(tcd.getX() + datawidth,
-                                    tcd.getY(), (rect.width / 2)
-                                            - (datawidth / 2), tcd
+                            new Rectangle2D.Double(tcd.getX() + datawidth, tcd
+                                    .getY(),
+                                    (rect.width / 2) - (datawidth / 2), tcd
                                             .getHeight()))));
                     break;
                 case right:
@@ -397,9 +394,8 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                     // right of the newly insert label.
 
                     placequ.addLast((new InsidePlaces(Placetype.right,
-                            new Rectangle2D.Double(rect.x + datawidth,
-                                    rect.y, rect.width - datawidth, tcd
-                                            .getHeight()))));
+                            new Rectangle2D.Double(rect.x + datawidth, rect.y,
+                                    rect.width - datawidth, tcd.getHeight()))));
                     // below the label is a placetype right. (A drawing will
                     // show the cause)
                     placequ.addLast((new InsidePlaces(Placetype.right,
@@ -410,13 +406,12 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                 case bottom:
                     tcd.setXY(rect.x + (rect.width / 2) - (datawidth / 2),
                             rect.y);
-                 // we know slice the area into three parts. below, right and
-                 // left of the newly insert label.
+                    // we know slice the area into three parts. below, right and
+                    // left of the newly insert label.
 
                     placequ.addLast((new InsidePlaces(Placetype.right,
                             new Rectangle2D.Double(tcd.getX() + datawidth,
-                                    rect.y,
-                                    rect.width / 2 - datawidth / 2, tcd
+                                    rect.y, rect.width / 2 - datawidth / 2, tcd
                                             .getHeight()))));
                     placequ.addLast((new InsidePlaces(Placetype.bottom,
                             new Rectangle2D.Double(rect.x, rect.y
@@ -424,8 +419,8 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                                     - tcd.getHeight()))));
                     placequ.addLast((new InsidePlaces(Placetype.left,
                             new Rectangle2D.Double(rect.x, rect.y,
-                                    (rect.width / 2) - (datawidth / 2),
-                                    tcd.getHeight()))));
+                                    (rect.width / 2) - (datawidth / 2), tcd
+                                            .getHeight()))));
                     break;
                 case left:
                     tcd.setXY(rect.x + rect.width - datawidth, rect.y);
@@ -475,7 +470,6 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      */
     @Override
     public void recreateTagCloud() {
-
         // Table
         if (m_typeoftagcloud < 3) {
             createTable(getPreferredSize().width);
@@ -487,7 +481,6 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
 
         /** the tag cloud is going to be painted */
         setlabelsontheiplaces();
-
     }
 
     /**Changes the width of the tagcloud.
@@ -520,7 +513,6 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      * @param drawingPaneDimension the new dimension for the view
      */
     public void fittoscreen(final Dimension drawingPaneDimension) {
-
         double fontSizeScalingFactor =
                 (drawingPaneDimension.getWidth() * drawingPaneDimension
                         .getHeight())

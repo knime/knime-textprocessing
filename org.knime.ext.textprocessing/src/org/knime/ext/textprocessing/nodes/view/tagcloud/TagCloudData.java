@@ -135,7 +135,6 @@ public class TagCloudData {
      */
     public void initLabel(final int fs, final Color c, final String fontname,
             final FontRenderContext frc, final long seed) {
-
         Random rt = new Random(seed);
         m_fs = fs;
         changeTextcolor(c);
@@ -147,7 +146,6 @@ public class TagCloudData {
         setFontStyle(m_fs, fontname, false);
         m_x = rt.nextDouble();
         m_y = rt.nextDouble();
-
     }
 
     /**
@@ -164,7 +162,6 @@ public class TagCloudData {
         initLabel(fs, c, fontname, new FontRenderContext(new Font(fontname,
                 Font.PLAIN, fs).getTransform(), true, true),
                 System.currentTimeMillis());
-
     }
 
     /**Checks if two labels intersect.
@@ -173,14 +170,12 @@ public class TagCloudData {
      * @return true if the section of this and comp intersects
      */
     public boolean intersects(final TagCloudData comp) {
-
         Rectangle2D.Double akt =
                 new Rectangle2D.Double(this.m_x, this.m_y, this.m_width,
                         this.m_height);
         Rectangle2D.Double cur =
                 new Rectangle2D.Double(comp.m_x, comp.m_y, comp.m_width,
                         comp.m_height);
-
         return akt.intersects(cur);
     }
 
@@ -210,8 +205,6 @@ public class TagCloudData {
         m_isHighlighted = false;
         m_isselected = false;
         m_isbold = false;
-
-
     }
 
     /**
@@ -241,7 +234,6 @@ public class TagCloudData {
         m_sumFreq += freq;
         m_rowID.add(rowid);
         return m_sumFreq;
-
     }
 
     /**
@@ -438,14 +430,12 @@ public class TagCloudData {
         }
         Font myfont = new Font(fontname, fontstyle, fontsize);
 
-
         Rectangle2D size =
                 myfont.getStringBounds(m_term.getText(), new FontRenderContext(
                         myfont.getTransform(), true, true));
         TextLayout tl =
                 new TextLayout(m_term.getText(), myfont, new FontRenderContext(
                         myfont.getTransform(), true, true));
-
         m_width = size.getWidth();
         m_height = tl.getAscent();
     }
@@ -456,7 +446,6 @@ public class TagCloudData {
      * @return true if the text color was changed
      */
     public boolean changeTextcolor(final Color color) {
-
         if (color.equals(m_color) || m_colorfixed) {
             return false;
         }
@@ -524,7 +513,6 @@ public class TagCloudData {
      * @return true if the term and the rectangle intersect
      */
     public boolean intersects(final Rectangle selectionRectangle) {
-
         Rectangle akt =
                 new Rectangle((int)this.m_x, (int)this.m_y, (int)this.m_width,
                         (int)this.m_height);
@@ -614,7 +602,6 @@ public class TagCloudData {
      */
     public void saveTo(final ModelContentWO modelContent,
                        final String config) {
-
         modelContent.addInt(config + CFG_KEY_TERM_COLOR, m_color.getRGB());
         modelContent.addBoolean(config + CFG_KEY_TERM_COLORFIXED, m_colorfixed);
         modelContent.addBoolean(config + CFG_KEY_TERM_HILITE, m_isHighlighted);
@@ -646,7 +633,6 @@ public class TagCloudData {
             i++;
         }
         modelContent.addRowKeyArray(config + CFG_KEY_TERM_ROWKEYS, rk);
-
     }
 
     /**
@@ -661,7 +647,6 @@ public class TagCloudData {
      */
     public void loadFrom(final ModelContentRO modelContent,
             final String config) throws InvalidSettingsException {
-
         m_color = new Color(modelContent.getInt(config + CFG_KEY_TERM_COLOR),
                 true);
         m_colorfixed = modelContent.getBoolean(
@@ -699,5 +684,4 @@ public class TagCloudData {
             m_rowID.add(rk[i]);
         }
     }
-
 }
