@@ -233,6 +233,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory">
       </node>
+      <node
+            category-path="/textprocessing/misc"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
