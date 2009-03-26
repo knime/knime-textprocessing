@@ -32,6 +32,6 @@
 <!ELEMENT Month (#PCDATA)>
 <!ELEMENT Year (#PCDATA)>
 
-<!ELEMENT Titlel (#PCDATA)>
+<!ELEMENT Title (#PCDATA)>
 <!ELEMENT Section (#PCDATA)>
 <!ATTLIST Section annotation CDATA #REQUIRED>

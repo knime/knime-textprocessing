@@ -23,17 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.dml;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.SAXParserFactory;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -52,6 +41,18 @@ import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -255,7 +256,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     
     private List<Tag> m_tags;
     
-    private String m_modifiability;
+    private String m_modifiability = "";
     
     private String m_annotation = "";
     
@@ -510,8 +511,9 @@ public class DmlDocumentParser extends DefaultHandler implements
             if (doc.getDocFile() != null && doc.getDocFile().length() > 0) {
                 atts.clear();
                 hd.startElement("", "", FILENAME, atts);
-                hd.characters(doc.getDocFile().getAbsolutePath().toCharArray(),
-                        0, doc.getDocFile().getAbsolutePath().length());
+                String filename = stripNonValidXMLCharacters(
+                        doc.getDocFile().getAbsolutePath()); 
+                hd.characters(filename.toCharArray(), 0, filename.length());
                 hd.endElement("", "", FILENAME);
             }
             
@@ -519,8 +521,9 @@ public class DmlDocumentParser extends DefaultHandler implements
             for (DocumentCategory cat : doc.getCategories()) {
                 atts.clear();
                 hd.startElement("", "", CATEGORY, atts);
-                hd.characters(cat.getCategoryName().toCharArray(),
-                        0, cat.getCategoryName().length());
+                String category = stripNonValidXMLCharacters(
+                        cat.getCategoryName()); 
+                hd.characters(category.toCharArray(), 0, category.length());
                 hd.endElement("", "", CATEGORY);                
             }
             
@@ -528,8 +531,9 @@ public class DmlDocumentParser extends DefaultHandler implements
             for (DocumentSource source : doc.getSources()) {
                 atts.clear();
                 hd.startElement("", "", SOURCE, atts);
-                hd.characters(source.getSourceName().toCharArray(),
-                        0, source.getSourceName().length());
+                String docSource = stripNonValidXMLCharacters(
+                        source.getSourceName()); 
+                hd.characters(docSource.toCharArray(), 0, docSource.length());
                 hd.endElement("", "", SOURCE);                
             }
             
@@ -537,8 +541,9 @@ public class DmlDocumentParser extends DefaultHandler implements
             if (doc.getType() != null) {
                 atts.clear();
                 hd.startElement("", "", DOCUMENT_TYPE, atts);
-                hd.characters(doc.getType().toString().toCharArray(),
-                        0, doc.getType().toString().length());
+                String type = stripNonValidXMLCharacters(
+                        doc.getType().toString());
+                hd.characters(type.toCharArray(), 0, type.length());
                 hd.endElement("", "", DOCUMENT_TYPE);                
             }
             
@@ -552,15 +557,19 @@ public class DmlDocumentParser extends DefaultHandler implements
                     if (a.getFirstName().length() > 0) {
                         atts.clear();
                         hd.startElement("", "", FIRSTNAME, atts);
-                        hd.characters(a.getFirstName().toCharArray(), 0, a
-                                .getFirstName().length());
+                        String firstname = stripNonValidXMLCharacters(
+                                a.getFirstName()); 
+                        hd.characters(firstname.toCharArray(), 0, 
+                                firstname.length());
                         hd.endElement("", "", FIRSTNAME);
                     }
                     if (a.getLastName().length() > 0) {
                         atts.clear();
                         hd.startElement("", "", LASTNAME, atts);
-                        hd.characters(a.getLastName().toCharArray(), 0, a
-                                .getLastName().length());
+                        String lastname = stripNonValidXMLCharacters(
+                                a.getLastName()); 
+                        hd.characters(lastname.toCharArray(), 0, 
+                                lastname.length());
                         hd.endElement("", "", LASTNAME);
                     }
                     hd.endElement("", "", AUTHOR);
@@ -574,23 +583,23 @@ public class DmlDocumentParser extends DefaultHandler implements
             // Day
             atts.clear();
             hd.startElement("", "", DAY, atts);
-            hd.characters(Integer.toString(doc.getPubDate().getDay())
-                    .toCharArray(), 0, Integer.toString(
-                    doc.getPubDate().getDay()).length());
+            String day = stripNonValidXMLCharacters(
+                    Integer.toString(doc.getPubDate().getDay()));
+            hd.characters(day.toCharArray(), 0, day.length());
             hd.endElement("", "", DAY);
             // Month
             atts.clear();
             hd.startElement("", "", MONTH, atts);
-            hd.characters(Integer.toString(doc.getPubDate().getMonth())
-                    .toCharArray(), 0, Integer.toString(
-                    doc.getPubDate().getMonth()).length());
+            String month = stripNonValidXMLCharacters(
+                    Integer.toString(doc.getPubDate().getMonth())); 
+            hd.characters(month.toCharArray(), 0, month.length());
             hd.endElement("", "", MONTH);
             // Year
             atts.clear();
             hd.startElement("", "", YEAR, atts);
-            hd.characters(Integer.toString(doc.getPubDate().getYear())
-                    .toCharArray(), 0, Integer.toString(
-                    doc.getPubDate().getYear()).length());
+            String year = stripNonValidXMLCharacters(
+                    Integer.toString(doc.getPubDate().getYear()));
+            hd.characters(year.toCharArray(), 0, year.length());
             hd.endElement("", "", YEAR);
             hd.endElement("", "", PUBLICATIONDATE);
 
@@ -626,8 +635,10 @@ public class DmlDocumentParser extends DefaultHandler implements
                             for (Word w : t.getWords()) {
                                 atts.clear();
                                 hd.startElement("", "", WORD, atts);
-                                hd.characters(w.getWord().toCharArray(), 0, w
-                                        .getWord().length());
+                                String word = stripNonValidXMLCharacters(
+                                        w.getWord());
+                                hd.characters(word.toCharArray(), 0, 
+                                        word.length());
                                 hd.endElement("", "", WORD);
                             }
 
@@ -660,14 +671,45 @@ public class DmlDocumentParser extends DefaultHandler implements
             hd.endDocument();
             os.close();
         } catch (SAXException e1) {
-            LOGGER.error("Could not create xml output!");
+            LOGGER.error("Could not create xml output of documemnt " 
+                    + "file:" + doc.getDocFile() 
+                    + " / title:" + doc.getTitle());
             LOGGER.info(e1.getMessage());
+            e1.printStackTrace();
         } catch (IOException e2) {
-            LOGGER.error("Could not write xml output to output stream!");
+            LOGGER.error("Could not write xml output to output stream " 
+                    + "of document file:" + doc.getDocFile() 
+                    + " / title:" + doc.getTitle());
             LOGGER.info(e2.getMessage());
+            e2.printStackTrace();
         }
 
         return os.toString();
+    }
+    
+    /**
+     * Strips non valid XML characters and returns stripped string.
+     * 
+     * @param in String with non valid XML characters which have to be removed
+     * @return Stripped string containing only valid XML characters
+     */
+    public static String stripNonValidXMLCharacters(final String in) {
+        StringBuffer out = new StringBuffer();
+        char curr;
+        if (in == null || (in.equals(""))) {
+            return "";
+        }
+        for (int i = 0; i < in.length(); i++) {
+            curr = in.charAt(i);
+            if ((curr == 0x9) ||
+                (curr == 0xA) ||
+                (curr == 0xD) ||
+                ((curr >= 0x20) && (curr <= 0xD7FF)) ||
+                ((curr >= 0xE000) && (curr <= 0xFFFD)) ||
+                ((curr >= 0x10000) && (curr <= 0x10FFFF)))
+                out.append(curr);
+        }
+        return out.toString();
     }
     
     /**

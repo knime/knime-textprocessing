@@ -5,14 +5,14 @@
          point="org.knime.workbench.repository.categories">
       <category
             description="Textprocessing nodes"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="textprocessing"
             name="Textprocessing"
             path="/">
       </category>
       <category
             description="Textprocessing IO nodes"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="io"
             name="IO"
             path="/textprocessing">
@@ -20,7 +20,7 @@
       <category
             after="io"
             description="Tagger nodes (POS, NER)"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="tagging"
             name="Enrichment"
             path="/textprocessing">
@@ -28,14 +28,14 @@
       <category
             after="tagging"
             description="Transformation nodes"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="transformation"
             name="Transformation"
             path="/textprocessing">
       </category>
       <category
             after="transformation"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="preprocessing"
             name="Preprocessing"
             path="/textprocessing">
@@ -43,7 +43,7 @@
       <category
             after="preprocessing"
             description="Contains nodes that compute several kinds of frequencies"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="frequencies"
             name="Frequencies"
             path="/textprocessing">
@@ -51,7 +51,7 @@
       <category
             after="frequencies"
             description="Contains misc nodes of the textprocessing plugin"
-            icon="icons/missing.gif"
+            icon="resources/missing.gif"
             level-id="misc"
             name="Misc"
             path="/textprocessing">
@@ -226,6 +226,18 @@
             expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/transformation"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory">
+      </node>
+      <node
+            category-path="/textprocessing/misc"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory">
       </node>
    </extension>
    <extension
