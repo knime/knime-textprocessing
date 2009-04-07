@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<feature id="org.knime.features.ext.textprocessing" label="KNIME Textprocessing Nodes" plugin="org.knime.ext.textprocessing" provider-name="KNIME GmbH, Konstanz, Germany" version="2.0.2.0020587">
+<feature id="org.knime.features.ext.textprocessing" label="KNIME Textprocessing Nodes" plugin="org.knime.ext.textprocessing" provider-name="KNIME GmbH, Konstanz, Germany" version="2.0.2.0020616">
 
    <description url="http://www.knime.org/download_extensions.html">
       This feature contains nodes for text processing.
