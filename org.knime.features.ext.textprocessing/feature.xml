@@ -3,7 +3,7 @@
       id="org.knime.features.ext.textprocessing"
       label="KNIME Textprocessing Nodes"
       version="2.0.1.0010000"
-      provider-name="Chair for Bioinformatics and Information Mining, Prof. Berthold, University of Konstanz, Germany"
+      provider-name="KNIME GmbH, Konstanz, Germany"
       plugin="org.knime.ext.textprocessing">
 
    <description url="http://www.knime.org/download_extensions.html">
@@ -12,6 +12,7 @@
 
    <copyright>
       Copyright, 2003 - 2009
+      University of Konstanz, Germany
       KNIME GmbH, Konstanz, Germany
    </copyright>
 
