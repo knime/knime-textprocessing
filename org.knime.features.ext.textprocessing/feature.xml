@@ -360,6 +360,6 @@ Public License instead of this License.
 
    <plugin download-size="0" id="org.knime.ext.textprocessing" install-size="0" version="0.0.0"/>
 
-   <plugin download-size="0" id="org.knime.features.ext.textprocessing.source" install-size="0" version="0.0.0"/>
+   <includes id="org.knime.features.ext.textprocessing.source" version="0.0.0"/>
 
 </feature>
