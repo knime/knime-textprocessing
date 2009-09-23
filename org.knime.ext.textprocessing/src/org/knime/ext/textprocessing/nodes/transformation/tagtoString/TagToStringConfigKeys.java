@@ -22,20 +22,22 @@ package org.knime.ext.textprocessing.nodes.transformation.tagtoString;
  *
  * @author Kilian Thiel
  */
-public class TagToStringConfigKeys {
+public final class TagToStringConfigKeys {
 
+    private TagToStringConfigKeys() { }
+    
     /**
      * The configuration key of the tag types to convert.
      */
-    public static String CFG_KEY_TAG_TYPES = "TagTypes";
+    public static final String CFG_KEY_TAG_TYPES = "TagTypes";
     
     /**
      * The configuration key of the term column.
      */
-    public static String CFG_KEY_TERM_COL = "TermColumn";
+    public static final String CFG_KEY_TERM_COL = "TermColumn";
     
     /**
-     * The configuration key of the missing tag string;
+     * The configuration key of the missing tag string.
      */
-    public static String CFG_KEY_MISSING_TAG_STRING = "MissingString";
+    public static final String CFG_KEY_MISSING_TAG_STRING = "MissingString";
 }

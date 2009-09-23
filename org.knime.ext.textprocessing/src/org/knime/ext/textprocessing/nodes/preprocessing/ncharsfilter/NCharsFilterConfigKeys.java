@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilterConfigKeys {
+public final class NCharsFilterConfigKeys {
 
+    private  NCharsFilterConfigKeys() { }
+    
     /**
      * Config Key for the n number (minimum of chars).
      */

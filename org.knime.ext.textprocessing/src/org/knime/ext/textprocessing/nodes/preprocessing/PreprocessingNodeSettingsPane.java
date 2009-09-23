@@ -83,6 +83,11 @@ public class PreprocessingNodeSettingsPane extends DefaultNodeSettingsPane {
                 BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME);
     }
     
+    /**
+     * @return Creates and returns a <code>SettingsModelBoolean</code> which
+     * stores the flag specifying whether unmodifiable terms will be 
+     * preprocessed was well or not.
+     */
     public static SettingsModelBoolean getPreprocessUnmodifiableModel() {
         return new SettingsModelBoolean(
                 PreprocessingConfigKeys.CFG_KEY_PREPRO_UNMODIFIABLE,

@@ -35,13 +35,17 @@ public enum BiomedicalNeTag implements TagBuilder {
     /** Unkown type. */
     UNKNOWN,
 
-    /** A Protein name **/
+    /** A Protein name. **/
     PROTEIN,
-    /** A Gene name **/
+    /** DNA. **/
+    DNA,
+    /** RNA. **/
+    RNA,
+    /** A GENE name. **/
     GENE,
-    /** A cell line name **/
+    /** A cell line name. **/
     CELL_LINE,
-    /** A cell type name **/
+    /** A cell type name. **/
     CELL_TYPE;
 
 

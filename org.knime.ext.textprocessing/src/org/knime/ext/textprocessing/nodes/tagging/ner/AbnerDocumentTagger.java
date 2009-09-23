@@ -23,15 +23,15 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.ner;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import abner.Tagger;
 
@@ -51,17 +51,39 @@ import abner.Tagger;
  */
 public class AbnerDocumentTagger extends AbstractDocumentTagger {
 
+    /**
+     * Name of the Biocreative model of ABNER.
+     */
+    public static final String MODEL_BIOCREATIVE = "Biocreative";
+    
+    /**
+     * Name of the NLPBA model of ABNER.
+     */
+    public static final String MODEL_NLPBA = "NLPBA";
+    
     private Tagger m_tagger;
 
     /**
      * Creates a new instance of <code>AbnerDocumentTagger</code> with given
      * flag specifying if recognized named entities is set unmodifiable.
-     *
+     * The specified ABNER model is used for named entity recognition, if
+     * no model or a non valid model is specified the "Biocreative" model is
+     * used by default.
+     * 
      * @param setNeUnmodifiable The unmodifiable flag to set.
+     * @param model The ABNER model to use for tagging.
      */
-    public AbnerDocumentTagger(final boolean setNeUnmodifiable) {
+    public AbnerDocumentTagger(final boolean setNeUnmodifiable, 
+            final String model) {
         super(setNeUnmodifiable);
-        m_tagger = new Tagger(Tagger.BIOCREATIVE);
+        
+        if (model.equals(MODEL_NLPBA)) {
+            m_tagger = new Tagger(Tagger.NLPBA);    
+        } else if (model.equals(MODEL_BIOCREATIVE)) {
+            m_tagger = new Tagger(Tagger.BIOCREATIVE);
+        } else {
+            m_tagger = new Tagger(Tagger.BIOCREATIVE);
+        }
     }
 
     /**

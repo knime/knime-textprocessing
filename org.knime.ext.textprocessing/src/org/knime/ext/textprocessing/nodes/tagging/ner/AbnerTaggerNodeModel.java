@@ -35,6 +35,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
@@ -58,12 +59,21 @@ public class AbnerTaggerNodeModel extends NodeModel {
     /**
      * The default value of the terms unmodifiable flag.
      */
-    public static boolean DEFAULT_UNMODIFIABLE = true;
+    public static final boolean DEFAULT_UNMODIFIABLE = true;
+    
+    /**
+     * The default value of the ABNER tagging model.
+     */
+    public static final String DEF_ABNERMODEL = 
+        AbnerDocumentTagger.MODEL_BIOCREATIVE; 
     
     private int m_docColIndex = -1;
     
     private SettingsModelBoolean m_setUnmodifiableModel = 
         AbnerTaggerNodeDialog.createSetUnmodifiableModel();
+    
+    private SettingsModelString m_abnerTaggingModel = 
+        AbnerTaggerNodeDialog.createAbnerModelModel();
     
     private DocumentDataTableBuilder m_dtBuilder;
     
@@ -98,17 +108,18 @@ public class AbnerTaggerNodeModel extends NodeModel {
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            ExecutionContext exec) throws Exception {
+            final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
         
         List<Document> newDocuments = new ArrayList<Document>();
         DocumentTagger tagger = new AbnerDocumentTagger(
-                m_setUnmodifiableModel.getBooleanValue());
+                m_setUnmodifiableModel.getBooleanValue(), 
+                m_abnerTaggingModel.getStringValue());
         
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             
             double progress = (double)currDoc / (double)rowCount;
             exec.setProgress(progress, "Tagging document " + currDoc + " of " 
@@ -132,6 +143,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_setUnmodifiableModel.validateSettings(settings);
+        m_abnerTaggingModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -140,6 +152,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_setUnmodifiableModel.saveSettingsTo(settings);
+        m_abnerTaggingModel.saveSettingsTo(settings);
     }
 
     /**
@@ -149,6 +162,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_setUnmodifiableModel.validateSettings(settings);
+        m_abnerTaggingModel.validateSettings(settings);
     }
     
     /**

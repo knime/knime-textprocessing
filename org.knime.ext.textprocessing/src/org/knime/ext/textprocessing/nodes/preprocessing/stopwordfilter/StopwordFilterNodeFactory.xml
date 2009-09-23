@@ -14,6 +14,14 @@
         <option name="Case sensitive">
               If checked the stop word are matched case sensitive otherwise not. 
         </option>
+        <option name="Use build in list">
+              Specifies if build in stop word list is used or not. If checked
+              the specified path will be ignored. 
+        </option>
+        <option name="Stopword lists">
+              Available build in stop word lists. If "Use build in list" is 
+              checked, the build in stop word list to use can be specified here. 
+        </option>        
         <option name="Selected file">
               The location of the stop word file. Stop words need to be written
               among each other in one column, in a way that each line contains

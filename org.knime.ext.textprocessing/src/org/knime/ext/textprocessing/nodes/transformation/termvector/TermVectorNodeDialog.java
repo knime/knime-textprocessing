@@ -71,6 +71,11 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
                 TermVectorNodeModel.DEFAULT_IGNORE_TAGS);
     }
 
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelString</code> containing the name of the document 
+     * column.
+     */
     public static final SettingsModelString getDocColModel() {
         return new SettingsModelString(TermVectorConfigKeys.CFGKEY_DOC_COL,
                 TermVectorNodeModel.DEFAULT_DOCUMENT_COLNAME);

@@ -211,7 +211,8 @@ public class DataTableSpecVerifier {
 
         if (m_numStringCells < 1) {
             valid = false;
-            throwException(throwException, "No column with StringCells found !");
+            throwException(throwException, 
+                    "No column with StringCells found !");
         } else if (m_numStringCells > 1) {
             valid = false;
             throwException(throwException,

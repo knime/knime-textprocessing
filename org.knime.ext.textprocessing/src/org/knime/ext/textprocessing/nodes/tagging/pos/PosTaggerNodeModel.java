@@ -99,7 +99,7 @@ public class PosTaggerNodeModel extends NodeModel {
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             
             double progress = (double)currDoc / (double)rowCount;
             exec.setProgress(progress, "Tagging document " + currDoc + " of " 

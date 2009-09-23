@@ -94,7 +94,7 @@ public class DictionaryDocumentTagger extends AbstractDocumentTagger {
      */
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-        List<TaggedEntity> m_foundEntities = new ArrayList<TaggedEntity>();
+        List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
 
         String sentenceStr = sentence.getText();
         if (!m_caseSensitve) {
@@ -110,11 +110,11 @@ public class DictionaryDocumentTagger extends AbstractDocumentTagger {
             if (sentenceStr.contains(entity)) {
                 TaggedEntity taggedEntity = new TaggedEntity(ne,
                         m_tag.getTagValue());
-                m_foundEntities.add(taggedEntity);
+                foundEntities.add(taggedEntity);
             }
         }
 
-        return m_foundEntities;
+        return foundEntities;
     }
 
     /**

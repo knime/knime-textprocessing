@@ -23,9 +23,6 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
 import org.knime.core.node.BufferedDataTable;
@@ -34,14 +31,19 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * A utility class providing static methods to transform and change data 
  * structures containing terms, documents or similar.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DataStructureUtil {
+public final class DataStructureUtil {
 
+    private DataStructureUtil() { }
+    
     /**
      * Builds a set of documents out of the given data table and returns it.
      * The index of the cells containing the documents has to be specified.
@@ -64,7 +66,7 @@ public class DataStructureUtil {
         int rows = data.getRowCount();
         
         RowIterator it = data.iterator();        
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             DataRow row = it.next();
             Document doc = ((DocumentValue)row.getCell(documentCellIndex))
                             .getDocument();

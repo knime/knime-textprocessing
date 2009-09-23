@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.nodes.source.grabber;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentGrabberConfigKeys {
+public final class DocumentGrabberConfigKeys {
 
+    private DocumentGrabberConfigKeys() { }
+    
     /**
      * Config Key for the query.
      */
@@ -63,5 +65,5 @@ public class DocumentGrabberConfigKeys {
     /**
      * Config Key for the document type.
      */
-    public static final String CFGKEY_DOC_TYPE = "DocumentType";
+    public static final String CFGKEY_DOC_TYPE = "DocumentType";     
 }

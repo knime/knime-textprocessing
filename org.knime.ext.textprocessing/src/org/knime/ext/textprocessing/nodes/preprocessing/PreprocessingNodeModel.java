@@ -241,7 +241,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         int count = 0;
         
         RowIterator i = inData[0].iterator();
-        while(i.hasNext()) {
+        while (i.hasNext()) {
             exec.checkCanceled();
             count++;
             DataRow row = i.next();
@@ -256,6 +256,10 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     }
 
         
+    /**
+     * Preprocesses the given row.
+     * @param row The row tp apply preprocessing step on.
+     */
     public void processRow(final DataRow row) {
         DataCell newDocCell = null;
         RowKey rowKey = row.getKey();
@@ -324,8 +328,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                         + m_noRows);
     }
     
-    private synchronized void addRowToContainer(RowKey rk, Term t, 
-            DataCell preprocessedDoc, DataCell origDoc) {
+    private synchronized void addRowToContainer(final RowKey rk, final Term t, 
+            final DataCell preprocessedDoc, final DataCell origDoc) {
         Set<Term> terms = m_addedRows.get(preprocessedDoc);
         if (terms == null) {
             terms = new HashSet<Term>();

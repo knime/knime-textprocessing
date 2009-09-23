@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.nodes.tagging.dict;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DictionaryTaggerConfigKeys {
+public final class DictionaryTaggerConfigKeys {
 
+    private DictionaryTaggerConfigKeys() { }
+    
     /**
      * The configuration key for the file containing the named entities.
      */

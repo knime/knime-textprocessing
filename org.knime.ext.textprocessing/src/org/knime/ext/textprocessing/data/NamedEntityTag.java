@@ -33,13 +33,13 @@ import java.util.List;
 public enum NamedEntityTag implements TagBuilder {
     /** Unkown type. */
     UNKNOWN,
-    /** A location */
+    /** A location. */
     LOCATION,
-    /** A person */
+    /** A person. */
     PERSON,
-    /** A company */
+    /** A company. */
     COMPANY,
-    /** A date */
+    /** A date. */
     DATE;
 
     private final Tag m_tag;

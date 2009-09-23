@@ -211,9 +211,9 @@ public class TermVectorNodeModel extends NodeModel {
             // if current term is not equals last term, create new feature
             // vector for last term
             if (lastTerm != null) {
-                boolean equals = m_ignoreTagsModel.getBooleanValue() ?
-                        currTerm.equalsWordsOnly(lastTerm) :
-                            currTerm.equals(lastTerm);
+                boolean equals = m_ignoreTagsModel.getBooleanValue() 
+                ? currTerm.equalsWordsOnly(lastTerm) 
+                        : currTerm.equals(lastTerm);
                 if (!equals) {
                     // add old feature vector to table
                     dc.addRowToTable(createDataRow(lastTerm, featureVector));

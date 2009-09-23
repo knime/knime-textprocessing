@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.frequencies;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class FrequenciesConfigKeys {
+public final class FrequenciesConfigKeys {
 
+    private FrequenciesConfigKeys() { }
+    
     /**
      * The configuration key for the column containing he documents to process.
      */

@@ -23,10 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
-import java.text.ParseException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -47,6 +43,10 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
 import org.knime.ext.textprocessing.util.FullDataCellCache;
+
+import java.text.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A <code>CellFactory</code> to build a document for each data row. The
@@ -93,8 +93,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
         if (m_config.getTitleStringIndex() >= 0) {
             DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
             String title = "";
-            if (!titleCell.isMissing() && 
-                    titleCell.getType().isCompatible(StringValue.class)) {
+            if (!titleCell.isMissing() 
+                    && titleCell.getType().isCompatible(StringValue.class)) {
                 title = ((StringValue)titleCell).getStringValue();
             }
             
@@ -105,8 +105,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
         if (m_config.getFulltextStringIndex() >= 0) {
             DataCell textCell = row.getCell(m_config.getFulltextStringIndex());
             String fulltext = "";
-            if (!textCell.isMissing() && 
-                    textCell.getType().isCompatible(StringValue.class)) {
+            if (!textCell.isMissing() 
+                    && textCell.getType().isCompatible(StringValue.class)) {
                 fulltext = ((StringValue)textCell).getStringValue();
             }
             docBuilder.addSection(fulltext, SectionAnnotation.UNKNOWN);
@@ -115,8 +115,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
         // Set authors
         if (m_config.getAuthorsStringIndex() >= 0) {
             DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
-            if (!auhorsCell.isMissing() &&
-                    auhorsCell.getType().isCompatible(StringValue.class)) {
+            if (!auhorsCell.isMissing() 
+                    && auhorsCell.getType().isCompatible(StringValue.class)) {
                 String authors = ((StringValue)auhorsCell).getStringValue();
                 String[]authorsArr = authors.split(
                         m_config.getAuthorsSplitChar());
@@ -124,7 +124,7 @@ public class StringsToDocumentCellFactory implements CellFactory {
                     String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
                     String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
                     
-                    String names[] = author.split(" ");
+                    String[] names = author.split(" ");
                     if (names.length > 1) {
                         firstName = "";
                         for (int i = 0; i < names.length - 1; i++) {

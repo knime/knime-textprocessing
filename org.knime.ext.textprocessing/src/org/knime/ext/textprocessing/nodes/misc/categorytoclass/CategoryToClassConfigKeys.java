@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.misc.categorytoclass;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class CategoryToClassConfigKeys {
+public final class CategoryToClassConfigKeys {
 
+    private CategoryToClassConfigKeys() { }
+    
     /**
      * The configuration key of the document column to use.
      */

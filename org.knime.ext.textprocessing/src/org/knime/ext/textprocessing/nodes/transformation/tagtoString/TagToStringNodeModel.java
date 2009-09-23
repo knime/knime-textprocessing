@@ -50,15 +50,27 @@ import java.util.Set;
  */
 public class TagToStringNodeModel extends NodeModel {
 
-    public static Set<String> ALL_TAG_TYPES = 
+    /**
+     * Set with all tag types.
+     */
+    public static final Set<String> ALL_TAG_TYPES = 
         TagFactory.getInstance().getTagTypes();
     
-    public static String DEFAULT_TAG_TYPE = 
+    /**
+     * The default tag type.
+     */
+    public static final String DEFAULT_TAG_TYPE = 
         PartOfSpeechTag.getDefault().getType();
     
-    static String MISSING_CELL_VALUE = "<MissingCell>";
+    /**
+     * The missing cell vaue.
+     */
+    public static final String MISSING_CELL_VALUE = "<MissingCell>";
     
-    public static String DEFAULT_MISSING_VALUE = MISSING_CELL_VALUE;
+    /**
+     * The default missing cell value.
+     */
+    public static final String DEFAULT_MISSING_VALUE = MISSING_CELL_VALUE;
     
     
     private SettingsModelStringArray m_tagTypesModel = 
@@ -70,6 +82,9 @@ public class TagToStringNodeModel extends NodeModel {
     private SettingsModelString m_missingTagValueModel = 
         TagToStringNodeDialog.getMissingTagModel();
     
+    /**
+     * Creates new instance of <code>TagToStringNodeModel</code>.
+     */
     public TagToStringNodeModel() {
         super(1, 1);
     }
@@ -86,9 +101,11 @@ public class TagToStringNodeModel extends NodeModel {
     }
 
     /**
-     * @param tagTypes
-     * @param oldSpec
-     * @return
+     * Creates output <code>DataColumnSpec</code>s based on given tag types and
+     * incoming <code>DataTableSpec</code>.
+     * @param tagTypes tag types to consider.
+     * @param oldSpec The incoming <code>DataTableSpec</code> 
+     * @return Output <code>DataColumnSpec</code>s.
      */
     static DataColumnSpec[] getDataTableSpec(final List<String> tagTypes,
             final DataTableSpec oldSpec) {
@@ -116,7 +133,7 @@ public class TagToStringNodeModel extends NodeModel {
         for (String tagType : m_tagTypesModel.getStringArrayValue()) {
             tagTypes.add(tagType);
         }
-        CellFactory cellFac = new TagToStringCellFactory(termColIndex, tagTypes, 
+        CellFactory cellFac = new TagToStringCellFactory(termColIndex, tagTypes,
                     inData[0].getDataTableSpec(), 
                     m_missingTagValueModel.getStringValue());
         ColumnRearranger rearranger = new ColumnRearranger(
@@ -139,7 +156,7 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(NodeSettingsWO settings) {
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_tagTypesModel.saveSettingsTo(settings);
         m_termColModel.saveSettingsTo(settings);
         m_missingTagValueModel.saveSettingsTo(settings);
@@ -149,7 +166,7 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(NodeSettingsRO settings)
+    protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_tagTypesModel.validateSettings(settings);
         m_termColModel.validateSettings(settings);

@@ -48,6 +48,14 @@ public class TagToStringCellFactory implements CellFactory {
     
     private DataCell m_missingCell;
     
+    /**
+     * Creates new instance of <code>TagToStringCellFactory</code>.
+     * 
+     * @param termColIndex The index of the term column.
+     * @param tagTypes The tag types to consider.
+     * @param oldSpec The incoming spec.
+     * @param missingValue The missing-value value.
+     */
     public TagToStringCellFactory(final int termColIndex, 
             final List<String> tagTypes, final DataTableSpec oldSpec,
             final String missingValue) {
@@ -114,8 +122,8 @@ public class TagToStringCellFactory implements CellFactory {
      * {@inheritDoc}
      */
     @Override
-    public void setProgress(int curRowNr, int rowCount, RowKey lastKey,
-            ExecutionMonitor exec) {
+    public void setProgress(final int curRowNr, final int rowCount, 
+            final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
         exec.setProgress(prog, "Converting tag to string of row: " + curRowNr 
                 + " of " + rowCount + " rows");

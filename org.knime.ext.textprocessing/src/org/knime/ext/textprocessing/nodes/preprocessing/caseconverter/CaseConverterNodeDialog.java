@@ -63,7 +63,7 @@ public class CaseConverterNodeDialog extends PreprocessingNodeSettingsPane {
                 "Case to convert to", false, options));
     }
     
-    private class CaseButtonGroup implements ButtonGroupEnumInterface {
+    private final class CaseButtonGroup implements ButtonGroupEnumInterface {
 
         private String m_text;
         

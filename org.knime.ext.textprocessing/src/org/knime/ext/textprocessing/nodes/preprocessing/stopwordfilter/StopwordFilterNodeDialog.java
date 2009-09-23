@@ -23,13 +23,16 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
-import javax.swing.JFileChooser;
-
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
+
+import javax.swing.JFileChooser;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * 
@@ -59,6 +62,34 @@ public class StopwordFilterNodeDialog extends PreprocessingNodeSettingsPane {
     }
     
     /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelBoolean</code> containing the flag if a build in list
+     * will be used or not.
+     */
+    public static final SettingsModelBoolean getUseBuildInListModel() {
+        return new SettingsModelBoolean(
+                StopwordFilterConfigKeys.CFGKEY_USE_BUILDIN_LIST,
+                StopwordFilterNodeModel.DEF_USE_BUILIN_LIST);
+    }
+    
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelString</code> containing the name of the selected
+     * stopword list to use.
+     */
+    public static final SettingsModelString getBuildInListModel() {
+        return new SettingsModelString(
+                StopwordFilterConfigKeys.CFGKEY_BUILDIN_LIST,
+                BuildInStopwordListFactory.getInstance().getDefaultName());
+    }
+    
+    private SettingsModelString m_buildinListModel;
+    
+    private SettingsModelString m_fileModel;
+    
+    private SettingsModelBoolean m_useBuilinListModel;
+    
+    /**
      * Creates new instance of <code>StopwordFilterNodeDialog</code>.
      */
     public StopwordFilterNodeDialog() {
@@ -70,8 +101,41 @@ public class StopwordFilterNodeDialog extends PreprocessingNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(
                 getCaseSensitiveModel(), "Case sensitive"));
         
+        setHorizontalPlacement(true);
+        m_useBuilinListModel = getUseBuildInListModel();
+        m_useBuilinListModel.addChangeListener(new StopwordChangeListener());
+        addDialogComponent(new DialogComponentBoolean(
+                m_useBuilinListModel, "Use build in list"));
+        
+        m_buildinListModel = getBuildInListModel();
+        addDialogComponent(new DialogComponentStringSelection(
+                m_buildinListModel, "Stopword lists", 
+                BuildInStopwordListFactory.getInstance().getNames()));
+        setHorizontalPlacement(false);
+        
+        m_fileModel = getFileModel();
         addDialogComponent(new DialogComponentFileChooser(
-                getFileModel(), StopwordFilterNodeDialog.class.toString(),
+                m_fileModel, StopwordFilterNodeDialog.class.toString(),
                 JFileChooser.FILES_ONLY));
+        
+        updateModels();
+    }
+    
+    private class StopwordChangeListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(final ChangeEvent arg0) {
+            updateModels();
+        }        
+    }
+    
+    private void updateModels() {
+        if (m_useBuilinListModel.getBooleanValue()) {
+            m_buildinListModel.setEnabled(true);
+            m_fileModel.setEnabled(false);
+        } else {
+            m_buildinListModel.setEnabled(false);
+            m_fileModel.setEnabled(true);
+        }
     }
 }

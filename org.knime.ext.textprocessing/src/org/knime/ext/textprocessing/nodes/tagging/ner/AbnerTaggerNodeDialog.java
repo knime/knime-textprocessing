@@ -25,7 +25,12 @@ package org.knime.ext.textprocessing.nodes.tagging.ner;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates the dialog of the AbnerTaggerNode with a checkbox component,
@@ -52,6 +57,20 @@ public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
     }
     
     /**
+     * Creates and returns a 
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString} 
+     * containing the name of the ABNER tagging model to use.
+     * 
+     * @return A <code>SettingsModelString</code> containing the the name of 
+     * the ABNER tagging model to use.
+     */
+    public static SettingsModelString createAbnerModelModel() {
+        return new SettingsModelString(
+                AbnerTaggerConfigKeys.CFGKEY_MODEL,
+                AbnerTaggerNodeModel.DEF_ABNERMODEL);
+    }
+    
+    /**
      * Creates a new instance of <code>AbnerTaggerNodeDialog</code> providing
      * a checkbox enabling the user to specify whether terms representing named
      * entities have to be set unmodifiable or not. 
@@ -60,5 +79,11 @@ public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(
                         createSetUnmodifiableModel(), 
                         "Set named entities unmodifiable"));
+        
+        List<String> modelNames = new ArrayList<String>();
+        modelNames.add(AbnerDocumentTagger.MODEL_BIOCREATIVE);
+        modelNames.add(AbnerDocumentTagger.MODEL_NLPBA);
+        addDialogComponent(new DialogComponentStringSelection(
+                createAbnerModelModel(), "ABNER model", modelNames));
     }
 }

@@ -23,15 +23,15 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 /**
  * All different types of {@link org.knime.ext.textprocessing.data.Tag}s have
@@ -45,7 +45,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TagFactory {
+public final class TagFactory {
 
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(TagFactory.class);
@@ -64,7 +64,7 @@ public class TagFactory {
     public static final String TAGSET_DTD_POSTFIX =
         "/resources/tagset/tagset.dtd";
 
-    private static TagFactory m_instance;
+    private static TagFactory instance;
 
     private HashSet<TagBuilder> m_tagBuilder = new HashSet<TagBuilder>();
 
@@ -81,10 +81,10 @@ public class TagFactory {
      * @return The singleton instance of <code>TagFactory</code>.
      */
     public static TagFactory getInstance() {
-        if (m_instance == null) {
-            m_instance = new TagFactory();
+        if (instance == null) {
+            instance = new TagFactory();
         }
-        return m_instance;
+        return instance;
     }
 
     /**
@@ -135,7 +135,7 @@ public class TagFactory {
                             + tagBuilder.getClass().toString());
                 }
             }
-        } catch(ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             LOGGER.warn("Class of tag could not be found!");
             LOGGER.warn(e.getMessage());
         } catch (SecurityException e) {

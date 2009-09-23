@@ -104,6 +104,7 @@ public class StringToTermNodeModel extends NodeModel {
     }
     
     /**
+     * @param spec The incoming <code>DataTableSpec</code>.
      * @return The column spec of the term column to append.
      */
     static final DataColumnSpec getTermColumnSpec(final DataTableSpec spec) {

@@ -30,7 +30,7 @@ package org.knime.ext.textprocessing.nodes.frequencies.filter;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class FilterFactory {
+public final class FilterFactory {
 
     private FilterFactory() { }
     

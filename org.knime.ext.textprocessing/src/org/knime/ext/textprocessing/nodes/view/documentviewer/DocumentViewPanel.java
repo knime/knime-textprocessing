@@ -23,6 +23,17 @@
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
+import org.knime.ext.textprocessing.data.Author;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.Paragraph;
+import org.knime.ext.textprocessing.data.Section;
+import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.data.Term;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -40,17 +51,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-
-import org.knime.ext.textprocessing.data.Author;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentCategory;
-import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.data.Paragraph;
-import org.knime.ext.textprocessing.data.Section;
-import org.knime.ext.textprocessing.data.Sentence;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagFactory;
-import org.knime.ext.textprocessing.data.Term;
 
 /**
  *
@@ -151,8 +151,7 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
     private String getPreparedText(final Document doc, final boolean hiliteTags,
-            final String tagType)
-    {
+            final String tagType) {
         StringBuffer buffer = new StringBuffer();
 
         buffer.append("<h1>");

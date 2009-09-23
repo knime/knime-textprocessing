@@ -8,15 +8,20 @@
         <intro>
             This node recognizes biomedical named entities, such as genes, 
             proteins or cells and assigns tags to the corresponding terms like 
-            "GENE", "PROTEIN", "CELL LINE" or "CELL TYPE". Furthermore it can be
-            specified that found named entities are marked as unmodifiable,
-            meaning that they are not going to be modified by any node afterwards.
-            As underlying named entity recognition software ABNER 
-            (A Biomedical named entity recognizer) was used. For more details
-            see: http://pages.cs.wisc.edu/~bsettles/abner/.
+            "PROTEIN", "RNA", "DNA", "CELL LINE" or "CELL TYPE". Furthermore 
+            it can be specified that found named entities are marked as 
+            unmodifiable, meaning that they are not going to be modified by any 
+            node afterwards. As underlying named entity recognition software 
+            ABNER (A Biomedical named entity recognizer) was used. For more 
+            details see: http://pages.cs.wisc.edu/~bsettles/abner/.
         </intro>
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
+        </option>
+        <option name="ABNER model">
+            Specifies the ABNER model to use. The <i>Biocreative</i> model 
+            recognizes proteins only, the <i>NLPBA</i> model 
+            recognizes cells, dna and rna lines as well.
         </option>
     </fullDescription>
         

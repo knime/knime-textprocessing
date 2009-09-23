@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.transformation.termtostring;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermToStringConfigKeys {
+public final class TermToStringConfigKeys {
 
+    private TermToStringConfigKeys() { }
+    
     /**
      * The configuration key of the term column.
      */

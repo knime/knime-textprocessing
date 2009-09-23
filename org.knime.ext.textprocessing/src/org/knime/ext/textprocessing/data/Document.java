@@ -67,7 +67,7 @@ public class Document implements TextContainer, Serializable {
     public static final DocumentType DEFAULT_TYPE = DocumentType.UNKNOWN;
 
     /**
-     * The default document file 
+     * The default document file .
      * (System.getProperty("user.home") + "NoFileSpecified")):
      */
     public static final File DEFAULT_FILE = new File(

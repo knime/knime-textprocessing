@@ -23,11 +23,11 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmer;
 import org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -42,11 +42,17 @@ public enum Stemming {
      * The Kuhlen Stemmer.
      */
     KUHLEN {
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Preprocessing getPreprocessing() {
             return new KuhlenStemmer();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public StringPreprocessing getStringPreprocessing() {
             return new KuhlenStemmer();
@@ -57,11 +63,17 @@ public enum Stemming {
      * The Porter Stemmer.
      */
     PORTER {
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Preprocessing getPreprocessing() {
             return new PorterStemmer();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public StringPreprocessing getStringPreprocessing() {
             return new PorterStemmer();

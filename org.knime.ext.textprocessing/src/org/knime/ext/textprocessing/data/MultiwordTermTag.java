@@ -32,9 +32,10 @@ import java.util.List;
  * @author Pierre-Francois Laquerre, University of Konstanz
  */
 public enum MultiwordTermTag implements TagBuilder {
+    
     /** Unkown type. */
     UNKNOWN,
-    /** n-gram */
+    /** n-gram. */
     MULTIWORDTERM;
 
     private final Tag m_tag;

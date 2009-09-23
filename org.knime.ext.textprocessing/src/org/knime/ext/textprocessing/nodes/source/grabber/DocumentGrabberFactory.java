@@ -30,9 +30,9 @@ import java.util.Set;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentGrabberFactory {
+public final class DocumentGrabberFactory {
 
-    private static DocumentGrabberFactory INSTANCE = null;
+    private static DocumentGrabberFactory instance = null;
     
     private Hashtable<String, DocumentGrabber> m_grabber;
     
@@ -45,10 +45,10 @@ public class DocumentGrabberFactory {
      * @return The singelton instance of <code>DocumentGrabberFactory</code>.
      */
     public static DocumentGrabberFactory getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new DocumentGrabberFactory();
+        if (instance == null) {
+            instance = new DocumentGrabberFactory();
         }
-        return INSTANCE;
+        return instance;
     }
     
     /**

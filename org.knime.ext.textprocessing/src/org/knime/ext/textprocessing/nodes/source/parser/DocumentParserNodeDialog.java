@@ -23,8 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
-import javax.swing.JFileChooser;
-
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
@@ -33,6 +31,8 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
+
+import javax.swing.JFileChooser;
 
 /**
  * Creates the dialog of the DocumentParserNode with a file chooser component,
@@ -100,6 +100,18 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
                 DocumentParserNodeModel.DEFAULT_DOCTYPE.toString());
     }
     
+    /**
+     * @return The 
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean}
+     * containing the <code>boolean</code> value of the ignore hidden files flag
+     * (if set <code>true</code> hidden files will be not considered for 
+     * parsing.
+     */
+    static SettingsModelBoolean getIgnoreHiddenFilesModel() {
+        return new SettingsModelBoolean(
+                DocumentParserConfigKeys.CFGKEY_IGNORE_HIDDENFILES, 
+                DocumentParserNodeModel.DEFAULT_IGNORE_HIDDENFILES);
+    }    
     
     /**
      * Creates a new instance of <code>DocumentParserNodeDialog</code> which 
@@ -112,8 +124,13 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
                 getPathModel(), DocumentParserNodeDialog.class.toString(), 
                 JFileChooser.OPEN_DIALOG, true));
         
+        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(
                 getRecursiveModel(), "Search recursively"));
+        
+        addDialogComponent(new DialogComponentBoolean(
+                getIgnoreHiddenFilesModel(), "Ignore hidden files"));        
+        setHorizontalPlacement(false);
         
         addDialogComponent(new DialogComponentString(
                 getCategoryModel(), "Document category"));

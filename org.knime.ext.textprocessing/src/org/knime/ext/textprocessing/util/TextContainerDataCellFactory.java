@@ -67,6 +67,9 @@ public interface TextContainerDataCellFactory {
     /**
      * Returns false if given data cell is not compatible with expected
      * type.
+     * @param cell The cell to validate its type.
+     * @return <code>true</code> is the type of the given cell is valid,
+     * <code>false</code> otherwise.
      */
     public boolean validateCellType(final DataCell cell);
 }

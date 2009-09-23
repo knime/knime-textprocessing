@@ -22,15 +22,6 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
 import org.knime.core.node.BufferedDataTable;
@@ -45,6 +36,15 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Provides various Document analysis methods.
  *
@@ -52,7 +52,9 @@ import org.knime.ext.textprocessing.util.clustering.Cluster;
  *
  * @author Pierre-Francois Laquerre, University of Konstanz
  */
-public class DocumentUtil {
+public final class DocumentUtil {
+    
+    private DocumentUtil() { }
 
     /**
      * @param doc the document to analyse
@@ -146,49 +148,6 @@ public class DocumentUtil {
         return frequencies;
     }
 
-//    /**
-//     * Calculates the individual cooccurrence frequency of the terms in a given
-//     * set with the terms in a document. This is the comparison method used in
-//     * the keyword extraction paper (see KeywordExtractorNode): only pairs count
-//     *
-//     * Example: "a a b b b" -> cooc(a,a) = 1, cooc(a,b) = 2, cooc(b,b) = 1
-//     *
-//     * @param doc the document to analyse
-//     * @param terms the terms to look for
-//     * @return a FrequencyMap for each term in 'terms', containing cooccurrence
-//     *         frequencies for each term in 'doc'
-//     */
-//    public static FrequencyMap<UnorderedPair<Term>> getTermCooccurrencesPaper(
-//            final Document doc, final Set<Term> terms) {
-//        FrequencyMap<UnorderedPair<Term>> coocs =
-//                new FrequencyMap<UnorderedPair<Term>>();
-//
-//        Iterator<Sentence> sentences = doc.sentenceIterator();
-//        while (sentences.hasNext()) {
-//            Sentence sentence = sentences.next();
-//            ArrayList<Term> uniqueterms =
-//                    new ArrayList<Term>(new HashSet<Term>(sentence.getTerms()));
-//            FrequencyMap<Term> frequencies = getTermFrequencies(sentence);
-//
-//            for (int i = 0; i < uniqueterms.size(); i++) {
-//                Term t1 = uniqueterms.get(i);
-//
-//                if (terms.contains(t1)) {
-//                    int t1freq = frequencies.get(t1);
-//
-//                    for (int j = i + 1; j < uniqueterms.size(); j++) {
-//                        Term t2 = uniqueterms.get(j);
-//
-//                        int pairs = Math.min(t1freq, frequencies.get(t2));
-//                        coocs.increment(UnorderedPair.makePair(t1,t2), pairs);
-//                    }
-//                }
-//            }
-//        }
-//
-//        return coocs;
-//    }
-
     /**
      * Calculates the individual cooccurrence frequency of the terms in a given
      * set with the terms in a document.
@@ -227,7 +186,8 @@ public class DocumentUtil {
     }
 
     /**
-     * Calculates the total number of possible cooccurrences for each given term
+     * Calculates the total number of possible cooccurrences for each given 
+     * term.
      * @param doc the document to analyse
      * @param terms the terms to calculate the number of cooccurrences for
      * @return the total number of possible cooccurrences for each given term
@@ -247,7 +207,7 @@ public class DocumentUtil {
                 if (terms.contains(t)) {
                     int freq = termfreqs.get(t);
                     totalcoocs.increment(t,
-                            senterms.size() * freq - ((freq+1)*freq)/2);
+                            senterms.size() * freq - ((freq + 1) * freq) / 2);
                 }
             }
         }
@@ -257,7 +217,7 @@ public class DocumentUtil {
 
     /**
      * Calculates for each term the total length of all sentences in which it
-     * occurs
+     * occurs.
      * @param doc the document to analyse
      * @return total sentence length for each term present in the document
      */
@@ -309,8 +269,8 @@ public class DocumentUtil {
 
                     // the number of cooccurrences in a sentence s is
                     // |s|*freq(c in s) - [summation from i = 1 to freq(c in s)]
-                    nrcoocs.increment(c, senlength * clusterfreqs -
-                            (sumOverOne(clusterfreqs)));
+                    nrcoocs.increment(c, senlength * clusterfreqs 
+                            - (sumOverOne(clusterfreqs)));
                 }
             }
         }
@@ -363,7 +323,8 @@ public class DocumentUtil {
 
                         if (c.contains(t)) {
                             cCoocs.increment(t,
-                              (clusterfreqs - 1) * freqt - sumOverOne(freqt-1));
+                              (clusterfreqs - 1) * freqt 
+                              - sumOverOne(freqt - 1));
                         } else {
                             cCoocs.increment(t, freqt * clusterfreqs);
                         }
@@ -380,7 +341,7 @@ public class DocumentUtil {
      * @return summation of 1 for i from 1 to n
      */
     private static int sumOverOne(final int n) {
-        return (n * (n+1)) / 2;
+        return (n * (n + 1)) / 2;
     }
 
     /**

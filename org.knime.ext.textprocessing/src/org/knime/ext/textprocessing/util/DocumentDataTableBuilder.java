@@ -75,8 +75,8 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      * documents. 
      * @throws CanceledExecutionException If execution was canceled.
      */
-    public BufferedDataTable createDataTable(ExecutionContext exec,
-            List<Document> docs) throws CanceledExecutionException {
+    public BufferedDataTable createDataTable(final ExecutionContext exec,
+            final List<Document> docs) throws CanceledExecutionException {
       // create cache
       FullDataCellCache cache = new FullDataCellCache(m_documentCellFac);
       BufferedDataContainer dc =

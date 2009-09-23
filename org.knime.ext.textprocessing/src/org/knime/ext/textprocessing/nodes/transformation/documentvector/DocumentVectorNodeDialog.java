@@ -62,11 +62,21 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
                 DocumentVectorNodeModel.DEFAULT_COL);
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelString</code> containing the name of the document
+     * column. 
+     */
     public static final SettingsModelString getDocumentColModel() {
         return new SettingsModelString(DocumentVectorConfigKeys.CFGKEY_DOC_COL,
                 DocumentVectorNodeModel.DEFAULT_DOCUMENT_COLNAME);
     }
     
+    /**
+     * @return Creates and returns a new instance of 
+     * <code>SettingsModelBoolean</code> specifying whether tags will be ignored
+     * or not.
+     */
     public static final SettingsModelBoolean getIgnoreTagsModel() {
         return new SettingsModelBoolean(
                 DocumentVectorConfigKeys.CFGKEY_IGNORE_TAGS,

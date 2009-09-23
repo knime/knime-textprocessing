@@ -182,11 +182,11 @@ public enum PartOfSpeechTag implements TagBuilder {
         return PartOfSpeechTag.UNKNOWN.getTag();
     }
 
-    private static Pattern m_symbolPattern = Pattern.compile(
+    private static Pattern symbolPattern = Pattern.compile(
             "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]");
 
     private static boolean isSymbol(final String str) {
-        if (m_symbolPattern.matcher(str).matches()) {
+        if (symbolPattern.matcher(str).matches()) {
             return true;
         }
         return false;

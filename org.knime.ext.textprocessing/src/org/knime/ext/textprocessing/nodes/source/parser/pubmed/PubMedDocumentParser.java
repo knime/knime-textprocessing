@@ -23,13 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.pubmed;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.SAXParserFactory;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
@@ -40,6 +33,14 @@ import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -61,7 +62,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
     /**
      * The default source of the pub med parser.
      */
-    public final static String DEFAULT_SOURCE = "PubMed";
+    public static final String DEFAULT_SOURCE = "PubMed";
     
     /**
      * The name of the article tag.
@@ -196,7 +197,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
-    public List<Document> parse(InputStream is) throws Exception {
+    public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
         SAXParserFactory fac = SAXParserFactory.newInstance();
         fac.setValidating(true);

@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud;
  *
  * @author Iris Adae, University of Konstanz
  */
-public class TagCloudConfigKeys {
+public final class TagCloudConfigKeys {
 
+    private TagCloudConfigKeys() { }
+    
     /**
      * The configuration key for the column containing he documents to process.
      */

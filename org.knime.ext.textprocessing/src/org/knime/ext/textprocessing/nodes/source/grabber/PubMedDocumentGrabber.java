@@ -24,6 +24,14 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
+import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,14 +52,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
-import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
 
 
 /**
@@ -189,7 +189,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         List<String> validExtensions = new ArrayList<String>();
         validExtensions.add(FILE_EXTENSION);
         
-        FileCollector fc = new FileCollector(dir, validExtensions, false);
+        FileCollector fc = new FileCollector(dir, validExtensions, false, true);
         List<File> files = fc.getFiles();
         int fileCount = files.size();
         int currFile = 1;

@@ -158,6 +158,9 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
         return dc.getTable();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final DataTableSpec createDataTableSpec() {
         return createDataTableSpec(false);

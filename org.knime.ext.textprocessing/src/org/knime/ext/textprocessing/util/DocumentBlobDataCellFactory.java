@@ -61,6 +61,9 @@ public class DocumentBlobDataCellFactory implements
         return DocumentBlobCell.TYPE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean validateCellType(final DataCell cell) {
         if (cell instanceof DocumentBlobCell) {

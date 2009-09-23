@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.nodes.transformation.termvector;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermVectorConfigKeys {
+public final class TermVectorConfigKeys {
 
+    private TermVectorConfigKeys() { }
+    
     /**
      * The configuration key of the boolean value setting.
      */

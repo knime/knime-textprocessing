@@ -26,13 +26,13 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

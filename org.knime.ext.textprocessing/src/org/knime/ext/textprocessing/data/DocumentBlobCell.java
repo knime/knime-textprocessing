@@ -23,10 +23,6 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
@@ -39,8 +35,12 @@ import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.List;
+
 /**
- * A {@link org.knime.core.data.container.BlobDataCell} implementation holding a 
+ * A {@link org.knime.core.data.container.BlobDataCell} implementation holding a
  * {@link org.knime.ext.textprocessing.data.Document} value by storing this 
  * value in a private <code>Document</code> member. It provides a document 
  * value as well as a string value.
@@ -59,7 +59,8 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
      * 
      * @see DataType#getType(Class)
      */
-    public static final DataType TYPE = DataType.getType(DocumentBlobCell.class);
+    public static final DataType TYPE = 
+        DataType.getType(DocumentBlobCell.class);
 
     /**
      * Returns the preferred value class of this cell implementation. This

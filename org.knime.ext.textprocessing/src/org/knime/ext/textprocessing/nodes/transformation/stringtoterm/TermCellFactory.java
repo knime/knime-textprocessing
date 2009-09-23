@@ -54,6 +54,7 @@ public class TermCellFactory implements CellFactory {
      * 
      * @param colIndex The index of the column containing the string to
      * convert to terms.
+     * @param inSpec The incoming <code>DataTableSpec</code>.
      */
     public TermCellFactory(final int colIndex, final DataTableSpec inSpec) {
         if (colIndex < 0) {

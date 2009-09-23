@@ -39,7 +39,7 @@ public class RegExReplacerNodeDialog extends PreprocessingNodeSettingsPane {
      */
     public static final SettingsModelString getRegExModel() {
         return new SettingsModelString(
-                RegExReplacerFilterConfigKeys.CFGKEY_REGEX,
+                RegExReplacerConfigKeys.CFGKEY_REGEX,
                 RegExReplacerNodeModel.DEFAULT_REGEX);
     }
 
@@ -49,7 +49,7 @@ public class RegExReplacerNodeDialog extends PreprocessingNodeSettingsPane {
      */
     public static final SettingsModelString getReplacementModel() {
         return new SettingsModelString(
-                RegExReplacerFilterConfigKeys.CFGKEY_REPLACEMENT,
+                RegExReplacerConfigKeys.CFGKEY_REPLACEMENT,
                 RegExReplacerNodeModel.DEFAULT_REPLACEMENT);
     }
 

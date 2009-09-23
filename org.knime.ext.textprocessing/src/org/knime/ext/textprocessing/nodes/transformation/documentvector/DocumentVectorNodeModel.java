@@ -122,7 +122,7 @@ public class DocumentVectorNodeModel extends NodeModel {
     public DocumentVectorNodeModel() {
         super(1, 1);
         m_documentCellFac =
-            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();        
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_booleanModel.addChangeListener(new InternalChangeListener());
         checkUncheck();
     }
@@ -301,7 +301,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         return new DataTableSpec(columnSpecs);
     }    
     
-    private List<Double> initFeatureVector(int size) {
+    private List<Double> initFeatureVector(final int size) {
         List<Double> featureVector = new ArrayList<Double>(size);
         for (int i = 0; i < size; i++) {
             featureVector.add(i, 0.0);

@@ -53,11 +53,17 @@ public class DocumentDataCellFactory implements TextContainerDataCellFactory {
         return dc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataType getDataType() {
         return DocumentCell.TYPE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean validateCellType(final DataCell cell) {
         if (cell instanceof DocumentCell) {

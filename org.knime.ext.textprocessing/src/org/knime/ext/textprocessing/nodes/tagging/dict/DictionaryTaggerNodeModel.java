@@ -62,17 +62,17 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     /**
      * The default value of the terms unmodifiable flag.
      */
-    public static boolean DEFAULT_UNMODIFIABLE = true;
+    public static final boolean DEFAULT_UNMODIFIABLE = true;
     
     /**
      * The default value of the case sensitive setting.
      */
-    public static boolean DEFAULT_CASE_SENSITIVE = true;
+    public static final boolean DEFAULT_CASE_SENSITIVE = true;
     
     /**
      * The default value of the default tag.
      */
-    public static String DEFAULT_TAG = 
+    public static final String DEFAULT_TAG = 
         NamedEntityTag.UNKNOWN.getTag().getTagValue();
     
     private int m_docColIndex = -1;
@@ -157,7 +157,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             
             double progress = (double)currDoc / (double)rowCount;
             exec.setProgress(progress, "Tagging document " + currDoc + " of " 

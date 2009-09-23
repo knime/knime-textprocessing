@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  *
- * Copyright, 2003 - 2009
+ * Copyright, 2003 - 2007
  * University of Konstanz, Germany
  * Chair for Bioinformatics and Information Mining (Prof. M. Berthold)
  * and KNIME GmbH, Konstanz, Germany
@@ -17,25 +17,22 @@
  * website: www.knime.org
  * email: contact@knime.org
  * ---------------------------------------------------------------------
- *
+ * 
  * History
- *   14.08.2007 (thiel): created
+ *   20.11.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
+package org.knime.ext.textprocessing.nodes.transformation.sentenceextraction;
 
 /**
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class RegExReplacerFilterConfigKeys {
+public final class SentenceExtractionConfigKeys {
 
+    private SentenceExtractionConfigKeys() { }
+    
     /**
-     * Config Key for the regular expression.
+     * The configuration key of the document column setting.
      */
-    public static final String CFGKEY_REGEX = "RegEx";
-
-    /**
-     * Config Key for the replacement.
-     */
-    public static final String CFGKEY_REPLACEMENT = "Replacement";
+    public static final String CFG_KEY_DOCUMENT_COLUMN = "Documnt Column";
 }

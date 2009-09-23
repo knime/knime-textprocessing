@@ -97,8 +97,8 @@ public abstract class FrequencyCellFactory implements CellFactory {
     /**
      * {@inheritDoc}
      */
-    public final void setProgress(int curRowNr, int rowCount, RowKey lastKey,
-            ExecutionMonitor exec) {
+    public final void setProgress(final int curRowNr, final int rowCount, 
+            final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
         exec.setProgress(prog, "Computing frequency of row: " + curRowNr 
                 + " of " + rowCount + " rows");

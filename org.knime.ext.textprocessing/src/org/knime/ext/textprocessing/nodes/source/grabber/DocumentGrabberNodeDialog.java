@@ -24,13 +24,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFileChooser;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -45,6 +38,13 @@ import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JFileChooser;
 
 
 /**
@@ -120,6 +120,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 DocumentGrabberConfigKeys.CFGKEY_DOC_TYPE, "");
     }
+         
     
     private DialogComponentButtonLabel m_buttonLabel;
     private SettingsModelString m_queryModel;

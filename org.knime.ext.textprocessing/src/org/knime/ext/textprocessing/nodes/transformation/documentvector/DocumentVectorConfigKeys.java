@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvector;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentVectorConfigKeys {
+public final class DocumentVectorConfigKeys {
 
+    private DocumentVectorConfigKeys() { }
+    
     /**
      * The configuration key of the boolean value setting.
      */

@@ -71,6 +71,13 @@ public class DocumentParserNodeModel extends NodeModel {
      * specified directory is search recursively).
      */
     public static final boolean DEFAULT_RECURSIVE = false;
+
+    /**
+     * The default value of the ignore hidden files flag 
+     * (if set <code>true</code> the hidden files will be not considered for 
+     * parsing.
+     */
+    public static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
     
     /**
      * The default category of the documents.
@@ -105,6 +112,9 @@ public class DocumentParserNodeModel extends NodeModel {
     private SettingsModelString m_typeModel = 
         DocumentParserNodeDialog.getTypeModel();
     
+    private SettingsModelBoolean m_ignoreHiddenFilesModel = 
+        DocumentParserNodeDialog.getIgnoreHiddenFilesModel();
+    
     private DocumentParser m_parser;
     
     private List<String> m_validExtensions;
@@ -130,7 +140,7 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(DataTableSpec[] inSpecs)
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }    
@@ -139,12 +149,13 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(BufferedDataTable[] inData,
-            ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
+            final ExecutionContext exec) throws Exception {
         List<Document> docs = new ArrayList<Document>();
         
         File dir = new File(m_pathModel.getStringValue());        
         boolean recursive = m_recursiveModel.getBooleanValue();
+        boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
         String category = m_categoryModel.getStringValue();
         if (category != null && category.length() > 0) {
             m_parser.setDocumentCategory(new DocumentCategory(category));
@@ -158,7 +169,8 @@ public class DocumentParserNodeModel extends NodeModel {
             m_parser.setDocumentType(type);
         }
         
-        FileCollector fc = new FileCollector(dir, m_validExtensions, recursive);
+        FileCollector fc = new FileCollector(dir, m_validExtensions, recursive, 
+                ignoreHiddenFiles);
         List<File> files = fc.getFiles();
         int fileCount = files.size();
         int currFile = 1;
@@ -197,7 +209,8 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(File nodeInternDir, ExecutionMonitor exec)
+    protected void loadInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
     }
 
@@ -205,7 +218,8 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(File nodeInternDir, ExecutionMonitor exec)
+    protected void saveInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
     }    
     
@@ -224,38 +238,41 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(NodeSettingsRO settings)
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_pathModel.loadSettingsFrom(settings);
         m_recursiveModel.loadSettingsFrom(settings);
         m_categoryModel.loadSettingsFrom(settings);
         m_sourceModel.loadSettingsFrom(settings);
         m_typeModel.loadSettingsFrom(settings);
+        m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(NodeSettingsWO settings) {
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_pathModel.saveSettingsTo(settings);
         m_recursiveModel.saveSettingsTo(settings);
         m_categoryModel.saveSettingsTo(settings);
         m_sourceModel.saveSettingsTo(settings);
         m_typeModel.saveSettingsTo(settings);
+        m_ignoreHiddenFilesModel.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(NodeSettingsRO settings)
+    protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_pathModel.validateSettings(settings);
         m_recursiveModel.validateSettings(settings);
         m_categoryModel.validateSettings(settings);
         m_sourceModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
+        m_ignoreHiddenFilesModel.validateSettings(settings);
         
         // check selected directory
         String dir = ((SettingsModelString)m_pathModel.

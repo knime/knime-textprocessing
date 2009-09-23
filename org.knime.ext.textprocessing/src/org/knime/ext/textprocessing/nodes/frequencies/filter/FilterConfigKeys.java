@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.frequencies.filter;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class FilterConfigKeys {
+public final class FilterConfigKeys {
 
+    private FilterConfigKeys() { }
+    
     /**
      * The configuration key for the relative/absolute setting of TF 
      * computation.

@@ -30,8 +30,10 @@ package org.knime.ext.textprocessing.nodes.source.parser;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentParserConfigKeys {
+public final class DocumentParserConfigKeys {
 
+    private DocumentParserConfigKeys() { }
+    
     /**
      * The configuration key of the path of the directory containing the files
      * to parse.
@@ -58,4 +60,9 @@ public class DocumentParserConfigKeys {
      * The configuration key of the type of the document.
      */
     public static final String CFGKEY_DOCTYPE = "Type";
+    
+    /**
+     * The configuration key of the "ignore hidden files" flag.
+     */
+    public static final String CFGKEY_IGNORE_HIDDENFILES = "IgnoreHiddenFiles";
 }

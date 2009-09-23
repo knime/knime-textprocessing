@@ -47,6 +47,8 @@ public class FileCollector {
     
     private boolean m_recursive;
     
+    private boolean m_ignoreHidden;
+    
     private List<File> m_files;
     
     /**
@@ -58,10 +60,12 @@ public class FileCollector {
      * @param dir Directory to search for files.
      * @param ext Extensions of file to search for.
      * @param recursive if set <code>true</code> the directory will be
+     * @param ignoreHiddenFiles if set <code>true</code> hidden files will not 
+     * be collected.
      * searched recursively.
      */
     public FileCollector(final File dir, final List<String> ext, 
-            final boolean recursive) {
+            final boolean recursive, final boolean ignoreHiddenFiles) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException(dir.getName()
                     + " is not a directory ");
@@ -70,6 +74,7 @@ public class FileCollector {
         m_directory = dir;
         m_extensions = ext;
         m_recursive = recursive;
+        m_ignoreHidden = ignoreHiddenFiles;
         
         collectFiles();
     }
@@ -104,6 +109,13 @@ public class FileCollector {
     }
 
     /**
+     * @return the ignore hidden files flag.
+     */
+    public boolean getIgnoreHidden() {
+        return m_ignoreHidden;
+    }    
+    
+    /**
      * Collects all the files in directory with given extension.
      */
     private void collectFiles() {
@@ -116,7 +128,17 @@ public class FileCollector {
         if (dir.isDirectory()) {
             // ad files to list
             File[] filesWithExt = dir.listFiles(filter);
-            files.addAll(Arrays.asList(filesWithExt));
+            
+            // check for hidden files
+            if (m_ignoreHidden) {
+                for (File f : filesWithExt) {
+                    if (!f.isHidden()) {
+                        files.add(f);
+                    }
+                }
+            } else {
+                files.addAll(Arrays.asList(filesWithExt));
+            }
             
             // go recursively through all sub dirs
             if (m_recursive) {
@@ -139,11 +161,10 @@ public class FileCollector {
         /**
          * {@inheritDoc}
          */
-        public boolean accept(final File f, final String s) {
+        public boolean accept(final File f, final String s) {            
             if (m_extensions.size() == 0) {
                 return true;
             }
-            
             for (String ext : m_extensions) {
                 if (s.toLowerCase().endsWith("." + ext)) {
                     return true;

@@ -86,7 +86,7 @@ public class Sentence implements TextContainer {
             if (i < m_terms.size() - 1) {
                 sb.append(Term.WORD_SEPARATOR);
             } else {
-            	sb.append(".");
+                sb.append(".");
             }
         }
 

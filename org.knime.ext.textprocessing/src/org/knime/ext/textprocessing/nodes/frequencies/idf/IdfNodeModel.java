@@ -58,8 +58,8 @@ public class IdfNodeModel extends FrequencyNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void initCellFactory(BufferedDataTable inData,
-            ExecutionContext exec) throws CanceledExecutionException {
+    protected void initCellFactory(final BufferedDataTable inData,
+            final ExecutionContext exec) throws CanceledExecutionException {
         m_cellFac = new IdfCellFactory(getDocumentColIndex(), getTermColIndex(),
                 inData, exec);
     }
@@ -120,8 +120,12 @@ public class IdfNodeModel extends FrequencyNodeModel {
         // Nothing to do ...
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected DataTableSpec createDataTableSpec(DataTableSpec inDataSpec) {
+    protected DataTableSpec createDataTableSpec(
+            final DataTableSpec inDataSpec) {
         DataColumnSpec freq = 
             new DataColumnSpecCreator(
                     DataTableSpec.getUniqueColumnName(

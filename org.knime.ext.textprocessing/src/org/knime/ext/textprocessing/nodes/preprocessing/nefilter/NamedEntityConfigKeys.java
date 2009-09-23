@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.nodes.preprocessing.nefilter;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NamedEntityConfigKeys {
+public final class NamedEntityConfigKeys {
 
+    private NamedEntityConfigKeys() { }
+    
     /**
      * The configuration key for the filter modifiable setting.
      */

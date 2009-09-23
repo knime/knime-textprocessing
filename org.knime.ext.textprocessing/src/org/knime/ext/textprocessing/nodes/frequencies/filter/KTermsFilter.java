@@ -68,7 +68,7 @@ public class KTermsFilter extends FrequencyFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean internalMatches(DataRow row, int rowIndex) {
+    public boolean internalMatches(final DataRow row, final int rowIndex) {
         m_count++;
         if (m_count <= m_k) {
             return true;

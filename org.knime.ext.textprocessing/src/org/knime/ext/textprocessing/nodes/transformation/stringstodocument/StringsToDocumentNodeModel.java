@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 public class StringsToDocumentNodeModel extends NodeModel {
 
     
-    private final static int INPORT = 0; 
+    private static final int INPORT = 0; 
     
     private SettingsModelString m_titleColModel = 
         StringsToDocumentNodeDialog.getTitleStringModel();
@@ -207,7 +207,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(NodeSettingsWO settings) {
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_fulltextColModel.saveSettingsTo(settings);
         m_authorsColModel.saveSettingsTo(settings);
         m_titleColModel.saveSettingsTo(settings);
@@ -222,7 +222,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(NodeSettingsRO settings)
+    protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_fulltextColModel.validateSettings(settings);
         m_authorsColModel.validateSettings(settings);

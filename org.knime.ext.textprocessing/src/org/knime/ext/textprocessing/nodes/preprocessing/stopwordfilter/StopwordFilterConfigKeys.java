@@ -27,7 +27,9 @@ package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class StopwordFilterConfigKeys {
+public final class StopwordFilterConfigKeys {
+    
+    private StopwordFilterConfigKeys() { }
 
     /**
      * Config Key for file containing the stop words.
@@ -38,4 +40,14 @@ public class StopwordFilterConfigKeys {
      * Config Key for the activation of case sensitivity.
      */
     public static final String CFGKEY_CASE_SENSITIVE = "CS";
+
+    /**
+     * Config Key for the "use build in list" flag.
+     */
+    public static final String CFGKEY_USE_BUILDIN_LIST = "UseBuildInList";
+
+    /**
+     * Config Key for the selected build in list.
+     */
+    public static final String CFGKEY_BUILDIN_LIST = "BuildInList";   
 }

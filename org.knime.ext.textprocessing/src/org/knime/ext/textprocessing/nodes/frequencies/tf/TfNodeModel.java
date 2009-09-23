@@ -134,8 +134,12 @@ public class TfNodeModel extends FrequencyNodeModel {
         // Nothing to do ...
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected DataTableSpec createDataTableSpec(final DataTableSpec inDataSpec) {
+    protected DataTableSpec createDataTableSpec(
+            final DataTableSpec inDataSpec) {
         DataColumnSpec freq;
         if (m_relativeModel.getBooleanValue()) {
             String colName = DataTableSpec.getUniqueColumnName(

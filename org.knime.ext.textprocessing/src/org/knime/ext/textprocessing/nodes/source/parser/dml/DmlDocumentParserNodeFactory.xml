@@ -20,6 +20,9 @@
             If checked, the specified directory is searched for xml
             files recursively.
         </option>
+        <option name="Ignore hidden files">
+            If checked, hidden files will not be considered for parsing.
+        </option>
         <option name="Document category">
             Specifies the category of the documents.
         </option>

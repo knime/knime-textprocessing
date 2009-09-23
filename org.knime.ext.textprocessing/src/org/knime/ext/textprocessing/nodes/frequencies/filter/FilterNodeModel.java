@@ -65,7 +65,7 @@ public class FilterNodeModel extends NodeModel {
     public static final String SELECTION_NUMBER = "Number of terms";
     
     /**
-     * The default filtering
+     * The default filtering.
      */
     public static final String DEF_SELECTION = SELECTION_NUMBER;
     

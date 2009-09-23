@@ -101,8 +101,8 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected final void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected final void loadValidatedSettingsFrom(
+            final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_strictFilteringModel.loadSettingsFrom(settings);
         m_validTagsModel.loadSettingsFrom(settings);

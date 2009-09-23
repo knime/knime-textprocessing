@@ -108,15 +108,22 @@ public abstract class FrequencyNodeModel extends NodeModel {
         m_termColIndex = verifier.getTermCellIndex();
     }
     
+    /**
+     * Creates a new <code>DataTableSpec</code>.
+     * 
+     * @param inDataSpec The input <code>DataTableSpec</code>.
+     * @return The new created output <code>DataTableSpec</code>.
+     */
     protected abstract DataTableSpec createDataTableSpec(
-            final DataTableSpec inDataSpec);  
+            final DataTableSpec inDataSpec);
     
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final BufferedDataTable[] execute(BufferedDataTable[] inData,
-            ExecutionContext exec) throws Exception {
+    protected final BufferedDataTable[] execute(
+            final BufferedDataTable[] inData, final ExecutionContext exec) 
+    throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
         
         m_documentColIndex = inDataTable.getDataTableSpec().findColumnIndex(

@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.preprocessing.caseconverter;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class CaseConverterConfigKeys {
+public final class CaseConverterConfigKeys {
 
+    private CaseConverterConfigKeys() { }
+    
     /**
      * The configuration key for the case to convert to.
      */

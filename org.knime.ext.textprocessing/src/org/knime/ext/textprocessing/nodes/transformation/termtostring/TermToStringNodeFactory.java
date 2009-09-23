@@ -31,7 +31,8 @@ import org.knime.core.node.NodeView;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermToStringNodeFactory extends NodeFactory<TermToStringNodeModel> {
+public class TermToStringNodeFactory 
+extends NodeFactory<TermToStringNodeModel> {
 
     /**
      * {@inheritDoc}

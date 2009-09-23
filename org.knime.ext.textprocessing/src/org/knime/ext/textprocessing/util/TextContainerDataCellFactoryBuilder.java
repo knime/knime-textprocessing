@@ -21,7 +21,11 @@ package org.knime.ext.textprocessing.util;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
-public class TextContainerDataCellFactoryBuilder {
+/**
+ * @author Kilian Thiel, University of Konstanz
+ */
+public final class TextContainerDataCellFactoryBuilder {
+    
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(TextContainerDataCellFactoryBuilder.class);
     

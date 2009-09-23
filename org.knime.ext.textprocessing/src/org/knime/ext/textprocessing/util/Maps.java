@@ -50,8 +50,8 @@ public class Maps {
      * @return a new map containing the top min(n, source.size()) entries.
      */
     @SuppressWarnings("unchecked")
-    public static <K, V extends Comparable<V>> Map<K, V> getTopValues(final Map<K, V> source,
-            final int n) {
+    public static <K, V extends Comparable<V>> Map<K, V> getTopValues(
+            final Map<K, V> source, final int n) {
         Map<K, V> topvalues = new LinkedHashMap<K, V>();
         int nbval = n > source.size() ? source.size() : n;
 
@@ -99,8 +99,8 @@ public class Maps {
      * @param map the map to modify
      * @param cond the condition that must be met for an element to be kept
      */
-    public static <M extends Map<K,V>, K, V> void filter(
-            final M map, final Condition<Entry<K,V>> cond) {
+    public static <M extends Map<K, V>, K, V> void filter(
+            final M map, final Condition<Entry<K, V>> cond) {
         Iterator<Entry<K, V>> it = map.entrySet().iterator();
         while (it.hasNext()) {
             Entry<K, V> e = it.next();

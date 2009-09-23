@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class StringsToDocumentConfigKeys {
+public final class StringsToDocumentConfigKeys {
 
+    private StringsToDocumentConfigKeys() { }
+    
     /**
      * The configuration key of the title column.
      */

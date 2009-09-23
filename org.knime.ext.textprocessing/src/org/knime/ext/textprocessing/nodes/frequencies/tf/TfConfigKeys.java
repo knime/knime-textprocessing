@@ -27,8 +27,10 @@ package org.knime.ext.textprocessing.nodes.frequencies.tf;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TfConfigKeys {
+public final class TfConfigKeys {
 
+    private TfConfigKeys() { }
+    
     /**
      * The configuration key for the relative/absolute setting of TF 
      * computation.

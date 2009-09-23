@@ -27,7 +27,9 @@ package org.knime.ext.textprocessing.nodes.view.documentviewer;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewerConfigKeys {
+public final class DocumentViewerConfigKeys {
+    
+    private DocumentViewerConfigKeys() { }
     
     /**
      * The configuration key for the column containing he documents to process.

@@ -23,9 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.Paragraph;
@@ -36,6 +33,9 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The abstract class <code>AbstractDocumentTagger</code> implements the
@@ -242,7 +242,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         // it
                     } else if (oldList.get(t).getWords().size() > 1) {
                         List<Word> newWords = new ArrayList<Word>();
-                        for (int w = 0; w < oldList.get(t).getWords().size(); w++) {
+                        for (int w = 0; w < oldList.get(t).getWords().size(); 
+                        w++) {
                             // add word if index matches
                             if (w >= startWordIndex && w <= stopWordIndex) {
                                 newWords.add(oldList.get(t).getWords().get(w));
@@ -370,10 +371,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         }
                     }
                 }
-            }
+            } else {
             // if we are before or after the interesting part just add the
             // terms without rearrangement
-            else {
                 newTermList.add(oldList.get(t));
             }
         }

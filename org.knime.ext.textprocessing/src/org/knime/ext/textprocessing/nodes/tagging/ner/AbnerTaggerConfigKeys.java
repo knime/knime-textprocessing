@@ -27,10 +27,17 @@ package org.knime.ext.textprocessing.nodes.tagging.ner;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class AbnerTaggerConfigKeys {
+public final class AbnerTaggerConfigKeys {
+    
+    private AbnerTaggerConfigKeys() { }
     
     /**
      * The configuration key of unmodifiable flag of terms.
      */
     public static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
+    
+    /**
+     * The configuration key for the ABNER tagging model.
+     */
+    public static final String CFGKEY_MODEL = "ABNER Model";
 }

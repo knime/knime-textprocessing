@@ -53,7 +53,7 @@ public class NamedEntityFilter implements Preprocessing {
     public Term preprocess(final Term term) {
         if (m_filterModifiable && term.isUnmodifiable()) {
             return term;
-        } else if(!m_filterModifiable && !term.isUnmodifiable()) {
+        } else if (!m_filterModifiable && !term.isUnmodifiable()) {
             return term;
         }
         return null;

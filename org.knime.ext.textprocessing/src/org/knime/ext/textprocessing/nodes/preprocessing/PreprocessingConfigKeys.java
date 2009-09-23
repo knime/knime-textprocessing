@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.nodes.preprocessing;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PreprocessingConfigKeys {
+public final class PreprocessingConfigKeys {
 
+    private PreprocessingConfigKeys() { }
+    
     /**
      * The configuration key for the deep preprcessing setting.
      */

@@ -23,9 +23,10 @@
  */
 package org.knime.ext.textprocessing.preferences;
 
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 /**
  * 
@@ -34,10 +35,10 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 public class TextprocessingPreferenceInitializer extends
         AbstractPreferenceInitializer {
 
-    private static boolean DEFAULT_USE_BLOB = true;
+    private static final boolean DEFAULT_USE_BLOB = true;
     
     /** Preference key for the usage of blob cells setting. */
-    public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";    
+    public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";
     
     /**
      * {@inheritDoc}

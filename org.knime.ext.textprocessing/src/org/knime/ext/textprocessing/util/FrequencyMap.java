@@ -34,7 +34,7 @@ import java.util.Set;
  */
 public class FrequencyMap<K> extends DefaultMap<K, Integer> {
     // Integers are immutable, no worries about sharing the reference here
-    private static Integer m_defaultValue = new Integer(0);
+    private static final Integer DEFAULT_VALUE = new Integer(0);
 
     /**
      * Creates a FrequencyMap with the default map type from DefaultMap.
@@ -56,7 +56,7 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
      */
     @Override
     public Integer getDefaultValue() {
-        return m_defaultValue;
+        return DEFAULT_VALUE;
     }
 
     /**
@@ -74,7 +74,7 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
     }
 
     /**
-     * Increments the frequency count for object 'key'
+     * Increments the frequency count for object 'key'.
      *
      * @param key the object whose count should be incremented
      * @return the new value
@@ -84,7 +84,7 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
     }
 
     /**
-     * Increments the frequency count for object 'key' by n
+     * Increments the frequency count for object 'key' by n.
      *
      * @param key the object whose count should be incremented
      * @param n the increment value
@@ -95,7 +95,7 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
     }
 
     /**
-     * Decrements the frequency count for object 'key'
+     * Decrements the frequency count for object 'key'.
      *
      * @param key the object whose count should be decremented
      * @return the new value
@@ -105,7 +105,7 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
     }
 
     /**
-     * Decrements the frequency count for object 'key' by n
+     * Decrements the frequency count for object 'key' by n.
      *
      * @param key the object whose count should be decremented
      * @param n the decrement value
@@ -129,7 +129,7 @@ public class FrequencyMap<K> extends DefaultMap<K, Integer> {
                 sb.append(",");
             }
 
-            return sb.toString().substring(0, sb.length()-1);
+            return sb.toString().substring(0, sb.length() - 1);
         }
         return "";
     }

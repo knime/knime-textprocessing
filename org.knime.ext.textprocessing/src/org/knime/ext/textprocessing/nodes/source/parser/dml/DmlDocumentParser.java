@@ -339,25 +339,25 @@ public class DmlDocumentParser extends DefaultHandler implements
                     m_currentDoc.setDocumentFile(f);
                 }
             }
-        } else if(m_lastTag.equals(FIRSTNAME)) {
+        } else if (m_lastTag.equals(FIRSTNAME)) {
             m_firstName = "";
-        } else if(m_lastTag.equals(LASTNAME)) {
+        } else if (m_lastTag.equals(LASTNAME)) {
             m_lastName = "";
-        } else if(m_lastTag.equals(DAY)) {
+        } else if (m_lastTag.equals(DAY)) {
             m_day = "";
-        } else if(m_lastTag.equals(MONTH)) {
+        } else if (m_lastTag.equals(MONTH)) {
             m_month = "";
-        } else if(m_lastTag.equals(YEAR)) {
+        } else if (m_lastTag.equals(YEAR)) {
             m_year = "";
-        } else if(m_lastTag.equals(WORD)) {
+        } else if (m_lastTag.equals(WORD)) {
             m_word = "";
-        } else if(m_lastTag.equals(TAG_TYPE)) {
+        } else if (m_lastTag.equals(TAG_TYPE)) {
             m_tagType = "";
-        } else if(m_lastTag.equals(TAG_VALUE)) {
+        } else if (m_lastTag.equals(TAG_VALUE)) {
             m_tagValue = "";
         } else if (m_lastTag.equals(MODIFIABILITY)) { 
             m_modifiability = "";
-        } else if(m_lastTag.equals(TERM)) {
+        } else if (m_lastTag.equals(TERM)) {
             m_words = new ArrayList<Word>();
             m_tags = new ArrayList<Tag>();
         } else if (m_lastTag.equals(SECTION)) {
@@ -383,7 +383,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             Document doc = m_currentDoc.createDocument();
             m_docs.add(doc);
             m_currentDoc = null;
-        } else if(qName.equals(AUTHOR)) {
+        } else if (qName.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
         } else if (qName.equals(PUBLICATIONDATE)) {
@@ -400,18 +400,18 @@ public class DmlDocumentParser extends DefaultHandler implements
                         + ") could not be parsed !");
                 LOGGER.warn(e.getStackTrace());
             }
-        } else if(qName.equals(WORD)) {
+        } else if (qName.equals(WORD)) {
             if (m_words != null && m_word != null) {
                 Word w = new Word(m_word.trim());
                 m_words.add(w);
             }
-        } else if(qName.equals(TAG)) {
+        } else if (qName.equals(TAG)) {
             if (m_tags != null && m_tagType != null && m_tagValue != null) {
                 Tag t = TagFactory.getInstance().createTag(m_tagType.trim(), 
                         m_tagValue.trim());
                 m_tags.add(t);
             }
-        } else if(qName.equals(TERM)) {
+        } else if (qName.equals(TERM)) {
             if (m_words != null && m_tags != null) {
                 boolean mod = new Boolean(m_modifiability.trim());
                 Term t = new Term(m_words, m_tags, mod);
@@ -701,13 +701,14 @@ public class DmlDocumentParser extends DefaultHandler implements
         }
         for (int i = 0; i < in.length(); i++) {
             curr = in.charAt(i);
-            if ((curr == 0x9) ||
-                (curr == 0xA) ||
-                (curr == 0xD) ||
-                ((curr >= 0x20) && (curr <= 0xD7FF)) ||
-                ((curr >= 0xE000) && (curr <= 0xFFFD)) ||
-                ((curr >= 0x10000) && (curr <= 0x10FFFF)))
+            if ((curr == 0x9) 
+                    || (curr == 0xA) 
+                    || (curr == 0xD) 
+                    || ((curr >= 0x20) && (curr <= 0xD7FF)) 
+                    || ((curr >= 0xE000) && (curr <= 0xFFFD)) 
+                    || ((curr >= 0x10000) && (curr <= 0x10FFFF))) {
                 out.append(curr);
+            }
         }
         return out.toString();
     }

@@ -51,7 +51,7 @@ public class StringsToDocumentConfig {
     static final String DEF_DOCUMENT_CATEGORY = "";
 
     /**
-     * The default document type
+     * The default document type.
      */
     static final String DEF_DOCUMENT_TYPE = DocumentType.UNKNOWN.toString();  
     

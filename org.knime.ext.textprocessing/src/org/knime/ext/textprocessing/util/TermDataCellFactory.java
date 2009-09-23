@@ -53,11 +53,17 @@ public class TermDataCellFactory implements TextContainerDataCellFactory {
         return dc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataType getDataType() {
         return TermCell.TYPE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean validateCellType(final DataCell cell) {
         if (cell instanceof TermCell) {
