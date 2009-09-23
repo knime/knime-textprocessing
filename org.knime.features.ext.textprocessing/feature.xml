@@ -360,7 +360,7 @@ Public License instead of this License.
    </license>
 
    <url>
-      <update label="KNIME Labs" url="http://www.knime.org/update_2.x/labs"/>
+      <update label="KNIME Labs" url="http://labs.knime.org/update/2.1"/>
    </url>
 
    <includes
