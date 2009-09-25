@@ -26,6 +26,7 @@ import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -93,23 +94,28 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
                 m_documentColIndex).getName();
         List<String> colList = new ArrayList<String>();
         colList.add(docColName);
+        
+        m_exec.setMessage("Sorting input table");
+        ExecutionContext subEC = m_exec.createSubExecutionContext(0.3);
         SortedTable sortedTable = new SortedTable(inData, colList, 
-                new boolean[]{true}, m_exec);
+                new boolean[]{true}, subEC);
         BufferedDataTable sortedBDT = exec.createBufferedDataTable(sortedTable,
-                m_exec);
+                subEC);
         
         // prepare for chunking
         List<DataRow> chunk = new ArrayList<DataRow>();
         Document lastDoc = null;
         
         // go through data table, chunk and preprocess chunk when ready.
+        m_exec.setMessage("Grouping");
+        ExecutionMonitor subExec = m_exec.createSubExecutionContext(1.0);
         m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
                 m_appendIncomingDocument));
         RowIterator i = sortedBDT.iterator();
         while (i.hasNext()) {
-            exec.checkCanceled();
+            m_exec.checkCanceled();
             DataRow row = i.next();
-            setProgress();
+            setProgress(subExec);
             
             Document currDoc = ((DocumentValue)row.getCell(m_documentColIndex))
                                .getDocument();
@@ -134,10 +140,10 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
         return m_dc.getTable();
     }
     
-    private void setProgress() {
+    private void setProgress(final ExecutionMonitor exec) {
         int curr = m_currRow.incrementAndGet();
         double prog = (double)curr / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocesing row " + curr + " of "
+        exec.setProgress(prog, "Preprocesing row " + curr + " of "
                         + m_noRows);
     }
     

@@ -15,7 +15,8 @@ Bundle-ClassPath: knime-textprocessing-patches.jar,
  lib/opennlp-tools-1.3.0.jar,
  lib/maxent-2.4.0.jar,
  lib/trove.jar,
- lib/abner.jar
+ lib/abner.jar,
+ lib/Snowball.jar
 Export-Package: .,
  abner,
  edu.umass.cs.mallet.base.classify,
