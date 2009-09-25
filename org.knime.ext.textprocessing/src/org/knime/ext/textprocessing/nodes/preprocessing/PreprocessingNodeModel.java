@@ -23,13 +23,7 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowIterator;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -38,39 +32,41 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBuilder;
-import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.data.Paragraph;
-import org.knime.ext.textprocessing.data.Section;
-import org.knime.ext.textprocessing.data.Sentence;
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
-import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.event.ChangeListener;
 
 /**
  * This class represents the super class of all text preprocessing node models
- * which apply filtering or modification of terms. Classes which extend
- * <code>PreprocessingNodeModel</code>  have to implement the method
+ * which apply filtering or modification or any kind of preprocessing of terms 
+ * and documents. Classes which extend <code>PreprocessingNodeModel</code>  
+ * have to implement the method
  * {@link PreprocessingNodeModel#initPreprocessing()} and take care of a
  * proper initialization of the used
  * {@link org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing}
- * instance. A stop word filter i.e. requires a file containing the stop words,
+ * instance. 
+ *
+ * A stop word filter i.e. requires a file containing the stop words,
  * a case converter requires information about the case to convert the terms to
  * and so on. The configure and execute procedure is done by the
  * <code>PreprocessingNodeModel</code>, classes extending this model do not
  * need to care about that. Once the used <code>Preprocessing</code> instance
  * is initialized properly the rest is done automatically.
+ *
+ * There exists Two ways of preprocessing a bag of words. The first is row
+ * by row. A row consists of a term an a document, and a preprocessing instance
+ * i.e. a StopWordFilter can apply the preprocessing step (filtering stop words)
+ * for each row separately.
+ * The second way of preprocessing is chunk wise preprocessing. Here chunks
+ * will be passed over to the preprocessing instance.
+ * The preprocessor instance decides which kind of preprocessing strategy
+ * (row by row or chunk wise) is applied. By default the
+ * {@link org.knime.ext.textprocessing.nodes.preprocessing.RowPreprocessor}
+ * is used. To change the strategy i.e. to 
+ * {@link org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessor}
+ * The constructor must be overwritten and the preprocessor which have to be 
+ * used must be specified as parameter.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -115,38 +111,28 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     protected Preprocessing m_preprocessing;
     
-    private BufferedDataContainer m_dc = null;
-    
-    
-    private TextContainerDataCellFactory m_docCellFac;
-    
-    private TextContainerDataCellFactory m_termCellFac;
+    /**
+     * The preprocessor to use.
+     */
+    protected AbstractPreprocessor m_preprocessor;
     
     private BagOfWordsDataTableBuilder m_fac;
-    
-    private HashMap<Document, DataCell> m_preprocessedDocuments;
-    
-    private HashMap<DataCell, Set<Term>> m_addedRows;
-    
-    private int m_noRows = 0;
-    
-    private AtomicInteger m_currRow = new AtomicInteger(0);
-    
-    private ExecutionContext m_exec;
 
     /**
-     * The constructor of <code>PreprocessingNodeModel</code>.
+     * The constructor of <code>PreprocessingNodeModel</code> with the specified
+     * preprocessor to use.
+     * @param preprocessor The preprocessor to use.
      */
-    public PreprocessingNodeModel() {
+    public PreprocessingNodeModel(final AbstractPreprocessor preprocessor) {
         super(1, 1);
 
-        m_docCellFac = 
-            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        m_termCellFac =
-            TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        if (preprocessor == null) {
+            m_preprocessor = new RowPreprocessor();
+        } else {
+            m_preprocessor = preprocessor;
+        }
         m_fac = new BagOfWordsDataTableBuilder();
-        
-        
+                
         m_deepPreproModel =
             PreprocessingNodeSettingsPane.getDeepPrepressingModel();
         m_appendIncomingModel =
@@ -169,6 +155,15 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         cl2.stateChanged(null);
     }
 
+    /**
+     * The constructor of <code>PreprocessingNodeModel</code>.
+     * The <code>RowPreprocessor</code> is used by default.
+     */
+    public PreprocessingNodeModel() {
+        this(new RowPreprocessor());
+    }
+    
+    
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
@@ -192,6 +187,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * Initializes the <code>Preprocessing</code> instance.
      */
     protected abstract void initPreprocessing();
+
 
     /**
      * {@inheritDoc}
@@ -219,7 +215,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             throw new InvalidSettingsException(
                    "Index of specified original document column is not valid!" 
                     + " Check your settings!");
-        }        
+        }
         
         
         // initialize the underlying preprocessing
@@ -228,130 +224,21 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             throw new NullPointerException(
                     "Preprocessing instance may not be null!");
         }
-        m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
-                        m_appendIncomingModel.getBooleanValue()));
         
-        // handle chunks
-        m_currRow = new AtomicInteger(0);
-        m_noRows = inData[0].getRowCount();
-        m_exec = exec;
+        // initialize the underlying preprocessor
+        if (m_preprocessor == null) {
+            throw new NullPointerException(
+                    "Preprocessor instance may not be null!");
+        }
+        m_preprocessor.initialize(
+                m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
+                m_deepPreproModel.getBooleanValue(), 
+                m_appendIncomingModel.getBooleanValue(),
+                m_preproUnModifiable.getBooleanValue(),
+                m_preprocessing);
         
-        m_preprocessedDocuments = new HashMap<Document, DataCell>();
-        m_addedRows = new HashMap<DataCell, Set<Term>>();
-        int count = 0;
-        
-        RowIterator i = inData[0].iterator();
-        while (i.hasNext()) {
-            exec.checkCanceled();
-            count++;
-            DataRow row = i.next();
-            
-            setProgress();
-            processRow(row);
-        }
-        m_dc.close();
-        m_preprocessedDocuments.clear();
-        m_addedRows.clear();
-        return new BufferedDataTable[]{m_dc.getTable()};
-    }
-
-        
-    /**
-     * Preprocesses the given row.
-     * @param row The row tp apply preprocessing step on.
-     */
-    public void processRow(final DataRow row) {
-        DataCell newDocCell = null;
-        RowKey rowKey = row.getKey();
-        DataCell termcell = row.getCell(m_termColIndex);
-        DataCell doccell = row.getCell(m_documentColIndex);
-        DataCell origDocCell = row.getCell(m_origDocumentColIndex);
-
-        // handle missing value (ignore rows with missing values)
-        if (termcell.isMissing() || doccell.isMissing()) {
-            return;
-        }
-        Term term = ((TermValue)termcell).getTermValue();
-
-        //
-        // do the preprocessing twist
-        //
-        // is the term unmodifiable ???
-        if (!term.isUnmodifiable() || m_preproUnModifiable.getBooleanValue()) {
-            term = m_preprocessing.preprocess(term);
-
-            // if term is null or empty continue with next term !
-            if (term == null || term.getText().length() <= 0) {
-                return;
-            }
-        }
-        // do we have to preprocess the documents itself too ?
-        if (m_deepPreproModel.getBooleanValue()) {
-            Document doc = ((DocumentValue)doccell).getDocument();
-            newDocCell = m_preprocessedDocuments.get(doc);
-
-            if (newDocCell == null) {
-                // preprocess doc here !!!
-                DocumentBuilder builder = new DocumentBuilder(doc);
-                for (Section s : doc.getSections()) {
-                    for (Paragraph p : s.getParagraphs()) {
-                        for (Sentence sen : p.getSentences()) {
-                            for (Term t : sen.getTerms()) {
-                                if (!t.isUnmodifiable()) {
-                                    t = m_preprocessing.preprocess(t);
-                                }
-                                if (t != null && t.getText().length() > 0) {
-                                    builder.addTerm(t);
-                                }
-                            }
-                            builder.createNewSentence();
-                        }
-                        builder.createNewParagraph();
-                    }
-                    builder.createNewSection(s.getAnnotation());
-                }
-                Document newDoc = builder.createDocument();
-                newDocCell = m_docCellFac.createDataCell(newDoc);
-                m_preprocessedDocuments.put(doc, newDocCell);
-            }
-        } else {
-            // new doc is the same as the old doc
-            newDocCell = doccell;
-        }
-        addRowToContainer(rowKey, term, newDocCell, origDocCell);
-    }
-
-    private void setProgress() {
-        int curr = m_currRow.incrementAndGet();
-        double prog = (double)curr / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocesing row " + curr + " of "
-                        + m_noRows);
-    }
-    
-    private synchronized void addRowToContainer(final RowKey rk, final Term t, 
-            final DataCell preprocessedDoc, final DataCell origDoc) {
-        Set<Term> terms = m_addedRows.get(preprocessedDoc);
-        if (terms == null) {
-            terms = new HashSet<Term>();
-        } else if (terms.contains(t)) {
-            // do not add row, since this preprocessed term has already been 
-            // added.
-            return;
-        }
-        // if term has not been added, memorize it
-        terms.add(t);
-        m_addedRows.put(preprocessedDoc, terms);
-        
-        // add row with or without unchanged document.
-        DataRow row;
-        if (m_appendIncomingModel.getBooleanValue()) {
-            row = new DefaultRow(rk, m_termCellFac.createDataCell(t), 
-                    preprocessedDoc, origDoc);
-        } else {
-            row = new DefaultRow(rk, m_termCellFac.createDataCell(t), 
-                    preprocessedDoc);
-        }
-        m_dc.addRowToTable(row);
+        return new BufferedDataTable[]{
+                m_preprocessor.doPreprocessing(inData[0], exec)};
     }
 
     /**

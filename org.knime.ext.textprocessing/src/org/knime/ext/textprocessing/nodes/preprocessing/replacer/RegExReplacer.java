@@ -28,7 +28,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class RegExReplacer implements Preprocessing, StringPreprocessing {
+public class RegExReplacer implements TermPreprocessing, StringPreprocessing {
 
     private String m_regEx;
     private String m_replacement;
@@ -58,7 +58,7 @@ public class RegExReplacer implements Preprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {

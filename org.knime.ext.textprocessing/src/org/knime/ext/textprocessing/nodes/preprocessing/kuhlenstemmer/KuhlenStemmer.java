@@ -32,14 +32,14 @@ import java.util.List;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class KuhlenStemmer implements Preprocessing, StringPreprocessing {
+public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
 
     private static final NodeLogger LOGGER = NodeLogger
     .getLogger(KuhlenStemmer.class);
@@ -52,7 +52,7 @@ public class KuhlenStemmer implements Preprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {

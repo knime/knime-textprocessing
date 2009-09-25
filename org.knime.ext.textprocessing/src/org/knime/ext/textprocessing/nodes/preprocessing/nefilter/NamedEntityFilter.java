@@ -24,7 +24,7 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.nefilter;
 
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
  * The filter class of the named entity filter node. Provides methods to filter
@@ -32,7 +32,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NamedEntityFilter implements Preprocessing {
+public class NamedEntityFilter implements TermPreprocessing {
 
     private boolean m_filterModifiable;
     
@@ -50,7 +50,7 @@ public class NamedEntityFilter implements Preprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         if (m_filterModifiable && term.isUnmodifiable()) {
             return term;
         } else if (!m_filterModifiable && !term.isUnmodifiable()) {

@@ -28,20 +28,20 @@ import java.util.Set;
 
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilter;
 
 /**
  * A tag filter, filtering terms with not specified tags. 
- * See {@link StopWordFilter#preprocess(Term)} for details to filter terms.
+ * See {@link StopWordFilter#preprocessTerm(Term)} for details to filter terms.
  * <code>TagFilter</code> implements <code>Preprocessing</code> and can be
  * used as a preprocessing step. The preprocessing method 
- * {@link StopWordFilter#preprocess(Term)} returns null if the term was filtered 
+ * {@link StopWordFilter#preprocessTerm(Term)} returns null if the term was filtered 
  * out, an the given unmodified term if not. 
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class TagFilter implements Preprocessing {
+public class TagFilter implements TermPreprocessing {
 
     private Set<Tag> m_validTags;
     
@@ -69,7 +69,7 @@ public class TagFilter implements Preprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         boolean allValid = true;
         boolean oneValid = false;
         

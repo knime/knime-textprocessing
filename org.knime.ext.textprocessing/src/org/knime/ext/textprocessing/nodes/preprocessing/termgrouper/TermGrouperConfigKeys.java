@@ -16,17 +16,18 @@
  * History
  *   24.09.2009 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing;
+package org.knime.ext.textprocessing.nodes.preprocessing.termgrouper;
 
 /**
- * The mother of all *Preprocessing interfaces. All preprocessing class and 
- * interfaces extend from this interface bundling all preprocessing classes
- * under one common type. Due to the diverse specification of different kinds 
- * of preprocessing no common method is specified by this interface.
- * 
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public interface Preprocessing {
+public final class TermGrouperConfigKeys {
 
+    private TermGrouperConfigKeys() { }
+    
+    /**
+     * Config key for the tag grouping policy.
+     */
+    public static final String CFGKEY_GROUPPOLICY = "Group Policy";
 }

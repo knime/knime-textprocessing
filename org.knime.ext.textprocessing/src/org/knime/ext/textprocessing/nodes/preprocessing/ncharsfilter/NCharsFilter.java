@@ -24,17 +24,17 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
 
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * Filters terms with less than the specified number N chars. If a given term
  * has less than N characters <code>null</code> is returned by the
- * {@link NCharsFilter#preprocess(Term)} method, otherwise unmodified term.
+ * {@link NCharsFilter#preprocessTerm(Term)} method, otherwise unmodified term.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NCharsFilter implements Preprocessing, StringPreprocessing {
+public class NCharsFilter implements TermPreprocessing, StringPreprocessing {
 
     private int m_n = 1;
     
@@ -51,7 +51,7 @@ public class NCharsFilter implements Preprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         if (term.getText().length() >= m_n) {
             return term;
         }

@@ -19,33 +19,33 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   14.10.2008 (thiel): created
+ *   19.03.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import org.knime.ext.textprocessing.data.Term;
 
 /**
- * This interface can be implemented by all string preprocessing nodes
- * no matter if filter or modification nodes. The method 
- * {@link StringPreprocessing#preprocessString(String)} has to 
- * be implemented by all underlying classes and provide a certain 
- * string preprocessing functionality. A stemmer node for instance has to stem 
- * the given string and return the stemmed one. If a string preprocessing 
- * class filters out a given string, <code>null</code> has to be returned. 
+ * This interface has to be implemented by all term preprocessing nodes
+ * no matter if filter or modification nodes. 
+ * The method {@link TermPreprocessing#preprocessTerm(Term)} has to be implemented by 
+ * all underlying classes and provide a certain term preprocessing functionality. 
+ * A stemmer node for instance has to stem the given term and return the 
+ * stemmed one. If a term preprocessing class filters out a given term, 
+ * <code>null</code> has to be returned.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public interface StringPreprocessing {
+public interface TermPreprocessing extends Preprocessing {
 
     /**
-     * Preprocesses the given string in a certain manner. Modification nodes, 
-     * such as stemmer or case converter return the modified string. 
-     * Filter nodes such as stop word filter return <code>null</code> if the 
-     * given string was filtered out, otherwise the string is returned 
-     * unmodified.
+     * Preprocesses the given term in a certain manner. Modification nodes, 
+     * such as stemmer or case converter return the modified term. Filter nodes
+     * such as stop word filter return <code>null</code> if the given term
+     * was filtered out, otherwise the term is returned unmodified.
      * 
-     * @param str The string to preprocess
-     * @return The preprocessed string
+     * @param term The term to preprocess
+     * @return The preprocessed term
      */
-    public String preprocessString(final String str);
+    public Term preprocessTerm(final Term term);
 }

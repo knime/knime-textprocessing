@@ -28,14 +28,14 @@ import java.util.List;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class CaseConverter implements Preprocessing, StringPreprocessing {
+public class CaseConverter implements TermPreprocessing, StringPreprocessing {
 
     /**
      * Constant for lower case conversion.
@@ -86,7 +86,7 @@ public class CaseConverter implements Preprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {

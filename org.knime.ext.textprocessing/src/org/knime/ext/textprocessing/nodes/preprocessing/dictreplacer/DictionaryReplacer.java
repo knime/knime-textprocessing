@@ -20,7 +20,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
@@ -32,7 +32,7 @@ import java.util.List;
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class DictionaryReplacer implements Preprocessing, StringPreprocessing {
+public class DictionaryReplacer implements TermPreprocessing, StringPreprocessing {
 
     private Hashtable<String, String> m_replaceDict;
     
@@ -52,7 +52,7 @@ public class DictionaryReplacer implements Preprocessing, StringPreprocessing {
      * {@inheritDoc}
      */
     @Override
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         String word = term.getText();
         String newWord = m_replaceDict.get(word);
         if (newWord != null) {

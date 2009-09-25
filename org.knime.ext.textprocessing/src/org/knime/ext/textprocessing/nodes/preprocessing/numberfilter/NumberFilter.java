@@ -24,14 +24,14 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class NumberFilter implements Preprocessing, StringPreprocessing {
+public class NumberFilter implements TermPreprocessing, StringPreprocessing {
 
     private static String numbers = "^[-+]?[\\d.,]+";
     
@@ -52,7 +52,7 @@ public class NumberFilter implements Preprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         String filtered = NumberFilter.numberFilter(term.getText());
         if (filtered.length() <= 0) {
             return null;

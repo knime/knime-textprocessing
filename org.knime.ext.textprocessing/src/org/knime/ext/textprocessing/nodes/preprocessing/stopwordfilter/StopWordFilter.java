@@ -27,19 +27,19 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 
 import java.util.HashSet;
 
 /**
  * A stop word filter, filtering strings contained in the given set of stop 
- * words. See {@link StopWordFilter#preprocess(Term)} for details to filter 
+ * words. See {@link StopWordFilter#preprocessTerm(Term)} for details to filter 
  * terms.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class StopWordFilter implements Preprocessing, StringPreprocessing {
+public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
 
     private HashSet < String > m_wordList;
     
@@ -84,7 +84,7 @@ public class StopWordFilter implements Preprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
-    public Term preprocess(final Term term) {
+    public Term preprocessTerm(final Term term) {
         String t;
         if (m_caseSensitive) {
             t = term.getText();

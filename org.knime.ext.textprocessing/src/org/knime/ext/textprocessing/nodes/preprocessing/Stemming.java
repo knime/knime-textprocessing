@@ -46,7 +46,7 @@ public enum Stemming {
          * {@inheritDoc}
          */
         @Override
-        public Preprocessing getPreprocessing() {
+        public TermPreprocessing getPreprocessing() {
             return new KuhlenStemmer();
         }
         
@@ -67,7 +67,7 @@ public enum Stemming {
          * {@inheritDoc}
          */
         @Override
-        public Preprocessing getPreprocessing() {
+        public TermPreprocessing getPreprocessing() {
             return new PorterStemmer();
         }
         
@@ -84,7 +84,7 @@ public enum Stemming {
      * @return a certain stemmer as <code>Preprocessing</code> instance, which
      * is used to preprocess <code>Term</code>s.
      */
-    public abstract Preprocessing getPreprocessing();
+    public abstract TermPreprocessing getPreprocessing();
     
     /**
      * @return a certain stemmer as <code>StringPreprocessing</code> instance, 
