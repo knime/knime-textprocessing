@@ -37,10 +37,14 @@ public enum NamedEntityTag implements TagBuilder {
     LOCATION,
     /** A person. */
     PERSON,
-    /** A company. */
-    COMPANY,
+    /** A organization. */
+    ORGANIZATION,
     /** A date. */
-    DATE;
+    DATE,
+    /** A time. */
+    TIME,
+    /** Money. */
+    MONEY;
 
     private final Tag m_tag;
 

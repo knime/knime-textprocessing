@@ -277,6 +277,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

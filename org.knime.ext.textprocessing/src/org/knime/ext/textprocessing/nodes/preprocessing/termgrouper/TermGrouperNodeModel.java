@@ -40,7 +40,7 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
     /**
      * The default tag grouping policy.
      */
-    public static final String DEFAULT_POLICY = TermGrouper.DELETE_CONFLICTING;
+    public static final String DEFAULT_POLICY = TermGrouper.DELETE_ALL;
     
     private SettingsModelString m_tagGroupingPolicyModel = 
         TermGrouperNodeDialog.getTagGroupingPolicyModel();

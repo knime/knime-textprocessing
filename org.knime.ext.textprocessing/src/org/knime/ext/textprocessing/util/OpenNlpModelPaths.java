@@ -54,6 +54,24 @@ public final class OpenNlpModelPaths {
     private static final String POS_DICT_POSTFIX = 
         "/resources/opennlpmodels/pos/tagdict";
     
+    private static final String NER_LOCATION_MODEL_POSTFIX =
+        "/resources/opennlpmodels/namefind/location.bin.gz";
+    
+    private static final String NER_PERSON_MODEL_POSTFIX =
+        "/resources/opennlpmodels/namefind/person.bin.gz";
+    
+    private static final String NER_ORGANIZATION_MODEL_POSTFIX =
+        "/resources/opennlpmodels/namefind/organization.bin.gz";
+    
+    private static final String NER_MONEY_MODEL_POSTFIX =
+        "/resources/opennlpmodels/namefind/money.bin.gz";
+
+    private static final String NER_DATE_MODEL_POSTFIX =
+        "/resources/opennlpmodels/namefind/date.bin.gz";
+
+    private static final String NER_TIME_MODEL_POSTFIX =
+        "/resources/opennlpmodels/namefind/time.bin.gz";
+    
     /**
      * The base path to the models.
      */
@@ -103,5 +121,29 @@ public final class OpenNlpModelPaths {
      */
     public String getPosTaggerDictFile() {
         return m_basePath + POS_DICT_POSTFIX;
-    }    
+    }
+    
+    public String getPersonNERModelFile() {
+        return m_basePath + NER_PERSON_MODEL_POSTFIX;
+    }
+    
+    public String getLocationNERModelFile() {
+        return m_basePath + NER_LOCATION_MODEL_POSTFIX;
+    }
+    
+    public String getOrganizationNERModelFile() {
+        return m_basePath + NER_ORGANIZATION_MODEL_POSTFIX;
+    }
+    
+    public String getMoneyNERModelFile() {
+        return m_basePath + NER_MONEY_MODEL_POSTFIX;
+    }
+    
+    public String getDateNERModelFile() {
+        return m_basePath + NER_DATE_MODEL_POSTFIX;
+    }
+    
+    public String getTimeNERModelFile() {
+        return m_basePath + NER_TIME_MODEL_POSTFIX;
+    }
 }
