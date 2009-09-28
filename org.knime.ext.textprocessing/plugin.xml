@@ -94,8 +94,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.ner.AbnerTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.ner.AbnerTaggerNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
