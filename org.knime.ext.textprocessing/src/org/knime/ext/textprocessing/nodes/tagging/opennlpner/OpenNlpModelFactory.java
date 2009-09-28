@@ -64,8 +64,8 @@ public final class OpenNlpModelFactory {
         
         // PERSON
         String name = "Person";
-        OpenNlpModel m = new OpenNlpModel(name, 
-                getModel(paths.getPersonNERModelFile()), 
+        OpenNlpModel m = new OpenNlpModel(name, getModel(
+                paths.getPersonNERModelFile()), 
                 NamedEntityTag.PERSON.toString());
         m_models.put(name, m);
         

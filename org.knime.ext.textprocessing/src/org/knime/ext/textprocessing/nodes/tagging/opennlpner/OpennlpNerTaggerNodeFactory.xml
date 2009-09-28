@@ -19,6 +19,17 @@
             Specifies the OpenNLP model to use. Each model is able to recognize
             a certain type of named entities.
         </option>
+        <option name="Use additional dictionary file">
+            If checked an additional dictionary file is used by the OpenNlp
+            model to recognize entities.
+        </option>
+        <option name="Dictionary file">
+            The location of the dictionary file. Each named entity have to be 
+            written in one line and each word of this entity must be separated 
+            by a whitespace, i.e:<br />
+            Firstname1 Lastname2<br />
+            Firstname2 Lastname2
+        </option>
     </fullDescription>
         
     <ports>

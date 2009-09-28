@@ -136,7 +136,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         // Read file with named entities
         Set<String> namedEntities = new HashSet<String>();
         File file = new File(m_fileModel.getStringValue());
-        if (file.exists()) {
+        if (file.exists() && file.canRead() && file.isFile()) {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while ((line = br.readLine()) != null) {

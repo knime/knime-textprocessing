@@ -42,6 +42,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  * @author Kilian Thiel, University of Konstanz
  *
@@ -59,6 +62,17 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     public static final String DEF_OPENNLPMODEL = 
         OpenNlpModelFactory.getInstance().getDefaultName();
     
+    /**
+     * The default value for the dictionary flag.
+     */
+    public static final boolean DEFAULT_USE_DICT = false;
+    
+    /**
+     * The default dictionary file location.
+     */
+    public static final String DEFAULT_DICT_FILENAME = 
+        System.getProperty("user.home");
+    
     private int m_docColIndex = -1;
     
     private DocumentDataTableBuilder m_dtBuilder;
@@ -69,12 +83,20 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     private SettingsModelString m_modelNameModel = 
         OpenNlpNerNodeDialog.createOpenNlpModelModel();
     
+    private SettingsModelBoolean m_useDictFileModel = 
+        OpenNlpNerNodeDialog.createUseDictModel();
+    
+    private SettingsModelString m_dictFileModel = 
+        OpenNlpNerNodeDialog.createDictFileModel();
+    
     /**
      * Creates new instance of <code>OpennlpNerTaggerNodeModel</code>.
      */
     public OpennlpNerTaggerNodeModel() {
         super(1, 1);
         m_dtBuilder = new DocumentDataTableBuilder();
+        m_useDictFileModel.addChangeListener(new SettingsChangeListener());
+        checkSettings();
     }
     
     /**
@@ -86,10 +108,14 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
         checkDataTableSpec(inData[0].getDataTableSpec());
         
         List<Document> newDocuments = new ArrayList<Document>();
+        String dictFileName = null;
+        if (m_useDictFileModel.getBooleanValue()) {
+            dictFileName = m_dictFileModel.getStringValue();
+        }
         DocumentTagger tagger = new OpennlpNerDocumentTagger(
                 m_unmodifiableModel.getBooleanValue(),
                 OpenNlpModelFactory.getInstance().getModelByName(
-                        m_modelNameModel.getStringValue()));
+                        m_modelNameModel.getStringValue()), dictFileName);
         
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
@@ -145,6 +171,8 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_unmodifiableModel.loadSettingsFrom(settings);
         m_modelNameModel.loadSettingsFrom(settings);
+        m_useDictFileModel.loadSettingsFrom(settings);
+        m_dictFileModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -154,6 +182,8 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_modelNameModel.saveSettingsTo(settings);
         m_unmodifiableModel.saveSettingsTo(settings);
+        m_useDictFileModel.saveSettingsTo(settings);
+        m_dictFileModel.saveSettingsTo(settings);
     }
 
     /**
@@ -164,6 +194,20 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_modelNameModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
+        m_useDictFileModel.validateSettings(settings);
+        m_dictFileModel.validateSettings(settings);
+
+        boolean useDictFile = ((SettingsModelBoolean)m_useDictFileModel
+                .createCloneWithValidatedValue(settings)).getBooleanValue();
+        if (useDictFile) {
+            String file = ((SettingsModelString)m_dictFileModel
+                    .createCloneWithValidatedValue(settings)).getStringValue();
+            File f = new File(file);
+            if (!f.isFile() || !f.exists() || !f.canRead()) {
+                throw new InvalidSettingsException("Selected file file: "
+                        + file + " is not valid!");
+            }
+        }
     }
 
     
@@ -186,4 +230,24 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
+    
+    private class SettingsChangeListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent arg0) {
+            checkSettings();
+        }
+        
+    }
+    
+    private void checkSettings() {
+        if (m_useDictFileModel.getBooleanValue()) {
+            m_dictFileModel.setEnabled(true);
+        } else {
+            m_dictFileModel.setEnabled(false);
+        }
+    }    
 }

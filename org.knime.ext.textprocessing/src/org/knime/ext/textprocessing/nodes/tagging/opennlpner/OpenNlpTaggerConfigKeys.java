@@ -40,4 +40,14 @@ public final class OpenNlpTaggerConfigKeys {
      * The configuration key for the ABNER tagging model.
      */
     public static final String CFGKEY_MODEL = "OPENNLP Model";
+    
+    /**
+     * The configuration key for the dictionary flag.
+     */
+    public static final String CFGKEY_USE_DICT = "Use Dict";
+    
+    /**
+     * The configuration key for the dictionary file.
+     */
+    public static final String CFGKEY_DICTFILE = "Dict File";
 }

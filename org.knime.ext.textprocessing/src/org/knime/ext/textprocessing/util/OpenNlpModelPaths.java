@@ -123,26 +123,44 @@ public final class OpenNlpModelPaths {
         return m_basePath + POS_DICT_POSTFIX;
     }
     
+    /**
+     * @return the model file of the person recognizer.
+     */
     public String getPersonNERModelFile() {
         return m_basePath + NER_PERSON_MODEL_POSTFIX;
     }
-    
+
+    /**
+     * @return the model file of the location recognizer.
+     */
     public String getLocationNERModelFile() {
         return m_basePath + NER_LOCATION_MODEL_POSTFIX;
     }
     
+    /**
+     * @return the model file of the organization recognizer.
+     */
     public String getOrganizationNERModelFile() {
         return m_basePath + NER_ORGANIZATION_MODEL_POSTFIX;
     }
     
+    /**
+     * @return the model file of the money recognizer.
+     */
     public String getMoneyNERModelFile() {
         return m_basePath + NER_MONEY_MODEL_POSTFIX;
     }
     
+    /**
+     * @return the model file of the date recognizer.
+     */
     public String getDateNERModelFile() {
         return m_basePath + NER_DATE_MODEL_POSTFIX;
     }
     
+    /**
+     * @return the model file of the time recognizer.
+     */
     public String getTimeNERModelFile() {
         return m_basePath + NER_TIME_MODEL_POSTFIX;
     }

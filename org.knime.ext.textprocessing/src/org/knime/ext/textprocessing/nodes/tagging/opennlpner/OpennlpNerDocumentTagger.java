@@ -29,6 +29,9 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +51,8 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
     
     private OpenNlpModel m_model;
     
+    private HashMap<String, String> m_dictionary;
+    
     /**
      * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
      * given unmodifiable flag and model to tag with.
@@ -55,10 +60,12 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
      * @param setNeUnmodifiable The flag specifying whether found named entities
      * will be set unmodifiable or not.
      * @param model The model to tag with.
+     * @param dictFileName The file name of teh dictionary to use.
      * @throws IOException If something happens.
      */
     public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
-            final OpenNlpModel model) throws IOException {
+            final OpenNlpModel model, final String dictFileName) 
+    throws IOException {
         super(setNeUnmodifiable);
         if (model == null) {
             throw new IllegalArgumentException(
@@ -66,6 +73,26 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
         }
         m_model = model;
         m_tagger = new NameFinderME(m_model.getModel());
+        m_dictionary = new HashMap<String, String>();
+        
+        if (dictFileName != null) {
+            File f = new File(dictFileName);
+            if (f.exists() && f.canRead() && f.isFile()) {
+                BufferedReader br = new BufferedReader(new FileReader(f));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] words = line.trim().split(" ");
+                    for (int i = 0; i < words.length; i++) {
+                        String tag = "start";
+                        if (i > 0) {
+                            tag = "cont";
+                        }
+                        m_dictionary.put(words[i], tag);
+                    }
+                }
+                br.close();
+            }
+        }
     }
     
     /**
@@ -98,7 +125,7 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
                 words.add(w.getWord());
             }
         }
-        List<String> res = m_tagger.find(words, new HashMap<String, String>());
+        List<String> res = m_tagger.find(words, m_dictionary);
         List<TaggedEntity> nes = new ArrayList<TaggedEntity>();
         
         String namedEntity = null;
@@ -118,6 +145,7 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
         if (namedEntity != null) {
             TaggedEntity te = new TaggedEntity(namedEntity, m_model.getTag());
             nes.add(te);
+            namedEntity = null;
         }
         return nes;
     }
