@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.knime.org/2008/09/XMLConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.knime.org/2008/09/XMLConfig http://www.knime.org/XMLConfig_2008_09.xsd" key="settings.xml">
+<entry key="name" type="xstring" value="OpenNLP NE tagger"/>
+<config key="model">
+<config key="OPENNLP Model_Internals">
+<entry key="SettingsModelID" type="xstring" value="SMID_string"/>
+<entry key="EnabledStatus" type="xboolean" value="true"/>
+</config>
+<entry key="OPENNLP Model" type="xstring" value="Organization"/>
+<config key="SetUnmodifiable_Internals">
+<entry key="SettingsModelID" type="xstring" value="SMID_boolean"/>
+<entry key="EnabledStatus" type="xboolean" value="true"/>
+</config>
+<entry key="SetUnmodifiable" type="xboolean" value="true"/>
+<config key="Use Dict_Internals">
+<entry key="SettingsModelID" type="xstring" value="SMID_boolean"/>
+<entry key="EnabledStatus" type="xboolean" value="true"/>
+</config>
+<entry key="Use Dict" type="xboolean" value="false"/>
+<config key="Dict File_Internals">
+<entry key="SettingsModelID" type="xstring" value="SMID_string"/>
+<entry key="EnabledStatus" type="xboolean" value="false"/>
+</config>
+<entry key="Dict File" type="xstring" value=""/>
+</config>
+<entry key="hasContent" type="xboolean" value="false"/>
+<config key="ports">
+<config key="port_0">
+<entry key="index" type="xint" value="0"/>
+<entry key="port_dir_location" type="xstring" isnull="true" value=""/>
+</config>
+</config>
+</config>

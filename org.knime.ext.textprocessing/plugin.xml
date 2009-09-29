@@ -64,6 +64,14 @@
             name="Misc"
             path="/labs/textprocessing">
       </category>
+      <category
+            after="misc"
+            description="Contains textprocessing meta nodes"
+            icon="resources/missing.gif"
+            level-id="meta"
+            name="Meta"
+            path="/labs/textprocessing">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -298,6 +306,45 @@
             id="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
             name="Textprocessing">
       </page>
+   </extension>
+   <extension
+         point="org.knime.workbench.repository.metanode">
+      <PersistedMetaNode
+            after="cross_validation"
+            category-path="/labs/textprocessing/meta"
+            expert-flag="false"
+            icon="src/org/knime/ext/textprocessing/icons/TextProcDefault.png"
+            id="simple_preprocessing"
+            name="Simple Preprocessing"
+            workflowDir="metanode_templates/Simple Preprocessing/">
+      </PersistedMetaNode>
+      <PersistedMetaNode
+            after="simple_preprocessing"
+            category-path="/labs/textprocessing/meta"
+            expert-flag="false"
+            icon="src/org/knime/ext/textprocessing/icons/TextProcDefault.png"
+            id="extended_ner_preprocessing"
+            name="Extended NER Preprocessing"
+            workflowDir="metanode_templates/Extended NER Preprocessing/">
+      </PersistedMetaNode>
+      <PersistedMetaNode
+            after="extended_ner_preprocessing"
+            category-path="/labs/textprocessing/meta"
+            expert-flag="false"
+            icon="src/org/knime/ext/textprocessing/icons/TextProcFrequencies.png"
+            id="frequencies"
+            name="Frequencies"
+            workflowDir="metanode_templates/Frequencies/">
+      </PersistedMetaNode>
+      <PersistedMetaNode
+            after="frequencies"
+            category-path="/labs/textprocessing/meta"
+            expert-flag="false"
+            icon="src/org/knime/ext/textprocessing/icons/TextProcVectors.png"
+            id="vector_creation"
+            name="Vector Creation"
+            workflowDir="metanode_templates/Vector Creation/">
+      </PersistedMetaNode>
    </extension>
    
 </plugin>
