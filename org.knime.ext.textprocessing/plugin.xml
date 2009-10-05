@@ -291,6 +291,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/misc"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.stringmatcher.StringMatcherNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.misc.stringmatcher.StringMatcherNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

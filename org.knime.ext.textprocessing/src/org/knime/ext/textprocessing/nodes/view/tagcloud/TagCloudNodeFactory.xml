@@ -8,8 +8,8 @@
 		
 		 <p>A tag cloud is a representation of words indicating the importance of the
          words by manipulating the visual properties.
-         Here we use the distribution of the font size, the intensity of the color and
-        the thickness of the font.</p>
+         Here we use the distribution of font size, transparency and
+        boldness of the font.</p>
         
         <p>The user can change the following view properties on the fly:
             <ol>
@@ -17,7 +17,7 @@
             <li>The distribution of the font size (linear, logarithm or exponential)</li>
             <li>The font name</li>
             <li>The amount of bold terms</li>
-            <li>The color intensity of the labels</li>
+            <li>The transperency of the labels</li>
             <li>Zooming</li>
             </ol>
         </p>
