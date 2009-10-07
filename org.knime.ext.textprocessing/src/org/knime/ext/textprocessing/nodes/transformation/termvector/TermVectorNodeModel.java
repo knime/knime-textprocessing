@@ -288,9 +288,9 @@ public class TermVectorNodeModel extends NodeModel {
             if (count == null || count < 1) {
                 count = 1;
                 columnTitles.put(origTitle, count);
-            }
-            // if title occurres another time, add the count value
-            if (count >= 1) {
+                
+            // if title occurs another time, add the count value
+            } else if (count >= 1) {
                 count++;
                 title += " - #" + count;
                 columnTitles.put(origTitle, count);
