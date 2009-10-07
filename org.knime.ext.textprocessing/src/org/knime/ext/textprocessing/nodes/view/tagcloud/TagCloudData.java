@@ -178,6 +178,19 @@ public class TagCloudData {
                         comp.m_height);
         return akt.intersects(cur);
     }
+    
+    /**Checks if two labels intersect.
+    *
+    * @param comp another tagclouddata
+     * @param perc maximal allowed overlap percentage
+    * @return true if the section of this and comp intersects
+    */
+   public boolean intersects(final TagCloudData comp, final int perc) {
+       Rectangle cur =
+               new Rectangle((int)comp.m_x, (int)comp.m_y, (int)comp.m_width,
+                       (int)comp.m_height);
+       return intersects(cur, perc);
+   }
 
     /**Calculate the distance of the center of two terms.
      *
@@ -518,6 +531,32 @@ public class TagCloudData {
                         (int)this.m_height);
 
         return akt.intersects(selectionRectangle);
+    }
+    
+    /**
+     * @param selectionRectangle a Rectangle in the view.
+     * @param perc amount of allowed overlapping.
+     * @return true if the term and the rectangle intersect
+     */
+    public boolean intersects(final Rectangle selectionRectangle, 
+            final int perc) {
+        Rectangle akt =
+                new Rectangle((int)this.m_x, (int)this.m_y, (int)this.m_width,
+                        (int)this.m_height);
+        Rectangle sect = akt.intersection(selectionRectangle);
+        double area = sect.getWidth() * sect.getHeight();
+        if (sect.getWidth() * sect.getHeight() <= 0) {
+            return false;
+        }
+
+        double overlap =
+                100
+                        * area
+                        / Math.min(akt.height * akt.width,
+                                selectionRectangle.height
+                                        * selectionRectangle.width);
+
+        return overlap < perc;
     }
 
     /**

@@ -23,6 +23,11 @@
 
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.knime.base.node.util.DefaultDataArray;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
@@ -40,11 +45,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * The NodeModel of the tag cloud node.
@@ -137,15 +137,15 @@ public class TagCloudNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        int numofRows = 0;
-        if (m_allRows.getBooleanValue()) {
-          numofRows = inData[0].getRowCount();
-        } else {
-            numofRows = m_noOfRows.getIntValue();
-            if (numofRows <= 0) {
-                throw new Exception(
-                        "There must be at least one column included!");
-            }
+        int numofRows = inData[0].getRowCount();
+        if (!m_allRows.getBooleanValue()) {
+            numofRows = Math.min(m_noOfRows.getIntValue(), numofRows);
+            
+        }
+        if (numofRows <= 0) {
+            m_tagcloud = null;
+            setWarningMessage("Empty data table, nothing to display");
+            return null;
         }
         m_data = new DefaultDataArray(inData[0], 1, numofRows, exec);
 
@@ -168,12 +168,11 @@ public class TagCloudNodeModel extends NodeModel {
             m_valueColIndex = (new DataTableSpecVerifier(
                     inData[0].getSpec())).getNumberCellIndex();
         }
-
+        
         m_tagcloud = new TagCloud();
         m_tagcloud.createTagCloud(exec, this);
 
         exec.setProgress(1, "TagCloud completed");
-
         return null;
     }
 

@@ -337,33 +337,37 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         HashMap<Term, Term> termtags = new HashMap<Term, Term>();
 
         for (final DataRow row : data) {
-            Term term =
-                    ((TermValue)row.getCell(termColumn))
-                            .getTermValue();
-            Term termwithouttags = new Term(term.getWords(), null, true);
-            double i =
-                    ((DoubleValue)row.getCell(valueColumn))
-                            .getDoubleValue();
-            RowKey rowk = row.getKey();
-            // m_hiliteTool.put(rowk, term);
-
-            if (m_hashi.containsKey(termwithouttags)) {
-                i = m_hashi.get(termwithouttags).addFreq(i, rowk);
-
-            } else {
-                m_hashi.put(termwithouttags, createTagCloudData(
-                        termwithouttags, i, rowk));
-                termtags.put(termwithouttags, term);
-                Color c = data.getDataTableSpec().getRowColor(row).getColor();
-                if (!c.equals(ColorAttr.DEFAULT.getColor())) {
-                    m_hashi.get(termwithouttags).setColorPrefixed(c);
+            if (!row.getCell(termColumn).isMissing() 
+                    && !row.getCell(valueColumn).isMissing()) {
+                Term term =
+                        ((TermValue)row.getCell(termColumn))
+                                .getTermValue();
+                Term termwithouttags = new Term(term.getWords(), null, true);
+                double i =
+                        ((DoubleValue)row.getCell(valueColumn))
+                                .getDoubleValue();
+                RowKey rowk = row.getKey();
+                // m_hiliteTool.put(rowk, term);
+    
+                if (m_hashi.containsKey(termwithouttags)) {
+                    i = m_hashi.get(termwithouttags).addFreq(i, rowk);
+    
+                } else {
+                    m_hashi.put(termwithouttags, createTagCloudData(
+                            termwithouttags, i, rowk));
+                    termtags.put(termwithouttags, term);
+                    Color c = data.getDataTableSpec()
+                                .getRowColor(row).getColor();
+                    if (!c.equals(ColorAttr.DEFAULT.getColor())) {
+                        m_hashi.get(termwithouttags).setColorPrefixed(c);
+                    }
                 }
-            }
-            if (i < m_minvalue) {
-                m_minvalue = i;
-            }
-            if (i > m_maxvalue) {
-                m_maxvalue = i;
+                if (i < m_minvalue) {
+                    m_minvalue = i;
+                }
+                if (i > m_maxvalue) {
+                    m_maxvalue = i;
+                }            
             }
         }
 
@@ -394,31 +398,34 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             final int termColumn, final int valueColumn) {
 
         for (final DataRow row : data) {
-             Term term =
-                    ((TermValue)row.getCell(termColumn))
-                            .getTermValue();
-            double i =
-                    ((DoubleValue)row.getCell(valueColumn))
-                            .getDoubleValue();
-            RowKey rowk = row.getKey();
-
-            if (m_hashi.containsKey(term)) {
-                i = m_hashi.get(term).addFreq(i, rowk);
-
-            } else {
-                m_hashi.put(term, createTagCloudData(term, i, rowk));
-                Color c = data.getDataTableSpec().getRowColor(row).getColor();
-                if (!c.equals(ColorAttr.DEFAULT.getColor())) {
-                    m_hashi.get(term).setColorPrefixed(c);
+            if (!row.getCell(termColumn).isMissing() 
+                    && !row.getCell(valueColumn).isMissing()) {
+                 Term term =
+                        ((TermValue)row.getCell(termColumn))
+                                .getTermValue();
+                double i =
+                        ((DoubleValue)row.getCell(valueColumn))
+                                .getDoubleValue();
+                RowKey rowk = row.getKey();
+    
+                if (m_hashi.containsKey(term)) {
+                    i = m_hashi.get(term).addFreq(i, rowk);
+    
+                } else {
+                    m_hashi.put(term, createTagCloudData(term, i, rowk));
+                    Color c = data.getDataTableSpec()
+                            .getRowColor(row).getColor();
+                    if (!c.equals(ColorAttr.DEFAULT.getColor())) {
+                        m_hashi.get(term).setColorPrefixed(c);
+                    }
+                }
+                if (i < m_minvalue) {
+                    m_minvalue = i;
+                }
+                if (i > m_maxvalue) {
+                    m_maxvalue = i;
                 }
             }
-            if (i < m_minvalue) {
-                m_minvalue = i;
-            }
-            if (i > m_maxvalue) {
-                m_maxvalue = i;
-            }
-
         }
     }
 
@@ -507,6 +514,21 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                 }
             }
         }
+    }
+    
+    /**
+     * Changes the minimal and maximal font size. These two bounds are used for
+     * the font size distribution algorithm.
+     *
+     * @param min new minimal font size
+     * @param max new maximal font size
+     * @param calctype new type of the calculation
+     */
+    protected void setMinMaxFontsize(final int min,
+            final int max, final int calctype) {
+        m_minfont = min;
+        m_maxfont = max;
+        m_calcType = Math.min(3, Math.max(0, calctype));
     }
 
     /**
