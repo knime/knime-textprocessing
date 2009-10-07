@@ -25,7 +25,7 @@
 		<option name="Search string column">
 		Specify the desired column of the Data Table
 		</option>
-		<option name="Ditionary column">
+		<option name="Dictionary column">
 		Specify the desired column of the Dictionary Table
 		</option>
 		<option name="Maximal number of related words">
