@@ -23,9 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.termtostring;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -41,6 +38,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
@@ -68,6 +68,14 @@ public class TermToStringNodeModel extends NodeModel {
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
+        
+        m_termColIndex = spec.findColumnIndex(
+                m_termColModel.getStringValue());
+        if (m_termColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified term column is not valid! " 
+                    + "Check your settings!");
+        } 
     }
     
     private DataTableSpec createDataTableSpec(

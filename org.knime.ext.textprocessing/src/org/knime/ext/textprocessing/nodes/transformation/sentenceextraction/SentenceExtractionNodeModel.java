@@ -71,6 +71,8 @@ public class SentenceExtractionNodeModel extends NodeModel {
      */
     static final String SENTENCE_COLNAME = "Sentence";
     
+    private int m_docColIndex = -1;
+    
     private SettingsModelString m_documentColModel =
         SentenceExtractionNodeDialog.getDocumentColumnModel();
     
@@ -90,6 +92,15 @@ public class SentenceExtractionNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier v = new DataTableSpecVerifier(inSpecs[0]);
         v.verifyMinimumDocumentCells(1, true);
+        
+        m_docColIndex = inSpecs[0].findColumnIndex(
+                m_documentColModel.getStringValue());
+        if (m_docColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
+        
         return new DataTableSpec[]{createOutDataTableSpec()};
         
     }
@@ -114,13 +125,8 @@ public class SentenceExtractionNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        int docColIndex = inData[0].getDataTableSpec().findColumnIndex(
+        m_docColIndex = inData[0].getDataTableSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
-        if (docColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified column is not valid (<0)");
-        }
-        exec.checkCanceled();
         
         // create cache
         FullDataCellCache docCache = new FullDataCellCache(
@@ -133,7 +139,7 @@ public class SentenceExtractionNodeModel extends NodeModel {
         while (it.hasNext()) {
             DataRow row = it.next();
             Document doc = 
-                ((DocumentValue)row.getCell(docColIndex)).getDocument();
+                ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
             DataCell docCell = docCache.getInstance(doc);
             
             Iterator<Sentence> si = doc.sentenceIterator();

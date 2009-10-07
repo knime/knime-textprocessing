@@ -109,7 +109,7 @@ public class DocumentVectorNodeModel extends NodeModel {
     private SettingsModelBoolean m_booleanModel = 
         DocumentVectorNodeDialog.getBooleanModel();
     
-    private SettingsModelString m_docuColModel = 
+    private SettingsModelString m_documentColModel = 
         DocumentVectorNodeDialog.getDocumentColModel();
     
     private SettingsModelBoolean m_ignoreTags = 
@@ -143,6 +143,14 @@ public class DocumentVectorNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
+        
+        m_documentColIndex = spec.findColumnIndex(
+                m_documentColModel.getStringValue());
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
     }
     
     /**
@@ -157,7 +165,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         
         // document column index.
         m_documentColIndex = inData[0].getSpec().findColumnIndex(
-                m_docuColModel.getStringValue());
+                m_documentColModel.getStringValue());
         
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
@@ -172,7 +180,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         
         // Sort the data table first by documents
         List<String> colList = new ArrayList<String>();
-        colList.add(m_docuColModel.getStringValue());
+        colList.add(m_documentColModel.getStringValue());
         boolean [] sortAsc = new boolean[]{true};
         BufferedDataTable sortedTable = new SortedTable(inData[0], colList, 
                 sortAsc, exec).getBufferedDataTable();
@@ -325,7 +333,7 @@ public class DocumentVectorNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
-        m_docuColModel.loadSettingsFrom(settings);
+        m_documentColModel.loadSettingsFrom(settings);
         m_ignoreTags.loadSettingsFrom(settings);
     }
 
@@ -336,7 +344,7 @@ public class DocumentVectorNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_colModel.saveSettingsTo(settings);
         m_booleanModel.saveSettingsTo(settings);
-        m_docuColModel.saveSettingsTo(settings);
+        m_documentColModel.saveSettingsTo(settings);
         m_ignoreTags.saveSettingsTo(settings);
     }
 
@@ -348,7 +356,7 @@ public class DocumentVectorNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
-        m_docuColModel.validateSettings(settings);
+        m_documentColModel.validateSettings(settings);
         m_ignoreTags.validateSettings(settings);
     }
 

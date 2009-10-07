@@ -27,6 +27,7 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 
 /**
  * 
@@ -41,7 +42,8 @@ public class TermToStringNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString getTermColModel() {
         return new SettingsModelString(
-                TermToStringConfigKeys.CFGKEY_TERMCOL, "");
+                TermToStringConfigKeys.CFGKEY_TERMCOL, 
+                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME);
     }
     
     /**

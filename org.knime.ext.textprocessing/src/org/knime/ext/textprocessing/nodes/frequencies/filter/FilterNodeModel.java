@@ -156,6 +156,14 @@ public class FilterNodeModel extends NodeModel {
         verifier.verifyTermCell(true);
         verifier.verifyMinimumNumberCells(1, true);
         m_termColIndex = verifier.getTermCellIndex();
+        
+        int documentColIndex = spec.findColumnIndex(
+                m_documentColModel.getStringValue());
+        if (documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
     }
     
     /**

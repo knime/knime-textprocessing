@@ -104,8 +104,15 @@ public abstract class FrequencyNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        m_documentColIndex = verifier.getDocumentCellIndex();
         m_termColIndex = verifier.getTermCellIndex();
+        
+        m_documentColIndex = spec.findColumnIndex(
+                m_documentColModel.getStringValue());
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        } 
     }
     
     /**

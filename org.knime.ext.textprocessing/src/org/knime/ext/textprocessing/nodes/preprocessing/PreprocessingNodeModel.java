@@ -170,8 +170,24 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-    }
+        
+        String docColName = m_documentColModel.getStringValue();
+        String origDocColName = m_origDocumentColModel.getStringValue();
+        m_documentColIndex = spec.findColumnIndex(docColName);
+        m_origDocumentColIndex = spec.findColumnIndex(origDocColName);
 
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
+        if (m_origDocumentColIndex < 0) {
+            throw new InvalidSettingsException(
+                   "Index of specified original document column is not valid!" 
+                    + " Check your settings!");
+        }  
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -196,27 +212,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     protected final BufferedDataTable[] execute(
             final BufferedDataTable[] inData, final ExecutionContext exec)
     throws Exception {
-        checkDataTableSpec(inData[0].getDataTableSpec());
-
         // search indices of document and original document columns.
-        String docColName = m_documentColModel.getStringValue();
-        String origDocColName = m_origDocumentColModel.getStringValue();
-        m_documentColIndex =
-            inData[0].getDataTableSpec().findColumnIndex(docColName);
-        m_origDocumentColIndex =
-            inData[0].getDataTableSpec().findColumnIndex(origDocColName);
-
-        if (m_documentColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
-                    + "Check your settings!");
-        }
-        if (m_origDocumentColIndex < 0) {
-            throw new InvalidSettingsException(
-                   "Index of specified original document column is not valid!" 
-                    + " Check your settings!");
-        }
-        
+        checkDataTableSpec(inData[0].getDataTableSpec());        
         
         // initialize the underlying preprocessing
         initPreprocessing();

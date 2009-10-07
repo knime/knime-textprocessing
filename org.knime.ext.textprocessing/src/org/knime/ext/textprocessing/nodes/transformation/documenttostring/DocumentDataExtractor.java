@@ -36,6 +36,7 @@ import org.knime.core.data.def.StringCell;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 
@@ -105,7 +106,7 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final Set<Author> authors = doc.getAuthors();
-            if (authors == null) {
+            if (authors == null || authors.size() == 0) {
                 return DataType.getMissingCell();
             }
             final StringBuilder buf = new StringBuilder();
@@ -132,7 +133,7 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final Set<Author> authors = doc.getAuthors();
-            if (authors == null) {
+            if (authors == null || authors.size() == 0) {
                 return DataType.getMissingCell();
             }
             final List<DataCell> names =
@@ -154,7 +155,7 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final Set<DocumentCategory> categories = doc.getCategories();
-            if (categories == null) {
+            if (categories == null || categories.size() == 0) {
                 return DataType.getMissingCell();
             }
             final StringBuilder buf = new StringBuilder();
@@ -179,13 +180,58 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final Set<DocumentCategory> categories = doc.getCategories();
-            if (categories == null) {
+            if (categories == null || categories.size() == 0) {
                 return DataType.getMissingCell();
             }
             final List<DataCell> names =
                 new ArrayList<DataCell>(categories.size());
             for (final DocumentCategory category : categories) {
                 names.add(new StringCell(category.getCategoryName()));
+            }
+            return CollectionCellFactory.createSetCell(names);
+        }
+    }),
+    /**Returns the source of a document.*/
+    SOURCE("Source", new Extractor() {
+        @Override
+        public DataType getDataType() {
+            return StringCell.TYPE;
+        }
+        @Override
+        public DataCell getValue(final Document doc) {
+            final Set<DocumentSource> sources = doc.getSources();
+            if (sources == null || sources.size() == 0) {
+                return DataType.getMissingCell();
+            }
+            final StringBuilder buf = new StringBuilder();
+            boolean first = true;
+            for (final DocumentSource source : sources) {
+                if (first) {
+                    first = false;
+                } else {
+                    buf.append(", ");
+                }
+                buf.append(source.getSourceName());
+            }
+            return new StringCell(buf.toString());
+        }
+    }),    
+    /**Returns the sources of a document as set.*/
+    SOURCE_SET("Source set", new Extractor() {
+        @Override
+        public DataType getDataType() {
+            return SetCell.getCollectionType(StringCell.TYPE);
+        }
+        @Override
+        public DataCell getValue(final Document doc) {
+            final Set<DocumentSource> sources = doc.getSources();
+            if (sources == null || sources.size() == 0) {
+                return DataType.getMissingCell();
+            }
+            final List<DataCell> names =
+                new ArrayList<DataCell>(sources.size());
+            for (final DocumentSource source : sources) {
+                names.add(new StringCell(source.getSourceName()));
             }
             return CollectionCellFactory.createSetCell(names);
         }
@@ -198,11 +244,11 @@ public enum DocumentDataExtractor {
         }
         @Override
         public DataCell getValue(final Document doc) {
-            final DocumentType category = doc.getType();
-            if (category == null) {
+            final DocumentType type = doc.getType();
+            if (type == null) {
                 return DataType.getMissingCell();
             }
-            return new StringCell(category.name());
+            return new StringCell(type.name());
         }
     }),
     /**Returns the publication date of a document.*/
@@ -214,7 +260,8 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final PublicationDate date = doc.getPubDate();
-            if (date == null) {
+            if (date == null || (date.getYear() == 0 && date.getMonth() == 0 
+                    && date.getDay() == 0)) {
                 return DataType.getMissingCell();
             }
             return new StringCell(date.toString());
@@ -229,7 +276,7 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final File file = doc.getDocFile();
-            if (file == null) {
+            if (file == null || file.length() <= 0) {
                 return DataType.getMissingCell();
             }
             return new StringCell(file.getAbsolutePath());

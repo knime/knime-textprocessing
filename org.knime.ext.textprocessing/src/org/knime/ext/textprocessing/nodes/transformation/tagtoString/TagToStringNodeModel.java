@@ -72,6 +72,7 @@ public class TagToStringNodeModel extends NodeModel {
      */
     public static final String DEFAULT_MISSING_VALUE = MISSING_CELL_VALUE;
     
+    private int m_termColIndex = -1;
     
     private SettingsModelStringArray m_tagTypesModel = 
         TagToStringNodeDialog.getTagTypesModel();
@@ -97,6 +98,15 @@ public class TagToStringNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[0]);
         verifier.verifyMinimumTermCells(1, true);
+        
+        m_termColIndex = inSpecs[0].findColumnIndex(
+                m_termColModel.getStringValue());
+        if (m_termColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified term column is not valid! " 
+                    + "Check your settings!");
+        } 
+        
         return null;
     }
 
@@ -126,14 +136,14 @@ public class TagToStringNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        int termColIndex = inData[0].getDataTableSpec().findColumnIndex(
+        m_termColIndex = inData[0].getDataTableSpec().findColumnIndex(
                 m_termColModel.getStringValue());
         
         List<String> tagTypes = new ArrayList<String>();
         for (String tagType : m_tagTypesModel.getStringArrayValue()) {
             tagTypes.add(tagType);
         }
-        CellFactory cellFac = new TagToStringCellFactory(termColIndex, tagTypes,
+        CellFactory cellFac = new TagToStringCellFactory(m_termColIndex, tagTypes,
                     inData[0].getDataTableSpec(), 
                     m_missingTagValueModel.getStringValue());
         ColumnRearranger rearranger = new ColumnRearranger(

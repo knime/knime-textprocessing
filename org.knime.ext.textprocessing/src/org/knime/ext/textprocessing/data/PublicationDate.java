@@ -153,16 +153,29 @@ Comparable<PublicationDate> {
      */
     public PublicationDate(final int year, final int month, final int day)
             throws ParseException {
-        String dateStr = year + "/" + month + "/" + day;
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-        Date date = df.parse(dateStr);
-        
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        
-        m_year = cal.get(Calendar.YEAR);
-        m_month = cal.get(Calendar.MONTH) + 1;
-        m_day = cal.get(Calendar.DAY_OF_MONTH);
+        // check default date
+        if (year == 0 && month == 0 && day == 0) {
+            m_year = 0;
+            m_month = 0;
+            m_day = 0;
+        } else {
+            Calendar cal = new GregorianCalendar();
+            if (year > cal.get(Calendar.YEAR)) {
+                throw new ParseException("Year " + year 
+                        + " is not valid !", 0);
+            }
+            if (month > 12 || month < 1) {
+                throw new ParseException("Month " + month 
+                        + " is not valid !", 0);
+            }
+            if (day > 31 || day < 1) {
+                throw new ParseException("Day " + day 
+                        + " is not valid !", 0);
+            }
+            m_year = cal.get(Calendar.YEAR);
+            m_month = cal.get(Calendar.MONTH) + 1;
+            m_day = cal.get(Calendar.DAY_OF_MONTH);
+        }
     }
 
     /**

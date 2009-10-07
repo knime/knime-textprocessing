@@ -23,9 +23,6 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.categorytoclass;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -41,6 +38,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
@@ -76,6 +76,15 @@ public class CategoryToClassNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(
                 inSpecs[INDATA_INDEX]);
         verifier.verifyMinimumDocumentCells(1, true);
+        
+        int docCellIndex = inSpecs[0].findColumnIndex(
+                m_documentCol.getStringValue());
+        if (docCellIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
+        
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
     }
 

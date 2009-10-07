@@ -108,7 +108,7 @@ public class TermVectorNodeModel extends NodeModel {
     private final SettingsModelBoolean m_ignoreTagsModel =
         TermVectorNodeDialog.getIgnoreTagsModel();
     
-    private final SettingsModelString m_docColModel = 
+    private final SettingsModelString m_documentColModel = 
         TermVectorNodeDialog.getDocColModel();
 
     /**
@@ -136,6 +136,14 @@ public class TermVectorNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
+        
+        m_documentColIndex = spec.findColumnIndex(
+                m_documentColModel.getStringValue());
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
     }
 
     /**
@@ -147,7 +155,7 @@ public class TermVectorNodeModel extends NodeModel {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
         m_documentColIndex = inData[0].getSpec().findColumnIndex(
-                m_docColModel.getStringValue());
+                m_documentColModel.getStringValue());
         
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
@@ -322,7 +330,7 @@ public class TermVectorNodeModel extends NodeModel {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
         m_ignoreTagsModel.loadSettingsFrom(settings);
-        m_docColModel.loadSettingsFrom(settings);
+        m_documentColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -333,7 +341,7 @@ public class TermVectorNodeModel extends NodeModel {
         m_colModel.saveSettingsTo(settings);
         m_booleanModel.saveSettingsTo(settings);
         m_ignoreTagsModel.saveSettingsTo(settings);
-        m_docColModel.saveSettingsTo(settings);
+        m_documentColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -345,7 +353,7 @@ public class TermVectorNodeModel extends NodeModel {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
         m_ignoreTagsModel.validateSettings(settings);
-        m_docColModel.validateSettings(settings);
+        m_documentColModel.validateSettings(settings);
     }
 
 

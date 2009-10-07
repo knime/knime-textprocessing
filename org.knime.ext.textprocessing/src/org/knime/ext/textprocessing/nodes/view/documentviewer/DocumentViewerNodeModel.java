@@ -96,6 +96,15 @@ implements BufferedDataTableHolder {
                 inSpecs[INPUT_INDEX]);
         verifier.verifyMinimumDocumentCells(1, true);
         m_documentCellindex = verifier.getDocumentCellIndex();
+        
+        int documentColIndex = inSpecs[0].findColumnIndex(
+                m_documentColModel.getStringValue());
+        if (documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                    "Index of specified document column is not valid! " 
+                    + "Check your settings!");
+        }
+        
         return new DataTableSpec[]{};
     }
 
