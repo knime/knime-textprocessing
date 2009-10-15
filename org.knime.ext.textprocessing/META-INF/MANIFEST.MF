@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Plug-in
 Bundle-SymbolicName: org.knime.ext.textprocessing;singleton:=true
-Bundle-Version: 2.1.0.0021700
+Bundle-Version: 2.1.0.0022922
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.knime.core,

@@ -18,9 +18,9 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer;
 
-import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -65,7 +65,7 @@ extends NodeFactory<SnowballStemmerNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNodeView<SnowballStemmerNodeModel> createNodeView(
+    public NodeView<SnowballStemmerNodeModel> createNodeView(
             final int viewIndex, final SnowballStemmerNodeModel nodeModel) {
         return null;
     }

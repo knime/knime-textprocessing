@@ -2,7 +2,7 @@
  * This source code, its documentation and all appendant files
  * are protected by copyright law. All rights reserved.
  * 
- * Copyright, 2003 - 2006
+ * Copyright, 2003 - 2009
  * Universitaet Konstanz, Germany.
  * Lehrstuhl fuer Angewandte Informatik
  * Prof. Dr. Michael R. Berthold
@@ -18,9 +18,9 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
-import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -49,7 +49,7 @@ extends NodeFactory<DictionaryReplacerNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNodeView<DictionaryReplacerNodeModel> createNodeView(
+    public NodeView<DictionaryReplacerNodeModel> createNodeView(
             final int viewIndex, final DictionaryReplacerNodeModel nodeModel) {
         return null;
     }

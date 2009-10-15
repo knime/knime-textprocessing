@@ -18,9 +18,9 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
-import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -49,7 +49,7 @@ extends NodeFactory<OpennlpNerTaggerNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNodeView<OpennlpNerTaggerNodeModel> createNodeView(
+    public NodeView<OpennlpNerTaggerNodeModel> createNodeView(
             final int viewIndex, final OpennlpNerTaggerNodeModel nodeModel) {
         return null;
     }

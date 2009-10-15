@@ -18,9 +18,9 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.termgrouper;
 
-import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -48,7 +48,7 @@ public class TermGrouperNodeFactory extends NodeFactory<TermGrouperNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNodeView<TermGrouperNodeModel> createNodeView(
+    public NodeView<TermGrouperNodeModel> createNodeView(
             final int viewIndex, final TermGrouperNodeModel nodeModel) {
         return null;
     }
