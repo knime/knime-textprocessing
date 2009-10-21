@@ -319,7 +319,7 @@
             after="cross_validation"
             category-path="/labs/textprocessing/meta"
             expert-flag="false"
-            icon="src/org/knime/ext/textprocessing/icons/TextProcDefault.png"
+            icon="resources/icons/TextProcDefault.png"
             id="simple_preprocessing"
             name="Simple Preprocessing"
             workflowDir="metanode_templates/Simple Preprocessing/">
@@ -328,7 +328,7 @@
             after="simple_preprocessing"
             category-path="/labs/textprocessing/meta"
             expert-flag="false"
-            icon="src/org/knime/ext/textprocessing/icons/TextProcDefault.png"
+            icon="resources/icons/TextProcDefault.png"
             id="extended_ner_preprocessing"
             name="Extended NER Preprocessing"
             workflowDir="metanode_templates/Extended NER Preprocessing/">
@@ -337,7 +337,7 @@
             after="extended_ner_preprocessing"
             category-path="/labs/textprocessing/meta"
             expert-flag="false"
-            icon="src/org/knime/ext/textprocessing/icons/TextProcFrequencies.png"
+            icon="resources/icons/TextProcFrequencies.png"
             id="frequencies"
             name="Frequencies"
             workflowDir="metanode_templates/Frequencies/">
@@ -346,7 +346,7 @@
             after="frequencies"
             category-path="/labs/textprocessing/meta"
             expert-flag="false"
-            icon="src/org/knime/ext/textprocessing/icons/TextProcVectors.png"
+            icon="resources/icons/TextProcVectors.png"
             id="vector_creation"
             name="Vector Creation"
             workflowDir="metanode_templates/Vector Creation/">
