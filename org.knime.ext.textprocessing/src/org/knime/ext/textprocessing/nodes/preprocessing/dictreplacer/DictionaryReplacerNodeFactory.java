@@ -1,16 +1,23 @@
-/* -------------------------------------------------------------------
- * This source code, its documentation and all appendant files
- * are protected by copyright law. All rights reserved.
- * 
- * Copyright, 2003 - 2006
- * Universitaet Konstanz, Germany.
- * Lehrstuhl fuer Angewandte Informatik
- * Prof. Dr. Michael R. Berthold
- * 
- * You may not modify, publish, transmit, transfer or sell, reproduce,
- * create derivative works from, distribute, perform, display, or in
- * any way exploit any of the content, in whole or in part, except as
- * otherwise expressly permitted in writing by the copyright owner.
+/*
+ * ------------------------------------------------------------------------
+ *
+ *  Copyright (C) 2003 - 2009
+ *  University of Konstanz, Germany and
+ *  KNIME GmbH, Konstanz, Germany
+ *  Website: http://www.knime.org; Email: contact@knime.org
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License, version 2, as 
+ *  published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
  * 
  * History
@@ -18,9 +25,9 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
-import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -49,7 +56,7 @@ extends NodeFactory<DictionaryReplacerNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public AbstractNodeView<DictionaryReplacerNodeModel> createNodeView(
+    public NodeView<DictionaryReplacerNodeModel> createNodeView(
             final int viewIndex, final DictionaryReplacerNodeModel nodeModel) {
         return null;
     }

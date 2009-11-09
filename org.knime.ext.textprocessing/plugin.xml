@@ -15,7 +15,7 @@
             description="Textprocessing nodes"
             icon="resources/missing.gif"
             level-id="textprocessing"
-            name="Textprocessing"
+            name="Text Processing"
             path="/labs">
       </category>
       <category
@@ -351,6 +351,5 @@
             name="Vector Creation"
             workflowDir="metanode_templates/Vector Creation/">
       </PersistedMetaNode>
-   </extension>
-   
+   </extension>   
 </plugin>
