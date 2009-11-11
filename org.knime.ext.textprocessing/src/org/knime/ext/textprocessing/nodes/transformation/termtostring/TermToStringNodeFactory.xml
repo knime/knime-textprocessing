@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcTerm2String.png" type="Manipulator">
+    <name>Term to String</name>
+    <shortDescription>Converts terms to strings and adds a new column containing
+    these strings.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node allows you to convert terms of a defined column into strings
+            and attach a new column containing the these strings. The tags
+            of the terms get lost, since only the words of the terms are
+            converted.
+        </intro>
+        <option name="Term Column">
+            The column containing the terms to convert into strings.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Term input table" index="0">
+            An input data table containing term cells.
+        </inPort>
+        <outPort name="Term output table" index="0">
+        An output table containing the input data with an additional string
+        cell column.
+        </outPort>
+    </ports>
+</knimeNode>

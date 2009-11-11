@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator">
+    <name>Sentence extractor</name>
+    <shortDescription>Extracts all sentences of a document as string.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Extracts all sentences a document consists of and returns a data 
+			table of documents, the corresponding sentences as string column
+			and the number of terms contained in a sentences as int column.
+		</intro>
+		<option name="Document column">The document column to use</option>
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents.</inPort>
+        <outPort name="Documents and extracted sentences." index="0">
+        The output table which contains document and sentences columns.</outPort>
+	</ports>
+</knimeNode>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 1.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDocumentView.png" type="Visualizer">
+	<name>Tagcloud</name>
+	<shortDescription>Creates a tag cloud</shortDescription>
+	<fullDescription>
+		<intro> 
+		
+		 <p>A tag cloud is a representation of words indicating the importance of the
+         words by manipulating the visual properties.
+         Here we use the distribution of font size, transparency and
+        boldness of the font.</p>
+        
+        <p>The user can change the following view properties on the fly:
+            <ol>
+            <li>Minimal and maximal font size</li>
+            <li>The distribution of the font size (linear, logarithm or exponential)</li>
+            <li>The font name</li>
+            <li>The amount of bold terms</li>
+            <li>The transperency of the labels</li>
+            <li>Zooming</li>
+            </ol>
+        </p>
+        
+        <h3>Color of term:</h3>
+        <p> To improve the variety of the tag cloud the colors of the terms are
+        arranged. There are two possibilities.
+        The user can create its own distribution method by adding a color 
+        to the rows, using the color appender.</p>
+        <p>
+        If there were no colors added to the rows, the color will be arranged 
+        using the type of the first term. The so preselected colors can afterwards 
+        be changed on the fly.
+        </p>
+        
+	
+	<h3>HiLiting:</h3>
+        <p> The terms may be selected by dragging
+        a rectangle with the mouse over the points or 
+        by clicking on points.
+        The selected terms may be 
+        hilited by either right-click to get the context menu or via the hilite
+        menu in the menu bar.</p>
+        <p> Important: If a term was found in more than one row, hiliting this term
+        will cause all rows to be hilited, which contains this term.
+        On the other hand, for hiliting a term it is sufficient that one of its
+        representing rows was hilited.</p>
+        
+        </intro>
+        
+          <option name="Display all rows">
+            If selected the histogram view displays all rows of the incoming data.
+    </option>
+    <option name="No. of rows to display">
+            Defines the number of rows to be displayed in the histogram.
+            This option is disabled if the 'Display all rows' option is selected.
+    </option>
+    <option name="Term column">
+            The text of the terms in this column will be shown in the tagcloud.
+            If the rows don't contain colors, the tag of the term is used for 
+            determine the term color.
+    </option>
+    <option name="Value column">
+            This value represents the importance of the term. Be aware that, the higher
+            this value, the more important the term will be considered in the view.
+            The value is used for the font size, the intensity of the font color 
+            and the boldness of the font.
+    </option>
+    <option name="Ignore tags">
+            If selected the tags are ignored. So two terms are equal, when 
+            their words are equal. 
+            For the color distribution will then always the first tag
+            which was associated with the words be used.
+            The new value of the term will be the sum over all terms, which 
+            contain the same words.             
+    </option>
+    <option name="Kind of tagcloud">
+            The view offers four kinds of tag cloud. 
+            The look of the first three of them is the same, just the sorting 
+            is different.
+            <ol>
+            <li>Simple table : The terms are shown in a table. The terms will be 
+            sorted  in the order of their first appearance in the data table.</li>
+            <li>Alphabetic table : The terms are shown in a table. The terms will be 
+            sorted  in alphabetical order.</li>
+            <li>Size-sorted table : The terms are shown in a table. The terms will be 
+            sorted  in descending order of their values.</li>
+            <li>Inside-Out tagcloud : In this view the terms are arranged
+            in a kind of circular way. The goal is to display the most
+            important terms in the middle and the others around. With
+            this positioning the amount of white space is reduced and the important
+            words gain a lot of attention. </li>
+            </ol>
+    </option>
+        
+        
+	</fullDescription>
+	<ports>
+        <dataIn name="Terms and values input table" index="0">
+        The input table must contain at least one column with terms and 
+        one column with a value.</dataIn>
+    </ports>    
+  
+    
+    <views>
+        <view index="0" name="Tagcloud">
+                Displays the terms in a table tagcloud view. 
+        </view>
+    </views>    
+	
+</knimeNode>

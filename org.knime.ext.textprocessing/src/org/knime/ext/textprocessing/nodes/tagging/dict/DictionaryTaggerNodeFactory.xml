@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Dictionary tagger</name>
+    <shortDescription>Assigns tags to named entities specified in the given list.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node recognizes named entities specified in the given list and
+            assigns a specified tag. Optionally the recognized named entity 
+            terms can be set unmodifiable, meaning that the terms are not
+            modified or filtered afterwards by any following node.
+        </intro>
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+        <option name="Case sensitive">
+            If checked, case sensitive named entity recognition will be applied,
+            otherwise not. 
+        </option>
+        <option name="Selected File">
+            Specifies the location of the dictionary file.
+        </option>
+        <option name="Named entity tag">
+            Specifies the type of tag to use for tagging recognized named entities.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

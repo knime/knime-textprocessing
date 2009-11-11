@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcTerm2String.png" type="Manipulator">
+    <name>Tags to String</name>
+    <shortDescription>Converts tags to strings.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Converts the term's tag values of the specified tag types to strings.
+			For each selected tag type a column is appended, containing the
+			strings representation of the corresponding tag value. If no tag
+			value of a certain type is available the "Missing tag value" string
+			is set. If "Missing tag value is set to "&lt;MissingCell&gt;", a 
+			missing cell is set.
+		</intro>
+		<option name="Term column">
+			The column containing the terms (tags) to convert.
+		</option>
+        <option name="Tag types">
+            The tag types to convert.
+        </option>
+        <option name="Missing tag value">
+            The value to set for missing tags.
+            If value is set to "&lt;MissingCell&gt;" missing cells are used. 
+        </option>
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Table containing the strings" index="0">
+            The input table containing the terms (tags) to convert.
+        </inPort>
+        <outPort name="Table with converted terms" index="0">
+        	The output table containing the converted tags.
+        </outPort>
+	</ports>
+</knimeNode>
