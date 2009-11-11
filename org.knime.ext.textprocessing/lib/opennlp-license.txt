@@ -1,5 +1,0 @@
-openNLP, with its homepage at http://opennlp.sourceforge.net/.
-For the license see http://opennlp.sourceforge.net/about.html:
-
-Excerpt:
-If you are working on open source natural language software or wish to start a project and are interested in joining OpenNLP, let us know about it by either posting to the OpenNLP forum or sending mail to Jason Baldridge (jmb@cogsci.ed.ac.uk) or Tom Morton (tsmorton@users.sourceforge.net). The only requirement is that the software is related to NLP and is distributed under an open source license. You are otherwise free to use your favorite programming languages, theories, methodologies, operating systems, etc. Also note that open source projects that have been around for a while and wish to be part of OpenNLP are welcome to join. The only administrative duty you have is to notify Jason with the name of your project, your website, and a brief description. 
