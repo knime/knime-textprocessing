@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -38,6 +38,8 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 
 
 /**
+ * The {@link CellFactory} implementation of the DocumentDataExtractor node
+ * that creates a cell for each selected document property.
  *
  * @author Tobias Koetter, University of Konstanz
  */
@@ -45,20 +47,33 @@ public class DocumentDataExtractorCellFactory implements CellFactory {
 
     private final DocumentDataExtractor[] m_extractors;
     private final int m_docColIdx;
+    private final DataColumnSpec[] m_columnSpecs;
 
     /**Constructor for class DocumentExtractorCellFactory.
      * @param docColIdx the index of the document column
+     * @param columnSpecs the {@link DataColumnSpec}s to return in the same
+     * order as the extractors
      * @param extractors the {@link DocumentDataExtractor}s to use
      */
     public DocumentDataExtractorCellFactory(final int docColIdx,
+            final DataColumnSpec[] columnSpecs,
             final DocumentDataExtractor[] extractors) {
-        m_docColIdx = docColIdx;
+        if (columnSpecs == null || columnSpecs.length < 1) {
+            throw new NullPointerException(
+                    "column specs must not be empty");
+        }
         if (docColIdx < 0) {
             throw new IllegalArgumentException("Invalid document column");
         }
         if (extractors == null || extractors.length < 1) {
             throw new IllegalArgumentException("extractors must not be empty");
         }
+        if (columnSpecs.length != extractors.length) {
+            throw new IllegalArgumentException(
+                    "Column specs and extractors must have the same sice");
+        }
+        m_columnSpecs = columnSpecs;
+        m_docColIdx = docColIdx;
         m_extractors = extractors;
 
     }
@@ -87,11 +102,7 @@ public class DocumentDataExtractorCellFactory implements CellFactory {
      */
     @Override
     public DataColumnSpec[] getColumnSpecs() {
-        final DataColumnSpec[] specs = new DataColumnSpec[m_extractors.length];
-        for (int i = 0, length = m_extractors.length; i < length; i++) {
-            specs[i] = m_extractors[i].getColumnSpec();
-        }
-        return specs;
+        return m_columnSpecs;
     }
     /**
      * {@inheritDoc}

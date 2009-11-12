@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -32,10 +32,12 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelectio
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
+
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 
 /**
+ * The NodeDialog implementation of the DocumentDataExtractor node.
  *
  * @author Tobias Koetter, University of Konstanz
  */
@@ -56,7 +58,7 @@ public class DocumentDataExtractorNodeDialog extends DefaultNodeSettingsPane {
                 DocumentValue.class);
         final DialogComponent extractors =
             new DialogComponentStringListSelection(m_extractorNames,
-                    "Data extractors: ", 
+                    "Data extractors: ",
                     DocumentDataExtractor.getExtractorNames());
         addDialogComponent(colName);
         addDialogComponent(extractors);
