@@ -26,6 +26,11 @@
 
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
 import org.knime.core.data.collection.CollectionCellFactory;
@@ -33,12 +38,6 @@ import org.knime.core.data.collection.SetCell;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -265,7 +264,7 @@ public enum DocumentDataExtractor {
                     && date.getDay() == 0)) {
                 return DataType.getMissingCell();
             }
-            return new DateAndTimeCell(date.getYear(), date.getMonth(),
+            return new DateAndTimeCell(date.getYear(), date.getMonth() - 1,
                     date.getDay());
         }
     }),
