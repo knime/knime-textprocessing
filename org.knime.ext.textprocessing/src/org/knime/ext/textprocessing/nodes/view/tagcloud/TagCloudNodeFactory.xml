@@ -96,9 +96,9 @@
         
 	</fullDescription>
 	<ports>
-        <dataIn name="Terms and values input table" index="0">
+        <inPort name="Terms and values input table" index="0">
         The input table must contain at least one column with terms and 
-        one column with a value.</dataIn>
+        one column with a value.</inPort>
     </ports>    
   
     
