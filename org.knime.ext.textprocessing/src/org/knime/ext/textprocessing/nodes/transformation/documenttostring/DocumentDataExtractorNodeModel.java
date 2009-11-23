@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -27,7 +27,9 @@
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
@@ -39,12 +41,14 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.ext.textprocessing.data.DocumentValue;
 
 import java.io.File;
 
+import org.knime.ext.textprocessing.data.DocumentValue;
+
 
 /**
+ * {@link NodeModel} implementation of the DocumentDataExtractor node.
  *
  * @author Tobias Koetter, University of Konstanz
  */
@@ -55,9 +59,9 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
     private final SettingsModelStringArray m_extractorNames =
         getExtractorNamesConfigObj();
 
+    private DataColumnSpec[] m_extractorColumnSpecs = null;
+
     /**Constructor for class DocumentExtractorNodeMode.
-     * @param nrInDataPorts
-     * @param nrOutDataPorts
      */
     protected DocumentDataExtractorNodeModel() {
         super(1, 1);
@@ -72,7 +76,7 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
         if (inSpecs == null || inSpecs.length < 1) {
             throw new InvalidSettingsException("Invalid input spec");
         }
-        final DocumentDataExtractor[] extractors = 
+        final DocumentDataExtractor[] extractors =
             DocumentDataExtractor.getExctractor(
                     m_extractorNames.getStringArrayValue());
         if (extractors == null || extractors.length < 1) {
@@ -96,7 +100,10 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
                         + colName);
             }
         }
-        return new DataTableSpec[] {createSpec(inSpecs[0], extractors)};
+        m_extractorColumnSpecs = createColumnSpecs(inSpecs[0], extractors);
+        final DataTableSpec resultSpec =
+            createSpec(inSpecs[0], m_extractorColumnSpecs);
+        return new DataTableSpec[] {resultSpec};
     }
 
     /**
@@ -115,7 +122,7 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
         if (docColIdx < 0) {
             throw new InvalidSettingsException("Invalid document column");
         }
-        final DocumentDataExtractor[] extractors = 
+        final DocumentDataExtractor[] extractors =
             DocumentDataExtractor.getExctractor(
                     m_extractorNames.getStringArrayValue());
         final BufferedDataTable resultTable;
@@ -126,8 +133,8 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
         } else {
             final ColumnRearranger rearranger =
                 new ColumnRearranger(inSpec);
-            final CellFactory factory =
-                new DocumentDataExtractorCellFactory(docColIdx, extractors);
+            final CellFactory factory = new DocumentDataExtractorCellFactory(
+                    docColIdx, m_extractorColumnSpecs, extractors);
             rearranger.append(factory);
             resultTable =
                 exec.createColumnRearrangeTable(table, rearranger, exec);
@@ -135,16 +142,40 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
         return new BufferedDataTable[] {resultTable};
     }
 
+    /**
+     * @param origSpec the original {@link DataTableSpec}
+     * @param columnSpecs the extractor {@link DataColumnSpec}s
+     * @return the original {@link DataTableSpec} with a new column
+     * specification per {@link DocumentDataExtractor} attached to it
+     */
     private static final DataTableSpec createSpec(final DataTableSpec origSpec,
-            final DocumentDataExtractor[] extractors) {
-        if (extractors == null || extractors.length == 0) {
+            final DataColumnSpec[] columnSpecs) {
+        if (columnSpecs == null || columnSpecs.length == 0) {
             return origSpec;
+        }
+        return new DataTableSpec(origSpec, new DataTableSpec(columnSpecs));
+    }
+
+    /**
+     *@param origSpec the original {@link DataTableSpec}
+     * @param extractors the extractors to use
+     * @return the {@link DataColumnSpec} for the given
+     * {@link DocumentDataExtractor} in the same order as given
+     */
+    private static DataColumnSpec[] createColumnSpecs(
+            final DataTableSpec origSpec,
+            final DocumentDataExtractor[] extractors) {
+        if (extractors == null || extractors.length < 1) {
+            return new DataColumnSpec[0];
         }
         final DataColumnSpec[] cols = new DataColumnSpec[extractors.length];
         for (int i = 0, length = extractors.length; i < length; i++) {
-            cols[i] = extractors[i].getColumnSpec();
+             final String name = DataTableSpec.getUniqueColumnName(origSpec,
+                     extractors[i].getName());
+             final DataType type = extractors[i].getDataType();
+             cols[i] = new DataColumnSpecCreator(name, type).createSpec();
         }
-        return new DataTableSpec(origSpec, new DataTableSpec(cols));
+        return cols;
     }
 
     /**
@@ -181,7 +212,7 @@ public class DocumentDataExtractorNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        // nothing to do
+        m_extractorColumnSpecs = null;
     }
 
     /**

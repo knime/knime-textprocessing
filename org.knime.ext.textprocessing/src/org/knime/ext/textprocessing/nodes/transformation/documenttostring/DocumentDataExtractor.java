@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -26,12 +26,16 @@
 
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataType;
 import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.SetCell;
+import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.ext.textprocessing.data.Author;
@@ -40,11 +44,6 @@ import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -216,7 +215,7 @@ public enum DocumentDataExtractor {
             }
             return new StringCell(buf.toString());
         }
-    }),    
+    }),
     /**Returns the sources of a document as set.*/
     SOURCE_SET("Source set", new Extractor() {
         @Override
@@ -256,16 +255,17 @@ public enum DocumentDataExtractor {
     PUB_DATE("Publication date", new Extractor() {
         @Override
         public DataType getDataType() {
-            return StringCell.TYPE;
+            return DateAndTimeCell.TYPE;
         }
         @Override
         public DataCell getValue(final Document doc) {
             final PublicationDate date = doc.getPubDate();
-            if (date == null || (date.getYear() == 0 && date.getMonth() == 0 
+            if (date == null || (date.getYear() == 0 && date.getMonth() == 0
                     && date.getDay() == 0)) {
                 return DataType.getMissingCell();
             }
-            return new StringCell(date.toString());
+            return new DateAndTimeCell(date.getYear(), date.getMonth() - 1,
+                    date.getDay());
         }
     }),
     /**Returns the file path of a document.*/
@@ -314,7 +314,7 @@ public enum DocumentDataExtractor {
     /**Constructor for class DocumentExtractor.
      *
      */
-    private DocumentDataExtractor(final String name, 
+    private DocumentDataExtractor(final String name,
             final Extractor extractor) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name must not be empty");
@@ -335,13 +335,10 @@ public enum DocumentDataExtractor {
     }
 
     /**
-     * @return the {@link DataColumnSpec}
+     * @return the {@link DataType} the extractor returns as result
      */
-    public DataColumnSpec getColumnSpec() {
-        final DataColumnSpecCreator creator =
-            new DataColumnSpecCreator(getName(),
-                    m_extractor.getDataType());
-        return creator.createSpec();
+    public DataType getDataType() {
+        return m_extractor.getDataType();
     }
 
     /**
