@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator">
-    <name>Sentence extractor</name>
+    <name>Sentence Extractor</name>
     <shortDescription>Extracts all sentences of a document as string.
     </shortDescription>
     <fullDescription>
