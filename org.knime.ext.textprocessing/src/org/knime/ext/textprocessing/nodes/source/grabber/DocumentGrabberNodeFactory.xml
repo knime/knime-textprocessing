@@ -41,8 +41,8 @@
 	</fullDescription>
 		
 	<ports>
-        <dataOut name="Documents output table" index="0">
+        <outPort name="Documents output table" index="0">
         	An output table which contains the parsed document data.
-        </dataOut>
+        </outPort>
 	</ports>
 </knimeNode>
