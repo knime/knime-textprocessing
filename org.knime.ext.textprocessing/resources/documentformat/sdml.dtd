@@ -20,6 +20,7 @@
 	==================================================================
 -->
 
+<!ELEMENT Documents (Document+)>
 <!ELEMENT Document (Authors?,PublicationDate?,Title,Section+)>
 
 <!ELEMENT Authors (Author*)>
