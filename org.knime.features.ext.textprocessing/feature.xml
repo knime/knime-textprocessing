@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><feature id="org.knime.features.ext.textprocessing" label="%featureName" plugin="org.knime.ext.textprocessing" provider-name="KNIME GmbH, Konstanz, Germany" version="2.1.0.0022922">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<feature id="org.knime.features.ext.textprocessing" label="%featureName" plugin="org.knime.ext.textprocessing" provider-name="KNIME GmbH, Konstanz, Germany" version="2.1.1.0023889">
 
    <description url="http://www.knime.org/download_extensions.html">
       %description
@@ -303,8 +304,8 @@ to attach them to the start of each source file to most effectively
 convey the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    &lt;one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) &lt;year>  &lt;name of author>
+    &lt;one line to give the program's name and a brief idea of what it does.&gt;
+    Copyright (C) &lt;year&gt;  &lt;name of author&gt;
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -342,7 +343,7 @@ necessary.  Here is a sample; alter the names:
   Yoyodyne, Inc., hereby disclaims all copyright interest in the program
   `Gnomovision' (which makes passes at compilers) written by James Hacker.
 
-  &lt;signature of Ty Coon>, 1 April 1989
+  &lt;signature of Ty Coon&gt;, 1 April 1989
   Ty Coon, President of Vice
 
 This General Public License does not permit incorporating your program into
