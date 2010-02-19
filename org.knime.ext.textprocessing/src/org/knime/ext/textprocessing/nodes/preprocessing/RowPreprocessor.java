@@ -162,7 +162,8 @@ public class RowPreprocessor extends AbstractPreprocessor {
                     for (Paragraph p : s.getParagraphs()) {
                         for (Sentence sen : p.getSentences()) {
                             for (Term t : sen.getTerms()) {
-                                if (!t.isUnmodifiable()) {
+                                if (!t.isUnmodifiable() 
+                                        || m_preprocessUnmodifiable) {
                                     t = m_termPreprocessing.preprocessTerm(t);
                                 }
                                 if (t != null && t.getText().length() > 0) {
