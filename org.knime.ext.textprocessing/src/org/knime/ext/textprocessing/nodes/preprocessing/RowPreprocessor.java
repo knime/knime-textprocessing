@@ -117,7 +117,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
     private void setProgress() {
         int curr = m_currRow.incrementAndGet();
         double prog = (double)curr / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocesing row " + curr + " of "
+        m_exec.setProgress(prog, "Preprocessing row " + curr + " of "
                         + m_noRows);
     }
     

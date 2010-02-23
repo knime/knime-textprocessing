@@ -150,7 +150,7 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
     private void setProgress(final ExecutionMonitor exec) {
         int curr = m_currRow.incrementAndGet();
         double prog = (double)curr / (double)m_noRows;
-        exec.setProgress(prog, "Preprocesing row " + curr + " of "
+        exec.setProgress(prog, "Preprocessing row " + curr + " of "
                         + m_noRows);
     }
     
