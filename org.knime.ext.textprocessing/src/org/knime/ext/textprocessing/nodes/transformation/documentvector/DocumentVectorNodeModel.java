@@ -181,6 +181,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         }
         
         // Sort the data table first by documents
+        exec.setProgress("Sorting input table");
         List<String> colList = new ArrayList<String>();
         colList.add(m_documentColModel.getStringValue());
         boolean [] sortAsc = new boolean[]{true};
@@ -192,6 +193,7 @@ public class DocumentVectorNodeModel extends NodeModel {
             new Hashtable<String, Integer>();
         
         // first go through data table to collect the features
+        exec.setProgress("Collecting features");
         int currIndex = 0;
         RowIterator it = sortedTable.iterator();
         while (it.hasNext()) {
@@ -212,6 +214,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         }
         
         // second go through data table to create feature vectors
+        exec.setProgress("Create feature vectors");
         BufferedDataContainer dc =
             exec.createDataContainer(createDataTableSpec(featureIndexTable));
         
