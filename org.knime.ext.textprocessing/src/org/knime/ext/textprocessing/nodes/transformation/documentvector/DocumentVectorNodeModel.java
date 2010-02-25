@@ -297,11 +297,16 @@ public class DocumentVectorNodeModel extends NodeModel {
         DataColumnSpec[] columnSpecs = new DataColumnSpec[featureCount + 1];
         
         // add document column
+        String documentColumnName = 
+            DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME;
+        while (featureIndexTable.contains(documentColumnName)) {
+            documentColumnName += "#";
+        }
+        
         DataColumnSpecCreator columnSpecCreator =
-            new DataColumnSpecCreator(
-                    DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+            new DataColumnSpecCreator(documentColumnName, 
                     m_documentCellFac.getDataType());
-        columnSpecs[0] = columnSpecCreator.createSpec();        
+        columnSpecs[0] = columnSpecCreator.createSpec();
         
         // add feature vector columns
         Set<String> terms = featureIndexTable.keySet();
