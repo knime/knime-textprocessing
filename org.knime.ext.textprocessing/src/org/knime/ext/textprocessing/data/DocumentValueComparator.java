@@ -49,6 +49,10 @@ public class DocumentValueComparator extends DataValueComparator {
         if (v1 == v2) {
             return 0;
         }
+        if (((DocumentValue)v1).getDocument() 
+                == ((DocumentValue)v2).getDocument()) {
+            return 0;
+        }
         
         // compare title
         String str1 = ((DocumentValue)v1).getDocument().getTitle();
