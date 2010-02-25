@@ -109,11 +109,6 @@ public class DocumentValueComparator extends DataValueComparator {
         // finally compare text (because its the most expensive comparison
         str1 = ((DocumentValue)v1).getDocument().getText();
         str2 = ((DocumentValue)v2).getDocument().getText();
-        res = str1.compareTo(str2);
-        if (res != 0) {
-            return res;
-        }
-        
         return str1.compareTo(str2);
     }
 }

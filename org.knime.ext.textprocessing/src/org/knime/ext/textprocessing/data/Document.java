@@ -98,6 +98,8 @@ public class Document implements TextContainer, Serializable {
      * Cache of the hash code.
      */
     private int m_hashCode = -1;
+    
+    private String m_titleCache = null;
 
     /**
      * Creates a new instance of <code>Document</code> with the given
@@ -314,7 +316,10 @@ public class Document implements TextContainer, Serializable {
      * exists, otherwise an empty string.
      */
     public String getTitle() {
-        return getSectionText(SectionAnnotation.TITLE);
+        if (m_titleCache == null) {
+            m_titleCache = getSectionText(SectionAnnotation.TITLE);
+        }
+        return m_titleCache;
     }
 
     /**
