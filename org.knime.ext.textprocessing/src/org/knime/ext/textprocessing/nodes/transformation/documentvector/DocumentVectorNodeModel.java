@@ -299,7 +299,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         // add document column
         String documentColumnName = 
             DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME;
-        while (featureIndexTable.contains(documentColumnName)) {
+        while (featureIndexTable.containsKey(documentColumnName)) {
             documentColumnName += "#";
         }
         
