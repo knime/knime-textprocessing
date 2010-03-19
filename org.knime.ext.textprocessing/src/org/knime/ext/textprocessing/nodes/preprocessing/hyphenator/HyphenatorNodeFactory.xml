@@ -2,11 +2,11 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
     <name>Hyphenator</name>
-    <shortDescription>Hyphenates terms / strings.
+    <shortDescription>Hyphenates terms.
     </shortDescription>
     <fullDescription>
         <intro>
-        	Terms and strings will be hyphenated according to the algorithm of
+        	Terms will be hyphenated according to the algorithm of
         	Liang (Liang's Algorithm), see (http://www.tug.org/docs/liang/) for 
         	details. The language dependent patterns 
         	used for hyphenation have been taken from 
