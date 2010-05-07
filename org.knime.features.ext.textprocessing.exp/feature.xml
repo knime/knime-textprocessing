@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.exp"
       label="%featureName"
-      version="2.2.0.12345"
+      version="2.1.2.0024319"
       provider-name="KNIME GmbH, Konstanz, Germany">
 
    <description url="http://www.knime.org/download_extensions.html">
@@ -456,6 +456,10 @@ library.  If this is what you want to do, use the GNU Lesser
 General
 Public License instead of this License.
    </license>
+
+   <url>
+      <update label="KNIME Update Site" url="http://www.knime.org/update/2.1/beta"/>
+   </url>
 
    <plugin
          id="org.knime.ext.textprocessing.exp"
