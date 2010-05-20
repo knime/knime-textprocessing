@@ -54,7 +54,7 @@ NodeFactory<DocumentParserNodeModel> {
     @Override
     public DocumentParserNodeModel createNodeModel() {
         return new DocumentParserNodeModel(
-                new FlatFileDocumentParser());
+                new FlatFileDocumentParser(), true);
     }
 
     /**

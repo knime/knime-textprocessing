@@ -127,6 +127,8 @@ public class DocumentParserNodeModel extends NodeModel {
     private SettingsModelString m_charsetModel =
         CharsetDocumentParserNodeDialog.getCharsetModel();
 
+    private boolean m_withCharset = false;
+
     private DocumentParser m_parser;
 
     private List<String> m_validExtensions;
@@ -141,11 +143,12 @@ public class DocumentParserNodeModel extends NodeModel {
      * @param validFileExtensions The valid extensions of files to parse.
      */
     public DocumentParserNodeModel(final DocumentParser parser,
-            final String... validFileExtensions) {
+            final boolean withCharset, final String... validFileExtensions) {
         super(0, 1);
         m_parser = parser;
         m_validExtensions = Arrays.asList(validFileExtensions);
         m_dtBuilder = new DocumentDataTableBuilder();
+        m_withCharset = withCharset;
     }
 
     /**
@@ -180,8 +183,10 @@ public class DocumentParserNodeModel extends NodeModel {
         if (type != null) {
             m_parser.setDocumentType(type);
         }
-        Charset charset = Charset.forName(m_charsetModel.getStringValue());
-        m_parser.setCharset(charset);
+        if (m_withCharset) {
+            Charset charset = Charset.forName(m_charsetModel.getStringValue());
+            m_parser.setCharset(charset);
+        }
 
         FileCollector fc = new FileCollector(dir, m_validExtensions, recursive,
                 ignoreHiddenFiles);
@@ -260,7 +265,10 @@ public class DocumentParserNodeModel extends NodeModel {
         m_sourceModel.loadSettingsFrom(settings);
         m_typeModel.loadSettingsFrom(settings);
         m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
-        m_charsetModel.loadSettingsFrom(settings);
+
+        if (m_withCharset) {
+            m_charsetModel.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -274,7 +282,10 @@ public class DocumentParserNodeModel extends NodeModel {
         m_sourceModel.saveSettingsTo(settings);
         m_typeModel.saveSettingsTo(settings);
         m_ignoreHiddenFilesModel.saveSettingsTo(settings);
-        m_charsetModel.saveSettingsTo(settings);
+
+        if (m_withCharset) {
+            m_charsetModel.saveSettingsTo(settings);
+        }
     }
 
     /**
@@ -289,7 +300,10 @@ public class DocumentParserNodeModel extends NodeModel {
         m_sourceModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
         m_ignoreHiddenFilesModel.validateSettings(settings);
-        m_charsetModel.validateSettings(settings);
+
+        if (m_withCharset) {
+            m_charsetModel.validateSettings(settings);
+        }
 
         // check selected directory
         String dir = ((SettingsModelString)m_pathModel.

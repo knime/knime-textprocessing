@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   19.02.2008 (thiel): created
  */
@@ -34,10 +34,10 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
 /**
  * The {@link org.knime.core.node.NodeFactory} of the Sdml document parser node,
  * provides methods to create the model and the dialog instance.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class SdmlDocumentParserNodeFactory extends 
+public class SdmlDocumentParserNodeFactory extends
 NodeFactory<DocumentParserNodeModel> {
 
     /**
@@ -54,14 +54,14 @@ NodeFactory<DocumentParserNodeModel> {
     @Override
     public DocumentParserNodeModel createNodeModel() {
         return new DocumentParserNodeModel(
-                new SdmlDocumentParser(), "xml");
+                new SdmlDocumentParser(), false, "xml");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentParserNodeModel> createNodeView(final int index, 
+    public NodeView<DocumentParserNodeModel> createNodeView(final int index,
             final DocumentParserNodeModel model) {
         return null;
     }
