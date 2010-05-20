@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -25,13 +25,14 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
-import java.io.InputStream;
-import java.util.List;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * All parser, parsing various document formats, like Reuters, PubMed, etc.
@@ -77,4 +78,9 @@ public interface DocumentParser {
      * @param filePath The path to the file containing the document.
      */
     public void setDocumentFilepath(final String filePath);
+
+    /**
+     * @param charset The charset to use by the parser.
+     */
+    public void setCharset(final Charset charset);
 }

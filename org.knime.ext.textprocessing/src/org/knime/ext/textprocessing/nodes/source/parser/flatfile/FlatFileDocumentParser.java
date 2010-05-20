@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -25,13 +25,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.flatfile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -42,6 +35,14 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements the
@@ -98,7 +99,11 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         m_currentDoc.addDocumentCategory(m_category);
         m_currentDoc.addDocumentSource(m_source);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        if (m_charset == null) {
+            m_charset = Charset.defaultCharset();
+        }
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(is, m_charset));
         String line = null;
         StringBuilder text = new StringBuilder();
         while ((line = br.readLine()) != null) {

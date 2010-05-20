@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   20.02.2008 (Kilian Thiel): created
  */
@@ -38,6 +38,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,15 +48,15 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Implements the 
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} 
+ * Implements the
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
  * interface. The provided method
  * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
- * is able to parse the data of the given input stream containing PubMed 
+ * is able to parse the data of the given input stream containing PubMed
  * (http://www.pubmed.org) document search results. For more details
  * about the xml format used by PubMed to deliver search results see
  * (http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_060101.dtd).
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class PubMedDocumentParser extends DefaultHandler implements
@@ -65,7 +66,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * The default source of the pub med parser.
      */
     public static final String DEFAULT_SOURCE = "PubMed";
-    
+
     /**
      * The name of the article tag.
      */
@@ -80,12 +81,12 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * The name of the article title tag.
      */
     public static final String ARTICLETITLE = "articletitle";
-    
+
     /**
      * The name of the author tag.
      */
     public static final String AUTHOR = "author";
-    
+
     /**
      * The name of the first name tag.
      */
@@ -95,11 +96,11 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * The name of the fore name tag.
      */
     public static final String FORENAME = "forename";
-    
+
     /**
      * The name of the last name tag.
      */
-    public static final String LASTNAME = "lastname";    
+    public static final String LASTNAME = "lastname";
 
     /**
      * The name of the publication date tag.
@@ -110,12 +111,12 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * The name of the year tag.
      */
     public static final String YEAR = "year";
-    
+
     /**
      * The name of the month tag.
      */
     public static final String MONTH = "month";
-    
+
     /**
      * The name of the day tag.
      */
@@ -124,67 +125,67 @@ public class PubMedDocumentParser extends DefaultHandler implements
     /**
      * The name of the journal tag.
      */
-    public static final String JOURNAL = "journal";    
+    public static final String JOURNAL = "journal";
 
     /**
      * The name of the title tag.
      */
-    public static final String TITLE = "title";    
-    
-    
-    private static final NodeLogger LOGGER = 
+    public static final String TITLE = "title";
+
+
+    private static final NodeLogger LOGGER =
         NodeLogger.getLogger(PubMedDocumentParser.class);
-    
+
     private List<Document> m_docs;
-    
+
     private DocumentCategory m_category;
-    
+
     private DocumentSource m_source;
-    
+
     private DocumentType m_type;
-    
-    private String m_docPath;    
-    
+
+    private String m_docPath;
+
     private DocumentBuilder m_currentDoc;
-    
+
     private String m_lastTag;
-    
+
     private String m_abstract = "";
-    
+
     private String m_title = "";
-    
+
     private String m_firstName = "";
-    
+
     private String m_lastName = "";
-    
+
     private boolean m_pubDateFlag = false;
-    
+
     private String m_day = "";
-    
+
     private String m_month = "";
-    
+
     private String m_year = "";
-    
+
     private String m_journalTitle = "";
-    
+
     private boolean m_journalFlag = false;
-    
-    
+
+
     /**
-     * Creates a new instance of <code>PubMedDocumentParser</code>. The 
-     * document source is set to 
-     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} 
-     * by default. The document category and file path will be set to 
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The
+     * document source is set to
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE}
+     * by default. The document category and file path will be set to
      * <code>null</code> by default.
      */
     public PubMedDocumentParser() {
         this(null, null, new DocumentSource(DEFAULT_SOURCE));
     }
-    
+
     /**
      * Creates a new instance of <code>PubMedDocumentParser</code>. The given
      * source, category and file path is set to the created documents.
-     * 
+     *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
@@ -194,8 +195,8 @@ public class PubMedDocumentParser extends DefaultHandler implements
         m_category = category;
         m_source = source;
         m_docPath = docPath;
-    } 
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -207,15 +208,15 @@ public class PubMedDocumentParser extends DefaultHandler implements
         return m_docs;
     }
 
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, 
+    public void startElement(final String uri, final String localName,
             final String qName, final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
-        
+
         if (m_lastTag.equals(PUBMEDARTICLE)) {
             m_currentDoc = new DocumentBuilder();
             if (m_category != null) {
@@ -226,7 +227,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
             }
             if (m_type != null) {
                 m_currentDoc.setDocumentType(m_type);
-            }            
+            }
             if (m_docPath != null) {
                 File f = new File(m_docPath);
                 if (f.exists()) {
@@ -234,7 +235,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 }
             }
         } else if (m_lastTag.equals(ABSTRACTTEXT)) {
-            m_abstract = "";    
+            m_abstract = "";
         } else if (m_lastTag.equals(ARTICLETITLE)) {
             m_title = "";
         } else if (m_lastTag.equals(FIRSTNAME) || qName.equals(FORENAME)) {
@@ -255,12 +256,12 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_journalTitle = "";
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void endElement(final String uri, final String localName, 
+    public void endElement(final String uri, final String localName,
             final String qName) {
         String name = qName.toLowerCase();
         if (name.equals(PUBMEDARTICLE) && m_currentDoc != null) {
@@ -268,7 +269,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_docs.add(doc);
             m_currentDoc = null;
         } else if (name.equals(ABSTRACTTEXT)) {
-            m_currentDoc.addSection(m_abstract.trim(), 
+            m_currentDoc.addSection(m_abstract.trim(),
                     SectionAnnotation.ABSTRACT);
         } else if (name.equals(ARTICLETITLE)) {
             m_currentDoc.addTitle(m_title.trim());
@@ -292,20 +293,20 @@ public class PubMedDocumentParser extends DefaultHandler implements
             } catch (Exception e) {
                 LOGGER.warn("Publication date could not be created!");
                 LOGGER.warn(e.getMessage());
-                
+
                 // set empty PublicationDate!
                 m_currentDoc.setPublicationDate(new PublicationDate());
             }
         } else if (name.equals(TITLE)) {
             if (m_journalTitle.length() > 0) {
-                m_currentDoc.addSection(m_journalTitle, 
+                m_currentDoc.addSection(m_journalTitle,
                         SectionAnnotation.JOURNAL_TITLE);
             }
         } else if (name.equals(JOURNAL)) {
             m_journalFlag = false;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -349,12 +350,20 @@ public class PubMedDocumentParser extends DefaultHandler implements
      */
     public void setDocumentType(final DocumentType type) {
         m_type = type;
-    } 
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     public void setDocumentFilepath(final String filePath) {
         m_docPath = filePath;
-    }    
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * The given charset is ignored since the SAX parser takes it from the xml
+     * file.
+     */
+    public void setCharset(Charset charset) { }
 }

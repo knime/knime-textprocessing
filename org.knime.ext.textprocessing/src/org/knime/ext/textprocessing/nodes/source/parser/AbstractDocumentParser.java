@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,24 +19,25 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   20.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
-
-import java.io.InputStream;
-import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.List;
+
 /**
- * This abstract class implements conveniently all setter methods of the 
+ * This abstract class implements conveniently all setter methods of the
  * interface
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}, 
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser},
  * such as
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentCategory(DocumentCategory)},
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentSource(DocumentSource)},
@@ -44,8 +45,8 @@ import org.knime.ext.textprocessing.data.DocumentType;
  * and
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentType(DocumentType)}.
  * The parse method is still not implemented since the parsing technique
- * is still up to the concrete underlying parser. 
- * 
+ * is still up to the concrete underlying parser.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public abstract class AbstractDocumentParser implements DocumentParser {
@@ -54,35 +55,40 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * The category of the document.
      */
     protected DocumentCategory m_category;
-    
+
     /**
      * The source of the document.
      */
     protected DocumentSource m_source;
-    
+
     /**
      * The type of the document.
      */
     protected DocumentType m_type;
-    
+
     /**
      * The path of the file containing the document.
      */
     protected String m_docPath;
-    
+
     /**
-     * Constructor of <code>AbstractDocumentParser</code>. 
-     * The document source, category and file path will be set to 
+     * The charset to use by the parser.
+     */
+    protected Charset m_charset;
+
+    /**
+     * Constructor of <code>AbstractDocumentParser</code>.
+     * The document source, category and file path will be set to
      * <code>null</code> by default.
      */
     public AbstractDocumentParser() {
         this(null, null, null);
     }
-    
+
     /**
      * Constructor of <code>AbstractDocumentParser</code>. The given
      * source, category and file path is set to the created documents.
-     * 
+     *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
@@ -93,7 +99,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
         m_source = source;
         m_docPath = docPath;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -118,12 +124,19 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      */
     public void setDocumentType(final DocumentType type) {
         m_type = type;
-    } 
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     public void setDocumentFilepath(final String filePath) {
         m_docPath = filePath;
-    } 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCharset(final Charset charset) {
+        m_charset = charset;
+    }
 }
