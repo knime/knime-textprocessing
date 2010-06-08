@@ -497,7 +497,7 @@ public class DmlDocumentParser extends DefaultHandler implements
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         // header
-        OutputFormat of = new OutputFormat("XML", "ISO-8859-1", true);
+        OutputFormat of = new OutputFormat("XML", "UTF-8", true);
         of.setIndent(1);
         of.setIndenting(true);
         of.setDoctype(PUBLIC_IDENTIFIER, "./dml.dtd");
