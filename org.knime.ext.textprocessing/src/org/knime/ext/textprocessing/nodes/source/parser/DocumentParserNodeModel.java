@@ -140,6 +140,12 @@ public class DocumentParserNodeModel extends NodeModel {
      * specified parser to use and the valid extensions of files to parse.
      *
      * @param parser The parser to use.
+     * @param withCharset if <code>true</code> the character set of the
+     * character set model is handed to the parser in order to properly decode
+     * the text to parse, otherwise not. Be aware that if <code>true</code> is
+     * set the {@link org.knime.ext.textprocessing.nodes.source.parser.CharsetDocumentParserNodeDialog}
+     * needs to be used in order to enable the user to specify a certain
+     * encoding via the dialog.
      * @param validFileExtensions The valid extensions of files to parse.
      */
     public DocumentParserNodeModel(final DocumentParser parser,
