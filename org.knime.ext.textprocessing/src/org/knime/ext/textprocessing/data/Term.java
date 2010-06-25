@@ -79,7 +79,8 @@ public class Term implements TextContainer, Serializable {
     public Term(final List<Word> words, final List<Tag> tags,
             final boolean unmodifiable) throws NullPointerException {
         if (words == null) {
-            throw new NullPointerException("The ist of words may not be null!");
+            throw new NullPointerException(
+                    "The list of words must not be null!");
         }
         m_words = words;
 
