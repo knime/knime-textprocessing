@@ -354,7 +354,7 @@ Public License instead of this License.
 	</license>
 
    <url>
-      <update label="KNIME Labs" url="http://labs.knime.org/update/2.1"/>
+      <update label="KNIME Labs" url="http://labs.knime.org/update/2.2"/>
    </url>
 
    <includes id="org.knime.features.ext.textprocessing.source" version="0.0.0"/>

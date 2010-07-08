@@ -454,7 +454,7 @@ Public License instead of this License.
    </license>
 
    <url>
-      <update label="KNIME Update Site" url="http://www.knime.org/update/2.1/beta"/>
+      <update label="KNIME Update Site" url="http://www.knime.org/update/2.2/beta"/>
    </url>
 
    <plugin download-size="0" id="org.knime.ext.textprocessing.exp" install-size="0" version="0.0.0"/>
