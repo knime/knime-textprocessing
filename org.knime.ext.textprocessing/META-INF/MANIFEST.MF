@@ -1,4 +1,6 @@
 Manifest-Version: 1.0
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.knime.core
+ ,org.knime.workbench,org.knime.workbench.repository,org.knime.base
 Export-Package: .,abner,edu.umass.cs.mallet.base.classify,edu.umass.cs
  .mallet.base.classify.evaluate,edu.umass.cs.mallet.base.classify.exam
  ples,edu.umass.cs.mallet.base.classify.tests,edu.umass.cs.mallet.base
@@ -67,8 +69,6 @@ Export-Package: .,abner,edu.umass.cs.mallet.base.classify,edu.umass.cs
  ng.util,org.knime.ext.textprocessing.util.clustering,org.knime.ext.te
  xtprocessing.util.similarity,org.tartarus.snowball,org.tartarus.snowb
  all.ext
-Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.knime.core
- ,org.knime.workbench,org.knime.workbench.repository,org.knime.base
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: knime-textprocessing-patches.jar,knime-textprocessin
@@ -76,8 +76,8 @@ Bundle-ClassPath: knime-textprocessing-patches.jar,knime-textprocessin
  lib/abner.jar,lib/Snowball.jar,lib/json.jar
 Bundle-Version: 2.2.1.0026408
 Bundle-Name: KNIME Textprocessing Plug-in
+Bundle-ManifestVersion: 2
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugi
  n
-Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.knime.ext.textprocessing;singleton:=true
 
