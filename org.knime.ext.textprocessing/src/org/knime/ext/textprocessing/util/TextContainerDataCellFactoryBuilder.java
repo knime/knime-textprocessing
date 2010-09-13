@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   16.02.2009 (thiel): created
  */
@@ -32,27 +32,27 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Kilian Thiel, University of Konstanz
  */
 public final class TextContainerDataCellFactoryBuilder {
-    
+
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(TextContainerDataCellFactoryBuilder.class);
-    
+
     private TextContainerDataCellFactoryBuilder() { }
-    
+
     /**
-     * @return The <code>TextContainerDataCellFactory</code> creating 
+     * @return The <code>TextContainerDataCellFactory</code> creating
      * document cells.
      */
     public static TextContainerDataCellFactory createDocumentCellFactory() {
         if (!TextprocessingPreferenceInitializer.useBlobCell()) {
-            LOGGER.info("Creating document cell factory!");
+            LOGGER.debug("Creating document cell factory!");
             return new DocumentDataCellFactory();
         }
-        LOGGER.info("Creating document blob cell factory!");
+        LOGGER.debug("Creating document blob cell factory!");
         return new DocumentBlobDataCellFactory();
     }
-    
+
     /**
-     * @return The <code>TextContainerDataCellFactory</code> creating 
+     * @return The <code>TextContainerDataCellFactory</code> creating
      * term cells.
      */
     public static TextContainerDataCellFactory createTermCellFactory() {

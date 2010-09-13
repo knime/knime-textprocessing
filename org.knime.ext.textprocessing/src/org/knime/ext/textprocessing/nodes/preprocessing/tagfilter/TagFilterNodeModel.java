@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -32,14 +32,15 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagBuilder;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 /**
  * The abstract class <code>TagFilterNodeModel</code> provides a functionality
@@ -60,11 +61,18 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
      */
     public static final boolean DEF_STRICT = false;
 
+    /**
+     * The default value of the "filter matching" setting.
+     */
+    public static final boolean DEF_FILTER_MATCHING = false;
 
-    private SettingsModelBoolean m_strictFilteringModel =
+    private final SettingsModelBoolean m_filterMatchingModel =
+        TagFilterNodeDialog.getFilterMatchingModel();
+
+    private final SettingsModelBoolean m_strictFilteringModel =
         TagFilterNodeDialog.getStrictFilteringModel();
 
-    private SettingsModelStringArray m_validTagsModel =
+    private final SettingsModelStringArray m_validTagsModel =
         TagFilterNodeDialog.getValidTagsModel();
 
 
@@ -84,19 +92,20 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
      */
     @Override
     protected final void initPreprocessing() {
-        TagBuilder tb = getTagBuilder();
-        Set<Tag> validTags = new HashSet<Tag>(
+        final TagBuilder tb = getTagBuilder();
+        final Set<Tag> validTags = new HashSet<Tag>(
                 m_validTagsModel.getStringArrayValue().length);
 
-        for (String s : m_validTagsModel.getStringArrayValue()) {
-            Tag t = tb.buildTag(getValidTagType(), s);
+        for (final String s : m_validTagsModel.getStringArrayValue()) {
+            final Tag t = tb.buildTag(getValidTagType(), s);
             if (t != null) {
                 validTags.add(t);
             }
         }
 
         m_preprocessing = new TagFilter(validTags, getValidTagType(),
-                m_strictFilteringModel.getBooleanValue());
+                m_strictFilteringModel.getBooleanValue(),
+                m_filterMatchingModel.getBooleanValue());
     }
 
     /**
@@ -108,6 +117,12 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
         super.loadValidatedSettingsFrom(settings);
         m_strictFilteringModel.loadSettingsFrom(settings);
         m_validTagsModel.loadSettingsFrom(settings);
+        try {
+            m_filterMatchingModel.loadSettingsFrom(settings);
+        } catch (final InvalidSettingsException e) {
+            // this is a older version set it to the old behavior
+            m_filterMatchingModel.setBooleanValue(false);
+        }
     }
 
     /**
@@ -118,6 +133,7 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
         super.saveSettingsTo(settings);
         m_strictFilteringModel.saveSettingsTo(settings);
         m_validTagsModel.saveSettingsTo(settings);
+        m_filterMatchingModel.saveSettingsTo(settings);
     }
 
     /**
@@ -129,6 +145,8 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
         super.validateSettings(settings);
         m_strictFilteringModel.validateSettings(settings);
         m_validTagsModel.validateSettings(settings);
+        //we can not valid date the new setting but we also don't need to
+//        m_filterMatchingModel.validateSettings(settings);
     }
 
     /**

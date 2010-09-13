@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -71,8 +71,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      * The case sensitive flag.
      */
     protected boolean m_caseSensitive = true;
-    
-    protected Tokenizer m_wordTokenizer = 
+
+    protected Tokenizer m_wordTokenizer =
         DefaultTokenization.getWordTokenizer();
 
     /**
@@ -126,7 +126,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
     /**
      * Preprocesses a document before tagging. This is where a tagger would
-     * build a private model to use for tagging entities in the method 
+     * build a private model to use for tagging entities in the method
      * tagEntities(Sentence).
      * @param doc The document to tag.
      */
@@ -183,10 +183,16 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         List<Term> newTermList = null;
         List<Term> oldList = oldTermList;
 
+        if (neWords.size() <= 0) {
+            return oldList;
+        }
+
         // Won't this blow up if we have "a,b,a" as an entity and "ababab" as a
         // sentence?
         List<IndexRange> startStopRanges = findNe(oldList, neWords);
 
+        // if new list contains no entities to look up for return old list
+        // so that no tag is assigned to empty entities.
         if (startStopRanges.size() <= 0) {
             return oldList;
         }
@@ -244,7 +250,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         // it
                     } else if (oldList.get(t).getWords().size() > 1) {
                         List<Word> newWords = new ArrayList<Word>();
-                        for (int w = 0; w < oldList.get(t).getWords().size(); 
+                        for (int w = 0; w < oldList.get(t).getWords().size();
                         w++) {
                             // add word if index matches
                             if (w >= startWordIndex && w <= stopWordIndex) {

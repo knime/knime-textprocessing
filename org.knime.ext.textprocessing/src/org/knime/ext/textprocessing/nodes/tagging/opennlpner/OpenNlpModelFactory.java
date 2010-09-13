@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -25,12 +25,12 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
-import java.util.Hashtable;
-import java.util.Set;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
+
+import java.util.Hashtable;
+import java.util.Set;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -60,7 +60,7 @@ public final class OpenNlpModelFactory {
     }
 
     private OpenNlpModelFactory() {
-        LOGGER.info("Registering Maxent Models ...");
+        LOGGER.debug("Registering Maxent Models ...");
 
         OpenNlpModelPaths paths = OpenNlpModelPaths.getOpenNlpModelPaths();
 

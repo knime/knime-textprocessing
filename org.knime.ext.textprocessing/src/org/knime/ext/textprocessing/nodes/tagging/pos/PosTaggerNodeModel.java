@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   22.02.2008 (thiel): created
  */
@@ -48,18 +48,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The node model of the POS (part of speech) tagger. Extends 
+ * The node model of the POS (part of speech) tagger. Extends
  * {@link org.knime.core.node.NodeModel} and provides methods to configure and
  * execute the node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class PosTaggerNodeModel extends NodeModel {
-    
+
     private int m_docColIndex = -1;
-    
+
     private DocumentDataTableBuilder m_dtBuilder;
-    
+
     /**
      * Creates new instance of <code>PosTaggerNodeModel</code> which adds
      * part of speech tags to terms of documents.
@@ -68,7 +68,7 @@ public class PosTaggerNodeModel extends NodeModel {
         super(1, 1);
         m_dtBuilder = new DocumentDataTableBuilder();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -79,41 +79,41 @@ public class PosTaggerNodeModel extends NodeModel {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
-    private void checkDataTableSpec(final DataTableSpec spec) 
+    private void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        
+
         checkDataTableSpec(inData[0].getDataTableSpec());
-        
+
         List<Document> newDocuments = new ArrayList<Document>();
         DocumentTagger tagger = new PosDocumentTagger(false);
-        
+
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
         while (it.hasNext()) {
-            
+
             double progress = (double)currDoc / (double)rowCount;
-            exec.setProgress(progress, "Tagging document " + currDoc + " of " 
+            exec.setProgress(progress, "Tagging document " + currDoc + " of "
                     + rowCount);
             exec.checkCanceled();
             currDoc++;
-            
+
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
             newDocuments.add(tagger.tag(docVal.getDocument()));
         }
-        
+
         return new BufferedDataTable[]{m_dtBuilder.createDataTable(
                         exec, newDocuments)};
     }
@@ -122,7 +122,7 @@ public class PosTaggerNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
     }
@@ -131,11 +131,11 @@ public class PosTaggerNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -152,7 +152,7 @@ public class PosTaggerNodeModel extends NodeModel {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
     }
-    
+
     /**
      * {@inheritDoc}
      */

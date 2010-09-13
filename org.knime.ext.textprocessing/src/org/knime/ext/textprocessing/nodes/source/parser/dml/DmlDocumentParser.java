@@ -395,7 +395,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             int year = Integer.parseInt(m_year.trim());
             PublicationDate pd;
             try {
-                pd = new PublicationDate(year, month, day);
+                //pd = new PublicationDate(year, month, day);
+                pd = PublicationDate.createPublicationDate(year, month, day);
                 m_currentDoc.setPublicationDate(pd);
             } catch (ParseException e) {
                 LOGGER.warn("Publication date ("
@@ -497,11 +498,10 @@ public class DmlDocumentParser extends DefaultHandler implements
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         // header
-        OutputFormat of = new OutputFormat("XML", "UTF-8", true);
-        of.setIndent(1);
-        of.setIndenting(true);
+        OutputFormat of = new OutputFormat("XML", "UTF-8", false);
         of.setDoctype(PUBLIC_IDENTIFIER, "./dml.dtd");
 
+        String str = null;
         try {
             XMLSerializer serializer = new XMLSerializer(os, of);
             ContentHandler hd = serializer.asContentHandler();
@@ -673,6 +673,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             hd.endElement("", "", DOCUMENT);
             hd.endDocument();
             os.close();
+
+            str = os.toString("UTF-8");
         } catch (SAXException e1) {
             LOGGER.error("Could not create xml output of documemnt "
                     + "file:" + doc.getDocFile()
@@ -687,7 +689,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             e2.printStackTrace();
         }
 
-        return os.toString();
+        return str;
     }
 
     /**
@@ -697,7 +699,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * @return Stripped string containing only valid XML characters
      */
     public static String stripNonValidXMLCharacters(final String in) {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         char curr;
         if (in == null || (in.equals(""))) {
             return "";
@@ -713,8 +715,32 @@ public class DmlDocumentParser extends DefaultHandler implements
                 out.append(curr);
             }
         }
-        return out.toString();
+        return removeNonValidUtf8Characters(out.toString());
+        //return out.toString();
     }
+
+    private static String removeNonValidUtf8Characters(final String in) {
+        if (in == null) {
+            return null;
+        }
+        byte[] byteArr = in.getBytes();
+        for (int i = 0; i < byteArr.length; i++) {
+            byte ch = byteArr[i];
+            // remove any characters outside the valid UTF-8 range
+            // as well as all control characters
+            // except tabs and new lines
+            if (!((ch > 31 && ch < 253)
+                    || ch == '\t'
+                    || ch == '\n'
+                    || ch == '\r')) {
+                byteArr[i] = ' ';
+            }
+        }
+        return new String(byteArr, UTF8_CHARSET);
+    }
+
+    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
+
 
     /**
      * {@inheritDoc}
