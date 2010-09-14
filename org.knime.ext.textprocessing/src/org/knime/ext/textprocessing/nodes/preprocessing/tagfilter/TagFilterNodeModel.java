@@ -32,15 +32,14 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagBuilder;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
 /**
  * The abstract class <code>TagFilterNodeModel</code> provides a functionality
@@ -121,7 +120,7 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
             m_filterMatchingModel.loadSettingsFrom(settings);
         } catch (final InvalidSettingsException e) {
             // this is a older version set it to the old behavior
-            m_filterMatchingModel.setBooleanValue(false);
+            m_filterMatchingModel.setBooleanValue(DEF_FILTER_MATCHING);
         }
     }
 
@@ -146,7 +145,7 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
         m_strictFilteringModel.validateSettings(settings);
         m_validTagsModel.validateSettings(settings);
         //we can not valid date the new setting but we also don't need to
-//        m_filterMatchingModel.validateSettings(settings);
+        //m_filterMatchingModel.validateSettings(settings);
     }
 
     /**

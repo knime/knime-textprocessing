@@ -25,13 +25,13 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
-import java.util.List;
-import java.util.Set;
-
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilter;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * A tag filter, filtering terms with not specified tags.
@@ -77,37 +77,47 @@ public class TagFilter implements TermPreprocessing {
      */
     public Term preprocessTerm(final Term term) {
         boolean allValid = true;
-        boolean oneValid = false;
 
         final List<Tag> tags = term.getTags();
-        if (tags.isEmpty() && m_filterMatching) {
-            //the term does not contains any tag and only matching
-            //should filtered
-            return term;
+        if (tags.isEmpty()) {
+            if (m_filterMatching) {
+              //the term does not contains any tag and only matching
+              //should filtered
+              return term;
+            }
+            return null;
         }
         for (final Tag t : tags) {
             if (t.getTagType().equals(m_validTagType)) {
                 if (m_filterMatching) {
                     if (!m_validTags.contains(t)) {
-                        oneValid = true;
+                        if (!m_strict) {
+                            return term;
+                        }
                     } else {
                         allValid = false;
                     }
                 } else {
                     if (m_validTags.contains(t)) {
-                        oneValid = true;
+                        if (!m_strict) {
+                            return term;
+                        }
                     } else {
                         allValid = false;
                     }
                 }
-            } else if (m_filterMatching) {
-                oneValid = true;
+            } else {
+                if (m_filterMatching) {
+                    if (!m_strict) {
+                        return term;
+                    }
+                } else {
+                    allValid = false;
+                }
             }
         }
 
-        if (m_strict && allValid && oneValid) {
-            return term;
-        } else if (!m_strict && oneValid) {
+        if (m_strict && allValid) {
             return term;
         }
         return null;

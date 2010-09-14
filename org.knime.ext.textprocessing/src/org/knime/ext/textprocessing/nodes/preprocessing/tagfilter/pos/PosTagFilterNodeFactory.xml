@@ -19,6 +19,11 @@
              to the terms. Otherwise at least one of the specified tags has to be
              applied to the terms.
         </option>
+        <option name="Filter matching">
+             If checked, terms which have the specified tags are filtered, 
+             otherwise they are kept. If strict filtering is checked, all tags
+             must match to filter or keep a term.
+        </option>
         <option name="Tags">
              The tags to filter for.
         </option>
