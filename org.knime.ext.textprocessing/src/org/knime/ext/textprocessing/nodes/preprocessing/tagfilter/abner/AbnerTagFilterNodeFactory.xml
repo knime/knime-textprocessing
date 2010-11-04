@@ -6,43 +6,46 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            Filters all terms contained in the given bag of words (input table) 
-            with biomedical named entities (BNER) tags assigned, 
-            not specified in the dialog. The terms are filtered out of the bag of 
+            Filters all terms contained in the given bag of words (input table)
+            with biomedical named entities (BNER) tags assigned,
+            not specified in the dialog. The terms are filtered out of the bag of
             words and the documents as well if deep preprocessing is checked.
             <br />
-            To detect biomedical named entities, the ABNER 
+            To detect biomedical named entities, the ABNER
             (A Biomedical Named Entity Recognizer) Software is used
             (see http://pages.cs.wisc.edu/~bsettles/abner/ for details).
             <br />
-            A term is kept if at least one of its assigned BNER tags is a valid 
-            tag. If strict filtering is set, all assigned BNER tags of a term 
-            have to be valid. 
+            A term is kept if at least one of its assigned BNER tags is a valid
+            tag. If strict filtering is set, all assigned BNER tags of a term
+            have to be valid.
         </intro>
-        
+
+        <tab name="Preprocessing options">
         <option name="Strict filtering">
-             If strict filtering is checked, terms need to have all specified 
+             If strict filtering is checked, terms need to have all specified
              tags applied. If  not checked, at least one tag has to be applied.
         </option>
         <option name="Filter matching">
-             If checked, terms which have the specified tags are filtered, 
+             If checked, terms which have the specified tags are filtered,
              otherwise they are kept. If strict filtering is checked, all tags
              must match to filter or keep a term.
         </option>
         <option name="Tags">
              The tags to filter for.
         </option>
+        </tab>
 
+        <tab name="Deep preprocessing options">
         <option name="Deep preprocessing">
              If deep preprocessing is checked, the terms contained inside
-             the documents are preprocessed too, this means that the documents 
-             themselves are changed too, which is more time consuming. 
-        </option>        
+             the documents are preprocessed too, this means that the documents
+             themselves are changed too, which is more time consuming.
+        </option>
         <option name="Document column">
               Specifies the column containing the documents to preprocess.
         </option>
         <option name="Append unchanged documents">
-            If checked, the documents contained in the specified "Original 
+            If checked, the documents contained in the specified "Original
             Document column" are appended unchanged even if deep preprocessing
             is checked. This helps to keep the original documents in the
             output data table without the agonizing pain of joining.
@@ -50,12 +53,13 @@
         <option name="Original Document column">
               Specifies the column containing the original documents which
               can be attached unchanged.
-        </option>        
+        </option>
         <option name="Ignore unmodifiable tag">
               If checked unmodifiable terms will be preprocessed too.
         </option>
+        </tab>
     </fullDescription>
-        
+
     <ports>
         <inPort name="Terms and related documents input table" index="0">
         The input table which contains the terms to filter.</inPort>

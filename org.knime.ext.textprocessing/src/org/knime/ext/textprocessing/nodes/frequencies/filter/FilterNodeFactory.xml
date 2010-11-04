@@ -5,47 +5,50 @@
 	<shortDescription>
 	   Filters terms with a certain frequency value.
 	</shortDescription>
-	
+
 	<fullDescription>
 	<intro>
         Filters terms in the given bag of words with a certain frequency value.
         On the one hand minimum and maximum values can be defined to be
         used for filtering. If the value of a specified frequency column
         is less than the minimum or greater than the maximum value the term is
-        filtered. On the other hand a number k of terms to keep can be defined. 
-        Only those k terms with the highest frequency value are kept, the rest 
-        is filtered. 
+        filtered. On the other hand a number k of terms to keep can be defined.
+        Only those k terms with the highest frequency value are kept, the rest
+        is filtered.
 	</intro>
+
+	<tab name="Deep Filtering">
         <option name="Document column">
-              Specifies the column containing the documents to apply the 
+              Specifies the column containing the documents to apply the
               filtering.
-        </option>	
+        </option>
         <option name="Deep filtering">
              If deep filtering is checked, the terms contained inside
              the documents are filtered too, this means that the documents are
              changed, which is more time consuming.
         </option>
+    </tab>
 
-        
+    <tab name="Filter options">
         <option name="Filter unmodifiable terms">
              Usually terms which have been set unmodifiable are not modified
-             or filtered. If this setting is checked, these terms are filtered 
+             or filtered. If this setting is checked, these terms are filtered
              as well if they don't fit the specified requirements.
         </option>
         <option name="Filter column">
              The column containing the values to apply the filtering, i.e.
-             the TF measure of each term can be computed before by the TF node. 
+             the TF measure of each term can be computed before by the TF node.
              Once the column is appended, the filtering can be applied to this
              values.
         </option>
         <option name="Filtering by">
              The filter option specifies which filtering is be applied, the
-             threshold filtering or the number of terms filtering. 
+             threshold filtering or the number of terms filtering.
              The threshold filtering
              keeps all rows with values contained in the specified filter column
              which are greater than the specified min and less than the maximum
              value. The number of terms filter on the other hand keeps a number K
-             rows with the highest values. 
+             rows with the highest values.
         </option>
         <option name="Min Max settings">
             Specifies the minimum and the maximum threshold of the values of
@@ -53,18 +56,19 @@
         </option>
         <option name="Number Settings">
             Specifies a number K of rows to keep, the rest is filtered out.
-            Only these K rows with the highest value of the filter column are 
+            Only these K rows with the highest value of the filter column are
             kept.
         </option>
+    </tab>
 	</fullDescription>
-		
+
 	<ports>
         <inPort name="Terms and related documents input table" index="0">
         The input table which contains terms and documents.</inPort>
         <outPort name="Terms and documents output table" index="0">
-        The output table which contains terms documents and a corresponding 
+        The output table which contains terms documents and a corresponding
         frequency value.
         </outPort>
-	</ports>	
+	</ports>
 </knimeNode>
 

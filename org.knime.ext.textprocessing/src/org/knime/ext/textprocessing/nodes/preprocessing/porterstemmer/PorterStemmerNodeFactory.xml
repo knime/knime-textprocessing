@@ -7,21 +7,22 @@
     <fullDescription>
         <intro>
         	This node allows you to stem terms by the Porter stemmer algorithm,
-        	thereby terms will be reduced to their stem.  
-        	The stemmed terms are stored in the outgoing DataTable, as well as 
+        	thereby terms will be reduced to their stem.
+        	The stemmed terms are stored in the outgoing DataTable, as well as
         	the documents containing these terms.
 		</intro>
-		
+
+		<tab name="Deep preprocessing options">
         <option name="Deep preprocessing">
              If deep preprocessing is checked, the terms contained inside
-             the documents are preprocessed too, this means that the documents 
-             themselves are changed too, which is more time consuming. 
-        </option>        
+             the documents are preprocessed too, this means that the documents
+             themselves are changed too, which is more time consuming.
+        </option>
         <option name="Document column">
               Specifies the column containing the documents to preprocess.
         </option>
         <option name="Append unchanged documents">
-            If checked, the documents contained in the specified "Original 
+            If checked, the documents contained in the specified "Original
             Document column" are appended unchanged even if deep preprocessing
             is checked. This helps to keep the original documents in the
             output data table without the agonizing pain of joining.
@@ -29,12 +30,13 @@
         <option name="Original Document column">
               Specifies the column containing the original documents which
               can be attached unchanged.
-        </option>        
+        </option>
         <option name="Ignore unmodifiable tag">
               If checked unmodifiable terms will be preprocessed too.
         </option>
+        </tab>
 	</fullDescription>
-		
+
 	<ports>
         <inPort name="Terms and related documents input table" index="0">
         The input table which contains the terms to stem.</inPort>

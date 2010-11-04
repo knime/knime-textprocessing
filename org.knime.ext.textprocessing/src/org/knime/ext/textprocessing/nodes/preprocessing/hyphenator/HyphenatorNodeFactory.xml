@@ -7,31 +7,34 @@
     <fullDescription>
         <intro>
         	Terms will be hyphenated according to the algorithm of
-        	Liang (Liang's Algorithm), see (http://www.tug.org/docs/liang/) for 
-        	details. The language dependent patterns 
-        	used for hyphenation have been taken from 
+        	Liang (Liang's Algorithm), see (http://www.tug.org/docs/liang/) for
+        	details. The language dependent patterns
+        	used for hyphenation have been taken from
         	http://hyphenator.googlecode.com/svn/trunk/ and modified in order to
-        	fit the JSON format.  
-        	The string, separating the syllables can be specified. 
+        	fit the JSON format.
+        	The string, separating the syllables can be specified.
 		</intro>
-		
+
+        <tab name="Preprocessing options">
         <option name="Language">
               The language of the terms (strings) to hyphenate.
         </option>
         <option name="Separator">
               The string to use for separating the syllables.
         </option>
-		
+        </tab>
+
+		<tab name="Deep preprocessing options">
         <option name="Deep preprocessing">
              If deep preprocessing is checked, the terms contained inside
-             the documents are preprocessed too, this means that the documents 
-             themselves are changed too, which is more time consuming. 
-        </option>        
+             the documents are preprocessed too, this means that the documents
+             themselves are changed too, which is more time consuming.
+        </option>
         <option name="Document column">
               Specifies the column containing the documents to preprocess.
         </option>
         <option name="Append unchanged documents">
-            If checked, the documents contained in the specified "Original 
+            If checked, the documents contained in the specified "Original
             Document column" are appended unchanged even if deep preprocessing
             is checked. This helps to keep the original documents in the
             output data table without the agonizing pain of joining.
@@ -39,12 +42,13 @@
         <option name="Original Document column">
               Specifies the column containing the original documents which
               can be attached unchanged.
-        </option>        
+        </option>
         <option name="Ignore unmodifiable tag">
               If checked unmodifiable terms will be preprocessed too.
         </option>
+        </tab>
 	</fullDescription>
-		
+
     <ports>
         <inPort name="Terms and related documents input table" index="0">
         The input table which contains the terms to convert.</inPort>
