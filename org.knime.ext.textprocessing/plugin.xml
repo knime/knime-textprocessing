@@ -4,14 +4,6 @@
    <extension
          point="org.knime.workbench.repository.categories">
       <category
-            after="misc"
-            description="Nodes provided on labs.knime.org"
-            icon="resources/labs.png"
-            level-id="labs"
-            name="KNIME Labs"
-            path="/">
-      </category>      
-      <category
             description="Textprocessing nodes"
             icon="resources/missing.gif"
             level-id="textprocessing"
