@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing"
       label="KNIME Textprocessing"
-      version="2.4.0.qualifier"
+      version="2.3.1.qualifier"
       provider-name="KNIME GmbH, Konstanz, Germany"
       plugin="org.knime.ext.textprocessing">
 
@@ -11,7 +11,7 @@
    </description>
 
    <copyright>
-      Copyright, 2003 - 2010
+      Copyright, 2003 - 2011
       University of Konstanz, Germany
       KNIME GmbH, Konstanz, Germany
    </copyright>
