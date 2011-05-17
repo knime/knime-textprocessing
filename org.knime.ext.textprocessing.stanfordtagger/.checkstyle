@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fileset-config file-format-version="1.2.0" simple-config="false">
+    <fileset name="Alle" enabled="false" check-config-name="Sun Checks" local="false">
+        <file-match-pattern match-pattern="." include-pattern="true"/>
+    </fileset>
+    <fileset name="UniKN KNIME" enabled="true" check-config-name="UniKN KNIME" local="false">
+        <file-match-pattern match-pattern=".java$" include-pattern="true"/>
+    </fileset>
+    <fileset name="UniKN KNIME Unittest" enabled="true" check-config-name="UniKN KNIME Unittest" local="false">
+        <file-match-pattern match-pattern=".java$" include-pattern="true"/>
+    </fileset>
+</fileset-config>

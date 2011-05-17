@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing Stanford Tagger Plug-in
+Bundle-SymbolicName: org.knime.ext.textprocessing.stanfordtagger;singleton:=true
+Bundle-Version: 2.3.5.qualifier
+Bundle-ClassPath: lib/stanford-postagger.jar
+Bundle-Vendor: Chair for Bioinformatics and Information Mining,
+ University of Konstanz,
+ Germany
+Export-Package: org.knime.ext.textprocessing.stanfordtagger
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.knime.core,
+ org.knime.base,
+ org.knime.ext.textprocessing
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.knime.ext.textprocessing.stanfordtagger.TextprocessingStanfordTaggerPlugin
