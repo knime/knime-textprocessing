@@ -27,7 +27,9 @@ package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner;
 
 import java.util.Set;
 
+import org.knime.ext.textprocessing.data.BiomedicalNeTag;
 import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeDialog;
 
 /**
@@ -41,6 +43,7 @@ public class AbnerTagFilterNodeDialog extends TagFilterNodeDialog {
      */
     @Override
     protected Set<Tag> getTags() {
-        return AbnerTagFilterNodeModel.getTags();
+        return TagFactory.getInstance().getTagSetByType(
+                BiomedicalNeTag.TAG_TYPE).getTags();
     }
 }

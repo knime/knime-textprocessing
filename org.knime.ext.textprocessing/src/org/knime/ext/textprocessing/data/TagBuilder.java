@@ -25,6 +25,9 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * This interface has to be implemented by all different kind of tags such
  * as i.e. {@link org.knime.ext.textprocessing.data.PartOfSpeechTag}. It
@@ -53,18 +56,29 @@ package org.knime.ext.textprocessing.data;
 public interface TagBuilder {
 
     /**
-     * Builds a valid {@link org.knime.ext.textprocessing.data.Tag} instance
-     * if the underlying specific tag is responsible for the given tag type.
-     * If the type is different to that of the underlying tag <code>null</code>
-     * is returned.
+     * Builds a valid {@link org.knime.ext.textprocessing.data.Tag} instance if
+     * there exists a tag with the given string value, otherwise null.
      *
-     * @param type The type of tag to create.
      * @param value The value of the tag to create.
-     * @return The valid instance of tag if the type of the underlying
-     * implementation matches the given type, otherwise <code>null</code>.
+     * @return The valid instance of a tag  if
+     * there exists a tag with the given string value, otherwise 
+     * <code>null</code>.
      */
-    public Tag buildTag(final String type, final String value);
+    public Tag buildTag(final String value);
 
+    /**
+     * Returns a list of all valid tag values of the underlying tag set as 
+     * strings.
+     * @return a list of all valid tag values of the underlying tag set.
+     */
+    public List<String> asStringList();
+    
+    /**
+     * Returns a set of all valid tags of the underlying tag set.
+     * @return a set of all valid tags of the underlying tag set.
+     */
+    public Set<Tag> getTags();
+    
     /**
      * @return The type of the underlying <code>TagBuilder</code>
      * implementation.

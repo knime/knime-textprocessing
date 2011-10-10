@@ -27,7 +27,9 @@ package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.ne;
 
 import java.util.Set;
 
+import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeDialog;
 
 /**
@@ -42,6 +44,7 @@ public class NamedEntityFilterNodeDialog extends TagFilterNodeDialog {
      */
     @Override
     protected Set<Tag> getTags() {
-        return NamedEntityFilterNodeModel.getTags();
+        return TagFactory.getInstance().getTagSetByType(
+                NamedEntityTag.TAG_TYPE).getTags();
     }
 }

@@ -155,6 +155,8 @@ public class RowPreprocessor extends AbstractPreprocessor {
             Document doc = ((DocumentValue)doccell).getDocument();
             newDocCell = m_preprocessedDocuments.get(doc);
 
+            // deep-preprocess only if document has not been preprocessed yet
+            // (is not in cache m_preprocessedDocuments)
             if (newDocCell == null) {
                 // preprocess doc here !!!
                 DocumentBuilder builder = new DocumentBuilder(doc);

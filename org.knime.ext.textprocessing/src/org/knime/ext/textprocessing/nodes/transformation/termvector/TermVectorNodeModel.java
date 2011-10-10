@@ -25,6 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.termvector;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -34,6 +43,8 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.collection.CollectionCellFactory;
+import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.node.BufferedDataContainer;
@@ -54,16 +65,6 @@ import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * The model of the document vector node, creates a document feature vector
@@ -112,6 +113,8 @@ public class TermVectorNodeModel extends NodeModel {
     
     private final SettingsModelString m_documentColModel = 
         TermVectorNodeDialog.getDocColModel();
+    
+    private static DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
     /**
      * Creates a new instance of <code>TermVectorNodeModel</code>.
@@ -129,7 +132,7 @@ public class TermVectorNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{null};
+        return new DataTableSpec[]{createDataTableSpec(null)};
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec)
@@ -201,7 +204,7 @@ public class TermVectorNodeModel extends NodeModel {
             exec.createDataContainer(createDataTableSpec(featureIndexTable));
 
         Term lastTerm = null;
-        List<Double> featureVector = initFeatureVector(
+        List<DoubleCell> featureVector = initFeatureVector(
                 featureIndexTable.size());
 
         it = sortedTable.iterator();
@@ -233,7 +236,7 @@ public class TermVectorNodeModel extends NodeModel {
             }
             // add new document at certain index to feature vector
             int index = featureIndexTable.get(currDoc);
-            featureVector.set(index, currValue);
+            featureVector.set(index, new DoubleCell(currValue));
 
             lastTerm = currTerm;
         }
@@ -250,67 +253,68 @@ public class TermVectorNodeModel extends NodeModel {
     private int m_rowKeyNr = 1;
 
     private DataRow createDataRow(final Term term,
-            final List<Double> featureVector) {
-        DataCell[] cells = new DataCell[featureVector.size() + 1];
-        cells[0] = new TermCell(term);
-        for (int i = 0; i < cells.length - 1; i++) {
-            cells[i + 1] = new DoubleCell(featureVector.get(i));
-        }
-
+            final List<DoubleCell> featureVector) {
         RowKey rowKey = new RowKey(new Integer(m_rowKeyNr).toString());
         m_rowKeyNr++;
-        DataRow newRow = new DefaultRow(rowKey, cells);
-
-        return newRow;
+        DataCell termCell = new TermCell(term);
+        DataCell collectionCell = CollectionCellFactory.createSparseListCell(
+                featureVector, DEFAULT_CELL); 
+        return new DefaultRow(rowKey, new DataCell[]{termCell, collectionCell});
     }
 
     private DataTableSpec createDataTableSpec(
             final Hashtable<Document, Integer> featureIndexTable) {
         Hashtable<String, Integer> columnTitles =
             new Hashtable<String, Integer>();
-
-        int featureCount = featureIndexTable.size();
-        DataColumnSpec[] columnSpecs = new DataColumnSpec[featureCount + 1];
+        DataColumnSpec[] columnSpecs = new DataColumnSpec[2];
 
         // add document column
         DataColumnSpecCreator columnSpecCreator =
-            new DataColumnSpecCreator("Term", TermCell.TYPE);
+            new DataColumnSpecCreator(
+                    BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
+                    TermCell.TYPE);
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         // add feature vector columns
-        Set<Document> documents = featureIndexTable.keySet();
-        for (Document d : documents) {
-            int index = featureIndexTable.get(d) + 1;
+        columnSpecCreator = new DataColumnSpecCreator(
+                BagOfWordsDataTableBuilder.DEF_TERM_VECTOR_COLNAME,
+                ListCell.getCollectionType(DoubleCell.TYPE));        
+        
+        if (featureIndexTable != null) {
+            String[] featureNames = new String[featureIndexTable.size()];
+            for (Document d : featureIndexTable.keySet()) {
+                int index = featureIndexTable.get(d);
 
-            // avoid duplicate titles by adding numbers if titles are equal.
-            String origTitle = d.getTitle();
-            String title = origTitle;
-            Integer count = columnTitles.get(origTitle);
-            // if title is used the first time initialize the count value with 1
-            if (count == null || count < 1) {
-                count = 1;
-                columnTitles.put(origTitle, count);
+                // avoid duplicate titles by adding numbers if titles are equal.
+                String origTitle = d.getTitle();
+                String title = origTitle;
+                Integer count = columnTitles.get(origTitle);
+                // if title is used the first time initialize the count value 
+                // with 1
+                if (count == null || count < 1) {
+                    count = 1;
+                    columnTitles.put(origTitle, count);
                 
-            // if title occurs another time, add the count value
-            } else if (count >= 1) {
-                count++;
-                title += " - #" + count;
-                columnTitles.put(origTitle, count);
+                    // if title occurs another time, add the count value
+                } else if (count >= 1) {
+                    count++;
+                    title += " - #" + count;
+                    columnTitles.put(origTitle, count);
+                }
+                featureNames[index] = title;
             }
-
-            columnSpecCreator = new DataColumnSpecCreator(title,
-                    DoubleCell.TYPE);
-            columnSpecs[index] = columnSpecCreator.createSpec();
+            columnSpecCreator.setElementNames(featureNames);
         }
+        columnSpecs[1] = columnSpecCreator.createSpec();
 
         columnTitles.clear();
         return new DataTableSpec(columnSpecs);
     }
 
-    private List<Double> initFeatureVector(final int size) {
-        List<Double> featureVector = new ArrayList<Double>(size);
+    private List<DoubleCell> initFeatureVector(final int size) {
+        List<DoubleCell> featureVector = new ArrayList<DoubleCell>(size);
         for (int i = 0; i < size; i++) {
-            featureVector.add(i, 0.0);
+            featureVector.add(i, DEFAULT_CELL);
         }
         return featureVector;
     }

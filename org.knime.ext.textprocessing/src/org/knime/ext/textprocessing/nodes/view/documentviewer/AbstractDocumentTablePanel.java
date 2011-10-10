@@ -25,8 +25,6 @@
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
-import org.knime.ext.textprocessing.data.Document;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -43,6 +41,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+
+import org.knime.ext.textprocessing.data.Document;
 
 /**
  * A panel providing the functionality of displaying a specified set of 
@@ -86,6 +86,12 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
         add(initTable(), BorderLayout.CENTER);
     }
     
+    /**
+     * Clears the list of documents.
+     */
+    public void clean() {
+        m_sortedDocs.clear();
+    }
     
     /**
      * This method is called by a double click on a document of the table.

@@ -25,6 +25,10 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -40,11 +44,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
@@ -130,12 +129,13 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        List<Document> docs = new ArrayList<Document>();
-        
+            final ExecutionContext exec) throws Exception {        
         DocumentGrabber grabber = 
             DocumentGrabberFactory.getInstance().getGrabber(
                     m_dataBaseModel.getStringValue());
+        
+        m_dtBuilder.openDataTable(exec);
+
         if (grabber != null)  {            
             String queryStr = m_queryModel.getStringValue();
             Query query = new Query(queryStr, m_maxResultsModel.getIntValue());
@@ -150,11 +150,14 @@ public class DocumentGrabberNodeModel extends NodeModel {
                 ((AbstractDocumentGrabber)grabber).setExec(exec);
             }
             
-            docs = grabber.grabDocuments(
+            List<Document> docs = grabber.grabDocuments(
                     new File(m_directoryModel.getStringValue()), query);
+            for (Document d : docs) {
+                m_dtBuilder.addDocument(d);
+            }
         }
         
-        return new BufferedDataTable[]{m_dtBuilder.createDataTable(exec, docs)};
+        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
 
@@ -163,7 +166,10 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        // Nothing to do ...
+        m_dtBuilder.getAndCloseDataTable();
+        try {
+            m_dtBuilder.getAndCloseDataTable();
+        } catch (Exception e) { /* Do noting just try */ }
     }
 
 

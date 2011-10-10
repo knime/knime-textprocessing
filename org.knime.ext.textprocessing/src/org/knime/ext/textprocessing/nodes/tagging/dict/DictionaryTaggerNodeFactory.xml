@@ -2,14 +2,15 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
     <name>Dictionary tagger</name>
-    <shortDescription>Assigns tags to named entities specified in the given list.
+    <shortDescription>Assigns specified tags values of specified tag types 
+        to terms of the given list.
     </shortDescription>
     <fullDescription>
         <intro>
             This node recognizes named entities specified in the given list and
-            assigns a specified tag. Optionally the recognized named entity 
-            terms can be set unmodifiable, meaning that the terms are not
-            modified or filtered afterwards by any following node.
+            assigns a specified tag value and type. Optionally the recognized 
+            named entity terms can be set unmodifiable, meaning that the terms 
+            are not modified or filtered afterwards by any following node.
         </intro>
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
@@ -21,8 +22,11 @@
         <option name="Selected File">
             Specifies the location of the dictionary file.
         </option>
-        <option name="Named entity tag">
-            Specifies the type of tag to use for tagging recognized named entities.
+        <option name="Tag type">
+            Specifies the tag type of which tag values can be chosen.
+        </option>
+        <option name="Tag value">
+            Specifies the tag value to use for tagging recognized named entities.
         </option>
     </fullDescription>
         

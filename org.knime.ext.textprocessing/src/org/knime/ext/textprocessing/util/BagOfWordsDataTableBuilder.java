@@ -25,6 +25,9 @@
  */
 package org.knime.ext.textprocessing.util;
 
+import java.util.Hashtable;
+import java.util.Set;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
@@ -38,9 +41,6 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
-
-import java.util.Hashtable;
-import java.util.Set;
 
 /**
  * Provides convenient methods that create
@@ -67,6 +67,11 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * The default term column name in bow data tables.
      */
     public static final String DEF_TERM_COLNAME = "Term";
+    
+    /**
+     * The default term vector column name in bow data tables.
+     */
+    public static final String DEF_TERM_VECTOR_COLNAME = "Term Vector";    
     
     private final TextContainerDataCellFactory m_documentCellFac;
 

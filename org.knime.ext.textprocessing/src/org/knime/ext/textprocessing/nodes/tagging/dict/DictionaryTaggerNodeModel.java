@@ -25,6 +25,13 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -38,26 +45,18 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
- * The model class of the dictionary based named entity recognizer.
  * 
- * @author Kilian Thiel, University of Konstanz
+ * @author thiel, University of Konstanz
  */
 public class DictionaryTaggerNodeModel extends NodeModel {
 
@@ -77,6 +76,11 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     public static final String DEFAULT_TAG = 
         NamedEntityTag.UNKNOWN.getTag().getTagValue();
     
+    /**
+     * The default tag type.
+     */
+    public static final String DEFAULT_TAG_TYPE = "NE";
+    
     private int m_docColIndex = -1;
     
     private SettingsModelBoolean m_setUnmodifiableModel = 
@@ -84,6 +88,9 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     
     private SettingsModelString m_tagModel = 
         DictionaryTaggerNodeDialog.createTagModel();
+    
+    private SettingsModelString m_tagTypeModel = 
+        DictionaryTaggerNodeDialog.createTagTypeModel();    
     
     private SettingsModelString m_fileModel = 
         DictionaryTaggerNodeDialog.createFileModel();
@@ -150,15 +157,18 @@ public class DictionaryTaggerNodeModel extends NodeModel {
                     "Specified dictionary file does not exist!");
         }
         
-        List<Document> newDocuments = new ArrayList<Document>();
+        String tagTypeStr = m_tagTypeModel.getStringValue();
+        String tagStr = m_tagModel.getStringValue();
+        Tag tag = TagFactory.getInstance().getTagSetByType(tagTypeStr)
+                .buildTag(tagStr);
         DocumentTagger tagger = new DictionaryDocumentTagger(
-                m_setUnmodifiableModel.getBooleanValue(), namedEntities,
-                NamedEntityTag.stringToTag(m_tagModel.getStringValue()),
+                m_setUnmodifiableModel.getBooleanValue(), namedEntities, tag,
                 m_caseSensitiveModel.getBooleanValue());
         
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
+        m_dtBuilder.openDataTable(exec);
         while (it.hasNext()) {
             
             double progress = (double)currDoc / (double)rowCount;
@@ -169,11 +179,10 @@ public class DictionaryTaggerNodeModel extends NodeModel {
             
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-            newDocuments.add(tagger.tag(docVal.getDocument()));
+            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
         }
         
-        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-                exec, newDocuments)};
+        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
     /**
@@ -192,6 +201,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_caseSensitiveModel.loadSettingsFrom(settings);
         m_tagModel.loadSettingsFrom(settings);
+        m_tagTypeModel.loadSettingsFrom(settings);
         m_fileModel.loadSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
     }
@@ -203,6 +213,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_caseSensitiveModel.saveSettingsTo(settings);
         m_tagModel.saveSettingsTo(settings);
+        m_tagTypeModel.saveSettingsTo(settings);
         m_fileModel.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
     }
@@ -215,6 +226,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
             throws InvalidSettingsException {
         m_caseSensitiveModel.validateSettings(settings);
         m_tagModel.validateSettings(settings);
+        m_tagTypeModel.validateSettings(settings);
         m_fileModel.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         

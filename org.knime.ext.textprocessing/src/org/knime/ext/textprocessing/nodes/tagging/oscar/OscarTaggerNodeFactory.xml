@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Oscar tagger</name>
+    <shortDescription>Assigns chemical named entity tags to terms.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Assigns chemical named entity tags to terms which are recognized
+            by the Oscar chemical named entity recognizer framework
+            (see https://bitbucket.org/wwmm/oscar4/overview for details).
+            As tags the default named entity types of the Oscar framework
+            are used (see http://apidoc.ch.cam.ac.uk/oscar4-4.0.1/).
+            The Oscar tag filter is afterwards able to filter the 
+            assigned tags.
+        </intro>
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

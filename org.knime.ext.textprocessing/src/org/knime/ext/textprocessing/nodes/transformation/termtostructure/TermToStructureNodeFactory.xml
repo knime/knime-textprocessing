@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcTerm2String.png" type="Manipulator">
+    <name>Term to Structure</name>
+    <shortDescription>Converts terms to molecule structures represented as 
+    strings and adds a new column containing them.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Converts the terms of the specified term column to molecule strings
+            formatted by a specified format using the Oscar framework
+            (see https://bitbucket.org/wwmm/oscar4/overview for details).
+            Based on Oscar, molecules are translates into e.g. SMILES strings.
+            If a term can not be translated a missing cell is returned.
+        </intro>
+        <option name="Term Column">
+            The column containing the terms to convert into molecules 
+            descriptions.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Term input table" index="0">
+            An input data table containing term cells.
+        </inPort>
+        <outPort name="Term output table" index="0">
+        An output table containing the input data with an additional string
+        cell column.
+        </outPort>
+    </ports>
+</knimeNode>

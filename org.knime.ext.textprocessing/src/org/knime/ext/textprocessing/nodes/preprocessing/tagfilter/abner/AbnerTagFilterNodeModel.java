@@ -25,12 +25,7 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
-import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeModel;
 
@@ -39,18 +34,6 @@ import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeM
  * @author Kilian Thiel, University of Konstanz
  */
 public class AbnerTagFilterNodeModel extends TagFilterNodeModel {
-    
-    /**
-     * @return The set of all tags which can be specified as valid.
-     */
-    public static Set<Tag> getTags() {
-        Set<Tag> tags = new HashSet<Tag>();
-        List<String> tagStrs = BiomedicalNeTag.asStringList();
-        for (String s : tagStrs) {
-            tags.add(BiomedicalNeTag.stringToTag(s));
-        }
-        return tags;
-    }
     
     /**
      * {@inheritDoc}

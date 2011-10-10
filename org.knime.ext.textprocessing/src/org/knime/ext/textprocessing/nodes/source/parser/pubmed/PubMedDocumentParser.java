@@ -25,6 +25,14 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.pubmed;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParserFactory;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
@@ -35,15 +43,6 @@ import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-
-import java.io.File;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -200,6 +199,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
         SAXParserFactory fac = SAXParserFactory.newInstance();
@@ -208,6 +208,14 @@ public class PubMedDocumentParser extends DefaultHandler implements
         return m_docs;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clean() {
+        m_docs.clear();
+        m_currentDoc = null;
+    }
 
     /**
      * {@inheritDoc}
@@ -267,40 +275,79 @@ public class PubMedDocumentParser extends DefaultHandler implements
         if (name.equals(PUBMEDARTICLE) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
             m_docs.add(doc);
+            
             m_currentDoc = null;
+            // set empty strings to delete data from previous document
+            m_abstract = "";
+            m_title = "";
+            m_firstName = "";
+            m_lastName = "";
+            m_day = "";
+            m_month = "";
+            m_year = "";
+            m_journalTitle = "";
         } else if (name.equals(ABSTRACTTEXT)) {
-            m_currentDoc.addSection(m_abstract.trim(),
-                    SectionAnnotation.ABSTRACT);
+            if (m_currentDoc != null) {
+                m_currentDoc.addSection(m_abstract.trim(),
+                        SectionAnnotation.ABSTRACT);
+            } else {
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
+                        + "Abstract (" + ABSTRACTTEXT + ") can not be set.");
+            }
         } else if (name.equals(ARTICLETITLE)) {
-            m_currentDoc.addTitle(m_title.trim());
-        } else if (name.equals(AUTHOR)) {
-            Author a = new Author(m_firstName.trim(), m_lastName.trim());
-            m_currentDoc.addAuthor(a);
+            if (m_currentDoc != null) {
+                m_currentDoc.addTitle(m_title.trim());
+            } else {
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
+                        + "Title (" + ARTICLETITLE + ":" + m_title.trim() 
+                        + ") can not be set.");
+            }
+        } else if (name.equals(AUTHOR) && m_currentDoc != null) {
+            if (m_currentDoc != null) {
+                Author a = new Author(m_firstName.trim(), m_lastName.trim());
+                m_currentDoc.addAuthor(a);
+            } else {
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
+                        + "Author (" + AUTHOR + ":" + m_firstName.trim() 
+                        + " " + m_lastName.trim() + ") can not be set.");
+            }
         } else if (name.equals(PUBDATE)) {
-            m_pubDateFlag = false;
-            int year = 0;
-            int day = 0;
-            if (m_year.length() > 0) {
-                year = Integer.parseInt(m_year);
-            }
-            if (m_day.length() > 0) {
-                day = Integer.parseInt(m_day);
-            }
-            try {
-                PublicationDate pubDate = PublicationDate.createPublicationDate(
-                        year, m_month, day);
-                m_currentDoc.setPublicationDate(pubDate);
-            } catch (Exception e) {
-                LOGGER.warn("Publication date could not be created!");
-                LOGGER.warn(e.getMessage());
+            if (m_currentDoc != null) {
+                m_pubDateFlag = false;
+                int year = 0;
+                int day = 0;
+                if (m_year.length() > 0) {
+                    year = Integer.parseInt(m_year);
+                }
+                if (m_day.length() > 0) {
+                    day = Integer.parseInt(m_day);
+                }
+                try {
+                    PublicationDate pubDate =
+                            PublicationDate.createPublicationDate(year,
+                                    m_month, day);
+                    m_currentDoc.setPublicationDate(pubDate);
+                } catch (Exception e) {
+                    LOGGER.info("Publication date could not be created!");
+                    LOGGER.info(e.getMessage());
 
-                // set empty PublicationDate!
-                m_currentDoc.setPublicationDate(new PublicationDate());
+                    // set empty PublicationDate!
+                    m_currentDoc.setPublicationDate(new PublicationDate());
+                }
+            } else {
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
+                        + "Date (" + PUBDATE + ") can not be set.");
             }
         } else if (name.equals(TITLE)) {
             if (m_journalTitle.length() > 0) {
-                m_currentDoc.addSection(m_journalTitle,
-                        SectionAnnotation.JOURNAL_TITLE);
+                if (m_currentDoc != null) {
+                    m_currentDoc.addSection(m_journalTitle.trim(),
+                            SectionAnnotation.JOURNAL_TITLE);
+                }
+            } else {
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
+                        + "Journal title (" + TITLE + ":" 
+                        + m_journalTitle.trim() + ") can not be set.");
             }
         } else if (name.equals(JOURNAL)) {
             m_journalFlag = false;

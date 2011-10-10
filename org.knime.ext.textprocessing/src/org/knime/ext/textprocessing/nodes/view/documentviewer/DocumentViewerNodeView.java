@@ -60,7 +60,7 @@ public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
      */
     @Override
     protected void onClose() {
-        // Nothing to do ...
+        ((AbstractDocumentTablePanel)getComponent()).clean();
     }
 
     /**

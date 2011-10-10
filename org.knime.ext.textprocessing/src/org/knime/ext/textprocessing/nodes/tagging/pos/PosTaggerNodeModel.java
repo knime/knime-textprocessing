@@ -25,6 +25,9 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.pos;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -36,16 +39,10 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The node model of the POS (part of speech) tagger. Extends
@@ -92,15 +89,13 @@ public class PosTaggerNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-
         checkDataTableSpec(inData[0].getDataTableSpec());
-
-        List<Document> newDocuments = new ArrayList<Document>();
         DocumentTagger tagger = new PosDocumentTagger(false);
 
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
+        m_dtBuilder.openDataTable(exec);
         while (it.hasNext()) {
 
             double progress = (double)currDoc / (double)rowCount;
@@ -111,11 +106,10 @@ public class PosTaggerNodeModel extends NodeModel {
 
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-            newDocuments.add(tagger.tag(docVal.getDocument()));
+            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
         }
 
-        return new BufferedDataTable[]{m_dtBuilder.createDataTable(
-                        exec, newDocuments)};
+        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
     /**
@@ -141,9 +135,10 @@ public class PosTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
+        try {
+            m_dtBuilder.getAndCloseDataTable();
+        } catch (Exception e) { /* Do noting just try */ }
     }
-
-
 
     /**
      * {@inheritDoc}

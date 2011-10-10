@@ -25,13 +25,13 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
+import java.util.List;
+import java.util.Set;
+
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilter;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * A tag filter, filtering terms with not specified tags.
@@ -82,7 +82,7 @@ public class TagFilter implements TermPreprocessing {
         if (tags.isEmpty()) {
             if (m_filterMatching) {
               //the term does not contains any tag and only matching
-              //should filtered
+              //should be filtered
               return term;
             }
             return null;
@@ -107,13 +107,7 @@ public class TagFilter implements TermPreprocessing {
                     }
                 }
             } else {
-                if (m_filterMatching) {
-                    if (!m_strict) {
-                        return term;
-                    }
-                } else {
-                    allValid = false;
-                }
+                allValid = false;
             }
         }
 

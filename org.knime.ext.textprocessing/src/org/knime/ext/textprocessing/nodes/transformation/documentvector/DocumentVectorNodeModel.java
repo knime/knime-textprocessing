@@ -25,6 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -34,6 +43,8 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.collection.CollectionCellFactory;
+import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.node.BufferedDataContainer;
@@ -56,16 +67,6 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * The model of the document vector node, creates a document feature vector
@@ -136,7 +137,7 @@ public class DocumentVectorNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{null};
+        return new DataTableSpec[]{createDataTableSpec(null)};
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec) 
@@ -219,7 +220,7 @@ public class DocumentVectorNodeModel extends NodeModel {
             exec.createDataContainer(createDataTableSpec(featureIndexTable));
         
         Document lastDoc = null;
-        List<Double> featureVector = initFeatureVector(
+        List<DoubleCell> featureVector = initFeatureVector(
                 featureIndexTable.size());
         
         int numberOfRows = sortedTable.getRowCount();
@@ -246,7 +247,6 @@ public class DocumentVectorNodeModel extends NodeModel {
                 featureVector = initFeatureVector(featureIndexTable.size());
             }
             
-            
             // add new term at certain index to feature vector
             String key = "";
             // if tags have o be ignored
@@ -256,11 +256,11 @@ public class DocumentVectorNodeModel extends NodeModel {
                 key = currTerm.toString();
             }
             int index = featureIndexTable.get(key);
-            featureVector.set(index, currValue);
+            featureVector.set(index, new DoubleCell(currValue));
             
             // if last row, add feature vector to table
             if (currRow == numberOfRows) {
-                dc.addRowToTable(createDataRow(lastDoc, featureVector));
+                dc.addRowToTable(createDataRow(currDoc, featureVector));
             }
             
             lastDoc = currDoc;
@@ -276,53 +276,50 @@ public class DocumentVectorNodeModel extends NodeModel {
     
     private int m_rowKeyNr = 1;
     
+    private static DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
+    
     private DataRow createDataRow(final Document doc, 
-            final List<Double> featureVector) {
-        DataCell[] cells = new DataCell[featureVector.size() + 1];
-        cells[0] = m_documentCellFac.createDataCell(doc); 
-        for (int i = 0; i < cells.length - 1; i++) {
-            cells[i + 1] = new DoubleCell(featureVector.get(i)); 
-        }
-        
+            final List<DoubleCell> featureVector) {
         RowKey rowKey = new RowKey(new Integer(m_rowKeyNr).toString());
         m_rowKeyNr++;
-        DataRow newRow = new DefaultRow(rowKey, cells);      
-        
-        return newRow;
+        DataCell docCell = m_documentCellFac.createDataCell(doc); 
+        DataCell vectorCell = CollectionCellFactory.createSparseListCell(
+                featureVector, DEFAULT_CELL);
+        return new DefaultRow(rowKey, new DataCell[]{docCell, vectorCell});
     }
     
     private DataTableSpec createDataTableSpec(
             final Hashtable<String, Integer> featureIndexTable) {
-        int featureCount = featureIndexTable.size();
-        DataColumnSpec[] columnSpecs = new DataColumnSpec[featureCount + 1];
+        DataColumnSpec[] columnSpecs = new DataColumnSpec[2];
         
         // add document column
         String documentColumnName = 
             DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME;
-        while (featureIndexTable.containsKey(documentColumnName)) {
-            documentColumnName += "#";
-        }
-        
         DataColumnSpecCreator columnSpecCreator =
             new DataColumnSpecCreator(documentColumnName, 
                     m_documentCellFac.getDataType());
         columnSpecs[0] = columnSpecCreator.createSpec();
         
         // add feature vector columns
-        Set<String> terms = featureIndexTable.keySet();
-        for (String t : terms) {
-            int index = featureIndexTable.get(t) + 1;
-            columnSpecCreator = new DataColumnSpecCreator(t, DoubleCell.TYPE);
-            columnSpecs[index] = columnSpecCreator.createSpec();
+        columnSpecCreator = new DataColumnSpecCreator(
+                DocumentDataTableBuilder.DEF_DOCUMENT_VECTOR_COLNAME, 
+                ListCell.getCollectionType(DoubleCell.TYPE));
+        if (featureIndexTable != null) {
+            String[] featureNames = new String[featureIndexTable.size()];
+            for (String term : featureIndexTable.keySet()) {
+                featureNames[featureIndexTable.get(term)] = term;
+            }
+            columnSpecCreator.setElementNames(featureNames);
         }
-
+        columnSpecs[1] = columnSpecCreator.createSpec();
+        
         return new DataTableSpec(columnSpecs);
     }    
     
-    private List<Double> initFeatureVector(final int size) {
-        List<Double> featureVector = new ArrayList<Double>(size);
+    private List<DoubleCell> initFeatureVector(final int size) {
+        List<DoubleCell> featureVector = new ArrayList<DoubleCell>(size);
         for (int i = 0; i < size; i++) {
-            featureVector.add(i, 0.0);
+            featureVector.add(i, DEFAULT_CELL);
         }
         return featureVector;
     }

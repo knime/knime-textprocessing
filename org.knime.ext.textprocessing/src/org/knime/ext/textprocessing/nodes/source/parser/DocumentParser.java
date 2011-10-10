@@ -25,14 +25,14 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
-
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.List;
 
 /**
  * All parser, parsing various document formats, like Reuters, PubMed, etc.
@@ -58,6 +58,11 @@ public interface DocumentParser {
      * @throws Exception If something is not working properly.
      */
     public List<Document> parse(final InputStream is) throws Exception;
+    
+    /**
+     * Cleans list of parsed documents.
+     */
+    public void clean();
 
     /**
      * @param category The category of the documents to set.

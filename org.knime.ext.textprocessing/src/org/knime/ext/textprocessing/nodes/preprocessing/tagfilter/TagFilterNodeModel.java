@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -35,11 +40,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * The abstract class <code>TagFilterNodeModel</code> provides a functionality
@@ -96,7 +96,7 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
                 m_validTagsModel.getStringArrayValue().length);
 
         for (final String s : m_validTagsModel.getStringArrayValue()) {
-            final Tag t = tb.buildTag(getValidTagType(), s);
+            final Tag t = tb.buildTag(s);
             if (t != null) {
                 validTags.add(t);
             }

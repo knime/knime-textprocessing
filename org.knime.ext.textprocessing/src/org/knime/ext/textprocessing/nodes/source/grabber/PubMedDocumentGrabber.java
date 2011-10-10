@@ -25,14 +25,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
-import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,6 +45,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
+import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
 
 
 /**
@@ -213,6 +213,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             
             try {
                 docs.addAll(parser.parse(is));
+                parser.clean();
             } catch (Exception e) {
                 LOGGER.error("Could not parse file: " 
                         + f.getAbsolutePath().toString());

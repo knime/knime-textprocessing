@@ -26,7 +26,9 @@
 package org.knime.ext.textprocessing.data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -152,7 +154,7 @@ public enum PartOfSpeechTag implements TagBuilder {
      *
      * @return - the enum fields as a String list of their names.
      */
-    public static List<String> asStringList() {
+    public List<String> asStringList() {
         Enum<PartOfSpeechTag>[] values = values();
         List<String> list = new ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
@@ -198,11 +200,9 @@ public enum PartOfSpeechTag implements TagBuilder {
     /**
      * {@inheritDoc}
      */
-    public Tag buildTag(final String type, final String value) {
-        if (type.equals(TAG_TYPE)) {
-            return PartOfSpeechTag.stringToTag(value);
-        }
-        return null;
+    @Override
+    public Tag buildTag(final String value) {
+        return PartOfSpeechTag.stringToTag(value);
     }
 
     /**
@@ -219,4 +219,16 @@ public enum PartOfSpeechTag implements TagBuilder {
     public String getType() {
         return TAG_TYPE;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Tag> getTags() {
+        Set<Tag> tagSet = new HashSet<Tag>(values().length);
+        for (PartOfSpeechTag tag : values()) {
+            tagSet.add(tag.getTag());
+        }
+        return tagSet;
+    }     
 }

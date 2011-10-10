@@ -25,13 +25,18 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict;
 
+import java.util.List;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.NamedEntityTag;
+import org.knime.ext.textprocessing.data.TagFactory;
 
 /**
  * The dialog class of the dictionary named entity recognizer node.
@@ -80,6 +85,17 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns a
      * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the tag type to assign to each found named entity.
+     */
+    public static final SettingsModelString createTagTypeModel() {
+        return new SettingsModelString(
+                DictionaryTaggerConfigKeys.CFGKEY_TAG_TYPE,
+                DictionaryTaggerNodeModel.DEFAULT_TAG_TYPE);
+    }    
+    
+    /**
+     * @return Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
      * containing the tag to assign to each found named entity.
      */
     public static final SettingsModelString createTagModel() {
@@ -106,8 +122,45 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
                 createFileModel(), 
                 DictionaryTaggerNodeDialog.class.toString()));
         
+        
+        // tag type model
+        m_tagtypemodel = createTagTypeModel();
+        m_tagtypemodel.addChangeListener(new InternalChangeListener());
+        
+        // tag list
+        String selectedTagType = m_tagtypemodel.getStringValue();
+        List<String> tags = TagFactory.getInstance()
+                .getTagSetByType(selectedTagType).asStringList();
+        m_tagSelection = new DialogComponentStringSelection(
+                    createTagModel(), "Tag value", tags);
+
+        this.setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentStringSelection(
-                createTagModel(), "Named entity tag", 
-                NamedEntityTag.asStringList()));
+                m_tagtypemodel, "Tag type", 
+                TagFactory.getInstance().getTagTypes()));
+        
+        addDialogComponent(m_tagSelection);
+    }
+    
+    private DialogComponentStringSelection m_tagSelection;
+    
+    private SettingsModelString m_tagtypemodel;
+    
+    /**
+     * 
+     * @author thiel, University of Konstanz
+     */
+    class InternalChangeListener implements ChangeListener {
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            String selectedTagType = m_tagtypemodel.getStringValue();
+            List<String> tags = TagFactory.getInstance()
+                    .getTagSetByType(selectedTagType).asStringList();
+            m_tagSelection.replaceListItems(tags, "");
+        }
     }
 }

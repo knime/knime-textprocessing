@@ -25,6 +25,9 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.Paragraph;
@@ -35,9 +38,6 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The abstract class <code>AbstractDocumentTagger</code> implements the
@@ -173,8 +173,6 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             // entities and entity tag.
             termList = buildTermList(termList, neWords, entity.getTagString());
         }
-
-
         return new Sentence(termList);
     }
 
@@ -228,7 +226,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 if (startTermIndex == stopTermIndex) {
 
                     //
-                    // BUT does the term consist of of one or more words ?
+                    // BUT does the term consist of one or more words ?
                     // If it consists of more words, it has to be split up,
                     // if it consists only of one word just add the tags.
                     //
@@ -239,7 +237,14 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     if (oldList.get(t).getWords().size() == 1) {
                         List<Tag> tags = new ArrayList<Tag>();
                         tags.addAll(oldList.get(t).getTags());
-                        tags.addAll(getTags(entityTag));
+                        // only add tag if not already added
+                        List<Tag> newTags = getTags(entityTag);
+                        for (Tag ct : newTags) {
+                            if (!tags.contains(ct)) {
+                                tags.add(ct);
+                            }
+                        }
+                        
                         // CREATE NEW TERM !!!
                         Term newTerm =
                                 new Term(oldList.get(t).getWords(), tags,
@@ -260,7 +265,14 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                 // to new list
                                 if (w == stopWordIndex) {
                                     List<Tag> tags = new ArrayList<Tag>();
-                                    tags.addAll(getTags(entityTag));
+                                    // only add tag if not already added
+                                    List<Tag> newTags = getTags(entityTag);
+                                    for (Tag ct : newTags) {
+                                        if (!tags.contains(ct)) {
+                                            tags.add(ct);
+                                        }
+                                    }
+                                    
                                     // CREATE NEW TERM !!!
                                     Term newTerm =
                                             new Term(newWords, tags,
@@ -334,7 +346,14 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                 // add it
                                 if (w == stopWordIndex) {
                                     List<Tag> tags = new ArrayList<Tag>();
-                                    tags.addAll(getTags(entityTag));
+                                    // only add tag if not already added
+                                    List<Tag> newTags = getTags(entityTag);
+                                    for (Tag ct : newTags) {
+                                        if (!tags.contains(ct)) {
+                                            tags.add(ct);
+                                        }
+                                    }
+                                    
                                     // CREATE NEW TERM !!!
                                     Term newTerm =
                                             new Term(namedEntity, tags,

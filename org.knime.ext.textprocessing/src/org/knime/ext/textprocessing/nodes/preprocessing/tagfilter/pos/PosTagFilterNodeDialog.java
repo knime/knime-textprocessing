@@ -27,7 +27,9 @@ package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos;
 
 import java.util.Set;
 
+import org.knime.ext.textprocessing.data.PartOfSpeechTag;
 import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilterNodeDialog;
 
 /**
@@ -41,6 +43,7 @@ public class PosTagFilterNodeDialog extends TagFilterNodeDialog {
      */
     @Override
     protected Set<Tag> getTags() {
-        return PosTagFilterNodeModel.getTags();
+        return TagFactory.getInstance().getTagSetByType(
+                PartOfSpeechTag.TAG_TYPE).getTags();
     }
 }

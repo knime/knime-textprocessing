@@ -25,18 +25,6 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.sdml;
 
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
-import org.knime.ext.textprocessing.data.Author;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBuilder;
-import org.knime.ext.textprocessing.data.DocumentCategory;
-import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.data.PublicationDate;
-import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,6 +36,17 @@ import java.util.List;
 
 import javax.xml.parsers.SAXParserFactory;
 
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.knime.ext.textprocessing.data.Author;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentBuilder;
+import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.data.PublicationDate;
+import org.knime.ext.textprocessing.data.SectionAnnotation;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -215,6 +214,15 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
+    public void clean() {
+        m_docs.clear();
+        m_currentDoc = null;
+    }       
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public InputSource resolveEntity(final String pubId,
             final String sysId) throws IOException, SAXException {
         if (pubId != null) {
@@ -279,14 +287,15 @@ public class SdmlDocumentParser extends DefaultHandler implements
     @Override
     public void endElement(final String uri, final String localName,
             final String qName) {
-        if (qName.equals(DOCUMENT) && m_currentDoc != null) {
+        String endTag = qName.toLowerCase();
+        if (endTag.equals(DOCUMENT) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
             m_docs.add(doc);
             m_currentDoc = null;
-        } else if (qName.equals(AUTHOR)) {
+        } else if (endTag.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
-        } else if (qName.equals(PUBLICATIONDATE)) {
+        } else if (endTag.equals(PUBLICATIONDATE)) {
             int day = Integer.parseInt(m_day.trim());
             int month = Integer.parseInt(m_month.trim());
             int year = Integer.parseInt(m_year.trim());
@@ -300,9 +309,9 @@ public class SdmlDocumentParser extends DefaultHandler implements
                         + ") could not be parsed !");
                 LOGGER.info(e.getMessage());
             }
-        } else if (qName.equals(TITLE)) {
+        } else if (endTag.equals(TITLE)) {
             m_currentDoc.addTitle(m_title.trim());
-        } else if (qName.equals(SECTION)) {
+        } else if (endTag.equals(SECTION)) {
             m_currentDoc.addSection(m_section.trim(),
                     SectionAnnotation.stringToAnnotation(m_annotation));
         }

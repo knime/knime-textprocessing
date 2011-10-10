@@ -45,6 +45,11 @@ public final class DictionaryTaggerConfigKeys {
     public static final String CFGKEY_TAG = "Tag";
 
     /**
+     * The configuration key of the tag type to use.
+     */
+    public static final String CFGKEY_TAG_TYPE = "TagType";    
+    
+    /**
      * The configuration key of the case sensitive setting.
      */
     public static final String CFGKEY_CASE_SENSITIVE = "CS";

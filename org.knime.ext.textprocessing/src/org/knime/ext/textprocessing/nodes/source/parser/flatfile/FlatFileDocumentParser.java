@@ -25,6 +25,14 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.flatfile;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -35,14 +43,6 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implements the
@@ -90,6 +90,15 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      * {@inheritDoc}
      */
     @Override
+    public void clean() {
+        m_docs.clear();
+        m_currentDoc = null;
+    }       
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
 
@@ -113,7 +122,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
 
         int len = text.length();
         if (len > 0) {
-            text.delete(len - (Term.WORD_SEPARATOR.length() + 1), len);
+            text.delete(len - (Term.WORD_SEPARATOR.length()), len);
         }
 
         br.close();

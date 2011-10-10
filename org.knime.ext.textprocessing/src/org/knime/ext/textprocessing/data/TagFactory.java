@@ -25,15 +25,20 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
+
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 /**
  * All different types of {@link org.knime.ext.textprocessing.data.Tag}s have
@@ -51,6 +56,13 @@ public final class TagFactory {
 
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(TagFactory.class);
+    
+    /**The id of the AggregationMethod extension point.*/
+    public static final String EXT_POINT_ID =
+            "org.knime.ext.textprocessing.TagSet";
+    
+    /**The attribute of the aggregation method extension point.*/
+    public static final String EXT_POINT_ATTR_DF = "TagBuilder";
 
     /**
      * The path (postix) of the tagset.xml file relative to the plugin
@@ -68,7 +80,8 @@ public final class TagFactory {
 
     private static TagFactory instance;
 
-    private HashSet<TagBuilder> m_tagBuilder = new HashSet<TagBuilder>();
+    private Hashtable<String,TagBuilder> m_tagBuilder = 
+        new Hashtable<String,TagBuilder>();
 
 
     private TagFactory() {
@@ -77,6 +90,7 @@ public final class TagFactory {
         String pluginPath = plugin.getPluginRootPath();
         String tagSetPath = pluginPath + TAGSET_XML_POSTFIX;
         addTagSet(new File(tagSetPath));
+        registerExtensionPoints();
     }
 
     /**
@@ -103,19 +117,26 @@ public final class TagFactory {
      * @return The so far registered tags as a set.
      */
     public Set<TagBuilder> getTagSet() {
-        return Collections.unmodifiableSet(m_tagBuilder);
+        Set<TagBuilder> builder = new HashSet<TagBuilder>();
+        for (TagBuilder tb : m_tagBuilder.values()) {
+            builder.add(tb);
+        }
+        return Collections.unmodifiableSet(builder);
     }
 
     /**
      * @return The set of tag types.
      */
     public Set<String> getTagTypes() {
-        Set<String> types = new HashSet<String>();
-        for (TagBuilder tb : m_tagBuilder) {
-            types.add(tb.getType());
-        }
-        return types;
+        return m_tagBuilder.keySet();
     }
+    
+    /**
+     * @return The set of tag types.
+     */
+    public TagBuilder getTagSetByType(final String type) {
+        return m_tagBuilder.get(type);
+    }    
 
     @SuppressWarnings("unchecked")
     private void addTags(final Set<String> tagClassNames) {
@@ -132,7 +153,7 @@ public final class TagFactory {
                     TagBuilder tagBuilder = (TagBuilder)method.invoke(
                             new Object[]{}, new Object[]{});
 
-                    m_tagBuilder.add(tagBuilder);
+                    m_tagBuilder.put(tagBuilder.getType(), tagBuilder);
                     LOGGER.info("Added TagBuilder: "
                             + tagBuilder.getClass().toString());
                 }
@@ -168,12 +189,63 @@ public final class TagFactory {
      * @return A new instance of tag with given type and value.
      */
     public Tag createTag(final String type, final String value) {
-        for (TagBuilder tb : m_tagBuilder) {
-            Tag t = tb.buildTag(type, value);
-            if (t != null) {
-                return t;
-            }
+        TagBuilder tb = m_tagBuilder.get(type);
+        if (tb != null) {
+            return tb.buildTag(value);
         }
         return null;
+    }
+    
+    
+    /**
+     * Registers all extension point implementations.
+     */
+    private void registerExtensionPoints() {
+        try {
+            final IExtensionRegistry registry = Platform.getExtensionRegistry();
+            final IExtensionPoint point =
+                registry.getExtensionPoint(EXT_POINT_ID);
+            if (point == null) {
+                LOGGER.error("Invalid extension point: " + EXT_POINT_ID);
+                throw new IllegalStateException("ACTIVATION ERROR: "
+                        + " --> Invalid extension point: " + EXT_POINT_ID);
+            }
+            for (final IConfigurationElement elem
+                    : point.getConfigurationElements()) {
+                final String operator = elem.getAttribute(EXT_POINT_ATTR_DF);
+                final String decl =
+                    elem.getDeclaringExtension().getUniqueIdentifier();
+
+                if (operator == null || operator.isEmpty()) {
+                    LOGGER.error("The extension '" + decl
+                            + "' doesn't provide the required attribute '"
+                            + EXT_POINT_ATTR_DF + "'");
+                    LOGGER.error("Extension " + decl + " ignored.");
+                    continue;
+                }
+
+                try {
+                    final TagBuilder builder =
+                            (TagBuilder)elem.createExecutableExtension(
+                                    EXT_POINT_ATTR_DF);
+                    if (builder != null) {
+                        if (m_tagBuilder.containsKey(builder.getType())) {
+                            LOGGER.error("Tag set with type \"" 
+                                    + builder.getType() + "\" already exists!");
+                        } else {
+                            m_tagBuilder.put(builder.getType(), builder);
+                        }
+                    }
+                } catch (final Throwable t) {
+                    LOGGER.error("Problems during initialization of "
+                            + "tag set (with id '" + operator + "'.)");
+                    if (decl != null) {
+                        LOGGER.error("Extension " + decl + " ignored.", t);
+                    }
+                }
+            }
+        } catch (final Exception e) {
+            LOGGER.error("Exception while registering tag set extensions");
+        }
     }
 }

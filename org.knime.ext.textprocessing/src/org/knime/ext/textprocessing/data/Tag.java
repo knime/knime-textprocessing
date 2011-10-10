@@ -48,7 +48,7 @@ public class Tag {
      * @param tagType The type of the tag to set.
      * @throws NullPointerException if given tag value or type is null.
      */
-    Tag(final String tagValue, final String tagType) 
+    public Tag(final String tagValue, final String tagType) 
     throws NullPointerException {
         if (tagValue == null || tagType == null) {
             throw new NullPointerException(

@@ -25,6 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -42,16 +51,6 @@ import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 
 /**
@@ -172,8 +171,6 @@ public class DocumentParserNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        List<Document> docs = new ArrayList<Document>();
-
         File dir = new File(m_pathModel.getStringValue());
         boolean recursive = m_recursiveModel.getBooleanValue();
         boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
@@ -199,6 +196,7 @@ public class DocumentParserNodeModel extends NodeModel {
         List<File> files = fc.getFiles();
         int fileCount = files.size();
         int currFile = 1;
+        m_dtBuilder.openDataTable(exec);
         for (File f : files) {
 
             double progress = (double)currFile / (double)fileCount;
@@ -218,7 +216,10 @@ public class DocumentParserNodeModel extends NodeModel {
             m_parser.setDocumentFilepath(f.getAbsolutePath());
 
             try {
-                docs.addAll(m_parser.parse(is));
+                List<Document> docs = m_parser.parse(is);
+                for (Document d : docs) {
+                    m_dtBuilder.addDocument(d);
+                }
             } catch (Exception e) {
                 LOGGER.error("Could not parse file: "
                         + f.getAbsolutePath().toString());
@@ -226,8 +227,9 @@ public class DocumentParserNodeModel extends NodeModel {
                 throw e;
             }
         }
+        m_parser.clean();
 
-        return new BufferedDataTable[]{m_dtBuilder.createDataTable(exec, docs)};
+        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
     /**
@@ -254,6 +256,10 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
+        m_parser.clean();
+        try {
+            m_dtBuilder.getAndCloseDataTable();
+        } catch (Exception e) { /* Do noting just try */ }
     }
 
 

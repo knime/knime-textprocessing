@@ -25,6 +25,18 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.dml;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParserFactory;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -43,19 +55,6 @@ import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -302,6 +301,17 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
+    public void clean() {
+        m_docs.clear();
+        m_words.clear();
+        m_tags.clear();
+        m_currentDoc = null;
+    }    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public InputSource resolveEntity(final String pubId,
             final String sysId) throws IOException, SAXException {
         if (pubId != null) {
@@ -382,14 +392,15 @@ public class DmlDocumentParser extends DefaultHandler implements
     @Override
     public void endElement(final String uri, final String localName,
             final String qName) {
-        if (qName.equals(DOCUMENT) && m_currentDoc != null) {
+        String endTag = qName.toLowerCase();
+        if (endTag.equals(DOCUMENT) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
             m_docs.add(doc);
             m_currentDoc = null;
-        } else if (qName.equals(AUTHOR)) {
+        } else if (endTag.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
             m_currentDoc.addAuthor(a);
-        } else if (qName.equals(PUBLICATIONDATE)) {
+        } else if (endTag.equals(PUBLICATIONDATE)) {
             int day = Integer.parseInt(m_day.trim());
             int month = Integer.parseInt(m_month.trim());
             int year = Integer.parseInt(m_year.trim());
@@ -404,42 +415,42 @@ public class DmlDocumentParser extends DefaultHandler implements
                         + ") could not be parsed !");
                 LOGGER.warn(e.getStackTrace());
             }
-        } else if (qName.equals(WORD)) {
+        } else if (endTag.equals(WORD)) {
             if (m_words != null && m_word != null) {
                 Word w = new Word(m_word.trim());
                 m_words.add(w);
             }
-        } else if (qName.equals(TAG)) {
+        } else if (endTag.equals(TAG)) {
             if (m_tags != null && m_tagType != null && m_tagValue != null) {
                 Tag t = TagFactory.getInstance().createTag(m_tagType.trim(),
                         m_tagValue.trim());
                 m_tags.add(t);
             }
-        } else if (qName.equals(TERM)) {
+        } else if (endTag.equals(TERM)) {
             if (m_words != null && m_tags != null) {
                 boolean mod = new Boolean(m_modifiability.trim());
                 Term t = new Term(m_words, m_tags, mod);
                 m_currentDoc.addTerm(t);
             }
-        } else if (qName.equals(SENTENCE)) {
+        } else if (endTag.equals(SENTENCE)) {
             m_currentDoc.createNewSentence();
-        } else if (qName.equals(PARAGRAPH)) {
+        } else if (endTag.equals(PARAGRAPH)) {
             m_currentDoc.createNewParagraph();
-        } else if (qName.equals(SECTION)) {
+        } else if (endTag.equals(SECTION)) {
             m_currentDoc.createNewSection(
                     SectionAnnotation.stringToAnnotation(m_annotation));
-        } else if (qName.equals(FILENAME)) {
+        } else if (endTag.equals(FILENAME)) {
             File f = new File(m_docPath);
             if (f.exists()) {
                 m_currentDoc.setDocumentFile(f);
             }
-        } else if (qName.equals(CATEGORY)) {
+        } else if (endTag.equals(CATEGORY)) {
             DocumentCategory cat = new DocumentCategory(m_currentCategory);
             m_currentDoc.addDocumentCategory(cat);
-        } else if (qName.equals(SOURCE)) {
+        } else if (endTag.equals(SOURCE)) {
             DocumentSource source = new DocumentSource(m_currentSource);
             m_currentDoc.addDocumentSource(source);
-        } else if (qName.equals(DOCUMENT_TYPE)) {
+        } else if (endTag.equals(DOCUMENT_TYPE)) {
             if (m_type == null) {
                 DocumentType type =
                         DocumentType.stringToDocumentType(m_currentType);
@@ -481,11 +492,6 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_currentType +=  new String(ch, start, length);
         }
     }
-
-
-
-
-
 
     /**
      * Creates a <i>dml</i> out of the given document. See the <i>dml.dtd</i>
@@ -715,28 +721,7 @@ public class DmlDocumentParser extends DefaultHandler implements
                 out.append(curr);
             }
         }
-        return removeNonValidUtf8Characters(out.toString());
-        //return out.toString();
-    }
-
-    private static String removeNonValidUtf8Characters(final String in) {
-        if (in == null) {
-            return null;
-        }
-        byte[] byteArr = in.getBytes();
-        for (int i = 0; i < byteArr.length; i++) {
-            byte ch = byteArr[i];
-            // remove any characters outside the valid UTF-8 range
-            // as well as all control characters
-            // except tabs and new lines
-            if (!((ch > 31 && ch < 253)
-                    || ch == '\t'
-                    || ch == '\n'
-                    || ch == '\r')) {
-                byteArr[i] = ' ';
-            }
-        }
-        return new String(byteArr, UTF8_CHARSET);
+        return out.toString();
     }
 
     private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
