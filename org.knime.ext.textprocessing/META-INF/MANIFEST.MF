@@ -10,7 +10,8 @@ Bundle-ClassPath: knime-textprocessing.jar,
  lib/abner.jar,
  lib/Snowball.jar,
  lib/json.jar,
- lib/oscar4-all-4.0.1-with-dependencies.jar
+ lib/oscar4-all-4.0.1-with-dependencies.jar,
+ lib/stanford-postagger-2011-09-14.jar
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Export-Package: .,

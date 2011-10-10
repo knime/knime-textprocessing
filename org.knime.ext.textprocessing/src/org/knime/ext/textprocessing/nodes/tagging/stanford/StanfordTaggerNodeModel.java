@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,11 +19,11 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
- *   28.02.2008 (Kilian Thiel): created
+ *   22.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.oscar;
+package org.knime.ext.textprocessing.nodes.tagging.stanford;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,42 +39,42 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * The node model of the Oscar chemical named entity tagger. 
- * Extends {@link org.knime.core.node.NodeModel} and provides methods to 
- * configure and execute the node.
- * 
+ * The node model of the POS (part of speech) tagger. Extends
+ * {@link org.knime.core.node.NodeModel} and provides methods to configure and
+ * execute the node.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class OscarTaggerNodeModel extends NodeModel {
+public class StanfordTaggerNodeModel extends NodeModel {
 
     /**
-     * The default value of the terms unmodifiable flag.
+     * Default tagger model.
      */
-    public static final boolean DEFAULT_UNMODIFIABLE = true;
+    public static final String DEF_MODEL = "English left 3 words";
     
     private int m_docColIndex = -1;
-    
-    private SettingsModelBoolean m_setUnmodifiableModel = 
-        OscarTaggerNodeDialog.createSetUnmodifiableModel();
-    
+
     private DocumentDataTableBuilder m_dtBuilder;
     
+    private SettingsModelString m_taggerModelModel = 
+        StanfordTaggerNodeDialog.createTaggerModelModel();
+
     /**
-     * Creates a new instance of <code>OscarTaggerNodeModel</code> with one
-     * table in and one out port.
+     * Creates new instance of <code>StanfordTaggerNodeModel</code> which adds
+     * part of speech tags to terms of documents.
      */
-    public OscarTaggerNodeModel() {
+    public StanfordTaggerNodeModel() {
         super(1, 1);
         m_dtBuilder = new DocumentDataTableBuilder();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -85,13 +85,13 @@ public class OscarTaggerNodeModel extends NodeModel {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
-    private void checkDataTableSpec(final DataTableSpec spec) 
+    private void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
-    }  
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -99,37 +99,66 @@ public class OscarTaggerNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        
-        DocumentTagger tagger = new OscarDocumentTagger(
-                m_setUnmodifiableModel.getBooleanValue());
-        
+        DocumentTagger tagger = new StanfordDocumentTagger(false, 
+                m_taggerModelModel.getStringValue());
+
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
         m_dtBuilder.openDataTable(exec);
         while (it.hasNext()) {
-            
+
             double progress = (double)currDoc / (double)rowCount;
-            exec.setProgress(progress, "Tagging document " + currDoc + " of " 
+            exec.setProgress(progress, "Tagging document " + currDoc + " of "
                     + rowCount);
             exec.checkCanceled();
             currDoc++;
-            
+
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
             m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
         }
-        
+
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
-    }   
-    
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir,
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // empty ...
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir,
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // empty ...
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() {
+        try {
+            m_dtBuilder.getAndCloseDataTable();
+        } catch (Exception e) { /* Do noting just try */ }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        m_setUnmodifiableModel.validateSettings(settings);
+        m_taggerModelModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -137,7 +166,7 @@ public class OscarTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        m_setUnmodifiableModel.saveSettingsTo(settings);
+        m_taggerModelModel.saveSettingsTo(settings);
     }
 
     /**
@@ -146,34 +175,6 @@ public class OscarTaggerNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        m_setUnmodifiableModel.validateSettings(settings);
+        m_taggerModelModel.validateSettings(settings);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
-        // empty ...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
-        // empty ...
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // empty ...
-    }     
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Stanford tagger</name>
+    <shortDescription>Assigns part of speech tags to terms. 
+    Suitable for German and English texts.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node assigns to each term of a document a part of speech (POS)
+            tag. Therefore the Penn Treebank tag set is used when models for
+            English texts are used (for details see 
+            http://www.cis.upenn.edu/~treebank), and the STTS tag set
+            is used when models for German texts are used (for details see
+            http://www.ims.uni-stuttgart.de/projekte/CQPDemos/Bundestag/help-tagset.html ). 
+            The underlying tagger model deciding what tag to assign to which 
+            term is a model of the Stanford framework 
+            (see http://nlp.stanford.edu/software/tagger.shtml for details).
+        </intro>
+        <option name="Tagger model">
+            The tagger model to use.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

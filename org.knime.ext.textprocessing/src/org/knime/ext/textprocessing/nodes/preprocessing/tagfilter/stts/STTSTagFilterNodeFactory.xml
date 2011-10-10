@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../icons/TextProcDefault.png" type="Manipulator">
-    <name>POS Filter</name>
-    <shortDescription>Filters terms with certain POS tags.
+    <name>STTS Filter</name>
+    <shortDescription>Filters terms with certain STTS tags.
     </shortDescription>
     <fullDescription>
         <intro>
-        	Filters all terms that don't have the specified POS tags assigned.
+        	Filters all terms that don't have the specified STTS tags assigned.
         	The terms are filtered out of the bag of words and the documents as well
         	if deep preprocessing is checked.<br />
-        	A term is kept if at least one of the specified POS tags is assigned.
-        	If strict filtering is set, all specified POS tags have to be
+        	A term is kept if at least one of the specified STTS tags is assigned.
+        	If strict filtering is set, all specified STTS tags have to be
         	assigned to a term.
 		</intro>
 
 		<tab name="Preprocessing options">
         <option name="Strict filtering">
-             If strict filtering is checked, all specified POS tags have to be applied
+             If strict filtering is checked, all specified STTS tags have to be applied
              to the terms. Otherwise at least one of the specified tags has to be
              applied to the terms.
         </option>
