@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../icons/TextProcSource.png" type="Source">
-    <name>Flat File Document Parser</name>
-    <shortDescription>Parses flat text files.
+    <name>PDF Parser</name>
+    <shortDescription>Parses PDF files.
     </shortDescription>
     <fullDescription>
         <intro>
-            This node allows you to read flat text files and create a document
-            for each file. The documents title will be the first sentence of the
-            file and the full text the remaining text contained in the file. 
-            The specified directory will be searched for <b>all</b> files, 
-            if recursive search is activated the subdirectories are going to be
-            searched too. All contained files are parsed.
-            The document data is stored in the outgoing data table.
+            This node allows you to read PDF documents and create a document
+            for each file. The documents title and authors will be extracted 
+            form the PDFs meta data. The full text of the PDF is extracted, the 
+            structure of the PDF is not taken into account. For text extraction 
+            the PDFBox library is used. 
+            (see http://pdfbox.apache.org/ for details).
         </intro>
         <option name="Document directory">
             Set the directory containing the files to parse.
@@ -32,10 +31,7 @@
         </option>
         <option name="Document type">
             Specifies the type of the documents.
-        </option>
-        <option name="Charset">
-            Specifies the charset of the documents.
-        </option>
+        </option>        
     </fullDescription>
         
     <ports>

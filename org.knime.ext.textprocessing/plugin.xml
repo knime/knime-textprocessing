@@ -323,6 +323,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.stts.STTSTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.stts.STTSTagFilterNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/io"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
