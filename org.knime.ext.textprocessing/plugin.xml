@@ -329,6 +329,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/io"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

@@ -12,7 +12,9 @@ Bundle-ClassPath: knime-textprocessing.jar,
  lib/json.jar,
  lib/oscar4-all-4.0.1-with-dependencies.jar,
  lib/stanford-postagger-2011-09-14.jar,
- lib/pdfbox-app-1.6.0.jar
+ lib/pdfbox-app-1.6.0.jar,
+ lib/poi-3.7-20101029.jar,
+ lib/poi-scratchpad-3.7-20101029.jar
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Export-Package: .,
