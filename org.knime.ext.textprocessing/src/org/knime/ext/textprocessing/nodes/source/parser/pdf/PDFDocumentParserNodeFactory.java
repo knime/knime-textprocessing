@@ -28,7 +28,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.pdf;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
-import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeDialog;
+import org.knime.ext.textprocessing.nodes.source.parser.CharsetDocumentParserNodeDialog;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
 
 /**
@@ -45,7 +45,7 @@ NodeFactory<DocumentParserNodeModel> {
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentParserNodeDialog();
+        return new CharsetDocumentParserNodeDialog();
     }
 
     /**
@@ -54,7 +54,7 @@ NodeFactory<DocumentParserNodeModel> {
     @Override
     public DocumentParserNodeModel createNodeModel() {
         return new DocumentParserNodeModel(
-                new PDFDocumentParser(), false, "pdf");
+                new PDFDocumentParser(), true, "pdf");
     }
 
     /**

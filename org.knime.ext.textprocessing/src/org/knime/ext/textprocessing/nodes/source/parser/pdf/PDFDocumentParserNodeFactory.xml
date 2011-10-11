@@ -31,7 +31,10 @@
         </option>
         <option name="Document type">
             Specifies the type of the documents.
-        </option>        
+        </option>
+        <option name="Charset">
+            Specifies the charset of the documents.
+        </option>
     </fullDescription>
         
     <ports>

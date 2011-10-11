@@ -27,6 +27,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.pdf;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 import org.knime.ext.textprocessing.util.AuthorUtil;
@@ -93,7 +95,9 @@ public class PDFDocumentParser extends AbstractDocumentParser {
      */
     @Override
     public void clean() {
-        m_docs.clear();
+        if (m_docs != null) {
+            m_docs.clear();
+        }
         m_currentDoc = null;
     }       
     
@@ -112,11 +116,20 @@ public class PDFDocumentParser extends AbstractDocumentParser {
         m_currentDoc.setDocumentType(m_type);
         m_currentDoc.addDocumentCategory(m_category);
         m_currentDoc.addDocumentSource(m_source);
+
+        if (m_charset == null) {
+            m_charset = Charset.defaultCharset();
+        }
         
         PDDocument document = null;
         try {
             document = PDDocument.load(is);
 
+            // extract text from pdf
+            PDFTextStripper stripper = new PDFTextStripper(m_charset.name());
+            String text = stripper.getText(document);
+            m_currentDoc.addSection(text, SectionAnnotation.UNKNOWN);
+            
             // extract meta data from pdf
             String title = null;
             String authors = null;
@@ -139,20 +152,27 @@ public class PDFDocumentParser extends AbstractDocumentParser {
                 authors = information.getAuthor();
             }
 
-            if (title != null) {
-                m_currentDoc.addTitle(title);
-            } 
+            // if title meta data does not exist use first sentence
+            if (!checkTitle(title)) {
+                List<Section> sections = m_currentDoc.getSections();
+                if (sections.size() > 0) {
+                    title = sections.get(0).getParagraphs().get(0)
+                            .getSentences().get(0).getText().trim();
+                }
+            }
+            // if no useful first sentence exist use filename
+            if (!checkTitle(title)) {
+                title = m_docPath.toString().trim();
+            }
+            m_currentDoc.addTitle(title);
+            
+            // use author meta data
             if (authors != null) {
                 Set<Author> authSet = AuthorUtil.parseAuthors(authors);
                 for (Author a : authSet) {
                     m_currentDoc.addAuthor(a);
                 }
             }            
-
-            // extract text from pdf
-            PDFTextStripper stripper = new PDFTextStripper(m_charset.name());
-            String text = stripper.getText(document);
-            m_currentDoc.addSection(text, SectionAnnotation.UNKNOWN);
 
             // add document to list
             m_docs.add(m_currentDoc.createDocument());
@@ -162,5 +182,16 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             }
         }
         return m_docs;
+    }
+    
+    private boolean checkTitle(final String title) {
+        if (title == null) {
+            return false;
+        }
+        String t = title.trim();
+        if (t.equals("")) {
+            return false;
+        }
+        return true;
     }
 }

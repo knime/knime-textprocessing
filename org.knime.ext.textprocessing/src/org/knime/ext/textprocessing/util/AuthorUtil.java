@@ -86,7 +86,7 @@ public final class AuthorUtil {
                 }
                 lName.trim();
             } else if (nameSplits.length == 1) {
-                fName = nameSplits[0];
+                fName = nameSplits[0].trim();
             }
             authorSet.add(new Author(fName, lName));
         }

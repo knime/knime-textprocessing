@@ -77,7 +77,8 @@ public class FileCollector {
         m_recursive = recursive;
         m_ignoreHidden = ignoreHiddenFiles;
         
-        collectFiles();
+        m_files = new ArrayList<File>();
+        collectFiles(m_directory, new FileFilter());
     }
     
     /**
@@ -116,17 +117,8 @@ public class FileCollector {
         return m_ignoreHidden;
     }    
     
-    /**
-     * Collects all the files in directory with given extension.
-     */
-    private void collectFiles() {
-        m_files = new ArrayList<File>();
-        recCollectFiles(m_files, m_directory, new FileFilter());
-    }
-    
-    private void recCollectFiles(final List<File> files, final File dir, 
-            final FileFilter filter) {
-        if (dir.isDirectory()) {
+    private void collectFiles(final File dir, final FileFilter filter) {
+        if (dir.isDirectory()) {            
             // ad files to list
             File[] filesWithExt = dir.listFiles(filter);
             
@@ -134,20 +126,19 @@ public class FileCollector {
             if (m_ignoreHidden) {
                 for (File f : filesWithExt) {
                     if (!f.isHidden()) {
-                        files.add(f);
+                        m_files.add(f);
                     }
                 }
             } else {
-                files.addAll(Arrays.asList(filesWithExt));
+                m_files.addAll(Arrays.asList(filesWithExt));
             }
             
             // go recursively through all sub dirs
             if (m_recursive) {
-                String[] dirs = dir.list();
-                for (String s : dirs) {
-                    File f = new File(s);
-                    if (f.isDirectory()) {
-                        recCollectFiles(files, f, filter);
+                File[] dirs = dir.listFiles();
+                for (File s : dirs) {
+                    if (s.isDirectory()) {
+                        collectFiles(s, filter);
                     }
                 }
             }
