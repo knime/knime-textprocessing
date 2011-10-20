@@ -213,7 +213,9 @@ public class PubMedDocumentParser extends DefaultHandler implements
      */
     @Override
     public void clean() {
-        m_docs.clear();
+        if (m_docs != null) {
+            m_docs.clear();
+        }
         m_currentDoc = null;
     }
 

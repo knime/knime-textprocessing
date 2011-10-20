@@ -54,7 +54,6 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
 
-
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
@@ -92,7 +91,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     private static final String BASIC_FILE_NAME = "PubMedAbstracts";
     
     private static final String FILE_EXTENSION = "gz";
-    
+  
     
     
     private int m_stepSize = 100;
@@ -100,7 +99,6 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     private long m_delayMillis = 1000;
     
     private List<Integer> m_idList = new ArrayList<Integer>();
-    
 
     
     /**
@@ -231,9 +229,10 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         
         return docs;
     }
+
     
     private void saveDocument(final URL url, final File dir, 
-            final String filename) throws IOException {
+            final String filename) throws IOException, URISyntaxException {
         
         File dst = new File(dir.getAbsolutePath() + "/" + filename);
         if (!dst.exists()) {
@@ -243,8 +242,8 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(20000);
         conn.connect();
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
+        InputStreamReader isr = new InputStreamReader(conn.getInputStream());
+        BufferedReader in = new BufferedReader(isr);
         OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
         OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
         

@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.knime.ext.textprocessing.data.Document;
@@ -94,9 +95,6 @@ public class WordDocumentParser extends AbstractDocumentParser {
     /**
      * {@inheritDoc}
      */
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
@@ -110,7 +108,10 @@ public class WordDocumentParser extends AbstractDocumentParser {
         try {
             WordExtractor extractor = new WordExtractor(is);
             for (String p : extractor.getParagraphText()) {
-                m_currentDoc.addParagraph(p);
+                p = p.trim();
+                if (!onlyWhitepscaes(p)) {
+                    m_currentDoc.addParagraph(p);
+                }
             }
             m_currentDoc.createNewSection(SectionAnnotation.UNKNOWN);
             
@@ -135,6 +136,15 @@ public class WordDocumentParser extends AbstractDocumentParser {
         
         return m_docs;
     }
+    
+    private static Pattern symbolPattern = Pattern.compile("[\\s]+");
+
+    private static boolean onlyWhitepscaes(final String str) {
+        if (symbolPattern.matcher(str).matches()) {
+            return true;
+        }
+        return false;
+    }    
     
     private boolean checkTitle(final String title) {
         if (title == null) {

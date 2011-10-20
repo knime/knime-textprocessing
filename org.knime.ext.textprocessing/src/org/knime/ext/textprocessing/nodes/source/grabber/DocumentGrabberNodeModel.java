@@ -166,7 +166,6 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        m_dtBuilder.getAndCloseDataTable();
         try {
             m_dtBuilder.getAndCloseDataTable();
         } catch (Exception e) { /* Do noting just try */ }
