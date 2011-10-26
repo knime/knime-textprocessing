@@ -53,4 +53,9 @@ public final class TermVectorConfigKeys {
      * The configuration key of the column containing the documents.
      */
     public static final String CFGKEY_DOC_COL = "Document_Column"; 
+    
+    /**
+     * The configuration key of the as_collection flag.
+     */
+    public static final String CFGKEY_ASCOLLECTION = "As_Collection";
 }

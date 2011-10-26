@@ -25,6 +25,9 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.termvector;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -32,9 +35,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * Provides the dialog of the document vector node.
@@ -51,6 +51,17 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelBoolean getBooleanModel() {
         return new SettingsModelBoolean(TermVectorConfigKeys.CFGKEY_BOOLEAN,
                 TermVectorNodeModel.DEFAULT_BOOLEAN);
+    }
+    
+    /**
+     * @return Creates and returns an instance of 
+     * <code>SettingsModelBoolean</code> specifying if a collection cell has
+     * to be created or not.
+     */
+    public static final SettingsModelBoolean getAsCollectionModel() {
+        return new SettingsModelBoolean(
+                TermVectorConfigKeys.CFGKEY_ASCOLLECTION,
+                TermVectorNodeModel.DEFAULT_ASCOLLECTION);
     }
 
     /**
@@ -108,6 +119,9 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(
                 m_columnModel, "Vector value", 0, DoubleValue.class));
 
+        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), 
+                "As collection cell"));        
+        
         checkUncheck();
     }
 

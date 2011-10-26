@@ -52,5 +52,10 @@ public final class DocumentVectorConfigKeys {
     /**
      * The configuration key of the ignore tags flag.
      */
-    public static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";    
+    public static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";
+    
+    /**
+     * The configuration key of the as_collection flag.
+     */
+    public static final String CFGKEY_ASCOLLECTION = "As_Collection";  
 }
