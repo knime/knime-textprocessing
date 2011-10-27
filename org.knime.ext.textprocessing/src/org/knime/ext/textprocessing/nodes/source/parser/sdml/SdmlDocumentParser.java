@@ -206,7 +206,16 @@ public class SdmlDocumentParser extends DefaultHandler implements
         m_docs = new ArrayList<Document>();
         SAXParserFactory fac = SAXParserFactory.newInstance();
         fac.setValidating(true);
-        fac.newSAXParser().parse(is, this);
+        try {
+            fac.newSAXParser().parse(is, this);
+        } catch (SAXException e) {
+            LOGGER.warn("Could not parse SDML documents, XML is not valid!");
+            throw(e);
+        } catch (IOException e) {
+            LOGGER.warn("Could not read SDML documents!");
+            throw(e);
+        }
+        
         return m_docs;
     }
 

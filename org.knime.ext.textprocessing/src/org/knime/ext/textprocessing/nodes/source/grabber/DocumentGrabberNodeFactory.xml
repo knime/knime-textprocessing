@@ -26,7 +26,8 @@
 			The number of maximal resulting documents to download and parse.
 		</option>
 		<option name="Documents directory">
-			The directory to save the documents to.
+			The directory to save the documents to. The specified directory 
+			must exist, be writable and empty.
 		</option>
 		<option name="Delete after parsing">
 			If checked, the files containing the documents will be deleted 

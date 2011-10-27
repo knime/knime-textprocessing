@@ -293,7 +293,15 @@ public class DmlDocumentParser extends DefaultHandler implements
      */
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
-        SAXParserFactory.newInstance().newSAXParser().parse(is, this);
+        try {
+            SAXParserFactory.newInstance().newSAXParser().parse(is, this);
+        } catch (SAXException e) {
+            LOGGER.warn("Could not parse DML documents, XML is not valid!");
+            throw(e);
+        } catch (IOException e) {
+            LOGGER.warn("Could not read DML documents!");
+            throw(e);
+        }
         return m_docs;
     }
 

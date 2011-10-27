@@ -204,9 +204,18 @@ public class DocumentGrabberNodeModel extends NodeModel {
         String dir = ((SettingsModelString)m_directoryModel.
                 createCloneWithValidatedValue(settings)).getStringValue();
         File f = new File(dir);
-        if (!f.isDirectory() || !f.exists() || !f.canWrite()) {
+        if (!f.isDirectory()) {
             throw new InvalidSettingsException("Selected directory: " 
-                    + dir + " is not valid!");
+                    + dir + " is not a directory!");
+        } else if (!f.exists()) {
+            throw new InvalidSettingsException("Selected directory: " 
+                    + dir + " does not exist!");
+        } else if (!f.canWrite()) {
+            throw new InvalidSettingsException("Selected directory: " 
+                    + dir + " is not writable!");
+        } else if (f.listFiles().length > 0) {
+            throw new InvalidSettingsException("Selected directory: " 
+                    + dir + " is not empty!");
         }
     }
 

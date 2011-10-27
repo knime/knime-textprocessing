@@ -159,14 +159,34 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                     
                     String filename = BASIC_FILE_NAME + count + "." 
                         + FILE_EXTENSION;
-                    saveDocument(pubmed, directory, filename);
+                    try {
+                        saveDocument(pubmed, directory, filename);
+                    } catch (IOException e) {
+                        LOGGER.warn("Could not read PubMed Xml-Website!");
+                        throw(e);
+                    } catch (URISyntaxException e) {
+                        LOGGER.warn("URL Syntax is not valid!");
+                        throw(e);
+                    }
 
                     Thread.sleep(m_delayMillis);
                     idStart = idEnd + 1;
                     count++;
                 }
                 
-                return parseDocuments(directory);
+                List<Document> docs = new ArrayList<Document>();
+                try {
+                    docs = parseDocuments(directory);
+                } catch (URISyntaxException e) {
+                    LOGGER.warn("Could not find file containing " 
+                            + "PubMed documents!");
+                    throw(e);
+                } catch (Exception e) {
+                    LOGGER.warn("Could not parse PubMed documents!");
+                    throw(e);
+                }
+                 
+                return docs;
             }
         }
         
@@ -209,14 +229,8 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             }
             parser.setDocumentFilepath(f.getAbsolutePath());
             
-            try {
-                docs.addAll(parser.parse(is));
-                parser.clean();
-            } catch (Exception e) {
-                LOGGER.error("Could not parse file: " 
-                        + f.getAbsolutePath().toString());
-                throw e;
-            }
+            docs.addAll(parser.parse(is));
+            parser.clean();
         }
         
         if (getDeleteFiles()) {

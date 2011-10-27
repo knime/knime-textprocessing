@@ -26,6 +26,7 @@
 package org.knime.ext.textprocessing.nodes.source.parser.pubmed;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -204,7 +206,15 @@ public class PubMedDocumentParser extends DefaultHandler implements
         m_docs = new ArrayList<Document>();
         SAXParserFactory fac = SAXParserFactory.newInstance();
         fac.setValidating(true);
-        fac.newSAXParser().parse(is, this);
+        try {
+            fac.newSAXParser().parse(is, this);
+        } catch (SAXException e) {
+            LOGGER.warn("Could not parse PubMed documents, XML is not valid!");
+            throw(e);
+        } catch (IOException e) {
+            LOGGER.warn("Could not read PubMed documents!");
+            throw(e);
+        }
         return m_docs;
     }
 
