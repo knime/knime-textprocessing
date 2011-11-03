@@ -26,8 +26,7 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.OutputStream;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
@@ -36,6 +35,8 @@ import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
  * A data cell implementation holding a 
@@ -46,10 +47,9 @@ import org.knime.core.data.StringValue;
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermCell extends DataCell implements StringValue, TermValue {
-
-    private static final String SEPARATOR = "\n";
     
-    private static final String TAG_SECTION = "<<TAGS>>";
+    private static final NodeLogger LOGGER = 
+        NodeLogger.getLogger(TermCell.class);
     
     /**
      * Convenience access member for
@@ -149,8 +149,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
         @Override
         public TermCell deserialize(final DataCellDataInput input) 
         throws IOException {
-            String s = input.readUTF();
-            return TermCell.createTermCell(s);
+            return TermDocumentDeSerializationUtil.deserializeTermCell(input);
         }
 
         /**
@@ -159,91 +158,11 @@ public class TermCell extends DataCell implements StringValue, TermValue {
         @Override
         public void serialize(final TermCell cell, 
                 final DataCellDataOutput output) throws IOException {
-            output.writeUTF(cell.getSerializationString());
+            cell.serializeTerm((OutputStream) output);
         }
     }
     
-    
-    private String getSerializationString() {        
-        return TermCell.getSerializationString(this.getTermValue());
-    }
-    
-    private static TermCell createTermCell(final String s) {
-        return new TermCell(TermCell.createTerm(s));
-    }
-    
-    /**
-     * Returns the instance of <code>Term</code> related to the given string.
-     * @param s The string to get the related <code>Term</code> instance for.
-     * @return The instance of <code>Term</code> related to the given string.
-     */
-    static Term createTerm(final String s) {
-        List<Word> words = new ArrayList<Word>();
-        List<Tag> tags = new ArrayList<Tag>();
-
-        String[] str = s.split(TermCell.TAG_SECTION);
-        
-        // words
-        if (str.length > 0) {
-            String wordStr = str[0]; 
-            String[] wordsArr = wordStr.split(TermCell.SEPARATOR);
-            for (String w : wordsArr) {
-                if (w != null && w.length() > 0) {
-                    words.add(new Word(w));
-                }
-            }
-        }
-        
-        // tags
-        if (str.length > 1) {
-            String tagStr = str[1];
-            String[] tagsArr = tagStr.split(TermCell.SEPARATOR);
-            for (int i = 0; i < tagsArr.length; i++) {
-                String type = tagsArr[i];
-                i++;
-                
-                // if no tags are assigned, continue
-                if (i >= tagsArr.length) {
-                    continue;
-                }
-                
-                String value = tagsArr[i];
-                tags.add(TagFactory.getInstance().createTag(type, value));
-            }
-        }
-        
-        // modifiability
-        boolean unmodifiable = false;
-        if (str.length > 2) {
-            String modifiabilityStr = str[2];
-            unmodifiable = new Boolean(modifiabilityStr);
-        }
-        
-        return new Term(words, tags, unmodifiable);
-    }    
-    
-    /**
-     * Returns the serialization string of the given term.
-     * @param term The term to return its serialization string.
-     * @return The serialization string of the given term.
-     */
-    static String getSerializationString(final Term term) {
-        StringBuffer buf = new StringBuffer();
-        
-        for (Word w : term.getWords()) {
-            buf.append(w.getWord());
-            buf.append(TermCell.SEPARATOR);
-        }
-        buf.append(TermCell.TAG_SECTION);
-        for (Tag t : term.getTags()) {
-            buf.append(t.getTagType());
-            buf.append(TermCell.SEPARATOR);
-            buf.append(t.getTagValue());
-            buf.append(TermCell.SEPARATOR);
-        }
-        buf.append(TermCell.TAG_SECTION);
-        buf.append(term.isUnmodifiable());
-        
-        return buf.toString();
+    private void serializeTerm(final OutputStream out) throws IOException {
+        TermDocumentDeSerializationUtil.serializeTerm(m_term, out);
     }
 }

@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,12 +42,22 @@ import java.util.List;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class Section implements TextContainer {
+public class Section implements TextContainer, Externalizable {
 
     private List<Paragraph> m_paragraphs;
     
     private SectionAnnotation m_annotation;
     
+    private int m_hashCode = -1;
+
+    /**
+     * Creates empty instance of <code>Section</code> with all 
+     * <code>null</code> values.
+     */
+    public Section() {
+        m_paragraphs = null;
+        m_annotation = null;
+    }     
     
     /**
      * Creates new instance of <code>Section</code> with given list of 
@@ -155,13 +170,43 @@ public class Section implements TextContainer {
      */
     @Override
     public int hashCode() {
-        int fac = 119;
-        int div = 19;
-        int hash = 0;
-        for (Paragraph p : m_paragraphs) {
-            hash += fac * p.hashCode() / div; 
+        if (m_hashCode == -1) {
+            int fac = 119;
+            int div = 19;
+            m_hashCode = 0;
+            for (Paragraph p : m_paragraphs) {
+                m_hashCode += fac * p.hashCode() / div;
+            }
+            m_hashCode -= div * m_annotation.hashCode();
         }
-        hash -= div * m_annotation.hashCode();
-        return hash;
+        return m_hashCode;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeInt(m_hashCode);
+        out.writeInt(m_paragraphs.size());
+        for (Paragraph p : m_paragraphs) {
+            out.writeObject(p);
+        }
+        out.writeObject(m_annotation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_hashCode = in.readInt();
+        int size = in.readInt();
+        m_paragraphs = new ArrayList<Paragraph>(size);
+        for (int i = 0; i < size; i++) {
+            m_paragraphs.add((Paragraph)in.readObject());
+        }
+        m_annotation = (SectionAnnotation)in.readObject();
     }     
 }

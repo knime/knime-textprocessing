@@ -25,10 +25,9 @@
  */
 package org.knime.ext.textprocessing.preferences;
 
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
-
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 /**
  * 
@@ -37,10 +36,16 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class TextprocessingPreferenceInitializer extends
         AbstractPreferenceInitializer {
 
-    private static final boolean DEFAULT_USE_BLOB = true;
+    public static final boolean DEFAULT_USE_BLOB = true;
+    
+    public static final boolean DEFAULT_DML_DESERIALIZATION = true;
     
     /** Preference key for the usage of blob cells setting. */
     public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";
+    
+    /** Preference key for the usage of backwards compatibility. */
+    public static final String PREF_DML_DESERIALIZATION = 
+        "knime.textprocessing.dmldeserialization";
     
     /**
      * {@inheritDoc}
@@ -52,6 +57,7 @@ public class TextprocessingPreferenceInitializer extends
 
         //set default values
         store.setDefault(PREF_USE_BLOB, DEFAULT_USE_BLOB);
+        store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
     }
 
     /**
@@ -62,10 +68,23 @@ public class TextprocessingPreferenceInitializer extends
     public static boolean useBlobCell() {
         final IPreferenceStore pStore = 
             TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        
         if (!pStore.contains(PREF_USE_BLOB)) {
             return DEFAULT_USE_BLOB;
         }
         return pStore.getBoolean(PREF_USE_BLOB);
     }
+    
+    /**
+     * Returns true if dml deserialization has to be applied.
+     * 
+     * @return the dml deserialization setting
+     */
+    public static boolean useDmlDeserialization() {
+        final IPreferenceStore pStore = 
+            TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!pStore.contains(PREF_DML_DESERIALIZATION)) {
+            return DEFAULT_DML_DESERIALIZATION;
+        }
+        return pStore.getBoolean(PREF_DML_DESERIALIZATION);
+    }    
 }

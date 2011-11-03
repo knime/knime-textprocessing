@@ -25,6 +25,8 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Serializable;
+
 /**
  * Contains the source of a {@link org.knime.ext.textprocessing.data.Document}, 
  * which can for instance be PubMed, Reuters, etc. The source specifies where a 
@@ -32,7 +34,7 @@ package org.knime.ext.textprocessing.data;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentSource {
+public class DocumentSource implements Serializable {
 
     /**
      * The default source name.

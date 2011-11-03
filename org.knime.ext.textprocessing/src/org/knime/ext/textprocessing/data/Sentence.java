@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,10 +39,20 @@ import java.util.List;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Sentence implements TextContainer {
+public class Sentence implements TextContainer, Externalizable {
 
     private List<Term> m_terms;
+    
+    private int m_hashCode = -1;
 
+    /**
+     * Creates empty instance of <code>Sentence</code> with all 
+     * <code>null</code> values.
+     */
+    public Sentence() {
+        m_terms = null;
+    }
+    
     /**
      * Creates a new instance of <code>Sentence</code> with the given list of
      * {@link org.knime.ext.textprocessing.data.Term}s as its words .
@@ -119,12 +134,40 @@ public class Sentence implements TextContainer {
      */
     @Override
     public int hashCode() {
-        int fac = 119;
-        int div = 13;
-        int hash = 0;
-        for (Term t : m_terms) {
-            hash += fac * t.hashCode() / div;
+        if (m_hashCode == -1) {
+            int fac = 119;
+            int div = 13;
+            m_hashCode = 0;
+            for (Term t : m_terms) {
+                m_hashCode += fac * t.hashCode() / div;
+            }
         }
-        return hash;
+        return m_hashCode;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeInt(m_hashCode);
+        out.writeInt(m_terms.size());
+        for (Term t : m_terms) {
+            out.writeObject(t);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_hashCode = in.readInt();
+        int size = in.readInt();
+        m_terms = new ArrayList<Term>(size);
+        for (int i = 0; i < size; i++) {
+            m_terms.add((Term)in.readObject());
+        }
     }
 }

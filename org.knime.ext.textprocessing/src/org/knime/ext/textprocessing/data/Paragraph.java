@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,9 +39,19 @@ import java.util.List;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class Paragraph implements TextContainer {
+public class Paragraph implements TextContainer, Externalizable {
 
     private List<Sentence> m_sentences;
+    
+    private int m_hashCode = -1;
+
+    /**
+     * Creates empty instance of <code>Paragraph</code> with all 
+     * <code>null</code> values.
+     */
+    public Paragraph() {
+        m_sentences = null;
+    }    
     
     /**
      * Creates new instance of <code>Paragraph</code> with the given list of
@@ -116,12 +131,40 @@ public class Paragraph implements TextContainer {
      */
     @Override
     public int hashCode() {
-        int fac = 119;
-        int div = 13;
-        int hash = 0;
-        for (Sentence s : m_sentences) {
-            hash += fac * s.hashCode() / div; 
+        if (m_hashCode == -1) {
+            int fac = 119;
+            int div = 13;
+            m_hashCode = 0;
+            for (Sentence s : m_sentences) {
+                m_hashCode += fac * s.hashCode() / div;
+            }
         }
-        return hash;
-    } 
+        return m_hashCode;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeInt(m_hashCode);
+        out.writeInt(m_sentences.size());
+        for (Sentence s : m_sentences) {
+            out.writeObject(s);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_hashCode = in.readInt();
+        int size = in.readInt();
+        m_sentences = new ArrayList<Sentence>(size);
+        for (int i = 0; i < size; i++) {
+            m_sentences.add((Sentence)in.readObject());
+        }
+    }    
 }

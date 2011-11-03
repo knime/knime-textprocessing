@@ -25,9 +25,8 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
+import java.io.OutputStream;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
@@ -38,8 +37,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.BlobDataCell;
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
+import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
  * A {@link org.knime.core.data.container.BlobDataCell} implementation holding a
@@ -152,7 +150,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
         return m_document;
     }
     
-    /** Factory for (de-)serializing a DocumentCell. */
+    /** Factory for (de-)serializing a DocumentBlobCell. */
     private static class DocumentSerializer implements 
         DataCellSerializer<DocumentBlobCell> {
 
@@ -162,8 +160,8 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
         @Override
         public DocumentBlobCell deserialize(final DataCellDataInput input)
                 throws IOException {
-            String s = input.readUTF();
-            return DocumentBlobCell.createDocumentCell(s);
+            return TermDocumentDeSerializationUtil.
+            deserializeDocumentBlobCell(input);
         }
 
         /**
@@ -171,58 +169,12 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
          */
         @Override
         public void serialize(final DocumentBlobCell cell, 
-                final DataCellDataOutput output)
-                throws IOException {
-            output.writeUTF(cell.getSerializationString());
+                final DataCellDataOutput output) throws IOException {
+            cell.serializeDocument((OutputStream)output);
         }
     }
     
-    private static DocumentBlobCell createDocumentCell(final String str) {
-        Document d;
-        try {
-            d = DocumentBlobCell.createDocument(str);
-        } catch (Exception e) {
-            LOGGER.warn("Parse error: Document cell could not be created!");
-            return null;
-        }
-        return new DocumentBlobCell(d);
-    }
-    
-    
-    /**
-     * @return The String which is used to serialize the cell.
-     */
-    private String getSerializationString() {
-        return DocumentCell.getSerializationString(m_document);
-    }
-    
-    /**
-     * Returns the instance of <code>Document</code> related to the given 
-     * string.
-     * @param str The string to get the related <code>Document</code> 
-     * instance for.
-     * @return The instance of <code>Document</code> related to the given 
-     * string.
-     * @throws Exception If document could not be parsed.
-     */
-    static Document createDocument(final String str) throws Exception {
-        DocumentParser parser = new DmlDocumentParser();
-        List<Document> docs = parser.parse(new ByteArrayInputStream(
-                str.getBytes("UTF-8")));
-        Document doc = null;
-        if (docs.size() > 0) {
-            doc = docs.get(0);
-        }
-        return doc;
-    }
-      
-    
-    /**
-     * Returns a xml serialization string for given <code>Document</code>.
-     * @param doc The document to get the serialization string for.
-     * @return The serialization string for given <code>Document</code>.
-     */
-    static String getSerializationString(final Document doc) {
-        return DmlDocumentParser.documentAsDml(doc);
+    private void serializeDocument(final OutputStream out) throws IOException {
+        TermDocumentDeSerializationUtil.serializeDocument(m_document, out);
     }
 }

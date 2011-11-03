@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 
 /**
  * Contains a single word and represents the atomic unit of a 
@@ -32,9 +37,17 @@ package org.knime.ext.textprocessing.data;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class Word implements TextContainer {
+public class Word implements TextContainer, Externalizable {
     
     private String m_word;
+    
+    /**
+     * Creates empty instance of <code>Word</code> with <code>null</code> value
+     * for word.
+     */
+    public Word() {
+        m_word = null;
+    }    
     
     /**
      * Creates a new instance of <code>Word</code> with given string to set as
@@ -97,5 +110,22 @@ public class Word implements TextContainer {
     @Override
     public int hashCode() {
         return getWord().hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeUTF(m_word);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_word = in.readUTF();
     }
 }

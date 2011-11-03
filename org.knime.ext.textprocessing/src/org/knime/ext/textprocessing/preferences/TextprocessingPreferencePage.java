@@ -57,11 +57,22 @@ public class TextprocessingPreferencePage extends FieldEditorPreferencePage
     @Override
     protected void createFieldEditors() {
         Composite parent = getFieldEditorParent();
+        
+        // Blob cell setting
         BooleanFieldEditor useBlobCells =
                 new BooleanFieldEditor(
                         TextprocessingPreferenceInitializer.PREF_USE_BLOB,
                         "Use Blob Cells", parent);
         addField(useBlobCells);
+        
+        // Dml deserialization setting
+        BooleanFieldEditor useDmlDeserialization =
+            new BooleanFieldEditor(
+                   TextprocessingPreferenceInitializer.PREF_DML_DESERIALIZATION,
+                   "Enable backwards compatibility / load old " 
+                   + "textprocessing nodes (2.4.x and older). " 
+                   + "Uncheck to speed up processing.", parent);
+        addField(useDmlDeserialization);
     }
 
     /**

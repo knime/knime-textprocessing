@@ -26,9 +26,6 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +59,11 @@ import java.util.Set;
  * @author Kilian Thiel, University of Konstanz
  */
 public class Document implements TextContainer, Serializable {
+
+    /**
+     * Serialization ID.
+     */
+    private static final long serialVersionUID = 8370032424383401173L;
 
     /**
      * The default document type value (UNKNOWN).
@@ -479,37 +481,7 @@ public class Document implements TextContainer, Serializable {
         }
 
         return m_hashCode;
-    }
-
-    private void writeObject(final ObjectOutputStream out) throws IOException {
-        out.writeObject(DocumentCell.getSerializationString(this));
-    }
-
-    
-    private void readObject(final ObjectInputStream in) 
-    throws IOException, ClassNotFoundException {
-        Object o = in.readObject();
-        if (!(o instanceof String)) {
-            throw new ClassNotFoundException(
-                    "Serialized object is not a String!");
-        }
-        String docStr = (String)o;
-        try {            
-            Document doc = DocumentCell.createDocument(docStr);
-            m_authors = doc.getAuthors();
-            m_categories = doc.getCategories();
-            m_docFile = doc.getDocFile();
-            m_length = doc.getLength();
-            m_pubDate = doc.getPubDate();
-            m_sections = doc.getSections();
-            m_sources = doc.getSources();
-            m_type = doc.getType();
-        } catch (Exception e) {
-            throw new IOException("Could not deserialize document! " 
-                    + e.getMessage()); 
-        }
-    }
-    
+    }    
     
     
     /**

@@ -25,10 +25,10 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Term implements TextContainer, Serializable {
+public class Term implements TextContainer, Externalizable {
 
     /**
      * The default string which separates the words, the term contains. This
@@ -64,6 +64,17 @@ public class Term implements TextContainer, Serializable {
 
     private int m_hashCode = -1;
 
+    /**
+     * Creates empty instance of <code>Term</code> with all <code>null</code>
+     * values.
+     */
+    public Term() {
+        m_words = null;
+        m_tags = null;
+        m_hashCode = -1;
+        m_unmodifiable = false;
+    }
+    
     /**
      * Creates a new instance of <code>Term</code> with the given list of
      * {@link org.knime.ext.textprocessing.data.Word}s representing the term,
@@ -229,28 +240,43 @@ public class Term implements TextContainer, Serializable {
 
         return m_hashCode;
     }
-    
-    private void writeObject(final ObjectOutputStream out) throws IOException {
-        out.writeObject(TermCell.getSerializationString(this));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeBoolean(m_unmodifiable);
+        out.writeInt(m_hashCode);
+        
+        out.writeInt(m_words.size());
+        for (Word w : m_words) {
+            out.writeObject(w);
+        }        
+        out.writeInt(m_tags.size());
+        for (Tag t : m_tags) {
+            out.writeObject(t);
+        }       
     }
 
-    
-    private void readObject(final ObjectInputStream in) 
-    throws IOException, ClassNotFoundException {
-        Object o = in.readObject();
-        if (!(o instanceof String)) {
-            throw new ClassNotFoundException(
-                    "Serialized object is not a String!");
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_unmodifiable = in.readBoolean();
+        m_hashCode = in.readInt();
+        
+        int size = in.readInt();
+        m_words = new ArrayList<Word>(size);
+        for (int i = 0; i < size; i++) {
+            m_words.add((Word)in.readObject());
         }
-        String termStr = (String)o;
-        try {            
-            Term term = TermCell.createTerm(termStr);
-            m_tags = term.getTags();
-            m_unmodifiable = term.isUnmodifiable();
-            m_words = term.getWords();
-        } catch (Exception e) {
-            throw new IOException("Could not deserialize term! " 
-                    + e.getMessage()); 
+        size = in.readInt();
+        m_tags = new ArrayList<Tag>(size);
+        for (int i = 0; i < size; i++) {
+            m_tags.add((Tag)in.readObject());
         }
-    }    
+    }
 }

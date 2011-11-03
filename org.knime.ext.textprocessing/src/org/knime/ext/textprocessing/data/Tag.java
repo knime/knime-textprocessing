@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * Represents all tags which can be assigned to 
  * {@link org.knime.ext.textprocessing.data.Term}s. Tags represent the meanings 
@@ -34,11 +39,20 @@ package org.knime.ext.textprocessing.data;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class Tag {
+public class Tag implements Externalizable {
 
     private String m_tagValue;
     
     private String m_tagType;
+    
+    /**
+     * Creates empty instance of <code>Tag</code> with all <code>null</code>
+     * values.
+     */
+    public Tag() {
+        m_tagType = null;
+        m_tagValue = null;
+    }    
     
     /**
      * Creates a new instance of <code>Tag</code> with given value and type,
@@ -100,5 +114,24 @@ public class Tag {
     @Override
     public int hashCode() {
         return getTagValue().hashCode() * getTagType().hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeUTF(m_tagValue);
+        out.writeUTF(m_tagType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_tagValue = in.readUTF();
+        m_tagType = in.readUTF();
     }    
 }

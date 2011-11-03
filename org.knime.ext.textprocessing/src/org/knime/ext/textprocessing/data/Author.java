@@ -25,7 +25,10 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * Contains the first and last name of an author. Authors can be assigned to
@@ -33,12 +36,20 @@ import java.io.Serializable;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class Author implements Serializable {
+public class Author implements Externalizable {
 
     private String m_lastName = "-";
 
     private String m_firstName = "-";
 
+    /**
+     * Creates empty instance of <code>Author</code> with empty strings.
+     */    
+    public Author() {
+        m_firstName = "";
+        m_lastName = "";
+    }
+    
     /**
      * Creates new instance of Author with given first and last name.
      * 
@@ -102,5 +113,24 @@ public class Author implements Serializable {
         hashCode *= 119 + m_firstName.hashCode();
         hashCode *= 119 + m_lastName.hashCode();
         return hashCode;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeUTF(m_firstName);
+        out.writeUTF(m_lastName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_firstName = in.readUTF();
+        m_lastName = in.readUTF();
     }    
 }

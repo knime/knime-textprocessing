@@ -25,6 +25,8 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.Serializable;
+
 /**
  * Contains the category of a 
  * {@link org.knime.ext.textprocessing.data.Document}, which can for instance be
@@ -34,7 +36,7 @@ package org.knime.ext.textprocessing.data;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentCategory {
+public class DocumentCategory implements Serializable {
 
     /**
      * The default source name.
