@@ -101,6 +101,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      */
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
+        m_docs = new ArrayList<Document>();
         m_docs.add(parseInternal(is));
         return m_docs;
     }
@@ -114,8 +115,6 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
     }
     
     private Document parseInternal(final InputStream is) throws Exception {
-        m_docs = new ArrayList<Document>();
-
         m_currentDoc = new DocumentBuilder();
         m_currentDoc.setDocumentFile(new File(m_docPath));
         m_currentDoc.setDocumentType(m_type);

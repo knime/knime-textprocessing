@@ -264,6 +264,7 @@ public class DmlDocumentParser extends DefaultHandler implements
 
     private String m_annotation = "";
 
+    private boolean m_storeInList = false;
 
 
     /**
@@ -296,6 +297,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      */
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
+        m_storeInList = true;
         try {
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {
@@ -409,7 +411,9 @@ public class DmlDocumentParser extends DefaultHandler implements
             
             // due to memory issues documents are not all stored in list anymore
             // but handed out via listener mechanism
-            //m_docs.add(doc);
+            if (m_storeInList) {
+                m_docs.add(doc);
+            }
             notifyAllListener(new DocumentParsedEvent(doc, this));
             
             m_currentDoc = null;
@@ -789,6 +793,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     public void parseDocument(final InputStream is) throws Exception {
+        m_storeInList = false;
         try {
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {

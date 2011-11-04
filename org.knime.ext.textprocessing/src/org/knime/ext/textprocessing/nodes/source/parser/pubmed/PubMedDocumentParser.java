@@ -172,6 +172,8 @@ public class PubMedDocumentParser extends DefaultHandler implements
     private String m_journalTitle = "";
 
     private boolean m_journalFlag = false;
+    
+    private boolean m_storeInList = false;
 
 
     /**
@@ -207,6 +209,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
+        m_storeInList = true;
         SAXParserFactory fac = SAXParserFactory.newInstance();
         fac.setValidating(true);
         try {
@@ -293,6 +296,9 @@ public class PubMedDocumentParser extends DefaultHandler implements
             // due to memory issues documents are not all stored in list anymore
             // but handed out via listener mechanism
             //m_docs.add(doc);
+            if (m_storeInList) {
+                m_docs.add(doc);
+            }
             notifyAllListener(new DocumentParsedEvent(doc, this));
             
             m_currentDoc = null;
@@ -443,6 +449,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     public void parseDocument(final InputStream is) throws Exception {
+        m_storeInList = false;
         try {
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {

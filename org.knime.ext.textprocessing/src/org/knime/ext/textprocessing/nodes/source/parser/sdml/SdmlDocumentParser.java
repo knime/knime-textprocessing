@@ -175,6 +175,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
 
     private String m_title = "";
 
+    private boolean m_storeInList = false;
 
     /**
      * Creates a new instance of <code>SdmlDocumentParser</code>. The documents
@@ -207,6 +208,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
      */
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
+        m_storeInList = true;
         SAXParserFactory fac = SAXParserFactory.newInstance();
         fac.setValidating(true);
         try {
@@ -306,6 +308,9 @@ public class SdmlDocumentParser extends DefaultHandler implements
             // due to memory issues documents are not all stored in list anymore
             // but handed out via listener mechanism
             //m_docs.add(doc);
+            if (m_storeInList) {
+                m_docs.add(doc);
+            }
             notifyAllListener(new DocumentParsedEvent(doc, this));
             
             m_currentDoc = null;
@@ -403,6 +408,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     public void parseDocument(final InputStream is) throws Exception {
+        m_storeInList = false;
         try {
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {
