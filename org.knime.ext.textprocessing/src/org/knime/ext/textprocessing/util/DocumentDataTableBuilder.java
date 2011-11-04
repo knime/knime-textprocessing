@@ -154,7 +154,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      * @throws IllegalStateException If the 
      * <code>DocumentDataTableBuilder</code> has not been opened before.
      */
-    public void addDocument(final Document d, final RowKey rowKey) 
+    public synchronized void addDocument(final Document d, final RowKey rowKey) 
         throws IllegalStateException {
         if (m_opened) {
             if (!TextprocessingPreferenceInitializer.useBlobCell()) {
@@ -190,7 +190,8 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      * @throws IllegalStateException If the 
      * <code>DocumentDataTableBuilder</code> has not been opened before.
      */
-    public void addDocument(final Document d) throws IllegalStateException {
+    public synchronized void addDocument(final Document d)
+    throws IllegalStateException {
         m_rowRey++;
         RowKey rowKey = RowKey.createRowKey(m_rowRey);
         addDocument(d, rowKey);

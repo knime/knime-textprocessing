@@ -107,7 +107,8 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * @throws IllegalArgumentException If a data cell is not compatible with
      * <code>DocumentValue</code>.
      */
-    public BufferedDataTable createDataTable(final ExecutionContext exec,
+    public synchronized BufferedDataTable createDataTable(
+            final ExecutionContext exec,
             final Hashtable<DataCell, Set<Term>> docTerms,
             final boolean useTermCache) throws CanceledExecutionException,
             IllegalArgumentException {
