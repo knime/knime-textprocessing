@@ -70,7 +70,7 @@ public class TextprocessingPreferencePage extends FieldEditorPreferencePage
             new BooleanFieldEditor(
                    TextprocessingPreferenceInitializer.PREF_DML_DESERIALIZATION,
                    "Enable backwards compatibility / load old " 
-                   + "textprocessing nodes (2.4.x and older). " 
+                   + "textprocessing nodes (2.4.x and older)." 
                    + "Uncheck to speed up processing.", parent);
         addField(useDmlDeserialization);
     }

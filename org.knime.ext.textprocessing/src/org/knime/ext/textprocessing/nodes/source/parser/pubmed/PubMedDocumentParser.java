@@ -43,6 +43,8 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -196,6 +198,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
         m_category = category;
         m_source = source;
         m_docPath = docPath;
+        m_listener = new ArrayList<DocumentParsedEventListener>();
     }
 
     /**
@@ -286,7 +289,11 @@ public class PubMedDocumentParser extends DefaultHandler implements
         String name = qName.toLowerCase();
         if (name.equals(PUBMEDARTICLE) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
-            m_docs.add(doc);
+            
+            // due to memory issues documents are not all stored in list anymore
+            // but handed out via listener mechanism
+            //m_docs.add(doc);
+            notifyAllListener(new DocumentParsedEvent(doc, this));
             
             m_currentDoc = null;
             // set empty strings to delete data from previous document
@@ -424,5 +431,59 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * The given charset is ignored since the SAX parser takes it from the xml
      * file.
      */
-    public void setCharset(Charset charset) { }
+    public void setCharset(final Charset charset) { }
+    
+    
+    /**
+     * List of listeners.
+     */
+    private List<DocumentParsedEventListener> m_listener;
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void parseDocument(final InputStream is) throws Exception {
+        try {
+            SAXParserFactory.newInstance().newSAXParser().parse(is, this);
+        } catch (SAXException e) {
+            LOGGER.warn("Could not parse PubMed documents, XML is not valid!");
+            throw(e);
+        } catch (IOException e) {
+            LOGGER.warn("Could not read PubMed documents!");
+            throw(e);
+        }
+    }
+
+    /**
+     * Notifies all registered listeners with given event.
+     * @param event Event to notify listener with
+     */
+    public void notifyAllListener(final DocumentParsedEvent event) {
+        for (DocumentParsedEventListener l : m_listener) {
+            l.documentParsed(event);
+        }
+    }    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void addDocumentParsedListener(
+            final DocumentParsedEventListener listener) {
+        m_listener.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeDocumentParsedListener(
+            final DocumentParsedEventListener listener) {
+        m_listener.remove(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeAllDocumentParsedListener() {
+        m_listener.clear();
+    }    
 }

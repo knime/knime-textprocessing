@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 
 
 
@@ -53,6 +54,7 @@ public interface DocumentGrabber {
      * else goes wrong. 
      * @return The list of parsed documents.
      */
+    @Deprecated
     public List < Document > grabDocuments(final File directory, 
             final Query query) throws Exception;
     
@@ -68,4 +70,42 @@ public interface DocumentGrabber {
      * else goes wrong.
      */
     public int numberOfResults(final Query query) throws Exception;
+    
+    /**
+     * Fetches and the documents resulting from the given query and writes 
+     * them to the given directory. Afterwards the documents are parsed and
+     * instances of {@link org.knime.ext.textprocessing.data.Document}s are
+     * created. After each parsed document all registered
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * are notified.
+     *
+     * @param directory The directory to save the documents to.
+     * @param query The query to send to the bibliographic database.
+     * @throws Exception If grabber can not connect to the server or something 
+     * else goes wrong. 
+     */
+    public void fetchAndParseDocuments(final File directory, final Query query) 
+    throws Exception;
+    
+    /**
+     * Adds the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * from the list of listeners. 
+     * @param listener Listener to add.
+     */
+    public void addDocumentParsedListener(
+            final DocumentParsedEventListener listener);
+    
+    /**
+     * Removes the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * from the list of listeners. 
+     * @param listener Listener to remove.
+     */
+    public void removeDocumentParsedListener(
+            final DocumentParsedEventListener listener);
+
+    /**
+     * Removes all {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * from the list of listeners. 
+     */    
+    public void removeAllDocumentParsedListener();    
 }

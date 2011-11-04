@@ -216,10 +216,10 @@ public class DocumentParserNodeModel extends NodeModel {
             m_parser.setDocumentFilepath(f.getAbsolutePath());
 
             try {
-                List<Document> docs = m_parser.parse(is);
-                for (Document d : docs) {
-                    m_dtBuilder.addDocument(d);
-                }
+                m_parser.addDocumentParsedListener(
+                        new InternalDocumentParsedEventListener());
+                m_parser.parseDocument(is);
+
             } catch (Exception e) {
                 LOGGER.error("Could not parse file: "
                         + f.getAbsolutePath().toString());
@@ -230,6 +230,21 @@ public class DocumentParserNodeModel extends NodeModel {
         m_parser.clean();
 
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
+    }
+    
+    private class InternalDocumentParsedEventListener implements 
+    DocumentParsedEventListener {
+        /**
+         * {@inheritDoc}
+         */
+        public void documentParsed(final DocumentParsedEvent event) {
+            if (m_dtBuilder != null) {
+                Document d = event.getDocument();
+                if (d != null) {
+                    m_dtBuilder.addDocument(d);
+                }
+            }
+        }
     }
 
     /**

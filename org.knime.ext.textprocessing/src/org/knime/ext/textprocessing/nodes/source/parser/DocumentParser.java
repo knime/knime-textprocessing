@@ -57,7 +57,41 @@ public interface DocumentParser {
      * @return A list of documents parsed out of the input stream's data.
      * @throws Exception If something is not working properly.
      */
+    @Deprecated
     public List<Document> parse(final InputStream is) throws Exception;
+    
+    /**
+     * Parses the data of the given <code>InputStream</code> and creates
+     * instances of {@link org.knime.ext.textprocessing.data.Document}s after 
+     * each parsed document all {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * are notified.
+     *
+     * @param is the <code>InputStream</code> providing the data to parse.
+     * @throws Exception If something is not working properly.
+     */
+    public void parseDocument(final InputStream is) throws Exception;
+    
+    /**
+     * Adds the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * from the list of listeners. 
+     * @param listener Listener to add.
+     */
+    public void addDocumentParsedListener(
+            final DocumentParsedEventListener listener);
+    
+    /**
+     * Removes the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * from the list of listeners. 
+     * @param listener Listener to remove.
+     */
+    public void removeDocumentParsedListener(
+            final DocumentParsedEventListener listener);
+
+    /**
+     * Removes all {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
+     * from the list of listeners. 
+     */    
+    public void removeAllDocumentParsedListener();
     
     /**
      * Cleans list of parsed documents.

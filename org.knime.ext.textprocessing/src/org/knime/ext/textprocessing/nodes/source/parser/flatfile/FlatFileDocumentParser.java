@@ -43,6 +43,7 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 
 /**
  * Implements the
@@ -100,6 +101,19 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      */
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
+        m_docs.add(parseInternal(is));
+        return m_docs;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void parseDocument(final InputStream is) throws Exception {
+        Document d = parseInternal(is);
+        notifyAllListener(new DocumentParsedEvent(d, this));
+    }
+    
+    private Document parseInternal(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
 
         m_currentDoc = new DocumentBuilder();
@@ -144,8 +158,6 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         } else {
             m_currentDoc.addTitle(m_docPath);
         }
-
-        m_docs.add(m_currentDoc.createDocument());
-        return m_docs;
+        return m_currentDoc.createDocument();
     }
 }

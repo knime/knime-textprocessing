@@ -50,6 +50,8 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
@@ -125,6 +127,56 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         if (directory != null && query != null) {
             if (directory.exists() && directory.isDirectory()) {
                                 
+                fetchDocuments(directory, query);
+                
+                List<Document> docs = new ArrayList<Document>();
+                try {
+                    docs = parseDocuments(directory);
+                } catch (URISyntaxException e) {
+                    LOGGER.warn("Could not find file containing " 
+                            + "PubMed documents!");
+                    throw(e);
+                } catch (Exception e) {
+                    LOGGER.warn("Could not parse PubMed documents!");
+                    throw(e);
+                }
+                 
+                return docs;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void fetchAndParseDocuments(final File directory, final Query query)
+            throws Exception {
+        if (directory != null && query != null) {
+            if (directory.exists() && directory.isDirectory()) {
+                
+                fetchDocuments(directory, query);
+                
+                try {
+                    parseDocumentsAndNotify(directory);
+                } catch (URISyntaxException e) {
+                    LOGGER.warn("Could not find file containing " 
+                            + "PubMed documents!");
+                    throw(e);
+                } catch (Exception e) {
+                    LOGGER.warn("Could not parse PubMed documents!");
+                    throw(e);
+                }
+            }
+        }
+        return;
+    }    
+
+    private void fetchDocuments(final File directory, final Query query) 
+    throws Exception {
+        if (directory != null && query != null) {
+            if (directory.exists() && directory.isDirectory()) {
+                                
                 URL pubmed = buildUrl(query, true);
                 LOGGER.info("PubMed Query: " + pubmed.toString());
 
@@ -142,7 +194,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                     // setting progress
                     double progress = (double)idEnd  / (double)m_idList.size()
                                         * 0.5;
-                    message("Grabbing Documents from " + idStart + " to " 
+                    message("Fetching documents from " + idStart + " to " 
                             + idEnd + " of " + m_idList.size(), progress);
                     
                     String idString = "";
@@ -173,26 +225,61 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                     idStart = idEnd + 1;
                     count++;
                 }
-                
-                List<Document> docs = new ArrayList<Document>();
-                try {
-                    docs = parseDocuments(directory);
-                } catch (URISyntaxException e) {
-                    LOGGER.warn("Could not find file containing " 
-                            + "PubMed documents!");
-                    throw(e);
-                } catch (Exception e) {
-                    LOGGER.warn("Could not parse PubMed documents!");
-                    throw(e);
-                }
-                 
-                return docs;
             }
         }
-        
-        return null;
+        return;
     }
-
+    
+    private void parseDocumentsAndNotify(final File dir) throws Exception {
+        DocumentParser parser = new PubMedDocumentParser();
+        parser.addDocumentParsedListener(
+                new InternalDocumentParsedEventListener());
+        
+        parser.setDocumentSource(new DocumentSource(SOURCE));
+        if (getDocumentCategory() != null) {
+            parser.setDocumentCategory(getDocumentCategory());
+        }
+        if (getDocumentType() != null) {
+            parser.setDocumentType(getDocumentType());
+        }        
+        
+        List<String> validExtensions = new ArrayList<String>();
+        validExtensions.add(FILE_EXTENSION);
+        
+        FileCollector fc = new FileCollector(dir, validExtensions, false, true);
+        List<File> files = fc.getFiles();
+        int fileCount = files.size();
+        int currFile = 1;
+        for (File f : files) {
+            double progress = (double)currFile / (double)fileCount;
+            setProgress(progress, "Parsing file " + currFile + " of " 
+                    + fileCount);
+            checkCanceled();
+            currFile++;
+            LOGGER.info("Parsing file: " + f.getAbsolutePath());
+            
+            InputStream is;
+            if (f.getName().toLowerCase().endsWith(".gz") 
+                    || f.getName().toLowerCase().endsWith(".zip")) {
+                is = new GZIPInputStream(new FileInputStream(f));
+            } else {
+                is = new FileInputStream(f);
+            }
+            parser.setDocumentFilepath(f.getAbsolutePath());
+            parser.parseDocument(is);
+        }
+        
+        if (getDeleteFiles()) {
+            for (File file : files) {
+                if (file.isFile() && file.exists()) {
+                    file.delete();
+                }
+            }
+        }
+        return;
+    }    
+    
+    @Deprecated
     private List < Document > parseDocuments(final File dir) throws Exception {
         List<Document> docs = new ArrayList<Document>();
         
@@ -373,5 +460,15 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
      */
     public void setStepSize(final int stepSize) {
         m_stepSize = stepSize;
+    }
+    
+    private class InternalDocumentParsedEventListener 
+    implements DocumentParsedEventListener {
+        /**
+         * {@inheritDoc}
+         */
+        public void documentParsed(final DocumentParsedEvent event) {
+            notifyAllListener(event);
+        }
     }
 }

@@ -25,10 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 
 
 /**
@@ -45,6 +50,11 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     private DocumentCategory m_documentCategory;
     
     private DocumentType m_documentType;
+    
+    /**
+     * List of listeners.
+     */
+    protected List<DocumentParsedEventListener> m_listener;
     
     /**
      * Constructor of <code>AbstractDocumentGrabber</code> with flag 
@@ -66,6 +76,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
         m_delete = deleteFiles;
         m_documentCategory = documentCategory;
         m_documentType = documentType;
+        m_listener = new ArrayList<DocumentParsedEventListener>();
     }
 
     /**
@@ -168,4 +179,40 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     public void setDocumentType(final DocumentType documentType) {
         m_documentType = documentType;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addDocumentParsedListener(
+            final DocumentParsedEventListener listener) {
+        m_listener.add(listener);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeDocumentParsedListener(
+            final DocumentParsedEventListener listener) {
+        m_listener.remove(listener);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllDocumentParsedListener() {
+        m_listener.clear();
+    }
+    
+    /**
+     * Notifies all registered listeners with given event.
+     * @param event Event to notify listener with
+     */
+    public void notifyAllListener(final DocumentParsedEvent event) {
+        for (DocumentParsedEventListener l : m_listener) {
+            l.documentParsed(event);
+        }
+    }    
 }

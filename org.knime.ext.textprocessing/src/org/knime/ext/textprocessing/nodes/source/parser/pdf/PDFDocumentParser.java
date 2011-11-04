@@ -47,6 +47,7 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.util.AuthorUtil;
 
 /**
@@ -104,13 +105,25 @@ public class PDFDocumentParser extends AbstractDocumentParser {
     /**
      * {@inheritDoc}
      */
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
+        m_docs.add(parseInternal(is));
+        return m_docs;
+    }
+    
+    private boolean checkTitle(final String title) {
+        if (title == null) {
+            return false;
+        }
+        String t = title.trim();
+        if (t.equals("")) {
+            return false;
+        }
+        return true;
+    }
 
+    private Document parseInternal(final InputStream is) throws Exception {
         m_currentDoc = new DocumentBuilder();
         m_currentDoc.setDocumentFile(new File(m_docPath));
         m_currentDoc.setDocumentType(m_type);
@@ -175,23 +188,19 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             }            
 
             // add document to list
-            m_docs.add(m_currentDoc.createDocument());
+            return m_currentDoc.createDocument();
         } finally {
             if (document != null) {
                 document.close();
             }
         }
-        return m_docs;
     }
     
-    private boolean checkTitle(final String title) {
-        if (title == null) {
-            return false;
-        }
-        String t = title.trim();
-        if (t.equals("")) {
-            return false;
-        }
-        return true;
+    /**
+     * {@inheritDoc}
+     */
+    public void parseDocument(final InputStream is) throws Exception {
+        Document d = parseInternal(is);
+        notifyAllListener(new DocumentParsedEvent(d, this));
     }
 }

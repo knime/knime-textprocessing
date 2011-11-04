@@ -27,7 +27,6 @@ package org.knime.ext.textprocessing.nodes.source.grabber;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -43,6 +42,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
@@ -150,16 +151,29 @@ public class DocumentGrabberNodeModel extends NodeModel {
                 ((AbstractDocumentGrabber)grabber).setExec(exec);
             }
             
-            List<Document> docs = grabber.grabDocuments(
+            grabber.addDocumentParsedListener(
+                    new InternalDocumentParsedEventListener());
+            grabber.fetchAndParseDocuments(
                     new File(m_directoryModel.getStringValue()), query);
-            for (Document d : docs) {
-                m_dtBuilder.addDocument(d);
-            }
         }
         
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
+    private class InternalDocumentParsedEventListener implements 
+    DocumentParsedEventListener {
+        /**
+         * {@inheritDoc}
+         */
+        public void documentParsed(final DocumentParsedEvent event) {
+            if (m_dtBuilder != null) {
+                Document d = event.getDocument();
+                if (d != null) {
+                    m_dtBuilder.addDocument(d);
+                }
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}

@@ -25,14 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
-
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.List;
 
 /**
  * This abstract class implements conveniently all setter methods of the
@@ -75,6 +76,11 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * The charset to use by the parser.
      */
     protected Charset m_charset;
+    
+    /**
+     * List of listeners.
+     */
+    protected List<DocumentParsedEventListener> m_listener;
 
     /**
      * Constructor of <code>AbstractDocumentParser</code>.
@@ -98,12 +104,18 @@ public abstract class AbstractDocumentParser implements DocumentParser {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
+        m_listener = new ArrayList<DocumentParsedEventListener>();
     }
 
     /**
      * {@inheritDoc}
      */
     public abstract List<Document> parse(final InputStream is) throws Exception;
+    
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void parseDocument(final InputStream is) throws Exception;
 
     /**
      * {@inheritDoc}
@@ -138,5 +150,38 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      */
     public void setCharset(final Charset charset) {
         m_charset = charset;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void addDocumentParsedListener(
+            final DocumentParsedEventListener listener) {
+        m_listener.add(listener);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void removeDocumentParsedListener(
+            final DocumentParsedEventListener listener) {
+        m_listener.remove(listener);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void removeAllDocumentParsedListener() {
+        m_listener.clear();
+    }
+    
+    /**
+     * Notifies all registered listeners with given event.
+     * @param event Event to notify listener with
+     */
+    public void notifyAllListener(final DocumentParsedEvent event) {
+        for (DocumentParsedEventListener l : m_listener) {
+            l.documentParsed(event);
+        }
     }
 }
