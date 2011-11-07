@@ -132,6 +132,7 @@ Require-Bundle: org.eclipse.ui,
  org.knime.core,
  org.knime.workbench,
  org.knime.workbench.repository,
- org.knime.base
+ org.knime.base,
+ org.knime.ext.svg;bundle-version="2.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

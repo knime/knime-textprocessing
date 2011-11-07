@@ -79,6 +79,11 @@ public final class TagCloudConfigKeys {
                     "InsideOut Table"};
 
     /**
+     * Index of default tag cloud type.
+     */
+    public static final int DEFAULT_TAGCLOUD_TYPE = 3;
+    
+    /**
      * Configuration key and label for ignoring the tags.
      */
     public static final String CFGKEY_IGNORE_TAGS = "Ignore tags";
@@ -102,6 +107,19 @@ public final class TagCloudConfigKeys {
      */
     public static final String NO_OF_ROWS_LABEL = "No. of rows to display:";
 
+    
+    /** 
+     * Config Key for image width.  
+     */
+    public static final String CFGKEY_WIDTH = "Width";
 
-
+    /** 
+     * Config Key for image height.  
+     */
+    public static final String CFGKEY_HEIGHT = "Height";
+    
+    /** 
+     * Config Key for image export type.
+     */
+    public static final String CFGKEY_EXPORTTYPE = "ExportType";    
 }

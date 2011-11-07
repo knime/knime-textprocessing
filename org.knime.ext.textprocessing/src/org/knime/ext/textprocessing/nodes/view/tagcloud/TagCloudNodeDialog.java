@@ -26,12 +26,14 @@
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
+import org.knime.core.node.NodeViewExport;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -64,13 +66,18 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
     */
     @SuppressWarnings("unchecked")
     public TagCloudNodeDialog() {
-        removeTab("Options");
-        createNewTabAt("Options", 1);
-
-
-        createNewGroup("Rows to display:");
-        m_noOfRows = getNoofRowsModel();
         m_allRows = getUseallrowsBooleanModel();
+        m_noOfRows = getNoofRowsModel();
+        m_term = getTermColumnModel();
+        m_columnvalue = getValueModel();
+        m_ignoretags = getBooleanModel();
+        m_typeofcalctc = getTypeofTCcalculationModel();
+        
+        
+        removeTab("Options");
+        createNewTabAt("General", 1);
+
+        createNewGroup("Row settings:");
         m_allRows.addChangeListener(new ChangeListener() {
             public void stateChanged(final ChangeEvent e) {
                 m_noOfRows.setEnabled(!m_allRows.getBooleanValue());
@@ -78,43 +85,69 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         });
         addDialogComponent(new DialogComponentBoolean(m_allRows,
                 TagCloudConfigKeys.ALL_ROWS_LABEL));
-        addDialogComponent(
-                new DialogComponentNumber(m_noOfRows,
-                        TagCloudConfigKeys.NO_OF_ROWS_LABEL, new Integer(1)));
-
-        m_term = getTermColumnModel();
-        m_columnvalue = getValueModel();
-        m_ignoretags = getBooleanModel();
-        m_typeofcalctc = getTypeofTCcalculationModel();
-
+        addDialogComponent(new DialogComponentNumber(m_noOfRows,
+                TagCloudConfigKeys.NO_OF_ROWS_LABEL, new Integer(1)));
         closeCurrentGroup();
-        createNewGroup(" Column settings:");
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                m_term,
+        
+        createNewGroup("Column settings:");
+        addDialogComponent(new DialogComponentColumnNameSelection(m_term,
                 "Term column", 0, TermValue.class));
 
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                m_columnvalue,
+        addDialogComponent(new DialogComponentColumnNameSelection(m_columnvalue,
                 "Value column", 0, IntValue.class, DoubleValue.class));
-
         closeCurrentGroup();
-        createNewGroup(" Tagcloud settings:");
-
-        addDialogComponent(new DialogComponentBoolean(
-                m_ignoretags,
+        
+        createNewGroup("Tagcloud settings:");
+        addDialogComponent(new DialogComponentBoolean(m_ignoretags,
                 TagCloudConfigKeys.CFGKEY_IGNORE_TAGS));
 
         ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0;
-               i < TagCloudConfigKeys.CFG_TYPEOFTCCALCI.length; i++) {
+        for (int i = 0; i < TagCloudConfigKeys.CFG_TYPEOFTCCALCI.length; i++) {
             list.add(TagCloudConfigKeys.CFG_TYPEOFTCCALCI[i]);
         }
-        addDialogComponent(
-                new DialogComponentStringSelection(m_typeofcalctc,
+        addDialogComponent(new DialogComponentStringSelection(m_typeofcalctc,
                 TagCloudConfigKeys.CFG_TYPEOFTCCALC, list));
+        closeCurrentGroup();
+        
+        
+        createNewTab("Image Export");
+        final Set<String> exportTypes =
+            NodeViewExport.getViewExportMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(
+                getImageTypeModel(), "Image type:", exportTypes));
+        
+        createNewGroup("Image size:");
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentNumber(
+                getWidthModel(), "Width:", Integer.valueOf(10)));
+        addDialogComponent(new DialogComponentNumber(
+                getHeightModel(), "Height:", Integer.valueOf(10)));
         closeCurrentGroup();
     }
 
+    public static SettingsModelString getImageTypeModel() {
+        final Set<String> types = NodeViewExport.getViewExportMap().keySet();
+        String preset;
+        if (types != null && !types.isEmpty()) {
+            preset = types.iterator().next();
+        } else {
+            preset = null;
+        }
+        return new SettingsModelString(TagCloudConfigKeys.CFGKEY_EXPORTTYPE,
+                preset);
+    }
+    
+    public static final SettingsModelIntegerBounded getWidthModel() {
+        return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_WIDTH, 
+                TagCloudNodeModel.DEFAULT_WIDTH, 0, Integer.MAX_VALUE);
+    }
+    
+    public static final SettingsModelIntegerBounded getHeightModel() {
+        return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_WIDTH, 
+                TagCloudNodeModel.DEFAULT_HEIGHT, 0, Integer.MAX_VALUE);
+    }
+    
+    
     /**
      ** @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the type of
@@ -123,7 +156,8 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelString getTypeofTCcalculationModel() {
         return new SettingsModelString(
                 TagCloudConfigKeys.CFG_TYPEOFTCCALC,
-                TagCloudConfigKeys.CFG_TYPEOFTCCALCI[0]);
+                TagCloudConfigKeys.
+                CFG_TYPEOFTCCALCI[TagCloudConfigKeys.DEFAULT_TAGCLOUD_TYPE]);
     }
 
     /**
@@ -133,8 +167,7 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString getTermColumnModel() {
         return new SettingsModelString(
-                TagCloudConfigKeys.CFG_KEY_TERM_COL,
-                    "");
+                TagCloudConfigKeys.CFG_KEY_TERM_COL, "");
     }
 
     /**
@@ -144,8 +177,7 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
       */
     public static final SettingsModelString getValueModel() {
         return  new SettingsModelString(
-                TagCloudConfigKeys.CFG_KEY_VALUE_COL,
-                    "");
+                TagCloudConfigKeys.CFG_KEY_VALUE_COL, "");
     }
 
     /**
@@ -165,8 +197,7 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelIntegerBounded getNoofRowsModel() {
         return new SettingsModelIntegerBounded(
                 TagCloudConfigKeys.CFGKEY_NO_OF_ROWS,
-                TagCloudConfigKeys.DEFAULT_NO_OF_ROWS, 0,
-                Integer.MAX_VALUE);
+                TagCloudConfigKeys.DEFAULT_NO_OF_ROWS, 0, Integer.MAX_VALUE);
     }
 
     /**
