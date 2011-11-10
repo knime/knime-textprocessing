@@ -25,6 +25,17 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -51,24 +62,14 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.TermEvent;
+import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
-import org.knime.ext.textprocessing.util.FullDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
+import org.knime.ext.textprocessing.util.SoftDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.UnorderedPair;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 /**
  * Extracts keywords from a document according to the method presented in
@@ -436,7 +437,7 @@ public class KeygraphNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
                 exec.createDataContainer(createDataTableSpec());
-        FullDataCellCache docCache = new FullDataCellCache(
+        DataCellCache docCache = new SoftDataCellCache(
                TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
         
         int rowid = 0;

@@ -47,42 +47,43 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Kilian Thiel, University of Konstanz
  */
 public class TagSetParser extends DefaultHandler {
-    
+
     /**
      * The name of the Tag tag.
      */
     public static final String TAG = "tag";
-    
+
     /**
      * The public identifier for (sdml) xml files.
      */
-    public static final String PUBLIC_IDENTIFIER = 
-        "-//UNIKN//DTD KNIME TagSet 2.0//EN";    
-    
-    private static final NodeLogger LOGGER = 
-        NodeLogger.getLogger(TagSetParser.class);
-    
+    public static final String PUBLIC_IDENTIFIER =
+            "-//UNIKN//DTD KNIME TagSet 2.0//EN";
+
+    private static final NodeLogger LOGGER = NodeLogger
+            .getLogger(TagSetParser.class);
+
     private Set<String> m_tagClassNames;
-    
+
     private String m_lastMember;
-    
+
     private String m_tag = "";
-    
+
     /**
      * Creates new empty instance of <code>TagSetParser</code>.
      */
-    public TagSetParser() { }
+    public TagSetParser() { /* empty */
+    }
 
     /**
-     * Parses the given file consisting of the tagset data and creates
-     * a set of all contained tags.
+     * Parses the given file consisting of the tagset data and creates a set of
+     * all contained tags.
      * 
      * @param file The file to parse.
      * @return The set containing all parsed available tags.
      */
     public Set<String> parse(final File file) {
         try {
-            m_tagClassNames = new HashSet<String>();     
+            m_tagClassNames = new HashSet<String>();
             SAXParserFactory fac = SAXParserFactory.newInstance();
             fac.setValidating(true);
             fac.newSAXParser().parse(file, this);
@@ -98,16 +99,16 @@ public class TagSetParser extends DefaultHandler {
         }
         return m_tagClassNames;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public InputSource resolveEntity(final String pubId,
-            final String sysId) throws IOException, SAXException {
+    public InputSource resolveEntity(final String pubId, final String sysId)
+            throws IOException, SAXException {
         if (pubId != null) {
-            TextprocessingCorePlugin plugin = 
-                TextprocessingCorePlugin.getDefault();
+            TextprocessingCorePlugin plugin =
+                    TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
             if (pubId.equals(PUBLIC_IDENTIFIER)) {
                 path += TagFactory.TAGSET_DTD_POSTFIX;
@@ -116,32 +117,32 @@ public class TagSetParser extends DefaultHandler {
             return new InputSource(in);
         }
         return super.resolveEntity(pubId, sysId);
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, 
+    public void startElement(final String uri, final String localName,
             final String qName, final Attributes attributes) {
         m_lastMember = qName.toLowerCase();
         if (m_lastMember.equals(TAG)) {
             m_tag = "";
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void endElement(final String uri, final String localName, 
+    public void endElement(final String uri, final String localName,
             final String qName) {
         String name = qName.toLowerCase();
         if (name.equals(TAG)) {
             m_tagClassNames.add(m_tag);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */

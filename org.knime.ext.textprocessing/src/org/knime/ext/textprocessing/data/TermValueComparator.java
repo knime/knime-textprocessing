@@ -29,9 +29,9 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.DataValueComparator;
 
 /**
- * Comparator returned by the 
- * {@link org.knime.ext.textprocessing.data.TermValue} interface. 
- *
+ * Comparator returned by the
+ * {@link org.knime.ext.textprocessing.data.TermValue} interface.
+ * 
  * @see org.knime.ext.textprocessing.data.TermValue#UTILITY
  * @see org.knime.ext.textprocessing.data.TermValue.TermUtilityFactory
  * @author Kilian Thiel, University of Konstanz
@@ -39,7 +39,7 @@ import org.knime.core.data.DataValueComparator;
 public class TermValueComparator extends DataValueComparator {
 
     /**
-     * Compares two {@link org.knime.ext.textprocessing.data.TermValue}s based 
+     * Compares two {@link org.knime.ext.textprocessing.data.TermValue}s based
      * on their words (tags are ignored).
      * 
      * {@inheritDoc}

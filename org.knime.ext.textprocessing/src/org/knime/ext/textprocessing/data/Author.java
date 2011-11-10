@@ -44,12 +44,12 @@ public class Author implements Externalizable {
 
     /**
      * Creates empty instance of <code>Author</code> with empty strings.
-     */    
+     */
     public Author() {
         m_firstName = "";
         m_lastName = "";
     }
-    
+
     /**
      * Creates new instance of Author with given first and last name.
      * 
@@ -58,7 +58,7 @@ public class Author implements Externalizable {
      */
     public Author(final String firstName, final String lastName) {
         super();
-        
+
         if (lastName != null && lastName.length() > 0) {
             m_lastName = lastName;
         }
@@ -66,7 +66,7 @@ public class Author implements Externalizable {
             m_firstName = firstName;
         }
     }
-    
+
     /**
      * @return Returns the first name of the author.
      */
@@ -79,8 +79,7 @@ public class Author implements Externalizable {
      */
     public String getLastName() {
         return m_lastName;
-    } 
-    
+    }
 
     /**
      * {@inheritDoc}
@@ -102,7 +101,6 @@ public class Author implements Externalizable {
         }
         return true;
     }
-
 
     /**
      * {@inheritDoc}
@@ -132,5 +130,5 @@ public class Author implements Externalizable {
             ClassNotFoundException {
         m_firstName = in.readUTF();
         m_lastName = in.readUTF();
-    }    
+    }
 }

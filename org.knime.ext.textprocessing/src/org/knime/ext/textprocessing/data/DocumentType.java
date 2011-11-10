@@ -29,13 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains the type of a document, which can be for instance a transaction,
- * a proceeding, a book or unknown.
+ * Contains the type of a document, which can be for instance a transaction, a
+ * proceeding, a book or unknown.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public enum DocumentType {
-    
+
     /** Constant for a unkown type. */
     UNKNOWN,
     /** Constant for a transaction (journal). */
@@ -58,14 +58,14 @@ public enum DocumentType {
         }
         return list;
     }
-    
+
     /**
      * Returns the proper <code>DocumentType</code> accordant to the given
      * string.
      * 
      * @param str The string to get the proper <code>DocumentType</code> for.
      * @return The proper <code>DocumentType</code> accordant to the given
-     * string.
+     *         string.
      */
     public static DocumentType stringToDocumentType(final String str) {
         for (DocumentType type : values()) {
@@ -74,5 +74,5 @@ public enum DocumentType {
             }
         }
         return DocumentType.UNKNOWN;
-    }    
+    }
 }

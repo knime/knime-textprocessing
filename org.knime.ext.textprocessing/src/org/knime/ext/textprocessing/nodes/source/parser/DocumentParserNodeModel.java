@@ -216,6 +216,10 @@ public class DocumentParserNodeModel extends NodeModel {
             m_parser.setDocumentFilepath(f.getAbsolutePath());
 
             try {
+                // first remove all listeners in order to avoid that two or more
+                // listeners are registered, adding the same document twice or
+                // three times.
+                m_parser.removeAllDocumentParsedListener();
                 m_parser.addDocumentParsedListener(
                         new InternalDocumentParsedEventListener());
                 m_parser.parseDocument(is);

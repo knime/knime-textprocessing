@@ -31,10 +31,10 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * Represents all tags which can be assigned to 
- * {@link org.knime.ext.textprocessing.data.Term}s. Tags represent the meanings 
- * of a {@link org.knime.ext.textprocessing.data.Term} according to their type 
- * which can for instance be a certain Part-Of-Speech tag, a named entity tag, 
+ * Represents all tags which can be assigned to
+ * {@link org.knime.ext.textprocessing.data.Term}s. Tags represent the meanings
+ * of a {@link org.knime.ext.textprocessing.data.Term} according to their type
+ * which can for instance be a certain Part-Of-Speech tag, a named entity tag,
  * etc.
  * 
  * @author Kilian Thiel, University of Konstanz
@@ -42,9 +42,9 @@ import java.io.ObjectOutput;
 public class Tag implements Externalizable {
 
     private String m_tagValue;
-    
+
     private String m_tagType;
-    
+
     /**
      * Creates empty instance of <code>Tag</code> with all <code>null</code>
      * values.
@@ -52,8 +52,8 @@ public class Tag implements Externalizable {
     public Tag() {
         m_tagType = null;
         m_tagValue = null;
-    }    
-    
+    }
+
     /**
      * Creates a new instance of <code>Tag</code> with given value and type,
      * which may not be null.
@@ -62,8 +62,8 @@ public class Tag implements Externalizable {
      * @param tagType The type of the tag to set.
      * @throws NullPointerException if given tag value or type is null.
      */
-    public Tag(final String tagValue, final String tagType) 
-    throws NullPointerException {
+    public Tag(final String tagValue, final String tagType)
+            throws NullPointerException {
         if (tagValue == null || tagType == null) {
             throw new NullPointerException(
                     "Tag value or type may not be null!");
@@ -71,22 +71,21 @@ public class Tag implements Externalizable {
         m_tagValue = tagValue;
         m_tagType = tagType;
     }
-    
+
     /**
      * @return The value of the tag.
      */
     public String getTagValue() {
         return m_tagValue;
     }
-    
+
     /**
      * @return The type of the tag.
      */
     public String getTagType() {
         return m_tagType;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -103,11 +102,11 @@ public class Tag implements Externalizable {
         }
         if (!t.getTagType().equals(getTagType())) {
             return false;
-        } 
-        
+        }
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -133,5 +132,5 @@ public class Tag implements Externalizable {
             ClassNotFoundException {
         m_tagValue = in.readUTF();
         m_tagType = in.readUTF();
-    }    
+    }
 }

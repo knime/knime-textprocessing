@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -57,12 +57,13 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell;
+import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
-import org.knime.ext.textprocessing.util.FullDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
+import org.knime.ext.textprocessing.util.SoftDataCellCache;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 import org.knime.ext.textprocessing.util.clustering.ClusteringAlgorithm;
 import org.knime.ext.textprocessing.util.clustering.GreedyClustering;
@@ -159,9 +160,11 @@ public class KeywordExtractorNodeModel extends NodeModel {
         ExecutionMonitor subExecDocs = exec.createSubProgress(0.9);
         for (Document doc : documents) {
             exec.checkCanceled();
-            ExecutionMonitor subDoc = subExecDocs.createSubProgress(1.0 / nbdocs);
+            ExecutionMonitor subDoc = subExecDocs.createSubProgress(
+                    1.0 / nbdocs);
 
-            subExecDocs.setProgress("Processing document " + i + " of " + nbdocs);
+            subExecDocs.setProgress("Processing document " + i + " of " 
+                    + nbdocs);
 
             if (m_ignoreTermTags.getBooleanValue()) {
                 keywords.put(doc, extractKeywords(DocumentUtil
@@ -315,8 +318,8 @@ public class KeywordExtractorNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
             exec.createDataContainer(createDataTableSpec());
-        FullDataCellCache docCache = new FullDataCellCache(
-                new DocumentBlobDataCellFactory());        
+        DataCellCache docCache = new SoftDataCellCache(
+              TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
         
         int rowid = 0;
         for (Entry<Document, Map<Term, Double>> e : keywords.entrySet()) {

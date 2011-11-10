@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Contains a complete paragraph as a list of 
+ * Contains a complete paragraph as a list of
  * {@link org.knime.ext.textprocessing.data.Sentence}s.
  * 
  * @author Kilian Thiel, University of Konstanz
@@ -42,29 +42,29 @@ import java.util.List;
 public class Paragraph implements TextContainer, Externalizable {
 
     private List<Sentence> m_sentences;
-    
+
     private int m_hashCode = -1;
 
     /**
-     * Creates empty instance of <code>Paragraph</code> with all 
+     * Creates empty instance of <code>Paragraph</code> with all
      * <code>null</code> values.
      */
     public Paragraph() {
         m_sentences = null;
-    }    
-    
+    }
+
     /**
      * Creates new instance of <code>Paragraph</code> with the given list of
-     * {@link org.knime.ext.textprocessing.data.Sentence}s to set. The list
-     * may not be <code>null</code> otherwise a 
-     * <code>NullPointerException</code> will be thrown.
+     * {@link org.knime.ext.textprocessing.data.Sentence}s to set. The list may
+     * not be <code>null</code> otherwise a <code>NullPointerException</code>
+     * will be thrown.
      * 
      * @param sentences The list of sentences to set.
      * @throws NullPointerException If the given list of sentences is
-     * <code>null</code>
+     *             <code>null</code>
      */
-    public Paragraph(final List<Sentence> sentences) 
-    throws NullPointerException {
+    public Paragraph(final List<Sentence> sentences)
+            throws NullPointerException {
         if (sentences == null) {
             throw new NullPointerException(
                     "List of sentences may not be null!");
@@ -82,6 +82,7 @@ public class Paragraph implements TextContainer, Externalizable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < m_sentences.size(); i++) {
@@ -92,7 +93,7 @@ public class Paragraph implements TextContainer, Externalizable {
         }
         return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -105,9 +106,9 @@ public class Paragraph implements TextContainer, Externalizable {
                 sb.append(Term.WORD_SEPARATOR);
             }
         }
-        return sb.toString();        
+        return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -122,10 +123,10 @@ public class Paragraph implements TextContainer, Externalizable {
         if (!p.getSentences().equals(m_sentences)) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -141,7 +142,7 @@ public class Paragraph implements TextContainer, Externalizable {
         }
         return m_hashCode;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -166,5 +167,5 @@ public class Paragraph implements TextContainer, Externalizable {
         for (int i = 0; i < size; i++) {
             m_sentences.add((Sentence)in.readObject());
         }
-    }    
+    }
 }

@@ -30,32 +30,31 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-
 /**
- * Contains a single word and represents the atomic unit of a 
+ * Contains a single word and represents the atomic unit of a
  * {@link org.knime.ext.textprocessing.data.Document}.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class Word implements TextContainer, Externalizable {
-    
+
     private String m_word;
-    
+
     /**
      * Creates empty instance of <code>Word</code> with <code>null</code> value
      * for word.
      */
     public Word() {
         m_word = null;
-    }    
-    
+    }
+
     /**
      * Creates a new instance of <code>Word</code> with given string to set as
      * word.
      * 
      * @param word The word to set.
      * @throws NullPointerException If the given string to set as word is null
-     * an exception will be thrown.
+     *             an exception will be thrown.
      */
     public Word(final String word) throws NullPointerException {
         if (word == null) {
@@ -63,7 +62,7 @@ public class Word implements TextContainer, Externalizable {
         }
         m_word = word;
     }
-    
+
     /**
      * @return The word.
      */
@@ -74,10 +73,11 @@ public class Word implements TextContainer, Externalizable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText() {
         return getWord();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -85,7 +85,7 @@ public class Word implements TextContainer, Externalizable {
     public String toString() {
         return getWord();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -100,10 +100,10 @@ public class Word implements TextContainer, Externalizable {
         if (!w.getWord().equals(getWord())) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -213,24 +213,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_directoryModel.validateSettings(settings);
         m_maxResultsModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
-        
-        // check selected directory
-        String dir = ((SettingsModelString)m_directoryModel.
-                createCloneWithValidatedValue(settings)).getStringValue();
-        File f = new File(dir);
-        if (!f.isDirectory()) {
-            throw new InvalidSettingsException("Selected directory: " 
-                    + dir + " is not a directory!");
-        } else if (!f.exists()) {
-            throw new InvalidSettingsException("Selected directory: " 
-                    + dir + " does not exist!");
-        } else if (!f.canWrite()) {
-            throw new InvalidSettingsException("Selected directory: " 
-                    + dir + " is not writable!");
-        } else if (f.listFiles().length > 0) {
-            throw new InvalidSettingsException("Selected directory: " 
-                    + dir + " is not empty!");
-        }
+        m_directoryModel.validateSettings(settings);
     }
 
     /**

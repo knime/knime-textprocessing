@@ -25,7 +25,17 @@
  */
 package org.knime.ext.textprocessing.nodes.source.grabber;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonLabel;
@@ -39,13 +49,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFileChooser;
 
 
 /**
@@ -127,6 +130,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelString m_queryModel;
     private SettingsModelString m_databaseModel;
     private SettingsModelInteger m_maxResultsModel;    
+    private SettingsModelString m_directoryModel;
     
     /**
      * Creates new instance of <code>DocumentGrabberNodeDialog</code>.
@@ -152,10 +156,10 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentNumber(m_maxResultsModel, 
                 "Maximal results: ", 100));
         
-        
+        m_directoryModel = getDirectoryModel();
         addDialogComponent(new DialogComponentFileChooser(
-                getDirectoryModel(), "DocumentsDirectory - save", 
-                        JFileChooser.SAVE_DIALOG, true));
+                m_directoryModel, "DocumentsDirectory - save", 
+                JFileChooser.SAVE_DIALOG, true));
         
         addDialogComponent(new DialogComponentBoolean(
                 getDeleteFilesModel(), "Delete after parsing: "));
@@ -166,6 +170,31 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(
                 getDocumentTypeModel(), "Document Type:", types));        
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings)
+            throws InvalidSettingsException {
+        super.saveAdditionalSettingsTo(settings);
+        
+        String dir = m_directoryModel.getStringValue();
+        File f = new File(dir);
+        if (!f.isDirectory()) {
+            throw new InvalidSettingsException("Selected directory: " + dir
+                    + " is not a directory!");
+        } else if (!f.exists()) {
+            throw new InvalidSettingsException("Selected directory: " + dir
+                    + " does not exist!");
+        } else if (!f.canWrite()) {
+            throw new InvalidSettingsException("Selected directory: " + dir
+                    + " is not writable!");
+        } else if (f.listFiles().length > 0) {
+            throw new InvalidSettingsException("Selected directory: " + dir
+                    + " is not empty!");
+        }
+        
     }
     
     /**

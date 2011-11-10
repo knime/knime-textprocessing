@@ -35,23 +35,24 @@ import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
- * A {@link org.knime.core.data.DataCell} implementation holding a 
- * {@link org.knime.ext.textprocessing.data.Document} value by storing this 
- * value in a private <code>Document</code> member. It provides a document 
- * value as well as a string value.
+ * A {@link org.knime.core.data.DataCell} implementation holding a
+ * {@link org.knime.ext.textprocessing.data.Document} value by storing this
+ * value in a private <code>Document</code> member. It provides a document value
+ * as well as a string value.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentCell extends DataCell implements StringValue,
         DocumentValue {
-    
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(DocumentCell.class);
-    
+
+    /**
+     * Serial Version ID.
+     */
+    private static final long serialVersionUID = -3321138724982107144L;
+
     /**
      * Convenience access member for
      * <code>DataType.getType(DocumentCell.class)</code>.
@@ -132,25 +133,27 @@ public class DocumentCell extends DataCell implements StringValue,
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getStringValue() {
         StringBuffer buf = new StringBuffer();
         buf.append("\"");
         buf.append(m_document.getTitle());
         buf.append("\"");
-        
+
         return buf.toString();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Document getDocument() {
         return m_document;
     }
-    
+
     /** Factory for (de-)serializing a DocumentCell. */
-    private static class DocumentSerializer implements 
-    DataCellSerializer<DocumentCell> {
+    private static class DocumentSerializer implements
+            DataCellSerializer<DocumentCell> {
 
         /**
          * {@inheritDoc}
@@ -158,21 +161,21 @@ public class DocumentCell extends DataCell implements StringValue,
         @Override
         public DocumentCell deserialize(final DataCellDataInput input)
                 throws IOException {
-            return TermDocumentDeSerializationUtil.deserializeDocumentCell(
-                    input);
+            return TermDocumentDeSerializationUtil
+                    .deserializeDocumentCell(input);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void serialize(final DocumentCell cell, 
+        public void serialize(final DocumentCell cell,
                 final DataCellDataOutput output) throws IOException {
             cell.serializeDocument((OutputStream)output);
         }
     }
-    
+
     private void serializeDocument(final OutputStream out) throws IOException {
         TermDocumentDeSerializationUtil.serializeDocument(m_document, out);
-    }   
+    }
 }

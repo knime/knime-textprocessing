@@ -25,27 +25,31 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
- * Contains the source of a {@link org.knime.ext.textprocessing.data.Document}, 
- * which can for instance be PubMed, Reuters, etc. The source specifies where a 
+ * Contains the source of a {@link org.knime.ext.textprocessing.data.Document},
+ * which can for instance be PubMed, Reuters, etc. The source specifies where a
  * {@link org.knime.ext.textprocessing.data.Document} stems from.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentSource implements Serializable {
+public class DocumentSource implements Externalizable {
 
     /**
      * The default source name.
      */
     private static final String DEFAULT_SOURCE_NAME = "DefaultSource";
-    
+
     private String m_sourceName;
-    
+
     /**
-     * Creates new instance of <code>DocumentSource</code> with given 
-     * source name.
+     * Creates new instance of <code>DocumentSource</code> with given source
+     * name.
+     * 
      * @param sourceName The name of the source to set.
      */
     public DocumentSource(final String sourceName) {
@@ -55,22 +59,21 @@ public class DocumentSource implements Serializable {
             m_sourceName = sourceName;
         }
     }
-    
+
     /**
      * Creates empty <code>DocumentSource</code> instance with the default name.
      */
     public DocumentSource() {
         this(null);
     }
-    
+
     /**
      * @return The name of the source.
      */
     public String getSourceName() {
         return m_sourceName;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -85,15 +88,32 @@ public class DocumentSource implements Serializable {
         if (!ds.getSourceName().equals(m_sourceName)) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public int hashCode() {
         return m_sourceName.hashCode();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeUTF(m_sourceName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_sourceName = in.readUTF();
     }    
 }

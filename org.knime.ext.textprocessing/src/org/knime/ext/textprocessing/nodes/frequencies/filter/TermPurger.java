@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
@@ -42,15 +47,11 @@ import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.FullDataCellCache;
+import org.knime.ext.textprocessing.util.SoftDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
-
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Provides methods to purge terms out of documents based on the specified 
@@ -171,7 +172,7 @@ public class TermPurger {
         
         TextContainerDataCellFactory docCellFac = 
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        FullDataCellCache dataCellCache = new FullDataCellCache(docCellFac);
+        DataCellCache dataCellCache = new SoftDataCellCache(docCellFac);
         
         BufferedDataContainer dc = m_exec.createDataContainer(
                 m_inData.getDataTableSpec());

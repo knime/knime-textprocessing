@@ -31,10 +31,7 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -58,7 +55,7 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
 
     private JTable m_table;
     
-    private List<Document> m_sortedDocs;
+    private List<Document> m_docs;
     
     
     /**
@@ -67,20 +64,12 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
      * 
      * @param documents The set of documents to display.
      */
-    public AbstractDocumentTablePanel(final Set<Document> documents) {
-        if (documents != null) {
-            m_sortedDocs = new ArrayList<Document>(documents);
+    public AbstractDocumentTablePanel(final List<Document> documents) {
+        if (documents == null) {
+            m_docs = new ArrayList<Document>(0);
         } else {
-            m_sortedDocs = new ArrayList<Document>(0);
+            m_docs = documents;
         }
-        Collections.sort(m_sortedDocs, new Comparator<Document>() {
-            @Override
-            public int compare(final Document o1, final Document o2) {
-                String title1 = o1.getTitle();
-                String title2 = o2.getTitle();
-                return title1.compareTo(title2);
-            }
-        });
         
         setLayout(new BorderLayout());
         add(initTable(), BorderLayout.CENTER);
@@ -90,7 +79,7 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
      * Clears the list of documents.
      */
     public void clean() {
-        m_sortedDocs.clear();
+        m_docs.clear();
     }
     
     /**
@@ -114,9 +103,9 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
         label.setText("Documents");
         panel.add(label, BorderLayout.NORTH);
         
-        Object[][] docList = new Object[m_sortedDocs.size()][1];
+        Object[][] docList = new Object[m_docs.size()][1];
         int count = 0;
-        for (Document d : m_sortedDocs) {
+        for (Document d : m_docs) {
             docList[count][0] = d.getTitle();
             count++;
         }
@@ -151,7 +140,7 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
             // if double clicked
             if (e.getClickCount() == 2) {                
                 int rowIndex = m_table.getSelectedRow();
-                Document doc = m_sortedDocs.get(rowIndex);
+                Document doc = m_docs.get(rowIndex);
                 
                 onClick(rowIndex, doc);
             }

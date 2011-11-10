@@ -25,6 +25,10 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
+import java.text.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -43,12 +47,9 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
-import org.knime.ext.textprocessing.util.FullDataCellCache;
-
-import java.text.ParseException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.knime.ext.textprocessing.util.DataCellCache;
+import org.knime.ext.textprocessing.util.SoftDataCellCache;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  * A <code>CellFactory</code> to build a document for each data row. The
@@ -64,7 +65,7 @@ public class StringsToDocumentCellFactory implements CellFactory {
     
     private StringsToDocumentConfig m_config;
     
-    private FullDataCellCache m_cache;
+    private DataCellCache m_cache;
     
     /**
      * Creates new instance of <code>StringsToDocumentCellFactory</code> with
@@ -81,7 +82,8 @@ public class StringsToDocumentCellFactory implements CellFactory {
                     "Configuration object may not be null!");
         }
         m_config = config;
-        m_cache = new FullDataCellCache(new DocumentBlobDataCellFactory());
+        m_cache = new SoftDataCellCache(
+              TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
     }
     
     /**

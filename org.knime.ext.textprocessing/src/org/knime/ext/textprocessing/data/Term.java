@@ -33,17 +33,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 /**
- * Contains one or more words (at least one) and groups them to a meaning of
- * a higher-level according to the grouping algorithms (like named entity
+ * Contains one or more words (at least one) and groups them to a meaning of a
+ * higher-level according to the grouping algorithms (like named entity
  * recognition, protein or gene name recognition, etc.). In addition a list of
  * {@link org.knime.ext.textprocessing.data.Tag}s can be assigned to a
  * <code>Term</code>, which label the different meanings of it, i.e.
  * Part-Of-Speech tags, Named Entity tags, etc. Further a term can be set
  * unmodifiable with the effect that it may not be filtered out or transformed
  * in any way by any node.
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class Term implements TextContainer, Externalizable {
@@ -74,17 +73,17 @@ public class Term implements TextContainer, Externalizable {
         m_hashCode = -1;
         m_unmodifiable = false;
     }
-    
+
     /**
      * Creates a new instance of <code>Term</code> with the given list of
      * {@link org.knime.ext.textprocessing.data.Word}s representing the term,
      * the list of {@link org.knime.ext.textprocessing.data.Tag}s and the
      * unmodifiable flag.
-     *
+     * 
      * @param words The list of words the term consist of.
      * @param tags The tags representing the meanings of the term.
      * @param unmodifiable If set <code>true</code> the term is set unmodifiable
-     * and is not affected by filter or transformer nodes.
+     *            and is not affected by filter or transformer nodes.
      * @throws NullPointerException Will be thrown if the word list is null.
      */
     public Term(final List<Word> words, final List<Tag> tags,
@@ -106,8 +105,8 @@ public class Term implements TextContainer, Externalizable {
 
     /**
      * @return the unmodifiable list of
-     * {@link org.knime.ext.textprocessing.data.Word}s the
-     * {@link org.knime.ext.textprocessing.data.Word}sterm consist of.
+     *         {@link org.knime.ext.textprocessing.data.Word}s the
+     *         {@link org.knime.ext.textprocessing.data.Word}sterm consist of.
      */
     public List<Word> getWords() {
         return Collections.unmodifiableList(m_words);
@@ -115,7 +114,8 @@ public class Term implements TextContainer, Externalizable {
 
     /**
      * @return the unmodifiable list of
-     * {@link org.knime.ext.textprocessing.data.Tag}s assigned to the term.
+     *         {@link org.knime.ext.textprocessing.data.Tag}s assigned to the
+     *         term.
      */
     public List<Tag> getTags() {
         return Collections.unmodifiableList(m_tags);
@@ -131,6 +131,7 @@ public class Term implements TextContainer, Externalizable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < m_words.size(); i++) {
@@ -195,14 +196,14 @@ public class Term implements TextContainer, Externalizable {
      * Compares <code>this</code> with the given object. Returns
      * <code>true</code> if given object is an instance of a <code>Term</code>
      * and if the list of words of the given term is equal to the internal list
-     * of words. Otherwise <code>false</code> is returned. Attributes like
-     * tags or modifiability is not compared, therefore use
+     * of words. Otherwise <code>false</code> is returned. Attributes like tags
+     * or modifiability is not compared, therefore use
      * {@link Term#equals(Object)}.
-     *
+     * 
      * @param o The object to compare with.
      * @return <code>true</code> if given object is an instance of
-     * <code>Term</code> and the list of words is equal to the list of words of
-     * the given term.
+     *         <code>Term</code> and the list of words is equal to the list of
+     *         words of the given term.
      */
     public boolean equalsWordsOnly(final Object o) {
         if (o == null) {
@@ -248,15 +249,15 @@ public class Term implements TextContainer, Externalizable {
     public void writeExternal(final ObjectOutput out) throws IOException {
         out.writeBoolean(m_unmodifiable);
         out.writeInt(m_hashCode);
-        
+
         out.writeInt(m_words.size());
         for (Word w : m_words) {
             out.writeObject(w);
-        }        
+        }
         out.writeInt(m_tags.size());
         for (Tag t : m_tags) {
             out.writeObject(t);
-        }       
+        }
     }
 
     /**
@@ -267,7 +268,7 @@ public class Term implements TextContainer, Externalizable {
             ClassNotFoundException {
         m_unmodifiable = in.readBoolean();
         m_hashCode = in.readInt();
-        
+
         int size = in.readInt();
         m_words = new ArrayList<Word>(size);
         for (int i = 0; i < size; i++) {

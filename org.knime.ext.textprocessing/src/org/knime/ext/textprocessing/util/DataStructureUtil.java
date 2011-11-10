@@ -25,6 +25,11 @@
  */
 package org.knime.ext.textprocessing.util;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
 import org.knime.core.node.BufferedDataTable;
@@ -32,9 +37,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A utility class providing static methods to transform and change data 
@@ -66,6 +68,45 @@ public final class DataStructureUtil {
         
         int rowCount = 1;
         int rows = data.getRowCount();
+        
+        RowIterator it = data.iterator();        
+        while (it.hasNext()) {
+            DataRow row = it.next();
+            Document doc = ((DocumentValue)row.getCell(documentCellIndex))
+                            .getDocument();
+            documents.add(doc);
+
+            if (exec != null) {
+                exec.checkCanceled();
+                double prog = (double)rows / (double)rowCount;
+                exec.setProgress(prog, "Caching row " + rowCount + " of "
+                        + rows);
+                rowCount++;
+            }
+        }
+        
+        return documents;
+    }
+    
+    /**
+     * Builds a list of documents out of the given data table and returns it.
+     * The index of the cells containing the documents has to be specified.
+     * Furthermore an execution context has to be given, to enable to cancel the
+     * process as well as display its progress.
+     * 
+     * @param data The data table containing the documents to store in a set.
+     * @param documentCellIndex The index of the cells containing the documents.
+     * @param exec An execution context to enable the user to cancel the process
+     * as well as display its progress.
+     * @return A list containing all the documents in the given data table.
+     * @throws CanceledExecutionException If the user cancels the process.
+     */    
+    public static final List<Document> buildDocumentList(
+            final BufferedDataTable data, final int documentCellIndex, 
+            final ExecutionContext exec) throws CanceledExecutionException {
+        int rowCount = 1;
+        int rows = data.getRowCount();
+        List<Document> documents = new ArrayList<Document>(rows);
         
         RowIterator it = data.iterator();        
         while (it.hasNext()) {

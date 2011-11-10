@@ -25,6 +25,13 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -44,13 +51,6 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.DocumentChunk;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Provides a chunk wise preprocessing strategy.
@@ -78,11 +78,16 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
      */
     @Override
     public void checkPreprocessing() throws InvalidSettingsException {
-        if (!(m_preprocessing instanceof ChunkPreprocessing)) {
+        if (!(m_preprocessing instanceof ChunkPreprocessing) 
+                && !(m_preprocessing instanceof TermPreprocessing)) {
             throw new InvalidSettingsException("Specified preprocessing "
                     + "instance is not an instance of ChunkPreprocessing!");
+        } else if ((m_preprocessing instanceof TermPreprocessing)) {
+            m_chunkPreprocessing = new ChunkToTermPreprocessingAdapter(
+                    (TermPreprocessing)m_preprocessing);
+        } else {
+            m_chunkPreprocessing = (ChunkPreprocessing)m_preprocessing;
         }
-        m_chunkPreprocessing = (ChunkPreprocessing)m_preprocessing;
     }
     
     /**

@@ -34,10 +34,10 @@ import java.util.regex.Pattern;
 /**
  * This enum contains the Penn Treebank part of speech tag set. To create a
  * valid {@link org.knime.ext.textprocessing.data.Tag} instance use
- * {@link org.knime.ext.textprocessing.data.STTSPartOfSpeechTag#getTag()}, i.e:
+ * {@link org.knime.ext.textprocessing.data.STTSPartOfSpeechTag#getTag()}, i.e: 
  * <br><br>
  * <code>Tag t = PartOfSpeechTag.NN.getTag();</code>
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public enum STTSPartOfSpeechTag implements TagBuilder {
@@ -46,7 +46,7 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
     UNKNOWN,
 
     //
-    /// all STTS tags
+    // / all STTS tags
     //
     /** attributives Adjektiv. */
     ADJA,
@@ -71,9 +71,9 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
     /** Interjektion. */
     ITJ,
     /** unterordnende Konjunktion mit ``zu'' und Infinitiv. */
-    KOUI,     
+    KOUI,
     /** unterordnende Konjunktion mit Satz. */
-    KOUS , 
+    KOUS,
     /** nebenordnende Konjunktion. */
     KON,
     /** Vergleichskonjunktion. */
@@ -87,11 +87,11 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
     /** attribuierendes Demonstrativpronomen. */
     PDAT,
     /** substituierendes Indefinitpronomen. */
-    PIS,    
+    PIS,
     /** attribuierendes Indefinitpronomen ohne Determiner. */
-    PIAT, 
+    PIAT,
     /** attribuierendes Indefinitpronomen mit Determiner. */
-    PIDAT,    
+    PIDAT,
     /** irreflexives Personalpronomen. */
     PPER,
     /** substituierendes Possessivpronomen. */
@@ -162,8 +162,8 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
 
     /**
      * Creates new instance of <code>PartOfSpeechTag</code> and
-     * {@link org.knime.ext.textprocessing.data.Tag} with the specified
-     * Penn Treebank POS tag.
+     * {@link org.knime.ext.textprocessing.data.Tag} with the specified Penn
+     * Treebank POS tag.
      */
     private STTSPartOfSpeechTag() {
         m_tag = new Tag(name(), TAG_TYPE);
@@ -171,7 +171,7 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
 
     /**
      * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
-     * to the specified <code>PartOfSpeechTag</code>.
+     *         to the specified <code>PartOfSpeechTag</code>.
      */
     public Tag getTag() {
         return m_tag;
@@ -179,9 +179,10 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     *
+     * 
      * @return - the enum fields as a String list of their names.
      */
+    @Override
     public List<String> asStringList() {
         Enum<STTSPartOfSpeechTag>[] values = values();
         List<String> list = new ArrayList<String>();
@@ -192,14 +193,15 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
     }
 
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to
-     * the given string. If no corresponding
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to the
+     * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
+     * 
      * @param str The string representing a
-     * {@link org.knime.ext.textprocessing.data.Tag}.
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to
-     * the given string.
+     *            {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
+     *         given string.
      */
     public static Tag stringToTag(final String str) {
         if (isSymbol(str)) {
@@ -223,7 +225,6 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
         return false;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -234,7 +235,7 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
 
     /**
      * @return The default "UNKNOWN" <code>STTSPartOfSpeechTag</code> as
-     * <code>TagBuilder</code>.
+     *         <code>TagBuilder</code>.
      */
     public static TagBuilder getDefault() {
         return STTSPartOfSpeechTag.UNKNOWN;
@@ -243,10 +244,11 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getType() {
         return TAG_TYPE;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -257,5 +259,5 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
             tagSet.add(tag.getTag());
         }
         return tagSet;
-    }     
+    }
 }

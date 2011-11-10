@@ -29,9 +29,9 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.DataValueComparator;
 
 /**
- * Comparator returned by the 
- * {@link org.knime.ext.textprocessing.data.DocumentValue} interface. 
- *
+ * Comparator returned by the
+ * {@link org.knime.ext.textprocessing.data.DocumentValue} interface.
+ * 
  * @see org.knime.ext.textprocessing.data.DocumentValue#UTILITY
  * @see org.knime.ext.textprocessing.data.DocumentValue.DocumentUtilityFactory
  * @author Kilian Thiel, University of Konstanz
@@ -39,7 +39,7 @@ import org.knime.core.data.DataValueComparator;
 public class DocumentValueComparator extends DataValueComparator {
 
     /**
-     * Compares two {@link org.knime.ext.textprocessing.data.DocumentValue}s 
+     * Compares two {@link org.knime.ext.textprocessing.data.DocumentValue}s
      * based on their text.
      * 
      * {@inheritDoc}
@@ -49,11 +49,11 @@ public class DocumentValueComparator extends DataValueComparator {
         if (v1 == v2) {
             return 0;
         }
-        if (((DocumentValue)v1).getDocument() 
-                == ((DocumentValue)v2).getDocument()) {
+        if (((DocumentValue)v1).getDocument() == ((DocumentValue)v2)
+                .getDocument()) {
             return 0;
         }
-        
+
         // compare title
         String str1 = ((DocumentValue)v1).getDocument().getTitle();
         String str2 = ((DocumentValue)v2).getDocument().getTitle();
@@ -61,7 +61,7 @@ public class DocumentValueComparator extends DataValueComparator {
         if (res != 0) {
             return res;
         }
-        
+
         // compare type
         str1 = ((DocumentValue)v1).getDocument().getType().toString();
         str2 = ((DocumentValue)v2).getDocument().getType().toString();
@@ -69,7 +69,7 @@ public class DocumentValueComparator extends DataValueComparator {
         if (res != 0) {
             return res;
         }
-        
+
         // compare date
         str1 = ((DocumentValue)v1).getDocument().getPubDate().toString();
         str2 = ((DocumentValue)v2).getDocument().getPubDate().toString();
@@ -77,7 +77,7 @@ public class DocumentValueComparator extends DataValueComparator {
         if (res != 0) {
             return res;
         }
-        
+
         // compare file
         str1 = ((DocumentValue)v1).getDocument().getDocFile().getAbsolutePath();
         str2 = ((DocumentValue)v2).getDocument().getDocFile().getAbsolutePath();
@@ -85,7 +85,7 @@ public class DocumentValueComparator extends DataValueComparator {
         if (res != 0) {
             return res;
         }
-        
+
         // compare authors
         str1 = ((DocumentValue)v1).getDocument().getAuthors().toString();
         str2 = ((DocumentValue)v2).getDocument().getAuthors().toString();
@@ -93,7 +93,7 @@ public class DocumentValueComparator extends DataValueComparator {
         if (res != 0) {
             return res;
         }
-        
+
         // compare categories
         str1 = ((DocumentValue)v1).getDocument().getCategories().toString();
         str2 = ((DocumentValue)v2).getDocument().getCategories().toString();
@@ -109,7 +109,7 @@ public class DocumentValueComparator extends DataValueComparator {
         if (res != 0) {
             return res;
         }
-        
+
         // finally compare text (because its the most expensive comparison
         str1 = ((DocumentValue)v1).getDocument().getText();
         str2 = ((DocumentValue)v2).getDocument().getText();

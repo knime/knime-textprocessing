@@ -60,9 +60,9 @@ import java.util.Set;
  * @author Kilian Thiel, University of Konstanz
  */
 public enum OscarChemDefaultTag implements TagBuilder {
-    /** ADJECTIVE. */ 
+    /** ADJECTIVE. */
     CJ,
-    /** ASE. */ 
+    /** ASE. */
     ASE,
     /** ASES. */
     ASES,
@@ -96,12 +96,12 @@ public enum OscarChemDefaultTag implements TagBuilder {
     /**
      * The constant for Oscar tag types.
      */
-    public static final String TAG_TYPE = "OSCAR";    
-    
+    public static final String TAG_TYPE = "OSCAR";
+
     /**
      * Creates new instance of <code>OscarChemDefaultTag</code> and
-     * {@link org.knime.ext.textprocessing.data.Tag} with the specified
-     * Oscar tag.
+     * {@link org.knime.ext.textprocessing.data.Tag} with the specified Oscar
+     * tag.
      */
     private OscarChemDefaultTag() {
         m_tag = new Tag(name(), TAG_TYPE);
@@ -109,15 +109,15 @@ public enum OscarChemDefaultTag implements TagBuilder {
 
     /**
      * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
-     * to the specified <code>OscarChemDefaultTag</code>.
+     *         to the specified <code>OscarChemDefaultTag</code>.
      */
     public Tag getTag() {
         return m_tag;
-    }    
+    }
 
     /**
      * Returns the enum fields as a String list of their names.
-     *
+     * 
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -128,17 +128,18 @@ public enum OscarChemDefaultTag implements TagBuilder {
             list.add(values[i].name());
         }
         return list;
-    }  
+    }
 
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to
-     * the given string. If no corresponding
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to the
+     * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
+     * 
      * @param str The string representing a
-     * {@link org.knime.ext.textprocessing.data.Tag}.
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to
-     * the given string.
+     *            {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
+     *         given string.
      */
     public static Tag stringToTag(final String str) {
         for (OscarChemDefaultTag ne : values()) {
@@ -159,7 +160,7 @@ public enum OscarChemDefaultTag implements TagBuilder {
 
     /**
      * @return The default "UNKNOWN" <code>OscarChemDefaultTag</code> as
-     * <code>TagBuilder</code>.
+     *         <code>TagBuilder</code>.
      */
     public static TagBuilder getDefault() {
         return OscarChemDefaultTag.CUST;
@@ -183,5 +184,5 @@ public enum OscarChemDefaultTag implements TagBuilder {
             tagSet.add(tag.getTag());
         }
         return tagSet;
-    }  
+    }
 }

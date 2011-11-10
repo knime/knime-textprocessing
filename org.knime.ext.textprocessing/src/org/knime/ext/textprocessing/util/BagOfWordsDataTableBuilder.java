@@ -113,8 +113,8 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
             final boolean useTermCache) throws CanceledExecutionException,
             IllegalArgumentException {
         // create cache
-        FullDataCellCache termCache =
-                new FullDataCellCache(new TermDataCellFactory());
+        DataCellCache termCache = new SoftDataCellCache(
+                new TermDataCellFactory());
         BufferedDataContainer dc =
                 exec.createDataContainer(this.createDataTableSpec());
 

@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Contains the documents text as with all its
@@ -48,20 +49,20 @@ import java.util.Set;
  * {@link org.knime.ext.textprocessing.data.PublicationDate}, a
  * {@link org.knime.ext.textprocessing.data.DocumentSource}, a
  * {@link org.knime.ext.textprocessing.data.DocumentCategory} and a
- * {@link org.knime.ext.textprocessing.data.DocumentType} can be assigned to
- * a <code>Document</code> in order to specify more details.
- * <br/><br/>
+ * {@link org.knime.ext.textprocessing.data.DocumentType} can be assigned to a
+ * <code>Document</code> in order to specify more details. <br/>
+ * <br/>
  * To create instances of <code>Document</code> use the
  * {@link org.knime.ext.textprocessing.data.DocumentBuilder} which provides
  * methods to add text and finally build a new <code>Document</code> instance
  * out of it.
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class Document implements TextContainer, Serializable {
 
     /**
-     * Serialization ID.
+     * Serial Version ID.
      */
     private static final long serialVersionUID = 8370032424383401173L;
 
@@ -71,11 +72,13 @@ public class Document implements TextContainer, Serializable {
     public static final DocumentType DEFAULT_TYPE = DocumentType.UNKNOWN;
 
     /**
-     * The default document file .
-     * (System.getProperty("user.home") + "NoFileSpecified")):
+     * The default document file . (System.getProperty("user.home") +
+     * "NoFileSpecified")):
      */
     public static final File DEFAULT_FILE = new File(
             System.getProperty("user.home") + "/NoFileSpecified.txt");
+
+    private final UUID m_uuid = UUID.randomUUID();
 
     private List<Section> m_sections;
 
@@ -100,29 +103,30 @@ public class Document implements TextContainer, Serializable {
      * Cache of the hash code.
      */
     private int m_hashCode = -1;
-    
+
     private String m_titleCache = null;
 
     /**
      * Creates a new instance of <code>Document</code> with the given
      * parameters, like the documents sections, type, authors, sources,
-     * categories, publication date and the file of the document to set.
-     * If any of these parameters is <code>null</code> a
+     * categories, publication date and the file of the document to set. If any
+     * of these parameters is <code>null</code> a
      * <code>NullPointerException</code> is thrown.
-     *
+     * 
      * @param sections The sections of the document to set. Sections are i.e.
-     * title, abstract chapters, etc.
-     * @param type The type of the document to set, i.e. book, transaction
-     * or proceeding.
+     *            title, abstract chapters, etc.
+     * @param type The type of the document to set, i.e. book, transaction or
+     *            proceeding.
      * @param authors The authors of the document.
      * @param sources The sources of a document to set, specifying where the
-     * documents stems from, i.e. Reuters, PubMed, etc.
+     *            documents stems from, i.e. Reuters, PubMed, etc.
      * @param categories The categories of a document to set, specifying roughly
-     * the topic of the document, i.e. breast cancer, presidential elections.
+     *            the topic of the document, i.e. breast cancer, presidential
+     *            elections.
      * @param date The documents publication date to set.
      * @param documentFile The file containing the document.
      * @throws NullPointerException If any of the parameters are set
-     * <code>null</code>.
+     *             <code>null</code>.
      */
     Document(final List<Section> sections, final DocumentType type,
             final Set<Author> authors, final Set<DocumentSource> sources,
@@ -171,7 +175,7 @@ public class Document implements TextContainer, Serializable {
         } else {
             m_docFile = documentFile;
         }
-        
+
         m_pubDate = date;
         m_categories = categories;
         m_sources = sources;
@@ -184,42 +188,38 @@ public class Document implements TextContainer, Serializable {
      * Creates a new instance of <code>Document</code> with a given list of
      * sections which may not be <code>null</code>, otherwise a
      * <code>NullPointerException</code> will be thrown.
-     *
+     * 
      * @param sections The sections of the document to set. Sections are i.e.
-     * title, abstract chapters, etc.
+     *            title, abstract chapters, etc.
      * @throws NullPointerException If the given list of sections to set is
-     * <code>null</code>.
+     *             <code>null</code>.
      */
-    Document(final List<Section> sections)
-    throws NullPointerException {
+    Document(final List<Section> sections) throws NullPointerException {
         this(sections, DEFAULT_TYPE, new HashSet<Author>(),
                 new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(),
                 new PublicationDate(), null);
     }
 
-
     /**
      * Creates a new instance of <code>Document</code> with a given list of
      * sections, the authors of the document, the publication date and a file
-     * containing the document's text to set. None of the given parameters
-     * may be <code>null</code>, otherwise a <code>NullPointerException</code>
-     * will be thrown.
-     *
+     * containing the document's text to set. None of the given parameters may
+     * be <code>null</code>, otherwise a <code>NullPointerException</code> will
+     * be thrown.
+     * 
      * @param sections The sections of the document to set. Sections are i.e.
-     * title, abstract chapters, etc.
+     *            title, abstract chapters, etc.
      * @param authors The authors of the document.
      * @param date The documents publication date to set.
      * @param documentFile The file containing the document.
      * @throws NullPointerException If any of the parameters are set
-     * <code>null</code>.
+     *             <code>null</code>.
      */
     Document(final List<Section> sections, final Set<Author> authors,
             final PublicationDate date, final File documentFile) {
-        this(sections, DEFAULT_TYPE, authors,
-                new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(),
-                date, documentFile);
+        this(sections, DEFAULT_TYPE, authors, new HashSet<DocumentSource>(),
+                new HashSet<DocumentCategory>(), date, documentFile);
     }
-
 
     /**
      * @return the sections of the document.
@@ -270,15 +270,14 @@ public class Document implements TextContainer, Serializable {
         return m_docFile;
     }
 
-
     /**
      * Returns all {@link org.knime.ext.textprocessing.data.Section}s with the
      * specified {@link org.knime.ext.textprocessing.data.SectionAnnotation} as
      * list. If no sections can be found, an empty list is returned.
-     *
+     * 
      * @param annotation The annotation of the sections to return.
-     * @return a list of sections with the given annotation assigned.
-     * If no sections can be found, an empty list is returned.
+     * @return a list of sections with the given annotation assigned. If no
+     *         sections can be found, an empty list is returned.
      */
     public List<Section> getSection(final SectionAnnotation annotation) {
         List<Section> sections = new ArrayList<Section>();
@@ -291,14 +290,14 @@ public class Document implements TextContainer, Serializable {
     }
 
     /**
-     * Returns the text of all
-     * {@link org.knime.ext.textprocessing.data.Section}s with the specified
-     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} as string.
-     * If no sections can be found an empty string is returned.
-     *
+     * Returns the text of all {@link org.knime.ext.textprocessing.data.Section}
+     * s with the specified
+     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} as string. If
+     * no sections can be found an empty string is returned.
+     * 
      * @param annotation The annotation of the sections to find.
      * @return the text of the sections with the given annotation assigned as
-     * string. If no sections can be found, an empty string is returned.
+     *         string. If no sections can be found, an empty string is returned.
      */
     public String getSectionText(final SectionAnnotation annotation) {
         StringBuilder sb = new StringBuilder();
@@ -312,10 +311,9 @@ public class Document implements TextContainer, Serializable {
         return sb.toString();
     }
 
-
     /**
      * @return The title of the document, if a section with "Title" annotation
-     * exists, otherwise an empty string.
+     *         exists, otherwise an empty string.
      */
     public String getTitle() {
         if (m_titleCache == null) {
@@ -344,16 +342,16 @@ public class Document implements TextContainer, Serializable {
 
     /**
      * @return The abstract of the document, if a section with "Abstract"
-     * annotation exists, otherwise an empty string.
+     *         annotation exists, otherwise an empty string.
      */
     public String getAbstract() {
         return getSectionText(SectionAnnotation.ABSTRACT);
     }
 
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < m_sections.size(); i++) {
@@ -382,31 +380,31 @@ public class Document implements TextContainer, Serializable {
 
     /**
      * Checks the parts of the given document for equality which are not user
-     * defined, such as all the <b>sections</b>, the <b>authors</b>, and
-     * the <b>publication date</b>. Beside sections, authors, and publication 
-     * date no other members are compared. If given document is considered
-     * as equal <code>true</code> is returned, otherwise <code>false</code>.
+     * defined, such as all the <b>sections</b>, the <b>authors</b>, and the
+     * <b>publication date</b>. Beside sections, authors, and publication date
+     * no other members are compared. If given document is considered as equal
+     * <code>true</code> is returned, otherwise <code>false</code>.
      * 
      * @param d The document to check for equality based on fixed document
-     * members.
-     * @return <code>true</code> if sections, authors, and publication date 
-     * of given document are equal, <code>false</code> otherwise. 
+     *            members.
+     * @return <code>true</code> if sections, authors, and publication date of
+     *         given document are equal, <code>false</code> otherwise.
      */
     public boolean equalsContent(final Document d) {
         if (d == null) {
             return false;
         }
 
-        if ((d.getAuthors() == null && m_authors != null) 
-            || !d.getAuthors().equals(m_authors)) {
+        if ((d.getAuthors() == null && m_authors != null)
+                || !d.getAuthors().equals(m_authors)) {
             return false;
-        } else if ((d.getSections() == null && m_sections != null) 
+        } else if ((d.getSections() == null && m_sections != null)
                 || !d.getSections().equals(m_sections)) {
             return false;
-        } else if ((d.getPubDate() == null && m_pubDate != null) 
-            || !d.getPubDate().equals(m_pubDate)) {
+        } else if ((d.getPubDate() == null && m_pubDate != null)
+                || !d.getPubDate().equals(m_pubDate)) {
             return false;
-        } 
+        }
 
         return true;
     }
@@ -428,22 +426,25 @@ public class Document implements TextContainer, Serializable {
         if (this == d) {
             return true;
         }
-        
-        if ((d.getSources() == null && m_sources != null) 
+
+        if (!d.getUUID().equals(m_uuid)) {
+            return false;
+        }
+        if ((d.getSources() == null && m_sources != null)
                 || !d.getSources().equals(m_sources)) {
             return false;
-        } else if ((d.getCategories() == null && m_categories != null) 
+        } else if ((d.getCategories() == null && m_categories != null)
                 || !d.getCategories().equals(m_categories)) {
             return false;
-        } else if ((d.getType() == null && m_type != null) 
+        } else if ((d.getType() == null && m_type != null)
                 || !d.getType().equals(m_type)) {
             return false;
-        } else if ((d.getDocFile() == null && m_docFile != null) 
-            || !d.getDocFile().equals(m_docFile)) {
+        } else if ((d.getDocFile() == null && m_docFile != null)
+                || !d.getDocFile().equals(m_docFile)) {
             return false;
         } else if (!equalsContent(d)) {
             return false;
-        } 
+        }
 
         return true;
     }
@@ -453,37 +454,43 @@ public class Document implements TextContainer, Serializable {
      */
     @Override
     public int hashCode() {
-        if (m_hashCode == -1) {
-            m_hashCode = 0;
-            int fac = 119 / 19;
+        return m_uuid.hashCode();
+        // if (m_hashCode == -1) {
+        // m_hashCode = 0;
+        // int fac = 119 / 19;
+        //
+        // for (Section s : m_sections) {
+        // m_hashCode += fac * s.hashCode();
+        // }
+        // for (Author a : m_authors) {
+        // m_hashCode += fac * a.hashCode();
+        // }
+        // for (DocumentSource s : m_sources) {
+        // m_hashCode += fac * s.hashCode();
+        // }
+        // for (DocumentCategory c : m_categories) {
+        // m_hashCode += fac * c.hashCode();
+        // }
+        // if (m_pubDate != null) {
+        // m_hashCode += fac * m_pubDate.hashCode();
+        // }
+        // if (m_type != null) {
+        // m_hashCode += fac * m_type.hashCode();
+        // }
+        // if (m_docFile != null) {
+        // m_hashCode += fac * m_docFile.hashCode();
+        // }
+        // }
+        // return m_hashCode;
+    }
 
-            for (Section s : m_sections) {
-                m_hashCode += fac * s.hashCode();
-            }
-            for (Author a : m_authors) {
-                m_hashCode += fac * a.hashCode();
-            }
-            for (DocumentSource s : m_sources) {
-                m_hashCode += fac * s.hashCode();
-            }
-            for (DocumentCategory c : m_categories) {
-                m_hashCode += fac * c.hashCode();
-            }
-            if (m_pubDate != null) {
-                m_hashCode += fac * m_pubDate.hashCode();
-            }
-            if (m_type != null) {
-                m_hashCode += fac * m_type.hashCode();
-            }
-            if (m_docFile != null) {
-                m_hashCode += fac * m_docFile.hashCode();
-            }
-        }
+    /**
+     * @return The UUID of the document.
+     */
+    public UUID getUUID() {
+        return m_uuid;
+    }
 
-        return m_hashCode;
-    }    
-    
-    
     /**
      * @return a read-only iterator on the sentences of this document.
      */
@@ -493,10 +500,12 @@ public class Document implements TextContainer, Serializable {
 
     /**
      * Read-only iterator over a document's sentences.
+     * 
      * @author Pierre-Francois Laquerre, University of Konstanz
      */
     private class SentenceIterator implements Iterator<Sentence> {
         private List<Sentence> m_sentences;
+
         private ListIterator<Sentence> m_iterator;
 
         /**
@@ -517,6 +526,7 @@ public class Document implements TextContainer, Serializable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasNext() {
             return m_iterator.hasNext();
         }
@@ -524,6 +534,7 @@ public class Document implements TextContainer, Serializable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Sentence next() {
             return m_iterator.next();
         }
@@ -531,6 +542,7 @@ public class Document implements TextContainer, Serializable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

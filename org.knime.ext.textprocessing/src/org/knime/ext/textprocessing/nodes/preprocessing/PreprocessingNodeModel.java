@@ -25,6 +25,8 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -36,8 +38,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-
-import javax.swing.event.ChangeListener;
+import org.knime.ext.textprocessing.util.ProcessingFactory;
 
 /**
  * This class represents the super class of all text preprocessing node models
@@ -129,7 +130,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         super(1, 1);
 
         if (preprocessor == null) {
-            m_preprocessor = new RowPreprocessor();
+            m_preprocessor = ProcessingFactory.getPrecessing();
         } else {
             m_preprocessor = preprocessor;
         }
@@ -162,7 +163,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * The <code>RowPreprocessor</code> is used by default.
      */
     public PreprocessingNodeModel() {
-        this(new RowPreprocessor());
+        this(ProcessingFactory.getPrecessing());
     }
     
     

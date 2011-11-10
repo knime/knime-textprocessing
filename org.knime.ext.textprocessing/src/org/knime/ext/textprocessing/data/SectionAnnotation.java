@@ -46,18 +46,18 @@ public enum SectionAnnotation {
     JOURNAL_TITLE,
     /** The title of the conference the document was published at. **/
     CONFERENCE_TITLE;
-    
-    
+
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.SectionAnnotation} 
-     * related to the given string. If no corresponding 
-     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is available 
+     * Returns the {@link org.knime.ext.textprocessing.data.SectionAnnotation}
+     * related to the given string. If no corresponding
+     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is available
      * the <code>UNKNOWN</code> annotation is returned.
-     * @param str The string representing a 
-     * {@link org.knime.ext.textprocessing.data.SectionAnnotation}. 
-     * @return The related 
-     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} to the given 
-     * string.
+     * 
+     * @param str The string representing a
+     *            {@link org.knime.ext.textprocessing.data.SectionAnnotation}.
+     * @return The related
+     *         {@link org.knime.ext.textprocessing.data.SectionAnnotation} to
+     *         the given string.
      */
     public static SectionAnnotation stringToAnnotation(final String str) {
         SectionAnnotation sa = valueOf(str);
@@ -65,8 +65,8 @@ public enum SectionAnnotation {
             return sa;
         }
         return SectionAnnotation.UNKNOWN;
-    }    
-    
+    }
+
     /**
      * Returns the enum fields as a String list of their names.
      * 

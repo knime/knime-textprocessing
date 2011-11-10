@@ -36,31 +36,32 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.BlobDataCell;
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
  * A {@link org.knime.core.data.container.BlobDataCell} implementation holding a
- * {@link org.knime.ext.textprocessing.data.Document} value by storing this 
- * value in a private <code>Document</code> member. It provides a document 
- * value as well as a string value.
+ * {@link org.knime.ext.textprocessing.data.Document} value by storing this
+ * value in a private <code>Document</code> member. It provides a document value
+ * as well as a string value.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentBlobCell extends BlobDataCell implements StringValue,
         DocumentValue {
 
-    private static final NodeLogger LOGGER =
-            NodeLogger.getLogger(DocumentBlobCell.class);
-    
+    /**
+     * Serial Version ID.
+     */
+    private static final long serialVersionUID = -331144525175261641L;
+
     /**
      * Convenience access member for
      * <code>DataType.getType(DocumentCell.class)</code>.
      * 
      * @see DataType#getType(Class)
      */
-    public static final DataType TYPE = 
-        DataType.getType(DocumentBlobCell.class);
+    public static final DataType TYPE = DataType
+            .getType(DocumentBlobCell.class);
 
     /**
      * Returns the preferred value class of this cell implementation. This
@@ -134,25 +135,27 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getStringValue() {
         StringBuffer buf = new StringBuffer();
         buf.append("\"");
         buf.append(m_document.getTitle());
         buf.append("\"");
-        
+
         return buf.toString();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Document getDocument() {
         return m_document;
     }
-    
+
     /** Factory for (de-)serializing a DocumentBlobCell. */
-    private static class DocumentSerializer implements 
-        DataCellSerializer<DocumentBlobCell> {
+    private static class DocumentSerializer implements
+            DataCellSerializer<DocumentBlobCell> {
 
         /**
          * {@inheritDoc}
@@ -160,20 +163,20 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
         @Override
         public DocumentBlobCell deserialize(final DataCellDataInput input)
                 throws IOException {
-            return TermDocumentDeSerializationUtil.
-            deserializeDocumentBlobCell(input);
+            return TermDocumentDeSerializationUtil
+                    .deserializeDocumentBlobCell(input);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void serialize(final DocumentBlobCell cell, 
+        public void serialize(final DocumentBlobCell cell,
                 final DataCellDataOutput output) throws IOException {
             cell.serializeDocument((OutputStream)output);
         }
     }
-    
+
     private void serializeDocument(final OutputStream out) throws IOException {
         TermDocumentDeSerializationUtil.serializeDocument(m_document, out);
     }

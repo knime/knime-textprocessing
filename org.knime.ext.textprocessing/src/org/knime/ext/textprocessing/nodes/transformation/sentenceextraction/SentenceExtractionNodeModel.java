@@ -25,6 +25,10 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.sentenceextraction;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
@@ -48,14 +52,11 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
-import org.knime.ext.textprocessing.util.FullDataCellCache;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
+import org.knime.ext.textprocessing.util.SoftDataCellCache;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  * 
@@ -131,8 +132,8 @@ public class SentenceExtractionNodeModel extends NodeModel {
                 m_documentColModel.getStringValue());
         
         // create cache
-        FullDataCellCache docCache = new FullDataCellCache(
-                new DocumentBlobDataCellFactory());
+        DataCellCache docCache = new SoftDataCellCache(
+              TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
         BufferedDataContainer dc = exec.createDataContainer(
                 createOutDataTableSpec());
         

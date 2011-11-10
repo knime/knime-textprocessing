@@ -45,14 +45,15 @@ public interface DocumentValue extends DataValue {
     /**
      * @return The document.
      */
-    public Document getDocument();    
-    
-    /** Meta information to this value type.
+    public Document getDocument();
+
+    /**
+     * Meta information to this value type.
+     * 
      * @see DataValue#UTILITY
      */
-    public static final UtilityFactory UTILITY = 
-        new DocumentUtilityFactory();
-    
+    public static final UtilityFactory UTILITY = new DocumentUtilityFactory();
+
     /** Implementations of the meta information of this value class. */
     public static class DocumentUtilityFactory extends UtilityFactory {
         /** Singleton icon to be used to display this cell type. */
@@ -63,10 +64,11 @@ public interface DocumentValue extends DataValue {
             ImageIcon icon;
             try {
                 ClassLoader loader = DocumentValue.class.getClassLoader();
-                String path = 
-                    DocumentValue.class.getPackage().getName()
-                    .replace('.', '/');
-                icon = new ImageIcon(loader.getResource(path 
+                String path =
+                        DocumentValue.class.getPackage().getName()
+                                .replace('.', '/');
+                icon =
+                        new ImageIcon(loader.getResource(path
                                 + "/icon/DocumentValue.png"));
             } catch (Exception e) {
                 icon = null;
@@ -74,11 +76,11 @@ public interface DocumentValue extends DataValue {
             ICON = icon;
         }
 
-        private static final DocumentValueComparator DOCUMENT_COMPARATOR = 
-            new DocumentValueComparator();
-        
+        private static final DocumentValueComparator DOCUMENT_COMPARATOR =
+                new DocumentValueComparator();
+
         /** Only subclasses are allowed to instantiate this class. */
-        protected DocumentUtilityFactory() {
+        protected DocumentUtilityFactory() { /* empty */
         }
 
         /**
@@ -96,7 +98,7 @@ public interface DocumentValue extends DataValue {
         protected DataValueComparator getComparator() {
             return DOCUMENT_COMPARATOR;
         }
-        
+
         /**
          * {@inheritDoc}
          */

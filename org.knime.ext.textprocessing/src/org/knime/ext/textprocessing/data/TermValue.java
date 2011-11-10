@@ -46,13 +46,14 @@ public interface TermValue extends DataValue {
      * @return The {@link org.knime.ext.textprocessing.data.Term} instance.
      */
     public Term getTermValue();
-    
-    /** Meta information to this value type.
+
+    /**
+     * Meta information to this value type.
+     * 
      * @see DataValue#UTILITY
      */
-    public static final UtilityFactory UTILITY = 
-        new TermUtilityFactory();
-    
+    public static final UtilityFactory UTILITY = new TermUtilityFactory();
+
     /** Implementations of the meta information of this value class. */
     public static class TermUtilityFactory extends UtilityFactory {
         /** Singleton icon to be used to display this cell type. */
@@ -64,10 +65,11 @@ public interface TermValue extends DataValue {
             // TODO create a particular icon for the DocumentListValue
             try {
                 ClassLoader loader = TermValue.class.getClassLoader();
-                String path = 
-                    TermValue.class.getPackage().getName()
-                    .replace('.', '/');
-                icon = new ImageIcon(loader.getResource(path 
+                String path =
+                        TermValue.class.getPackage().getName()
+                                .replace('.', '/');
+                icon =
+                        new ImageIcon(loader.getResource(path
                                 + "/icon/TermValue.png"));
             } catch (Exception e) {
                 icon = null;
@@ -75,11 +77,11 @@ public interface TermValue extends DataValue {
             ICON = icon;
         }
 
-        private static final TermValueComparator TERM_COMPARATOR = 
-            new TermValueComparator();
-        
+        private static final TermValueComparator TERM_COMPARATOR =
+                new TermValueComparator();
+
         /** Only subclasses are allowed to instantiate this class. */
-        protected TermUtilityFactory() {
+        protected TermUtilityFactory() { /* empty */
         }
 
         /**
@@ -97,7 +99,7 @@ public interface TermValue extends DataValue {
         protected DataValueComparator getComparator() {
             return TERM_COMPARATOR;
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -109,5 +111,5 @@ public interface TermValue extends DataValue {
         }
 
     }
-    
+
 }

@@ -43,7 +43,7 @@ public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
      */
     public DocumentViewerNodeView(final DocumentViewerNodeModel model) {
         super(model);
-        JPanel panel = new DocumentViewerTablePanel(model.getDocuments());
+        JPanel panel = new DocumentViewerTablePanel(model.getDocumentList());
         setComponent(panel);
     }
     
@@ -60,9 +60,9 @@ public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
      */
     @Override
     protected void onClose() {
-        ((AbstractDocumentTablePanel)getComponent()).clean();
+        // Nothing to do ...
     }
-
+    
     /**
      * {@inheritDoc}
      */

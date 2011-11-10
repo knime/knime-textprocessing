@@ -36,29 +36,28 @@ import java.util.List;
 /**
  * Contains a complete sentence as a list of
  * {@link org.knime.ext.textprocessing.data.Term}s.
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class Sentence implements TextContainer, Externalizable {
 
     private List<Term> m_terms;
-    
+
     private int m_hashCode = -1;
 
     /**
-     * Creates empty instance of <code>Sentence</code> with all 
+     * Creates empty instance of <code>Sentence</code> with all
      * <code>null</code> values.
      */
     public Sentence() {
         m_terms = null;
     }
-    
+
     /**
      * Creates a new instance of <code>Sentence</code> with the given list of
-     * {@link org.knime.ext.textprocessing.data.Term}s as its words .
-     * If it is set to <code>null</code> a <code>NullPointerException</code> is
-     * thrown.
-     *
+     * {@link org.knime.ext.textprocessing.data.Term}s as its words . If it is
+     * set to <code>null</code> a <code>NullPointerException</code> is thrown.
+     * 
      * @param sentence The list of terms to set as sentence.
      * @throws NullPointerException If the list of terms is <code>null</code>.
      */
@@ -81,6 +80,7 @@ public class Sentence implements TextContainer, Externalizable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < m_terms.size(); i++) {
@@ -109,7 +109,6 @@ public class Sentence implements TextContainer, Externalizable {
 
         return sb.toString();
     }
-
 
     /**
      * {@inheritDoc}

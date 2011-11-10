@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public enum NamedEntityTag implements TagBuilder {
@@ -59,8 +59,8 @@ public enum NamedEntityTag implements TagBuilder {
 
     /**
      * Creates new instance of <code>NamedEntityTag</code> and
-     * {@link org.knime.ext.textprocessing.data.Tag} with the specified
-     * named antity tag.
+     * {@link org.knime.ext.textprocessing.data.Tag} with the specified named
+     * antity tag.
      */
     private NamedEntityTag() {
         m_tag = new Tag(name(), TAG_TYPE);
@@ -68,7 +68,7 @@ public enum NamedEntityTag implements TagBuilder {
 
     /**
      * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
-     * to the specified <code>NamedEntityTag</code>.
+     *         to the specified <code>NamedEntityTag</code>.
      */
     public Tag getTag() {
         return m_tag;
@@ -76,7 +76,7 @@ public enum NamedEntityTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     *
+     * 
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -90,14 +90,15 @@ public enum NamedEntityTag implements TagBuilder {
     }
 
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to
-     * the given string. If no corresponding
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to the
+     * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
+     * 
      * @param str The string representing a
-     * {@link org.knime.ext.textprocessing.data.Tag}.
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to
-     * the given string.
+     *            {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
+     *         given string.
      */
     public static Tag stringToTag(final String str) {
         for (NamedEntityTag ne : values()) {
@@ -118,7 +119,7 @@ public enum NamedEntityTag implements TagBuilder {
 
     /**
      * @return The default "UNKNOWN" <code>NamedEntityTag</code> as
-     * <code>TagBuilder</code>.
+     *         <code>TagBuilder</code>.
      */
     public static TagBuilder getDefault() {
         return NamedEntityTag.UNKNOWN;
@@ -131,7 +132,7 @@ public enum NamedEntityTag implements TagBuilder {
     public String getType() {
         return TAG_TYPE;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -142,5 +143,5 @@ public enum NamedEntityTag implements TagBuilder {
             tagSet.add(tag.getTag());
         }
         return tagSet;
-    }        
+    }
 }

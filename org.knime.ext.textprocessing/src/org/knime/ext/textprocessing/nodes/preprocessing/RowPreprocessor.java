@@ -25,6 +25,12 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
@@ -42,11 +48,6 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Provides a row by row preprocessing strategy.
  * 
@@ -59,7 +60,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
     
     private int m_noRows = 0;
     
-    private HashMap<Document, DataCell> m_preprocessedDocuments;
+    private HashMap<UUID, DataCell> m_preprocessedDocuments;
     
     private HashMap<DataCell, Set<Term>> m_addedRows;
     
@@ -97,8 +98,10 @@ public class RowPreprocessor extends AbstractPreprocessor {
         
         m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
                 m_appendIncomingDocument));
-        m_preprocessedDocuments = new HashMap<Document, DataCell>();
-        m_addedRows = new HashMap<DataCell, Set<Term>>();
+        // create hash map with appropriate size
+        m_preprocessedDocuments = new HashMap<UUID, DataCell>(m_noRows);
+        // size is not known before hand but minimum number of documents
+        m_addedRows = new HashMap<DataCell, Set<Term>>(m_noRows);
         
         RowIterator i = inData.iterator();
         while (i.hasNext()) {
@@ -153,7 +156,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
         // do we have to preprocess the documents itself too ?
         if (m_deepPreprocessing) {
             Document doc = ((DocumentValue)doccell).getDocument();
-            newDocCell = m_preprocessedDocuments.get(doc);
+            newDocCell = m_preprocessedDocuments.get(doc.getUUID());
 
             // deep-preprocess only if document has not been preprocessed yet
             // (is not in cache m_preprocessedDocuments)
@@ -180,7 +183,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
                 }
                 Document newDoc = builder.createDocument();
                 newDocCell = m_docCellFac.createDataCell(newDoc);
-                m_preprocessedDocuments.put(doc, newDocCell);
+                m_preprocessedDocuments.put(doc.getUUID(), newDocCell);
             }
         } else {
             // new doc is the same as the old doc

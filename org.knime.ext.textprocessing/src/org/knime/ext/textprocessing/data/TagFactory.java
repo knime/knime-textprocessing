@@ -41,27 +41,27 @@ import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
 /**
- * All different types of {@link org.knime.ext.textprocessing.data.Tag}s have
- * to be registered in this factory to be able to create
- * the right tag instance (i.e. PartOfSpeechTag) related to the type of the
- * tag. Access the singleton instance of the factory by calling
+ * All different types of {@link org.knime.ext.textprocessing.data.Tag}s have to
+ * be registered in this factory to be able to create the right tag instance
+ * (i.e. PartOfSpeechTag) related to the type of the tag. Access the singleton
+ * instance of the factory by calling
  * {@link org.knime.ext.textprocessing.data.TagFactory#getInstance()}. To add
  * your own tagset, specified in a xml file (see tagset.dtd) use the method
  * {@link org.knime.ext.textprocessing.data.TagFactory#addTagSet(File)}, which
  * registers the specified tags in this factory.
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public final class TagFactory {
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(TagFactory.class);
-    
-    /**The id of the AggregationMethod extension point.*/
+    private static final NodeLogger LOGGER = NodeLogger
+            .getLogger(TagFactory.class);
+
+    /** The id of the AggregationMethod extension point. */
     public static final String EXT_POINT_ID =
             "org.knime.ext.textprocessing.TagSet";
-    
-    /**The attribute of the aggregation method extension point.*/
+
+    /** The attribute of the aggregation method extension point. */
     public static final String EXT_POINT_ATTR_DF = "TagBuilder";
 
     /**
@@ -69,24 +69,22 @@ public final class TagFactory {
      * directory.
      */
     public static final String TAGSET_XML_POSTFIX =
-        "/resources/tagset/tagset.xml";
+            "/resources/tagset/tagset.xml";
 
     /**
      * The path (postix) of the tagset.dtd file relative to the plugin
      * directory.
      */
     public static final String TAGSET_DTD_POSTFIX =
-        "/resources/tagset/tagset.dtd";
+            "/resources/tagset/tagset.dtd";
 
     private static TagFactory instance;
 
-    private Hashtable<String,TagBuilder> m_tagBuilder = 
-        new Hashtable<String,TagBuilder>();
-
+    private Hashtable<String, TagBuilder> m_tagBuilder =
+            new Hashtable<String, TagBuilder>();
 
     private TagFactory() {
-        TextprocessingCorePlugin plugin =
-            TextprocessingCorePlugin.getDefault();
+        TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
         String pluginPath = plugin.getPluginRootPath();
         String tagSetPath = pluginPath + TAGSET_XML_POSTFIX;
         addTagSet(new File(tagSetPath));
@@ -105,6 +103,7 @@ public final class TagFactory {
 
     /**
      * Adds the tagset specified in the xml file.
+     * 
      * @param xmlTagSet The xml file containing the tagset to add.
      */
     public void addTagSet(final File xmlTagSet) {
@@ -130,13 +129,14 @@ public final class TagFactory {
     public Set<String> getTagTypes() {
         return m_tagBuilder.keySet();
     }
-    
+
     /**
-     * @return The set of tag types.
+     * @param type The type to return set of tags for.
+     * @return The set of tags for given type
      */
     public TagBuilder getTagSetByType(final String type) {
         return m_tagBuilder.get(type);
-    }    
+    }
 
     @SuppressWarnings("unchecked")
     private void addTags(final Set<String> tagClassNames) {
@@ -145,13 +145,14 @@ public final class TagFactory {
             for (String tagName : tagClassNames) {
                 tagName.trim();
                 if (tagName.length() > 0) {
-                    tagClass = (Class<? extends TagBuilder>)
-                    Class.forName(tagName);
+                    tagClass =
+                            (Class<? extends TagBuilder>)Class.forName(tagName);
 
-                    final Method method = tagClass.getMethod(
-                            "getDefault", new Class[]{});
-                    TagBuilder tagBuilder = (TagBuilder)method.invoke(
-                            new Object[]{}, new Object[]{});
+                    final Method method =
+                            tagClass.getMethod("getDefault", new Class[]{});
+                    TagBuilder tagBuilder =
+                            (TagBuilder)method.invoke(new Object[]{},
+                                    new Object[]{});
 
                     m_tagBuilder.put(tagBuilder.getType(), tagBuilder);
                     LOGGER.info("Added TagBuilder: "
@@ -179,11 +180,10 @@ public final class TagFactory {
         }
     }
 
-
     /**
      * Creates a valid instance of {@link org.knime.ext.textprocessing.data.Tag}
      * with given type and value.
-     *
+     * 
      * @param type The type of the tag to create.
      * @param value The value of the tag to create.
      * @return A new instance of tag with given type and value.
@@ -195,8 +195,7 @@ public final class TagFactory {
         }
         return null;
     }
-    
-    
+
     /**
      * Registers all extension point implementations.
      */
@@ -204,17 +203,17 @@ public final class TagFactory {
         try {
             final IExtensionRegistry registry = Platform.getExtensionRegistry();
             final IExtensionPoint point =
-                registry.getExtensionPoint(EXT_POINT_ID);
+                    registry.getExtensionPoint(EXT_POINT_ID);
             if (point == null) {
                 LOGGER.error("Invalid extension point: " + EXT_POINT_ID);
                 throw new IllegalStateException("ACTIVATION ERROR: "
                         + " --> Invalid extension point: " + EXT_POINT_ID);
             }
-            for (final IConfigurationElement elem
-                    : point.getConfigurationElements()) {
+            for (final IConfigurationElement elem : point
+                    .getConfigurationElements()) {
                 final String operator = elem.getAttribute(EXT_POINT_ATTR_DF);
                 final String decl =
-                    elem.getDeclaringExtension().getUniqueIdentifier();
+                        elem.getDeclaringExtension().getUniqueIdentifier();
 
                 if (operator == null || operator.isEmpty()) {
                     LOGGER.error("The extension '" + decl
@@ -230,7 +229,7 @@ public final class TagFactory {
                                     EXT_POINT_ATTR_DF);
                     if (builder != null) {
                         if (m_tagBuilder.containsKey(builder.getType())) {
-                            LOGGER.error("Tag set with type \"" 
+                            LOGGER.error("Tag set with type \""
                                     + builder.getType() + "\" already exists!");
                         } else {
                             m_tagBuilder.put(builder.getType(), builder);

@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public enum BiomedicalNeTag implements TagBuilder {
@@ -52,7 +52,6 @@ public enum BiomedicalNeTag implements TagBuilder {
     /** A cell type name. **/
     CELL_TYPE;
 
-
     private final Tag m_tag;
 
     /**
@@ -62,8 +61,8 @@ public enum BiomedicalNeTag implements TagBuilder {
 
     /**
      * Creates new instance of <code>BiomedicalNeTag</code> and
-     * {@link org.knime.ext.textprocessing.data.Tag} with the specified
-     * ABNER tag.
+     * {@link org.knime.ext.textprocessing.data.Tag} with the specified ABNER
+     * tag.
      */
     private BiomedicalNeTag() {
         m_tag = new Tag(name(), TAG_TYPE);
@@ -71,7 +70,7 @@ public enum BiomedicalNeTag implements TagBuilder {
 
     /**
      * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
-     * to the specified <code>BiomedicalNeTag</code>.
+     *         to the specified <code>BiomedicalNeTag</code>.
      */
     public Tag getTag() {
         return m_tag;
@@ -79,7 +78,7 @@ public enum BiomedicalNeTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     *
+     * 
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -90,17 +89,18 @@ public enum BiomedicalNeTag implements TagBuilder {
             list.add(values[i].name());
         }
         return list;
-    }  
+    }
 
     /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to
-     * the given string. If no corresponding
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to the
+     * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
+     * 
      * @param str The string representing a
-     * {@link org.knime.ext.textprocessing.data.Tag}.
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to
-     * the given string.
+     *            {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
+     *         given string.
      */
     public static Tag stringToTag(final String str) {
         for (BiomedicalNeTag ne : values()) {
@@ -121,7 +121,7 @@ public enum BiomedicalNeTag implements TagBuilder {
 
     /**
      * @return The default "UNKNOWN" <code>BiomedicalNeTag</code> as
-     * <code>TagBuilder</code>.
+     *         <code>TagBuilder</code>.
      */
     public static TagBuilder getDefault() {
         return BiomedicalNeTag.UNKNOWN;
@@ -134,7 +134,7 @@ public enum BiomedicalNeTag implements TagBuilder {
     public String getType() {
         return TAG_TYPE;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -145,5 +145,5 @@ public enum BiomedicalNeTag implements TagBuilder {
             tagSet.add(tag.getTag());
         }
         return tagSet;
-    }     
+    }
 }

@@ -25,6 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
@@ -44,13 +53,6 @@ import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPan
 import org.knime.ext.textprocessing.util.DataStructureUtil;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * 
  * @author Kilian Thiel, University of Konstanz
@@ -65,7 +67,7 @@ implements BufferedDataTableHolder {
     
     private int m_documentCellindex = -1;
     
-    private Set<Document> m_documents;
+    private List<Document> m_documents;
     
     private BufferedDataTable m_data;
 
@@ -116,22 +118,30 @@ implements BufferedDataTableHolder {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        
         m_exec = exec;
         m_documentCellindex = inData[0].getDataTableSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
         
-        m_documents = new HashSet<Document>();
+        m_documents = new ArrayList<Document>();
         m_data = inData[INPUT_INDEX];
-        m_documents = DataStructureUtil.buildDocumentSet(m_data, 
+        m_documents = DataStructureUtil.buildDocumentList(m_data, 
                 m_documentCellindex, m_exec);
+        Collections.sort(m_documents, new Comparator<Document>() {
+            @Override
+            public int compare(final Document o1, final Document o2) {
+                String title1 = o1.getTitle();
+                String title2 = o2.getTitle();
+                return title1.compareTo(title2);
+            }
+        });
+        
         return new BufferedDataTable[]{};
     }
     
     /**
      * @return the set of documents to display.
      */
-    Set<Document> getDocuments() {
+    List<Document> getDocumentList() {
         return m_documents;
     }
     
@@ -153,7 +163,7 @@ implements BufferedDataTableHolder {
         }
         m_data = tables[0];
         try {
-            m_documents = DataStructureUtil.buildDocumentSet(m_data, 
+            m_documents = DataStructureUtil.buildDocumentList(m_data, 
                     m_documentCellindex, m_exec);
         } catch (CanceledExecutionException e) {
             LOGGER.warn(

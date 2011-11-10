@@ -34,44 +34,44 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Contains all corresponding 
+ * Contains all corresponding
  * {@link org.knime.ext.textprocessing.data.Paragraph}s as a list as well as a
- * annotation ({@link org.knime.ext.textprocessing.data.SectionAnnotation}) 
- * marking out the position and rolw of the section, i.e. title, abstract, 
- * chapter, etc.  
+ * annotation ({@link org.knime.ext.textprocessing.data.SectionAnnotation})
+ * marking out the position and rolw of the section, i.e. title, abstract,
+ * chapter, etc.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class Section implements TextContainer, Externalizable {
 
     private List<Paragraph> m_paragraphs;
-    
+
     private SectionAnnotation m_annotation;
-    
+
     private int m_hashCode = -1;
 
     /**
-     * Creates empty instance of <code>Section</code> with all 
-     * <code>null</code> values.
+     * Creates empty instance of <code>Section</code> with all <code>null</code>
+     * values.
      */
     public Section() {
         m_paragraphs = null;
         m_annotation = null;
-    }     
-    
+    }
+
     /**
-     * Creates new instance of <code>Section</code> with given list of 
+     * Creates new instance of <code>Section</code> with given list of
      * {@link org.knime.ext.textprocessing.data.Paragraph}s and the given
      * {@link org.knime.ext.textprocessing.data.SectionAnnotation} to set. If
-     * one of these parameters is <code>null</code> a 
+     * one of these parameters is <code>null</code> a
      * <code>NullPointerException</code> will be thrown.
      * 
      * @param paragraphs The list of paragraphs to set.
      * @param annotation The annotation to set.
      * @throws NullPointerException If the given list of paragraphs or the
-     * annotation is <code>null</code>.
+     *             annotation is <code>null</code>.
      */
-    public Section(final List<Paragraph> paragraphs, 
+    public Section(final List<Paragraph> paragraphs,
             final SectionAnnotation annotation) throws NullPointerException {
         if (paragraphs == null) {
             throw new NullPointerException(
@@ -79,31 +79,30 @@ public class Section implements TextContainer, Externalizable {
         } else if (annotation == null) {
             throw new NullPointerException("Annotation may not be null!");
         }
-        
+
         m_paragraphs = paragraphs;
         m_annotation = annotation;
     }
-    
+
     /**
-     * Creates new instance of <code>Section</code> with given list of 
-     * {@link org.knime.ext.textprocessing.data.Paragraph}s. The annotation
-     * is set to <code>UNKONWON</code> by default. If the given list of 
-     * paragraphs is <code>null</code> a <code>NullPointerException</code> 
-     * will be thrown.
+     * Creates new instance of <code>Section</code> with given list of
+     * {@link org.knime.ext.textprocessing.data.Paragraph}s. The annotation is
+     * set to <code>UNKONWON</code> by default. If the given list of paragraphs
+     * is <code>null</code> a <code>NullPointerException</code> will be thrown.
      * 
      * @param paragraphs The list of paragraphs to set.
-     * @throws NullPointerException If the given list of paragraphs or is 
-     * <code>null</code>.
+     * @throws NullPointerException If the given list of paragraphs or is
+     *             <code>null</code>.
      */
-    public Section(final List<Paragraph> paragraphs) 
-    throws NullPointerException {
+    public Section(final List<Paragraph> paragraphs)
+            throws NullPointerException {
         this(paragraphs, SectionAnnotation.UNKNOWN);
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < m_paragraphs.size(); i++) {
@@ -128,8 +127,7 @@ public class Section implements TextContainer, Externalizable {
     public SectionAnnotation getAnnotation() {
         return m_annotation;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -144,7 +142,7 @@ public class Section implements TextContainer, Externalizable {
         }
         return sb.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -161,10 +159,10 @@ public class Section implements TextContainer, Externalizable {
         } else if (!s.getAnnotation().equals(m_annotation)) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -181,7 +179,7 @@ public class Section implements TextContainer, Externalizable {
         }
         return m_hashCode;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -208,5 +206,5 @@ public class Section implements TextContainer, Externalizable {
             m_paragraphs.add((Paragraph)in.readObject());
         }
         m_annotation = (SectionAnnotation)in.readObject();
-    }     
+    }
 }

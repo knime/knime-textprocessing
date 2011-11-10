@@ -25,7 +25,7 @@
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.JFrame;
 
@@ -44,7 +44,7 @@ public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
      * 
      * @param documents The set of documents to display.
      */
-    public DocumentViewerTablePanel(final Set<Document> documents) {
+    public DocumentViewerTablePanel(final List<Document> documents) {
         super(documents);
     }
     

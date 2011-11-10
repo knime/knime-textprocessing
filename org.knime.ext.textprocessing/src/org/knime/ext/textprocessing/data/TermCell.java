@@ -35,22 +35,23 @@ import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
- * A data cell implementation holding a 
+ * A data cell implementation holding a
  * {@link org.knime.ext.textprocessing.data.Term} value by storing this value in
- * a private <code>Term</code> member. It provides a term value as well
- * as a string value.
+ * a private <code>Term</code> member. It provides a term value as well as a
+ * string value.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermCell extends DataCell implements StringValue, TermValue {
-    
-    private static final NodeLogger LOGGER = 
-        NodeLogger.getLogger(TermCell.class);
-    
+
+    /**
+     * Serial Version ID.
+     */
+    private static final long serialVersionUID = 8738131596453134576L;
+
     /**
      * Convenience access member for
      * <code>DataType.getType(TermCell.class)</code>.
@@ -86,14 +87,15 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     private Term m_term;
 
     /**
-     * Creates a new instance of <code>TermCell</code> with given 
+     * Creates a new instance of <code>TermCell</code> with given
      * {@link org.knime.ext.textprocessing.data.Term}.
-     * @param term The <code>Term</code> to set. 
+     * 
+     * @param term The <code>Term</code> to set.
      */
     public TermCell(final Term term) {
         m_term = term;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -103,7 +105,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
             return false;
         }
         TermCell t = (TermCell)dc;
-        
+
         return t.getTermValue().equals(m_term);
     }
 
@@ -126,6 +128,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getStringValue() {
         return m_term.toString();
     }
@@ -133,22 +136,21 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term getTermValue() {
         return m_term;
     }
-    
-    
-    
+
     /** Factory for (de-)serializing a TermCell. */
-    private static class TermSerializer implements 
-        DataCellSerializer<TermCell> {
+    private static class TermSerializer implements DataCellSerializer<TermCell> 
+    {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public TermCell deserialize(final DataCellDataInput input) 
-        throws IOException {
+        public TermCell deserialize(final DataCellDataInput input)
+                throws IOException {
             return TermDocumentDeSerializationUtil.deserializeTermCell(input);
         }
 
@@ -156,12 +158,12 @@ public class TermCell extends DataCell implements StringValue, TermValue {
          * {@inheritDoc}
          */
         @Override
-        public void serialize(final TermCell cell, 
+        public void serialize(final TermCell cell,
                 final DataCellDataOutput output) throws IOException {
-            cell.serializeTerm((OutputStream) output);
+            cell.serializeTerm((OutputStream)output);
         }
     }
-    
+
     private void serializeTerm(final OutputStream out) throws IOException {
         TermDocumentDeSerializationUtil.serializeTerm(m_term, out);
     }

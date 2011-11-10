@@ -40,12 +40,18 @@ public class TextprocessingPreferenceInitializer extends
     
     public static final boolean DEFAULT_DML_DESERIALIZATION = true;
     
+    public static final boolean DEFAULT_ROW_PREPROCESSING = true;
+    
     /** Preference key for the usage of blob cells setting. */
     public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";
     
     /** Preference key for the usage of backwards compatibility. */
     public static final String PREF_DML_DESERIALIZATION = 
         "knime.textprocessing.dmldeserialization";
+    
+    /** Preference key for the usage of row preprocessing. */
+    public static final String PREF_ROW_PREPROCESSING = 
+        "knime.textprocessing.rowpreprocessing";
     
     /**
      * {@inheritDoc}
@@ -58,6 +64,7 @@ public class TextprocessingPreferenceInitializer extends
         //set default values
         store.setDefault(PREF_USE_BLOB, DEFAULT_USE_BLOB);
         store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
+        store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
     }
 
     /**
@@ -86,5 +93,19 @@ public class TextprocessingPreferenceInitializer extends
             return DEFAULT_DML_DESERIALIZATION;
         }
         return pStore.getBoolean(PREF_DML_DESERIALIZATION);
-    }    
+    }
+    
+    /**
+     * Returns true if row preprocessing has to be applied.
+     * 
+     * @return the preprocessing policy
+     */
+    public static boolean useRowPreprocessing() {
+        final IPreferenceStore pStore = 
+            TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!pStore.contains(PREF_ROW_PREPROCESSING)) {
+            return DEFAULT_ROW_PREPROCESSING;
+        }
+        return pStore.getBoolean(PREF_ROW_PREPROCESSING);
+    }      
 }

@@ -38,6 +38,7 @@ import org.knime.ext.textprocessing.data.TextContainer;
  * 
  * @author Kilian Thiel, University of Konstanz
  */
+@Deprecated
 public class FullDataCellCache extends DataCellCache {
 
     private Hashtable<TextContainer, DataCell> m_cache;

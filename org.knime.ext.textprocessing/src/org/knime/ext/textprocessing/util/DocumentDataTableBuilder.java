@@ -93,7 +93,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public BufferedDataTable createDataTable(final ExecutionContext exec,
             final List<Document> docs) throws CanceledExecutionException {
       // create cache
-      FullDataCellCache cache = new FullDataCellCache(m_documentCellFac);
+      DataCellCache cache = new SoftDataCellCache(m_documentCellFac);
       BufferedDataContainer dc =
               exec.createDataContainer(this.createDataTableSpec());
 
@@ -115,7 +115,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     }
     
     
-    private FullDataCellCache m_cache;
+    private DataCellCache m_cache;
     
     private BufferedDataContainer m_dc;
     
@@ -135,7 +135,9 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      */
     public void openDataTable(final ExecutionContext exec) {
         // create cache
-        m_cache = new FullDataCellCache(m_documentCellFac);
+        //m_cache = new FullDataCellCache(m_documentCellFac);
+        m_cache = new SoftDataCellCache(m_documentCellFac);
+        
         m_dc = exec.createDataContainer(this.createDataTableSpec());
         m_opened = true;
         m_rowRey = 0;

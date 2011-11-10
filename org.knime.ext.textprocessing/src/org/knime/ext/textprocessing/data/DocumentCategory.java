@@ -25,29 +25,33 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
- * Contains the category of a 
- * {@link org.knime.ext.textprocessing.data.Document}, which can for instance be
- * artificial intelligence, presidential elections, breast cancer, etc. The 
- * category of a {@link org.knime.ext.textprocessing.data.Document} specifies 
- * its superior topic. 
+ * Contains the category of a {@link org.knime.ext.textprocessing.data.Document}
+ * , which can for instance be artificial intelligence, presidential elections,
+ * breast cancer, etc. The category of a
+ * {@link org.knime.ext.textprocessing.data.Document} specifies its superior
+ * topic.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentCategory implements Serializable {
+public class DocumentCategory implements Externalizable {
 
     /**
      * The default source name.
      */
     private static final String DEFAULT_CATEGORY = "";
-    
+
     private String m_categoryName;
-    
+
     /**
-     * Creates new instance of <code>DocumentCategory</code> with the given 
-     * name of the category.
+     * Creates new instance of <code>DocumentCategory</code> with the given name
+     * of the category.
+     * 
      * @param categoryName The name of the source to set.
      */
     public DocumentCategory(final String categoryName) {
@@ -57,23 +61,22 @@ public class DocumentCategory implements Serializable {
             m_categoryName = categoryName;
         }
     }
-    
+
     /**
-     * Creates empty <code>DocumentCategory</code> instance with the default 
+     * Creates empty <code>DocumentCategory</code> instance with the default
      * name.
      */
     public DocumentCategory() {
         this(null);
     }
-    
+
     /**
      * @return The name of the category.
      */
     public String getCategoryName() {
         return m_categoryName;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -88,15 +91,32 @@ public class DocumentCategory implements Serializable {
         if (!dc.getCategoryName().equals(m_categoryName)) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public int hashCode() {
         return m_categoryName.hashCode();
-    }     
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeUTF(m_categoryName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_categoryName = in.readUTF();
+    }    
 }

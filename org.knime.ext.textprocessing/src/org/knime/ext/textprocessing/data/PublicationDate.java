@@ -25,7 +25,10 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,18 +36,18 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * Encapsulates a publication date of a 
+ * Encapsulates a publication date of a
  * {@link org.knime.ext.textprocessing.data.Document} with the ability to handle
- * missing values. For example, an instance of <code>PublicationDate</code> 
- * can be created without explicitly setting the day the month or even the year.
- * If only the publication year of a publication is known, 
- * an instance of  <code>PublicationDate</code> can be created nevertheless. 
- * If the complete date is unknown a zero date can be created.
+ * missing values. For example, an instance of <code>PublicationDate</code> can
+ * be created without explicitly setting the day the month or even the year. If
+ * only the publication year of a publication is known, an instance of
+ * <code>PublicationDate</code> can be created nevertheless. If the complete
+ * date is unknown a zero date can be created.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public class PublicationDate implements Serializable, 
-Comparable<PublicationDate> {
+public class PublicationDate implements Externalizable,
+        Comparable<PublicationDate> {
 
     private int m_year = 0;
 
@@ -54,22 +57,22 @@ Comparable<PublicationDate> {
 
     /**
      * Creates a proper <code>PublicationDate</code> instance with the given
-     * year, month and day values and returns it. If day is less or equals
-     * zero, only the year and the month is taken into account, if the month
-     * is less or equals zero too only the year is used to create the
+     * year, month and day values and returns it. If day is less or equals zero,
+     * only the year and the month is taken into account, if the month is less
+     * or equals zero too only the year is used to create the
      * <code>PublicationDate</code>. If the month number is not valid, i.e.
-     * greater than 12 a <code>ParseException</code> is thrown. 
+     * greater than 12 a <code>ParseException</code> is thrown.
      * 
      * @param year The year to create the <code>PublicationDate</code> with.
      * @param month The month to create the <code>PublicationDate</code> with.
      * @param day The day to create the <code>PublicationDate</code> with.
      * @return The new instance of <code>PublicationDate</code> with the given
-     * parameters.
-     * @throws ParseException If any of the parameters is not valid, i.e.
-     * the number of the month is greater than 12 or the number of the day
-     * greater than 31 (or 30 according to the month).
+     *         parameters.
+     * @throws ParseException If any of the parameters is not valid, i.e. the
+     *             number of the month is greater than 12 or the number of the
+     *             day greater than 31 (or 30 according to the month).
      */
-    public static PublicationDate createPublicationDate(final int year, 
+    public static PublicationDate createPublicationDate(final int year,
             final int month, final int day) throws ParseException {
         PublicationDate date = null;
         if (day > 0 && month > 0 && year > 0) {
@@ -80,31 +83,31 @@ Comparable<PublicationDate> {
             date = new PublicationDate(year);
         }
 
-        return date; 
+        return date;
     }
-    
+
     /**
      * Creates a proper <code>PublicationDate</code> instance with the given
-     * year, month and day values and returns it. If day is less or equals
-     * zero, only the year and the month is taken into account. A 
-     * <code>ParseException</code> is thrown if the mont or day is not valid. 
+     * year, month and day values and returns it. If day is less or equals zero,
+     * only the year and the month is taken into account. A
+     * <code>ParseException</code> is thrown if the mont or day is not valid.
      * 
-     * @param year The year to create the <code>PublicationDate</code> with. 
+     * @param year The year to create the <code>PublicationDate</code> with.
      * @param month The month to create the <code>PublicationDate</code> with.
      * @param day The day to create the <code>PublicationDate</code> with.
      * @return The new instance of <code>PublicationDate</code> with the given
-     * parameters.
-     * @throws ParseException If any of the parameters is not valid, i.e.
-     * the month is non of the 12 month names or the number of the day
-     * greater than 31 (or 30 according to the month).
+     *         parameters.
+     * @throws ParseException If any of the parameters is not valid, i.e. the
+     *             month is non of the 12 month names or the number of the day
+     *             greater than 31 (or 30 according to the month).
      */
-    public static PublicationDate createPublicationDate(final int year, 
+    public static PublicationDate createPublicationDate(final int year,
             final String month, final int day) throws ParseException {
-        return createPublicationDate(year, monthStrToInt(month), day); 
-    }    
-    
+        return createPublicationDate(year, monthStrToInt(month), day);
+    }
+
     /**
-     * Returns the proper number representation (1 - 12) for the given month 
+     * Returns the proper number representation (1 - 12) for the given month
      * string. The string can be the complete name of the month like "February"
      * or the first three characters like "feb".
      * 
@@ -141,12 +144,12 @@ Comparable<PublicationDate> {
         }
         return m;
     }
-    
-    
+
     /**
      * Creates a new instance of <code>PublicationDate</code> with given year,
      * month and day. These parameters have to be valid, otherwise a
      * <code>ParseException</code> will be thrown.
+     * 
      * @param year the dates year
      * @param month the dates month
      * @param day the dates day of month
@@ -159,25 +162,23 @@ Comparable<PublicationDate> {
             m_year = 0;
             m_month = 0;
             m_day = 0;
-        } else {            
+        } else {
             Calendar cal = new GregorianCalendar();
             if (year > cal.get(Calendar.YEAR)) {
-                throw new ParseException("Year " + year 
-                        + " is not valid !", 0);
+                throw new ParseException("Year " + year + " is not valid !", 0);
             }
             if (month > 12 || month < 1) {
-                throw new ParseException("Month " + month 
-                        + " is not valid !", 0);
+                throw new ParseException("Month " + month + " is not valid !",
+                        0);
             }
             if (day > 31 || day < 1) {
-                throw new ParseException("Day " + day 
-                        + " is not valid !", 0);
+                throw new ParseException("Day " + day + " is not valid !", 0);
             }
             String dateStr = year + "/" + month + "/" + day;
             SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
             Date date = df.parse(dateStr);
             cal.setTime(date);
-            
+
             m_year = cal.get(Calendar.YEAR);
             m_month = cal.get(Calendar.MONTH) + 1;
             m_day = cal.get(Calendar.DAY_OF_MONTH);
@@ -186,60 +187,61 @@ Comparable<PublicationDate> {
 
     /**
      * Creates a new instance of <code>PublicationDate</code> with given year.
-     * and month. If given year is greater than the current year, or given
-     * month is not valid a <code>IllegalArgumentException</code> will be 
-     * thrown. The day of month is set to zero.
+     * and month. If given year is greater than the current year, or given month
+     * is not valid a <code>IllegalArgumentException</code> will be thrown. The
+     * day of month is set to zero.
+     * 
      * @param year the dates year.
      * @param month the dates month.
      */
     public PublicationDate(final int year, final int month) {
         Calendar cal = new GregorianCalendar();
         if (year > cal.get(Calendar.YEAR)) {
-            throw new IllegalArgumentException("Year " + year 
+            throw new IllegalArgumentException("Year " + year
                     + " is not valid !");
         }
         if (month > 12 || month < 1) {
-            throw new IllegalArgumentException("Month " + month 
+            throw new IllegalArgumentException("Month " + month
                     + " is not valid !");
         }
         m_year = year;
         m_month = month;
     }
-    
+
     /**
      * Creates a new instance of <code>PublicationDate</code> with given year.
-     * If given year is greater than the current year, a 
-     * <code>IllegalArgumentException</code> will be thrown. 
-     * The month and day of month is set to zero.
+     * If given year is greater than the current year, a
+     * <code>IllegalArgumentException</code> will be thrown. The month and day
+     * of month is set to zero.
+     * 
      * @param year the dates year.
      */
     public PublicationDate(final int year) {
         Calendar cal = new GregorianCalendar();
         if (year > cal.get(Calendar.YEAR) || year <= 0) {
-            throw new IllegalArgumentException("Year " + year 
+            throw new IllegalArgumentException("Year " + year
                     + " is not valid !");
         }
         m_year = year;
     }
-    
+
     /**
      * Creates a new zeroed instance of <code>PublicationDate</code>.
      */
-    public PublicationDate() { }
-    
-    
+    public PublicationDate() { /* empty */
+    }
 
     /**
-     * Returns the String representation of a date, which is
-     * <i>yyyy-mm-dd</i> by default. Missing values will be ignored, a
-     * zero or empty date is represented by the String "0000-00-00". 
+     * Returns the String representation of a date, which is <i>yyyy-mm-dd</i>
+     * by default. Missing values will be ignored, a zero or empty date is
+     * represented by the String "0000-00-00".
      * 
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         String str;
-        
+
         if (m_month > 0 && m_day > 0) {
             str = m_year + "-" + m_month + "-" + m_day;
         } else if (m_month > 0 && m_day < 1) {
@@ -249,19 +251,20 @@ Comparable<PublicationDate> {
         } else {
             str = "0000-00-00";
         }
-        
+
         return str;
     }
-    
+
     /**
      * Returns the dates serialization String, which is similar to the String
-     * returned by {@link PublicationDate#toString()} except that missing 
-     * values, like day or month, two zeros "00" will be replaced by zeros.  
+     * returned by {@link PublicationDate#toString()} except that missing
+     * values, like day or month, two zeros "00" will be replaced by zeros.
+     * 
      * @return The dates serialization String.
      */
     public String serializationString() {
         String str;
-        
+
         if (m_month > 0 && m_day > 0) {
             str = m_year + "-" + m_month + "-" + m_day;
         } else if (m_month > 0 && m_day < 1) {
@@ -271,10 +274,10 @@ Comparable<PublicationDate> {
         } else {
             str = "0000-00-00";
         }
-        
-        return str;        
+
+        return str;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -287,7 +290,7 @@ Comparable<PublicationDate> {
             return false;
         }
         PublicationDate d = (PublicationDate)o;
-        
+
         if (d.getYear() != m_year) {
             return false;
         }
@@ -299,7 +302,7 @@ Comparable<PublicationDate> {
         }
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -307,7 +310,7 @@ Comparable<PublicationDate> {
     public int hashCode() {
         int prime = 119;
         int hashCode = 1;
-        
+
         hashCode *= prime + new Integer(m_year).hashCode();
         hashCode *= prime + new Integer(m_month).hashCode();
         hashCode *= prime + new Integer(m_day).hashCode();
@@ -318,6 +321,7 @@ Comparable<PublicationDate> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compareTo(final PublicationDate o) throws ClassCastException {
         int yd = m_year - o.getYear();
         int md = m_month - o.getMonth();
@@ -330,8 +334,7 @@ Comparable<PublicationDate> {
         }
         return dd;
     }
-    
-    
+
     /**
      * @return the day
      */
@@ -352,7 +355,7 @@ Comparable<PublicationDate> {
     public int getYear() {
         return m_year;
     }
-    
+
     /**
      * @return The todays date formatted like "dd-MM-yyy".
      */
@@ -360,5 +363,26 @@ Comparable<PublicationDate> {
         Date today = new Date();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         return format.format(today);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeInt(m_year);
+        out.writeInt(m_month);
+        out.writeInt(m_day);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        m_year = in.readInt();
+        m_month = in.readInt();
+        m_day = in.readInt();
     }
 }

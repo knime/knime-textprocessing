@@ -26,20 +26,20 @@
 package org.knime.ext.textprocessing.data;
 
 /**
- * Classes implementing this interface have to contain textual data in any
- * kind of representations. Therefore the method
+ * Classes implementing this interface have to contain textual data in any kind
+ * of representations. Therefore the method
  * {@link org.knime.ext.textprocessing.data.TextContainer#getText()} enables the
- * access of this textual data in an unified way.   
+ * access of this textual data in an unified way.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
 public interface TextContainer {
 
     /**
-     * @return The textual data of the <code>TextContainer</code> as a 
-     * single String. The difference to {@link java.lang.Object#toString()} is
-     * that not a string representation of the instance is returned but only
-     * the useful textual data as string.
+     * @return The textual data of the <code>TextContainer</code> as a single
+     *         String. The difference to {@link java.lang.Object#toString()} is
+     *         that not a string representation of the instance is returned but
+     *         only the useful textual data as string.
      */
     public String getText();
 }
