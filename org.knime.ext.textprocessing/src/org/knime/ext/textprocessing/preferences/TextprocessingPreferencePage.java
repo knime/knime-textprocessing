@@ -28,7 +28,6 @@ package org.knime.ext.textprocessing.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
@@ -85,7 +84,6 @@ public class TextprocessingPreferencePage extends FieldEditorPreferencePage
      */
     @Override
     protected void createFieldEditors() {
-        Composite parent = getFieldEditorParent();
         
         // Dml deserialization setting
         Group serializationGrp = new Group(getFieldEditorParent(), 
