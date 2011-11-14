@@ -23,7 +23,7 @@
  * History
  *   09.09.2008 (Iris Adae): created
  */
-package org.knime.ext.textprocessing.nodes.view.tagcloud;
+package org.knime.ext.textprocessing.nodes.view.tagcloud.outport;
 
 /**
  * Summarizing all ConfigKeys necessary for the TagCloud dialog components.
@@ -79,6 +79,11 @@ public final class TagCloudConfigKeys {
                     "InsideOut Table"};
 
     /**
+     * Index of default tag cloud type.
+     */
+    public static final int DEFAULT_TAGCLOUD_TYPE = 3;
+    
+    /**
      * Configuration key and label for ignoring the tags.
      */
     public static final String CFGKEY_IGNORE_TAGS = "Ignore tags";
@@ -102,6 +107,39 @@ public final class TagCloudConfigKeys {
      */
     public static final String NO_OF_ROWS_LABEL = "No. of rows to display:";
 
+    
+    /** 
+     * Config Key for image width.  
+     */
+    public static final String CFGKEY_WIDTH = "Width";
 
-
+    /** 
+     * Config Key for image height.  
+     */
+    public static final String CFGKEY_HEIGHT = "Height";
+    
+    /** 
+     * Config Key for image export type.
+     */
+    public static final String CFGKEY_EXPORTTYPE = "ExportType";
+    
+    /** 
+     * Config Key for anti aliasing.
+     */
+    public static final String CFGKEY_ANTIALIASING = "Anti Aliasing";
+    
+    /** 
+     * Config Key for background color.
+     */
+    public static final String CFGKEY_BACKGROUND_COLOR = "Background Color";
+    
+    /** 
+     * Config Key for alpha value.
+     */
+    public static final String CFGKEY_ALPHA_VALUE = "Alpha value";
+    
+    /** 
+     * Config Key for bold value.
+     */
+    public static final String CFGKEY_BOLD_VALUE = "Bold value";    
 }

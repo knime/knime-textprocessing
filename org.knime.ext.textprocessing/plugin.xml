@@ -335,6 +335,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/misc"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

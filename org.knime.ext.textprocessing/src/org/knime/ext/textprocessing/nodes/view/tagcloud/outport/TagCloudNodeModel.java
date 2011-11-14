@@ -24,16 +24,25 @@
  *   15.11.2008 (Iris Adae): created
  */
 
-package org.knime.ext.textprocessing.nodes.view.tagcloud;
+package org.knime.ext.textprocessing.nodes.view.tagcloud.outport;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import javax.swing.JFrame;
+
+import org.knime.base.data.xml.SvgCell;
+import org.knime.base.data.xml.SvgImageContent;
 import org.knime.base.node.util.DefaultDataArray;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.image.ImageContent;
+import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -44,9 +53,17 @@ import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NodeViewExport;
+import org.knime.core.node.NodeViewExport.ExportType;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelColor;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.image.ImagePortObject;
+import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -77,9 +94,30 @@ public class TagCloudNodeModel extends NodeModel {
 
     private SettingsModelIntegerBounded m_noOfRows =
             TagCloudNodeDialog.getNoofRowsModel();
+    
     private SettingsModelBoolean m_allRows =
             TagCloudNodeDialog.getUseallrowsBooleanModel();
+    
+    private SettingsModelIntegerBounded m_widthModel = 
+        TagCloudNodeDialog.getWidthModel();
+    
+    private SettingsModelIntegerBounded m_heightModel = 
+        TagCloudNodeDialog.getHeightModel();
+    
+    private SettingsModelString m_imagetypeModel = 
+        TagCloudNodeDialog.getImageTypeModel();
+    
+    private SettingsModelColor m_backgroundColorModel =
+        TagCloudNodeDialog.getBackgroundColorModel();
+    
+    private SettingsModelBoolean m_antialiasingModel = 
+        TagCloudNodeDialog.getAntiAliasingModel();
+    
+    private SettingsModelIntegerBounded m_alphaModel = 
+        TagCloudNodeDialog.getAlphaModel();
 
+    private SettingsModelIntegerBounded m_boldModel = 
+        TagCloudNodeDialog.getBoldModel();
 
     /** The selected ID of the Column containing the value. */
     private int m_valueColIndex;
@@ -97,11 +135,21 @@ public class TagCloudNodeModel extends NodeModel {
      */
     public static final String INTERNAL_MODEL = "TagCloudNodel.data";
 
+    public static final int DEFAULT_WIDTH = 1024;
+    
+    public static final int DEFAULT_HEIGHT = 700;
+    
+    public static final boolean DEFAULT_ANTIALIASING = true;
+    
+    public static final Color DEFAULT_BACKGROUND_COLOR = Color.white;
+   
+    
     /**
      * Initializes NodeModel.
      */
      TagCloudNodeModel() {
-        super(1, 0);
+         super(new PortType[] {BufferedDataTable.TYPE}, 
+                 new PortType[] {ImagePortObject.TYPE});
     }
 
 
@@ -109,19 +157,26 @@ public class TagCloudNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-
-        DataTableSpecVerifier verifier
-                    = new DataTableSpecVerifier(inSpecs[0]);
-        /** Verifies if there are at least one termcell and
-         *  one numbercell and initializes the selected column indexes
+        DataTableSpec inSpec = (DataTableSpec)inSpecs[0];
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpec);
+        /* 
+         * Verifies if there are at least one termcell and
+         * one numbercell and initializes the selected column indexes
          */
         verifier.verifyMinimumTermCells(1, true);
         verifier.verifyMinimumNumberCells(1, true);
-
-        setColumnindexes(inSpecs[0]);
-        return null;
+        setColumnindexes(inSpec);
+        
+        final String imgType = m_imagetypeModel.getStringValue();
+        ImagePortObjectSpec outSpec;
+        if (imgType.toUpperCase().startsWith("SVG")) {
+            outSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        } else {
+            outSpec = new ImagePortObjectSpec(PNGImageContent.TYPE);
+        }
+        return new PortObjectSpec[] {outSpec};
     }
 
     /** Initializes the column index for the selected term and value
@@ -134,49 +189,95 @@ public class TagCloudNodeModel extends NodeModel {
         m_valueColIndex = verifier.getNumberCellIndex();
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
+    protected final PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
-        int numofRows = inData[0].getRowCount();
+
+        BufferedDataTable dataTable = (BufferedDataTable)inData[0];
+        int numofRows = dataTable.getRowCount();
         if (!m_allRows.getBooleanValue()) {
             numofRows = Math.min(m_noOfRows.getIntValue(), numofRows);
-            
+
         }
         if (numofRows <= 0) {
             m_tagcloud = null;
             setWarningMessage("Empty data table, nothing to display");
             return null;
         }
-        m_data = new DefaultDataArray(inData[0], 1, numofRows, exec);
-
-        setColumnindexes(inData[0].getDataTableSpec());
-
-        m_termColIndex =
-                inData[0].getDataTableSpec().findColumnIndex(
+        m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
+        setColumnindexes(dataTable.getDataTableSpec());
+        m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(
                         m_termColModel.getStringValue());
 
         if (m_termColIndex < 0) {
-            m_termColIndex = (new DataTableSpecVerifier(
-                    inData[0].getSpec())).getTermCellIndex();
+            m_termColIndex = (new DataTableSpecVerifier(dataTable.getSpec()))
+            .getTermCellIndex();
         }
-
-        m_valueColIndex =
-                inData[0].getDataTableSpec().findColumnIndex(
+        m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(
                         m_valueColModel.getStringValue());
 
         if (m_valueColIndex < 0) {
-            m_valueColIndex = (new DataTableSpecVerifier(
-                    inData[0].getSpec())).getNumberCellIndex();
+            m_valueColIndex = (new DataTableSpecVerifier(dataTable.getSpec()))
+            .getNumberCellIndex();
         }
-        
+
         m_tagcloud = new TagCloud();
         m_tagcloud.createTagCloud(exec, this);
-
+        m_tagcloud.changealpha(m_alphaModel.getIntValue());
+        m_tagcloud.changebold(m_boldModel.getIntValue());
+        m_tagcloud.changeWidth(m_widthModel.getIntValue());
         exec.setProgress(1, "TagCloud completed");
-        return null;
+        
+        TagCloudViewPlotter plotter = new TagCloudViewPlotter();
+        plotter.setTagCloudModel(m_tagcloud);
+        plotter.updatePaintModel();
+        plotter.fitToSize(getWindowDimension());
+        plotter.setBackground(m_backgroundColorModel.getColorValue());
+        
+        TagCloudViewDrawingPane drawingPane = 
+            (TagCloudViewDrawingPane)plotter.getDrawingPane();
+        drawingPane.setAntialiasing(m_antialiasingModel.getBooleanValue());
+        drawingPane.setOpaque(true);
+        drawingPane.setBackground(m_backgroundColorModel.getColorValue());
+        
+        // dirty workaround ... draw pane in order to get the specified 
+        // background color.        
+        JFrame f = new JFrame("Test");
+        f.setContentPane(drawingPane);
+        f.pack();
+        f.dispose();
+        
+        final String imgType = m_imagetypeModel.getStringValue();
+        final ExportType exportType =
+                NodeViewExport.getViewExportMap().get(imgType);
+        if (exportType == null) {
+            throw new InvalidSettingsException("Invalid image type:" + imgType);
+        }
+        final File file =
+                File.createTempFile("image", "." + exportType.getFileSuffix());
+        file.deleteOnExit();
+        exec.setMessage("Creating image file...");
+        exportType.export(file, drawingPane, 
+                drawingPane.getPreferredSize().width,
+                drawingPane.getPreferredSize().height);
+        final InputStream is = new FileInputStream(file);
+        ImagePortObjectSpec outSpec;
+        final ImageContent image;
+        if (imgType.toUpperCase().startsWith("SVG")) {
+            outSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+            image = new SvgImageContent(is);
+        } else {
+            outSpec = new ImagePortObjectSpec(PNGImageContent.TYPE);
+            image = new PNGImageContent(is);
+        }
+        is.close();
+        file.delete();
+        final PortObject po = new ImagePortObject(image, outSpec);
+        return new PortObject[]{po};
     }
 
 
@@ -193,6 +294,13 @@ public class TagCloudNodeModel extends NodeModel {
         m_termColModel.loadSettingsFrom(settings);
         m_allRows.loadSettingsFrom(settings);
         m_noOfRows.loadSettingsFrom(settings);
+        m_widthModel.loadSettingsFrom(settings);
+        m_heightModel.loadSettingsFrom(settings);
+        m_imagetypeModel.loadSettingsFrom(settings);
+        m_antialiasingModel.loadSettingsFrom(settings);
+        m_backgroundColorModel.loadSettingsFrom(settings);
+        m_alphaModel.loadSettingsFrom(settings);
+        m_boldModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -258,6 +366,13 @@ public class TagCloudNodeModel extends NodeModel {
         m_termColModel.saveSettingsTo(settings);
         m_noOfRows.saveSettingsTo(settings);
         m_allRows.saveSettingsTo(settings);
+        m_widthModel.saveSettingsTo(settings);
+        m_heightModel.saveSettingsTo(settings);
+        m_imagetypeModel.saveSettingsTo(settings);
+        m_antialiasingModel.saveSettingsTo(settings);
+        m_backgroundColorModel.saveSettingsTo(settings);
+        m_alphaModel.saveSettingsTo(settings);
+        m_boldModel.saveSettingsTo(settings);
     }
 
     /**
@@ -272,6 +387,13 @@ public class TagCloudNodeModel extends NodeModel {
         m_termColModel.validateSettings(settings);
         m_noOfRows.validateSettings(settings);
         m_allRows.validateSettings(settings);
+        m_widthModel.validateSettings(settings);
+        m_heightModel.validateSettings(settings);
+        m_imagetypeModel.validateSettings(settings);
+        m_antialiasingModel.validateSettings(settings);
+        m_backgroundColorModel.validateSettings(settings);
+        m_alphaModel.validateSettings(settings);
+        m_boldModel.validateSettings(settings);
     }
 
 
@@ -321,4 +443,12 @@ public class TagCloudNodeModel extends NodeModel {
         return m_ignoretags.getBooleanValue();
     }
 
+    /**
+     * @return the preferred dimensions of the window which is the layout
+     * dimension {@link #getLayoutDimension()} plus an offset
+     */
+    private Dimension getWindowDimension() {
+        return new Dimension(m_widthModel.getIntValue(),
+                m_heightModel.getIntValue());
+    }
 }
