@@ -57,19 +57,9 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
      * {@inheritDoc}
      */
     @Override
-    public void paint(final Graphics g) {
-        super.paint(g);
-        paintComponent(g);
-        //paintContent(g);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void paintContent(final Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
-        
+
         Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud
                 .getmaxFontsize());
         TagCloudData[] points = m_tagcloud.getDataArray();
@@ -105,17 +95,6 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
         }
         return super.getPreferredSize();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Dimension getSize() {
-        if (m_tagcloud != null) {
-            return m_tagcloud.getPreferredSize();
-        }
-        return super.getPreferredSize();
-    }    
 
     /**
      * Called when the tag cloud has changed.

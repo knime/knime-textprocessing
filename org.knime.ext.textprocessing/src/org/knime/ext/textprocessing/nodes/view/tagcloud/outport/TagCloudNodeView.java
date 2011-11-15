@@ -70,6 +70,12 @@ public class TagCloudNodeView extends NodeView<TagCloudNodeModel>  {
             m_plotter.setTagCloudModel(model.getTagCloud());
             m_plotter.updatePaintModel();
 
+            m_plotter.getProperties().getAntialiasButton().setSelected(
+                    model.useAntialiasing());
+            m_plotter.fitToSize(model.getWindowDimension());
+            m_plotter.getDrawingPane().setBackground(
+                    model.getBackgroundColor());
+            
             setComponent(m_plotter);
     }
 
@@ -86,6 +92,6 @@ public class TagCloudNodeView extends NodeView<TagCloudNodeModel>  {
      */
     @Override
     protected void onOpen() {
-        //nothing to do
+        // nothing to do ...
     }
 }

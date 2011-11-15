@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../icons/TextProcDocumentView.png" type="Visualizer">
-	<name>Tagcloud</name>
+	<name>Tagcloud (Outport)</name>
 	<shortDescription>Creates a tag cloud</shortDescription>
 	<fullDescription>
-		<intro> 
+		<intro>
 		 <p>A tag cloud is a representation of words indicating the importance of the
          words by manipulating the visual properties.
          Here we use the distribution of font size, transparency and
@@ -98,19 +98,24 @@
         The size of the image to export. Note that it can not be guaranteed that 
         the specified size is used correctly by the tag cloud. The required 
         space of the tag cloud depends on the number of terms and the frequency
-        distribution. The tag cloud algorithm tries to fit the tag cloud to the
-        specified size as good as possible. 
+        distribution. The tag cloud algorithm tries to adjust the font size
+        of the terms in a way that the specified size is realized as good as
+        possible.  
     </option>
     <option name="Background color">
         The background color to set.
     </option>        
     <option name="Alpha">
-        The alpha value to set. Terms with lower frequency have a lower alpha 
-        value if value is lower than 100.
+        The alpha value to set, specifying the transparency of terms with lower
+        frequency value. The specified value decreases linearly with decreasing
+        frequency values in a way that less frequent terms will be more 
+        transparent. 
     </option>
     <option name="Bold">
-        The bold value to set. Terms with lower frequency have a lower bold 
-        value if value is lower than 100.
+        The bold value to set, specifying the boldness of terms with lower
+        frequency value. The specified value decreases linearly with decreasing
+        frequency values in a way that less frequent terms will be less 
+        bold. 
     </option>
     <option name="aliasing">
         Whether anti aliasing is applied or not.
@@ -127,11 +132,9 @@
         </outPort>        
     </ports>
   
-    
     <views>
         <view index="0" name="Tagcloud">
                 Displays the terms in a table tagcloud view. 
         </view>
     </views>    
-	
 </knimeNode>

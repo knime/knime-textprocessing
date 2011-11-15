@@ -34,8 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.JFrame;
-
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.base.node.util.DefaultDataArray;
@@ -236,20 +234,18 @@ public class TagCloudNodeModel extends NodeModel {
         plotter.setTagCloudModel(m_tagcloud);
         plotter.updatePaintModel();
         plotter.fitToSize(getWindowDimension());
-        plotter.setBackground(m_backgroundColorModel.getColorValue());
         
-        TagCloudViewDrawingPane drawingPane = 
-            (TagCloudViewDrawingPane)plotter.getDrawingPane();
-        drawingPane.setAntialiasing(m_antialiasingModel.getBooleanValue());
-        drawingPane.setOpaque(true);
-        drawingPane.setBackground(m_backgroundColorModel.getColorValue());
-        
-        // dirty workaround ... draw pane in order to get the specified 
-        // background color.        
-        JFrame f = new JFrame("Test");
-        f.setContentPane(drawingPane);
-        f.pack();
-        f.dispose();
+        TagCloudImageExportPanel panel = new TagCloudImageExportPanel(
+                m_tagcloud);
+        panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
+        panel.setOpaque(true);
+        panel.setBackground(m_backgroundColorModel.getColorValue());
+        // don't know exactly why bonds have to be set, but they need
+        // to be set in order to get the background drawn properly.
+        // If bonds are not set background settings will be ignored even
+        // if opaque is set.
+        panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, 
+                m_tagcloud.getPreferredSize().height);
         
         final String imgType = m_imagetypeModel.getStringValue();
         final ExportType exportType =
@@ -261,9 +257,11 @@ public class TagCloudNodeModel extends NodeModel {
                 File.createTempFile("image", "." + exportType.getFileSuffix());
         file.deleteOnExit();
         exec.setMessage("Creating image file...");
-        exportType.export(file, drawingPane, 
-                drawingPane.getPreferredSize().width,
-                drawingPane.getPreferredSize().height);
+        
+        exportType.export(file, panel, 
+                panel.getPreferredSize().width,
+                panel.getPreferredSize().height);
+        
         final InputStream is = new FileInputStream(file);
         ImagePortObjectSpec outSpec;
         final ImageContent image;
@@ -447,8 +445,16 @@ public class TagCloudNodeModel extends NodeModel {
      * @return the preferred dimensions of the window which is the layout
      * dimension {@link #getLayoutDimension()} plus an offset
      */
-    private Dimension getWindowDimension() {
+    public Dimension getWindowDimension() {
         return new Dimension(m_widthModel.getIntValue(),
                 m_heightModel.getIntValue());
+    }
+    
+    public boolean useAntialiasing() {
+        return m_antialiasingModel.getBooleanValue();
+    }
+    
+    public Color getBackgroundColor() {
+        return m_backgroundColorModel.getColorValue();
     }
 }

@@ -125,20 +125,21 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
                 getWidthModel(), "Width:", Integer.valueOf(10)));
         addDialogComponent(new DialogComponentNumber(
                 getHeightModel(), "Height:", Integer.valueOf(10)));
+        setHorizontalPlacement(false);
         closeCurrentGroup();
         
         createNewGroup("Colors and shape:");
         addDialogComponent(new DialogComponentColorChooser(
                 getBackgroundColorModel(), "Background color:", true));
         
-        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumber(
                 getAlphaModel(), "Alpha:", 1));
         
         addDialogComponent(new DialogComponentNumber(
                 getBoldModel(), "Bold:", 1));
         
-        setHorizontalPlacement(true);
+        setHorizontalPlacement(false);
         addDialogComponent(new DialogComponentBoolean(
                 getAntiAliasingModel(), "Antialiasing:"));
         closeCurrentGroup();
