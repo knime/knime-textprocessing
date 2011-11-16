@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -74,8 +74,8 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         m_columnvalue = getValueModel();
         m_ignoretags = getBooleanModel();
         m_typeofcalctc = getTypeofTCcalculationModel();
-        
-        
+
+
         removeTab("Options");
         createNewTabAt("General", 1);
 
@@ -91,7 +91,7 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentNumber(m_noOfRows,
                 TagCloudConfigKeys.NO_OF_ROWS_LABEL, new Integer(1)));
         closeCurrentGroup();
-        
+
         createNewGroup("Column settings:");
         addDialogComponent(new DialogComponentColumnNameSelection(m_term,
                 "Term column", 0, TermValue.class));
@@ -99,8 +99,8 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(m_columnvalue,
                 "Value column", 0, IntValue.class, DoubleValue.class));
         closeCurrentGroup();
-        
-        createNewGroup("Tagcloud settings:");
+
+        createNewGroup("Tag Cloud settings:");
         addDialogComponent(new DialogComponentBoolean(m_ignoretags,
                 TagCloudConfigKeys.CFGKEY_IGNORE_TAGS));
 
@@ -111,14 +111,14 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentStringSelection(m_typeofcalctc,
                 TagCloudConfigKeys.CFG_TYPEOFTCCALC, list));
         closeCurrentGroup();
-        
-        
+
+
         createNewTab("Image Export");
         final Set<String> exportTypes =
             NodeViewExport.getViewExportMap().keySet();
         addDialogComponent(new DialogComponentStringSelection(
                 getImageTypeModel(), "Image type:", exportTypes));
-        
+
         createNewGroup("Image size:");
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumber(
@@ -127,47 +127,47 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
                 getHeightModel(), "Height:", Integer.valueOf(10)));
         setHorizontalPlacement(false);
         closeCurrentGroup();
-        
+
         createNewGroup("Colors and shape:");
         addDialogComponent(new DialogComponentColorChooser(
                 getBackgroundColorModel(), "Background color:", true));
-        
+
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumber(
                 getAlphaModel(), "Alpha:", 1));
-        
+
         addDialogComponent(new DialogComponentNumber(
                 getBoldModel(), "Bold:", 1));
-        
+
         setHorizontalPlacement(false);
         addDialogComponent(new DialogComponentBoolean(
-                getAntiAliasingModel(), "Antialiasing:"));
+                getAntiAliasingModel(), "Antialiasing"));
         closeCurrentGroup();
     }
 
     public static SettingsModelIntegerBounded getBoldModel() {
         return new SettingsModelIntegerBounded(
-                TagCloudConfigKeys.CFGKEY_BOLD_VALUE, 
+                TagCloudConfigKeys.CFGKEY_BOLD_VALUE,
                 AbstractTagCloud.DEFAULT_BOLD, 0, 100);
     }
-    
+
     public static SettingsModelIntegerBounded getAlphaModel() {
         return new SettingsModelIntegerBounded(
-                TagCloudConfigKeys.CFGKEY_ALPHA_VALUE, 
+                TagCloudConfigKeys.CFGKEY_ALPHA_VALUE,
                 AbstractTagCloud.DEFAULT_ALPHA, 0, 100);
-    }    
-    
+    }
+
     public static SettingsModelColor getBackgroundColorModel() {
         return new SettingsModelColor(
-                TagCloudConfigKeys.CFGKEY_BACKGROUND_COLOR, 
+                TagCloudConfigKeys.CFGKEY_BACKGROUND_COLOR,
                 TagCloudNodeModel.DEFAULT_BACKGROUND_COLOR);
     }
-    
+
     public static SettingsModelBoolean getAntiAliasingModel() {
         return new SettingsModelBoolean(TagCloudConfigKeys.CFGKEY_ANTIALIASING,
                 TagCloudNodeModel.DEFAULT_ANTIALIASING);
     }
-    
+
     public static SettingsModelString getImageTypeModel() {
         final Set<String> types = NodeViewExport.getViewExportMap().keySet();
         String preset;
@@ -179,18 +179,18 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(TagCloudConfigKeys.CFGKEY_EXPORTTYPE,
                 preset);
     }
-    
+
     public static final SettingsModelIntegerBounded getWidthModel() {
-        return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_WIDTH, 
+        return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_WIDTH,
                 TagCloudNodeModel.DEFAULT_WIDTH, 0, Integer.MAX_VALUE);
     }
-    
+
     public static final SettingsModelIntegerBounded getHeightModel() {
         return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_HEIGHT,
                 TagCloudNodeModel.DEFAULT_HEIGHT, 0, Integer.MAX_VALUE);
     }
-    
-    
+
+
     /**
      ** @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the type of
