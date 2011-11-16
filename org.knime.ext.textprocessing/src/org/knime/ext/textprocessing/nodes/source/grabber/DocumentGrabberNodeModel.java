@@ -151,6 +151,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
                 ((AbstractDocumentGrabber)grabber).setExec(exec);
             }
             
+            grabber.removeAllDocumentParsedListener();
             grabber.addDocumentParsedListener(
                     new InternalDocumentParsedEventListener());
             grabber.fetchAndParseDocuments(
@@ -165,6 +166,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void documentParsed(final DocumentParsedEvent event) {
             if (m_dtBuilder != null) {
                 Document d = event.getDocument();
