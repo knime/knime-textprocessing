@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator" deprecated="true">
+<knimeNode icon="../../../../icons/TextProcEnrichment.png" type="Manipulator">
     <name>Dictionary tagger</name>
     <shortDescription>Assigns specified tags values of specified tag types 
-        to terms of the given list.
+        to terms specified in an dictionary column.
     </shortDescription>
     <fullDescription>
         <intro>
-            This node recognizes named entities specified in the given list and
-            assigns a specified tag value and type. Optionally the recognized 
-            named entity terms can be set unmodifiable, meaning that the terms 
-            are not modified or filtered afterwards by any following node.
+            This node recognizes named entities specified in a dictionary column 
+            and assigns a specified tag value and type. Optionally the 
+            recognized named entity terms can be set unmodifiable, meaning that 
+            the terms are not modified or filtered afterwards by any following 
+            node.
         </intro>
+        <option name="Dictionary column">
+            Specifies the dictionary column containing the terms to search for. 
+        </option>
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
         </option>
         <option name="Case sensitive">
             If checked, case sensitive named entity recognition will be applied,
             otherwise not. 
-        </option>
-        <option name="Selected File">
-            Specifies the location of the dictionary file.
         </option>
         <option name="Tag type">
             Specifies the tag type of which tag values can be chosen.
@@ -32,7 +33,9 @@
         
     <ports>
         <inPort name="Documents input table" index="0">The input table
-        containing the documents to tag.</inPort>    
+        containing the documents to tag.</inPort>
+        <inPort name="Dictionary input table" index="1">The input table
+        containing the dictionary column.</inPort>    
         <outPort name="Documents output table" index="0">An output table
         containing the tagged documents.</outPort>
     </ports>

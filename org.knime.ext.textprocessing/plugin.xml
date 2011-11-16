@@ -175,7 +175,7 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory">
       </node>
       <node
