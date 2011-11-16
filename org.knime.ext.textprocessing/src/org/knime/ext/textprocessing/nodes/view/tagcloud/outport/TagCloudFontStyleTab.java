@@ -397,8 +397,12 @@ public class TagCloudFontStyleTab extends PropertiesTab {
      * @return a new {@link JSlider}
      */
     private JSlider createMinMaxSlider(final int value) {
+        int val = value;
+        if (val > CFG_SLIDER_MAX_FONTSIZE) {
+            val = CFG_SLIDER_MAX_FONTSIZE;
+        }
         JSlider t = new JSlider(CFG_SLIDER_MIN_FONTSIZE,
-                CFG_SLIDER_MAX_FONTSIZE, value);
+                CFG_SLIDER_MAX_FONTSIZE, val);
         t.setLabelTable(t.createStandardLabels(CFG_SLIDER_STEPSIZE));
         t.setPaintLabels(true);
         t.setPaintTicks(true);
@@ -413,7 +417,11 @@ public class TagCloudFontStyleTab extends PropertiesTab {
      * @return a new {@link JSpinner}
      */
     private JSpinner createMinMaxSpinner(final int value) {
-        JSpinner t = new JSpinner(new SpinnerNumberModel(value,
+        int val = value;
+        if (val > CFG_SLIDER_MAX_FONTSIZE) {
+            val = CFG_SLIDER_MAX_FONTSIZE;
+        }
+        JSpinner t = new JSpinner(new SpinnerNumberModel(val,
                 CFG_SPINNER_MIN_FONTSIZE, CFG_SPINNER_MAX_FONTSIZE,
                 CFG_SPINNER_STEPSIZE));
         return t;

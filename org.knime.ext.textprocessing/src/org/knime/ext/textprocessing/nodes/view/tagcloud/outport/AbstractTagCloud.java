@@ -155,6 +155,10 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
 
     /** default value for the maximal font.*/
     protected static final int DEFAULT_MAXFONT = 50;
+    
+    protected static final int MAX_FONT = 150;
+    
+    protected static final int MIN_FONT = 1;
 
     /** default value for the alpha value.*/
     public static final int DEFAULT_ALPHA = 90;
@@ -530,8 +534,16 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
      */
     protected void setMinMaxFontsize(final int min,
             final int max, final int calctype) {
-        m_minfont = min;
-        m_maxfont = max;
+        int minF = min;
+        int maxF = max;
+        if (minF < MIN_FONT) {
+            minF = MIN_FONT;
+        }
+        if (maxF > MAX_FONT) {
+            maxF = MAX_FONT;
+        }
+        m_minfont = minF;
+        m_maxfont = maxF;
         m_calcType = Math.min(3, Math.max(0, calctype));
     }
 
@@ -588,8 +600,16 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         if (m_minfont != minFont || m_maxfont != maxFont
                 || !m_fontname.equals(fontname) || calcType != m_calcType
                 || m_bold != bold) {
-            m_minfont = minFont;
-            m_maxfont = maxFont;
+            int minF = minFont;
+            int maxF = maxFont;
+            if (minF < MIN_FONT) {
+                minF = MIN_FONT;
+            }
+            if (maxF > MAX_FONT) {
+                maxF = MAX_FONT;
+            }
+            m_minfont = minF;
+            m_maxfont = maxF;
             m_fontname = fontname;
             m_calcType = calcType;
             TCFontsize fs = TagCloudGeneral.getfontsizeobject(m_calcType);
@@ -911,8 +931,16 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
      */
     protected void setMinMaxFontsize(final int min,
             final int max) {
-        m_minfont = min;
-        m_maxfont = max;
+        int minF = min;
+        int maxF = max;
+        if (minF < MIN_FONT) {
+            minF = MIN_FONT;
+        }
+        if (maxF > MAX_FONT) {
+            maxF = MAX_FONT;
+        }
+        m_minfont = minF;
+        m_maxfont = maxF;
     }
 
     /**

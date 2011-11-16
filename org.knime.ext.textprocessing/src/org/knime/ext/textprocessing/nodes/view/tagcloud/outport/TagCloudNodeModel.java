@@ -133,9 +133,9 @@ public class TagCloudNodeModel extends NodeModel {
      */
     public static final String INTERNAL_MODEL = "TagCloudNodel.data";
 
-    public static final int DEFAULT_WIDTH = 1024;
+    public static final int DEFAULT_WIDTH = 800;
     
-    public static final int DEFAULT_HEIGHT = 700;
+    public static final int DEFAULT_HEIGHT = 600;
     
     public static final boolean DEFAULT_ANTIALIASING = true;
     
