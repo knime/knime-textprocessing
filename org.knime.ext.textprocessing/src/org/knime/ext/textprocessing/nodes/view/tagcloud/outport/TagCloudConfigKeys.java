@@ -141,5 +141,10 @@ public final class TagCloudConfigKeys {
     /** 
      * Config Key for bold value.
      */
-    public static final String CFGKEY_BOLD_VALUE = "Bold value";    
+    public static final String CFGKEY_BOLD_VALUE = "Bold value";
+    
+    /** 
+     * Config Key for font.
+     */
+    public static final String CFGKEY_FONT_VALUE = "Font value";    
 }

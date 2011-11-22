@@ -28,6 +28,7 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud.outport;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -62,6 +63,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.outport.font.SettingsModelFont;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -116,6 +118,9 @@ public class TagCloudNodeModel extends NodeModel {
 
     private SettingsModelIntegerBounded m_boldModel = 
         TagCloudNodeDialog.getBoldModel();
+    
+    private SettingsModelFont m_fontModel = 
+        TagCloudNodeDialog.getFontModel();
 
     /** The selected ID of the Column containing the value. */
     private int m_valueColIndex;
@@ -140,6 +145,8 @@ public class TagCloudNodeModel extends NodeModel {
     public static final boolean DEFAULT_ANTIALIASING = true;
     
     public static final Color DEFAULT_BACKGROUND_COLOR = Color.white;
+    
+    public static final Font DEFAULT_FONT = Font.decode(Font.SANS_SERIF);
    
     
     /**
@@ -227,6 +234,9 @@ public class TagCloudNodeModel extends NodeModel {
         m_tagcloud.createTagCloud(exec, this);
         m_tagcloud.changealpha(m_alphaModel.getIntValue());
         m_tagcloud.changebold(m_boldModel.getIntValue());
+        m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(), 
+                m_tagcloud.getmaxFontsize(), getFont().getName(), 
+                m_tagcloud.getCalcType(), m_boldModel.getIntValue());
         m_tagcloud.changeWidth(m_widthModel.getIntValue());
         exec.setProgress(1, "TagCloud completed");
         
@@ -299,6 +309,7 @@ public class TagCloudNodeModel extends NodeModel {
         m_backgroundColorModel.loadSettingsFrom(settings);
         m_alphaModel.loadSettingsFrom(settings);
         m_boldModel.loadSettingsFrom(settings);
+        m_fontModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -371,6 +382,7 @@ public class TagCloudNodeModel extends NodeModel {
         m_backgroundColorModel.saveSettingsTo(settings);
         m_alphaModel.saveSettingsTo(settings);
         m_boldModel.saveSettingsTo(settings);
+        m_fontModel.saveSettingsTo(settings);
     }
 
     /**
@@ -392,6 +404,7 @@ public class TagCloudNodeModel extends NodeModel {
         m_backgroundColorModel.validateSettings(settings);
         m_alphaModel.validateSettings(settings);
         m_boldModel.validateSettings(settings);
+        m_fontModel.validateSettings(settings);
     }
 
 
@@ -456,5 +469,9 @@ public class TagCloudNodeModel extends NodeModel {
     
     public Color getBackgroundColor() {
         return m_backgroundColorModel.getColorValue();
+    }
+    
+    public Font getFont() {
+        return m_fontModel.getFont();
     }
 }

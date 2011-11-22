@@ -25,6 +25,7 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud.outport;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -45,6 +46,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelColor;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.outport.font.DialogComponentFontChooser;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.outport.font.SettingsModelFont;
 
 
 /**
@@ -114,12 +117,12 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
 
 
         createNewTab("Image Export");
+        createNewGroup("Image properties:");
         final Set<String> exportTypes =
             NodeViewExport.getViewExportMap().keySet();
         addDialogComponent(new DialogComponentStringSelection(
                 getImageTypeModel(), "Image type:", exportTypes));
 
-        createNewGroup("Image size:");
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumber(
                 getWidthModel(), "Width:", Integer.valueOf(10)));
@@ -128,9 +131,9 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
-        createNewGroup("Colors and shape:");
-        addDialogComponent(new DialogComponentColorChooser(
-                getBackgroundColorModel(), "Background color:", true));
+        createNewGroup("Font and color:");
+        addDialogComponent(new DialogComponentFontChooser(getFontModel(),
+                "Font", true, new Dimension(150, 20)));
 
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumber(
@@ -142,9 +145,17 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         addDialogComponent(new DialogComponentBoolean(
                 getAntiAliasingModel(), "Antialiasing"));
+        
+        addDialogComponent(new DialogComponentColorChooser(
+                getBackgroundColorModel(), "Background color:", true));
         closeCurrentGroup();
     }
 
+    public static SettingsModelFont getFontModel() {
+        return new SettingsModelFont(TagCloudConfigKeys.CFGKEY_FONT_VALUE,
+                TagCloudNodeModel.DEFAULT_FONT);
+    }
+    
     public static SettingsModelIntegerBounded getBoldModel() {
         return new SettingsModelIntegerBounded(
                 TagCloudConfigKeys.CFGKEY_BOLD_VALUE,
