@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -34,10 +34,10 @@ import java.util.regex.Pattern;
 /**
  * This enum contains the Penn Treebank part of speech tag set. To create a
  * valid {@link org.knime.ext.textprocessing.data.Tag} instance use
- * {@link org.knime.ext.textprocessing.data.STTSPartOfSpeechTag#getTag()}, i.e: 
+ * {@link org.knime.ext.textprocessing.data.STTSPartOfSpeechTag#getTag()}, i.e:
  * <br><br>
  * <code>Tag t = PartOfSpeechTag.NN.getTag();</code>
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public enum STTSPartOfSpeechTag implements TagBuilder {
@@ -50,13 +50,13 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
     //
     /** attributives Adjektiv. */
     ADJA,
-    /** adverbiales oder pr‰dikatives Adjektiv. */
+    /** adverbiales oder pr√§dikatives Adjektiv. */
     ADJD,
     /** Adverb. */
     ADV,
-    /** Pr‰position; Zirkumposition links. */
+    /** Pr√§position; Zirkumposition links. */
     APPR,
-    /** Pr‰position mit Artikel. */
+    /** Pr√§position mit Artikel. */
     APPRART,
     /** Postposition. */
     APPO,
@@ -179,7 +179,7 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -197,7 +197,7 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
      * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     * 
+     *
      * @param str The string representing a
      *            {@link org.knime.ext.textprocessing.data.Tag}.
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
