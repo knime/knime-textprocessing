@@ -92,7 +92,9 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      */
     @Override
     public void clean() {
-        m_docs.clear();
+        if (m_docs != null) {
+           m_docs.clear();
+        }
         m_currentDoc = null;
     }       
     
@@ -109,6 +111,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void parseDocument(final InputStream is) throws Exception {
         Document d = parseInternal(is);
         notifyAllListener(new DocumentParsedEvent(d, this));
