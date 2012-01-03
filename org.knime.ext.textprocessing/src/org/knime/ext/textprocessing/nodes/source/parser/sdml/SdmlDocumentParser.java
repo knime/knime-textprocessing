@@ -230,7 +230,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
      */
     @Override
     public void clean() {
-        if(m_docs != null) {
+        if (m_docs != null) {
             m_docs.clear();
         }
         m_currentDoc = null;
