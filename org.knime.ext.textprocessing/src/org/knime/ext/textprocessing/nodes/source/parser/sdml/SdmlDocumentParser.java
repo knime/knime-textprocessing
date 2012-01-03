@@ -206,6 +206,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
         m_storeInList = true;
@@ -229,7 +230,9 @@ public class SdmlDocumentParser extends DefaultHandler implements
      */
     @Override
     public void clean() {
-        m_docs.clear();
+        if(m_docs != null) {
+            m_docs.clear();
+        }
         m_currentDoc = null;
     }       
     
@@ -364,6 +367,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentCategory(final DocumentCategory category) {
         m_category = category;
     }
@@ -371,6 +375,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentSource(final DocumentSource source) {
         m_source = source;
     }
@@ -378,6 +383,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentType(final DocumentType type) {
         m_type = type;
     }
@@ -385,6 +391,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentFilepath(final String filePath) {
         m_docPath = filePath;
     }
@@ -396,6 +403,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * The given charset is ignored since the SAX parser takes it from the xml
      * file.
      */
+    @Override
     public void setCharset(final Charset charset) { }
     
     
@@ -407,6 +415,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void parseDocument(final InputStream is) throws Exception {
         m_storeInList = false;
         try {
@@ -433,6 +442,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addDocumentParsedListener(
             final DocumentParsedEventListener listener) {
         m_listener.add(listener);
@@ -441,6 +451,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeDocumentParsedListener(
             final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
@@ -449,6 +460,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
     }

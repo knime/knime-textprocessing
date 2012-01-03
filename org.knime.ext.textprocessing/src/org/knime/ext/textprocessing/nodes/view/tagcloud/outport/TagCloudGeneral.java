@@ -113,8 +113,8 @@ public final class TagCloudGeneral {
         HashMap<String, Color> color = new HashMap<String, Color>();
 
         String[] strlist =
-                {"J", "V", "W", "F", "N", "S", "D", "E", "C", "I", "L", "U",
-                AbstractTagCloud.CFG_UNKNOWN_TAG_COLOR, "M", "P", "R", "T"};
+                {"J", "V", "W", "F", "N", "S", "D", "E", "C", "I", "L", "U", 
+                "M", AbstractTagCloud.CFG_UNKNOWN_TAG_COLOR, "P", "R", "T"};
 
         float fac = 360f / strlist.length;
         for (int i = 0; i < strlist.length; i++) {

@@ -301,7 +301,7 @@ public class Document implements TextContainer, Serializable {
      */
     public String getSectionText(final SectionAnnotation annotation) {
         StringBuilder sb = new StringBuilder();
-        List<Section> secs = getSection(SectionAnnotation.TITLE);
+        List<Section> secs = getSection(annotation);
         for (int i = 0; i < secs.size(); i++) {
             sb.append(secs.get(i).getText());
             if (i < secs.size() - 1) {
