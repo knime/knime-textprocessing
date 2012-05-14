@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.ext.textprocessing" version="2">
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleDoubleHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleDoubleHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleDoubleHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleFloatHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleFloatHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleFloatHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleHashSetDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleHashSetDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleHashSetDecorator"/>
+                <message_argument value="_set"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleIntHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleIntHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleIntHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleLongHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleLongHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleLongHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleObjectHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleObjectHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TDoubleObjectHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatDoubleHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatDoubleHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatDoubleHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatFloatHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatFloatHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatFloatHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatHashSetDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatHashSetDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatHashSetDecorator"/>
+                <message_argument value="_set"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatIntHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatIntHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatIntHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatLongHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatLongHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatLongHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatObjectHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatObjectHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TFloatObjectHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntDoubleHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntDoubleHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntDoubleHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntFloatHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntFloatHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntFloatHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntHashSetDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntHashSetDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntHashSetDecorator"/>
+                <message_argument value="_set"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntIntHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntIntHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntIntHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntLongHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntLongHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntLongHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntObjectHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntObjectHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TIntObjectHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongDoubleHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongDoubleHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongDoubleHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongFloatHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongFloatHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongFloatHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongHashSetDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongHashSetDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongHashSetDecorator"/>
+                <message_argument value="_set"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongIntHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongIntHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongIntHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongLongHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongLongHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongLongHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongObjectHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongObjectHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TLongObjectHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TObjectDoubleHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectDoubleHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectDoubleHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TObjectFloatHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectFloatHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectFloatHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TObjectIntHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectIntHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectIntHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TObjectLongHashMapDecorator">
+        <filter id="337682486">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectLongHashMapDecorator"/>
+            </message_arguments>
+        </filter>
+        <filter id="388100214">
+            <message_arguments>
+                <message_argument value="gnu.trove.decorator.TObjectLongHashMapDecorator"/>
+                <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
