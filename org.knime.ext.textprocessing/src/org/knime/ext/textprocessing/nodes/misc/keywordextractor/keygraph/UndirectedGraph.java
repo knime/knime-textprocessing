@@ -156,7 +156,6 @@ public class UndirectedGraph<NodeType, WeightType> {
     }
 
     private class Edge extends UnorderedPair<NodeType> {
-        private WeightType m_weight;
 
         /**
          * @param first the first node
@@ -166,15 +165,8 @@ public class UndirectedGraph<NodeType, WeightType> {
         public Edge(final NodeType first, final NodeType second,
                 final WeightType weight) {
             super(first, second);
-            m_weight = weight;
         }
 
-        /**
-         * @return the weight of the edge
-         */
-        public WeightType getWeight() {
-            return m_weight;
-        }
     }
 
     /**

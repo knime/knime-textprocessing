@@ -59,12 +59,12 @@ public class TextprocessingPreferencePage extends FieldEditorPreferencePage
         + "Uncheck to speed up processing. If workflows containing older " 
         + " nodes\nare loaded once, option can be unchecked.";
 
-    private static final String DESC_SERIALIZATION_I = 
-        "Check to enable loading of workflows containing old textprocessing " 
-        + "nodes (2.4.x and older). Note that backwards compatibility slows " 
-        + "down deserialization and thus buffering and processing of nodes. "
-        + "Uncheck to speed up processing. If workflows containing older " 
-        + "nodes are loaded and saved once, option can be unchecked.";
+//    private static final String DESC_SERIALIZATION_I = 
+//        "Check to enable loading of workflows containing old textprocessing " 
+//        + "nodes (2.4.x and older). Note that backwards compatibility slows " 
+//        + "down deserialization and thus buffering and processing of nodes. "
+//        + "Uncheck to speed up processing. If workflows containing older " 
+//        + "nodes are loaded and saved once, option can be unchecked.";
     
     private static final String DESC_PREPROCESSING = 
         "If checked, nodes of the \"Preprocessing\" category process data " 

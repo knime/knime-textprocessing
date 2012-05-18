@@ -751,7 +751,7 @@ public class DmlDocumentParser extends DefaultHandler implements
         return out.toString();
     }
 
-    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
+//    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
 
     /**

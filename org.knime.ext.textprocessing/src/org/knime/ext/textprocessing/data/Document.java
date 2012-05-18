@@ -99,11 +99,6 @@ public class Document implements TextContainer, Serializable {
      */
     private int m_length = -1;
 
-    /**
-     * Cache of the hash code.
-     */
-    private int m_hashCode = -1;
-
     private String m_titleCache = null;
 
     /**
