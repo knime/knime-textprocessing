@@ -148,13 +148,37 @@ public class StringsToDocumentCellFactory implements CellFactory {
         
         // set document source
         String docSource = m_config.getDocSource();
+        if (m_config.getUseSourceColumn()) {
+            if (m_config.getSourceStringIndex() >= 0) {
+                DataCell sourceCell = row.getCell(
+                        m_config.getSourceStringIndex());
+                if (!sourceCell.isMissing() 
+                    && sourceCell.getType().isCompatible(StringValue.class)) {
+                    docSource = ((StringValue)sourceCell).getStringValue();
+                } else {
+                    docSource = "";
+                }
+            }
+        }
         if (docSource.length() > 0) {
-            DocumentSource ds = new DocumentSource(m_config.getDocSource());
+            DocumentSource ds = new DocumentSource(docSource);
             docBuilder.addDocumentSource(ds);
         }
 
         // set document category
         String docCat = m_config.getDocCat();
+        if (m_config.getUseCatColumn()) {
+            if (m_config.getCategoryStringIndex() >= 0) {
+                DataCell catCell = row.getCell(
+                        m_config.getCategoryStringIndex());
+                if (!catCell.isMissing() 
+                    && catCell.getType().isCompatible(StringValue.class)) {
+                    docCat = ((StringValue)catCell).getStringValue();
+                } else {
+                    docCat = "";
+                }
+            }
+        }
         if (docCat.length() > 0) {
             DocumentCategory dc = new DocumentCategory(docCat);
             docBuilder.addDocumentCategory(dc);

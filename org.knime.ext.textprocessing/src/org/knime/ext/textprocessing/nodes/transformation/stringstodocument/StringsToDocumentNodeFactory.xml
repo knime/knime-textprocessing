@@ -27,10 +27,28 @@
             The string separating the author names.
         </option>
         <option name="Document source">
-            The source which is set to all documents.
+            The source which is set to all documents (if 
+            "Use sources from column" is not checked).
+        </option>
+        <option name="Use sources from column">
+            If checked, the string values of the specified column will be used
+            as document sources.
+        </option>        
+        <option name="Document source column">
+            The column containing the string used as source. No source is set 
+            for missing values.
         </option>
         <option name="Document category">
-            The category which is set to all documents.
+            The category which is set to all documents (if 
+            "Use categories from column" is not checked).
+        </option>
+        <option name="Use categories from column">
+            If checked, the string values of the specified column will be used
+            as document categories.
+        </option>        
+        <option name="Document category column">
+            The column containing the string used as category. No category is 
+            set for missing values.
         </option>
         <option name="Document type">
             The type which is set to all documents.

@@ -31,7 +31,7 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
  */
 public final class StringsToDocumentConfigKeys {
 
-    private StringsToDocumentConfigKeys() { }
+    private StringsToDocumentConfigKeys() { /* empty */ }
     
     /**
      * The configuration key of the title column.
@@ -72,4 +72,24 @@ public final class StringsToDocumentConfigKeys {
      * The configuration key of the publication date.
      */
     public static final String CFGKEY_PUBDATE = "PublicationDate";
+    
+    /**
+     * The configuration key of the "use category column" setting.
+     */
+    public static final String CFGKEY_USE_CATCOLUMN = "UseCategoryColumn";
+    
+    /**
+     * The configuration key of the category column setting.
+     */
+    public static final String CFGKEY_CATCOLUMN = "CategoryColumn";    
+    
+    /**
+     * The configuration key of the "use source column" setting.
+     */
+    public static final String CFGKEY_USE_SOURCECOLUMN = "UseSourceColumn";
+    
+    /**
+     * The configuration key of the source column setting.
+     */
+    public static final String CFGKEY_SOURCECOLUMN = "SourceColumn";       
 }

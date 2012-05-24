@@ -25,6 +25,7 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -63,6 +64,17 @@ public class NCharsFilterNodeModel extends PreprocessingNodeModel {
     private SettingsModelIntegerBounded m_nModel = 
         NCharsFilterNodeDialog.getNModel();
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void internalConfigure(final DataTableSpec[] inSpecs)
+            throws InvalidSettingsException {
+        if (1 >= m_nModel.getIntValue()) {
+            this.setWarningMessage("N is set to 1. Terms consisting of one " 
+                    + "single character will not be filtered!");
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -70,6 +82,11 @@ public class NCharsFilterNodeModel extends PreprocessingNodeModel {
     @Override
     protected void initPreprocessing() {
         m_preprocessing = new NCharsFilter(m_nModel.getIntValue());
+        
+        if (1 >= m_nModel.getIntValue()) {
+            this.setWarningMessage("N is set to 1. Terms consisting of one " 
+                    + "single character have not been filtered!");
+        }
     }
 
     /**

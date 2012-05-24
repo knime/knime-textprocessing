@@ -67,13 +67,30 @@ public class StringsToDocumentConfig {
      */
     static final String DEF_AUTHOR_NAMES = "-";
     
+    /**
+     * The default "use category column" setting.
+     */
+    static final boolean DEF_USE_CATCOLUMN = false;
+    
+    /**
+     * The default "use source column" setting.
+     */
+    static final boolean DEF_USE_SOURCECOLUMN = false;
     
     private int m_titleStringIndex = -1;
     
     private int m_fulltextStringIndex = -1;
     
     private int m_authorsStringIndex = -1;
-
+    
+    private int m_categoryStringIndex = -1;
+    
+    private int m_sourceStringIndex = -1;
+    
+    private boolean m_useCatColumn = DEF_USE_CATCOLUMN;
+    
+    private boolean m_useSourceColumn = DEF_USE_SOURCECOLUMN;
+    
     private String m_authorsSplitChar = DEF_AUTHORS_SPLITCHAR;
     
     private String m_docSource = DEF_DOCUMENT_SOURCE;
@@ -194,5 +211,61 @@ public class StringsToDocumentConfig {
      */
     public void setPublicationDate(final String publicationDate) {
         m_publicationDate = publicationDate;
+    }
+
+    /**
+     * @param categoryStringIndex the categoryStringIndex to set
+     */
+    public void setCategoryStringIndex(final int categoryStringIndex) {
+        m_categoryStringIndex = categoryStringIndex;
+    }
+
+    /**
+     * @return the categoryStringIndex
+     */
+    public int getCategoryStringIndex() {
+        return m_categoryStringIndex;
+    }
+
+    /**
+     * @param sourceStringIndex the sourceStringIndex to set
+     */
+    public void setSourceStringIndex(final int sourceStringIndex) {
+        m_sourceStringIndex = sourceStringIndex;
+    }
+
+    /**
+     * @return the sourceStringIndex
+     */
+    public int getSourceStringIndex() {
+        return m_sourceStringIndex;
+    }
+
+    /**
+     * @param useCatColumn the useCatColumn to set
+     */
+    public void setUseCatColumn(final boolean useCatColumn) {
+        m_useCatColumn = useCatColumn;
+    }
+
+    /**
+     * @return the useCatColumn
+     */
+    public boolean getUseCatColumn() {
+        return m_useCatColumn;
+    }
+
+    /**
+     * @param useSourceColumn the useSourceColumn to set
+     */
+    public void setUseSourceColumn(final boolean useSourceColumn) {
+        m_useSourceColumn = useSourceColumn;
+    }
+
+    /**
+     * @return the useSourceColumn
+     */
+    public boolean getUseSourceColumn() {
+        return m_useSourceColumn;
     }
 }

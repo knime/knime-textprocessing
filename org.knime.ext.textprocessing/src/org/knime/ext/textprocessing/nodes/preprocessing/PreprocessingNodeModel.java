@@ -198,10 +198,28 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
+        internalConfigure(inSpecs);
         return new DataTableSpec[]{m_fac.createDataTableSpec(
                 m_appendIncomingModel.getBooleanValue())};
     }
 
+    /**
+     * This method is empty and called by 
+     * {@link PreprocessingNodeModel#configure(DataTableSpec[])}.
+     * It can be overwritten if additional checks during the configure 
+     * procedure have to be done. The data table specs can not be chanced only
+     * additional parameter checks can be applied.
+     * @param inSpecs The input data table specs.
+     * @throws InvalidSettingsException Is thrown if specified settings are
+     * invalid.
+     */
+    protected void internalConfigure(final DataTableSpec[] inSpecs)
+    throws InvalidSettingsException {
+        /* empty method, can be used to override and thus apply additional 
+         * checks.
+         */
+    }
+    
     /**
      * Initializes the <code>Preprocessing</code> instance.
      */

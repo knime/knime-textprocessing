@@ -25,11 +25,16 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
 
@@ -119,7 +124,57 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_PUBDATE,
                 StringsToDocumentConfig.DEF_DOCUMENT_PUBDATE);
-    }    
+    }
+    
+    /**
+     * @return Creates and returns an instance of 
+     * <code>SettingsModelBoolean</code> specifying whether a column is used
+     * for category values or not. 
+     */
+    static final SettingsModelBoolean getUseCategoryColumnModel() {
+        return new SettingsModelBoolean(
+        StringsToDocumentConfigKeys.CFGKEY_USE_CATCOLUMN,
+        StringsToDocumentConfig.DEF_USE_CATCOLUMN);
+    }
+    
+    /**
+     * @return Creates and returns an instance of 
+     * <code>SettingsModelBoolean</code> specifying whether a column is used
+     * for source values or not. 
+     */
+    static final SettingsModelBoolean getUseSourceColumnModel() {
+        return new SettingsModelBoolean(
+        StringsToDocumentConfigKeys.CFGKEY_USE_SOURCECOLUMN,
+        StringsToDocumentConfig.DEF_USE_SOURCECOLUMN);
+    }
+    
+    /**
+     * @return Creates and returns an instance of 
+     * <code>SettingsModelString</code> specifying the column with the category
+     * values.
+     */
+    static final SettingsModelString getCategoryColumnModel() {
+        return new SettingsModelString(
+                StringsToDocumentConfigKeys.CFGKEY_CATCOLUMN, "");
+    }
+
+    /**
+     * @return Creates and returns an instance of 
+     * <code>SettingsModelString</code> specifying the column with the source
+     * values.
+     */
+    static final SettingsModelString getSourceColumnModel() {
+        return new SettingsModelString(
+                StringsToDocumentConfigKeys.CFGKEY_SOURCECOLUMN, "");
+    }
+    
+    private SettingsModelString m_docCategoryModel;
+    
+    private SettingsModelString m_docSourceModel;
+    
+    private SettingsModelBoolean m_useCatColumnModel;
+    
+    private SettingsModelBoolean m_useSourceColumnModel;
     
     /**
      * Creates a new instance of <code>StringsToDocumentNodeDialog</code>.
@@ -145,13 +200,37 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
                 getAuthorSplitStringModel(), "Author names separator"));
         closeCurrentGroup();
         
-        createNewGroup("Info");
+        createNewGroup("Source and Category");
+        m_docSourceModel = getDocSourceModel(); 
         addDialogComponent(new DialogComponentString(
-                getDocSourceModel(), "Document source"));        
-
-        addDialogComponent(new DialogComponentString(
-                getDocCategoryModel(), "Document category"));
+                m_docSourceModel, "Document source"));
+        setHorizontalPlacement(true);
+        m_useSourceColumnModel = getUseSourceColumnModel();
+        m_useSourceColumnModel.addChangeListener(
+                new CategorySourceUsageChanceListener());
+        addDialogComponent(new DialogComponentBoolean(
+                m_useSourceColumnModel, "Use sources from column"));
+        addDialogComponent(new DialogComponentColumnNameSelection(
+                getSourceColumnModel(), "Document source column", 0, 
+                StringValue.class));
+        setHorizontalPlacement(false);
         
+        m_docCategoryModel = getDocCategoryModel(); 
+        addDialogComponent(new DialogComponentString(
+                m_docCategoryModel, "Document category"));
+        setHorizontalPlacement(true);
+        m_useCatColumnModel = getUseCategoryColumnModel();
+        m_useCatColumnModel.addChangeListener(
+                new CategorySourceUsageChanceListener());
+        addDialogComponent(new DialogComponentBoolean(
+                m_useCatColumnModel, "Use categories from column"));
+        addDialogComponent(new DialogComponentColumnNameSelection(
+                getCategoryColumnModel(), "Document category column", 0, 
+                StringValue.class));
+        setHorizontalPlacement(false);
+        closeCurrentGroup();
+        
+        createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(
                 getTypeModel(), "Document type", types));
@@ -161,5 +240,23 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         dcs.setToolTipText("Date has to be specified like \"dd-mm-yyyy!\"");
         addDialogComponent(dcs);
         closeCurrentGroup();
+    }
+    
+    /**
+     * Enables and disables text fields of document source and category.
+     * @author Kilian Thiel, KNIME.com, Berlin, Germany
+     */
+    class CategorySourceUsageChanceListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+                m_docCategoryModel.setEnabled(
+                        !m_useCatColumnModel.getBooleanValue());
+                m_docSourceModel.setEnabled(
+                        !m_useSourceColumnModel.getBooleanValue());
+        }
     }
 }

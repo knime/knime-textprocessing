@@ -25,6 +25,16 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -37,17 +47,11 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 
@@ -55,8 +59,7 @@ import java.util.regex.Pattern;
  */
 public class StringsToDocumentNodeModel extends NodeModel {
 
-    
-    private static final int INPORT = 0; 
+    private static final int INPORT = 0;
     
     private SettingsModelString m_titleColModel = 
         StringsToDocumentNodeDialog.getTitleStringModel();
@@ -82,11 +85,28 @@ public class StringsToDocumentNodeModel extends NodeModel {
     private SettingsModelString m_pubDateModel = 
         StringsToDocumentNodeDialog.getPubDatModel();
     
+    private SettingsModelBoolean m_useCatColumnModel = 
+        StringsToDocumentNodeDialog.getUseCategoryColumnModel();
+
+    private SettingsModelBoolean m_useSourceColumnModel = 
+        StringsToDocumentNodeDialog.getUseSourceColumnModel();
+    
+    private SettingsModelString m_catColumnModel =
+        StringsToDocumentNodeDialog.getCategoryColumnModel();
+
+    private SettingsModelString m_sourceColumnModel =
+        StringsToDocumentNodeDialog.getSourceColumnModel();    
+    
+    
     /**
      * Creates new instance of <code>StringsToDocumentNodeModel</code>.
      */
     public StringsToDocumentNodeModel() {
         super(1, 1);
+        m_useCatColumnModel.addChangeListener(
+                new CategorySourceUsageChanceListener());
+        m_useSourceColumnModel.addChangeListener(
+                new CategorySourceUsageChanceListener());
     }
     
     /**
@@ -149,12 +169,22 @@ public class StringsToDocumentNodeModel extends NodeModel {
         if (!docSource.isEmpty() && docSource.length() > 0) {
             conf.setDocSource(docSource);
         }
+        int docSourceIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
+                m_sourceColumnModel.getStringValue());
+        conf.setSourceStringIndex(docSourceIndex);
+        boolean useSourceCol = m_useSourceColumnModel.getBooleanValue();
+        conf.setUseSourceColumn(useSourceCol);
         
         // Document category
         String docCat = m_docCategoryModel.getStringValue();
         if (!docCat.isEmpty() && docCat.length() > 0) {
             conf.setDocCat(docCat);
         }
+        int docCatIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
+                m_catColumnModel.getStringValue());
+        conf.setCategoryStringIndex(docCatIndex);
+        boolean useCatColumn = m_useCatColumnModel.getBooleanValue();
+        conf.setUseCatColumn(useCatColumn);
         
         // Document type
         String docType = m_docTypeModel.getStringValue();
@@ -195,6 +225,10 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_docCategoryModel.loadSettingsFrom(settings);
         m_docTypeModel.loadSettingsFrom(settings);
         m_pubDateModel.loadSettingsFrom(settings);
+        m_useCatColumnModel.loadSettingsFrom(settings);
+        m_useSourceColumnModel.loadSettingsFrom(settings);
+        m_catColumnModel.loadSettingsFrom(settings);
+        m_sourceColumnModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -218,6 +252,10 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_docCategoryModel.saveSettingsTo(settings);
         m_docTypeModel.saveSettingsTo(settings);
         m_pubDateModel.saveSettingsTo(settings);
+        m_useCatColumnModel.saveSettingsTo(settings);
+        m_useSourceColumnModel.saveSettingsTo(settings);
+        m_catColumnModel.saveSettingsTo(settings);
+        m_sourceColumnModel.saveSettingsTo(settings);
     }
 
     /**
@@ -234,6 +272,10 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_docCategoryModel.validateSettings(settings);
         m_docTypeModel.validateSettings(settings);
         m_pubDateModel.validateSettings(settings);
+        m_useCatColumnModel.validateSettings(settings);
+        m_useSourceColumnModel.validateSettings(settings);
+        m_catColumnModel.validateSettings(settings);
+        m_sourceColumnModel.validateSettings(settings);        
         
         String pubDate = ((SettingsModelString)m_pubDateModel.
                 createCloneWithValidatedValue(settings)).getStringValue();
@@ -276,5 +318,23 @@ public class StringsToDocumentNodeModel extends NodeModel {
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
+    }
+    
+    /**
+     * Enables and disables text fields of document source and category.
+     * @author Kilian Thiel, KNIME.com, Berlin, Germany
+     */
+    class CategorySourceUsageChanceListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+                m_docCategoryModel.setEnabled(
+                        !m_useCatColumnModel.getBooleanValue());
+                m_docSourceModel.setEnabled(
+                        !m_useSourceColumnModel.getBooleanValue());
+        }
     }
 }
