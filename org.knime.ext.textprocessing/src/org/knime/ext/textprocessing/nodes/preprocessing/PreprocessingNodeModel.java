@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -42,13 +42,13 @@ import org.knime.ext.textprocessing.util.ProcessingFactory;
 
 /**
  * This class represents the super class of all text preprocessing node models
- * which apply filtering or modification or any kind of preprocessing of terms 
- * and documents. Classes which extend <code>PreprocessingNodeModel</code>  
+ * which apply filtering or modification or any kind of preprocessing of terms
+ * and documents. Classes which extend <code>PreprocessingNodeModel</code>
  * have to implement the method
  * {@link PreprocessingNodeModel#initPreprocessing()} and take care of a
  * proper initialization of the used
  * {@link org.knime.ext.textprocessing.nodes.preprocessing.Preprocessing}
- * instance. 
+ * instance.
  *
  * A stop word filter i.e. requires a file containing the stop words,
  * a case converter requires information about the case to convert the terms to
@@ -66,9 +66,9 @@ import org.knime.ext.textprocessing.util.ProcessingFactory;
  * The preprocessor instance decides which kind of preprocessing strategy
  * (row by row or chunk wise) is applied. By default the
  * {@link org.knime.ext.textprocessing.nodes.preprocessing.RowPreprocessor}
- * is used. To change the strategy i.e. to 
+ * is used. To change the strategy i.e. to
  * {@link org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessor}
- * The constructor must be overwritten and the preprocessor which have to be 
+ * The constructor must be overwritten and the preprocessor which have to be
  * used must be specified as parameter.
  *
  * @author Kilian Thiel, University of Konstanz
@@ -79,7 +79,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * The default settings for prerprocessing unmodifiable terms.
      */
     public static final boolean DEF_PREPRO_UNMODIFIABLE = false;
-    
+
     /**
      * The default setting for deep preprocessing (<code>true</code>).
      */
@@ -90,8 +90,8 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * (<code>true</code>).
      */
     public static final boolean DEF_APPEND_INCOMING = true;
-    
-    
+
+
 
     private int m_documentColIndex = -1;
 
@@ -106,19 +106,19 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     private SettingsModelString m_documentColModel;
 
     private SettingsModelString m_origDocumentColModel;
-    
+
     private SettingsModelBoolean m_preproUnModifiable;
 
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.
      */
     protected Preprocessing m_preprocessing;
-    
+
     /**
      * The preprocessor to use.
      */
     protected AbstractPreprocessor m_preprocessor;
-    
+
     private BagOfWordsDataTableBuilder m_fac;
 
     /**
@@ -135,7 +135,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             m_preprocessor = preprocessor;
         }
         m_fac = new BagOfWordsDataTableBuilder();
-                
+
         m_deepPreproModel =
             PreprocessingNodeSettingsPane.getDeepPrepressingModel();
         m_appendIncomingModel =
@@ -144,9 +144,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             PreprocessingNodeSettingsPane.getDocumentColumnModel();
         m_origDocumentColModel =
             PreprocessingNodeSettingsPane.getOrigDocumentColumnModel();
-        m_preproUnModifiable = 
+        m_preproUnModifiable =
             PreprocessingNodeSettingsPane.getPreprocessUnmodifiableModel();
-        
+
         ChangeListener cl1 = new DefaultSwitchEventListener(m_documentColModel,
                 m_deepPreproModel);
         m_deepPreproModel.addChangeListener(cl1);
@@ -165,15 +165,15 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     public PreprocessingNodeModel() {
         this(ProcessingFactory.getPrecessing());
     }
-    
-    
+
+
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-        
+
         String docColName = m_documentColModel.getStringValue();
         String origDocColName = m_origDocumentColModel.getStringValue();
         m_documentColIndex = spec.findColumnIndex(docColName);
@@ -181,16 +181,16 @@ public abstract class PreprocessingNodeModel extends NodeModel {
 
         if (m_documentColIndex < 0) {
             throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
+                    "Index of specified document column is not valid! "
                     + "Check your settings!");
         }
         if (m_origDocumentColIndex < 0) {
             throw new InvalidSettingsException(
-                   "Index of specified original document column is not valid!" 
+                   "Index of specified original document column is not valid!"
                     + " Check your settings!");
-        }  
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -204,22 +204,23 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     }
 
     /**
-     * This method is empty and called by 
+     * This method is empty and called by
      * {@link PreprocessingNodeModel#configure(DataTableSpec[])}.
-     * It can be overwritten if additional checks during the configure 
+     * It can be overwritten if additional checks during the configure
      * procedure have to be done. The data table specs can not be chanced only
      * additional parameter checks can be applied.
      * @param inSpecs The input data table specs.
      * @throws InvalidSettingsException Is thrown if specified settings are
      * invalid.
+     * @since 2.6
      */
     protected void internalConfigure(final DataTableSpec[] inSpecs)
     throws InvalidSettingsException {
-        /* empty method, can be used to override and thus apply additional 
+        /* empty method, can be used to override and thus apply additional
          * checks.
          */
     }
-    
+
     /**
      * Initializes the <code>Preprocessing</code> instance.
      */
@@ -234,15 +235,15 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             final BufferedDataTable[] inData, final ExecutionContext exec)
     throws Exception {
         // search indices of document and original document columns.
-        checkDataTableSpec(inData[0].getDataTableSpec());        
-        
+        checkDataTableSpec(inData[0].getDataTableSpec());
+
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {
             throw new NullPointerException(
                     "Preprocessing instance may not be null!");
         }
-        
+
         // initialize the underlying preprocessor
         if (m_preprocessor == null) {
             throw new NullPointerException(
@@ -250,11 +251,11 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         }
         m_preprocessor.initialize(
                 m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
-                m_deepPreproModel.getBooleanValue(), 
+                m_deepPreproModel.getBooleanValue(),
                 m_appendIncomingModel.getBooleanValue(),
                 m_preproUnModifiable.getBooleanValue(),
                 m_preprocessing);
-        
+
         return new BufferedDataTable[]{
                 m_preprocessor.doPreprocessing(inData[0], exec)};
     }
