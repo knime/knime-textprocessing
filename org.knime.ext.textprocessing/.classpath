@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.7-20101029.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.7-20101029.jar" sourcepath="I:/Documents/Carrier/KNIME/TextminingPlugin/LibsAndStuff/ApachePOI/poi-src-3.7-20101029.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.7-20101029.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-app-1.6.0.jar" sourcepath="C:/Users/thiel/Downloads/PdfBox/pdfbox-1.6.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/stanford-postagger-2011-09-14.jar"/>

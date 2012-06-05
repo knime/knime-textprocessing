@@ -25,13 +25,23 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.word;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.HWPFDocumentCore;
+import org.apache.poi.hwpf.HWPFOldDocument;
+import org.apache.poi.hwpf.extractor.Word6Extractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.hwpf.model.FileInformationBlock;
+import org.apache.poi.poifs.filesystem.DirectoryNode;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -131,17 +141,51 @@ public class WordDocumentParser extends AbstractDocumentParser {
         m_currentDoc.addDocumentSource(m_source);
         
         try {
-            WordExtractor extractor = new WordExtractor(is);
-            for (String p : extractor.getParagraphText()) {
-                p = p.trim();
-                if (!onlyWhitepscaes(p)) {
-                    m_currentDoc.addParagraph(p);
+            boolean oldVersion = false;
+            
+            // first copy stream content into byte array os
+            // this is unfortunately necessary in order to check for the version
+            // of the word file. The version is checked to use the proper
+            // document (HWPFDocument or HWPFOldDocument).
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int c;
+            while ((c = is.read()) != -1) {
+                baos.write((char) c);
+            }                        
+            ByteArrayInputStream bais = 
+                new ByteArrayInputStream(baos.toByteArray());
+            oldVersion = isOldVersion(bais);
+            // reset stream here in order to enable reading again and parsing 
+            bais.reset();
+
+            // if Word97-2003 version use HWPFDocument
+            if (!oldVersion) {
+                HWPFDocument hwpfDoc = new HWPFDocument(bais);
+                WordExtractor extractor = new WordExtractor(hwpfDoc);
+                for (String p : extractor.getParagraphText()) {
+                    p = p.trim();
+                    if (!onlyWhitepscaes(p)) {
+                        m_currentDoc.addParagraph(p);
+                    }
                 }
-            }
+            // if Word95 version use HWPFOldDocument
+            } else {
+                HWPFOldDocument hwpfOldDoc = new HWPFOldDocument(
+                        HWPFDocumentCore.verifyAndBuildPOIFS(bais));
+                Word6Extractor oldExtractor = new Word6Extractor(hwpfOldDoc);
+
+                for (String p : oldExtractor.getParagraphText()) {
+                    p = p.trim();
+                    if (!onlyWhitepscaes(p)) {
+                        m_currentDoc.addParagraph(p);
+                    }
+                }
+            }         
+            
             m_currentDoc.createNewSection(SectionAnnotation.UNKNOWN);
             
+            // find title
             String title = null;
-            // if title meta data does not exist use first sentence
             if (!checkTitle(title)) {
                 List<Section> sections = m_currentDoc.getSections();
                 if (sections.size() > 0) {
@@ -153,16 +197,34 @@ public class WordDocumentParser extends AbstractDocumentParser {
                 title = m_docPath.toString();
             }
             m_currentDoc.addTitle(title);
-
+            
             return m_currentDoc.createDocument();
         } finally {
-            /* empty */
+            is.close();
         }
     }
+
+    private static boolean isOldVersion(final InputStream istream) 
+    throws IOException { 
+        DirectoryNode dir = HWPFDocumentCore.verifyAndBuildPOIFS(istream)
+                            .getRoot();
+        DocumentEntry documentProps = 
+            (DocumentEntry)dir.getEntry("WordDocument");
+
+        // Create our FIB, and check for the doc being encrypted
+        FileInformationBlock fib = new FileInformationBlock(
+                new byte[documentProps.getSize()]);
+        // Is this document too old for us?
+        if (fib.getNFib() < 106) {
+            return true;
+        }
+        return false;
+    }    
     
     /**
      * {@inheritDoc}
      */
+    @Override
     public void parseDocument(final InputStream is) throws Exception {
         Document d = parseInternal(is);
         notifyAllListener(new DocumentParsedEvent(d, this));
