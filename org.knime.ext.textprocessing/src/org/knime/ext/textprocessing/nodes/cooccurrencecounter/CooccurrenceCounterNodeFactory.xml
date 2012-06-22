@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../icons/TextProcFrequencies.png" type="Learner">
+    <name>Term co-occurrence counter</name>
+    <shortDescription>
+        Counts the number of co-occurrences for the given list of terms 
+        within the different parts e.g. sentence, paragraph, section and title
+        of the corresponding document.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            The node counts the number of co-occurrences for the given list of 
+            terms within the selected parts e.g. sentence, paragraph, section and
+             title of the corresponding document.
+            The order two terms occur is not considered. Thus the occurrence
+            of T1 followed by T2 is equal to the occurrence of T2 followed 
+            by T1. The output table returns the term pairs in alphabetical 
+            order.
+        </intro>
+        
+        <option name="Document column">
+            The column that contains the document to search for the 
+            term co-occurrences.
+        </option>
+        <option name="Term column">
+       		The column that contains the terms to compute the co-occurrence for.
+		 </option>
+		 <option name="Co-occurrence level">
+		   Select the co-occurrence level to be calculated. 
+		   They are ordered from more general (document co-occurrence)
+		   to more specific (neighbors). The more general levels include
+		   the more specific levels e.g. the sentence level includes the 
+		   neighbor and title co-occurrence calculation.
+		   Notice: The calculation of the more general statistic especially 
+		   the document level statistics might result in a very large data 
+		   table.
+		 </option>
+         <option name="Check term tags">
+            The tags e.g. POS tags of a term are considered when matching terms
+            if this option is selected. If this option is not selected only 
+            their textual representation is checked when matching terms.
+         </option>
+		 <option name="Sort input table">
+            Unselect this option if the input table is already sorted by the
+            document column.
+         </option>
+         <option name="Maximum number of parallel proceses">
+            Decrease the number of parallel processes in case of memory problems.
+        </option>
+    </fullDescription>
+    <ports>
+        <inPort index="0" name="Input table">
+            Input table with a document and term column
+        </inPort>
+        <outPort index="0" name="Co-occurrence table">
+            Table with the co-occurrence statistics for the input table 
+        </outPort>
+    </ports>
+</knimeNode>

@@ -336,6 +336,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
             id="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/frequencies"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.cooccurrencecounter.CooccurrenceCounterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.cooccurrencecounter.CooccurrenceCounterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
