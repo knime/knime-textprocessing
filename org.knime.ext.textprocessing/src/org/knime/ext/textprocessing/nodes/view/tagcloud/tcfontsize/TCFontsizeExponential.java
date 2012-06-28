@@ -36,8 +36,11 @@ public class TCFontsizeExponential implements TCFontsize {
      */
     public double getSize(final double minf, final double maxf,
             final double minv, final double maxv, final double value) {
+        // fix in version 2.6
+        if (maxv == minv) {
+             return minf;
+        }
         return ((Math.exp(value) - Math.exp(minv)) * (maxf - minf)
-                / (Math.exp(maxv) - Math.exp(minv)))
-                + minf;
+                / (Math.exp(maxv) - Math.exp(minv))) + minf;
     }
 }

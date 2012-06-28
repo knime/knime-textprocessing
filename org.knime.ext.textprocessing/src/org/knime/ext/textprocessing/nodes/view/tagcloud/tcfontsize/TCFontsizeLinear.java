@@ -36,6 +36,10 @@ public class TCFontsizeLinear implements TCFontsize {
      */
     public double getSize(final double minf, final double maxf,
             final double minv, final double maxv, final double value) {
+        // fix in version 2.6
+        if (maxv == minv) {
+             return minf;
+        }
         return ((value - minv) * (maxf - minf) / (maxv - minv)) + minf;
     }
 }

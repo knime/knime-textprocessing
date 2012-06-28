@@ -36,6 +36,10 @@ public class TCFontsizeLogarithmic implements TCFontsize {
      */
     public double getSize(final double minf, final double maxf,
             final double minv, final double maxv, final double value) {
+        // fix in version 2.6
+        if (maxv == minv) {
+             return minf;
+        }
         return ((Math.log(value) - Math.log(minv)) * (maxf - minf)
                / (Math.log(maxv) - Math.log(minv)))
                 + minf;
