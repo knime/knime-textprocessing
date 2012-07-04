@@ -26,6 +26,8 @@
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -33,11 +35,12 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellRenderer;
 
 import org.knime.ext.textprocessing.data.Document;
 
@@ -57,6 +60,7 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
     
     private List<Document> m_docs;
     
+    private int m_row = 0;
     
     /**
      * Constructor of <code>AbstractDocumentTablePanel</code> with the given 
@@ -97,40 +101,48 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
         
         JPanel panel = new JPanel(new BorderLayout());
         
-        JLabel label = new JLabel();
-        Font f = new Font("Verdana", Font.PLAIN, 20);
-        label.setFont(f);
-        label.setText("Documents");
-        panel.add(label, BorderLayout.NORTH);
-        
-        Object[][] docList = new Object[m_docs.size()][1];
+        // TABLE
+        Object[][] docList = new Object[m_docs.size()][2];
         int count = 0;
         for (Document d : m_docs) {
-            docList[count][0] = d.getTitle();
+            docList[count][0] = Integer.toString(count + 1);
+            docList[count][1] = d.getTitle();
             count++;
         }
         
-        m_table = new JTable(docList, new Object[]{"Document title"}) {
+        m_table = new JTable(docList, new Object[]{"#", "Document title"}) {
             @Override
             public boolean isCellEditable(final int x, final int y) {
                 return false;
             }
         };
-        m_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        Font headerFont = new Font("sansserif", Font.BOLD, 15);
+        m_table.getTableHeader().setFont(headerFont);
+        
+        m_table.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
         m_table.addMouseListener(listener);
+        m_table.addMouseMotionListener(listener);
+        m_table.setOpaque(false);
+        m_table.setDefaultRenderer(Object.class, 
+                new AttributiveCellRenderer());
+        m_table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        m_table.setToolTipText("double click to open document");
+        
+        m_table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        m_table.getColumnModel().getColumn(1).setPreferredWidth(750);
         
         JScrollPane jsp = new JScrollPane(m_table);
-        jsp.setPreferredSize(new Dimension(500, 600));
+        jsp.setPreferredSize(new Dimension(850, 600));
         panel.add(jsp, BorderLayout.CENTER);
         return panel;
     }
-    
     
     /**
      * 
      * @author Kilian Thiel, University of Konstanz
      */
-    class SummaryTableListener extends MouseAdapter {
+    private class SummaryTableListener extends MouseAdapter {
         
         /**
          * {@inheritDoc}
@@ -144,6 +156,55 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
                 
                 onClick(rowIndex, doc);
             }
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void mouseMoved(final MouseEvent e) {
+            JTable aTable = (JTable)e.getSource();
+            m_row = aTable.rowAtPoint(e.getPoint());
+            aTable.repaint();
+        }
+    }
+    
+    /**
+     * 
+     * @author Kilian Thiel, KNIME.com AG, Zurich
+     */
+    @SuppressWarnings("serial")
+    private class AttributiveCellRenderer extends JLabel implements 
+    TableCellRenderer {
+        
+        /**
+         * Constructor.
+         */
+        public AttributiveCellRenderer() {
+            setOpaque(true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component getTableCellRendererComponent(final JTable table,
+                final Object value, final boolean isSelected, 
+                final boolean hasFocus, final int row, final int column) {
+            
+            if (isSelected) {
+                this.setBackground(Color.DARK_GRAY);
+                this.setForeground(Color.WHITE);
+            } else if (row == m_row) {
+                this.setBackground(Color.LIGHT_GRAY);
+                this.setForeground(Color.BLACK);
+            } else {
+                this.setBackground(Color.WHITE);
+                this.setForeground(Color.BLACK);
+            }
+            
+            this.setText(value.toString());
+            return this;
         }
     }
 }

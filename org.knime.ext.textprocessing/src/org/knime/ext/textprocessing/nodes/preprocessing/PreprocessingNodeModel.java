@@ -122,12 +122,46 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     private BagOfWordsDataTableBuilder m_fac;
 
     /**
+     * The constructor of <code>PreprocessingNodeModel</code>.
+     * The <code>RowPreprocessor</code> is used by default.
+     */
+    public PreprocessingNodeModel() {
+        this(ProcessingFactory.getPrecessing());
+    }    
+
+    /**
      * The constructor of <code>PreprocessingNodeModel</code> with the specified
      * preprocessor to use.
      * @param preprocessor The preprocessor to use.
      */
     public PreprocessingNodeModel(final AbstractPreprocessor preprocessor) {
-        super(1, 1);
+        this(1, preprocessor);
+    }
+    
+    /**
+     * The constructor of <code>PreprocessingNodeModel</code>.
+     * The <code>RowPreprocessor</code> is used by default. If
+     * you use this constructor, be aware that the in port at index 0 is 
+     * preserved as in port for the bag of words data table.
+     * @param inPorts The number of in ports.
+     * @since 2.6
+     */
+    public PreprocessingNodeModel(final int inPorts) {
+        this(inPorts, ProcessingFactory.getPrecessing());
+    }     
+    
+    /**
+     * The constructor of <code>PreprocessingNodeModel</code> with the specified
+     * preprocessor to use and the specified number of in ports. If
+     * you use this constructor, be aware that the in port at index 0 is 
+     * preserved as in port for the bag of words data table.
+     * @param inPorts The number of in ports.
+     * @param preprocessor The preprocessor to use.
+     * @since 2.6
+     */
+    public PreprocessingNodeModel(final int inPorts, 
+            final AbstractPreprocessor preprocessor) {
+        super(inPorts, 1);
 
         if (preprocessor == null) {
             m_preprocessor = ProcessingFactory.getPrecessing();
@@ -156,14 +190,6 @@ public abstract class PreprocessingNodeModel extends NodeModel {
                 m_origDocumentColModel, m_appendIncomingModel);
         m_appendIncomingModel.addChangeListener(cl2);
         cl2.stateChanged(null);
-    }
-
-    /**
-     * The constructor of <code>PreprocessingNodeModel</code>.
-     * The <code>RowPreprocessor</code> is used by default.
-     */
-    public PreprocessingNodeModel() {
-        this(ProcessingFactory.getPrecessing());
     }
 
 
@@ -226,6 +252,26 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     protected abstract void initPreprocessing();
 
+    /**
+     * This method is empty and called by
+     * {@link PreprocessingNodeModel#execute(BufferedDataTable[], ExecutionContext)}.
+     * It can be overwritten if additional computation during the execute have 
+     * to be done. This method is called before the regular preprocessing
+     * computation is done and before the preprocessor is initialized. It can
+     * also be used to initialize the preprocessor instead of using
+     * {@link PreprocessingNodeModel#initPreprocessing()}.
+     * @param inData The input data tables.
+     * @param exec The execution context.
+     * @throws Exception If something goes terribly wrong
+     * @since 2.6
+     */
+    protected void internalExecute(final BufferedDataTable[] inData, 
+            final ExecutionContext exec) throws Exception {
+        /* empty method, can be used to override and thus apply additional
+         * checks and computation.
+         */
+    }    
+    
 
     /**
      * {@inheritDoc}
@@ -237,6 +283,9 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         // search indices of document and original document columns.
         checkDataTableSpec(inData[0].getDataTableSpec());
 
+        // internal execute
+        internalExecute(inData, exec);
+        
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {

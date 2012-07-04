@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Dict Replacer (2 in ports)</name>
+    <shortDescription>Replaces complete terms that match with dictionary keys by
+    corresponding specified values.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Replaces complete terms that match with specified dictionary terms
+            with a corresponding specified value. 
+            
+            The dictionary is provided by a additional data table at port 1, 
+            consisting of at least two string columns. One string column 
+            contains the strings to replace (keys) the other string column
+            contains the replacement strings (values). The columns can be
+            specified in the dialog. 
+		</intro>
+
+        <tab name="Dictionary">
+        <option name="Column containing the strings to replace">
+              The column containing the strings (words/terms) to replace (keys). 
+        </option>
+        <option name="Column containing the replacement strings">
+              The column containing the replacement strings (values). 
+        </option>
+        </tab>
+
+        <tab name="Deep preprocessing options">
+        <option name="Deep preprocessing">
+             If deep preprocessing is checked, the terms contained inside
+             the documents are preprocessed too, this means that the documents
+             themselves are changed too, which is more time consuming.
+        </option>
+        <option name="Document column">
+              Specifies the column containing the documents to preprocess.
+        </option>
+        <option name="Append unchanged documents">
+            If checked, the documents contained in the specified "Original
+            Document column" are appended unchanged even if deep preprocessing
+            is checked. This helps to keep the original documents in the
+            output data table without the agonizing pain of joining.
+        </option>
+        <option name="Original Document column">
+              Specifies the column containing the original documents which
+              can be attached unchanged.
+        </option>
+        <option name="Ignore unmodifiable tag">
+              If checked unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+	</fullDescription>
+
+    <ports>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains the terms to convert.</inPort>
+        <inPort name="Dictionary" index="1">
+        The input table containing at least of two string columns (dictionary).
+        </inPort>
+        <outPort name="Filtered terms and related documents output table" index="0">
+        The output table which contains the preprocessed terms.
+        </outPort>
+    </ports>
+</knimeNode>
