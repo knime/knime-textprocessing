@@ -63,5 +63,5 @@ public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
                 new DocumentViewPanel(document));
         detailsFrame.pack();
         detailsFrame.setVisible(true);
-    }
+    }   
 }

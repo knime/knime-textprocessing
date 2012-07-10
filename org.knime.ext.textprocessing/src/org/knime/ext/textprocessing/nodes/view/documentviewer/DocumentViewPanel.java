@@ -44,10 +44,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -56,8 +58,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.table.TableCellRenderer;
@@ -102,7 +108,11 @@ public class DocumentViewPanel extends JSplitPane {
 
     private int m_infoRow;
     
-    private JPopupMenu m_rightClickMenue; 
+    private JPopupMenu m_rightClickMenue;
+    
+    private JTextField m_searchField;
+    
+    private JToggleButton m_searchButton;
     
     /**
      * Creates new instance of <code>DocumentViewPanel</code> with given
@@ -123,11 +133,11 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
     private void displayDoc() {
-        JPanel controlPanel = createControlPanel();
+        JComponent controlPanel = createControlPanel();
         JPanel mainPanel = createMainPanel();
         JPanel authorPanel = createAuthorPanel();
         JPanel infoPanel = createInfoPanel();
-
+        
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(controlPanel, BorderLayout.NORTH);
         topPanel.add(mainPanel, BorderLayout.CENTER);
@@ -144,18 +154,33 @@ public class DocumentViewPanel extends JSplitPane {
         setDividerLocation(600);
     }
 
-    private JPanel createControlPanel() {
+    private JComponent createControlPanel() {
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
+        
+        JToolBar hiliteToolbar = new JToolBar();
         // hilite button
         m_hiliteTags = new JToggleButton();
         m_hiliteTags.setSelected(HILITE_TAGS);
         m_hiliteTags.addActionListener(new HiliteActionListener());
-        ImageIcon icon = createImageIcon("./hiliteicon.png", "Hilite tags");
+        ImageIcon icon = createImageIcon("./marker.png", "Hilite tags");
         m_hiliteTags.setIcon(icon);
-        m_hiliteTags.setToolTipText("Hilite tagged terms");
-        controlPanel.add(m_hiliteTags);
+        m_hiliteTags.setToolTipText("click to hilite tagged terms");
+        hiliteToolbar.add(m_hiliteTags);
 
+        // color chooser
+        m_colorChooserButton = new JButton();
+        icon = createImageIcon("./color.png", "Color");
+        m_colorChooserButton.setIcon(icon);
+        m_colorChooserButton.setToolTipText("Choose Color");
+        m_colorChooserButton.setBorder(BorderFactory.createLineBorder(
+                m_taggedEntityColor));
+        m_colorChooserButton.setBorderPainted(true);
+        m_colorChooserButton.addActionListener(new ColorButtonListener());
+        m_colorChooserButton.setOpaque(true);
+        hiliteToolbar.add(m_colorChooserButton);
+        
+        hiliteToolbar.addSeparator();
+        
         // tag combo box
         m_tagTypes = new JComboBox();
         Set<String> tagTypes = TagFactory.getInstance().getTagTypes();
@@ -163,17 +188,12 @@ public class DocumentViewPanel extends JSplitPane {
             m_tagTypes.addItem(tagType);
         }
         m_tagTypes.addActionListener(new HiliteActionListener());
-        controlPanel.add(m_tagTypes);
-
-        // color chooser
-        m_colorChooserButton = new JButton("Color");
-        m_colorChooserButton.addActionListener(new ColorButtonListener());
-        m_colorChooserButton.setOpaque(true);
-        m_colorChooserButton.setBackground(m_taggedEntityColor);
-        controlPanel.add(m_colorChooserButton);
+        hiliteToolbar.add(m_tagTypes);        
+        
+        hiliteToolbar.addSeparator();
         
         // links sources
-        controlPanel.add(new JLabel("Link to:"));
+        hiliteToolbar.add(new JLabel("Link to:"));
         m_linkSourcesBox = new JComboBox();
         for (String source : m_linkSources.getSearchEngineNames()) {
             m_linkSourcesBox.addItem(source);
@@ -181,8 +201,23 @@ public class DocumentViewPanel extends JSplitPane {
         m_linkSourcesBox.setSelectedItem(m_linkSources.getDefaultSource());
         m_linkSourcesBox.setEnabled(m_hiliteTags.isSelected());
         m_linkSourcesBox.addActionListener(new LinkSourceListener());
-        controlPanel.add(m_linkSourcesBox);
+        hiliteToolbar.add(m_linkSourcesBox);
         
+        JToolBar searchToolbar = new JToolBar();
+        // search field and button
+        m_searchButton = new JToggleButton();
+        m_searchButton.addActionListener(new SearchListener());
+        icon = createImageIcon("./search.png", "Search");
+        m_searchButton.setIcon(icon);
+        m_searchButton.setToolTipText("click to search");
+        searchToolbar.add(m_searchButton);
+        m_searchField = new JTextField();
+        m_searchField.setColumns(10);
+        m_searchField.getDocument().addDocumentListener(new SearchListener());
+        searchToolbar.add(m_searchField);
+        
+        controlPanel.add(searchToolbar);
+        controlPanel.add(hiliteToolbar);
         return controlPanel;
     }
 
@@ -192,7 +227,8 @@ public class DocumentViewPanel extends JSplitPane {
 
         m_fulltextPane = new JEditorPane();
         m_fulltextPane.setContentType("text/html");
-        m_fulltextPane.setText(getPreparedText(m_doc, HILITE_TAGS, ""));
+        m_fulltextPane.setText(getPreparedText(m_doc, HILITE_TAGS, "", null,
+                m_searchButton.isSelected()));
         m_fulltextPane.setEditable(false);
         m_fulltextPane.setCaretPosition(0);
         m_fulltextPane.addHyperlinkListener(new LinkListener());
@@ -217,7 +253,8 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
     private String getPreparedText(final Document doc, final boolean hiliteTags,
-            final String tagType) {
+            final String tagType, final String search, 
+            final boolean hiliteSearch) {
         StringBuffer buffer = new StringBuffer();
 
         buffer.append("<br/><font face=\"Verdana\" size=\"4\"><b>");
@@ -234,7 +271,8 @@ public class DocumentViewPanel extends JSplitPane {
             List<Paragraph> paras = s.getParagraphs();
            for (Paragraph p : paras) {
                buffer.append("<font face=\"Verdana\" size=\"3\"><br/><br/>");
-               buffer.append(getParagraphText(p, hiliteTags, tagType));
+               buffer.append(getParagraphText(p, hiliteTags, tagType, search,
+                       hiliteSearch));
                buffer.append("</font>");
            }
         }
@@ -243,8 +281,9 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
     private String getParagraphText(final Paragraph p,
-            final boolean hiliteTags, final String tagType) {
-        if (!hiliteTags) {
+            final boolean hiliteTags, final String tagType, 
+            final String search, final boolean hiliteSearch) {
+        if (!hiliteTags && !hiliteSearch) {
             return p.getText();
         }
         
@@ -255,28 +294,46 @@ public class DocumentViewPanel extends JSplitPane {
         StringBuffer paramStr = new StringBuffer();
         for (Sentence sen : p.getSentences()) {
             for (Term t : sen.getTerms()) {
-                boolean hilited = false;
-                if (t.getTags().size() > 0) {
-                    List<Tag> tags = t.getTags();
-                                        
-                    for (Tag tag : tags) {
-                        if (tag.getTagType().equals(tagType)) {
-                            String link = m_linkSources.getUrlString(
-                                    (String)m_linkSourcesBox.getSelectedItem(), 
-                                    t.getText());
-                            
-                            paramStr.append("<a href=\"" + link + "\">");
-                            paramStr.append("<font color=\"#" + hexColorStr 
-                                    + "\">" + t.getText() + "</font>");
-                            paramStr.append("</a>");
-                            
-                            paramStr.append(" ");
-                            hilited = true;
-                            break;
+                boolean marked = false;
+                
+                // search hiliting
+                if (hiliteSearch && search != null) {
+                    if (search.toLowerCase().equals(t.getText().toLowerCase())) 
+                    {
+                        paramStr.append("<font style=\"BACKGROUND-COLOR: green;"
+                                + "COLOR: white\">"
+                                + t.getText() + "</font>");
+                        paramStr.append(" ");
+                        marked = true;
+                        continue;
+                    }
+                }
+                
+                if (hiliteTags) {
+                    if (t.getTags().size() > 0) {
+                        List<Tag> tags = t.getTags();
+                        for (Tag tag : tags) {
+                            // tag hiliting
+                            if (tag.getTagType().equals(tagType)) {
+                                String link =
+                                        m_linkSources.getUrlString(
+                                                (String)m_linkSourcesBox
+                                                        .getSelectedItem(), t
+                                                        .getText());
+
+                                paramStr.append("<a href=\"" + link + "\">");
+                                paramStr.append("<font color=\"#" + hexColorStr
+                                        + "\">" + t.getText() + "</font>");
+                                paramStr.append("</a>");
+
+                                paramStr.append(" ");
+                                marked = true;
+                                break;
+                            }
                         }
                     }
                 }
-                if (!hilited) {
+                if (!marked) {
                     paramStr.append(t.getText() + " ");
                 }
             }
@@ -385,8 +442,9 @@ public class DocumentViewPanel extends JSplitPane {
     private void refreshHiliting() {
         m_fulltextPane.setText(getPreparedText(m_doc,
                 m_hiliteTags.isSelected(),
-                m_tagTypes.getSelectedItem().toString()));
-    }
+                m_tagTypes.getSelectedItem().toString(), 
+                m_searchField.getText(), m_searchButton.isSelected()));
+    }   
 
     private boolean checkBrowsingSupport() {
         Desktop desktop = null;
@@ -414,6 +472,45 @@ public class DocumentViewPanel extends JSplitPane {
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     * 
+     * @author Kilian Thiel, KNIME.com AG, Zurich
+     */
+    private class SearchListener implements ActionListener, DocumentListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            refreshHiliting();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
+            refreshHiliting();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
+            refreshHiliting();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
+            refreshHiliting();
         }
     }
     
@@ -499,7 +596,8 @@ public class DocumentViewPanel extends JSplitPane {
                 m_taggedEntityColor = Color.RED;
             }
             m_colorChooserButton.setOpaque(true);
-            m_colorChooserButton.setBackground(m_taggedEntityColor);
+            m_colorChooserButton.setBorder(BorderFactory.createLineBorder(
+                    m_taggedEntityColor));
             repaint();
             refreshHiliting();
         }
@@ -581,5 +679,4 @@ public class DocumentViewPanel extends JSplitPane {
             return this;
         }
     }
-    
 }
