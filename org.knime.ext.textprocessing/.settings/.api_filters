@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<component id="org.knime.ext.textprocessing" version="2">
+<?xml version="1.0" encoding="UTF-8"?><component id="org.knime.ext.textprocessing" version="2">
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleDoubleHashMapDecorator">
         <filter id="337682486">
             <message_arguments>
@@ -361,6 +360,14 @@
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TObjectLongHashMapDecorator"/>
                 <message_argument value="_map"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="opennlp.maxent.GISModel">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="opennlp.maxent.GISModel"/>
+                <message_argument value="main(String[])"/>
             </message_arguments>
         </filter>
     </resource>
