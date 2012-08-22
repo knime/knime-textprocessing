@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -56,7 +56,7 @@ import java.util.UUID;
  * {@link org.knime.ext.textprocessing.data.DocumentBuilder} which provides
  * methods to add text and finally build a new <code>Document</code> instance
  * out of it.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Document implements TextContainer, Serializable {
@@ -107,7 +107,7 @@ public class Document implements TextContainer, Serializable {
      * categories, publication date and the file of the document to set. If any
      * of these parameters is <code>null</code> a
      * <code>NullPointerException</code> is thrown.
-     * 
+     *
      * @param sections The sections of the document to set. Sections are i.e.
      *            title, abstract chapters, etc.
      * @param type The type of the document to set, i.e. book, transaction or
@@ -183,7 +183,7 @@ public class Document implements TextContainer, Serializable {
      * Creates a new instance of <code>Document</code> with a given list of
      * sections which may not be <code>null</code>, otherwise a
      * <code>NullPointerException</code> will be thrown.
-     * 
+     *
      * @param sections The sections of the document to set. Sections are i.e.
      *            title, abstract chapters, etc.
      * @throws NullPointerException If the given list of sections to set is
@@ -201,7 +201,7 @@ public class Document implements TextContainer, Serializable {
      * containing the document's text to set. None of the given parameters may
      * be <code>null</code>, otherwise a <code>NullPointerException</code> will
      * be thrown.
-     * 
+     *
      * @param sections The sections of the document to set. Sections are i.e.
      *            title, abstract chapters, etc.
      * @param authors The authors of the document.
@@ -269,7 +269,7 @@ public class Document implements TextContainer, Serializable {
      * Returns all {@link org.knime.ext.textprocessing.data.Section}s with the
      * specified {@link org.knime.ext.textprocessing.data.SectionAnnotation} as
      * list. If no sections can be found, an empty list is returned.
-     * 
+     *
      * @param annotation The annotation of the sections to return.
      * @return a list of sections with the given annotation assigned. If no
      *         sections can be found, an empty list is returned.
@@ -289,7 +289,7 @@ public class Document implements TextContainer, Serializable {
      * s with the specified
      * {@link org.knime.ext.textprocessing.data.SectionAnnotation} as string. If
      * no sections can be found an empty string is returned.
-     * 
+     *
      * @param annotation The annotation of the sections to find.
      * @return the text of the sections with the given annotation assigned as
      *         string. If no sections can be found, an empty string is returned.
@@ -379,7 +379,7 @@ public class Document implements TextContainer, Serializable {
      * <b>publication date</b>. Beside sections, authors, and publication date
      * no other members are compared. If given document is considered as equal
      * <code>true</code> is returned, otherwise <code>false</code>.
-     * 
+     *
      * @param d The document to check for equality based on fixed document
      *            members.
      * @return <code>true</code> if sections, authors, and publication date of
@@ -407,7 +407,7 @@ public class Document implements TextContainer, Serializable {
     /**
      * Checks the complete document for equality. All members must match to
      * consider the given document as equal.
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -450,33 +450,6 @@ public class Document implements TextContainer, Serializable {
     @Override
     public int hashCode() {
         return m_uuid.hashCode();
-        // if (m_hashCode == -1) {
-        // m_hashCode = 0;
-        // int fac = 119 / 19;
-        //
-        // for (Section s : m_sections) {
-        // m_hashCode += fac * s.hashCode();
-        // }
-        // for (Author a : m_authors) {
-        // m_hashCode += fac * a.hashCode();
-        // }
-        // for (DocumentSource s : m_sources) {
-        // m_hashCode += fac * s.hashCode();
-        // }
-        // for (DocumentCategory c : m_categories) {
-        // m_hashCode += fac * c.hashCode();
-        // }
-        // if (m_pubDate != null) {
-        // m_hashCode += fac * m_pubDate.hashCode();
-        // }
-        // if (m_type != null) {
-        // m_hashCode += fac * m_type.hashCode();
-        // }
-        // if (m_docFile != null) {
-        // m_hashCode += fac * m_docFile.hashCode();
-        // }
-        // }
-        // return m_hashCode;
     }
 
     /**
@@ -495,7 +468,7 @@ public class Document implements TextContainer, Serializable {
 
     /**
      * Read-only iterator over a document's sentences.
-     * 
+     *
      * @author Pierre-Francois Laquerre, University of Konstanz
      */
     private class SentenceIterator implements Iterator<Sentence> {

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -78,6 +78,7 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.util.ImgLoaderUtil;
 
 /**
  *
@@ -86,7 +87,7 @@ import org.knime.ext.textprocessing.data.Term;
 public class DocumentViewPanel extends JSplitPane {
 
     private SearchEngines m_linkSources = SearchEngines.getInstance();
-    
+
     private static final int MAX_COLS = 800;
     private static final int MAX_ROWS = 30;
 
@@ -95,25 +96,25 @@ public class DocumentViewPanel extends JSplitPane {
     private final Document m_doc;
 
     private JEditorPane m_fulltextPane;
-    
+
     private JToggleButton m_hiliteTags;
 
     private JComboBox m_tagTypes;
-    
+
     private JComboBox m_linkSourcesBox;
-    
+
     private JButton m_colorChooserButton;
-    
+
     private Color m_taggedEntityColor = Color.BLUE;
 
     private int m_infoRow;
-    
+
     private JPopupMenu m_rightClickMenue;
-    
+
     private JTextField m_searchField;
-    
+
     private JToggleButton m_searchButton;
-    
+
     /**
      * Creates new instance of <code>DocumentViewPanel</code> with given
      * document to display.
@@ -137,7 +138,7 @@ public class DocumentViewPanel extends JSplitPane {
         JPanel mainPanel = createMainPanel();
         JPanel authorPanel = createAuthorPanel();
         JPanel infoPanel = createInfoPanel();
-        
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(controlPanel, BorderLayout.NORTH);
         topPanel.add(mainPanel, BorderLayout.CENTER);
@@ -146,30 +147,31 @@ public class DocumentViewPanel extends JSplitPane {
         bottomPane.setLayout(new GridLayout(1, 2));
         bottomPane.add(authorPanel);
         bottomPane.add(infoPanel);
-        
+
         setTopComponent(topPanel);
         setBottomComponent(bottomPane);
-        
+
         setOneTouchExpandable(true);
         setDividerLocation(600);
     }
 
     private JComponent createControlPanel() {
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        
+
         JToolBar hiliteToolbar = new JToolBar();
         // hilite button
         m_hiliteTags = new JToggleButton();
         m_hiliteTags.setSelected(HILITE_TAGS);
         m_hiliteTags.addActionListener(new HiliteActionListener());
-        ImageIcon icon = createImageIcon("./marker.png", "Hilite tags");
+        ImageIcon icon = ImgLoaderUtil.loadImageIcon("marker.png",
+                                                     "Hilite tags");
         m_hiliteTags.setIcon(icon);
         m_hiliteTags.setToolTipText("click to hilite tagged terms");
         hiliteToolbar.add(m_hiliteTags);
 
         // color chooser
         m_colorChooserButton = new JButton();
-        icon = createImageIcon("./color.png", "Color");
+        icon = ImgLoaderUtil.loadImageIcon("color.png", "Color");
         m_colorChooserButton.setIcon(icon);
         m_colorChooserButton.setToolTipText("Choose Color");
         m_colorChooserButton.setBorder(BorderFactory.createLineBorder(
@@ -178,9 +180,9 @@ public class DocumentViewPanel extends JSplitPane {
         m_colorChooserButton.addActionListener(new ColorButtonListener());
         m_colorChooserButton.setOpaque(true);
         hiliteToolbar.add(m_colorChooserButton);
-        
+
         hiliteToolbar.addSeparator();
-        
+
         // tag combo box
         m_tagTypes = new JComboBox();
         Set<String> tagTypes = TagFactory.getInstance().getTagTypes();
@@ -188,10 +190,10 @@ public class DocumentViewPanel extends JSplitPane {
             m_tagTypes.addItem(tagType);
         }
         m_tagTypes.addActionListener(new HiliteActionListener());
-        hiliteToolbar.add(m_tagTypes);        
-        
+        hiliteToolbar.add(m_tagTypes);
+
         hiliteToolbar.addSeparator();
-        
+
         // links sources
         hiliteToolbar.add(new JLabel("Link to:"));
         m_linkSourcesBox = new JComboBox();
@@ -202,12 +204,12 @@ public class DocumentViewPanel extends JSplitPane {
         m_linkSourcesBox.setEnabled(m_hiliteTags.isSelected());
         m_linkSourcesBox.addActionListener(new LinkSourceListener());
         hiliteToolbar.add(m_linkSourcesBox);
-        
+
         JToolBar searchToolbar = new JToolBar();
         // search field and button
         m_searchButton = new JToggleButton();
         m_searchButton.addActionListener(new SearchListener());
-        icon = createImageIcon("./search.png", "Search");
+        icon = ImgLoaderUtil.loadImageIcon("search.png", "Search");
         m_searchButton.setIcon(icon);
         m_searchButton.setToolTipText("click to search");
         searchToolbar.add(m_searchButton);
@@ -215,7 +217,7 @@ public class DocumentViewPanel extends JSplitPane {
         m_searchField.setColumns(10);
         m_searchField.getDocument().addDocumentListener(new SearchListener());
         searchToolbar.add(m_searchField);
-        
+
         controlPanel.add(searchToolbar);
         controlPanel.add(hiliteToolbar);
         return controlPanel;
@@ -233,7 +235,7 @@ public class DocumentViewPanel extends JSplitPane {
         m_fulltextPane.setCaretPosition(0);
         m_fulltextPane.addHyperlinkListener(new LinkListener());
         m_fulltextPane.setToolTipText("Select text and right click.");
-        
+
         if (checkBrowsingSupport()) {
             m_rightClickMenue = new JPopupMenu();
             JMenuItem item;
@@ -244,7 +246,7 @@ public class DocumentViewPanel extends JSplitPane {
             }
             m_fulltextPane.setComponentPopupMenu(m_rightClickMenue);
         }
-        
+
         JScrollPane jsp = new JScrollPane(m_fulltextPane);
         jsp.setPreferredSize(new Dimension(MAX_COLS, MAX_ROWS * 20));
         panel.add(jsp, BorderLayout.CENTER);
@@ -253,7 +255,7 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
     private String getPreparedText(final Document doc, final boolean hiliteTags,
-            final String tagType, final String search, 
+            final String tagType, final String search,
             final boolean hiliteSearch) {
         StringBuffer buffer = new StringBuffer();
 
@@ -281,24 +283,24 @@ public class DocumentViewPanel extends JSplitPane {
     }
 
     private String getParagraphText(final Paragraph p,
-            final boolean hiliteTags, final String tagType, 
+            final boolean hiliteTags, final String tagType,
             final String search, final boolean hiliteSearch) {
         if (!hiliteTags && !hiliteSearch) {
             return p.getText();
         }
-        
+
         // selected color to hex str
         String hexColorStr = Integer.toHexString(
                 m_taggedEntityColor.getRGB() & 0x00ffffff);
-        
+
         StringBuffer paramStr = new StringBuffer();
         for (Sentence sen : p.getSentences()) {
             for (Term t : sen.getTerms()) {
                 boolean marked = false;
-                
+
                 // search hiliting
                 if (hiliteSearch && search != null) {
-                    if (search.toLowerCase().equals(t.getText().toLowerCase())) 
+                    if (search.toLowerCase().equals(t.getText().toLowerCase()))
                     {
                         paramStr.append("<font style=\"BACKGROUND-COLOR: green;"
                                 + "COLOR: white\">"
@@ -308,7 +310,7 @@ public class DocumentViewPanel extends JSplitPane {
                         continue;
                     }
                 }
-                
+
                 if (hiliteTags) {
                     if (t.getTags().size() > 0) {
                         List<Tag> tags = t.getTags();
@@ -367,7 +369,7 @@ public class DocumentViewPanel extends JSplitPane {
             names[0][1] = "";
         }
 
-        return createMetaInfoPanel("Authors", names, 
+        return createMetaInfoPanel("Authors", names,
                 new Object[]{"First name", "Last name"});
     }
 
@@ -399,12 +401,12 @@ public class DocumentViewPanel extends JSplitPane {
             info[row][1] = c.getCategoryName();
             row++;
         }
-        
-        return createMetaInfoPanel("Metainfo", info, 
+
+        return createMetaInfoPanel("Metainfo", info,
                 new Object[]{"Name", "Value"});
     }
-    
-    private JPanel createMetaInfoPanel(final String title, 
+
+    private JPanel createMetaInfoPanel(final String title,
             final Object[][] metaInfo, final Object[] metaInfoTableHeader) {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -419,32 +421,21 @@ public class DocumentViewPanel extends JSplitPane {
         table.addMouseMotionListener(new MetaInfoTableListener());
         table.setOpaque(false);
         table.setDefaultRenderer(Object.class, new AttributiveCellRenderer());
-        
+
         JScrollPane jsp = new JScrollPane(table);
-        jsp.setPreferredSize(new Dimension(MAX_COLS/2, MAX_ROWS * 5));
+        jsp.setPreferredSize(new Dimension(MAX_COLS / 2, MAX_ROWS * 5));
         panel.add(jsp, BorderLayout.CENTER);
         panel.setBorder(new EtchedBorder());
-        
-        return panel;
-    }    
 
-    private ImageIcon createImageIcon(final String path, 
-            final String description) {
-        URL imgURL = getClass().getResource(path);
-        if (imgURL != null) {
-            return new ImageIcon(imgURL, description);
-        } else {
-            System.err.println("Couldn't find file: " + path);
-            return null;
-        }
+        return panel;
     }
-    
+
     private void refreshHiliting() {
         m_fulltextPane.setText(getPreparedText(m_doc,
                 m_hiliteTags.isSelected(),
-                m_tagTypes.getSelectedItem().toString(), 
+                m_tagTypes.getSelectedItem().toString(),
                 m_searchField.getText(), m_searchButton.isSelected()));
-    }   
+    }
 
     private boolean checkBrowsingSupport() {
         Desktop desktop = null;
@@ -456,7 +447,7 @@ public class DocumentViewPanel extends JSplitPane {
         }
         return false;
     }
-    
+
     private void openUrlInBrowser(final URL u) {
         if (u != null) {
             Desktop desktop = null;
@@ -474,9 +465,9 @@ public class DocumentViewPanel extends JSplitPane {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     private class SearchListener implements ActionListener, DocumentListener {
@@ -513,9 +504,9 @@ public class DocumentViewPanel extends JSplitPane {
             refreshHiliting();
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     private class RightClickMenueListener implements ActionListener {
@@ -532,7 +523,7 @@ public class DocumentViewPanel extends JSplitPane {
                         String source = ((JMenuItem)e.getSource()).getText();
                         String urlStr = SearchEngines.getInstance()
                             .getUrlString(source, selectedText);
-                        
+
                         try {
                             URL u = new URL(urlStr);
                             openUrlInBrowser(u);
@@ -543,11 +534,11 @@ public class DocumentViewPanel extends JSplitPane {
                 }
             }
         }
-        
+
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     private class LinkSourceListener implements ActionListener {
@@ -560,9 +551,9 @@ public class DocumentViewPanel extends JSplitPane {
             refreshHiliting();
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     private class LinkListener implements HyperlinkListener {
@@ -578,9 +569,9 @@ public class DocumentViewPanel extends JSplitPane {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     private class ColorButtonListener implements ActionListener {
@@ -623,13 +614,13 @@ public class DocumentViewPanel extends JSplitPane {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, University of Konstanz
      */
     private class MetaInfoTableListener extends MouseAdapter {
-        
+
         /**
          * {@inheritDoc}
          */
@@ -640,15 +631,15 @@ public class DocumentViewPanel extends JSplitPane {
             aTable.repaint();
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     @SuppressWarnings("serial")
-    private class AttributiveCellRenderer extends JLabel 
+    private class AttributiveCellRenderer extends JLabel
     implements TableCellRenderer {
-        
+
         /**
          * Constructor.
          */
@@ -661,9 +652,9 @@ public class DocumentViewPanel extends JSplitPane {
          */
         @Override
         public Component getTableCellRendererComponent(final JTable table,
-                final Object value, final boolean isSelected, 
+                final Object value, final boolean isSelected,
                 final boolean hasFocus, final int row, final int column) {
-            
+
             if (isSelected) {
                 this.setBackground(Color.DARK_GRAY);
                 this.setForeground(Color.WHITE);
@@ -674,7 +665,7 @@ public class DocumentViewPanel extends JSplitPane {
                 this.setBackground(Color.WHITE);
                 this.setForeground(Color.BLACK);
             }
-            
+
             this.setText(value.toString());
             return this;
         }
