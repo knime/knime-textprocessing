@@ -61,7 +61,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 /**
  *
  * @author Kilian Thiel, KNIME.com AG, Zurich
- * @since 2.6.1
+ * @since 2.7
  */
 public final class ImgLoaderUtil {
 
