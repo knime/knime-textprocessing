@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   20.07.2007 (thiel): created
  */
@@ -52,33 +52,33 @@ import org.knime.ext.textprocessing.data.DocumentType;
 
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
-    
+
     private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(DocumentGrabberNodeDialog.class);    
-    
+        NodeLogger.getLogger(DocumentGrabberNodeDialog.class);
+
     /**
      * @return Creates and returns the settings model of the query.
      */
     public static final SettingsModelString getQueryModel() {
         return new SettingsModelString(
-                DocumentGrabberConfigKeys.CFGKEY_QUERY, ""); 
+                DocumentGrabberConfigKeys.CFGKEY_QUERY, "");
     }
-    
+
     /**
      * @return Creates and returns the settings model of the maximum results.
      */
     public static final SettingsModelIntegerBounded getMaxResultsModel() {
         return new SettingsModelIntegerBounded(
-                DocumentGrabberConfigKeys.CFGKEY_MAX_RESULTS, 
-                DocumentGrabberNodeModel.DEF_RESULTS, 
+                DocumentGrabberConfigKeys.CFGKEY_MAX_RESULTS,
+                DocumentGrabberNodeModel.DEF_RESULTS,
                 DocumentGrabberNodeModel.MIN_RESULTS,
-                DocumentGrabberNodeModel.MAX_RESULTS); 
+                DocumentGrabberNodeModel.MAX_RESULTS);
     }
-    
+
     /**
      * @return Creates and returns the settings model of the data base to use.
      */
@@ -87,7 +87,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
                 DocumentGrabberConfigKeys.CFGKEY_DATATBASE,
                 DocumentGrabberNodeModel.DEFAULT_DATABASE);
     }
-    
+
     /**
      * @return Creates and returns the settings model of the deleted files flag.
      */
@@ -96,17 +96,17 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
                 DocumentGrabberConfigKeys.CFGKEY_DELETE,
                 DocumentGrabberNodeModel.DEF_DELETE_AFTER_PARSE);
     }
-    
+
     /**
      * @return Creates and returns the settings model of the directory to save
      * the files to.
      */
     public static final SettingsModelString getDirectoryModel() {
         return new SettingsModelString(
-                DocumentGrabberConfigKeys.CFGKEY_DIR, 
+                DocumentGrabberConfigKeys.CFGKEY_DIR,
                 DocumentGrabberNodeModel.DEF_DIR);
     }
-    
+
     /**
      * @return Creates and returns the settings model of the document category
      * to set.
@@ -115,7 +115,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 DocumentGrabberConfigKeys.CFGKEY_DOC_CAT, "");
     }
-    
+
     /**
      * @return Creates and returns the settings model of the document type to
      * set.
@@ -124,23 +124,32 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 DocumentGrabberConfigKeys.CFGKEY_DOC_TYPE, "");
     }
-         
-    
+
+    /**
+     * @return Creates and returns the settings model of the extract meta info
+     * option.
+     * @since 2.7
+     */
+    public static final SettingsModelBoolean getExtractMetaInfoModel() {
+        return new SettingsModelBoolean(
+                DocumentGrabberConfigKeys.CFGKEY_EXTRACT_META_INFO, false);
+    }
+
     private DialogComponentButtonLabel m_buttonLabel;
     private SettingsModelString m_queryModel;
     private SettingsModelString m_databaseModel;
-    private SettingsModelInteger m_maxResultsModel;    
+    private SettingsModelInteger m_maxResultsModel;
     private SettingsModelString m_directoryModel;
-    
+
     /**
      * Creates new instance of <code>DocumentGrabberNodeDialog</code>.
      */
     public DocumentGrabberNodeDialog() {
-        
+
         m_queryModel = getQueryModel();
-        addDialogComponent(new DialogComponentMultiLineString(m_queryModel, 
+        addDialogComponent(new DialogComponentMultiLineString(m_queryModel,
                 "Query: "));
-        
+
         m_buttonLabel = new DialogComponentButtonLabel(
                 "Number of results ", " 0 ");
         m_buttonLabel.addActionListener(new ButtonListener());
@@ -149,36 +158,40 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         List<String> namesAsList = new ArrayList<String>(
                 DocumentGrabberFactory.getInstance().getGrabberNames());
         m_databaseModel = getDataBaseModel();
-        addDialogComponent(new DialogComponentStringSelection(m_databaseModel, 
+        addDialogComponent(new DialogComponentStringSelection(m_databaseModel,
                 "Database: ", namesAsList));
-        
+
         m_maxResultsModel = getMaxResultsModel();
-        addDialogComponent(new DialogComponentNumber(m_maxResultsModel, 
+        addDialogComponent(new DialogComponentNumber(m_maxResultsModel,
                 "Maximal results: ", 100));
-        
+
         m_directoryModel = getDirectoryModel();
         addDialogComponent(new DialogComponentFileChooser(
-                m_directoryModel, "DocumentsDirectory - save", 
+                m_directoryModel, "DocumentsDirectory - save",
                 JFileChooser.SAVE_DIALOG, true));
-        
+
         addDialogComponent(new DialogComponentBoolean(
                 getDeleteFilesModel(), "Delete after parsing: "));
-        
+
         addDialogComponent(new DialogComponentString(
                 getDocumentCategoryModel(), "Document Category:"));
-        
+
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(
-                getDocumentTypeModel(), "Document Type:", types));        
+                getDocumentTypeModel(), "Document Type:", types));
+
+        addDialogComponent(new DialogComponentBoolean(getExtractMetaInfoModel(),
+                "Extract meta information if provided by database"));
     }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public void saveAdditionalSettingsTo(final NodeSettingsWO settings)
             throws InvalidSettingsException {
         super.saveAdditionalSettingsTo(settings);
-        
+
         String dir = m_directoryModel.getStringValue();
         File f = new File(dir);
         if (!f.isDirectory()) {
@@ -194,11 +207,11 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
             throw new InvalidSettingsException("Selected directory: " + dir
                     + " is not empty!");
         }
-        
+
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, University of Konstanz
      */
     class ButtonListener implements ActionListener {
@@ -209,8 +222,8 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         public void actionPerformed(final ActionEvent e) {
             String database = m_databaseModel.getStringValue();
             String query = m_queryModel.getStringValue();
-            
-            DocumentGrabber grabber = 
+
+            DocumentGrabber grabber =
                 DocumentGrabberFactory.getInstance().getGrabber(database);
             int numberOfResults;
             try {

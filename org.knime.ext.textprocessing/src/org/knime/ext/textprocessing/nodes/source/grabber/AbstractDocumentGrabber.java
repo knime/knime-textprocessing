@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   20.07.2007 (thiel): created
  */
@@ -37,38 +37,44 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListe
 
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
+ */
+/**
+ *
+ * @author Kilian Thiel, KNIME.com AG, Zurich
  */
 public abstract class AbstractDocumentGrabber implements DocumentGrabber {
 
-    
+
     private ExecutionMonitor m_exec;
-    
+
     private boolean m_delete;
-    
+
     private DocumentCategory m_documentCategory;
-    
+
     private DocumentType m_documentType;
-    
+
+    private boolean m_extractMetaInfo = false;
+
     /**
      * List of listeners.
      */
     protected List<DocumentParsedEventListener> m_listener;
-    
+
     /**
-     * Constructor of <code>AbstractDocumentGrabber</code> with flag 
-     * deleteFiles to set, which specifies if downloaded files will be deleted 
+     * Constructor of <code>AbstractDocumentGrabber</code> with flag
+     * deleteFiles to set, which specifies if downloaded files will be deleted
      * after parsing, the given document category and type to set
      * and <code>ExecutionMonitor</code> to handle the progress.
-     * 
+     *
      * @param deleteFiles If set true files will be deleted after parsing.
      * @param documentCategory The category of the documents to set.
      * @param documentType The tpe of the document to set.
      * @param exec <code>ExecutionMonitor</code> to display the progress of
      * the process.
      */
-    public AbstractDocumentGrabber(final boolean deleteFiles, 
+    public AbstractDocumentGrabber(final boolean deleteFiles,
             final DocumentCategory documentCategory,
             final DocumentType documentType,
             final ExecutionMonitor exec) {
@@ -80,26 +86,26 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     }
 
     /**
-     * Constructor of <code>AbstractDocumentGrabber</code> with flag 
-     * deleteFiles to set, which specifies if downloaded files will be deleted 
+     * Constructor of <code>AbstractDocumentGrabber</code> with flag
+     * deleteFiles to set, which specifies if downloaded files will be deleted
      * after parsing.
-     * 
+     *
      * @param deleteFiles If set true files will be deleted after parsing.
      * @param documentCategory The category of the documents to set.
      */
-    public AbstractDocumentGrabber(final boolean deleteFiles, 
+    public AbstractDocumentGrabber(final boolean deleteFiles,
             final DocumentCategory documentCategory) {
         this(deleteFiles, documentCategory, null, null);
-    }    
-    
+    }
+
     /**
      * Constructor of <code>AbstractDocumentGrabber</code>. Files will
      * not be deleted after parsing, deleteFiles is set false by default.
      */
     public AbstractDocumentGrabber() {
         this(false, null, null, null);
-    }  
-    
+    }
+
     /**
      * @return the delete flag. If set true files will be deleted after parsing.
      */
@@ -108,7 +114,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     }
 
     /**
-     * @param delete If set <code>true</code> files will be deleted after 
+     * @param delete If set <code>true</code> files will be deleted after
      * parsing.
      */
     public void setDeleteFiles(final boolean delete) {
@@ -128,7 +134,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     public void setExec(final ExecutionMonitor exec) {
         m_exec = exec;
     }
-    
+
     /**
      * @see org.knime.core.node.NodeProgressMonitor#checkCanceled()
      * @throws CanceledExecutionException which indicated the execution will be
@@ -139,10 +145,10 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
             m_exec.checkCanceled();
         }
     }
-    
+
     /**
      * Sets the given progress and message if execution context is available.
-     * 
+     *
      * @param progress The progress to set.
      * @param message The message to set.
      */
@@ -179,7 +185,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     public void setDocumentType(final DocumentType documentType) {
         m_documentType = documentType;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -188,7 +194,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
             final DocumentParsedEventListener listener) {
         m_listener.add(listener);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -197,7 +203,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
             final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -205,7 +211,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
     }
-    
+
     /**
      * Notifies all registered listeners with given event.
      * @param event Event to notify listener with
@@ -214,5 +220,21 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
         for (DocumentParsedEventListener l : m_listener) {
             l.documentParsed(event);
         }
-    }    
+    }
+
+    /**
+     * @return the extractMetaInfo
+     * @since 2.7
+     */
+    public boolean getExtractMetaInfo() {
+        return m_extractMetaInfo;
+    }
+
+    /**
+     * @param extractMetaInfo the extractMetaInfo to set
+     * @since 2.7
+     */
+    public void setExtractMetaInfo(final boolean extractMetaInfo) {
+        m_extractMetaInfo = extractMetaInfo;
+    }
 }

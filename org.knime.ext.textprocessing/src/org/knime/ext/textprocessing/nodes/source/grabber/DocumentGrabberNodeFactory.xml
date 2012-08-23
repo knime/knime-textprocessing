@@ -39,6 +39,13 @@
         <option name="Document type">
             The type of the documents.
         </option>
+        <option name="Extract meta information if provided by database">
+            If checked, meta information is extracted if provided by database.
+            In case of PubMed the meta information consists of PubMed ID, the
+            chemical list, and the mesh heading list assigned to the article.
+            The meta information is stored as a regular section in the 
+            documents, annotated as meta information section.
+        </option>        
 	</fullDescription>
 		
 	<ports>

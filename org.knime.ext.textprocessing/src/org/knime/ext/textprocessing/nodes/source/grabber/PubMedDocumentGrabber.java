@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   18.07.2007 (thiel): created
  */
@@ -57,7 +57,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
@@ -66,50 +66,50 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
      * The source of the documents grabbed by this grabber.
      */
     public static final String SOURCE = "PubMed";
-    
+
     private static final NodeLogger LOGGER =
             NodeLogger.getLogger(PubMedDocumentGrabber.class);
-    
+
     private static final String PROTOCOL = "http";
-    
+
     private static final String HOST = "eutils.ncbi.nlm.nih.gov";
-    
-    
+
+
     private static final String SEARCH_PATH = "/entrez/eutils/esearch.fcgi";
-    
+
     private static final String SEARCH_QUERY = "db=pubmed&term=";
 
     private static final String SEARCH_QUERY_POSTFIX = "&retmax=";
-    
-    
+
+
     private static final String FETCH_PATH = "/entrez/eutils/efetch.fcgi";
-    
-    private static final String FETCH_QUERY = "db=pubmed&id="; 
-    
-    private static final String FETCH_QUERY_POSTFIX = 
+
+    private static final String FETCH_QUERY = "db=pubmed&id=";
+
+    private static final String FETCH_QUERY_POSTFIX =
         "&retmode=xml&rettype=abstract";
-    
-    
+
+
     private static final String BASIC_FILE_NAME = "PubMedAbstracts";
-    
+
     private static final String FILE_EXTENSION = "gz";
-  
-    
-    
+
+
+
     private int m_stepSize = 100;
-    
+
     private long m_delayMillis = 1000;
-    
+
     private List<Integer> m_idList = new ArrayList<Integer>();
 
-    
+
     /**
      * Creates empty instance of <code>PubMedDocumentGrabber</code>.
      */
     PubMedDocumentGrabber() {
         super();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -117,36 +117,36 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         URL pubmed = buildUrl(query, false);
         LOGGER.info("PubMed Query: " + pubmed.toString());
         return buildResultList(pubmed);
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
-    public List < Document > grabDocuments(final File directory, 
+    public List < Document > grabDocuments(final File directory,
             final Query query) throws Exception {
         if (directory != null && query != null) {
             if (directory.exists() && directory.isDirectory()) {
-                                
+
                 fetchDocuments(directory, query);
-                
+
                 List<Document> docs = new ArrayList<Document>();
                 try {
                     docs = parseDocuments(directory);
                 } catch (URISyntaxException e) {
-                    LOGGER.warn("Could not find file containing " 
+                    LOGGER.warn("Could not find file containing "
                             + "PubMed documents!");
                     throw(e);
                 } catch (Exception e) {
                     LOGGER.warn("Could not parse PubMed documents!");
                     throw(e);
                 }
-                 
+
                 return docs;
             }
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -154,13 +154,13 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             throws Exception {
         if (directory != null && query != null) {
             if (directory.exists() && directory.isDirectory()) {
-                
+
                 fetchDocuments(directory, query);
-                
+
                 try {
                     parseDocumentsAndNotify(directory);
                 } catch (URISyntaxException e) {
-                    LOGGER.warn("Could not find file containing " 
+                    LOGGER.warn("Could not find file containing "
                             + "PubMed documents!");
                     throw(e);
                 } catch (Exception e) {
@@ -170,46 +170,46 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             }
         }
         return;
-    }    
+    }
 
-    private void fetchDocuments(final File directory, final Query query) 
+    private void fetchDocuments(final File directory, final Query query)
     throws Exception {
         if (directory != null && query != null) {
             if (directory.exists() && directory.isDirectory()) {
-                                
+
                 URL pubmed = buildUrl(query, true);
                 LOGGER.info("PubMed Query: " + pubmed.toString());
 
                 // Read search result xml
                 buildResultList(pubmed);
-                
-                // go through all ids (with certain step size) 
+
+                // go through all ids (with certain step size)
                 // and download document
                 int idStart = 0;
                 int count = 1;
                 while (idStart < m_idList.size()) {
                     checkCanceled();
                     int idEnd = getEnd(idStart, m_idList.size() - 1);
-                    
+
                     // setting progress
                     double progress = (double)idEnd  / (double)m_idList.size()
                                         * 0.5;
-                    message("Fetching documents from " + idStart + " to " 
+                    message("Fetching documents from " + idStart + " to "
                             + idEnd + " of " + m_idList.size(), progress);
-                    
+
                     String idString = "";
                     for (int i = idStart; i <= idEnd; i++) {
                         idString += m_idList.get(i) + ",";
                     }
-                    
-                    String fetchStr = FETCH_QUERY + idString 
+
+                    String fetchStr = FETCH_QUERY + idString
                         + FETCH_QUERY_POSTFIX;
                     URI uri = new URI(PROTOCOL, HOST, FETCH_PATH, fetchStr, "");
                     pubmed = uri.toURL();
-                    
+
                     LOGGER.info("PubMed fetching: " + pubmed.toString());
-                    
-                    String filename = BASIC_FILE_NAME + count + "." 
+
+                    String filename = BASIC_FILE_NAME + count + "."
                         + FILE_EXTENSION;
                     try {
                         saveDocument(pubmed, directory, filename);
@@ -229,37 +229,38 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         }
         return;
     }
-    
+
     private void parseDocumentsAndNotify(final File dir) throws Exception {
-        DocumentParser parser = new PubMedDocumentParser();
+        DocumentParser parser = new PubMedDocumentParser(getExtractMetaInfo());
+
         parser.addDocumentParsedListener(
                 new InternalDocumentParsedEventListener());
-        
+
         parser.setDocumentSource(new DocumentSource(SOURCE));
         if (getDocumentCategory() != null) {
             parser.setDocumentCategory(getDocumentCategory());
         }
         if (getDocumentType() != null) {
             parser.setDocumentType(getDocumentType());
-        }        
-        
+        }
+
         List<String> validExtensions = new ArrayList<String>();
         validExtensions.add(FILE_EXTENSION);
-        
+
         FileCollector fc = new FileCollector(dir, validExtensions, false, true);
         List<File> files = fc.getFiles();
         int fileCount = files.size();
         int currFile = 1;
         for (File f : files) {
             double progress = (double)currFile / (double)fileCount;
-            setProgress(progress, "Parsing file " + currFile + " of " 
+            setProgress(progress, "Parsing file " + currFile + " of "
                     + fileCount);
             checkCanceled();
             currFile++;
             LOGGER.info("Parsing file: " + f.getAbsolutePath());
-            
+
             InputStream is;
-            if (f.getName().toLowerCase().endsWith(".gz") 
+            if (f.getName().toLowerCase().endsWith(".gz")
                     || f.getName().toLowerCase().endsWith(".zip")) {
                 is = new GZIPInputStream(new FileInputStream(f));
             } else {
@@ -268,7 +269,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             parser.setDocumentFilepath(f.getAbsolutePath());
             parser.parseDocument(is);
         }
-        
+
         if (getDeleteFiles()) {
             for (File file : files) {
                 if (file.isFile() && file.exists()) {
@@ -277,12 +278,12 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             }
         }
         return;
-    }    
-    
+    }
+
     @Deprecated
     private List < Document > parseDocuments(final File dir) throws Exception {
         List<Document> docs = new ArrayList<Document>();
-        
+
         DocumentParser parser = new PubMedDocumentParser();
         parser.setDocumentSource(new DocumentSource(SOURCE));
         if (getDocumentCategory() != null) {
@@ -290,36 +291,36 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         }
         if (getDocumentType() != null) {
             parser.setDocumentType(getDocumentType());
-        }        
-        
+        }
+
         List<String> validExtensions = new ArrayList<String>();
         validExtensions.add(FILE_EXTENSION);
-        
+
         FileCollector fc = new FileCollector(dir, validExtensions, false, true);
         List<File> files = fc.getFiles();
         int fileCount = files.size();
         int currFile = 1;
         for (File f : files) {
             double progress = (double)currFile / (double)fileCount;
-            setProgress(progress, "Parsing file " + currFile + " of " 
+            setProgress(progress, "Parsing file " + currFile + " of "
                     + fileCount);
             checkCanceled();
             currFile++;
             LOGGER.info("Parsing file: " + f.getAbsolutePath());
-            
+
             InputStream is;
-            if (f.getName().toLowerCase().endsWith(".gz") 
+            if (f.getName().toLowerCase().endsWith(".gz")
                     || f.getName().toLowerCase().endsWith(".zip")) {
                 is = new GZIPInputStream(new FileInputStream(f));
             } else {
                 is = new FileInputStream(f);
             }
             parser.setDocumentFilepath(f.getAbsolutePath());
-            
+
             docs.addAll(parser.parse(is));
             parser.clean();
         }
-        
+
         if (getDeleteFiles()) {
             for (File file : files) {
                 if (file.isFile() && file.exists()) {
@@ -327,19 +328,19 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                 }
             }
         }
-        
+
         return docs;
     }
 
-    
-    private void saveDocument(final URL url, final File dir, 
+
+    private void saveDocument(final URL url, final File dir,
             final String filename) throws IOException, URISyntaxException {
-        
+
         File dst = new File(dir.getAbsolutePath() + "/" + filename);
         if (!dst.exists()) {
             dst.createNewFile();
         }
-        
+
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(20000);
         conn.connect();
@@ -347,18 +348,18 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         BufferedReader in = new BufferedReader(isr);
         OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
         OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
-        
+
         // Transfer bytes from in to out
         String line;
         while ((line = in.readLine()) != null) {
             writer.write(line);
         }
-        
+
         in.close();
         writer.close();
         out.close();
     }
-    
+
     private int getEnd(final int start, final int max) {
         int end = start + m_stepSize;
         if (end > max) {
@@ -366,27 +367,27 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         }
         return end;
     }
-    
+
     private void message(final String str, final double progress) {
         if (getExec() != null) {
             getExec().setProgress(progress, str);
         }
     }
-    
-    private URL buildUrl(final Query query, final boolean applyMaxResults) 
+
+    private URL buildUrl(final Query query, final boolean applyMaxResults)
     throws URISyntaxException, MalformedURLException {
-        
+
         // Build search url
         String str = SEARCH_QUERY + query.getQuery();
         if (applyMaxResults) {
             str += SEARCH_QUERY_POSTFIX + query.getMaxResults();
         }
         URI uri = new URI(PROTOCOL, HOST, SEARCH_PATH, str, "");
-        
+
         return uri.toURL();
     }
-    
-    private int buildResultList(final URL url) throws IOException, 
+
+    private int buildResultList(final URL url) throws IOException,
     CanceledExecutionException {
         // Read search result xml
         int results = -1;
@@ -407,7 +408,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                 int id = Integer.parseInt(m.group(1));
                 m_idList.add(id);
             }
-            
+
             if (results == -1) {
                 // regular expression to find the "count" field
                 String regexCount = "<Count>(\\d+)</Count>";
@@ -420,17 +421,17 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                 }
             }
         }
-        
+
         return results;
     }
-    
+
     /**
      * @return The number of grabbed documents.
      */
     public int getNumberOfDocuments() {
         return m_idList.size();
     }
-    
+
     /**
      * @return the delay time between two requests in milliseconds
      */
@@ -439,7 +440,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     }
 
     /**
-     * @param delayMillis the delay time between two requests in milliseconds 
+     * @param delayMillis the delay time between two requests in milliseconds
      * to set.
      */
     public void setDelayMillis(final long delayMillis) {
@@ -447,7 +448,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     }
 
     /**
-     * @return the stepSize which specifies the number of abstracts stored in 
+     * @return the stepSize which specifies the number of abstracts stored in
      * one file.
      */
     public int getStepSize() {
@@ -455,14 +456,14 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     }
 
     /**
-     * @param stepSize the stepSize to set, which specifies the number of 
+     * @param stepSize the stepSize to set, which specifies the number of
      * abstracts stored in one file.
      */
     public void setStepSize(final int stepSize) {
         m_stepSize = stepSize;
     }
-    
-    private class InternalDocumentParsedEventListener 
+
+    private class InternalDocumentParsedEventListener
     implements DocumentParsedEventListener {
         /**
          * {@inheritDoc}

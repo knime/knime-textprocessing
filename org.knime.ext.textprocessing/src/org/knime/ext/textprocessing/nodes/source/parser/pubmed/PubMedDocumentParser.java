@@ -135,6 +135,35 @@ public class PubMedDocumentParser extends DefaultHandler implements
      */
     public static final String TITLE = "title";
 
+    /**
+     * The pub med id.
+     * @since 2.7
+     */
+    public static final String PMID = "pmid";
+
+    /**
+     * The chemical list.
+     * @since 2.7
+     */
+    public static final String CHEMICAL_LIST = "chemicallist";
+
+    /**
+     * The chemical name.
+     * @since 2.7
+     */
+    public static final String NAME_OF_SUBSTANCE = "nameofsubstance";
+
+    /**
+     * The mesh heading list.
+     * @since 2.7
+     */
+    public static final String MESH_HEADING_LIST = "meshheadinglist";
+
+    /**
+     * The mesh descriptor name.
+     * @since 2.7
+     */
+    public static final String DESCRIPTOR_NAME = "descriptorname";
 
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(PubMedDocumentParser.class);
@@ -171,9 +200,23 @@ public class PubMedDocumentParser extends DefaultHandler implements
 
     private String m_journalTitle = "";
 
+    private String m_pmid = "";
+
+    private boolean m_pmidIsSet = false;
+
+    private List<String> m_meshHeadingList = new ArrayList<String>();
+
+    private List<String> m_chemicalList = new ArrayList<String>();
+
+    private String m_chemicalEntry = "";
+
+    private String m_meshEntry = "";
+
     private boolean m_journalFlag = false;
-    
+
     private boolean m_storeInList = false;
+
+    private boolean m_extractMetaData = false;
 
 
     /**
@@ -184,7 +227,22 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * <code>null</code> by default.
      */
     public PubMedDocumentParser() {
-        this(null, null, new DocumentSource(DEFAULT_SOURCE));
+        this(null, null, new DocumentSource(DEFAULT_SOURCE), false);
+    }
+
+    /**
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The
+     * document source is set to
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE}
+     * by default. The document category and file path will be set to
+     * <code>null</code> by default.
+     *
+     * @param extractMetaData The flag whether meta data (mesh info and pub med
+     * id) are extracted or not.
+     * @since 2.7
+     */
+    public PubMedDocumentParser(final boolean extractMetaData) {
+        this(null, null, new DocumentSource(DEFAULT_SOURCE), extractMetaData);
     }
 
     /**
@@ -197,10 +255,28 @@ public class PubMedDocumentParser extends DefaultHandler implements
      */
     public PubMedDocumentParser(final String docPath,
             final DocumentCategory category, final DocumentSource source) {
+        this(docPath, category, source, false);
+    }
+
+    /**
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The given
+     * source, category and file path is set to the created documents.
+     *
+     * @param docPath The path to the file containing the document.
+     * @param category The category of the document to set.
+     * @param source The source of the document to set.
+     * @param extractMetaData The flag whether meta data (mesh info and pub med
+     * id) are extracted or not.
+     * @since 2.7
+     */
+    public PubMedDocumentParser(final String docPath,
+            final DocumentCategory category, final DocumentSource source,
+            final boolean extractMetaData) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
         m_listener = new ArrayList<DocumentParsedEventListener>();
+        m_extractMetaData = extractMetaData;
     }
 
     /**
@@ -280,6 +356,16 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_journalFlag = true;
         } else if (m_lastTag.equals(TITLE)) {
             m_journalTitle = "";
+        } else if (m_lastTag.equals(PMID)) {
+            m_pmid = "";
+        } else if (m_lastTag.equals(DESCRIPTOR_NAME)) {
+            m_meshEntry = "";
+        } else if (m_lastTag.equals(NAME_OF_SUBSTANCE)) {
+            m_chemicalEntry = "";
+        } else if (m_lastTag.equals(MESH_HEADING_LIST)) {
+            m_meshHeadingList = new ArrayList<String>();
+        } else if (m_lastTag.equals(CHEMICAL_LIST)) {
+            m_chemicalList = new ArrayList<String>();
         }
     }
 
@@ -292,7 +378,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
         String name = qName.toLowerCase();
         if (name.equals(PUBMEDARTICLE) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
-            
+
             // due to memory issues documents are not all stored in list anymore
             // but handed out via listener mechanism
             //m_docs.add(doc);
@@ -300,7 +386,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 m_docs.add(doc);
             }
             notifyAllListener(new DocumentParsedEvent(doc, this));
-            
+
             m_currentDoc = null;
             // set empty strings to delete data from previous document
             m_abstract = "";
@@ -311,6 +397,10 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_month = "";
             m_year = "";
             m_journalTitle = "";
+            m_pmid = "";
+            m_chemicalEntry = "";
+            m_meshEntry = "";
+            m_pmidIsSet = false;
         } else if (name.equals(ABSTRACTTEXT)) {
             if (m_currentDoc != null) {
                 m_currentDoc.addSection(m_abstract.trim(),
@@ -324,7 +414,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 m_currentDoc.addTitle(m_title.trim());
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Title (" + ARTICLETITLE + ":" + m_title.trim() 
+                        + "Title (" + ARTICLETITLE + ":" + m_title.trim()
                         + ") can not be set.");
             }
         } else if (name.equals(AUTHOR) && m_currentDoc != null) {
@@ -333,7 +423,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 m_currentDoc.addAuthor(a);
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Author (" + AUTHOR + ":" + m_firstName.trim() 
+                        + "Author (" + AUTHOR + ":" + m_firstName.trim()
                         + " " + m_lastName.trim() + ") can not be set.");
             }
         } else if (name.equals(PUBDATE)) {
@@ -371,11 +461,57 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 }
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Journal title (" + TITLE + ":" 
+                        + "Journal title (" + TITLE + ":"
                         + m_journalTitle.trim() + ") can not be set.");
             }
         } else if (name.equals(JOURNAL)) {
             m_journalFlag = false;
+        } else if (name.equals(PMID)) {
+            if (m_extractMetaData) {
+                if (m_pmid.length() > 0 && !m_pmidIsSet) {
+                    if (m_currentDoc != null) {
+                        m_currentDoc.addSection("PubMed ID: " + m_pmid,
+                                SectionAnnotation.META_INFORMATION);
+                    }
+                    m_pmidIsSet = true;
+                }
+            }
+        } else if (name.equals(NAME_OF_SUBSTANCE)) {
+            if (m_chemicalEntry.length() > 0 && m_chemicalList != null) {
+                m_chemicalList.add(m_chemicalEntry);
+            }
+        } else if (name.equals(DESCRIPTOR_NAME)) {
+            if (m_meshEntry.length() > 0 && m_meshHeadingList != null) {
+                m_meshHeadingList.add(m_meshEntry);
+            }
+        } else if (name.equals(CHEMICAL_LIST)) {
+            if (m_extractMetaData) {
+                if (m_chemicalList != null && m_chemicalList.size() > 0) {
+                    if (m_currentDoc != null) {
+                        StringBuilder chemicalInfo = new StringBuilder();
+                        chemicalInfo.append("Chemical list: ");
+                        for (String chem : m_chemicalList) {
+                            chemicalInfo.append(chem + "; ");
+                        }
+                        m_currentDoc.addSection(chemicalInfo.toString(),
+                                SectionAnnotation.META_INFORMATION);
+                    }
+                }
+            }
+        } else if (name.equals(MESH_HEADING_LIST)) {
+            if (m_extractMetaData) {
+                if (m_meshHeadingList != null && m_meshHeadingList.size() > 0) {
+                    if (m_currentDoc != null) {
+                        StringBuilder meshInfo = new StringBuilder();
+                        meshInfo.append("Mesh Heading list: ");
+                        for (String chem : m_meshHeadingList) {
+                            meshInfo.append(chem + "; ");
+                        }
+                        m_currentDoc.addSection(meshInfo.toString(),
+                                SectionAnnotation.META_INFORMATION);
+                    }
+                }
+            }
         }
     }
 
@@ -400,6 +536,12 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_day += new String(ch, start, length);
         } else if (m_lastTag.equals(TITLE) && m_journalFlag) {
             m_journalTitle += new String(ch, start, length);
+        } else if (m_lastTag.equals(PMID)) {
+            m_pmid += new String(ch, start, length);
+        } else if (m_lastTag.equals(NAME_OF_SUBSTANCE)) {
+            m_chemicalEntry += new String(ch, start, length);
+        } else if (m_lastTag.equals(DESCRIPTOR_NAME)) {
+            m_meshEntry += new String(ch, start, length);
         }
     }
 
@@ -438,13 +580,13 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * file.
      */
     public void setCharset(final Charset charset) { }
-    
-    
+
+
     /**
      * List of listeners.
      */
     private List<DocumentParsedEventListener> m_listener;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -469,8 +611,8 @@ public class PubMedDocumentParser extends DefaultHandler implements
         for (DocumentParsedEventListener l : m_listener) {
             l.documentParsed(event);
         }
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -492,5 +634,5 @@ public class PubMedDocumentParser extends DefaultHandler implements
      */
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
-    }    
+    }
 }

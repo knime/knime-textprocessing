@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   13.10.2008 (thiel): created
  */
@@ -47,7 +47,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListe
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentGrabberNodeModel extends NodeModel {
@@ -56,56 +56,59 @@ public class DocumentGrabberNodeModel extends NodeModel {
      * Default database to query.
      */
     public static final String DEFAULT_DATABASE = "PUBMED";
-    
+
     /**
      * The maximum number of results.
      */
     public static final int MAX_RESULTS = Integer.MAX_VALUE;
-    
+
     /**
      * The minimum number of results.
      */
     public static final int MIN_RESULTS = 1;
-    
+
     /**
      * The default number of results.
      */
     public static final int DEF_RESULTS = 1000;
-    
+
     /**
      * The default setting if results files are deleted after parsing.
      */
     public static final boolean DEF_DELETE_AFTER_PARSE = false;
-    
+
     /**
      * The default target directory.
      */
     public static final String DEF_DIR = System.getProperty("user.home");
-    
-    
-    private SettingsModelString m_queryModel = 
+
+
+    private SettingsModelString m_queryModel =
         DocumentGrabberNodeDialog.getQueryModel();
-    
-    private SettingsModelIntegerBounded m_maxResultsModel = 
+
+    private SettingsModelIntegerBounded m_maxResultsModel =
         DocumentGrabberNodeDialog.getMaxResultsModel();
-    
-    private SettingsModelString m_dataBaseModel = 
+
+    private SettingsModelString m_dataBaseModel =
         DocumentGrabberNodeDialog.getDataBaseModel();
-    
-    private SettingsModelBoolean m_deleteFilesModel = 
+
+    private SettingsModelBoolean m_deleteFilesModel =
         DocumentGrabberNodeDialog.getDeleteFilesModel();
-    
-    private SettingsModelString m_directoryModel = 
+
+    private SettingsModelString m_directoryModel =
         DocumentGrabberNodeDialog.getDirectoryModel();
-    
-    private SettingsModelString m_categoryModel = 
+
+    private SettingsModelString m_categoryModel =
         DocumentGrabberNodeDialog.getDocumentCategoryModel();
-    
-    private SettingsModelString m_typeModel = 
+
+    private SettingsModelString m_typeModel =
         DocumentGrabberNodeDialog.getDocumentTypeModel();
-    
+
+    private SettingsModelBoolean m_extractMetaInfoSettingsModel =
+        DocumentGrabberNodeDialog.getExtractMetaInfoModel();
+
     private DocumentDataTableBuilder m_dtBuilder;
-    
+
     /**
      * Creates new instance of <code>DocumentGrabberNodeModel</code>.
      */
@@ -113,7 +116,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         super(0, 1);
         m_dtBuilder = new DocumentDataTableBuilder();
     }
-    
+
 
 
     /**
@@ -124,44 +127,46 @@ public class DocumentGrabberNodeModel extends NodeModel {
             throws InvalidSettingsException {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {        
-        DocumentGrabber grabber = 
+            final ExecutionContext exec) throws Exception {
+        DocumentGrabber grabber =
             DocumentGrabberFactory.getInstance().getGrabber(
                     m_dataBaseModel.getStringValue());
-        
+
         m_dtBuilder.openDataTable(exec);
 
-        if (grabber != null)  {            
+        if (grabber != null)  {
             String queryStr = m_queryModel.getStringValue();
             Query query = new Query(queryStr, m_maxResultsModel.getIntValue());
-            
+
             if (grabber instanceof AbstractDocumentGrabber) {
                 boolean delete = m_deleteFilesModel.getBooleanValue();
                 DocumentCategory cat = new DocumentCategory(
                         m_categoryModel.getStringValue());
-                
+
                 ((AbstractDocumentGrabber)grabber).setDeleteFiles(delete);
                 ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
+                ((AbstractDocumentGrabber)grabber).setExtractMetaInfo(
+                        m_extractMetaInfoSettingsModel.getBooleanValue());
                 ((AbstractDocumentGrabber)grabber).setExec(exec);
             }
-            
+
             grabber.removeAllDocumentParsedListener();
             grabber.addDocumentParsedListener(
                     new InternalDocumentParsedEventListener());
             grabber.fetchAndParseDocuments(
                     new File(m_directoryModel.getStringValue()), query);
         }
-        
+
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
-    private class InternalDocumentParsedEventListener implements 
+    private class InternalDocumentParsedEventListener implements
     DocumentParsedEventListener {
         /**
          * {@inheritDoc}
@@ -199,7 +204,8 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_deleteFilesModel.saveSettingsTo(settings);
         m_directoryModel.saveSettingsTo(settings);
         m_maxResultsModel.saveSettingsTo(settings);
-        m_typeModel.saveSettingsTo(settings);        
+        m_typeModel.saveSettingsTo(settings);
+        m_extractMetaInfoSettingsModel.saveSettingsTo(settings);
     }
 
     /**
@@ -216,6 +222,12 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_maxResultsModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
         m_directoryModel.validateSettings(settings);
+
+        try {
+            m_extractMetaInfoSettingsModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // catch for the sake of downward compatibility
+        }
     }
 
     /**
@@ -231,26 +243,32 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_directoryModel.loadSettingsFrom(settings);
         m_maxResultsModel.loadSettingsFrom(settings);
         m_typeModel.loadSettingsFrom(settings);
-    }    
-    
-    
+
+        try {
+            m_extractMetaInfoSettingsModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // catch for the sake of downward compatibility
+        }
+    }
+
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
-    }    
+    }
 }
