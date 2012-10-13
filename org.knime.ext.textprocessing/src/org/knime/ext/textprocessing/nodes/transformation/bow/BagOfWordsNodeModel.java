@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -24,6 +24,14 @@
  *   03.03.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.bow;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
@@ -50,14 +58,6 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 /**
  * The model class of the Bag of word creator node. The method
  * {@link BagOfWordsNodeModel#configure(DataTableSpec[])} validates the incoming
@@ -75,14 +75,14 @@ public class BagOfWordsNodeModel extends NodeModel {
 
     private int m_documentColIndex = -1;
 
-    private BagOfWordsDataTableBuilder m_dtBuilder = 
+    private BagOfWordsDataTableBuilder m_dtBuilder =
         new BagOfWordsDataTableBuilder();
-    
-    private TextContainerDataCellFactory m_termFac = 
+
+    private TextContainerDataCellFactory m_termFac =
         TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     private int m_rowId = 1;
-    
+
     /**
      * Creates a new instance of <code>BagOfWordsNodeModel</code> with one in
      * and one data table out port.
@@ -158,12 +158,12 @@ public class BagOfWordsNodeModel extends NodeModel {
             exec.checkCanceled();
             currRow++;
         }
-        
+
         bdc.close();
         return new BufferedDataTable[]{bdc.getTable()};
     }
 
-    private void addToBOW(final Set<Term> terms, final DataCell docCell, 
+    private void addToBOW(final Set<Term> terms, final DataCell docCell,
             final BufferedDataContainer bdc) {
         for (Term t : terms) {
             RowKey key = RowKey.createRowKey(m_rowId);
@@ -171,13 +171,13 @@ public class BagOfWordsNodeModel extends NodeModel {
             DataRow newRow = new DefaultRow(key, tc, docCell);
             bdc.addRowToTable(newRow);
             m_rowId++;
-        } 
+        }
     }
 
     private Set<Term> setOfTerms(final Document doc) {
         Set<Term> termSet = null;
         if (doc != null) {
-            termSet = new HashSet<Term>();
+            termSet = new LinkedHashSet<Term>();
 
             Iterator<Sentence> it = doc.sentenceIterator();
             while (it.hasNext()) {
