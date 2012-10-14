@@ -10,7 +10,7 @@
             Converts the terms of the specified term column to molecule strings
             formatted by a specified format using the OSCAR framework
             (see https://bitbucket.org/wwmm/oscar4/overview for details).
-            Based on OSCAR version 4.1.1 using OPSIN 1.3, molecules are 
+            Based on OSCAR version 4.1.2 using OPSIN 1.3, molecules are 
             translates into e.g. SMILES strings. If a term can not be 
             translated a missing cell is returned.
         </intro>

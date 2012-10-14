@@ -12,7 +12,7 @@
             words and the documents as well if deep preprocessing is checked.
             <br />
             To detect chemical named entities, the OSCAR
-            framework version 4.1.1 is used
+            framework version 4.1.2 is used
             (see https://bitbucket.org/wwmm/oscar4/overview for details).
             <br />
             A term is kept if at least one of its assigned chemical tags is a valid

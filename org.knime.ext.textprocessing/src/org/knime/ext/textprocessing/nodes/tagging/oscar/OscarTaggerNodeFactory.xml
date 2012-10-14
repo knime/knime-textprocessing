@@ -7,7 +7,7 @@
     <fullDescription>
         <intro>
             Assigns chemical named entity tags to terms which are recognized
-            by the OSCAR chemical named entity recognizer framework version 4.1.1
+            by the OSCAR chemical named entity recognizer framework version 4.1.2
             (see https://bitbucket.org/wwmm/oscar4/overview for details).
             As tags the default named entity types of the OSCAR framework
             are used (see http://apidoc.ch.cam.ac.uk/oscar4-4.0.1/).
