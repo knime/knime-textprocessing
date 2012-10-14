@@ -6,11 +6,12 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            This node recognizes named enities based on OpenNlp models and
-            assigns the corresponding tags to them. The following entities are
-            recognized: Persons, Locations, Organizations, Money, Date, 
-            and Time. For more details of the OpenNlp natural language 
-            processing toolkit, see http://opennlp.sourceforge.net.
+            This node recognizes named enities based on opennlp models version 
+            1.5.2 and assigns the corresponding tags to them. The following 
+            entities are recognized: Persons, Locations, Organizations, Money, 
+            Date, and Time. For more details of the OpenNlp natural language 
+            processing toolkit, see 
+            http://opennlp.apache.org/documentation.html.
         </intro>
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.

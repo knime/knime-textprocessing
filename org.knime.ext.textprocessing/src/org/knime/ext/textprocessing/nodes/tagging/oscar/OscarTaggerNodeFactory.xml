@@ -7,11 +7,11 @@
     <fullDescription>
         <intro>
             Assigns chemical named entity tags to terms which are recognized
-            by the Oscar chemical named entity recognizer framework
+            by the OSCAR chemical named entity recognizer framework version 4.1.1
             (see https://bitbucket.org/wwmm/oscar4/overview for details).
-            As tags the default named entity types of the Oscar framework
+            As tags the default named entity types of the OSCAR framework
             are used (see http://apidoc.ch.cam.ac.uk/oscar4-4.0.1/).
-            The Oscar tag filter is afterwards able to filter the 
+            The OSCAR tag filter is afterwards able to filter the 
             assigned tags.
         </intro>
         <option name="Set named entities unmodifiable">

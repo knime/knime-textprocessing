@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -26,11 +26,12 @@
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
-import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.SuffixSensitiveGISModelReader;
+import opennlp.tools.namefind.TokenNameFinderModel;
 
 import org.knime.core.node.NodeLogger;
 
@@ -45,7 +46,7 @@ public class OpenNlpModel {
 
     private String m_name;
 
-    private SoftReference<MaxentModel> m_model;
+    private SoftReference<TokenNameFinderModel> m_model;
 
     private String m_fileName;
 
@@ -76,8 +77,8 @@ public class OpenNlpModel {
     /**
      * @return The maxent model.
      */
-    public synchronized MaxentModel getModel() {
-        MaxentModel m = m_model == null ? null : m_model.get();
+    public synchronized TokenNameFinderModel getModel() {
+        TokenNameFinderModel m = m_model == null ? null : m_model.get();
         if (m == null) {
             File f = new File(m_fileName);
             if (!f.exists() || !f.isFile() || !f.canRead()) {
@@ -88,8 +89,9 @@ public class OpenNlpModel {
             try {
                 LOGGER.info("Loading Maxent model ["
                         + f.getName() + "].");
-                m = new SuffixSensitiveGISModelReader(f).getModel();
-                m_model = new SoftReference<MaxentModel>(m);
+                InputStream is = new FileInputStream(f);
+                m = new TokenNameFinderModel(is);
+                m_model = new SoftReference<TokenNameFinderModel>(m);
             } catch (IOException e) {
                 LOGGER.warn("Maxent model could not be loeded from file ["
                         + m_fileName + "]!", e);

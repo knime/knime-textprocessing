@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -25,14 +25,18 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.pos;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import opennlp.tools.lang.english.PosTagger;
-import opennlp.tools.postag.POSDictionary;
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTagger;
+import opennlp.tools.postag.POSTaggerME;
 
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.PartOfSpeechTag;
@@ -56,7 +60,7 @@ import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
  */
 public class PosDocumentTagger extends AbstractDocumentTagger {
 
-    private PosTagger m_tagger;
+    private POSTagger m_tagger;
 
     /**
      * Creates a new instance of PosDocumentTagger and loads internally the
@@ -72,9 +76,11 @@ public class PosDocumentTagger extends AbstractDocumentTagger {
     public PosDocumentTagger(final boolean setNeUnmodifiable)
     throws IOException {
         super(setNeUnmodifiable);
-        OpenNlpModelPaths paths = OpenNlpModelPaths.getOpenNlpModelPaths();
-        m_tagger = new PosTagger(paths.getPosTaggerModelFile(),
-                new POSDictionary(paths.getPosTaggerDictFile()));
+        String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
+                .getPosTaggerModelFile();
+        InputStream is = new FileInputStream(new File(modelPath));
+        POSModel model = new POSModel(is);
+        m_tagger = new POSTaggerME(model);
     }
 
     /**
