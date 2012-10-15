@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,11 +19,17 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   21.04.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.frequencies.filter;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.knime.base.node.preproc.filter.row.RowFilterTable;
 import org.knime.core.data.DataTableSpec;
@@ -42,16 +48,10 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 /**
  * The model class of the filter node. Providing all default settings of the
  * filters, as well as the management of the filtering process.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FilterNodeModel extends NodeModel {
@@ -60,114 +60,114 @@ public class FilterNodeModel extends NodeModel {
      * Specifies the threshold filtering.
      */
     public static final String SELECTION_THRESHOLD = "Threshold";
-    
+
     /**
-     * Specifies the number filtering. 
+     * Specifies the number filtering.
      */
     public static final String SELECTION_NUMBER = "Number of terms";
-    
+
     /**
      * The default filtering.
      */
     public static final String DEF_SELECTION = SELECTION_NUMBER;
-    
-    
+
+
     /**
      * The default number of numbe filtering.
      */
     public static final int DEF_NUMBER = 1000;
-    
+
     /**
      * The min number of number filtering.
      */
     public static final int MIN_NUMBER = 0;
-    
+
     /**
      * The max number of number filtering.
      */
     public static final int MAX_NUMBER = Integer.MAX_VALUE;
 
-    
+
     /**
      * The default minimum number of threshold filtering.
      */
     public static final double DEF_MIN_THRESHOLD = 0.01;
-    
+
     /**
      * The min minimum number of threshold filtering.
      */
     public static final double MIN_MIN_THRESHOLD = 0;
-    
+
     /**
      * The default maximum number of threshold filtering.
      */
     public static final double DEF_MAX_THRESHOLD = 1.0;
-    
+
     /**
      * The max maximum number of threshold filtering.
      */
     public static final double MAX_MAX_THRESHOLD = 1000;
-    
+
     /**
      * The default settings for deep filtering.
      */
     public static final boolean DEF_DEEP_FILTERING = true;
-    
+
     /**
      * The default setting for modification of unmodifiable terms.
      */
     public static final boolean DEF_MODIFY_UNMODIFIABLE = false;
-    
-    private SettingsModelString m_filterSelectionModel = 
+
+    private SettingsModelString m_filterSelectionModel =
         FilterNodeDialog.getSelectionModel();
-    
+
     private SettingsModelString m_colModel = FilterNodeDialog.getColModel();
-    
-    private SettingsModelIntegerBounded m_numberModel = 
+
+    private SettingsModelIntegerBounded m_numberModel =
         FilterNodeDialog.getNumberModel();
-    
-    private SettingsModelDoubleRange m_minMaxModel = 
+
+    private SettingsModelDoubleRange m_minMaxModel =
         FilterNodeDialog.getMinMaxModel();
 
-    private SettingsModelBoolean m_deepFilteringModel = 
+    private SettingsModelBoolean m_deepFilteringModel =
         FilterNodeDialog.getDeepFilteringModel();
-    
-    private SettingsModelBoolean m_modifyUnmodifiableModel = 
-        FilterNodeDialog.getModifyUnmodifiableModel();    
-    
+
+    private SettingsModelBoolean m_modifyUnmodifiableModel =
+        FilterNodeDialog.getModifyUnmodifiableModel();
+
     private SettingsModelString m_documentColModel =
-        PreprocessingNodeSettingsPane.getDocumentColumnModel();    
-    
+        PreprocessingNodeSettingsPane.getDocumentColumnModel();
+
     private int m_termColIndex = -1;
-    
+
     /**
      * Creates an new instance of <code>FilterNodeModel</code>.
      */
     public FilterNodeModel() {
         super(1, 1);
-        
+
         m_filterSelectionModel.addChangeListener(
                 new FilterOptionChangeListener());
         enableModels();
     }
-    
-    private final void checkDataTableSpec(final DataTableSpec spec) 
+
+    private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         verifier.verifyMinimumNumberCells(1, true);
         m_termColIndex = verifier.getTermCellIndex();
-        
+
         int documentColIndex = spec.findColumnIndex(
                 m_documentColModel.getStringValue());
         if (documentColIndex < 0) {
             throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
+                    "Index of specified document column is not valid! "
                     + "Check your settings!");
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -185,35 +185,35 @@ public class FilterNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        
+
         int filterColIndex = inData[0].getDataTableSpec().findColumnIndex(
                 m_colModel.getStringValue());
-        
+
         // Filtering
         FrequencyFilter filter = FilterFactory.createFilter(
-                m_filterSelectionModel.getStringValue(), m_termColIndex, 
-                filterColIndex, m_numberModel.getIntValue(), 
+                m_filterSelectionModel.getStringValue(), m_termColIndex,
+                filterColIndex, m_numberModel.getIntValue(),
                 m_minMaxModel.getMinRange(), m_minMaxModel.getMaxRange(),
                 m_modifyUnmodifiableModel.getBooleanValue());
-        
+
         ExecutionContext subExec1 = exec.createSubExecutionContext(0.3);
-        BufferedDataTable preprocessedTable = 
+        BufferedDataTable preprocessedTable =
             filter.preprocessData(inData[0], subExec1);
-        
+
         BufferedDataTable filteredTable;
         synchronized (this) {
             filteredTable = exec.createBufferedDataTable(
                     new RowFilterTable(preprocessedTable, filter), exec);
         }
-        
+
         // Deep filtering
         ExecutionContext subExec3 = exec.createSubExecutionContext(0.7);
         if (m_deepFilteringModel.getBooleanValue()) {
-            TermPurger purger = new TermPurger(filteredTable, subExec3, 
+            TermPurger purger = new TermPurger(filteredTable, subExec3,
                     m_documentColModel.getStringValue());
             return new BufferedDataTable[]{purger.getPurgedDataTable()};
         }
-        
+
         return new BufferedDataTable[]{
                 exec.createBufferedDataTable(filteredTable, subExec3)};
     }
@@ -226,14 +226,15 @@ public class FilterNodeModel extends NodeModel {
         } else if (m_filterSelectionModel.getStringValue().equals(
                 FilterNodeModel.SELECTION_THRESHOLD)) {
             m_numberModel.setEnabled(false);
-            m_minMaxModel.setEnabled(true);            
+            m_minMaxModel.setEnabled(true);
         }
     }
-    
+
     private class FilterOptionChangeListener implements ChangeListener {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stateChanged(final ChangeEvent e) {
             enableModels();
         }
@@ -291,23 +292,23 @@ public class FilterNodeModel extends NodeModel {
         m_modifyUnmodifiableModel.loadSettingsFrom(settings);
         m_documentColModel.loadSettingsFrom(settings);
     }
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...

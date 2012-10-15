@@ -76,6 +76,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
             ((TagCloudViewPlotterProperties)getProperties())
                     .getFitToScreenButton().addActionListener(
                             new ActionListener() {
+                                @Override
                                 public void actionPerformed(
                                         final ActionEvent arg0) {
                                     fitTomyScreen();
@@ -89,6 +90,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
                 /**
                  * {@inheritDoc}
                  */
+                @Override
                 public void stateChanged(final ChangeEvent e) {
                     m_tagcloud.setColorMap(legend.getColorMapping());
                     updatePaintModel();
@@ -97,6 +99,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
 
             m_fs.addReverseChangeListener(new ChangeListener() {
                 // is called when the user wants the default values
+                @Override
                 public void stateChanged(final ChangeEvent e) {
 
                     updateSize();
@@ -111,6 +114,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
 
             m_fs.addChangeListener(new ChangeListener() {
                 // is called when the font style was changed in the tab.
+                @Override
                 public void stateChanged(final ChangeEvent e) {
 
                     updateSize();
@@ -257,6 +261,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unHiLiteAll(final KeyEvent event) {
         m_tagcloud.unHiLiteAll(event);
         repaint();

@@ -54,6 +54,7 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         String filtered = NumberFilter.numberFilter(term.getText());
         if (filtered.length() <= 0) {

@@ -497,6 +497,7 @@ public class TermVectorNodeModel extends NodeModel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stateChanged(final ChangeEvent e) {
             checkUncheck();
         }

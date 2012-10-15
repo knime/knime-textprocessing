@@ -1,6 +1,6 @@
-/* @(#)$RCSfile$ 
+/* @(#)$RCSfile$
  * $Revision$ $Date$ $Author$
- * 
+ *
 ========================================================================
  *
  *  Copyright (C) 2003 - 2011
@@ -9,7 +9,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 18, 2006 (Kilian Thiel): created
  */
@@ -33,26 +33,27 @@ import java.util.List;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
 
     private static final NodeLogger LOGGER = NodeLogger
     .getLogger(KuhlenStemmer.class);
-    
+
     /**
      * Creates new instance of PorterStemmer.
      */
     public KuhlenStemmer() { }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
@@ -61,15 +62,15 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String preprocessString(final String str) {
         return KuhlenStemmer.stem(str);
-    }    
-    
+    }
+
     /**
      * Returns the stemmed version of the given string.
      * @param str String to stem
@@ -88,14 +89,14 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
             return str;
         }
     }
-    
+
     private static String replaceIES(final String s) {
         return s.substring(0, s.length() - 3) + "y";
     }
-    
+
     private static String replaceES(final String s) {
         String t = s.substring(0, s.length() - 2);
-        if (t.endsWith("ch") || t.endsWith("sh") 
+        if (t.endsWith("ch") || t.endsWith("sh")
                || t.endsWith("ss") || t.endsWith("zz") || t.endsWith("x")) {
             return t;
         } else if (t.endsWith("o")) {
@@ -105,7 +106,7 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return s;
     }
-    
+
     private static String replaceS(final String s) {
         String t = s.substring(0, s.length() - 1);
         if (t.endsWith("e") || t.endsWith("oa") || t.endsWith("ea")) {
@@ -119,20 +120,20 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return s;
     }
-    
+
     private static String replaceING(final String s) {
         String t = s.substring(0, s.length() - 3);
         if (t.endsWith("x") || isVowel(t.charAt(t.length() - 1))) {
             return t;
-        } else if (t.length() > 1 && !isVowel(t.charAt(t.length() - 1))) { 
+        } else if (t.length() > 1 && !isVowel(t.charAt(t.length() - 1))) {
             if (!isVowel(t.charAt(t.length() - 2))) {
                 return t;
-            } 
+            }
             return t + "e";
         }
         return s;
     }
-    
+
     private static String replaceED(final String s) {
         String t = s.substring(0, s.length() - 2);
         if (t.endsWith("x") || isVowel(t.charAt(t.length() - 1))) {
@@ -144,12 +145,12 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
             return t + "e";
         }
         return s;
-    }    
-    
+    }
+
     private static final String internalStem(final String str) {
         String s = str;
         boolean go = false;
-        
+
         // Step 1, 2, 5, 3, 4, 5a, 5b:
         if (s.endsWith("ies")) {
             s = replaceIES(s);
@@ -177,25 +178,25 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
             s = s.substring(0, s.length() - 2);
             go = true;
         }
-        
+
         // Step 6:
         if (s.endsWith("ing") && (s.equals(str) || go)) {
             s = replaceING(s);
         }
-        
+
         // Step 7:
         if (s.endsWith("ied") && (s.equals(str) || go)) {
             s = s.substring(0, s.length() - 3) + "y";
         }
-        
+
         // Step 8:
         if (s.endsWith("ed") && (s.equals(str) || go)) {
             s = replaceED(s);
         }
-        
+
         return s;
     }
-    
+
     /**
      * Returns true is given Char is a vowel.
      * @param c Char to check if it is a vowel.

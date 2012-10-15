@@ -72,6 +72,7 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         m_noOfRows = getNoofRowsModel();
         m_allRows = getUseallrowsBooleanModel();
         m_allRows.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent e) {
                 m_noOfRows.setEnabled(!m_allRows.getBooleanValue());
             }

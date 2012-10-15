@@ -61,6 +61,7 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
      * will be set unmodifiable or not.
      * @param model The model to tag with.
      * @throws IOException If something happens.
+     * @since 2.7
      */
     public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
             final OpenNlpModel model)
@@ -114,7 +115,6 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
         List<String> words = new ArrayList<String>();

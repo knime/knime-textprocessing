@@ -47,6 +47,7 @@ public class DocumentDataCellFactory implements TextContainerDataCellFactory {
      * which have to be <code>Document</code> instances, otherwise 
      * <code>null</code> is returned.
      */
+    @Override
     public DataCell createDataCell(final TextContainer tc) {
         DataCell dc = null;
         if (tc instanceof Document) {

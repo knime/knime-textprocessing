@@ -69,6 +69,7 @@ public class OpenNlpWordTokenizer implements Tokenizer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized List<String> tokenize(final String sentence) {
         if (m_tokenizer != null) {
             return Arrays.asList(m_tokenizer.tokenize(sentence));

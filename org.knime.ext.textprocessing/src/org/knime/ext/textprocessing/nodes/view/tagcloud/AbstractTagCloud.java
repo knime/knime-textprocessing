@@ -498,6 +498,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void hiLite(final KeyEvent event) {
         hiLite(event.keys());
     }
@@ -537,6 +538,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unHiLite(final KeyEvent event) {
         Iterator<RowKey> it = event.keys().iterator();
         while (it.hasNext()) {
@@ -554,6 +556,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unHiLiteAll(final KeyEvent event) {
         for (int j = 0; j < m_dataarray.length; j++) {
             TC tcd = m_dataarray[j];

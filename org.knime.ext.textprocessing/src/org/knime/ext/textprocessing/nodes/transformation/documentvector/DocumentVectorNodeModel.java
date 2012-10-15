@@ -482,6 +482,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stateChanged(final ChangeEvent e) {
             checkUncheck();
         }

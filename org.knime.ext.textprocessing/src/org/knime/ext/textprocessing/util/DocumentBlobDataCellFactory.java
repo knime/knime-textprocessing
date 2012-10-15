@@ -48,6 +48,7 @@ public class DocumentBlobDataCellFactory implements
      * <code>TextContainer</code> which have to be <code>Document</code> 
      * instances, otherwise <code>null</code> is returned.
      */
+    @Override
     public DataCell createDataCell(final TextContainer tc) {
         DataCell dc = null;
         if (tc instanceof Document) {
@@ -59,6 +60,7 @@ public class DocumentBlobDataCellFactory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public DataType getDataType() {
         return DocumentBlobCell.TYPE;
     }

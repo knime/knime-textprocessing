@@ -144,6 +144,7 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stateChanged(final ChangeEvent e) {
             checkUncheck();
         }

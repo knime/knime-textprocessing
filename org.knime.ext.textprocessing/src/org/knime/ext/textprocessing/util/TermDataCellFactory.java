@@ -47,6 +47,7 @@ public class TermDataCellFactory implements TextContainerDataCellFactory {
      * which have to be <code>Term</code> instances, otherwise 
      * <code>null</code> is returned.
      */
+    @Override
     public DataCell createDataCell(final TextContainer tc) {
         DataCell dc = null;
         if (tc instanceof Term) {

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   27.08.2008 (thiel): created
  */
@@ -35,37 +35,37 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 
 import org.knime.ext.textprocessing.data.Document;
 
 /**
- * A panel providing the functionality of displaying a specified set of 
+ * A panel providing the functionality of displaying a specified set of
  * documents in a table. A double click at a document in a row of that table
  * will trigger the call of the abstract method
  * {@link AbstractDocumentTablePanel#onClick(int, Document)}. Extending
  * this class and implementing this method allows to react to a double click
  * on a certain document in a particular way.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public abstract class AbstractDocumentTablePanel extends JPanel {
 
     private JTable m_table;
-    
+
     private List<Document> m_docs;
-    
+
     private int m_row = 0;
-    
+
     /**
-     * Constructor of <code>AbstractDocumentTablePanel</code> with the given 
+     * Constructor of <code>AbstractDocumentTablePanel</code> with the given
      * set of documents to display.
-     * 
+     *
      * @param documents The set of documents to display.
      */
     public AbstractDocumentTablePanel(final List<Document> documents) {
@@ -74,33 +74,33 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
         } else {
             m_docs = documents;
         }
-        
+
         setLayout(new BorderLayout());
         add(initTable(), BorderLayout.CENTER);
     }
-    
+
     /**
      * Clears the list of documents.
      */
     public void clean() {
         m_docs.clear();
     }
-    
+
     /**
      * This method is called by a double click on a document of the table.
      * Implementing it allows to react in a certain way on a double click.
-     * 
+     *
      * @param rowIndex The index of the row at which was clicked.
      * @param document The document at which was clicked.
      */
-    protected abstract void onClick(final int rowIndex, 
+    protected abstract void onClick(final int rowIndex,
             final Document document);
-    
+
     private JPanel initTable() {
         SummaryTableListener listener = new SummaryTableListener();
-        
+
         JPanel panel = new JPanel(new BorderLayout());
-        
+
         // TABLE
         Object[][] docList = new Object[m_docs.size()][2];
         int count = 0;
@@ -109,55 +109,55 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
             docList[count][1] = d.getTitle();
             count++;
         }
-        
+
         m_table = new JTable(docList, new Object[]{"#", "Document title"}) {
             @Override
             public boolean isCellEditable(final int x, final int y) {
                 return false;
             }
         };
-        
+
         Font headerFont = new Font("sansserif", Font.BOLD, 15);
         m_table.getTableHeader().setFont(headerFont);
-        
-        m_table.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
+
+        m_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_table.addMouseListener(listener);
         m_table.addMouseMotionListener(listener);
         m_table.setOpaque(false);
-        m_table.setDefaultRenderer(Object.class, 
+        m_table.setDefaultRenderer(Object.class,
                 new AttributiveCellRenderer());
         m_table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         m_table.setToolTipText("double click to open document");
-        
+
         m_table.getColumnModel().getColumn(0).setPreferredWidth(50);
         m_table.getColumnModel().getColumn(1).setPreferredWidth(750);
-        
+
         JScrollPane jsp = new JScrollPane(m_table);
         jsp.setPreferredSize(new Dimension(850, 600));
         panel.add(jsp, BorderLayout.CENTER);
         return panel;
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, University of Konstanz
      */
     private class SummaryTableListener extends MouseAdapter {
-        
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void mouseClicked(final MouseEvent e) {
             // if double clicked
-            if (e.getClickCount() == 2) {                
+            if (e.getClickCount() == 2) {
                 int rowIndex = m_table.getSelectedRow();
                 Document doc = m_docs.get(rowIndex);
-                
+
                 onClick(rowIndex, doc);
             }
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -168,15 +168,15 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
             aTable.repaint();
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, KNIME.com AG, Zurich
      */
     @SuppressWarnings("serial")
-    private class AttributiveCellRenderer extends JLabel implements 
+    private class AttributiveCellRenderer extends JLabel implements
     TableCellRenderer {
-        
+
         /**
          * Constructor.
          */
@@ -189,9 +189,9 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
          */
         @Override
         public Component getTableCellRendererComponent(final JTable table,
-                final Object value, final boolean isSelected, 
+                final Object value, final boolean isSelected,
                 final boolean hasFocus, final int row, final int column) {
-            
+
             if (isSelected) {
                 this.setBackground(Color.DARK_GRAY);
                 this.setForeground(Color.WHITE);
@@ -202,7 +202,7 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
                 this.setBackground(Color.WHITE);
                 this.setForeground(Color.BLACK);
             }
-            
+
             this.setText(value.toString());
             return this;
         }

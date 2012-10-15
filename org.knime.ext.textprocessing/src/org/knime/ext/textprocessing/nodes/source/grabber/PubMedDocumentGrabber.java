@@ -113,6 +113,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int numberOfResults(final Query query) throws Exception {
         URL pubmed = buildUrl(query, false);
         LOGGER.info("PubMed Query: " + pubmed.toString());
@@ -122,6 +123,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List < Document > grabDocuments(final File directory,
             final Query query) throws Exception {
         if (directory != null && query != null) {
@@ -150,6 +152,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void fetchAndParseDocuments(final File directory, final Query query)
             throws Exception {
         if (directory != null && query != null) {
@@ -468,6 +471,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void documentParsed(final DocumentParsedEvent event) {
             notifyAllListener(event);
         }

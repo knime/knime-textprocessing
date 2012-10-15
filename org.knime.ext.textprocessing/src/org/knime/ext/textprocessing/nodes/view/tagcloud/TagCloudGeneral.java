@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -25,12 +25,6 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
-import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeExponential;
-import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLinear;
-import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLogarithmic;
-
 import java.awt.Color;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,6 +33,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeExponential;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLinear;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLogarithmic;
 
 /**
  * This is a utility class for some tag cloud routines.
@@ -61,14 +61,14 @@ public final class TagCloudGeneral {
      * @param keyset a set of keys to be sorted
      * @return an Iterator with all terms of keyset sorted by their Bib
      */
-    @SuppressWarnings("unchecked")
     public static final Iterator<Term> getsortedAlphabeticalIterator(
             final Set<Term> keyset) {
         List<Term> keys = new LinkedList<Term>(keyset);
-        Collections.sort(keys, new Comparator() {
-            public int compare(final Object o1, final Object o2) {
-                String tcd1 = ((Term)(o1)).getText();
-                String tcd2 = ((Term)(o2)).getText();
+        Collections.sort(keys, new Comparator<Term>() {
+            @Override
+            public int compare(final Term o1, final Term o2) {
+                String tcd1 = o1.getText();
+                String tcd2 = o2.getText();
                 return tcd1.compareTo(tcd2);
             }
         });
@@ -81,12 +81,12 @@ public final class TagCloudGeneral {
      * @param order true if sorted from small to big
      * @return an Iterator with all terms of m_hashi sorted by their Value
      */
-    @SuppressWarnings("unchecked")
     public static final Iterator<Term> getsortedFontsizeIterator(
             final HashMap<Term, TagCloudData> hashi, final boolean order) {
         List<Term> keys = new LinkedList<Term>(hashi.keySet());
-        Collections.sort(keys, new Comparator() {
-            public int compare(final Object o1, final Object o2) {
+        Collections.sort(keys, new Comparator<Term>() {
+            @Override
+            public int compare(final Term o1, final Term o2) {
                 int reverse = order ? -1 : 1;
                 TagCloudData tcd1 = hashi.get(o1);
                 TagCloudData tcd2 = hashi.get(o2);

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   03.03.2008 (thiel): created
  */
@@ -28,8 +28,8 @@ package org.knime.ext.textprocessing;
 import java.io.File;
 import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -40,12 +40,12 @@ import org.osgi.framework.BundleContext;
  * @author Kilian Thiel, University of Konstanz
  */
 public class TextprocessingCorePlugin extends AbstractUIPlugin {
-    
+
     // The shared instance.
     private static TextprocessingCorePlugin plugin;
 
     private String m_pluginRootPath;
-    
+
     /**
      * The constructor.
      */
@@ -61,7 +61,7 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
-        final URL pluginURL = Platform.resolve(plugin.find(new Path(".")));
+        final URL pluginURL = FileLocator.toFileURL(FileLocator.find(getBundle(), new Path("/"), null));
         final File tmpFile = new File(pluginURL.getPath());
         m_pluginRootPath = tmpFile.getAbsolutePath();
     }
@@ -79,7 +79,7 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
 
     /**
      * Returns the shared instance.
-     * 
+     *
      * @return The shared instance
      */
     public static TextprocessingCorePlugin getDefault() {
@@ -89,7 +89,7 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
     /**
      * Returns an image descriptor for the image file at the given plug-in
      * relative path.
-     * 
+     *
      * @param path the path
      * @return the image descriptor
      */
@@ -97,11 +97,11 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
         return AbstractUIPlugin.imageDescriptorFromPlugin(
                 "org.knime.ext.textprocessing", path);
     }
-    
+
     /**
      * @return the absolute root path of this plugin
      */
     public String getPluginRootPath() {
         return m_pluginRootPath;
-    }    
+    }
 }

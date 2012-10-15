@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   23.09.2009 (thiel): created
  */
@@ -38,7 +38,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -50,25 +49,21 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class DictionaryReplacer2InPortsNodeModel extends 
+public class DictionaryReplacer2InPortsNodeModel extends
 PreprocessingNodeModel {
-
-    private static final NodeLogger LOGGER = NodeLogger
-    .getLogger(DictionaryReplacer2InPortsNodeModel.class);
-        
-    private final SettingsModelString m_replaceColumModel = 
+    private final SettingsModelString m_replaceColumModel =
         DictionaryReplacer2InPortsNodeDialog.getReplaceColumnModel();
-    
-    private final SettingsModelString m_replacementColumModel = 
-        DictionaryReplacer2InPortsNodeDialog.getReplacementColumnModel();    
-    
+
+    private final SettingsModelString m_replacementColumModel =
+        DictionaryReplacer2InPortsNodeDialog.getReplacementColumnModel();
+
     /**
      * Constructor of <code>DictionaryReplacer2InPortsNodeModel</code>.
      */
     public DictionaryReplacer2InPortsNodeModel() {
         super(2);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -78,40 +73,40 @@ PreprocessingNodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[1]);
         verifier.verifyMinimumStringCells(2, true);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void internalExecute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        final int replaceColIndex = 
+        final int replaceColIndex =
             inData[1].getDataTableSpec().findColumnIndex(
                     m_replaceColumModel.getStringValue());
-        final int replacementColIndex = 
+        final int replacementColIndex =
             inData[1].getDataTableSpec().findColumnIndex(
                     m_replacementColumModel.getStringValue());
-        
+
         Hashtable<String, String> dictionary = new Hashtable<String, String>();
-        
+
         RowIterator it = inData[1].iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
-            
-            if (!row.getCell(replaceColIndex).isMissing() 
+
+            if (!row.getCell(replaceColIndex).isMissing()
                     && !row.getCell(replacementColIndex).isMissing()) {
-                String key = 
+                String key =
                     ((StringValue)row.getCell(replaceColIndex)).toString();
-                String value = 
+                String value =
                     ((StringValue)row.getCell(replacementColIndex)).toString();
-                
+
                 dictionary.put(key, value);
             }
         }
-        
+
         m_preprocessing = new DictionaryReplacer(dictionary);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -131,7 +126,7 @@ PreprocessingNodeModel {
         m_replaceColumModel.loadSettingsFrom(settings);
         m_replacementColumModel.loadSettingsFrom(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -141,7 +136,7 @@ PreprocessingNodeModel {
         m_replaceColumModel.saveSettingsTo(settings);
         m_replacementColumModel.saveSettingsTo(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -152,7 +147,7 @@ PreprocessingNodeModel {
         m_replaceColumModel.validateSettings(settings);
         m_replacementColumModel.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -160,12 +155,12 @@ PreprocessingNodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -175,7 +170,7 @@ PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   18.02.2008 (Kilian Thiel): created
  */
@@ -42,10 +42,10 @@ import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * Provides convenient methods that create 
+ * Provides convenient methods that create
  * {@link org.knime.core.node.BufferedDataTable}s containing
  * {@link org.knime.ext.textprocessing.data.Document}s.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentDataTableBuilder implements DataTableBuilder {
@@ -54,39 +54,39 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      * The default document column name in document data tables.
      */
     public static final String DEF_DOCUMENT_COLNAME = "Document";
-    
+
     /**
      * The default document vector column name in document data tables.
      */
     public static final String DEF_DOCUMENT_VECTOR_COLNAME = "Document Vector";
-    
+
     private final TextContainerDataCellFactory m_documentCellFac;
-    
+
     /**
      * Empty constructor of <code>DocumentDataTableBuilder</code>.
      */
-    public DocumentDataTableBuilder() {     
+    public DocumentDataTableBuilder() {
         m_documentCellFac =
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
     }
-    
+
     /**
-     * Creates and returns a {@link org.knime.core.node.BufferedDataTable} 
-     * containing a single column with the given documents as 
-     * {@link org.knime.ext.textprocessing.data.DocumentCell}s, one for each 
+     * Creates and returns a {@link org.knime.core.node.BufferedDataTable}
+     * containing a single column with the given documents as
+     * {@link org.knime.ext.textprocessing.data.DocumentCell}s, one for each
      * row.
-     * 
-     * @param exec The <code>ExecutionContext</code> to create the 
+     *
+     * @param exec The <code>ExecutionContext</code> to create the
      * <code>BufferedDataTable</code> with.
-     * @param docs The list of 
+     * @param docs The list of
      * {@link org.knime.ext.textprocessing.data.Document}s to keep in the table.
-     * @return The <code>BufferedDataTable</code> containing the given 
-     * documents. 
+     * @return The <code>BufferedDataTable</code> containing the given
+     * documents.
      * @throws CanceledExecutionException If execution was canceled.
-     * 
-     * @deprecated Use 
+     *
+     * @deprecated Use
      * {@link DocumentDataTableBuilder#openDataTable(ExecutionContext)},
-     * {@link DocumentDataTableBuilder#addDocument(Document, int)}, and 
+     * {@link DocumentDataTableBuilder#addDocument(Document, RowKey)}, and
      * {@link DocumentDataTableBuilder#getAndCloseDataTable()} instead.
      */
     @Deprecated
@@ -110,86 +110,86 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
 
       cache.reset();
       docs.clear();
-      
+
       return dc.getTable();
     }
-    
-    
+
+
     private DataCellCache m_cache;
-    
+
     private BufferedDataContainer m_dc;
-    
+
     private boolean m_opened = false;
-    
+
     private int m_rowRey = 0;
-    
+
     /**
-     * Creates new DataContainer to add rows to and create a 
+     * Creates new DataContainer to add rows to and create a
      * {@link org.knime.core.node.BufferedDataTable}, with one column containing
-     * the added documents as 
+     * the added documents as
      * {@link org.knime.ext.textprocessing.data.DocumentBlobCell}s. Before
      * adding and closing this open method must be called.
-     * 
-     * @param exec The <code>ExecutionContext</code> to create the 
+     *
+     * @param exec The <code>ExecutionContext</code> to create the
      * <code>BufferedDataTable</code> with.
      */
     public void openDataTable(final ExecutionContext exec) {
         // create cache
         //m_cache = new FullDataCellCache(m_documentCellFac);
         m_cache = new SoftDataCellCache(m_documentCellFac);
-        
+
         m_dc = exec.createDataContainer(this.createDataTableSpec());
         m_opened = true;
         m_rowRey = 0;
     }
-    
+
     /**
-     * Adds a row with the given document as 
+     * Adds a row with the given document as
      * {@link org.knime.ext.textprocessing.data.DocumentBlobCell} to the opened
      * data container. The method
      * {@link DocumentDataTableBuilder#openDataTable(ExecutionContext)} has to
-     * called before adding and closing is possible, otherwise an 
+     * called before adding and closing is possible, otherwise an
      * <code>IllegalStateException</code> is thrown.
-     * 
+     *
      * @param d The document to add.
      * @param rowKey The <code>RowKey</code> to set.
-     * @throws IllegalStateException If the 
+     * @throws IllegalStateException If the
      * <code>DocumentDataTableBuilder</code> has not been opened before.
      */
-    public synchronized void addDocument(final Document d, final RowKey rowKey) 
+    public synchronized void addDocument(final Document d, final RowKey rowKey)
         throws IllegalStateException {
         if (m_opened) {
             if (!TextprocessingPreferenceInitializer.useBlobCell()) {
                 // Cast to regular cell
-                DocumentCell docCell = 
+                DocumentCell docCell =
                     (DocumentCell)m_cache.getInstance(d);
                 DataRow row = new DefaultRow(rowKey, docCell);
                 m_dc.addRowToTable(row);
             } else {
                 // Cast to Blob cell
-                DocumentBlobCell docCell = 
+                DocumentBlobCell docCell =
                     (DocumentBlobCell)m_cache.getInstance(d);
                 DataRow row = new DefaultRow(rowKey, docCell);
                 m_dc.addRowToTable(row);
             }
         } else {
-            throw new IllegalStateException("DocumentDataTableBuilder has " 
+            throw new IllegalStateException("DocumentDataTableBuilder has "
                     + "not been opened! Open before add.");
         }
     }
-    
+
     /**
-     * Adds a row with the given document as 
+     * Adds a row with the given document as
      * {@link org.knime.ext.textprocessing.data.DocumentBlobCell} to the opened
      * data container. The method
      * {@link DocumentDataTableBuilder#openDataTable(ExecutionContext)} has to
-     * called before adding and closing is possible, otherwise an 
+     * called before adding and closing is possible, otherwise an
      * <code>IllegalStateException</code> is thrown. As <code>RowKey</code>
-     * a number is used, incremented by 1 each time this method is called. 
+     * a number is used, incremented by 1 each time this method is called.
      * The row key number starts at 0, when the data table builder is opened.
-     * 
+     *
      * @param d The document to add.
-     * @throws IllegalStateException If the 
+     * @throws IllegalStateException If the
      * <code>DocumentDataTableBuilder</code> has not been opened before.
      */
     public synchronized void addDocument(final Document d)
@@ -197,17 +197,17 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
         m_rowRey++;
         RowKey rowKey = RowKey.createRowKey(m_rowRey);
         addDocument(d, rowKey);
-    }   
-    
+    }
+
     /**
      * Closes the data container and returns the data table. The method
      * {@link DocumentDataTableBuilder#openDataTable(ExecutionContext)} has to
-     * called before adding and closing is possible, otherwise an 
+     * called before adding and closing is possible, otherwise an
      * <code>IllegalStateException</code> is thrown.
-     * 
-     * @return The <code>BufferedDataTable</code> containing the given 
+     *
+     * @return The <code>BufferedDataTable</code> containing the given
      * documents.
-     * @throws IllegalStateException If the 
+     * @throws IllegalStateException If the
      * <code>DocumentDataTableBuilder</code> has not been opened before.
      */
     public BufferedDataTable getAndCloseDataTable()
@@ -219,7 +219,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
             m_opened = false;
             return m_dc.getTable();
         } else {
-            throw new IllegalStateException("DocumentDataTableBuilder has " 
+            throw new IllegalStateException("DocumentDataTableBuilder has "
                     + "not been opened! Open before close.");
         }
     }
@@ -228,7 +228,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
      * containing just one column of type <code>Document(Blob)Cell</code> to
      * store text documents.
-     * 
+     *
      * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
      *         with just one column of type <code>Document(Blob)Cell</code>.
      */
@@ -236,7 +236,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public DataTableSpec createDataTableSpec() {
         // create DataTableSpec for output DataTable
         DataColumnSpecCreator dcscDocs = new DataColumnSpecCreator(
-                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME,
                 m_documentCellFac.getDataType());
         return new DataTableSpec(dcscDocs.createSpec());
     }

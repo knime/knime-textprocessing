@@ -85,6 +85,7 @@ public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         String t;
         if (m_caseSensitive) {

@@ -219,6 +219,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(final ActionEvent e) {
             String database = m_databaseModel.getStringValue();
             String query = m_queryModel.getStringValue();

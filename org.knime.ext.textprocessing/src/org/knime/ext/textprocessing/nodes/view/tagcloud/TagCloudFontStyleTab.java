@@ -172,6 +172,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
         }
         m_fontCombo.setSelectedIndex(curentpos);
         m_fontCombo.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 if (m_listener != null) {
                     m_listener.stateChanged(new ChangeEvent(this));
@@ -185,6 +186,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
         }
         m_calcType.setSelectedIndex(calcID);
         m_calcType.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 if (m_listener != null) {
                     m_listener.stateChanged(new ChangeEvent(this));
@@ -237,6 +239,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
             }
         });
         m_minSpinner.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent name) {
                 if (getMinFontsize() < CFG_SLIDER_MAX_FONTSIZE) {
                     m_minSlider.setValue((Integer)m_minSpinner.getValue());
@@ -252,6 +255,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
             }
         });
         m_maxSpinner.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent name) {
                 if (getMaxFontsize() <= CFG_SLIDER_MAX_FONTSIZE) {
                     m_maxSlider.setValue((Integer)m_maxSpinner.getValue());

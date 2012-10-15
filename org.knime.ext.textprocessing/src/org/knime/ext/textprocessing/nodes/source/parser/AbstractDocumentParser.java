@@ -110,16 +110,19 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract List<Document> parse(final InputStream is) throws Exception;
     
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract void parseDocument(final InputStream is) throws Exception;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentCategory(final DocumentCategory category) {
         m_category = category;
     }
@@ -127,6 +130,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentSource(final DocumentSource source) {
         m_source = source;
     }
@@ -134,6 +138,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentType(final DocumentType type) {
         m_type = type;
     }
@@ -141,6 +146,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDocumentFilepath(final String filePath) {
         m_docPath = filePath;
     }
@@ -148,6 +154,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCharset(final Charset charset) {
         m_charset = charset;
     }
@@ -155,6 +162,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addDocumentParsedListener(
             final DocumentParsedEventListener listener) {
         m_listener.add(listener);
@@ -163,6 +171,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeDocumentParsedListener(
             final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
@@ -171,6 +180,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
     }

@@ -72,6 +72,7 @@ public class OpenNlpSentenceTokenizer implements Tokenizer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized List<String> tokenize(final String text) {
         if (m_tokenizer != null) {
             return Arrays.asList(m_tokenizer.sentDetect(text));

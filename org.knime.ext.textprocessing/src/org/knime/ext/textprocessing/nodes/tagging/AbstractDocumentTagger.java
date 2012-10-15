@@ -135,6 +135,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized Document tag(final Document doc) {
         DocumentBuilder db = new DocumentBuilder(doc);
         for (Section s : doc.getSections()) {
@@ -244,7 +245,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                 tags.add(ct);
                             }
                         }
-                        
+
                         // CREATE NEW TERM !!!
                         Term newTerm =
                                 new Term(oldList.get(t).getWords(), tags,
@@ -272,7 +273,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                             tags.add(ct);
                                         }
                                     }
-                                    
+
                                     // CREATE NEW TERM !!!
                                     Term newTerm =
                                             new Term(newWords, tags,
@@ -353,7 +354,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                             tags.add(ct);
                                         }
                                     }
-                                    
+
                                     // CREATE NEW TERM !!!
                                     Term newTerm =
                                             new Term(namedEntity, tags,

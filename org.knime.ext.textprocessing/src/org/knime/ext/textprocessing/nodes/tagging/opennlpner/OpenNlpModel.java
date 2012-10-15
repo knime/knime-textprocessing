@@ -76,6 +76,7 @@ public class OpenNlpModel {
 
     /**
      * @return The maxent model.
+     * @since 2.7
      */
     public synchronized TokenNameFinderModel getModel() {
         TokenNameFinderModel m = m_model == null ? null : m_model.get();

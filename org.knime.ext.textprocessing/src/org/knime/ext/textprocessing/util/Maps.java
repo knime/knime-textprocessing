@@ -86,6 +86,7 @@ public class Maps {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int compare(final Entry<?, ? extends Comparable> e1,
                 final Entry<?, ? extends Comparable> e2) {
             return e1.getValue().compareTo(e2.getValue());

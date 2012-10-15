@@ -5,10 +5,10 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author adae, University of Konstanz
  */
-public class StringMatcherNodeFactory 
+public class StringMatcherNodeFactory
                 extends NodeFactory<StringMatcherNodeModel> {
 
     /**
@@ -30,9 +30,8 @@ public class StringMatcherNodeFactory
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public NodeView createNodeView(final int viewIndex,
+    public NodeView<StringMatcherNodeModel> createNodeView(final int viewIndex,
             final StringMatcherNodeModel nodeModel) {
         return null;
     }

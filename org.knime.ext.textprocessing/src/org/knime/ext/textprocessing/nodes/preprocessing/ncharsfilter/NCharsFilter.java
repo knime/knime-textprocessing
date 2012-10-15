@@ -53,6 +53,7 @@ public class NCharsFilter implements TermPreprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         if (term.getText().length() >= m_n) {
             return term;

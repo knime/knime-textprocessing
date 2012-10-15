@@ -48,6 +48,18 @@
 
 package org.knime.ext.textprocessing.nodes.cooccurrencecounter;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -75,20 +87,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.MutableInteger;
 import org.knime.core.util.ThreadPool;
-
-import org.knime.base.data.sort.SortedTable;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -326,9 +324,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                         new LinkedHashMap<TermContainer, MutableInteger>();
                     final Map<TermContainer, MutableInteger> sentenceTerms =
                         new LinkedHashMap<TermContainer, MutableInteger>();
-                    int secCounter = 0;
                     for (final Section section : sections) {
-                        secCounter++;
                         final SectionAnnotation annotation =
                             section.getAnnotation();
                         final boolean title =
@@ -510,12 +506,10 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             final AtomicInteger rowId, final BufferedDataContainer dc,
             final DataCell docCell, final Map<TermTuple, TermTuple> tuples)
     throws CanceledExecutionException {
-        int tupleCounter = 0;
         synchronized (dc) {
             //we synchronize the whole block to ensure that the tuples of a
             //document added consecutively to the table
             for (final TermTuple tuple : tuples.keySet()) {
-                tupleCounter++;
                 exec.checkCanceled();
                 final List<DataCell> cells = new LinkedList<DataCell>();
                 cells.add(docCell);

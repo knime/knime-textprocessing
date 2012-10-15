@@ -75,6 +75,7 @@ public class TagFilter implements TermPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         boolean allValid = true;
 

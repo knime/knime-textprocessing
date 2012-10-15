@@ -56,11 +56,12 @@ import org.knime.ext.textprocessing.util.AuthorUtil;
  * interface. The provided method
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}
  * is able to read the data of the given input stream and store it as a
- * {@link org.knime.ext.textprocessing.data.Document}s full text. 
- * 
+ * {@link org.knime.ext.textprocessing.data.Document}s full text.
+ *
  * To parse PDF files the PDFBox library is used.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 2.7
  */
 public class PDFDocumentParser extends AbstractDocumentParser {
 
@@ -100,8 +101,8 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             m_docs.clear();
         }
         m_currentDoc = null;
-    }       
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -111,7 +112,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
         m_docs.add(parseInternal(is));
         return m_docs;
     }
-    
+
     private boolean checkTitle(final String title) {
         if (title == null) {
             return false;
@@ -133,7 +134,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
         if (m_charset == null) {
             m_charset = Charset.defaultCharset();
         }
-        
+
         PDDocument document = null;
         try {
             document = PDDocument.load(is);
@@ -142,11 +143,11 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             PDFTextStripper stripper = new PDFTextStripper(m_charset.name());
             String text = stripper.getText(document);
             m_currentDoc.addSection(text, SectionAnnotation.UNKNOWN);
-            
+
             // extract meta data from pdf
             String title = null;
             String authors = null;
-            
+
             PDDocumentCatalog catalog = document.getDocumentCatalog();
             PDMetadata meta = catalog.getMetadata();
             if (meta != null) {
@@ -156,7 +157,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
                     title = dc.getTitle();
                 }
             }
-            PDDocumentInformation information = 
+            PDDocumentInformation information =
                 document.getDocumentInformation();
             if (information != null) {
                 if (title == null || title.length() <= 1) {
@@ -178,14 +179,14 @@ public class PDFDocumentParser extends AbstractDocumentParser {
                 title = m_docPath.toString().trim();
             }
             m_currentDoc.addTitle(title);
-            
+
             // use author meta data
             if (authors != null) {
                 Set<Author> authSet = AuthorUtil.parseAuthors(authors);
                 for (Author a : authSet) {
                     m_currentDoc.addAuthor(a);
                 }
-            }            
+            }
 
             // add document to list
             return m_currentDoc.createDocument();
@@ -195,10 +196,11 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public void parseDocument(final InputStream is) throws Exception {
         Document d = parseInternal(is);
         notifyAllListener(new DocumentParsedEvent(d, this));

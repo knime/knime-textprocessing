@@ -34,6 +34,7 @@ public class TCFontsizeLinear implements TCFontsize {
     /**
      * {@inheritDoc}
      */
+    @Override
     public double getSize(final double minf, final double maxf,
             final double minv, final double maxv, final double value) {
         // fix in version 2.6

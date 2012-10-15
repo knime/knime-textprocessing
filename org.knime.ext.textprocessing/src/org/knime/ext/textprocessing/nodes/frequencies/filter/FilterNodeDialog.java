@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -201,6 +201,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void stateChanged(final ChangeEvent e) {
             enableModels();
         }
@@ -217,6 +218,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getActionCommand() {
             return m_selection;
         }
@@ -224,6 +226,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getText() {
             return m_selection;
         }
@@ -231,6 +234,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getToolTip() {
             return null;
         }
@@ -238,6 +242,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isDefault() {
             if (m_selection.equals(FilterNodeModel.DEF_SELECTION)) {
                 return true;

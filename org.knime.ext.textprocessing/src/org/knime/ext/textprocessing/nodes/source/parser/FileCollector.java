@@ -1,6 +1,6 @@
-/* @(#)$RCSfile$ 
+/* @(#)$RCSfile$
  * $Revision$ $Date$ $Author$
- * 
+ *
 ========================================================================
  *
  *  Copyright (C) 2003 - 2011
@@ -9,7 +9,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 18, 2006 (Kilian Thiel): created
  */
@@ -37,50 +37,50 @@ import java.util.List;
 /**
  * Provides functionality to search a specified directory for files with
  * given extensions. The directory can be searched recursively or not.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FileCollector {
 
     private File m_directory;
-    
+
     private List<String> m_extensions;
-    
+
     private boolean m_recursive;
-    
+
     private boolean m_ignoreHidden;
-    
+
     private List<File> m_files;
-    
+
     /**
-     * Creates a new instance of <code>FileCollector</code> with given 
-     * directory, to search for file with given extensions. If 
+     * Creates a new instance of <code>FileCollector</code> with given
+     * directory, to search for file with given extensions. If
      * <code>recursive</code> is set <code>true</code> the directory will be
-     * searched recursively which means that subdirectories will by searched 
+     * searched recursively which means that subdirectories will by searched
      * too.
      * @param dir Directory to search for files.
      * @param ext Extensions of file to search for.
      * @param recursive if set <code>true</code> the directory will be
-     * @param ignoreHiddenFiles if set <code>true</code> hidden files will not 
+     * @param ignoreHiddenFiles if set <code>true</code> hidden files will not
      * be collected.
      * searched recursively.
      */
-    public FileCollector(final File dir, final List<String> ext, 
+    public FileCollector(final File dir, final List<String> ext,
             final boolean recursive, final boolean ignoreHiddenFiles) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException(dir.getName()
                     + " is not a directory ");
         }
-        
+
         m_directory = dir;
         m_extensions = ext;
         m_recursive = recursive;
         m_ignoreHidden = ignoreHiddenFiles;
-        
+
         m_files = new ArrayList<File>();
         collectFiles(m_directory, new FileFilter());
     }
-    
+
     /**
      * Returns a list with collected files.
      * @return A list with collected files.
@@ -88,7 +88,7 @@ public class FileCollector {
     public List<File> getFiles() {
         return Collections.unmodifiableList(m_files);
     }
-    
+
     /**
      * @return Returns the directory to search in.
      */
@@ -102,7 +102,7 @@ public class FileCollector {
     public List<String> getExtensions() {
         return m_extensions;
     }
-    
+
     /**
      * @return the recursive flag.
      */
@@ -115,13 +115,13 @@ public class FileCollector {
      */
     public boolean getIgnoreHidden() {
         return m_ignoreHidden;
-    }    
-    
+    }
+
     private void collectFiles(final File dir, final FileFilter filter) {
-        if (dir.isDirectory()) {            
+        if (dir.isDirectory()) {
             // ad files to list
             File[] filesWithExt = dir.listFiles(filter);
-            
+
             // check for hidden files
             if (m_ignoreHidden) {
                 for (File f : filesWithExt) {
@@ -132,7 +132,7 @@ public class FileCollector {
             } else {
                 m_files.addAll(Arrays.asList(filesWithExt));
             }
-            
+
             // go recursively through all sub dirs
             if (m_recursive) {
                 File[] dirs = dir.listFiles();
@@ -144,16 +144,17 @@ public class FileCollector {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @author Kilian Thiel, University of Konstanz
      */
     class FileFilter implements FilenameFilter {
         /**
          * {@inheritDoc}
          */
-        public boolean accept(final File f, final String s) {            
+        @Override
+        public boolean accept(final File f, final String s) {
             if (m_extensions.size() == 0) {
                 return true;
             }

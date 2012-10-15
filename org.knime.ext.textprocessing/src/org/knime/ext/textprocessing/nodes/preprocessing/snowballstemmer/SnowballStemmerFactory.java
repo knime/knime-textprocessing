@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   25.09.2009 (thiel): created
  */
@@ -38,16 +38,16 @@ import org.tartarus.snowball.SnowballStemmer;
 public final class SnowballStemmerFactory {
 
     private static final String PACKAGE_PREFIX = "org.tartarus.snowball.ext.";
-    
+
     private static final String PACKAGE_POSTFIX = "Stemmer";
-    
+
     private Set<String> m_stemmerNames = new HashSet<String>();
-    
-    private Hashtable<String, SnowballStemmer> m_stemmer = 
+
+    private Hashtable<String, SnowballStemmer> m_stemmer =
         new Hashtable<String, SnowballStemmer>();
-    
+
     private static SnowballStemmerFactory instance = null;
-    
+
     private SnowballStemmerFactory() throws ClassNotFoundException,
     InstantiationException, IllegalAccessException {
         m_stemmerNames.add("Danish");
@@ -66,42 +66,43 @@ public final class SnowballStemmerFactory {
         m_stemmerNames.add("Spanish");
         m_stemmerNames.add("Swedish");
         m_stemmerNames.add("Turkish");
-        
+
         for (String name : m_stemmerNames) {
-            Class stemClass = Class.forName(
+            @SuppressWarnings("unchecked")
+            Class<SnowballStemmer> stemClass = (Class<SnowballStemmer>)Class.forName(
                     PACKAGE_PREFIX + name.toLowerCase() + PACKAGE_POSTFIX);
-            SnowballStemmer stemmer = (SnowballStemmer)stemClass.newInstance();
+            SnowballStemmer stemmer = stemClass.newInstance();
             m_stemmer.put(name, stemmer);
-        }        
+        }
     }
-    
+
     /**
      * @return The singleton instance of <code>SnowballStemmerFactory</code>.
-     * @throws ClassNotFoundException If snowball stemmer class could not be 
+     * @throws ClassNotFoundException If snowball stemmer class could not be
      * found.
-     * @throws InstantiationException If snowball stemmer class could not be 
+     * @throws InstantiationException If snowball stemmer class could not be
      * instanciated.
-     * @throws IllegalAccessException If snowball stemmer class could not be 
+     * @throws IllegalAccessException If snowball stemmer class could not be
      * accessed.
      */
-    public static SnowballStemmerFactory getInstance() throws 
+    public static SnowballStemmerFactory getInstance() throws
     ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (instance == null) {
             instance = new SnowballStemmerFactory();
         }
         return instance;
     }
-    
+
     /**
      * @return The set of available snowball stemmer names.
      */
     public Set<String> getStemmerNames() {
         return m_stemmer.keySet();
     }
-    
+
     /**
      * Returns the Snowball stemmer corresponding to the given name.
-     * 
+     *
      * @param name The name to get the Snowball stemmer for.
      * @return the Snowball stemmer corresponding to the given name.
      */

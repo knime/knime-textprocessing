@@ -85,6 +85,7 @@ public class Hyphenator implements TermPreprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : term.getWords()) {
@@ -96,6 +97,7 @@ public class Hyphenator implements TermPreprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String preprocessString(final String str) {
         String returnWord = "";
         List<String> hyphens = hyphenate(str);

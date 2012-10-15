@@ -53,6 +53,7 @@ public class DBScanClusteringAlgorithm<T> implements ClusteringAlgorithm<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Cluster<T>> cluster(
             final Set<T> elements, final SimilarityMeasure<T> measure) {
         Set<Cluster<T>> clusters = new HashSet<Cluster<T>>();

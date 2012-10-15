@@ -53,6 +53,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();

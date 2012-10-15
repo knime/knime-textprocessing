@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -61,15 +61,14 @@ public final class TagCloudGeneral {
      * @param keyset a set of keys to be sorted
      * @return an Iterator with all terms of keyset sorted by their Bib
      */
-    @SuppressWarnings("unchecked")
     public static final Iterator<Term> getsortedAlphabeticalIterator(
             final Set<Term> keyset) {
         List<Term> keys = new LinkedList<Term>(keyset);
-        Collections.sort(keys, new Comparator() {
+        Collections.sort(keys, new Comparator<Term>() {
             @Override
-            public int compare(final Object o1, final Object o2) {
-                String tcd1 = ((Term)(o1)).getText();
-                String tcd2 = ((Term)(o2)).getText();
+            public int compare(final Term o1, final Term o2) {
+                String tcd1 = o1.getText();
+                String tcd2 = o2.getText();
                 return tcd1.compareTo(tcd2);
             }
         });
@@ -82,13 +81,12 @@ public final class TagCloudGeneral {
      * @param order true if sorted from small to big
      * @return an Iterator with all terms of m_hashi sorted by their Value
      */
-    @SuppressWarnings("unchecked")
     public static final Iterator<Term> getsortedFontsizeIterator(
             final HashMap<Term, TagCloudData> hashi, final boolean order) {
         List<Term> keys = new LinkedList<Term>(hashi.keySet());
-        Collections.sort(keys, new Comparator() {
+        Collections.sort(keys, new Comparator<Term>() {
             @Override
-            public int compare(final Object o1, final Object o2) {
+            public int compare(final Term o1, final Term o2) {
                 int reverse = order ? -1 : 1;
                 TagCloudData tcd1 = hashi.get(o1);
                 TagCloudData tcd2 = hashi.get(o2);
@@ -113,7 +111,7 @@ public final class TagCloudGeneral {
         HashMap<String, Color> color = new HashMap<String, Color>();
 
         String[] strlist =
-                {"J", "V", "W", "F", "N", "S", "D", "E", "C", "I", "L", "U", 
+                {"J", "V", "W", "F", "N", "S", "D", "E", "C", "I", "L", "U",
                 "M", AbstractTagCloud.CFG_UNKNOWN_TAG_COLOR, "P", "R", "T"};
 
         float fac = 360f / strlist.length;

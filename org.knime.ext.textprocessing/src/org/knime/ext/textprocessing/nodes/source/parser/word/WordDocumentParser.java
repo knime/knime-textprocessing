@@ -57,11 +57,12 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
  * interface. The provided method
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}
  * is able to read the data of the given input stream and store it as a
- * {@link org.knime.ext.textprocessing.data.Document}s full text. 
- * 
+ * {@link org.knime.ext.textprocessing.data.Document}s full text.
+ *
  * To parse PDF files the Apache POI library is used.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 2.7
  */
 public class WordDocumentParser extends AbstractDocumentParser {
 
@@ -101,8 +102,8 @@ public class WordDocumentParser extends AbstractDocumentParser {
             m_docs.clear();
         }
         m_currentDoc = null;
-    }       
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -112,7 +113,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
         m_docs.add(parseInternal(is));
         return m_docs;
     }
-    
+
     private static Pattern symbolPattern = Pattern.compile("[\\s]+");
 
     private static boolean onlyWhitepscaes(final String str) {
@@ -120,8 +121,8 @@ public class WordDocumentParser extends AbstractDocumentParser {
             return true;
         }
         return false;
-    }    
-    
+    }
+
     private boolean checkTitle(final String title) {
         if (title == null) {
             return false;
@@ -132,17 +133,17 @@ public class WordDocumentParser extends AbstractDocumentParser {
         }
         return true;
     }
-    
+
     private Document parseInternal(final InputStream is) throws Exception {
         m_currentDoc = new DocumentBuilder();
         m_currentDoc.setDocumentFile(new File(m_docPath));
         m_currentDoc.setDocumentType(m_type);
         m_currentDoc.addDocumentCategory(m_category);
         m_currentDoc.addDocumentSource(m_source);
-        
+
         try {
             boolean oldVersion = false;
-            
+
             // first copy stream content into byte array os
             // this is unfortunately necessary in order to check for the version
             // of the word file. The version is checked to use the proper
@@ -151,11 +152,11 @@ public class WordDocumentParser extends AbstractDocumentParser {
             int c;
             while ((c = is.read()) != -1) {
                 baos.write((char) c);
-            }                        
-            ByteArrayInputStream bais = 
+            }
+            ByteArrayInputStream bais =
                 new ByteArrayInputStream(baos.toByteArray());
             oldVersion = isOldVersion(bais);
-            // reset stream here in order to enable reading again and parsing 
+            // reset stream here in order to enable reading again and parsing
             bais.reset();
 
             // if Word97-2003 version use HWPFDocument
@@ -180,10 +181,10 @@ public class WordDocumentParser extends AbstractDocumentParser {
                         m_currentDoc.addParagraph(p);
                     }
                 }
-            }         
-            
+            }
+
             m_currentDoc.createNewSection(SectionAnnotation.UNKNOWN);
-            
+
             // find title
             String title = null;
             if (!checkTitle(title)) {
@@ -197,18 +198,18 @@ public class WordDocumentParser extends AbstractDocumentParser {
                 title = m_docPath.toString();
             }
             m_currentDoc.addTitle(title);
-            
+
             return m_currentDoc.createDocument();
         } finally {
             is.close();
         }
     }
 
-    private static boolean isOldVersion(final InputStream istream) 
-    throws IOException { 
+    private static boolean isOldVersion(final InputStream istream)
+    throws IOException {
         DirectoryNode dir = HWPFDocumentCore.verifyAndBuildPOIFS(istream)
                             .getRoot();
-        DocumentEntry documentProps = 
+        DocumentEntry documentProps =
             (DocumentEntry)dir.getEntry("WordDocument");
 
         // Create our FIB, and check for the doc being encrypted
@@ -219,8 +220,8 @@ public class WordDocumentParser extends AbstractDocumentParser {
             return true;
         }
         return false;
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -228,5 +229,5 @@ public class WordDocumentParser extends AbstractDocumentParser {
     public void parseDocument(final InputStream is) throws Exception {
         Document d = parseInternal(is);
         notifyAllListener(new DocumentParsedEvent(d, this));
-    }    
+    }
 }
