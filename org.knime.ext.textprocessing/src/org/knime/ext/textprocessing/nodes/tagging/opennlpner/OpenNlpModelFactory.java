@@ -25,12 +25,14 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
-
-import java.util.Hashtable;
-import java.util.Set;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -45,6 +47,13 @@ public final class OpenNlpModelFactory {
 
     private Hashtable<String, OpenNlpModel> m_models =
         new Hashtable<String, OpenNlpModel>();
+
+    private Map<String, String> m_modelTypeTagMapping =
+            new HashMap<String, String>();
+
+    private Map<String, String> m_modelTypeFileMapping =
+            new HashMap<String, String>();
+
 
     /**
      * Creates and returns a singleton instance of
@@ -64,41 +73,45 @@ public final class OpenNlpModelFactory {
 
         OpenNlpModelPaths paths = OpenNlpModelPaths.getOpenNlpModelPaths();
 
-        // PERSON
         String name = "Person";
-        OpenNlpModel m = new OpenNlpModel(name, paths.getPersonNERModelFile(),
-                NamedEntityTag.PERSON.toString());
-        m_models.put(name, m);
+        m_modelTypeTagMapping.put(name, NamedEntityTag.PERSON.toString());
+        m_modelTypeFileMapping.put(name, paths.getPersonNERModelFile());
 
-        // LOCATION
         name = "Location";
-        m = new OpenNlpModel(name, paths.getLocationNERModelFile(),
-                NamedEntityTag.LOCATION.toString());
-        m_models.put(name, m);
+        m_modelTypeTagMapping.put(name, NamedEntityTag.LOCATION.toString());
+        m_modelTypeFileMapping.put(name, paths.getLocationNERModelFile());
 
-        // ORGANIZATION
         name = "Organization";
-        m = new OpenNlpModel(name, paths.getOrganizationNERModelFile(),
-                NamedEntityTag.ORGANIZATION.toString());
-        m_models.put(name, m);
+        m_modelTypeTagMapping.put(name, NamedEntityTag.ORGANIZATION.toString());
+        m_modelTypeFileMapping.put(name, paths.getOrganizationNERModelFile());
 
-        // MONEY
         name = "Money";
-        m = new OpenNlpModel(name, paths.getMoneyNERModelFile(),
-                NamedEntityTag.MONEY.toString());
-        m_models.put(name, m);
+        m_modelTypeTagMapping.put(name, NamedEntityTag.MONEY.toString());
+        m_modelTypeFileMapping.put(name, paths.getMoneyNERModelFile());
 
-        // DATE
         name = "Date";
-        m = new OpenNlpModel(name, paths.getDateNERModelFile(),
-                NamedEntityTag.DATE.toString());
-        m_models.put(name, m);
+        m_modelTypeTagMapping.put(name, NamedEntityTag.DATE.toString());
+        m_modelTypeFileMapping.put(name, paths.getDateNERModelFile());
 
-        // TIME
         name = "Time";
-        m = new OpenNlpModel(name, paths.getTimeNERModelFile(),
-                NamedEntityTag.TIME.toString());
-        m_models.put(name, m);
+        m_modelTypeTagMapping.put(name, NamedEntityTag.TIME.toString());
+        m_modelTypeFileMapping.put(name, paths.getTimeNERModelFile());
+
+        for (String type : m_modelTypeTagMapping.keySet()) {
+            OpenNlpModel m = new OpenNlpModel(type,
+                                   m_modelTypeFileMapping.get(type),
+                                   m_modelTypeTagMapping.get(type));
+            m_models.put(type, m);
+        }
+    }
+
+    /**
+     * Returns the named entity tag by name.
+     * @param name the name to get the tag for.
+     * @return the tag corresponding to the given name.
+     */
+    public String getTagByName(final String name) {
+        return m_modelTypeTagMapping.get(name);
     }
 
     /**

@@ -36,6 +36,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
 
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
@@ -58,14 +64,10 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 /**
  * Implements the
@@ -219,6 +221,10 @@ public class DmlDocumentParser extends DefaultHandler implements
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(DmlDocumentParser.class);
 
+    private static final SAXTransformerFactory transformerFactory =
+            (SAXTransformerFactory)TransformerFactory.newInstance();
+
+
     private List<Document> m_docs;
 
     private DocumentCategory m_category;
@@ -326,8 +332,8 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_tags.clear();
         }
         m_currentDoc = null;
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -415,14 +421,14 @@ public class DmlDocumentParser extends DefaultHandler implements
         String endTag = qName.toLowerCase();
         if (endTag.equals(DOCUMENT) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
-            
+
             // due to memory issues documents are not all stored in list anymore
             // but handed out via listener mechanism
             if (m_storeInList) {
                 m_docs.add(doc);
             }
             notifyAllListener(new DocumentParsedEvent(doc, this));
-            
+
             m_currentDoc = null;
         } else if (endTag.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
@@ -531,13 +537,17 @@ public class DmlDocumentParser extends DefaultHandler implements
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         // header
-        OutputFormat of = new OutputFormat("XML", "UTF-8", false);
-        of.setDoctype(PUBLIC_IDENTIFIER, "./dml.dtd");
-
         String str = null;
         try {
-            XMLSerializer serializer = new XMLSerializer(os, of);
-            ContentHandler hd = serializer.asContentHandler();
+            TransformerHandler hd = transformerFactory.newTransformerHandler();
+            Transformer transformer = hd.getTransformer();
+
+            final String encoding = "UTF-8";
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, PUBLIC_IDENTIFIER);
+            transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "./dml.dtd");
+
 
             hd.startDocument();
             AttributesImpl atts = new AttributesImpl();
@@ -720,6 +730,12 @@ public class DmlDocumentParser extends DefaultHandler implements
                     + " / title:" + doc.getTitle());
             LOGGER.info(e2.getMessage());
             e2.printStackTrace();
+        } catch (TransformerConfigurationException ex) {
+            LOGGER.error("Could not create xml output of documemnt "
+                    + "file:" + doc.getDocFile()
+                    + " / title:" + doc.getTitle());
+            LOGGER.info(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return str;
@@ -795,12 +811,12 @@ public class DmlDocumentParser extends DefaultHandler implements
     @Override
     public void setCharset(final Charset charset) { }
 
-    
+
     /**
      * List of listeners.
      */
     private List<DocumentParsedEventListener> m_listener;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -826,8 +842,8 @@ public class DmlDocumentParser extends DefaultHandler implements
         for (DocumentParsedEventListener l : m_listener) {
             l.documentParsed(event);
         }
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
