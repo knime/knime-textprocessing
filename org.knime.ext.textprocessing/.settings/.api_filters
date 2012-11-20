@@ -4095,34 +4095,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleDoubleHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleDoubleHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleFloatHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TDoubleFloatHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleFloatHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleFloatHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4133,34 +4111,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleHashSetDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleHashSetDecorator"/>
-                <message_argument value="_set"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleIntHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TDoubleIntHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleIntHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleIntHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4171,34 +4127,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleLongHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleLongHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TDoubleObjectHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TDoubleObjectHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleObjectHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TDoubleObjectHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4225,34 +4159,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatDoubleHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatDoubleHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatFloatHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TFloatFloatHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatFloatHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatFloatHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4263,34 +4175,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatHashSetDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatHashSetDecorator"/>
-                <message_argument value="_set"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatIntHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TFloatIntHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatIntHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatIntHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4301,34 +4191,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatLongHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatLongHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TFloatObjectHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TFloatObjectHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatObjectHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TFloatObjectHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4355,34 +4223,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntDoubleHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntDoubleHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntFloatHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TIntFloatHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntFloatHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntFloatHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4393,34 +4239,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntHashSetDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntHashSetDecorator"/>
-                <message_argument value="_set"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntIntHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TIntIntHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntIntHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntIntHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4431,34 +4255,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntLongHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntLongHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TIntObjectHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TIntObjectHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntObjectHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TIntObjectHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4485,34 +4287,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongDoubleHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongDoubleHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongFloatHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TLongFloatHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongFloatHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongFloatHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4523,34 +4303,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongHashSetDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongHashSetDecorator"/>
-                <message_argument value="_set"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongIntHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TLongIntHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongIntHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongIntHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4561,34 +4319,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongLongHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongLongHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TLongObjectHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TLongObjectHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongObjectHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TLongObjectHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4615,34 +4351,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectDoubleHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectDoubleHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TObjectFloatHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TObjectFloatHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectFloatHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectFloatHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4653,34 +4367,12 @@
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
             </message_arguments>
         </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectIntHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectIntHashMapDecorator"/>
-                <message_argument value="_map"/>
-            </message_arguments>
-        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="gnu.trove.decorator.TObjectLongHashMapDecorator">
         <filter id="305365105">
             <message_arguments>
                 <message_argument value="gnu.trove.decorator.TObjectLongHashMapDecorator"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="337682486">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectLongHashMapDecorator"/>
-            </message_arguments>
-        </filter>
-        <filter id="388100214">
-            <message_arguments>
-                <message_argument value="gnu.trove.decorator.TObjectLongHashMapDecorator"/>
-                <message_argument value="_map"/>
             </message_arguments>
         </filter>
     </resource>
@@ -4913,12 +4605,6 @@
             <message_arguments>
                 <message_argument value="opennlp.maxent.GISModel"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="338792546">
-            <message_arguments>
-                <message_argument value="opennlp.maxent.GISModel"/>
-                <message_argument value="main(String[])"/>
             </message_arguments>
         </filter>
     </resource>

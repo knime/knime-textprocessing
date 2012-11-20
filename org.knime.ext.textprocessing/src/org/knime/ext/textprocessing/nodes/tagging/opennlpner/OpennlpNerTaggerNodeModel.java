@@ -79,6 +79,7 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
 
     /**
      * The default model file location.
+     * @since 2.7
      */
     public static final String DEFAULT_MODEL_FILENAME =
         System.getProperty("user.home");

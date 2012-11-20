@@ -55,6 +55,7 @@ public final class OpenNlpTaggerConfigKeys {
 
     /**
      * The configuration key for the model file.
+     * @since 2.7
      */
     public static final String CFGKEY_MODELFILE = "Model File";
 }

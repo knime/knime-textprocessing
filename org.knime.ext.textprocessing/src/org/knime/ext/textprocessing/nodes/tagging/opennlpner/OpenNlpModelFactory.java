@@ -109,6 +109,7 @@ public final class OpenNlpModelFactory {
      * Returns the named entity tag by name.
      * @param name the name to get the tag for.
      * @return the tag corresponding to the given name.
+     * @since 2.7
      */
     public String getTagByName(final String name) {
         return m_modelTypeTagMapping.get(name);
