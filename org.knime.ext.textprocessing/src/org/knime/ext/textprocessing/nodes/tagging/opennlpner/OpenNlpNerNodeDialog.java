@@ -100,6 +100,7 @@ public class OpenNlpNerNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns a <code>SettingsModelString</code> containing
      * the file name of the model file.
+     * @since 2.7
      */
     public static SettingsModelString createModelFileModel() {
         return new SettingsModelString(

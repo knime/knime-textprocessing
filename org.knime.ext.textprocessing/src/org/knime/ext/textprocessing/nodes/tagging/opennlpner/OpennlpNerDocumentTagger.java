@@ -64,6 +64,7 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
      * organization, etc.).
      * @param modelFileName Use of model file.
      * @throws IOException If something happens.
+     * @since 2.7
      */
     public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
             final String modelType, final String modelFileName)
