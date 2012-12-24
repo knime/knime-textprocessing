@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,11 +19,14 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   25.09.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -34,9 +37,6 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * @author Kilian Thiel, University of Konstanz
  *
@@ -45,24 +45,26 @@ public class SnowballStemmerNodeModel extends PreprocessingNodeModel {
 
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(SnowballStemmerNodeModel.class);
-    
+
     /**
      * Default snowball stemmer name.
      */
     public static final String DEF_STEMMER_NAME = "Porter";
-    
-    private SettingsModelString m_stemmerNameModel = 
+
+    private SettingsModelString m_stemmerNameModel =
         SnowballStemmerNodeDialog.getStemmerNameModel();
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initPreprocessing() {
         try {
+            SnowballStemmerFactory stemmerFactory =
+                    new SnowballStemmerFactory();
             m_preprocessing = new WrappedSnowballStemmer(
-                    SnowballStemmerFactory.getInstance().getStemmerByName(
-                            m_stemmerNameModel.getStringValue()));
+                    stemmerFactory.getStemmerByName(
+                    m_stemmerNameModel.getStringValue()));
         } catch (Exception e) {
             LOGGER.warn("Could not load Snowball stemmer!");
             LOGGER.debug(e.getMessage());
@@ -78,7 +80,7 @@ public class SnowballStemmerNodeModel extends PreprocessingNodeModel {
         super.loadValidatedSettingsFrom(settings);
         m_stemmerNameModel.loadSettingsFrom(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -87,7 +89,7 @@ public class SnowballStemmerNodeModel extends PreprocessingNodeModel {
         super.saveSettingsTo(settings);
         m_stemmerNameModel.saveSettingsTo(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -97,12 +99,12 @@ public class SnowballStemmerNodeModel extends PreprocessingNodeModel {
         super.validateSettings(settings);
         m_stemmerNameModel.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -120,8 +122,8 @@ public class SnowballStemmerNodeModel extends PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec) 
+    protected void saveInternals(final File nodeInternDir,
+            final ExecutionMonitor exec)
     throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }

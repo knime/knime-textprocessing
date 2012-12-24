@@ -54,13 +54,16 @@ import org.knime.ext.textprocessing.data.Document;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class AbstractDocumentTablePanel extends JPanel {
+public abstract class AbstractDocumentTablePanel extends JPanel
+implements DocumentProvider {
 
     private JTable m_table;
 
     private List<Document> m_docs;
 
     private int m_row = 0;
+
+    private int m_selectedRow = 0;
 
     /**
      * Constructor of <code>AbstractDocumentTablePanel</code> with the given
@@ -139,6 +142,19 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
     }
 
     /**
+     * {@inheritDoc}
+     * @since 2.7
+     */
+    @Override
+    public Document getDocument(final int index) {
+        if (index < m_docs.size() && index >= 0) {
+            return m_docs.get(index);
+        }
+        return null;
+    }
+
+
+    /**
      *
      * @author Kilian Thiel, University of Konstanz
      */
@@ -151,10 +167,10 @@ public abstract class AbstractDocumentTablePanel extends JPanel {
         public void mouseClicked(final MouseEvent e) {
             // if double clicked
             if (e.getClickCount() == 2) {
-                int rowIndex = m_table.getSelectedRow();
-                Document doc = m_docs.get(rowIndex);
+                m_selectedRow = m_table.getSelectedRow();
+                Document doc = m_docs.get(m_selectedRow);
 
-                onClick(rowIndex, doc);
+                onClick(m_selectedRow, doc);
             }
         }
 

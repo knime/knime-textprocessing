@@ -61,11 +61,13 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.table.TableCellRenderer;
 
 import org.knime.ext.textprocessing.data.Author;
@@ -93,7 +95,11 @@ public class DocumentViewPanel extends JSplitPane {
 
     private static final boolean HILITE_TAGS = false;
 
-    private final Document m_doc;
+    private final DocumentProvider m_docProvider;
+
+    private Document m_doc;
+
+    private int m_rowIndex;
 
     private JEditorPane m_fulltextPane;
 
@@ -115,6 +121,35 @@ public class DocumentViewPanel extends JSplitPane {
 
     private JToggleButton m_searchButton;
 
+    private JButton m_nextButton;
+
+    private JButton m_previousButton;
+
+    /**
+     * Creates new instance of <code>DocumentViewPanel</code> with given
+     * document to display.
+     *
+     * @param doc The document to display.
+     * @param docProvider The provider for next or previous documents.
+     * @param rowIndex The index of the row containing the document to display.
+     * @throws IllegalArgumentException If given document is <code>null</code>.
+     * @since 2.7
+     */
+    public DocumentViewPanel(final Document doc,
+          final DocumentProvider docProvider, final int rowIndex)
+                  throws IllegalArgumentException {
+        super(JSplitPane.VERTICAL_SPLIT);
+
+        if (doc == null) {
+            throw new IllegalArgumentException("Document may not be null!");
+        }
+        m_doc = doc;
+        m_docProvider = docProvider;
+        m_rowIndex = rowIndex;
+
+        displayDoc();
+    }
+
     /**
      * Creates new instance of <code>DocumentViewPanel</code> with given
      * document to display.
@@ -123,14 +158,8 @@ public class DocumentViewPanel extends JSplitPane {
      * @throws IllegalArgumentException If given document is <code>null</code>.
      */
     public DocumentViewPanel(final Document doc)
-    throws IllegalArgumentException {
-        super(JSplitPane.VERTICAL_SPLIT);
-
-        if (doc == null) {
-            throw new IllegalArgumentException("Document may not be null!");
-        }
-        m_doc = doc;
-        displayDoc();
+            throws IllegalArgumentException {
+        this(doc, null, 0);
     }
 
     private void displayDoc() {
@@ -218,8 +247,21 @@ public class DocumentViewPanel extends JSplitPane {
         m_searchField.getDocument().addDocumentListener(new SearchListener());
         searchToolbar.add(m_searchField);
 
+        // next and previous buttons
+        JToolBar navigationToolbar = new JToolBar();
+        m_previousButton = new BasicArrowButton(SwingConstants.WEST);
+        m_previousButton.addActionListener(new NewDocumentListener());
+        m_previousButton.setToolTipText("show previous document");
+        navigationToolbar.add(m_previousButton);
+        m_nextButton = new BasicArrowButton(SwingConstants.EAST);
+        m_nextButton.addActionListener(new NewDocumentListener());
+        m_nextButton.setToolTipText("show next document");
+        navigationToolbar.add(m_nextButton);
+
         controlPanel.add(searchToolbar);
         controlPanel.add(hiliteToolbar);
+        controlPanel.add(navigationToolbar);
+
         return controlPanel;
     }
 
@@ -535,6 +577,38 @@ public class DocumentViewPanel extends JSplitPane {
             }
         }
 
+    }
+
+
+    private class NewDocumentListener implements ActionListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            if (e.getSource().equals(m_nextButton)) {
+                if (m_docProvider != null) {
+                    int nextIndex = m_rowIndex + 1;
+                    Document nextDoc = m_docProvider.getDocument(nextIndex);
+                    if (nextDoc != null) {
+                        m_doc = nextDoc;
+                        m_rowIndex = nextIndex;
+                    }
+                }
+            } else if (e.getSource().equals(m_previousButton)) {
+                if (m_docProvider != null) {
+                    int prevIndex = m_rowIndex - 1;
+                    Document prevDoc = m_docProvider.getDocument(prevIndex);
+                    if (prevDoc != null) {
+                        m_doc = prevDoc;
+                        m_rowIndex = prevIndex;
+                    }
+                }
+            }
+
+            displayDoc();
+        }
     }
 
     /**

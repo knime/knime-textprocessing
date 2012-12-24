@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
@@ -86,8 +85,8 @@ public class DictionaryDocumentTagger extends AbstractDocumentTagger {
      */
     @Override
     protected List<Tag> getTags(final String tag) {
-        List<Tag> tags = new ArrayList<Tag>();
-        tags.add(NamedEntityTag.stringToTag(tag));
+        List<Tag> tags = new ArrayList<Tag>(1);
+        tags.add(m_tag);
         return tags;
     }
 
