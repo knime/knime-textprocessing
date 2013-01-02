@@ -143,7 +143,7 @@ implements DocumentProvider {
 
     /**
      * {@inheritDoc}
-     * @since 2.7
+     * @since 2.8
      */
     @Override
     public Document getDocument(final int index) {

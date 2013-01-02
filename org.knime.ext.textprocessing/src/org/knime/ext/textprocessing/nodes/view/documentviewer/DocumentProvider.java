@@ -55,7 +55,7 @@ import org.knime.ext.textprocessing.data.Document;
  * Interface to access of a list of documents.
  *
  * @author Kilian Thiel, Berlin, 2012
- * @since 2.7
+ * @since 2.8
  */
 public interface DocumentProvider {
 

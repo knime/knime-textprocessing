@@ -54,7 +54,7 @@ public final class SnowballStemmerFactory {
      * instantiated.
      * @throws IllegalAccessException If snowball stemmer classes could not be
      * accessed.
-     * @since 2.7
+     * @since 2.8
      */
     public SnowballStemmerFactory() throws ClassNotFoundException,
     InstantiationException, IllegalAccessException {

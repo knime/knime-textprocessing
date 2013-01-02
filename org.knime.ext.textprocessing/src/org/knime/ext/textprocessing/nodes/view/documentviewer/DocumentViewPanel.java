@@ -133,7 +133,7 @@ public class DocumentViewPanel extends JSplitPane {
      * @param docProvider The provider for next or previous documents.
      * @param rowIndex The index of the row containing the document to display.
      * @throws IllegalArgumentException If given document is <code>null</code>.
-     * @since 2.7
+     * @since 2.8
      */
     public DocumentViewPanel(final Document doc,
           final DocumentProvider docProvider, final int rowIndex)
