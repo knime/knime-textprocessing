@@ -219,6 +219,7 @@ public class BagOfWordsNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
+        m_rowId = 1;
     }
 
     /**

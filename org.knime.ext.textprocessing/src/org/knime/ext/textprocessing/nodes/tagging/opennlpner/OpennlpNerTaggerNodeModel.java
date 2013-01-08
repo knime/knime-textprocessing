@@ -97,9 +97,6 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     private SettingsModelBoolean m_useDictFileModel =
         OpenNlpNerNodeDialog.createUseDictModel();
 
-    private SettingsModelString m_dictFileModel =
-        OpenNlpNerNodeDialog.createDictFileModel();
-
     private SettingsModelString m_modelFileModel =
             OpenNlpNerNodeDialog.createModelFileModel();
 
@@ -192,7 +189,6 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
         m_unmodifiableModel.loadSettingsFrom(settings);
         m_modelNameModel.loadSettingsFrom(settings);
         m_useDictFileModel.loadSettingsFrom(settings);
-        m_dictFileModel.loadSettingsFrom(settings);
         m_modelFileModel.loadSettingsFrom(settings);
     }
 
@@ -204,7 +200,6 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
         m_modelNameModel.saveSettingsTo(settings);
         m_unmodifiableModel.saveSettingsTo(settings);
         m_useDictFileModel.saveSettingsTo(settings);
-        m_dictFileModel.saveSettingsTo(settings);
         m_modelFileModel.saveSettingsTo(settings);
     }
 
@@ -217,7 +212,6 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
         m_modelNameModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
         m_useDictFileModel.validateSettings(settings);
-        m_dictFileModel.validateSettings(settings);
         m_modelFileModel.validateSettings(settings);
 
         boolean useDictFile = ((SettingsModelBoolean)m_useDictFileModel

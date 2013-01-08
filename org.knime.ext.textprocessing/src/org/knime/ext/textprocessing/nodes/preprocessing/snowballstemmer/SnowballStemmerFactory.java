@@ -46,9 +46,16 @@ public final class SnowballStemmerFactory {
     private Hashtable<String, SnowballStemmer> m_stemmer =
         new Hashtable<String, SnowballStemmer>();
 
-    private static SnowballStemmerFactory instance = null;
-
-    private SnowballStemmerFactory() throws ClassNotFoundException,
+    /**
+     * Creates an instance of <code>SnowballStemmerFactory</code>.
+     * @throws ClassNotFoundException If snowball stemmer classes could not be
+     * found.
+     * @throws InstantiationException If snowball stemmer classes could not be
+     * instantiated.
+     * @throws IllegalAccessException If snowball stemmer classes could not be
+     * accessed.
+     */
+    public SnowballStemmerFactory() throws ClassNotFoundException,
     InstantiationException, IllegalAccessException {
         m_stemmerNames.add("Danish");
         m_stemmerNames.add("Dutch");
@@ -69,8 +76,9 @@ public final class SnowballStemmerFactory {
 
         for (String name : m_stemmerNames) {
             @SuppressWarnings("unchecked")
-            Class<SnowballStemmer> stemClass = (Class<SnowballStemmer>)Class.forName(
-                    PACKAGE_PREFIX + name.toLowerCase() + PACKAGE_POSTFIX);
+            Class<SnowballStemmer> stemClass =
+                (Class<SnowballStemmer>)Class.forName(
+                PACKAGE_PREFIX + name.toLowerCase() + PACKAGE_POSTFIX);
             SnowballStemmer stemmer = stemClass.newInstance();
             m_stemmer.put(name, stemmer);
         }
@@ -84,13 +92,13 @@ public final class SnowballStemmerFactory {
      * instanciated.
      * @throws IllegalAccessException If snowball stemmer class could not be
      * accessed.
+     * @deprecated SnowballStemmerFactory is no longer a singleton due to
+     * concurrency issues. Instead use constructor to create instance.
      */
+    @Deprecated
     public static SnowballStemmerFactory getInstance() throws
     ClassNotFoundException, InstantiationException, IllegalAccessException {
-        if (instance == null) {
-            instance = new SnowballStemmerFactory();
-        }
-        return instance;
+        return new SnowballStemmerFactory();
     }
 
     /**

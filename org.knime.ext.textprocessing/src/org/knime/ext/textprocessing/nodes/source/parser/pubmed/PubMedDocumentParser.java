@@ -340,7 +340,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_abstract = "";
         } else if (m_lastTag.equals(ARTICLETITLE)) {
             m_title = "";
-        } else if (m_lastTag.equals(FIRSTNAME) || qName.equals(FORENAME)) {
+        } else if (m_lastTag.equals(FIRSTNAME) || m_lastTag.equals(FORENAME)) {
             m_firstName = "";
         } else if (m_lastTag.equals(LASTNAME)) {
             m_lastName = "";
@@ -520,7 +520,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      */
     @Override
     public void characters(final char[] ch, final int start, final int length) {
-        if (m_lastTag.equals(FIRSTNAME)) {
+        if (m_lastTag.equals(FIRSTNAME) || m_lastTag.equals(FORENAME)) {
             m_firstName += new String(ch, start, length);
         } else if (m_lastTag.equals(LASTNAME)) {
             m_lastName += new String(ch, start, length);
