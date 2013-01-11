@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   26.06.2008 (thiel): created
  */
@@ -46,32 +46,32 @@ import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.FormatType;
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.ResolvedNamedEntity;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermToStructureCellFactory implements CellFactory {
 
     private int m_termColIndex = -1;
-    
+
     private String m_newColName;
-    
+
     private Oscar m_oscar;
-    
+
     private FormatType m_type;
-    
+
     /**
-     * Creates a new instance of <code>TermToStructureCellFactory</code> with 
-     * the given index of the term cell column and the name of the column to 
+     * Creates a new instance of <code>TermToStructureCellFactory</code> with
+     * the given index of the term cell column and the name of the column to
      * append.
-     * 
+     *
      * @param termColindex The index of the term cell column.
      * @param newColName The name of the column to append.
      * @param type The type of the format to convert the structure to.
      * @throws InvalidSettingsException if the given index of the term column
      * is less than zero.
      */
-    public TermToStructureCellFactory(final int termColindex, 
-            final String newColName, final FormatType type) 
+    public TermToStructureCellFactory(final int termColindex,
+            final String newColName, final FormatType type)
     throws InvalidSettingsException {
         if (termColindex < 0) {
             throw new InvalidSettingsException(
@@ -82,14 +82,18 @@ public class TermToStructureCellFactory implements CellFactory {
         m_oscar = new Oscar();
         m_type = type;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
-        Term term = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-        List<ResolvedNamedEntity> entities = 
+        final DataCell cell = row.getCell(m_termColIndex);
+        if (cell.isMissing()) {
+            return new DataCell[]{DataType.getMissingCell()};
+        }
+        Term term = ((TermValue)cell).getTermValue();
+        List<ResolvedNamedEntity> entities =
             m_oscar.findAndResolveNamedEntities(term.getText());
         for (ResolvedNamedEntity ne : entities) {
             ChemicalStructure inchi = ne.getFirstChemicalStructure(m_type);
@@ -105,7 +109,7 @@ public class TermToStructureCellFactory implements CellFactory {
      */
     @Override
     public DataColumnSpec[] getColumnSpecs() {
-        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName, 
+        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName,
                 StringCell.TYPE).createSpec();
         return new DataColumnSpec[]{strCol};
     }
@@ -114,10 +118,10 @@ public class TermToStructureCellFactory implements CellFactory {
      * {@inheritDoc}
      */
     @Override
-    public void setProgress(final int curRowNr, final int rowCount, 
+    public void setProgress(final int curRowNr, final int rowCount,
             final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Processing row: " + curRowNr 
+        exec.setProgress(prog, "Processing row: " + curRowNr
                 + " of " + rowCount + " rows");
     }
 }
