@@ -216,7 +216,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         List<Word> namedEntity = new ArrayList<Word>(neWords.size());
 
         // go through all the old term list
-        for (int t = 0; t < oldList.size(); t++) {
+        int t = -1;
+        for (Term term : oldList) {
+            t++;
 
             // if we reached the interesting terms containing the named
             // entity
@@ -235,9 +237,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     // the old term consists only of one word, so just add a tag
                     // By the way, this is the _only_ situation an old tag is
                     // kept and also assigned to the new term.
-                    if (oldList.get(t).getWords().size() == 1) {
+                    if (term.getWords().size() == 1) {
                         List<Tag> tags = new ArrayList<Tag>();
-                        tags.addAll(oldList.get(t).getTags());
+                        tags.addAll(term.getTags());
                         // only add tag if not already added
                         List<Tag> newTags = getTags(entityTag);
                         for (Tag ct : newTags) {
@@ -247,20 +249,22 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         }
 
                         // CREATE NEW TERM !!!
-                        Term newTerm =
-                                new Term(oldList.get(t).getWords(), tags,
+                        Term newTerm = new Term(term.getWords(), tags,
                                         m_setNeUnmodifiable);
                         newTermList.add(newTerm);
 
                         // the old term consists of more than one word so split
                         // it
-                    } else if (oldList.get(t).getWords().size() > 1) {
+                    } else if (term.getWords().size() > 1) {
                         List<Word> newWords = new ArrayList<Word>();
-                        for (int w = 0; w < oldList.get(t).getWords().size();
-                        w++) {
+
+                        int w = -1;
+                        for (Word word : term.getWords()) {
+                            w++;
+
                             // add word if index matches
                             if (w >= startWordIndex && w <= stopWordIndex) {
-                                newWords.add(oldList.get(t).getWords().get(w));
+                                newWords.add(word);
 
                                 // if last word to add, create term and add it
                                 // to new list
@@ -275,8 +279,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                     }
 
                                     // CREATE NEW TERM !!!
-                                    Term newTerm =
-                                            new Term(newWords, tags,
+                                    Term newTerm = new Term(newWords, tags,
                                                     m_setNeUnmodifiable);
                                     newTermList.add(newTerm);
                                     endTerm = true;
@@ -287,7 +290,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                 // a term.
                             } else {
                                 List<Word> newWord = new ArrayList<Word>();
-                                newWord.add(oldList.get(t).getWords().get(w));
+                                newWord.add(word);
                                 List<Tag> tags = new ArrayList<Tag>();
                                 // CREATE NEW TERM !!!
                                 Term newTerm = new Term(newWord, tags, false);
@@ -317,20 +320,23 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
                     // entity consists of more than one term, so split it up.
                 } else {
-                    List<Word> words = oldList.get(t).getWords();
-                    for (int w = 0; w < words.size(); w++) {
+                    List<Word> words = term.getWords();
+
+                    int w = -1;
+                    for (Word word : words) {
+                        w++;
 
                         // if current term is start term
                         if (t == startTermIndex) {
                             // if word is part of the named entity add it
                             if (w >= startWordIndex) {
-                                namedEntity.add(words.get(w));
+                                namedEntity.add(word);
 
                                 // otherwise create a new term containing the
                                 // word
                             } else {
                                 List<Word> newWord = new ArrayList<Word>();
-                                newWord.add(words.get(w));
+                                newWord.add(word);
                                 List<Tag> tags = new ArrayList<Tag>();
                                 // CREATE NEW TERM !!!
                                 Term newTerm = new Term(newWord, tags, false);
@@ -341,7 +347,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         } else if (t == stopTermIndex) {
                             // add words as long as stopWordIndex is not reached
                             if (w <= stopWordIndex) {
-                                namedEntity.add(words.get(w));
+                                namedEntity.add(word);
 
                                 // if last word is reached, create term and
                                 // add it
@@ -365,7 +371,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                 // otherwise create a term for each word
                             } else {
                                 List<Word> newWord = new ArrayList<Word>();
-                                newWord.add(words.get(w));
+                                newWord.add(word);
                                 List<Tag> tags = new ArrayList<Tag>();
                                 // CREATE NEW TERM !!!
                                 Term newTerm = new Term(newWord, tags, false);
@@ -375,7 +381,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                             // if we are in between the start term and the stop
                             // term just add all words to the new word list
                         } else if (t > startTermIndex && t < stopTermIndex) {
-                            namedEntity.add(words.get(w));
+                            namedEntity.add(word);
                         }
                     }
                     if (endTerm) {
@@ -402,7 +408,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             } else {
             // if we are before or after the interesting part just add the
             // terms without rearrangement
-                newTermList.add(oldList.get(t));
+                newTermList.add(term);
             }
         }
         return newTermList;
@@ -419,14 +425,20 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         int stopWordIndex = -1;
 
         // search all terms
-        for (int t = 0; t < sentence.size(); t++) {
-            List<Word> words = sentence.get(t).getWords();
+        int t = -1;
+        for (Term term : sentence) {
+            t++;
+            List<Word> words = term.getWords();
+
             // search words of terms
-            for (int w = 0; w < words.size(); w++) {
+            int w = -1;
+            for (Word word : words) {
+                w++;
 
                 // prepare word and ne for comparison (convert to lower case
                 // if case sensitivity is switched off)
-                String wordStr = words.get(w).getWord();
+                String wordStr = word.getWord();
+
                 String neStr = ne.get(found);
                 if (!m_caseSensitive) {
                     wordStr = wordStr.toLowerCase();
