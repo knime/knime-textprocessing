@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/stanford-postagger-3.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oscar4-all-4.1.2-with-dependencies.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opennlp-maxent-3.0.2-incubating.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opennlp-tools-1.5.2-incubating.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.7-20101029.jar" sourcepath="I:/Documents/Carrier/KNIME/TextminingPlugin/LibsAndStuff/ApachePOI/poi-src-3.7-20101029.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.7-20101029.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-app-1.6.0.jar" sourcepath="C:/Users/thiel/Downloads/PdfBox/pdfbox-1.6.0-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/stanford-postagger-2011-09-14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Snowball.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abner.jar"/>

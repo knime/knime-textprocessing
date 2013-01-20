@@ -94,7 +94,7 @@ public enum PharmaDefaultTag implements TagBuilder {
     /** Small molecule. */
     SMALL_MOLECULE,
     /** Unknown. */
-    UNKOWN;
+    UNKNOWN;
 
     private final Tag m_tag;
 
@@ -168,7 +168,7 @@ public enum PharmaDefaultTag implements TagBuilder {
      *         <code>TagBuilder</code>.
      */
     public static PharmaDefaultTag getDefault() {
-        return PharmaDefaultTag.UNKOWN;
+        return PharmaDefaultTag.UNKNOWN;
     }
 
     /**

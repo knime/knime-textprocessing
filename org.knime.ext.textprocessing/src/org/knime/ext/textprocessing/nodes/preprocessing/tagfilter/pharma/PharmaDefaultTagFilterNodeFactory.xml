@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Pharma Filter</name>
+    <shortDescription>Filters terms with certain Pharma tags.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Filters all terms that don't have the specified Pharma
+            tags assigned. The terms are filtered out of the bag of words and
+            the documents as well if deep preprocessing is checked.<br />
+            A term is kept if at least one of the specified Pharma tags 
+            is assigned. If strict filtering is set, all specified Pharma tags 
+            have to be assigned to a term.
+        </intro>
+
+        <tab name="Preprocessing options">
+        <option name="Strict filtering">
+             If strict filtering is checked, all specified Pharma tags have to be applied
+             to the terms. Otherwise at least one of the specified tags has to be
+             applied to the terms.
+        </option>
+        <option name="Filter matching">
+             If checked, terms which have the specified tags are filtered,
+             otherwise they are kept. If strict filtering is checked, all tags
+             must match to filter or keep a term.
+        </option>
+        <option name="Tags">
+             The tags to filter for.
+        </option>
+        </tab>
+
+        <tab name="Deep preprocessing options">
+        <option name="Deep preprocessing">
+             If deep preprocessing is checked, the terms contained inside
+             the documents are preprocessed too, this means that the documents
+             themselves are changed too, which is more time consuming.
+        </option>
+        <option name="Document column">
+              Specifies the column containing the documents to preprocess.
+        </option>
+        <option name="Append unchanged documents">
+            If checked, the documents contained in the specified "Original
+            Document column" are appended unchanged even if deep preprocessing
+            is checked. This helps to keep the original documents in the
+            output data table without the agonizing pain of joining.
+        </option>
+        <option name="Original Document column">
+              Specifies the column containing the original documents which
+              can be attached unchanged.
+        </option>
+        <option name="Ignore unmodifiable tag">
+              If checked unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+    </fullDescription>
+
+    <ports>
+        <inPort name="Terms and related documents input table" index="0">
+        The input table which contains the terms to filter.</inPort>
+        <outPort name="Filtered terms and related documents output table" index="0">
+        The output table which contains the preprocessed terms.
+        </outPort>
+    </ports>
+</knimeNode>

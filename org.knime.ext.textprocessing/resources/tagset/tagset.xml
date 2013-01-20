@@ -7,5 +7,6 @@
     <tag>org.knime.ext.textprocessing.data.MultiwordTermTag</tag>
     <tag>org.knime.ext.textprocessing.data.OscarChemDefaultTag</tag>
     <tag>org.knime.ext.textprocessing.data.PharmaDefaultTag</tag>
+    <tag>org.knime.ext.textprocessing.data.FrenchTreebankTag</tag>
 <tag>org.knime.ext.textprocessing.data.STTSPartOfSpeechTag</tag>
 </tagset>

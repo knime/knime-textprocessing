@@ -348,6 +348,18 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/preprocessing"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.frenchtreebank.FrenchTreebankTagFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.frenchtreebank.FrenchTreebankTagFilterNodeFactory">
+      </node>
+      <node
+            category-path="/labs/textprocessing/preprocessing"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

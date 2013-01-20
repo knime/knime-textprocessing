@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.FrenchTreebankTag;
 import org.knime.ext.textprocessing.data.PartOfSpeechTag;
 import org.knime.ext.textprocessing.data.STTSPartOfSpeechTag;
 import org.knime.ext.textprocessing.data.Sentence;
@@ -51,7 +52,7 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
  * of tags, see {@link org.knime.ext.textprocessing.data.PartOfSpeechTag} for
  * more details. The underlying tagger model which is used to choose the
  * (hopefully) proper tags for all the terms is an external model of the
- * Stanford framework, see (http://nlp.stanford.edu/software/tagger.shtml) 
+ * Stanford framework, see (http://nlp.stanford.edu/software/tagger.shtml)
  * for more details.
  *
  * @author Kilian Thiel, University of Konstanz
@@ -61,34 +62,47 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
     /**
      * Contains the paths to the models.
      */
-    private static final StanfordModelPaths PATHS = 
+    private static final StanfordModelPaths PATHS =
         StanfordModelPaths.getStanfordModelPaths();
-    
+
     /**
      * The tagger model names and their corresponding model file.
      */
-    public static final Hashtable<String, String> TAGGERMODELS = 
+    public static final Hashtable<String, String> TAGGERMODELS =
         new Hashtable<String, String>();
     static {
-        TAGGERMODELS.put("English bidirectional", 
-                PATHS.getBidirectionalPosModelFile());
-        TAGGERMODELS.put("English left 3 words", 
-                PATHS.getLeft3WordsPosModelFile());
-        TAGGERMODELS.put("English left 3 words distsim", 
-                PATHS.getLeft3WordsDistSimPosModelFile());
-        TAGGERMODELS.put("German fast", 
+        TAGGERMODELS.put("English bidirectional",
+                PATHS.getEnglishBidirectionalPosModelFile());
+        TAGGERMODELS.put("English left 3 words",
+                PATHS.getEnglishLeft3WordsPosModelFile());
+        TAGGERMODELS.put("English left 3 words caseless",
+                PATHS.getEnglishLeft3WordsCaselessPosModelFile());
+        TAGGERMODELS.put("German fast",
                 PATHS.getGermanFastPosModelFile());
-        TAGGERMODELS.put("German accurate", 
-                PATHS.getGermanAccuratePosModelFile());
+        TAGGERMODELS.put("German hgc",
+                PATHS.getGermanHgcPosModelFile());
+        TAGGERMODELS.put("German dewac",
+                         PATHS.getGermanDewacPosModelFile());
+        TAGGERMODELS.put("French",
+                         PATHS.getFrenchPosModelFile());
     }
-    
+
+    private enum Language {
+        ENGLISH,
+        GERMAN,
+        FRENCH,
+        ARABIC;
+    }
+
     private MaxentTagger m_tagger;
-    
+
     private String m_modelName;
+
+    private Language m_lang;
 
     /**
      * Creates a new instance of StanfordDocumentTagger and loads internally the
-     * specified tagging model of the Stanford library to POS tag the 
+     * specified tagging model of the Stanford library to POS tag the
      * documents. If <code>setNeUnmodifiable</code> is set <code>true</code>
      * all recognized terms are set to unmodifiable.
      *
@@ -99,15 +113,26 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      * @throws IOException If model can not be red.
      */
     public StanfordDocumentTagger(final boolean setNeUnmodifiable,
-            final String model) 
+            final String model)
     throws ClassNotFoundException, IOException {
         super(setNeUnmodifiable);
         if (!TAGGERMODELS.containsKey(model)) {
-            throw new IllegalArgumentException("Model \"" + model 
+            throw new IllegalArgumentException("Model \"" + model
                     + "\" does not exists.");
         }
         m_tagger = new MaxentTagger(TAGGERMODELS.get(model));
         m_modelName = model;
+
+        if (m_modelName.contains("German")) {
+            m_lang = Language.GERMAN;
+        } else if (m_modelName.contains("English")) {
+            m_lang = Language.ENGLISH;
+        } else if (m_modelName.contains("French")) {
+            m_lang = Language.FRENCH;
+        } else {
+            throw new IllegalArgumentException(
+                    "Language could not be specified from model!");
+        }
     }
 
     /**
@@ -116,8 +141,10 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
     @Override
     protected List<Tag> getTags(final String tag) {
         List<Tag> tags = new ArrayList<Tag>();
-        if (m_modelName.contains("German")) {
+        if (m_lang.equals(Language.GERMAN)) {
             tags.add(STTSPartOfSpeechTag.stringToTag(tag));
+        } else if (m_lang.equals(Language.FRENCH)) {
+            tags.add(FrenchTreebankTag.stringToTag(tag));
         } else {
             tags.add(PartOfSpeechTag.stringToTag(tag));
         }
@@ -136,7 +163,7 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
             }
         }
         ArrayList<TaggedWord> taggedWords = m_tagger.tagSentence(wordList);
-        
+
         List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(
                 wordList.size());
         for (TaggedWord tw : taggedWords) {
