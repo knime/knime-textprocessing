@@ -112,6 +112,15 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
 
     /**
      * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public String getName() {
+        return "PUBMED";
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public int numberOfResults(final Query query) throws Exception {

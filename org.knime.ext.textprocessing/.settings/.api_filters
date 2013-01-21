@@ -6104,6 +6104,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/grabber/DocumentGrabber.java" type="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabber">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabber"/>
+                <message_argument value="getName()"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/tagging/opennlpner/OpenNlpModel.java" type="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpenNlpModel">
         <filter id="338792546">
             <message_arguments>

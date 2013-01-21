@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="org.knime.ext.textprocessing.TagSet" name="TagSet" schema="schema/org.knime.ext.textprocessing.TagSet.exsd"/>
+   <extension-point id="org.knime.ext.textprocessing.DocumentGrabber" name="DocumentGrabber" schema="schema/org.knime.ext.textprocessing.DocumentGrabber.exsd"/>
    <extension
          point="org.knime.workbench.repository.categories">
       <category
