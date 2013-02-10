@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcFrequencies.png" type="Learner">
+    <name>NGram creator</name>
+    <shortDescription>Creates ngrams of documents.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node creates ngrams from the documents of the input table
+            and counts their frequencies. 
+            It can be specified whether word or character ngrams are created.
+            Furthermore it can be specified whether the output table is of a 
+            bag of words like structure or a data table containing ngrams and
+            their frequencies in the corpus and documents.     
+        </intro>
+        <option name="N">
+            The N value for ngram creation.
+        </option>
+        <option name="NGram type">
+            The type (Word or Character) specifies whether word or character
+            ngrams are created. 
+        </option>
+        <option name="Document column">
+            The column containing the input documents to create the ngrams of.
+        </option>
+        <option name="Output table">
+            Specifies the structure of the output data table. The "Ngram 
+            frequencies" option creates an output table consisting of all
+            ngrams and their frequencies in the complete corpus, as well as
+            the documents and sentences or words. 
+            Please note that this option is memory consuming for a large number
+            of documents.<br/>
+            
+            The "NGram bag of words"
+            option creates an output data table consisting of ngram and
+            document tuples. A tuple represents the occurrence of an ngram
+            in a document. Additionally the frequency column contains the
+            number of occurrences of the ngram in the document. This option
+            can also be applied on a large set of documents.
+        </option>
+        <option name="Number of maximal parallel processes">
+            Specifies the maximal number of parallel processes running for
+            ngram computation.
+        </option>
+        <option name="Number of documents to process in one process">
+            Specifies the number of documents to be processed by a single
+            process.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents.</inPort>    
+        <outPort name="Ngrams" index="0">The output table
+        containing the ngrams and their corresponding frequencies,
+        or a bag of ngrams.</outPort>
+    </ports>
+</knimeNode>

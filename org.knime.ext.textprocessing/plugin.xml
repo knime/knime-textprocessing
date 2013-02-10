@@ -361,6 +361,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/frequencies"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.ngram.NGramNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.misc.ngram.NGramNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
