@@ -113,6 +113,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
 
     private final SettingsModelBoolean m_checkTags = createCheckTagsModel();
 
+    private final SettingsModelBoolean m_skipMetaInfo = createSkipMetaInfoSection();
+
     private final SettingsModelString m_coocLevel =
         createCoocLevelModel();
 
@@ -139,6 +141,13 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      */
     static SettingsModelBoolean createCheckTagsModel() {
         return new SettingsModelBoolean("checkTags", true);
+    }
+
+    /**
+     * @return the check term tags model
+     */
+    static SettingsModelBoolean createSkipMetaInfoSection() {
+        return new SettingsModelBoolean("skipMetaInfoSection", false);
     }
 
     /**
@@ -245,6 +254,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             exec.createDataContainer(createResultSpec(spec));
         DataCell previousDocCell = null;
         final boolean checkTags = m_checkTags.getBooleanValue();
+        final boolean skipMetaInfo = m_skipMetaInfo.getBooleanValue();
         TermChecker terms = new TermChecker(checkTags);
         int docRowCounter = 0;
         int totalRowCounter = 0;
@@ -281,7 +291,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             } else {
                 pool.enqueue(processDocument(myExec, rowCount,
                         progressCounter, docRowCounter, semaphore, rowId, dc,
-                        previousDocCell, terms, checkTags));
+                        previousDocCell, terms, skipMetaInfo, checkTags));
                 previousDocCell = docCell;
                 terms = new TermChecker(checkTags);
                 docRowCounter = 0;
@@ -291,7 +301,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         exec.setMessage("Processing documents...");
         pool.enqueue(processDocument(myExec, rowCount, progressCounter,
                 docRowCounter, semaphore, rowId, dc, previousDocCell,
-                terms, checkTags));
+                terms, skipMetaInfo, checkTags));
         pool.waitForTermination();
         dc.close();
         return new BufferedDataTable[] {dc.getTable()};
@@ -301,7 +311,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             final int totalRowCount, final AtomicInteger progressCounter,
             final int docRowCounter, final Semaphore semaphore,
             final AtomicInteger rowId, final BufferedDataContainer dc,
-            final DataCell docCell, final TermChecker terms,
+            final DataCell docCell, final TermChecker terms, final boolean skipMetaInformation,
             final boolean checkTags)
     throws CanceledExecutionException {
         exec.checkCanceled();
@@ -333,6 +343,10 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                                     annotation)
                             || SectionAnnotation.JOURNAL_TITLE.equals(
                                     annotation);
+                        if (skipMetaInformation && SectionAnnotation.META_INFORMATION.equals(annotation)) {
+                            //this is a meta information section that should be skipped -> continue
+                            continue;
+                        }
                         final List<Paragraph> paragraphs =
                             section.getParagraphs();
                         for (final Paragraph paragraph : paragraphs) {
@@ -652,6 +666,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         m_procCount.saveSettingsTo(settings);
         m_checkTags.saveSettingsTo(settings);
         m_coocLevel.saveSettingsTo(settings);
+        m_skipMetaInfo.saveSettingsTo(settings);
     }
 
     /**
@@ -680,6 +695,12 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         m_procCount.loadSettingsFrom(settings);
         m_checkTags.loadSettingsFrom(settings);
         m_coocLevel.loadSettingsFrom(settings);
+        try {
+            m_skipMetaInfo.loadSettingsFrom(settings);
+        } catch (Exception e) {
+            //new intorduce in KNIME 2.8
+            m_skipMetaInfo.setBooleanValue(false);
+        }
     }
 
     /**

@@ -53,7 +53,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
-
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.TermValue;
 
@@ -88,6 +87,9 @@ public class CooccurrenceCounterNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(
                 CooccurrenceCounterNodeModel.createCheckTagsModel(),
                 "Check term tags"));
+        addDialogComponent(new DialogComponentBoolean(
+                  CooccurrenceCounterNodeModel.createSkipMetaInfoSection(),
+                  "Skip meta information sections"));
         addDialogComponent(new DialogComponentBoolean(
                 CooccurrenceCounterNodeModel.createSortModel(),
                 "Sort input table"));

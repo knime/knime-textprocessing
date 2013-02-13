@@ -40,6 +40,9 @@
             if this option is selected. If this option is not selected only 
             their textual representation is checked when matching terms.
          </option>
+         <option name="Skip meta information sections">
+            Select this option to ignore meta information sections.
+         </option>
 		 <option name="Sort input table">
             Unselect this option if the input table is already sorted by the
             document column.
