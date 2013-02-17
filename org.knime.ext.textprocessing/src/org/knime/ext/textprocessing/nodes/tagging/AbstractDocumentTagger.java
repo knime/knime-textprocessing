@@ -142,8 +142,15 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             for (Paragraph p : s.getParagraphs()) {
                 List<Sentence> newSentenceList = new ArrayList<Sentence>();
                 for (Sentence sn : p.getSentences()) {
-                    // tag sentence
-                    Sentence taggedSentence = tagSentence(sn);
+                    final Sentence taggedSentence;
+                    if (sn.getTerms().isEmpty()) {
+                        //do not try to tag empty sentences but keep the original one
+                        //to prevent exceptions in the taggers
+                        taggedSentence = sn;
+                    } else {
+                        // tag sentence
+                        taggedSentence = tagSentence(sn);
+                    }
                     // add tagged sentence to document
                     newSentenceList.add(taggedSentence);
                 }
