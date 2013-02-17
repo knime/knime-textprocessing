@@ -26,15 +26,19 @@
 package org.knime.ext.textprocessing.nodes.view.tagcloud.outport;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.AbstractTagCloud;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeExponential;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLinear;
@@ -110,9 +114,21 @@ public final class TagCloudGeneral {
     public static final HashMap<String, Color> getStandardColorMap() {
         HashMap<String, Color> color = new HashMap<String, Color>();
 
-        String[] strlist =
-                {"J", "V", "W", "F", "N", "S", "D", "E", "C", "I", "L", "U",
-                "M", AbstractTagCloud.CFG_UNKNOWN_TAG_COLOR, "P", "R", "T"};
+        // collect all available tags
+        Set<String> tagsFirstLetters = new HashSet<String>();
+        Set<String> tagTypes = TagFactory.getInstance().getTagTypes();
+        for (String tagType : tagTypes) {
+            List<String> tags = TagFactory.getInstance()
+                    .getTagSetByType(tagType).asStringList();
+            for (String tag : tags) {
+                tagsFirstLetters.add(tag);
+            }
+        }
+        // add unknown tag color
+        tagsFirstLetters.add(AbstractTagCloud.CFG_UNKNOWN_TAG_COLOR);
+        String[] strlist = tagsFirstLetters.toArray(new String[]{});
+        // sort tags
+        Arrays.sort(strlist);
 
         float fac = 360f / strlist.length;
         for (int i = 0; i < strlist.length; i++) {

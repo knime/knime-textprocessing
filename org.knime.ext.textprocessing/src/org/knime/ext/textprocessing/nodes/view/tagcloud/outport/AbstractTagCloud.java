@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -155,9 +155,9 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
 
     /** default value for the maximal font.*/
     protected static final int DEFAULT_MAXFONT = 50;
-    
+
     protected static final int MAX_FONT = 150;
-    
+
     protected static final int MIN_FONT = 1;
 
     /** default value for the alpha value.*/
@@ -344,7 +344,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         HashMap<Term, Term> termtags = new HashMap<Term, Term>();
 
         for (final DataRow row : data) {
-            if (!row.getCell(termColumn).isMissing() 
+            if (!row.getCell(termColumn).isMissing()
                     && !row.getCell(valueColumn).isMissing()) {
                 Term term =
                         ((TermValue)row.getCell(termColumn))
@@ -355,10 +355,10 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                                 .getDoubleValue();
                 RowKey rowk = row.getKey();
                 // m_hiliteTool.put(rowk, term);
-    
+
                 if (m_hashi.containsKey(termwithouttags)) {
                     i = m_hashi.get(termwithouttags).addFreq(i, rowk);
-    
+
                 } else {
                     m_hashi.put(termwithouttags, createTagCloudData(
                             termwithouttags, i, rowk));
@@ -374,7 +374,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                 }
                 if (i > m_maxvalue) {
                     m_maxvalue = i;
-                }            
+                }
             }
         }
 
@@ -405,7 +405,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             final int termColumn, final int valueColumn) {
 
         for (final DataRow row : data) {
-            if (!row.getCell(termColumn).isMissing() 
+            if (!row.getCell(termColumn).isMissing()
                     && !row.getCell(valueColumn).isMissing()) {
                  Term term =
                         ((TermValue)row.getCell(termColumn))
@@ -414,10 +414,10 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                         ((DoubleValue)row.getCell(valueColumn))
                                 .getDoubleValue();
                 RowKey rowk = row.getKey();
-    
+
                 if (m_hashi.containsKey(term)) {
                     i = m_hashi.get(term).addFreq(i, rowk);
-    
+
                 } else {
                     m_hashi.put(term, createTagCloudData(term, i, rowk));
                     Color c = data.getDataTableSpec()
@@ -478,7 +478,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                     c = standard;
                     copy.remove(CFG_UNKNOWN_TAG_COLOR);
                 } else {
-                    String now = itt.next().getTagValue().substring(0, 1);
+                    String now = itt.next().getTagValue();
                     if (m_color.containsKey(now)) {
                         c = m_color.get(now);
                         copy.remove(now);
@@ -523,7 +523,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             }
         }
     }
-    
+
     /**
      * Changes the minimal and maximal font size. These two bounds are used for
      * the font size distribution algorithm.
@@ -641,7 +641,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         } else if (m_bold <= 0) {
             return m_maxvalue + 1;
         }
-        double maxvalue = m_minvalue + ((m_maxvalue - m_minvalue) 
+        double maxvalue = m_minvalue + ((m_maxvalue - m_minvalue)
                 * (99 - m_bold) / (99));
         return maxvalue;
     }
@@ -695,7 +695,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             Iterator<Tag> itt = tcd.getTerm().getTags().iterator();
             if (itt.hasNext()) {
                 try {
-                    String now = itt.next().getTagValue().substring(0, 1);
+                    String now = itt.next().getTagValue();
                     if (m_color.containsKey(now)) {
                         tcd.changeTextcolor(m_color.get(now));
                     } else {
@@ -1052,8 +1052,8 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     protected void rebuiltColorTable() {
         if (m_dataarray != null && m_dataarray.length > 0) {
             m_color = new HashMap<String, Color>();
-            HashMap<String, Color> original
-                    = TagCloudGeneral.getStandardColorMap();
+            HashMap<String, Color> original =
+                    TagCloudGeneral.getStandardColorMap();
 
             for (int i = 0; i < m_dataarray.length; i++) {
                 TC tcd = m_dataarray[i];
@@ -1064,19 +1064,17 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
 
                         String newString = itt.next().getTagValue();
                         if (newString.length() > 0) {
-                            newString = newString.substring(0, 1);
                             if (original.containsKey(newString)) {
-                             now = newString;
+                                now = newString;
                             } else {
                                 now = CFG_UNKNOWN_TAG_COLOR;
-                        }
+                            }
                         } else {
                             now = CFG_UNKNOWN_TAG_COLOR;
                         }
                     }
                     if (!m_color.containsKey(now)) {
-                        Color c =
-                           new Color(tcd.getColor().getRGB(), false);
+                        Color c = new Color(tcd.getColor().getRGB(), false);
                         m_color.put(now, c);
                     }
                 }
