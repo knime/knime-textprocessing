@@ -240,11 +240,12 @@ public class DocumentViewPanel extends JSplitPane {
         m_searchButton.addActionListener(new SearchListener());
         icon = ImgLoaderUtil.loadImageIcon("search.png", "Search");
         m_searchButton.setIcon(icon);
-        m_searchButton.setToolTipText("click to search");
+        m_searchButton.setToolTipText("click to hilite search results");
         searchToolbar.add(m_searchButton);
-        m_searchField = new JTextField();
+        m_searchField = new JTextField("[a-z]+");
         m_searchField.setColumns(10);
         m_searchField.getDocument().addDocumentListener(new SearchListener());
+        m_searchField.setToolTipText("enter regular expression");
         searchToolbar.add(m_searchField);
 
         // next and previous buttons
@@ -324,6 +325,15 @@ public class DocumentViewPanel extends JSplitPane {
         return buffer.toString();
     }
 
+    private static boolean searchMatch(final Term term, final String search) {
+        try {
+            return term.getText().toLowerCase().matches(search);
+        } catch (Exception e) {
+            // do nothing
+        }
+        return false;
+    }
+
     private String getParagraphText(final Paragraph p,
             final boolean hiliteTags, final String tagType,
             final String search, final boolean hiliteSearch) {
@@ -342,8 +352,7 @@ public class DocumentViewPanel extends JSplitPane {
 
                 // search hiliting
                 if (hiliteSearch && search != null) {
-                    if (search.toLowerCase().equals(t.getText().toLowerCase()))
-                    {
+                    if (searchMatch(t, search)) {
                         paramStr.append("<font style=\"BACKGROUND-COLOR: green;"
                                 + "COLOR: white\">"
                                 + t.getText() + "</font>");

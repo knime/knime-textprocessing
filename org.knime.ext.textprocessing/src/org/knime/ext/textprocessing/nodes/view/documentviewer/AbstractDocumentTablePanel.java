@@ -42,7 +42,10 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 
+import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentSource;
 
 /**
  * A panel providing the functionality of displaying a specified set of
@@ -105,15 +108,53 @@ implements DocumentProvider {
         JPanel panel = new JPanel(new BorderLayout());
 
         // TABLE
-        Object[][] docList = new Object[m_docs.size()][2];
+        Object[][] docList = new Object[m_docs.size()][5];
         int count = 0;
         for (Document d : m_docs) {
             docList[count][0] = Integer.toString(count + 1);
             docList[count][1] = d.getTitle();
+
+            String authors = "";
+            int i = 0;
+            for (Author a : d.getAuthors()) {
+                authors += a.getFirstName() + " " + a.getLastName();
+
+                if (i < d.getAuthors().size() - 1) {
+                    authors += ", ";
+                }
+                i++;
+            }
+            docList[count][2] = authors;
+
+            String sources = "";
+            i = 0;
+            for (DocumentSource src : d.getSources()) {
+                sources += src.getSourceName();
+
+                if (i < d.getSources().size() - 1) {
+                    sources += ", ";
+                }
+                i++;
+            }
+            docList[count][3] = sources;
+
+            String categories = "";
+            i = 0;
+            for (DocumentCategory cat : d.getCategories()) {
+                categories += cat.getCategoryName();
+
+                if (i < d.getCategories().size() - 1) {
+                    categories += ", ";
+                }
+                i++;
+            }
+            docList[count][4] = categories;
+
             count++;
         }
 
-        m_table = new JTable(docList, new Object[]{"#", "Document title"}) {
+        m_table = new JTable(docList, new Object[]{
+                "#", "Document title", "Authors", "Source", "Category"}) {
             @Override
             public boolean isCellEditable(final int x, final int y) {
                 return false;
