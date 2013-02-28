@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2008 (thiel): created
  */
@@ -27,7 +27,7 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.knime.core.data.DataRow;
@@ -54,7 +54,7 @@ import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 
 /**
- * 
+ *
  * @author thiel, University of Konstanz
  */
 public class DictionaryTaggerNodeModel extends NodeModel {
@@ -63,48 +63,48 @@ public class DictionaryTaggerNodeModel extends NodeModel {
      * The default value of the terms unmodifiable flag.
      */
     public static final boolean DEFAULT_UNMODIFIABLE = true;
-    
+
     /**
      * The default value of the case sensitive setting.
      */
     public static final boolean DEFAULT_CASE_SENSITIVE = true;
-    
+
     /**
      * The default value of the default tag.
      */
-    public static final String DEFAULT_TAG = 
+    public static final String DEFAULT_TAG =
         NamedEntityTag.UNKNOWN.getTag().getTagValue();
-    
+
     /**
      * The default tag type.
      */
     public static final String DEFAULT_TAG_TYPE = "NE";
-    
+
     public static final int DICT_TABLE_INDEX = 1;
-    
+
     public static final int DATA_TABLE_INDEX = 0;
-    
-    
+
+
     private int m_docColIndex = -1;
-    
-    private SettingsModelBoolean m_setUnmodifiableModel = 
+
+    private SettingsModelBoolean m_setUnmodifiableModel =
         DictionaryTaggerNodeDialog.createSetUnmodifiableModel();
-    
-    private SettingsModelString m_tagModel = 
+
+    private SettingsModelString m_tagModel =
         DictionaryTaggerNodeDialog.createTagModel();
-    
-    private SettingsModelString m_tagTypeModel = 
-        DictionaryTaggerNodeDialog.createTagTypeModel();    
-    
-    private SettingsModelBoolean m_caseSensitiveModel = 
+
+    private SettingsModelString m_tagTypeModel =
+        DictionaryTaggerNodeDialog.createTagTypeModel();
+
+    private SettingsModelBoolean m_caseSensitiveModel =
         DictionaryTaggerNodeDialog.createCaseSensitiveModel();
-    
-    private SettingsModelString m_columnModel = 
+
+    private SettingsModelString m_columnModel =
         DictionaryTaggerNodeDialog.createColumnModel();
-    
+
     private DocumentDataTableBuilder m_dtBuilder;
-    
-    
+
+
     /**
      * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two
      * table in ports and one out port.
@@ -113,7 +113,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         super(2, 1);
         m_dtBuilder = new DocumentDataTableBuilder();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -124,7 +124,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
-    private void checkDataTableSpec(final DataTableSpec[] specs) 
+    private void checkDataTableSpec(final DataTableSpec[] specs)
     throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(
                 specs[DICT_TABLE_INDEX]);
@@ -132,8 +132,8 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         verfier = new DataTableSpecVerifier(specs[DATA_TABLE_INDEX]);
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
-    }      
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -143,19 +143,19 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         checkDataTableSpec(new DataTableSpec[]{
                 inData[0].getDataTableSpec(), inData[1].getDataTableSpec()
         });
-        
+
         // Read table with dictionary
-        int dictIndex = 
+        int dictIndex =
             inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(
                 m_columnModel.getStringValue());
-        Set<String> namedEntities = new HashSet<String>();
+        Set<String> namedEntities = new LinkedHashSet<String>();
         RowIterator it = inData[DICT_TABLE_INDEX].iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
             namedEntities.add(
                     ((StringValue)row.getCell(dictIndex)).getStringValue());
         }
-        
+
         // tag documents
         String tagTypeStr = m_tagTypeModel.getStringValue();
         String tagStr = m_tagModel.getStringValue();
@@ -164,24 +164,24 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         DocumentTagger tagger = new DictionaryDocumentTagger(
                 m_setUnmodifiableModel.getBooleanValue(), namedEntities, tag,
                 m_caseSensitiveModel.getBooleanValue());
-        
+
         it = inData[DATA_TABLE_INDEX].iterator();
         int rowCount = inData[DATA_TABLE_INDEX].getRowCount();
         int currDoc = 1;
         m_dtBuilder.openDataTable(exec);
         while (it.hasNext()) {
-            
+
             double progress = (double)currDoc / (double)rowCount;
-            exec.setProgress(progress, "Tagging document " + currDoc + " of " 
+            exec.setProgress(progress, "Tagging document " + currDoc + " of "
                     + rowCount);
             exec.checkCanceled();
             currDoc++;
-            
+
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
             m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
         }
-        
+
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
@@ -192,7 +192,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -235,7 +235,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -245,7 +245,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
