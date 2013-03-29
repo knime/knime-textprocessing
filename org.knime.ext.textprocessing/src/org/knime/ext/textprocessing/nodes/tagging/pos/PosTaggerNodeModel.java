@@ -106,7 +106,8 @@ public class PosTaggerNodeModel extends NodeModel {
 
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
+            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()),
+                                    row.getKey());
         }
 
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};

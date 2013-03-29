@@ -58,12 +58,12 @@ public class StanfordTaggerNodeModel extends NodeModel {
      * Default tagger model.
      */
     public static final String DEF_MODEL = "English left 3 words";
-    
+
     private int m_docColIndex = -1;
 
     private DocumentDataTableBuilder m_dtBuilder;
-    
-    private SettingsModelString m_taggerModelModel = 
+
+    private SettingsModelString m_taggerModelModel =
         StanfordTaggerNodeDialog.createTaggerModelModel();
 
     /**
@@ -99,7 +99,7 @@ public class StanfordTaggerNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        DocumentTagger tagger = new StanfordDocumentTagger(false, 
+        DocumentTagger tagger = new StanfordDocumentTagger(false,
                 m_taggerModelModel.getStringValue());
 
         RowIterator it = inData[0].iterator();
@@ -116,7 +116,8 @@ public class StanfordTaggerNodeModel extends NodeModel {
 
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
+            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()),
+                                    row.getKey());
         }
 
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};

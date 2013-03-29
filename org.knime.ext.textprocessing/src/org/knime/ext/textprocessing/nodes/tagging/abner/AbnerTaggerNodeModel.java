@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   28.02.2008 (Kilian Thiel): created
  */
@@ -47,10 +47,10 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger. 
- * Extends {@link org.knime.core.node.NodeModel} and provides methods to 
+ * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger.
+ * Extends {@link org.knime.core.node.NodeModel} and provides methods to
  * configure and execute the node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class AbnerTaggerNodeModel extends NodeModel {
@@ -59,23 +59,23 @@ public class AbnerTaggerNodeModel extends NodeModel {
      * The default value of the terms unmodifiable flag.
      */
     public static final boolean DEFAULT_UNMODIFIABLE = true;
-    
+
     /**
      * The default value of the ABNER tagging model.
      */
-    public static final String DEF_ABNERMODEL = 
-        AbnerDocumentTagger.MODEL_BIOCREATIVE; 
-    
+    public static final String DEF_ABNERMODEL =
+        AbnerDocumentTagger.MODEL_BIOCREATIVE;
+
     private int m_docColIndex = -1;
-    
-    private SettingsModelBoolean m_setUnmodifiableModel = 
+
+    private SettingsModelBoolean m_setUnmodifiableModel =
         AbnerTaggerNodeDialog.createSetUnmodifiableModel();
-    
-    private SettingsModelString m_abnerTaggingModel = 
+
+    private SettingsModelString m_abnerTaggingModel =
         AbnerTaggerNodeDialog.createAbnerModelModel();
-    
+
     private DocumentDataTableBuilder m_dtBuilder;
-    
+
     /**
      * Creates a new instance of <code>AbnerTaggerNodeModel</code> with one
      * table in and one out port.
@@ -84,7 +84,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
         super(1, 1);
         m_dtBuilder = new DocumentDataTableBuilder();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -95,13 +95,13 @@ public class AbnerTaggerNodeModel extends NodeModel {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
-    private void checkDataTableSpec(final DataTableSpec spec) 
+    private void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
         verfier.verifyDocumentCell(true);
         m_docColIndex = verfier.getDocumentCellIndex();
-    }  
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -109,31 +109,32 @@ public class AbnerTaggerNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        
+
         DocumentTagger tagger = new AbnerDocumentTagger(
-                m_setUnmodifiableModel.getBooleanValue(), 
+                m_setUnmodifiableModel.getBooleanValue(),
                 m_abnerTaggingModel.getStringValue());
-        
+
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
         m_dtBuilder.openDataTable(exec);
         while (it.hasNext()) {
-            
+
             double progress = (double)currDoc / (double)rowCount;
-            exec.setProgress(progress, "Tagging document " + currDoc + " of " 
+            exec.setProgress(progress, "Tagging document " + currDoc + " of "
                     + rowCount);
             exec.checkCanceled();
             currDoc++;
-            
+
             DataRow row = it.next();
             DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()));
+            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()),
+                                    row.getKey());
         }
-        
+
         return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
-    }   
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -162,12 +163,12 @@ public class AbnerTaggerNodeModel extends NodeModel {
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
     }
@@ -176,15 +177,15 @@ public class AbnerTaggerNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void reset() {
-    }     
+    }
 }
