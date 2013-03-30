@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   14.02.2008 (Kilian Thiel): created
  */
@@ -28,8 +28,10 @@ package org.knime.ext.textprocessing.data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
@@ -43,13 +45,13 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
  * <br/>
  * Example for building up a {@link org.knime.ext.textprocessing.data.Document}:
  * <br/>
- * <code> 
+ * <code>
  * DocumentBuilder db = new DocumentBuilder();<br/>
  * db.addAuthor(new Author("John", "Public"));<br/>
- * // add some more details like 
- * {@link org.knime.ext.textprocessing.data.DocumentType}, 
+ * // add some more details like
+ * {@link org.knime.ext.textprocessing.data.DocumentType},
  * {@link org.knime.ext.textprocessing.data.DocumentSource}, etc. ... <br/>
- * // add a title 
+ * // add a title
  * db.addTitle("A simple title");<br/>
  * // add some sentences <br/>
  * db.addSentence("This is a simple sentence.");<br/>
@@ -61,7 +63,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
  * // finally create document<br/>
  * Document d = db.createDocument(); <br/>
  * </code>
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentBuilder {
@@ -73,8 +75,6 @@ public class DocumentBuilder {
     private List<Paragraph> m_paragraphs = new ArrayList<Paragraph>();
 
     private List<Section> m_sections = new ArrayList<Section>();
-
-    // private Hashtable<String, Word> m_words = new Hashtable<String, Word>();
 
     private PublicationDate m_date = new PublicationDate();
 
@@ -89,6 +89,8 @@ public class DocumentBuilder {
     private Set<DocumentCategory> m_categories =
             new HashSet<DocumentCategory>();
 
+    private Map<String, String> m_metaInfo = new HashMap<String, String>();
+
     private Tokenizer m_sentenceTokenizer = DefaultTokenization
             .getSentenceTokenizer();
 
@@ -97,8 +99,7 @@ public class DocumentBuilder {
     /**
      * Creates new empty instance of <code>DocumentBuilder</code>.
      */
-    public DocumentBuilder() { /* empty */
-    }
+    public DocumentBuilder() { /* empty */ }
 
     /**
      * Creates new instance of <code>DocumentBuilder</code> and sets the meta
@@ -106,7 +107,7 @@ public class DocumentBuilder {
      * The meta information to copy is: the documents authors, the source, the
      * category, the type, the file and the publication date.<br/>
      * The text data like title or sections are not copied.
-     * 
+     *
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
@@ -133,24 +134,56 @@ public class DocumentBuilder {
 
         // Add publication date
         setPublicationDate(doc.getPubDate());
+
+        // Add meta info
+        addMetaInformation(doc.getMetaInformation());
     }
 
     /**
      * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance
      * with the specified data, like authors, sections, etc.
-     * 
+     *
      * @return a new {@link org.knime.ext.textprocessing.data.Document} instance
      *         with the specified data.
      */
     public Document createDocument() {
         return new Document(m_sections, m_type, m_authors, m_sources,
-                m_categories, m_date, m_docFile);
+                m_categories, m_date, m_docFile,
+                new DocumentMetaInfo(m_metaInfo));
+    }
+
+    /**
+     * Adds the key value pair to the meta information of the document.
+     * @param key The key of the meta information.
+     * @param value The value of the meta information.
+     * @since 2.8
+     */
+    public void addMetaInformation(final String key, final String value) {
+        if (key != null && value != null) {
+            m_metaInfo.put(key, value);
+        }
+    }
+
+    /**
+     * Adds all the key value pairs of the given {@link DocumentMetaInfo} to the
+     * meta info section of the current document to build.
+     * @param metaInfo The {@link DocumentMetaInfo} containing the key value
+     * pairs to add.
+     * @since 2.8
+     */
+    public void addMetaInformation(final DocumentMetaInfo metaInfo) {
+        if (metaInfo != null && metaInfo.getClass() != null
+                && metaInfo.getMetaInfoKeys().size() > 0) {
+            for (String key : metaInfo.getMetaInfoKeys()) {
+                addMetaInformation(key, metaInfo.getMetaInfoValue(key));
+            }
+        }
     }
 
     /**
      * Adds the given {@link org.knime.ext.textprocessing.data.Author} to the
      * list of authors.
-     * 
+     *
      * @param author the author to add to the authors list.
      */
     public void addAuthor(final Author author) {
@@ -162,7 +195,7 @@ public class DocumentBuilder {
     /**
      * Adds the given {@link org.knime.ext.textprocessing.data.DocumentSource}
      * to the list of sources.
-     * 
+     *
      * @param source the source to add to the sources list.
      */
     public void addDocumentSource(final DocumentSource source) {
@@ -174,7 +207,7 @@ public class DocumentBuilder {
     /**
      * Adds the given {@link org.knime.ext.textprocessing.data.DocumentCategory}
      * to the list of categories.
-     * 
+     *
      * @param category the category to add to the categories list.
      */
     public void addDocumentCategory(final DocumentCategory category) {
@@ -216,7 +249,7 @@ public class DocumentBuilder {
      * Tokenizes the given title and add it as a
      * {@link org.knime.ext.textprocessing.data.Section} with <code>TITLE</code>
      * annotation to the list of sections.
-     * 
+     *
      * @param title The title to tokenize and to add as section.
      */
     public void addTitle(final String title) {
@@ -268,7 +301,7 @@ public class DocumentBuilder {
      * of paragraphs to the new section a new empty list is created. The given
      * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is added to
      * the section and specifies its role.
-     * 
+     *
      * @param annotation The
      *            {@link org.knime.ext.textprocessing.data.SectionAnnotation} to
      *            add to the section.
@@ -283,7 +316,7 @@ public class DocumentBuilder {
 
     /**
      * Adds the given term to the list of terms.
-     * 
+     *
      * @param term The term to add to add to the current list of terms.
      */
     public void addTerm(final Term term) {
@@ -299,7 +332,7 @@ public class DocumentBuilder {
      * Tokenizes the given sentence and adds it as
      * {@link org.knime.ext.textprocessing.data.Sentence} to the current list of
      * sentences.
-     * 
+     *
      * @param sentence The sentence to tokenize and to add to the current list
      *            of sentences.
      */
@@ -315,7 +348,7 @@ public class DocumentBuilder {
 
     /**
      * Adds the given sentence to the list of sentences.
-     * 
+     *
      * @param sentence The sentence to add to add to the current list of
      *            sentences.
      */
@@ -329,7 +362,7 @@ public class DocumentBuilder {
      * Tokenizes the given paragraph and adds it as a
      * {@link org.knime.ext.textprocessing.data.Paragraph} to the current list
      * of paragraphs.
-     * 
+     *
      * @param paragraph The paragraph to tokenize and to add to the current list
      *            of paragraphs.
      */
@@ -345,7 +378,7 @@ public class DocumentBuilder {
 
     /**
      * Add the given paragraph to the current list of paragraphs.
-     * 
+     *
      * @param paragraph The paragraph to add to the current list of paragraphs.
      */
     public void addParagraph(final Paragraph paragraph) {
@@ -358,7 +391,7 @@ public class DocumentBuilder {
      * Tokenizes the given section and adds it as a instance of
      * {@link org.knime.ext.textprocessing.data.Section} to the current list of
      * sections.
-     * 
+     *
      * @param section The section to tokenize and to add to the current section
      *            list.
      * @param annotation The annotation of the section to create.
@@ -376,7 +409,7 @@ public class DocumentBuilder {
 
     /**
      * Adds the given section to the current list of sections.
-     * 
+     *
      * @param section The section to add to the current section list.
      */
     public void addSection(final Section section) {
@@ -386,9 +419,18 @@ public class DocumentBuilder {
     }
 
     /**
+     * Sets the given sections as sections to add to the document.
+     * @param sections The sections to add to the document.
+     * @since 2.8
+     */
+    public void setSections(final List<Section> sections) {
+        m_sections = sections;
+    }
+
+    /**
      * Tokenizes the given string and creates a section out of it. The given
      * annotation represents the sections annotation.
-     * 
+     *
      * @param section The string representing the text of the section.
      * @param annotation The annotation representing the role of the section.
      * @return The created instance of
@@ -412,7 +454,7 @@ public class DocumentBuilder {
 
     /**
      * Tokenizes the given string and creates a paragraph out of it.
-     * 
+     *
      * @param paragraph The string representing the text of the paragraph.
      * @return The created instance of
      *         {@link org.knime.ext.textprocessing.data.Paragraph}.
@@ -431,7 +473,7 @@ public class DocumentBuilder {
 
     /**
      * Tokenizes the given string and creates a sentence out of it.
-     * 
+     *
      * @param sentence The string representing the text of the sentence.
      * @return The created instance of
      *         {@link org.knime.ext.textprocessing.data.Sentence}.
@@ -451,7 +493,7 @@ public class DocumentBuilder {
      * well as {@link org.knime.ext.textprocessing.data.Term instances} are
      * created, for each string one. The words are registered and cached in the
      * word cache.
-     * 
+     *
      * @param words The list of string representing the words, to build a
      *            sentence out of.
      * @return The sentence build out of the given list of strings.

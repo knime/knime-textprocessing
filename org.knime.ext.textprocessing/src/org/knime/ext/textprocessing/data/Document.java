@@ -94,6 +94,8 @@ public class Document implements TextContainer, Serializable {
 
     private File m_docFile;
 
+    private DocumentMetaInfo m_metaInfo;
+
     /**
      * Length of the document in terms.
      */
@@ -104,8 +106,8 @@ public class Document implements TextContainer, Serializable {
     /**
      * Creates a new instance of <code>Document</code> with the given
      * parameters, like the documents sections, type, authors, sources,
-     * categories, publication date and the file of the document to set. If any
-     * of these parameters is <code>null</code> a
+     * categories, publication date, the file of the document and the meta
+     * information to set. If any of these parameters is <code>null</code> a
      * <code>NullPointerException</code> is thrown.
      *
      * @param sections The sections of the document to set. Sections are i.e.
@@ -120,13 +122,16 @@ public class Document implements TextContainer, Serializable {
      *            elections.
      * @param date The documents publication date to set.
      * @param documentFile The file containing the document.
+     * @param metaInfo The meta information of the document to set.
      * @throws NullPointerException If any of the parameters are set
      *             <code>null</code>.
+     * @since 2.8
      */
     Document(final List<Section> sections, final DocumentType type,
             final Set<Author> authors, final Set<DocumentSource> sources,
             final Set<DocumentCategory> categories, final PublicationDate date,
-            final File documentFile) throws NullPointerException {
+            final File documentFile, final DocumentMetaInfo metaInfo)
+                    throws NullPointerException {
 
         // sections
         if (sections == null) {
@@ -171,12 +176,49 @@ public class Document implements TextContainer, Serializable {
             m_docFile = documentFile;
         }
 
+        // the meta information
+        if (metaInfo == null) {
+            throw new NullPointerException(
+                    "The meta information may not be null!");
+        }
+
         m_pubDate = date;
         m_categories = categories;
         m_sources = sources;
         m_authors = authors;
         m_type = type;
         m_sections = sections;
+        m_metaInfo = metaInfo;
+    }
+
+    /**
+     * Creates a new instance of <code>Document</code> with the given
+     * parameters, like the documents sections, type, authors, sources,
+     * categories, publication date and the file of the document to set. If any
+     * of these parameters is <code>null</code> a
+     * <code>NullPointerException</code> is thrown.
+     *
+     * @param sections The sections of the document to set. Sections are i.e.
+     *            title, abstract chapters, etc.
+     * @param type The type of the document to set, i.e. book, transaction or
+     *            proceeding.
+     * @param authors The authors of the document.
+     * @param sources The sources of a document to set, specifying where the
+     *            documents stems from, i.e. Reuters, PubMed, etc.
+     * @param categories The categories of a document to set, specifying roughly
+     *            the topic of the document, i.e. breast cancer, presidential
+     *            elections.
+     * @param date The documents publication date to set.
+     * @param documentFile The file containing the document.
+     * @throws NullPointerException If any of the parameters are set
+     *             <code>null</code>.
+     */
+    Document(final List<Section> sections, final DocumentType type,
+             final Set<Author> authors, final Set<DocumentSource> sources,
+             final Set<DocumentCategory> categories, final PublicationDate date,
+             final File documentFile) throws NullPointerException {
+        this(sections, type, authors, sources, categories, date, documentFile,
+             new DocumentMetaInfo());
     }
 
     /**
@@ -263,6 +305,14 @@ public class Document implements TextContainer, Serializable {
      */
     public File getDocFile() {
         return m_docFile;
+    }
+
+    /**
+     * @return The meta information of the document.
+     * @since 2.8
+     */
+    public DocumentMetaInfo getMetaInformation() {
+        return m_metaInfo;
     }
 
     /**
@@ -398,6 +448,9 @@ public class Document implements TextContainer, Serializable {
             return false;
         } else if ((d.getPubDate() == null && m_pubDate != null)
                 || !d.getPubDate().equals(m_pubDate)) {
+            return false;
+        } else if ((d.getMetaInformation() == null && m_metaInfo != null)
+                || !d.getMetaInformation().equals(m_metaInfo)) {
             return false;
         }
 

@@ -373,6 +373,18 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.general.GeneralTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.general.GeneralTagFilterNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory">
+      </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

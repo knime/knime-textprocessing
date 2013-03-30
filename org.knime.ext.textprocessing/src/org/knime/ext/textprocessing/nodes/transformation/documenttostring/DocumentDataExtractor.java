@@ -34,6 +34,7 @@ import java.util.Set;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
 import org.knime.core.data.collection.CollectionCellFactory;
+import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.collection.SetCell;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.IntCell;
@@ -41,6 +42,7 @@ import org.knime.core.data.def.StringCell;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentMetaInfo;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
@@ -292,6 +294,30 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             return new IntCell(doc.getLength());
+        }
+    }),
+    /**
+     * Returns the meta info of a document.
+     * @since 2.8
+     */
+    METAINFO("Meta info", new Extractor() {
+        @Override
+        public DataType getDataType() {
+            return ListCell.getCollectionType(StringCell.TYPE);
+        }
+        @Override
+        public DataCell getValue(final Document doc) {
+            List<DataCell> strCells = new ArrayList<DataCell>();
+            DocumentMetaInfo metaInfo = doc.getMetaInformation();
+            if (metaInfo != null) {
+                for (String key : metaInfo.getMetaInfoKeys()) {
+                    String value = metaInfo.getMetaInfoValue(key);
+                    if (key != null && value != null) {
+                        strCells.add(new StringCell(key + ":" + value));
+                    }
+                }
+            }
+            return CollectionCellFactory.createListCell(strCells);
         }
     });
 

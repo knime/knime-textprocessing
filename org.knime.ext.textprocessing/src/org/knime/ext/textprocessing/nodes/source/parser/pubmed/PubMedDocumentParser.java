@@ -470,8 +470,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
             if (m_extractMetaData) {
                 if (m_pmid.length() > 0 && !m_pmidIsSet) {
                     if (m_currentDoc != null) {
-                        m_currentDoc.addSection("PubMed ID: " + m_pmid,
-                                SectionAnnotation.META_INFORMATION);
+                        m_currentDoc.addMetaInformation(PMID, m_pmid);
                     }
                     m_pmidIsSet = true;
                 }
@@ -489,12 +488,11 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 if (m_chemicalList != null && m_chemicalList.size() > 0) {
                     if (m_currentDoc != null) {
                         StringBuilder chemicalInfo = new StringBuilder();
-                        chemicalInfo.append("Chemical list: ");
                         for (String chem : m_chemicalList) {
                             chemicalInfo.append(chem + "; ");
                         }
-                        m_currentDoc.addSection(chemicalInfo.toString(),
-                                SectionAnnotation.META_INFORMATION);
+                        m_currentDoc.addMetaInformation(CHEMICAL_LIST,
+                                chemicalInfo.toString());
                     }
                 }
             }
@@ -503,12 +501,11 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 if (m_meshHeadingList != null && m_meshHeadingList.size() > 0) {
                     if (m_currentDoc != null) {
                         StringBuilder meshInfo = new StringBuilder();
-                        meshInfo.append("Mesh Heading list: ");
                         for (String chem : m_meshHeadingList) {
                             meshInfo.append(chem + "; ");
                         }
-                        m_currentDoc.addSection(meshInfo.toString(),
-                                SectionAnnotation.META_INFORMATION);
+                        m_currentDoc.addMetaInformation(MESH_HEADING_LIST,
+                                meshInfo.toString());
                     }
                 }
             }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator">
+    <name>Meta Info Inserter</name>
+    <shortDescription>Inserts key, values pairs as meta information to documents. 
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Inserts key, values pairs as meta information to documents. The keys and values must be provided as columns
+			of the input data table. For each document in the rows of the input table, the values of the specified key
+			and value columns are inserted as meta information. The column containing the documents, as well as the 
+			keys and values to insert must be specified.
+		</intro>
+		<option name="Document column">The document column to use.</option>
+		<option name="Key column">The column containing the keys to insert.</option>
+		<option name="Value column">The column containing the values to insert.</option>
+		<option name="Keep key, value cols">If checked, specified key and value columns are kept, otherwise they
+		will be filtered.</option>
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents.</inPort>
+        <outPort name="Documents with inserted meta info." index="0">
+        The output table which contains documents with the meta info inserted.</outPort>
+	</ports>
+</knimeNode>
