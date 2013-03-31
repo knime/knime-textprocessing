@@ -450,7 +450,9 @@ public class Document implements TextContainer, Serializable {
                 || !d.getPubDate().equals(m_pubDate)) {
             return false;
         } else if ((d.getMetaInformation() == null && m_metaInfo != null)
-                || !d.getMetaInformation().equals(m_metaInfo)) {
+                || (m_metaInfo == null && d.getMetaInformation() != null)
+                || (d.getMetaInformation() != null && m_metaInfo != null
+                    && !d.getMetaInformation().equals(m_metaInfo))) {
             return false;
         }
 
