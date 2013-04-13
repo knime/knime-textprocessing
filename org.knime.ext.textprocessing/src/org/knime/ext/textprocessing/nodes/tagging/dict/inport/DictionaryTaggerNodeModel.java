@@ -70,6 +70,12 @@ public class DictionaryTaggerNodeModel extends NodeModel {
     public static final boolean DEFAULT_CASE_SENSITIVE = true;
 
     /**
+     * The default value of the exact match setting.
+     * @since 2.8
+     */
+    public static final boolean DEFAULT_EXACTMATCH = true;
+
+    /**
      * The default value of the default tag.
      */
     public static final String DEFAULT_TAG =
@@ -101,6 +107,9 @@ public class DictionaryTaggerNodeModel extends NodeModel {
 
     private SettingsModelString m_columnModel =
         DictionaryTaggerNodeDialog.createColumnModel();
+
+    private SettingsModelBoolean m_exactMatchModel =
+            DictionaryTaggerNodeDialog.createExactMatchModel();
 
     private DocumentDataTableBuilder m_dtBuilder;
 
@@ -163,7 +172,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
                 .buildTag(tagStr);
         DocumentTagger tagger = new DictionaryDocumentTagger(
                 m_setUnmodifiableModel.getBooleanValue(), namedEntities, tag,
-                m_caseSensitiveModel.getBooleanValue());
+                m_caseSensitiveModel.getBooleanValue(), m_exactMatchModel.getBooleanValue());
 
         it = inData[DATA_TABLE_INDEX].iterator();
         int rowCount = inData[DATA_TABLE_INDEX].getRowCount();
@@ -205,6 +214,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         m_tagTypeModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
+        m_exactMatchModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -217,6 +227,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         m_tagTypeModel.saveSettingsTo(settings);
         m_columnModel.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
+        m_exactMatchModel.saveSettingsTo(settings);
     }
 
     /**
@@ -230,6 +241,7 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         m_tagTypeModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
+        m_exactMatchModel.validateSettings(settings);
     }
 
     /**
