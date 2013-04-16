@@ -72,6 +72,12 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      */
     protected boolean m_caseSensitive = true;
 
+    /**
+     * The exact match flag.
+     * @since 2.8
+     */
+    protected boolean m_exactMatch = true;
+
     protected Tokenizer m_wordTokenizer =
         DefaultTokenization.getWordTokenizer();
 
@@ -434,7 +440,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 }
 
                 // if ne element at "found" equals the current word
-                if (found < ne.size() && wordStr.equals(neStr)) {
+                if (found < ne.size() && ((m_exactMatch && wordStr.equals(neStr))
+                        || (!m_exactMatch && wordStr.contains(neStr)))) {
+                //if (found < ne.size() && wordStr.equals(neStr)) {
                     // if "found" 0 means we are at the beginning of the named
                     // entity
                     if (found == 0) {

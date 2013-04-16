@@ -23,6 +23,11 @@
             If checked, case sensitive named entity recognition will be applied,
             otherwise not. 
         </option>
+        <option name="Exact match">
+            If checked, terms are tagged as as named entities only if they match
+            exactly with an entity to find. Otherwise terms are tagged if they
+            contain the entity string.
+        </option>
         <option name="Tag type">
             Specifies the tag type of which tag values can be chosen.
         </option>

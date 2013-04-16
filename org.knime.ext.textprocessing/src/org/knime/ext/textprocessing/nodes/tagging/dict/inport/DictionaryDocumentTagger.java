@@ -66,6 +66,31 @@ public class DictionaryDocumentTagger extends AbstractDocumentTagger {
     public DictionaryDocumentTagger(final boolean setUnmodifiable,
             final Set<String> namedEntities, final Tag tag,
             final boolean caseSensitive) {
+        this(setUnmodifiable, namedEntities, tag, caseSensitive, true);
+    }
+
+    /**
+     * Creates a new instance of <code>DictionaryDocumentTagger</code> with
+     * given flag to set found named entities unmodifiable, to ignore the case
+     * of the named entities to detect, to compare entities by exact match or
+     * contains match, the tag to assign to the found named
+     * entities and the set of named entities to watch out for.
+     *
+     * @param setUnmodifiable If <code>true</code> found named entities are set
+     * unmodifiable, otherwise not.
+     * @param namedEntities The set of named entities to watch out for.
+     * @param tag The tag to assign to found named entities.
+     * @param caseSensitive If <code>false</code> the case of named entities
+     * and words of the sentences are ignored, otherwise not.
+     * @param exactMatch If <code>true</code> terms must match exactly with
+     * the entities to find, to be recognized. Otherwise terms only need to
+     * contain the entity string to find.
+     *
+     * @since 2.8
+     */
+    public DictionaryDocumentTagger(final boolean setUnmodifiable,
+            final Set<String> namedEntities, final Tag tag,
+            final boolean caseSensitive, final boolean exactMatch) {
         super(setUnmodifiable, caseSensitive);
 
         if (namedEntities == null) {
@@ -78,6 +103,7 @@ public class DictionaryDocumentTagger extends AbstractDocumentTagger {
         m_namedEntities = namedEntities;
         m_tag = tag;
         m_caseSensitve = caseSensitive;
+        m_exactMatch = exactMatch;
     }
 
     /**

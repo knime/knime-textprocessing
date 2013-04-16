@@ -1,13 +1,13 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2011
+ *  Copyright (C) 2003 - 2013
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2008 (thiel): created
  */
@@ -27,18 +27,18 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
 
 /**
  * Provides the configuration keys of the dictionary tagger node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public final class DictionaryTaggerConfigKeys {
 
     private DictionaryTaggerConfigKeys() { }
-    
+
     /**
      * The configuration key of the column to use as dictionary.
      */
     public static final String CFGKEY_DICT_COL = "Dictionary Column";
-    
+
     /**
      * The configuration key of the tag to use.
      */
@@ -47,15 +47,21 @@ public final class DictionaryTaggerConfigKeys {
     /**
      * The configuration key of the tag type to use.
      */
-    public static final String CFGKEY_TAG_TYPE = "TagType";    
-    
+    public static final String CFGKEY_TAG_TYPE = "TagType";
+
     /**
      * The configuration key of the case sensitive setting.
      */
     public static final String CFGKEY_CASE_SENSITIVE = "CS";
-    
+
     /**
      * The configuration key of unmodifiable flag of terms.
      */
     public static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
+
+    /**
+     * The configuration key of unmodifiable flag of terms.
+     * @since 2.8
+     */
+    public static final String CFGKEY_EXACTMATCH = "ExactMatch";
 }

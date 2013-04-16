@@ -13,6 +13,12 @@
                 <message_argument value="2.7.0"/>
             </message_arguments>
         </filter>
+        <filter comment="backporting enh 4187" id="924844039">
+            <message_arguments>
+                <message_argument value="2.7.4"/>
+                <message_argument value="2.7.1"/>
+            </message_arguments>
+        </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF" type="CreateModel">
         <filter id="305324134">
@@ -6122,6 +6128,15 @@
         <filter comment="Snowball Stemmer API change due to concurrency problems" id="1160773636">
             <message_arguments>
                 <message_argument value="SnowballStemmerFactory()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/AbstractDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger">
+        <filter comment="backporting enh 4187" id="1141899266">
+            <message_arguments>
+                <message_argument value="2.8"/>
+                <message_argument value="2.7"/>
+                <message_argument value="m_exactMatch"/>
             </message_arguments>
         </filter>
     </resource>
