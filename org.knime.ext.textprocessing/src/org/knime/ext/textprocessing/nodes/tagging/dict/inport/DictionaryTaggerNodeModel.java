@@ -214,7 +214,12 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         m_tagTypeModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
-        m_exactMatchModel.loadSettingsFrom(settings);
+        try {
+            // added in 2.7.4
+            m_exactMatchModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException ise) {
+            m_exactMatchModel.setBooleanValue(DEFAULT_EXACTMATCH);
+        }
     }
 
     /**
@@ -241,7 +246,8 @@ public class DictionaryTaggerNodeModel extends NodeModel {
         m_tagTypeModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
-        m_exactMatchModel.validateSettings(settings);
+        // added in 2.7.4
+        // m_exactMatchModel.validateSettings(settings);
     }
 
     /**
