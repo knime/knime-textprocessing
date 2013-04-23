@@ -146,7 +146,7 @@ public class NGramNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Input / Output settings");
 
         addDialogComponent(new DialogComponentColumnNameSelection(
-            getDocumentColumnModel(), "Document Column", 0,
+            getDocumentColumnModel(), "Document column", 0,
             DocumentValue.class));
 
         addDialogComponent(new DialogComponentButtonGroup(

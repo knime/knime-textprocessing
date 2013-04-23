@@ -42,9 +42,8 @@
             Specifies the maximal number of parallel processes running for
             ngram computation.
         </option>
-        <option name="Number of documents to process in one process">
-            Specifies the number of documents to be processed by a single
-            process.
+        <option name="Number of documents per process">
+            Specifies the number of documents being processed by a single thread.
         </option>
     </fullDescription>
         
