@@ -106,7 +106,24 @@ public final class DocumentGrabberFactory {
      * @return The grabber related to the given name.
      */
     public DocumentGrabber getGrabber(final String name) {
-        return m_grabber.get(name);
+        DocumentGrabber grabber = m_grabber.get(name);
+
+        DocumentGrabber newGrabberInstance = null;
+
+        // New instance of grabber needs to be created here, to ensure thread safety.
+        // Each node (thread in parallel chunk loop) must have its own instance.
+        // One singleton instance would either block or run into concurrency problems.
+        try {
+            newGrabberInstance = grabber.getClass().newInstance();
+        } catch (InstantiationException e) {
+            LOGGER.error("New DocumentGrabber instance " + grabber.getClass().toString() + " could not be created!");
+            LOGGER.error(e.getMessage());
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Empty Consructor of " + grabber.getClass().toString() + " is not accessible.");
+            LOGGER.error(e.getMessage());
+        }
+
+        return newGrabberInstance;
     }
 
     /**

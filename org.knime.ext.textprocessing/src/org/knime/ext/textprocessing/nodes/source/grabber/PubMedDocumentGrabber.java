@@ -35,6 +35,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -354,17 +355,30 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         }
 
         URLConnection conn = url.openConnection();
-        conn.setConnectTimeout(20000);
-        conn.connect();
+        conn.setConnectTimeout(60000);
+        try {
+            conn.connect();
+        } catch (SocketTimeoutException e) {
+            LOGGER.error("Timeout! Connection could not be established.");
+            throw e;
+        } catch (IOException e) {
+            LOGGER.error("Connection could not be opened.");
+            throw e;
+        }
         InputStreamReader isr = new InputStreamReader(conn.getInputStream());
         BufferedReader in = new BufferedReader(isr);
         OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
         OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
 
         // Transfer bytes from in to out
-        String line;
-        while ((line = in.readLine()) != null) {
-            writer.write(line);
+        try {
+            String line;
+            while ((line = in.readLine()) != null) {
+                writer.write(line);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Documents could not be downloaded.");
+            throw e;
         }
 
         in.close();
