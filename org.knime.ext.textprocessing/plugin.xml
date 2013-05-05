@@ -385,6 +385,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

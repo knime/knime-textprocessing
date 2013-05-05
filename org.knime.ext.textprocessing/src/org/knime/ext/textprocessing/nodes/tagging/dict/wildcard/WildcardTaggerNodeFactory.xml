@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Wildcard tagger</name>
+    <shortDescription>Assigns specified tags values of specified tag types 
+        to terms matching regular expressions specified in a string column.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            <p>
+            This node tags terms, that are matching regular expressions specified in a string column and assigns a 
+            specified tag value and type. Optionally the recognized named entity terms can be set unmodifiable, meaning 
+            that the terms are not modified or filtered afterwards by any following node. Matching can be applied case
+            sensitive or case insensitive, on term or on sentence level.
+            </p><p>
+            Single term level (term based):<br/>
+            Matching is applied on single terms only Terms are tagged as named entities if at least one of the 
+            specified regular expressions matches. If more than one expression is matching the last matching expression 
+            overrides previous, conflicting matches. Note: A regular expression must match completely for a term to 
+            be tagged. A partial match is not sufficient.
+            <br/><br/>
+            Example: Term "123abc456" matches with regex "\d+[a-z]+\d+" but not with "\d+".
+            <br/>
+            To find terms beginning with a certain string, e.g. "data" use the regular expression "data.*". The 
+            expression ".*data" matches to all terms ending with "data".
+            </p><p>
+            Multi term level (sentence based):<br/>
+            Matching is applied on sentences. All specified expressions are used for matching. If more than one 
+            expression matches, the last matching expression overrides previous, conflicting matches. If multiple terms 
+            are matching to one regular expression all terms will be tagged, as long as they do not overlap with the
+            previous term.
+            <br/><br/>
+            Example: Sentence "term1 term2" matches with regex "term\d+" in a way that "term1" and "term2" are tagged
+            as separate terms. Using "[term\d\s]+" as regular expression results in "term1 term2" as one tagged term.
+            Again the regular expression "\d+" would not match.
+            <br/>
+            The regular expression ".*" matches all terms in a sentence, meaning that the complete sentence will be 
+            tagged as one term.
+            </p><p>
+            Be aware that based on the specified regular expressions, tagging (matching) can be expensive in terms of 
+            processing time due to excessive backtracking. For more information about regular expressions in java see 
+            the <a href='http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html'>documentation of 
+            java.util.regex.Pattern</a> and the <a href='http://docs.oracle.com/javase/tutorial/essential/regex/'>Java 
+            tutorial about regular expressions</a>.
+            </p>
+        </intro>
+        <option name="Regular expression column">
+            Specifies the string column containing the regular expressions to match. 
+        </option>
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+        <option name="Case sensitive">
+            If checked, matching will be done case sensitive, otherwise not. 
+        </option>
+        <option name="Matching">        
+            Regular expressions can be matched on term (Single term) or on sentence (Multi term) level. If the single 
+            term option is selected, regular expressions will only be applied on single terms. If a term matches to one
+            of the specified regular expressions the term will be tagged. Multiple words (terms) can not be tagged with
+            the single term setting. If the multi term option is selected, regular expressions will be applied on 
+            sentence level. If a part of the sentence matches, the corresponding terms will be tagged. Multiple words 
+            can thus be tagged.
+        </option>
+        <option name="Tag type">
+            Specifies the tag type of which tag values can be chosen.
+        </option>
+        <option name="Tag value">
+            Specifies the tag value to use for tagging recognized named entities.
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>
+        <inPort name="Regular expression input table" index="1">The input table
+        containing the string column with the regular expression to match with.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

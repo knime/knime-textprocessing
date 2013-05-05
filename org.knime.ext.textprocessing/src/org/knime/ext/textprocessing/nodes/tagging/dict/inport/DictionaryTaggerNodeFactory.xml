@@ -3,7 +3,7 @@
 <knimeNode icon="../../../../icons/TextProcEnrichment.png" type="Manipulator">
     <name>Dictionary tagger</name>
     <shortDescription>Assigns specified tags values of specified tag types 
-        to terms specified in an dictionary column.
+        to terms specified in a dictionary column.
     </shortDescription>
     <fullDescription>
         <intro>

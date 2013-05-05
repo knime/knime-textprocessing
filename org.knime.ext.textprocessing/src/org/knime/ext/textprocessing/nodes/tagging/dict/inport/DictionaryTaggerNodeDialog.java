@@ -38,6 +38,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel;
 
 /**
  * The dialog class of the dictionary named entity recognizer node.
@@ -58,7 +59,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelBoolean createSetUnmodifiableModel() {
         return new SettingsModelBoolean(
                 DictionaryTaggerConfigKeys.CFGKEY_UNMODIFIABLE,
-                DictionaryTaggerNodeModel.DEFAULT_UNMODIFIABLE);
+                AbstractDictionaryTaggerModel.DEFAULT_UNMODIFIABLE);
     }
 
     /**
@@ -70,7 +71,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelBoolean createCaseSensitiveModel() {
         return new SettingsModelBoolean(
                 DictionaryTaggerConfigKeys.CFGKEY_CASE_SENSITIVE,
-                DictionaryTaggerNodeModel.DEFAULT_CASE_SENSITIVE);
+                AbstractDictionaryTaggerModel.DEFAULT_CASE_SENSITIVE);
     }
 
     /**
@@ -81,7 +82,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelString createTagTypeModel() {
         return new SettingsModelString(
                 DictionaryTaggerConfigKeys.CFGKEY_TAG_TYPE,
-                DictionaryTaggerNodeModel.DEFAULT_TAG_TYPE);
+                AbstractDictionaryTaggerModel.DEFAULT_TAG_TYPE);
     }
 
     /**
@@ -92,7 +93,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
     public static final SettingsModelString createTagModel() {
         return new SettingsModelString(
                 DictionaryTaggerConfigKeys.CFGKEY_TAG,
-                DictionaryTaggerNodeModel.DEFAULT_TAG);
+                AbstractDictionaryTaggerModel.DEFAULT_TAG);
     }
 
     /**
@@ -125,7 +126,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
     public DictionaryTaggerNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
                 createColumnModel(), "Dictionary column",
-                DictionaryTaggerNodeModel.DICT_TABLE_INDEX,
+                AbstractDictionaryTaggerModel.DICT_TABLE_INDEX,
                 StringValue.class));
 
         addDialogComponent(new DialogComponentBoolean(
