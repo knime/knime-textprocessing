@@ -75,11 +75,21 @@ public class WildcardTaggerNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns a
      * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
-     * containing the matching strategy to use (single or multi term).
+     * containing the matching level to use (single or multi term).
      */
-    public static final SettingsModelString createMatchingModel() {
-        return new SettingsModelString(WildcardTaggerConfigKeys.CFGKEY_SINGLETERM,
-                                       WildcardTaggerNodeModel.DEF_MATCHING_MODEL);
+    public static final SettingsModelString createMatchingLevelModel() {
+        return new SettingsModelString(WildcardTaggerConfigKeys.CFGKEY_MATCHING_LEVEL,
+                                       WildcardTaggerNodeModel.DEF_MATCHINGLEVEL);
+    }
+
+    /**
+     * @return Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the matching method to use (wildcard or regex).
+     */
+    public static final SettingsModelString createMatchingMethodModel() {
+        return new SettingsModelString(WildcardTaggerConfigKeys.CFGKEY_MATCHING_METHOD,
+                                       WildcardTaggerNodeModel.DEF_MATCHINGMETHOD);
     }
 
     /**
@@ -88,7 +98,7 @@ public class WildcardTaggerNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public WildcardTaggerNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
-                DictionaryTaggerNodeDialog.createColumnModel(), "Regular expression column",
+                DictionaryTaggerNodeDialog.createColumnModel(), "Expression column",
                 AbstractDictionaryTaggerModel.DICT_TABLE_INDEX,
                 StringValue.class));
 
@@ -104,9 +114,13 @@ public class WildcardTaggerNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
 
-        addDialogComponent(new DialogComponentButtonGroup(createMatchingModel(), false, "Matching",
-                new String[]{WildcardTaggerNodeModel.SINGLE_TERM_MATCHINGMODEL,
-                             WildcardTaggerNodeModel.MULTI_TERM_MATCHINGMODEL}));
+        addDialogComponent(new DialogComponentButtonGroup(createMatchingMethodModel(), false, "Matching method",
+                new String[]{WildcardTaggerNodeModel.WILDCARD_MATCHINGMETHOD,
+                             WildcardTaggerNodeModel.REGEX_MATCHINGMETHOD}));
+
+        addDialogComponent(new DialogComponentButtonGroup(createMatchingLevelModel(), false, "Matching level",
+                new String[]{WildcardTaggerNodeModel.SINGLETERM_MATCHINGLEVEL,
+                             WildcardTaggerNodeModel.MULTITERM_MATCHINGLEVEL}));
 
         // tag type model
         m_tagtypemodel = DictionaryTaggerNodeDialog.createTagTypeModel();

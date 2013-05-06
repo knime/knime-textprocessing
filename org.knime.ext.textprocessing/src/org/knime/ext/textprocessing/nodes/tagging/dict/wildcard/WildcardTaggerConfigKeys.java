@@ -38,5 +38,10 @@ public final class WildcardTaggerConfigKeys {
     /**
      * The configuration key of the single/multi term option.
      */
-    public static final String CFGKEY_SINGLETERM = "Single Term";
+    public static final String CFGKEY_MATCHING_LEVEL = "Matching level";
+
+    /**
+     * The configuration key of the regex/wildcard option.
+     */
+    public static final String CFGKEY_MATCHING_METHOD = "Matching method";
 }

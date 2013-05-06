@@ -97,9 +97,9 @@ public class MultiTermRegexDocumentTagger extends RegexDocumentTagger {
      */
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-        List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
+        final List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
 
-        Set<Pattern> pattern = getRegexpattern();
+        final Set<Pattern> pattern = getRegexpattern();
         String sentenceStr = sentence.getText();
 
         for (Pattern p : pattern) {

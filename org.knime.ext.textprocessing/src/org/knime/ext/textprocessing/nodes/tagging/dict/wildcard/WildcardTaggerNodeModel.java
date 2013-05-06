@@ -56,6 +56,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.knime.base.util.WildcardMatcher;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -73,21 +74,37 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
     /**
      * The single term matching setting.
      */
-    public static final String SINGLE_TERM_MATCHINGMODEL = "Single term (term based)";
+    public static final String SINGLETERM_MATCHINGLEVEL = "Single term (term based)";
 
     /**
      * The multi term matching setting.
      */
-    public static final String MULTI_TERM_MATCHINGMODEL = "Multi term (sentence based)";
+    public static final String MULTITERM_MATCHINGLEVEL = "Multi term (sentence based)";
 
     /**
      * The default term matching setting.
      */
-    public static final String DEF_MATCHING_MODEL = SINGLE_TERM_MATCHINGMODEL;
+    public static final String DEF_MATCHINGLEVEL = SINGLETERM_MATCHINGLEVEL;
+
+    /**
+     * The wildcard matching method setting.
+     */
+    public static final String WILDCARD_MATCHINGMETHOD = "Wildcard ('*' = any sequence, '?' = any character)";
+
+    /**
+     * The regex matching method setting.
+     */
+    public static final String REGEX_MATCHINGMETHOD = "Regular expression";
+
+    /**
+     * The default matching method.
+     */
+    public static final String DEF_MATCHINGMETHOD = WILDCARD_MATCHINGMETHOD;
 
 
-    private SettingsModelString m_matchingModel = WildcardTaggerNodeDialog.createMatchingModel();
+    private final SettingsModelString m_matchingLevelModel = WildcardTaggerNodeDialog.createMatchingLevelModel();
 
+    private final SettingsModelString m_matchingMethodModel = WildcardTaggerNodeDialog.createMatchingMethodModel();
 
     private Pattern createPattern(final String str) throws PatternSyntaxException {
         String regexStr = str;
@@ -109,12 +126,19 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
      */
     @Override
     protected DocumentTagger createDocumentTagger(final Set<String> dictionary) {
-        Set<Pattern> pattern = new LinkedHashSet<Pattern>();
-        List<String> invalidPattern = new ArrayList<String>();
+        final Set<Pattern> pattern = new LinkedHashSet<Pattern>();
+        final List<String> invalidPattern = new ArrayList<String>();
+        final boolean wildcardMatching = m_matchingMethodModel.getStringValue().equals(WILDCARD_MATCHINGMETHOD);
 
         // create regex pattern
         for (String str : dictionary) {
             Pattern p = null;
+
+            // transform wildcard expression into regular expression
+            if (wildcardMatching) {
+                str = WildcardMatcher.wildcardToRegex(str);
+            }
+
             try {
                 p = createPattern(str);
                 if (p != null) {
@@ -152,7 +176,8 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
                     + invalidPatternMsg + "]!");
         }
 
-        if (m_matchingModel.getStringValue().equals(SINGLE_TERM_MATCHINGMODEL)) {
+        // create single or multi term tagger
+        if (m_matchingLevelModel.getStringValue().equals(SINGLETERM_MATCHINGLEVEL)) {
             return new SingleTermRegexDocumentTagger(getUnmodifiableSetting(), pattern, getTagSetting(),
                                                     getCaseSensitiveSetting());
         } else {
@@ -169,7 +194,8 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
      */
     @Override
     protected void saveSettingsToInternal(final NodeSettingsWO settings) {
-        m_matchingModel.saveSettingsTo(settings);
+        m_matchingLevelModel.saveSettingsTo(settings);
+        m_matchingMethodModel.saveSettingsTo(settings);
     }
 
     /*
@@ -180,7 +206,8 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
      */
     @Override
     protected void validateSettingsInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_matchingModel.validateSettings(settings);
+        m_matchingLevelModel.validateSettings(settings);
+        m_matchingMethodModel.validateSettings(settings);
     }
 
     /*
@@ -191,6 +218,7 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
      */
     @Override
     protected void loadValidatedSettingsFromInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_matchingModel.loadSettingsFrom(settings);
+        m_matchingLevelModel.loadSettingsFrom(settings);
+        m_matchingMethodModel.loadSettingsFrom(settings);
     }
 }

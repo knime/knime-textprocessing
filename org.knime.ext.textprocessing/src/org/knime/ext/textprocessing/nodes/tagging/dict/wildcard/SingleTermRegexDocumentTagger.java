@@ -95,10 +95,10 @@ public class SingleTermRegexDocumentTagger extends RegexDocumentTagger {
      */
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-      List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
+      final List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
 
-      Set<Pattern> pattern = getRegexpattern();
-      List<Term> terms = sentence.getTerms();
+      final Set<Pattern> pattern = getRegexpattern();
+      final List<Term> terms = sentence.getTerms();
 
       for (Pattern p : pattern) {
           for (Term t : terms) {
