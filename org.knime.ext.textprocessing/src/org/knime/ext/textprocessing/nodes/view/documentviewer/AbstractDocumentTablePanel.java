@@ -57,8 +57,13 @@ import org.knime.ext.textprocessing.data.DocumentSource;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class AbstractDocumentTablePanel extends JPanel
-implements DocumentProvider {
+public abstract class AbstractDocumentTablePanel extends JPanel implements DocumentProvider {
+
+    /**
+     * Automatically generated serial version id.
+     */
+    private static final long serialVersionUID = -167060303181645711L;
+
 
     private JTable m_table;
 
@@ -66,7 +71,7 @@ implements DocumentProvider {
 
     private int m_row = 0;
 
-    private int m_selectedRow = 0;
+    private int m_selectedRowIndex = 0;
 
     /**
      * Constructor of <code>AbstractDocumentTablePanel</code> with the given
@@ -155,6 +160,12 @@ implements DocumentProvider {
 
         m_table = new JTable(docList, new Object[]{
                 "#", "Document title", "Authors", "Source", "Category"}) {
+
+            /**
+             * Automatically generated serial version id.
+             */
+            private static final long serialVersionUID = -167060303181645711L;
+
             @Override
             public boolean isCellEditable(final int x, final int y) {
                 return false;
@@ -194,6 +205,77 @@ implements DocumentProvider {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public Document next() {
+        int nextIndex = m_selectedRowIndex + 1;
+        Document nextDoc = getDocument(nextIndex);
+        if (nextDoc != null) {
+            m_selectedRowIndex = nextIndex;
+            m_table.setRowSelectionInterval(m_selectedRowIndex, m_selectedRowIndex);
+        }
+        return nextDoc;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public Document previous() {
+        Document prevDoc = null;
+        int prevIndex = m_selectedRowIndex - 1;
+        if (prevIndex >= 0) {
+            prevDoc = getDocument(prevIndex);
+            if (prevDoc != null) {
+                m_selectedRowIndex = prevIndex;
+                m_table.setRowSelectionInterval(m_selectedRowIndex, m_selectedRowIndex);
+            }
+        }
+        return prevDoc;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public boolean hasNext() {
+        int nextIndex = m_selectedRowIndex + 1;
+        Document nextDoc = getDocument(nextIndex);
+        if (nextDoc != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public boolean hasPrevious() {
+        int prevIndex = m_selectedRowIndex - 1;
+        if (prevIndex >= 0) {
+            Document prevDoc = getDocument(prevIndex);
+            if (prevDoc != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public void remove() {
+        // Documents are not removed!
+    }
 
     /**
      *
@@ -208,10 +290,10 @@ implements DocumentProvider {
         public void mouseClicked(final MouseEvent e) {
             // if double clicked
             if (e.getClickCount() == 2) {
-                m_selectedRow = m_table.getSelectedRow();
-                Document doc = m_docs.get(m_selectedRow);
+                m_selectedRowIndex = m_table.getSelectedRow();
+                Document doc = m_docs.get(m_selectedRowIndex);
 
-                onClick(m_selectedRow, doc);
+                onClick(m_selectedRowIndex, doc);
             }
         }
 

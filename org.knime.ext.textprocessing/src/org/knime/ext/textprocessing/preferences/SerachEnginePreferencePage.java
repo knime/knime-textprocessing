@@ -45,36 +45,48 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 20.12.2012 by kilian
+ * Created on 09.05.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.nodes.view.documentviewer;
+package org.knime.ext.textprocessing.preferences;
 
-import java.util.Iterator;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
-import org.knime.ext.textprocessing.data.Document;
 
 /**
- * Interface to access of a list of documents and iterate over it.
- *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
  */
-public interface DocumentProvider extends Iterator<Document> {
+public class SerachEnginePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+    private SearchEngineListEditor m_linkSources;
+
 
     /**
-     * @param index The index of the document to return.
-     * @return The document with the specified index of a document list.
-     * @since 2.7
-     */
-    public abstract Document getDocument(final int index);
+    * Creates a new search engine preference page.
+    */
+   public SerachEnginePreferencePage() {
+       super("Textprocessing Search Engine Settings", null, GRID);
+       setDescription("Specify search engines for linkage in DocumentViewer.");
+   }
 
-    /**
-     * @return The previous document if it exists, otherwise {@code null}.
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
-    public Document previous();
+    @Override
+    public void init(final IWorkbench workbench) {
+        setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+    }
 
-    /**
-     * @return {@code true} if a previous document exists, otherwise {@code false}.
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
      */
-    public boolean hasPrevious();
+    @Override
+    protected void createFieldEditors() {
+        m_linkSources = new SearchEngineListEditor(getFieldEditorParent());
+        addField(m_linkSources);
+    }
+
 }

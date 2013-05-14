@@ -45,36 +45,76 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 20.12.2012 by kilian
+ * Created on 09.05.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.nodes.view.documentviewer;
+package org.knime.ext.textprocessing.preferences;
 
-import java.util.Iterator;
+import java.util.List;
 
-import org.knime.ext.textprocessing.data.Document;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngineSettings;
+import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
+
 
 /**
- * Interface to access of a list of documents and iterate over it.
- *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
  */
-public interface DocumentProvider extends Iterator<Document> {
+public class SearchEnginePreferenceInitializer extends AbstractPreferenceInitializer {
+
+    /** Preference key of the search engines. */
+    public static final String PREF_SEARCHENGINES = "knime.textprocessing.searchengines";
+
+
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+     */
+    @Override
+    public void initializeDefaultPreferences() {
+        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+
+        //set default values
+        store.setDefault(PREF_SEARCHENGINES, getDefaultSearchEnginesSettingsString());
+    }
 
     /**
-     * @param index The index of the document to return.
-     * @return The document with the specified index of a document list.
-     * @since 2.7
+     * Returns the search engine settings as settings string.
+     *
+     * @return the search engines settings string
      */
-    public abstract Document getDocument(final int index);
+    public static String getSearchEnginesSettingsString() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!existsSearchEnginesSettings()) {
+            return getDefaultSearchEnginesSettingsString();
+        }
+        return pStore.getString(PREF_SEARCHENGINES);
+    }
 
     /**
-     * @return The previous document if it exists, otherwise {@code null}.
+     * @return {@code true} if search engine settings exist, otherwise {@code false}.
      */
-    public Document previous();
+    public static boolean existsSearchEnginesSettings() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        return pStore.contains(PREF_SEARCHENGINES);
+    }
 
     /**
-     * @return {@code true} if a previous document exists, otherwise {@code false}.
+     * Creates and returns the default search engine settings as preference settings string.
+     * @return the default search engine settings as preference settings string.
      */
-    public boolean hasPrevious();
+    public static String getDefaultSearchEnginesSettingsString() {
+        StringBuffer sb = new StringBuffer();
+        List<SearchEngineSettings> settings = SearchEngines.getDefaultSearchEngines();
+        int count = 0;
+        for (SearchEngineSettings setting : settings) {
+            sb.append(setting.getSettingsString());
+            if (count < settings.size() - 1) {
+                sb.append(SearchEngineSettings.SETTINGS_SEPARATOR);
+            }
+            count++;
+        }
+        return sb.toString();
+    }
 }

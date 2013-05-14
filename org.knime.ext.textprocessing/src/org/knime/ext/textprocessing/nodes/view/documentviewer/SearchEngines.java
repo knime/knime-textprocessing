@@ -44,71 +44,103 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
- *   03.07.2012 (kilian): created
+ *   03.07.2012 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
+
+import org.knime.ext.textprocessing.preferences.SearchEnginePreferenceInitializer;
 
 /**
  * Provides links to various search engines for given terms used as query terms.
- * 
+ *
  * @author Kilian Thiel, KNIME.com AG, Zurich
  * @since 2.6
  */
 public final class SearchEngines {
-    
+
     /**
-     * The singelton instance.
+     * The place holder for the query string.
+     * @since 2.8
      */
-    static final SearchEngines INSTANCE = new SearchEngines();
-    
+    public static final String QUERY_PLACEHOLDER = "<query>";
+
     /**
-     * Default search engine.
+     * The singelton {@code SearchEngines} instance.
      */
-    static final String DEFAULT_SOURCE = "Google";
-    
-    private Hashtable<String, String> m_sources;
-    
-    private SearchEngines() { 
-        m_sources = new Hashtable<String, String>();
-        
-        // GENERAL
-        m_sources.put("Google", 
-                "https://www.google.de/search?hl=en&noj=1&site=webhp&q=");
-        m_sources.put("Wikipedia", 
-                "http://en.wikipedia.org/w/index.php?search=");
-        m_sources.put("Leo (dict)",
-                "http://dict.leo.org/ende?lp=ende&lang=de&searchLoc=0&cmpType=relaxed&sectHdr=on&spellToler=&search=");
-        
-        // BIO
-        m_sources.put("PubMed", 
-                "http://www.ncbi.nlm.nih.gov/pubmed?term=");
-        m_sources.put("PubGene",
-                "http://www.pubgene.org/tools/Network/Subset.cgi?mode=simple&organism=hs&terms=");
-        m_sources.put("UniProtKB", 
-                "http://www.uniprot.org/uniprot/?sort=score&query=");
-        
-        // CHEM
-        m_sources.put("PubChem",
-                "http://www.ncbi.nlm.nih.gov/pccompound?term=");
-        m_sources.put("ZINC", "http://zinc.docking.org/results/query?term=");
-        m_sources.put("DrugBank", 
-                "http://www.drugbank.ca/search?commit=Search&query=");
+    private static SearchEngines instance = null;
+
+    private static final String DEFAULT_SOURCE = "Google";
+
+    private LinkedHashMap<String, String> m_sources;
+
+    private String m_defaultEngine = DEFAULT_SOURCE;
+
+    /**
+     * @return the default search engine settings
+     * @since 2.8
+     */
+    public static List<SearchEngineSettings> getDefaultSearchEngines() {
+        List<SearchEngineSettings> settings = new ArrayList<SearchEngineSettings>();
+        settings.add(new SearchEngineSettings("Google", "https://www.google.de/search?hl=en&noj=1&site=webhp&q="
+                                              + QUERY_PLACEHOLDER,
+                                              true));
+        settings.add(new SearchEngineSettings("Wikipedia", "http://en.wikipedia.org/w/index.php?search="
+                                              + QUERY_PLACEHOLDER));
+        settings.add(new SearchEngineSettings("Leo (dict)",
+                                              "http://dict.leo.org/ende?lp=ende&lang=de&searchLoc=0"
+                                              + "&cmpType=relaxed&sectHdr=on&spellToler=&search="
+                                              + QUERY_PLACEHOLDER));
+
+        settings.add(new SearchEngineSettings("PubMed", "http://www.ncbi.nlm.nih.gov/pubmed?term="
+                                              + QUERY_PLACEHOLDER));
+        settings.add(new SearchEngineSettings("UniProtKB", "http://www.uniprot.org/uniprot/?sort=score&query="
+                                              + QUERY_PLACEHOLDER));
+
+        settings.add(new SearchEngineSettings("PubChem", "http://www.ncbi.nlm.nih.gov/pccompound?term="
+                                              + QUERY_PLACEHOLDER));
+        settings.add(new SearchEngineSettings("DrugBank", "http://www.drugbank.ca/search?commit=Search&query="
+                                              + QUERY_PLACEHOLDER));
+
+        return settings;
     }
-    
-    /**
-     * @return The singelton instance.
-     */
-    public static SearchEngines getInstance() {
-        return INSTANCE;
+
+    private SearchEngines() {
+        m_sources = new LinkedHashMap<String, String>();
+        loadPreferenceSettings();
     }
-    
+
+    private void loadPreferenceSettings() {
+        if (SearchEnginePreferenceInitializer.existsSearchEnginesSettings()) {
+            String settingsStr = SearchEnginePreferenceInitializer.getSearchEnginesSettingsString();
+            List<SearchEngineSettings> settings = SearchEngineSettings.parseSettings(settingsStr);
+
+            clear();
+            for (SearchEngineSettings setting : settings) {
+                addSearchEngine(setting);
+                if (setting.isDefault()) {
+                    m_defaultEngine = setting.getName();
+                }
+            }
+        }
+    }
+
+    /**
+     * @return The singelton {@code SearchEngines} instance.
+     */
+    public static synchronized SearchEngines getInstance() {
+        if (instance == null) {
+            instance = new SearchEngines();
+        }
+        return instance;
+    }
+
     /**
      * @return A set containing the names of all available search engines.
      */
@@ -117,7 +149,81 @@ public final class SearchEngines {
         Collections.sort(keys);
         return keys;
     }
-    
+
+    /**
+     * @return The search engine link for the specified name.
+     * @param name The name of the search engine.
+     * @since 2.8
+     */
+    public String getLinkByName(final String name) {
+        return m_sources.get(name);
+    }
+
+    /**
+     * Clears all search engine entries.
+     * @since 2.8
+     */
+    public void clear() {
+        m_sources.clear();
+        m_defaultEngine = "";
+    }
+
+    /**
+     * @return a list of the settings of all registered search engines
+     * @since 2.8
+     */
+    public List<SearchEngineSettings> getSearchEngineSetting() {
+        List<SearchEngineSettings> settings = new ArrayList<SearchEngineSettings>();
+        for (String name : m_sources.keySet()) {
+            boolean def = false;
+            if (name.equals(m_defaultEngine)) {
+                def = true;
+            }
+            settings.add(new SearchEngineSettings(name, m_sources.get(name), def));
+        }
+        return settings;
+    }
+
+    /**
+     * Adds the specified search engine setting.
+     * @param setting the search engine to add.
+     * @since 2.8
+     */
+    public void addSearchEngine(final SearchEngineSettings setting) {
+        m_sources.put(setting.getName(), setting.getLink());
+        if (setting.isDefault()) {
+            m_defaultEngine = setting.getName();
+        }
+    }
+
+    /**
+     * Removes the specified search engine.
+     * @param setting The search engine to remove
+     * @since 2.8
+     */
+    public void removeSearchEngine(final SearchEngineSettings setting) {
+        m_sources.remove(setting.getName());
+        if (setting.isDefault()) {
+            if (m_sources.keySet().iterator().hasNext()) {
+                m_defaultEngine = m_sources.keySet().iterator().next();
+            } else {
+                m_defaultEngine = "";
+            }
+        }
+    }
+
+    /**
+     * Loads the default search engine settings.
+     * @since 2.8
+     */
+    public void loadDefault() {
+        clear();
+        List<SearchEngineSettings> settings = getDefaultSearchEngines();
+        for (SearchEngineSettings setting : settings) {
+            addSearchEngine(setting);
+        }
+    }
+
     /**
      * Returns the url to query the specified search engine with the given term.
      * @param source The search engine to query.
@@ -128,19 +234,19 @@ public final class SearchEngines {
         String encodedQuery = encode(query);
         String link = m_sources.get(source);
         if (link != null) {
-            link += encodedQuery;
+            link = link.replace(QUERY_PLACEHOLDER, encodedQuery);
             return link;
         }
-        return m_sources.get(DEFAULT_SOURCE) + encodedQuery;
+        return m_sources.get(DEFAULT_SOURCE).replace(QUERY_PLACEHOLDER, encodedQuery);
     }
-    
+
     /**
      * @return The default search engine
      */
     public String getDefaultSource() {
-        return DEFAULT_SOURCE;
+        return m_defaultEngine;
     }
-    
+
 
     private static String encode(final String input) {
         StringBuilder resultStr = new StringBuilder();

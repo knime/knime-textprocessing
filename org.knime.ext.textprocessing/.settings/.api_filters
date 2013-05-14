@@ -6120,20 +6120,4 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/knime/ext/textprocessing/preferences/TextprocessingPreferenceInitializer.java" type="org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer"/>
-                <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/ext/textprocessing/preferences/TextprocessingPreferencePage.java" type="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"/>
-                <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
 </component>

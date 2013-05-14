@@ -39,6 +39,11 @@ import org.knime.ext.textprocessing.data.Document;
 public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
 
     /**
+     * Automatically generated serial version id.
+     */
+    private static final long serialVersionUID = 3735659735470727304L;
+
+    /**
      * Creates a new instance of <code>DocumentViewerTablePanel</code> with
      * the given set of documents to display.
      *
@@ -55,12 +60,10 @@ public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
     protected void onClick(final int rowIndex, final Document document) {
         JFrame detailsFrame = new JFrame(document.getTitle());
         if (KNIMEConstants.KNIME16X16 != null) {
-            detailsFrame.setIconImage(
-                    KNIMEConstants.KNIME16X16.getImage());
+            detailsFrame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
         }
 
-        detailsFrame.setContentPane(
-                new DocumentViewPanel(document, this, rowIndex));
+        detailsFrame.setContentPane(new DocumentViewPanel(document, this));
         detailsFrame.pack();
         detailsFrame.setVisible(true);
     }

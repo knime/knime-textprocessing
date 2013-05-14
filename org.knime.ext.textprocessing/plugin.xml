@@ -397,6 +397,9 @@
       <initializer
             class="org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer">
       </initializer>
+      <initializer
+            class="org.knime.ext.textprocessing.preferences.SearchEnginePreferenceInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -405,6 +408,12 @@
             class="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
             id="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
             name="Textprocessing">
+      </page>
+      <page
+            category="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
+            class="org.knime.ext.textprocessing.preferences.SerachEnginePreferencePage"
+            id="org.knime.ext.textprocessing.preferences.SerachEnginePreferencePage"
+            name="Search Engines">
       </page>
    </extension>
    <extension
