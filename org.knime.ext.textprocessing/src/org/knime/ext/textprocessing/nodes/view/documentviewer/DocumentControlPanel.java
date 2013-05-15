@@ -88,9 +88,9 @@ public class DocumentControlPanel extends JPanel {
 
     private final JToggleButton m_hiliteTagsButton;
 
-    private final JComboBox<String> m_tagTypes;
+    private final JComboBox m_tagTypes;
 
-    private final JComboBox<String> m_linkSourcesBox;
+    private final JComboBox m_linkSourcesBox;
 
     private final JButton m_colorChooserButton;
 
@@ -141,7 +141,7 @@ public class DocumentControlPanel extends JPanel {
         hiliteToolbar.addSeparator();
 
         // tag combo box
-        m_tagTypes = new JComboBox<String>();
+        m_tagTypes = new JComboBox();
         Set<String> tagTypes = TagFactory.getInstance().getTagTypes();
         for (String tagType : tagTypes) {
             m_tagTypes.addItem(tagType);
@@ -153,7 +153,7 @@ public class DocumentControlPanel extends JPanel {
 
         // links sources
         hiliteToolbar.add(new JLabel("Link to:"));
-        m_linkSourcesBox = new JComboBox<String>();
+        m_linkSourcesBox = new JComboBox();
         for (String source : SearchEngines.getInstance().getSearchEngineNames()) {
             m_linkSourcesBox.addItem(source);
         }
