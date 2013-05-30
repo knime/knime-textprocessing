@@ -451,5 +451,22 @@
             workflowDir="metanode_templates/Vector Creation/">
       </PersistedMetaNode>
    </extension>
+   <extension
+         point="org.knime.core.DataValueRenderer">
+      <dataValue
+            valueClass="org.knime.ext.textprocessing.data.DocumentValue">
+         <renderer
+               rendererFactoryClass="org.knime.core.data.renderer.DefaultDataValueRenderer$Factory"
+               suggestAsDefault="false">
+         </renderer>
+      </dataValue>
+      <dataValue
+            valueClass="org.knime.ext.textprocessing.data.TermValue">
+         <renderer
+               rendererFactoryClass="org.knime.core.data.renderer.DefaultDataValueRenderer$Factory"
+               suggestAsDefault="false">
+         </renderer>
+      </dataValue>
+   </extension>
    
 </plugin>

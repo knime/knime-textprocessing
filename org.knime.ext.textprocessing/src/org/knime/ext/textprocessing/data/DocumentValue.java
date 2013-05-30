@@ -1,4 +1,4 @@
-/* 
+/*
 ========================================================================
  *
  *  Copyright (C) 2003 - 2013
@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   19.12.2006 (Kilian Thiel): created
  */
@@ -28,34 +28,30 @@ package org.knime.ext.textprocessing.data;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DataValueComparator;
-import org.knime.core.data.renderer.DataValueRendererFamily;
-import org.knime.core.data.renderer.DefaultDataValueRendererFamily;
-import org.knime.core.data.renderer.StringValueRenderer;
+import org.knime.core.data.ExtensibleUtilityFactory;
 
 /**
  * Interface for the document values.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public interface DocumentValue extends DataValue {
-
     /**
      * @return The document.
      */
-    public Document getDocument();
+    Document getDocument();
 
     /**
      * Meta information to this value type.
-     * 
+     *
      * @see DataValue#UTILITY
      */
-    public static final UtilityFactory UTILITY = new DocumentUtilityFactory();
+    UtilityFactory UTILITY = new DocumentUtilityFactory();
 
     /** Implementations of the meta information of this value class. */
-    public static class DocumentUtilityFactory extends UtilityFactory {
+    class DocumentUtilityFactory extends ExtensibleUtilityFactory {
         /** Singleton icon to be used to display this cell type. */
         private static final Icon ICON;
 
@@ -80,7 +76,8 @@ public interface DocumentValue extends DataValue {
                 new DocumentValueComparator();
 
         /** Only subclasses are allowed to instantiate this class. */
-        protected DocumentUtilityFactory() { /* empty */
+        protected DocumentUtilityFactory() {
+            super(DocumentValue.class);
         }
 
         /**
@@ -99,15 +96,13 @@ public interface DocumentValue extends DataValue {
             return DOCUMENT_COMPARATOR;
         }
 
+
         /**
          * {@inheritDoc}
          */
         @Override
-        protected DataValueRendererFamily getRendererFamily(
-                final DataColumnSpec spec) {
-            return new DefaultDataValueRendererFamily(
-                    StringValueRenderer.INSTANCE);
+        public String getName() {
+            return "Text documents";
         }
-
     }
 }
