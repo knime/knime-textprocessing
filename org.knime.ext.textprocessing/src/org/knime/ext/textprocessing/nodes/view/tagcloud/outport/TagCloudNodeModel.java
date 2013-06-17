@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -63,6 +63,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.outport.font.SettingsModelFont;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -94,32 +95,32 @@ public class TagCloudNodeModel extends NodeModel {
 
     private SettingsModelIntegerBounded m_noOfRows =
             TagCloudNodeDialog.getNoofRowsModel();
-    
+
     private SettingsModelBoolean m_allRows =
             TagCloudNodeDialog.getUseallrowsBooleanModel();
-    
-    private SettingsModelIntegerBounded m_widthModel = 
+
+    private SettingsModelIntegerBounded m_widthModel =
         TagCloudNodeDialog.getWidthModel();
-    
-    private SettingsModelIntegerBounded m_heightModel = 
+
+    private SettingsModelIntegerBounded m_heightModel =
         TagCloudNodeDialog.getHeightModel();
-    
-    private SettingsModelString m_imagetypeModel = 
+
+    private SettingsModelString m_imagetypeModel =
         TagCloudNodeDialog.getImageTypeModel();
-    
+
     private SettingsModelColor m_backgroundColorModel =
         TagCloudNodeDialog.getBackgroundColorModel();
-    
-    private SettingsModelBoolean m_antialiasingModel = 
+
+    private SettingsModelBoolean m_antialiasingModel =
         TagCloudNodeDialog.getAntiAliasingModel();
-    
-    private SettingsModelIntegerBounded m_alphaModel = 
+
+    private SettingsModelIntegerBounded m_alphaModel =
         TagCloudNodeDialog.getAlphaModel();
 
-    private SettingsModelIntegerBounded m_boldModel = 
+    private SettingsModelIntegerBounded m_boldModel =
         TagCloudNodeDialog.getBoldModel();
-    
-    private SettingsModelFont m_fontModel = 
+
+    private SettingsModelFont m_fontModel =
         TagCloudNodeDialog.getFontModel();
 
     /** The selected ID of the Column containing the value. */
@@ -139,21 +140,21 @@ public class TagCloudNodeModel extends NodeModel {
     public static final String INTERNAL_MODEL = "TagCloudNodel.data";
 
     public static final int DEFAULT_WIDTH = 800;
-    
+
     public static final int DEFAULT_HEIGHT = 600;
-    
+
     public static final boolean DEFAULT_ANTIALIASING = true;
-    
+
     public static final Color DEFAULT_BACKGROUND_COLOR = Color.white;
-    
+
     public static final Font DEFAULT_FONT = Font.decode(Font.SANS_SERIF);
-   
-    
+
+
     /**
      * Initializes NodeModel.
      */
      TagCloudNodeModel() {
-         super(new PortType[] {BufferedDataTable.TYPE}, 
+         super(new PortType[] {BufferedDataTable.TYPE},
                  new PortType[] {ImagePortObject.TYPE});
     }
 
@@ -166,14 +167,14 @@ public class TagCloudNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpec inSpec = (DataTableSpec)inSpecs[0];
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpec);
-        /* 
+        /*
          * Verifies if there are at least one termcell and
          * one numbercell and initializes the selected column indexes
          */
         verifier.verifyMinimumTermCells(1, true);
         verifier.verifyMinimumNumberCells(1, true);
         setColumnindexes(inSpec);
-        
+
         final String imgType = m_imagetypeModel.getStringValue();
         ImagePortObjectSpec outSpec;
         if (imgType.toUpperCase().startsWith("SVG")) {
@@ -234,17 +235,17 @@ public class TagCloudNodeModel extends NodeModel {
         m_tagcloud.createTagCloud(exec, this);
         m_tagcloud.changealpha(m_alphaModel.getIntValue());
         m_tagcloud.changebold(m_boldModel.getIntValue());
-        m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(), 
-                m_tagcloud.getmaxFontsize(), getFont().getName(), 
+        m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(),
+                m_tagcloud.getmaxFontsize(), getFont().getName(),
                 m_tagcloud.getCalcType(), m_boldModel.getIntValue());
         m_tagcloud.changeWidth(m_widthModel.getIntValue());
         exec.setProgress(1, "TagCloud completed");
-        
+
         TagCloudViewPlotter plotter = new TagCloudViewPlotter();
         plotter.setTagCloudModel(m_tagcloud);
         plotter.updatePaintModel();
         plotter.fitToSize(getWindowDimension());
-        
+
         TagCloudImageExportPanel panel = new TagCloudImageExportPanel(
                 m_tagcloud);
         panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
@@ -254,9 +255,9 @@ public class TagCloudNodeModel extends NodeModel {
         // to be set in order to get the background drawn properly.
         // If bonds are not set background settings will be ignored even
         // if opaque is set.
-        panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, 
+        panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width,
                 m_tagcloud.getPreferredSize().height);
-        
+
         final String imgType = m_imagetypeModel.getStringValue();
         final ExportType exportType =
                 NodeViewExport.getViewExportMap().get(imgType);
@@ -264,14 +265,13 @@ public class TagCloudNodeModel extends NodeModel {
             throw new InvalidSettingsException("Invalid image type:" + imgType);
         }
         final File file =
-                File.createTempFile("image", "." + exportType.getFileSuffix());
-        file.deleteOnExit();
+                FileUtil.createTempFile("image", "." + exportType.getFileSuffix());
         exec.setMessage("Creating image file...");
-        
-        exportType.export(file, panel, 
+
+        exportType.export(file, panel,
                 panel.getPreferredSize().width,
                 panel.getPreferredSize().height);
-        
+
         final InputStream is = new FileInputStream(file);
         ImagePortObjectSpec outSpec;
         final ImageContent image;
@@ -462,15 +462,15 @@ public class TagCloudNodeModel extends NodeModel {
         return new Dimension(m_widthModel.getIntValue(),
                 m_heightModel.getIntValue());
     }
-    
+
     public boolean useAntialiasing() {
         return m_antialiasingModel.getBooleanValue();
     }
-    
+
     public Color getBackgroundColor() {
         return m_backgroundColorModel.getColorValue();
     }
-    
+
     public Font getFont() {
         return m_fontModel.getFont();
     }
