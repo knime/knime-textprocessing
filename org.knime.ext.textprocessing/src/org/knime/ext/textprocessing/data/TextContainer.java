@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   13.02.2008 (thiel): created
  */
@@ -27,10 +27,11 @@ package org.knime.ext.textprocessing.data;
 
 /**
  * Classes implementing this interface have to contain textual data in any kind
- * of representations. Therefore the method
- * {@link org.knime.ext.textprocessing.data.TextContainer#getText()} enables the
+ * of representations. Therefore the methods
+ * {@link org.knime.ext.textprocessing.data.TextContainer#getText()} and
+ * {@link org.knime.ext.textprocessing.data.TextContainer#getTextWithWsSuffix()} enable the
  * access of this textual data in an unified way.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public interface TextContainer {
@@ -39,7 +40,22 @@ public interface TextContainer {
      * @return The textual data of the <code>TextContainer</code> as a single
      *         String. The difference to {@link java.lang.Object#toString()} is
      *         that not a string representation of the instance is returned but
-     *         only the useful textual data as string.
+     *         only the useful textual data as string. The whitespace suffix of
+     *         the last text entity (trailing white spaces) <b>are not included
+     *         </b> in the returned string, as they are in
+     *         {@link TextContainer#getTextWithWsSuffix()}.
      */
     public String getText();
+
+    /**
+     * @return The textual data of the <code>TextContainer</code> as a single
+     *         String. The difference to {@link java.lang.Object#toString()} is
+     *         that not a string representation of the instance is returned but
+     *         only the useful textual data as string. The difference to
+     *         {@link TextContainer#getText()} is, that the whitespace suffix of
+     *         the last text entity (trailing white spaces) <b>are included</b>
+     *         in the retruned string.
+     * @since 2.8
+     */
+    public String getTextWithWsSuffix();
 }

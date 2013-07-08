@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.knime.ext.textprocessing.util.TextContainers;
+
 /**
  * Contains one or more words (at least one) and groups them to a meaning of a
  * higher-level according to the grouping algorithms (like named entity
@@ -42,18 +44,17 @@ import java.util.List;
  * Part-Of-Speech tags, Named Entity tags, etc. Further a term can be set
  * unmodifiable with the effect that it may not be filtered out or transformed
  * in any way by any node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Term implements TextContainer, Externalizable {
 
     /**
-     * The default string which separates the words, the term contains. This
-     * separator is used i.e. in
-     * {@link org.knime.ext.textprocessing.data.Term#getText()} to separate the
-     * words and create a single string representing the term.
+     * The default string which separates the words, which is used e.g. in {@link Term#toString()}.
      */
     public static final String WORD_SEPARATOR = " ";
+
+    private static final long serialVersionUID = -4594861599001630681L;
 
     private List<Word> m_words;
 
@@ -62,6 +63,7 @@ public class Term implements TextContainer, Externalizable {
     private boolean m_unmodifiable = false;
 
     private int m_hashCode = -1;
+
 
     /**
      * Creates empty instance of <code>Term</code> with all <code>null</code>
@@ -79,7 +81,7 @@ public class Term implements TextContainer, Externalizable {
      * {@link org.knime.ext.textprocessing.data.Word}s representing the term,
      * the list of {@link org.knime.ext.textprocessing.data.Tag}s and the
      * unmodifiable flag.
-     * 
+     *
      * @param words The list of words the term consist of.
      * @param tags The tags representing the meanings of the term.
      * @param unmodifiable If set <code>true</code> the term is set unmodifiable
@@ -133,14 +135,16 @@ public class Term implements TextContainer, Externalizable {
      */
     @Override
     public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_words.size(); i++) {
-            sb.append(m_words.get(i).getText());
-            if (i < m_words.size() - 1) {
-                sb.append(WORD_SEPARATOR);
-            }
-        }
-        return sb.toString();
+        return TextContainers.getText(m_words);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public String getTextWithWsSuffix() {
+        return TextContainers.getTextWithWsSuffix(m_words);
     }
 
     /**
@@ -149,7 +153,7 @@ public class Term implements TextContainer, Externalizable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getText());
+        sb.append(getText().trim());
         sb.append("[");
         for (int i = 0; i < m_tags.size(); i++) {
             sb.append(m_tags.get(i).getTagValue());
@@ -199,7 +203,7 @@ public class Term implements TextContainer, Externalizable {
      * of words. Otherwise <code>false</code> is returned. Attributes like tags
      * or modifiability is not compared, therefore use
      * {@link Term#equals(Object)}.
-     * 
+     *
      * @param o The object to compare with.
      * @return <code>true</code> if given object is an instance of
      *         <code>Term</code> and the list of words is equal to the list of

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   13.02.2008 (thiel): created
  */
@@ -33,13 +33,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.knime.ext.textprocessing.util.TextContainers;
+
 /**
  * Contains a complete paragraph as a list of
  * {@link org.knime.ext.textprocessing.data.Sentence}s.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Paragraph implements TextContainer, Externalizable {
+
+    private static final long serialVersionUID = 8317307915043783911L;
 
     private List<Sentence> m_sentences;
 
@@ -58,7 +62,7 @@ public class Paragraph implements TextContainer, Externalizable {
      * {@link org.knime.ext.textprocessing.data.Sentence}s to set. The list may
      * not be <code>null</code> otherwise a <code>NullPointerException</code>
      * will be thrown.
-     * 
+     *
      * @param sentences The list of sentences to set.
      * @throws NullPointerException If the given list of sentences is
      *             <code>null</code>
@@ -84,14 +88,16 @@ public class Paragraph implements TextContainer, Externalizable {
      */
     @Override
     public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_sentences.size(); i++) {
-            sb.append(m_sentences.get(i).getText());
-            if (i < m_sentences.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
-        }
-        return sb.toString();
+        return TextContainers.getText(m_sentences);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public String getTextWithWsSuffix() {
+        return TextContainers.getTextWithWsSuffix(m_sentences);
     }
 
     /**
@@ -100,11 +106,8 @@ public class Paragraph implements TextContainer, Externalizable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_sentences.size(); i++) {
-            sb.append(m_sentences.get(i).toString());
-            if (i < m_sentences.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
+        for (Sentence sentence : m_sentences) {
+            sb.append(sentence.toString());
         }
         return sb.toString();
     }

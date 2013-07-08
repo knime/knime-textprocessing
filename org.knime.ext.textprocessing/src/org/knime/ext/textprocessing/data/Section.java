@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   13.02.2008 (thiel): created
  */
@@ -33,16 +33,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.knime.ext.textprocessing.util.TextContainers;
+
 /**
  * Contains all corresponding
  * {@link org.knime.ext.textprocessing.data.Paragraph}s as a list as well as a
  * annotation ({@link org.knime.ext.textprocessing.data.SectionAnnotation})
  * marking out the position and rolw of the section, i.e. title, abstract,
  * chapter, etc.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Section implements TextContainer, Externalizable {
+
+    private static final long serialVersionUID = 4227750560050399781L;
 
     private List<Paragraph> m_paragraphs;
 
@@ -65,7 +69,7 @@ public class Section implements TextContainer, Externalizable {
      * {@link org.knime.ext.textprocessing.data.SectionAnnotation} to set. If
      * one of these parameters is <code>null</code> a
      * <code>NullPointerException</code> will be thrown.
-     * 
+     *
      * @param paragraphs The list of paragraphs to set.
      * @param annotation The annotation to set.
      * @throws NullPointerException If the given list of paragraphs or the
@@ -89,7 +93,7 @@ public class Section implements TextContainer, Externalizable {
      * {@link org.knime.ext.textprocessing.data.Paragraph}s. The annotation is
      * set to <code>UNKONWON</code> by default. If the given list of paragraphs
      * is <code>null</code> a <code>NullPointerException</code> will be thrown.
-     * 
+     *
      * @param paragraphs The list of paragraphs to set.
      * @throws NullPointerException If the given list of paragraphs or is
      *             <code>null</code>.
@@ -104,14 +108,16 @@ public class Section implements TextContainer, Externalizable {
      */
     @Override
     public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_paragraphs.size(); i++) {
-            sb.append(m_paragraphs.get(i).getText());
-            if (i < m_paragraphs.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
-        }
-        return sb.toString();
+        return TextContainers.getText(m_paragraphs);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public String getTextWithWsSuffix() {
+        return TextContainers.getTextWithWsSuffix(m_paragraphs);
     }
 
     /**
@@ -134,11 +140,8 @@ public class Section implements TextContainer, Externalizable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_paragraphs.size(); i++) {
-            sb.append(m_paragraphs.get(i).toString());
-            if (i < m_paragraphs.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
+        for (Paragraph par : m_paragraphs) {
+            sb.append(par.toString());
         }
         return sb.toString();
     }

@@ -439,11 +439,7 @@ public class DocumentBuilder {
     private Section internalAddSection(final String section,
             final SectionAnnotation annotation) {
         if (section != null && section.length() > 0 && !section.equals("")) {
-            List<String> strSentences = m_sentenceTokenizer.tokenize(section);
-            List<Sentence> sentences = new ArrayList<Sentence>();
-            for (String s : strSentences) {
-                sentences.add(internalAddSentence(s));
-            }
+            List<Sentence> sentences = createSentenceList(section);
             Paragraph p = new Paragraph(sentences);
             List<Paragraph> paragraphs = new ArrayList<Paragraph>();
             paragraphs.add(p);
@@ -461,12 +457,54 @@ public class DocumentBuilder {
      */
     private Paragraph internalAddParagraph(final String paragraph) {
         if (paragraph != null && paragraph.length() > 0) {
-            List<String> strSentences = m_sentenceTokenizer.tokenize(paragraph);
-            List<Sentence> sentences = new ArrayList<Sentence>();
-            for (String s : strSentences) {
-                sentences.add(internalAddSentence(s));
-            }
+            List<Sentence> sentences = createSentenceList(paragraph);
             return new Paragraph(sentences);
+        }
+        return null;
+    }
+
+    /**
+     * Creates and returns list of sentences from given text.
+     * @param text The text to create a list of sentences from
+     * @return A list of sentences.
+     */
+    private List<Sentence> createSentenceList(final String text) {
+        if (text != null && !text.isEmpty()) {
+            List<String> strSentences = m_sentenceTokenizer.tokenize(text);
+            List<Sentence> sentences = new ArrayList<Sentence>();
+
+            String cpyText = text;
+            for (int i = 0; i < strSentences.size(); i++) {
+                final String sentence = strSentences.get(i);
+                final String whiteSpaceSuffix;
+                String nextSentence = null;
+                if (i < strSentences.size() - 1) {
+                    nextSentence = strSentences.get(i + 1);
+                }
+
+                //
+                // extract whitespace suffix characters
+                //
+
+                int tokenStart = cpyText.indexOf(sentence);
+                cpyText = cpyText.substring(tokenStart + sentence.length());
+
+                if (nextSentence != null) {
+                    int nextTokenStart = cpyText.indexOf(nextSentence);
+                    whiteSpaceSuffix = cpyText.substring(0, nextTokenStart);
+                    cpyText = cpyText.substring(nextTokenStart);
+                } else {
+                    if (cpyText.length() > 0) {
+                        whiteSpaceSuffix = cpyText;
+                    } else {
+                        whiteSpaceSuffix = "";
+                    }
+                }
+
+                sentences.add(internalAddSentence(sentence + whiteSpaceSuffix));
+            }
+
+            return sentences;
         }
         return null;
     }
@@ -480,36 +518,49 @@ public class DocumentBuilder {
      */
     private Sentence internalAddSentence(final String sentence) {
         if (sentence != null) {
+            // get tokens
             List<String> tokens = m_wordTokenizer.tokenize(sentence);
-            return internalAddSentence(tokens);
-        }
-        return null;
-    }
 
-    /**
-     * Build a new instance of
-     * {@link org.knime.ext.textprocessing.data.Sentence} out of the given list
-     * of strings. {@link org.knime.ext.textprocessing.data.Word} instances as
-     * well as {@link org.knime.ext.textprocessing.data.Term instances} are
-     * created, for each string one. The words are registered and cached in the
-     * word cache.
-     *
-     * @param words The list of string representing the words, to build a
-     *            sentence out of.
-     * @return The sentence build out of the given list of strings.
-     */
-    private Sentence internalAddSentence(final List<String> words) {
-        if (words != null) {
-            List<Term> terms = new ArrayList<Term>();
-            for (String s : words) {
-                // TODO filter out punctuation marks ?
-                Word w = new Word(s);
-                List<Word> termWords = new ArrayList<Word>();
-                termWords.add(w);
-                Term t = new Term(termWords, new ArrayList<Tag>(), false);
-                terms.add(t);
+            if (tokens != null) {
+                List<Term> terms = new ArrayList<Term>(tokens.size());
+                String cpySentence = sentence;
+
+                for (int i = 0; i < tokens.size(); i++) {
+                    final String token = tokens.get(i);
+                    final String whiteSpaceSuffix;
+                    String nextToken = null;
+                    if (i < tokens.size() - 1) {
+                        nextToken = tokens.get(i + 1);
+                    }
+
+                    //
+                    // extract whitespace suffix characters
+                    //
+
+                    int tokenStart = cpySentence.indexOf(token);
+                    cpySentence = cpySentence.substring(tokenStart + token.length());
+
+                    if (nextToken != null) {
+                        int nextTokenStart = cpySentence.indexOf(nextToken);
+                        whiteSpaceSuffix = cpySentence.substring(0, nextTokenStart);
+                        cpySentence = cpySentence.substring(nextTokenStart);
+                    } else {
+                        if (cpySentence.length() > 0) {
+                            whiteSpaceSuffix = cpySentence;
+                        } else {
+                            whiteSpaceSuffix = "";
+                        }
+                    }
+
+                    // create word with token and whitespace suffix characters
+                    Word w = new Word(token, whiteSpaceSuffix);
+                    List<Word> termWords = new ArrayList<Word>(1);
+                    termWords.add(w);
+                    Term t = new Term(termWords, new ArrayList<Tag>(1), false);
+                    terms.add(t);
+                }
+                return new Sentence(terms);
             }
-            return new Sentence(terms);
         }
         return null;
     }

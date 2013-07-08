@@ -137,7 +137,9 @@ public final class DocumentPanel extends JPanel implements Observer {
     }
 
 
-
+    private static final String replaceWhitespaces(final String str) {
+        return str.replaceAll("\\s", "&ensp;");
+    }
 
     private String getPreparedText() {
         StringBuffer buffer = new StringBuffer();
@@ -166,7 +168,7 @@ public final class DocumentPanel extends JPanel implements Observer {
 
     private String getParagraphText(final Paragraph p) {
         if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch()) {
-            return p.getText();
+            return replaceWhitespaces(p.getText());
         }
 
         // selected color to hex str
@@ -181,8 +183,8 @@ public final class DocumentPanel extends JPanel implements Observer {
                 if (m_docViewModel.isHiliteSearch() && m_docViewModel.getSearchString() != null) {
                     if (searchMatch(t, m_docViewModel.getSearchString())) {
                         paramStr.append("<font style=\"BACKGROUND-COLOR: green; COLOR: white\">"
-                                + t.getText() + "</font>");
-                        paramStr.append(" ");
+                                + replaceWhitespaces(t.getText()) + "</font>");
+                        paramStr.append(replaceWhitespaces(t.getTextWithWsSuffix().substring(t.getText().length())));
                         marked = true;
                         continue;
                     }
@@ -201,12 +203,14 @@ public final class DocumentPanel extends JPanel implements Observer {
                                                                        t.getText());
                                     paramStr.append("<a href=\"" + link + "\">");
                                 }
-                                paramStr.append("<font color=\"#" + hexColorStr + "\">" + t.getText() + "</font>");
+                                paramStr.append("<font color=\"#" + hexColorStr + "\">"
+                                        + replaceWhitespaces(t.getText()) + "</font>");
                                 if (SearchEngines.getInstance().getSearchEngineSetting().size() > 0) {
                                     paramStr.append("</a>");
                                 }
 
-                                paramStr.append(" ");
+                                paramStr.append(
+                                    replaceWhitespaces(t.getTextWithWsSuffix().substring(t.getText().length())));
                                 marked = true;
                                 break;
                             }
@@ -214,7 +218,7 @@ public final class DocumentPanel extends JPanel implements Observer {
                     }
                 }
                 if (!marked) {
-                    paramStr.append(t.getText() + " ");
+                    paramStr.append(replaceWhitespaces(t.getTextWithWsSuffix()));
                 }
             }
         }

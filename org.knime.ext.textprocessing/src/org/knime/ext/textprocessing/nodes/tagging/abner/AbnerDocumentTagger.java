@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -25,15 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.abner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import abner.Tagger;
 
@@ -57,12 +57,12 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
      * Name of the Biocreative model of ABNER.
      */
     public static final String MODEL_BIOCREATIVE = "Biocreative";
-    
+
     /**
      * Name of the NLPBA model of ABNER.
      */
     public static final String MODEL_NLPBA = "NLPBA";
-    
+
     private Tagger m_tagger;
 
     /**
@@ -71,16 +71,16 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
      * The specified ABNER model is used for named entity recognition, if
      * no model or a non valid model is specified the "Biocreative" model is
      * used by default.
-     * 
+     *
      * @param setNeUnmodifiable The unmodifiable flag to set.
      * @param model The ABNER model to use for tagging.
      */
-    public AbnerDocumentTagger(final boolean setNeUnmodifiable, 
+    public AbnerDocumentTagger(final boolean setNeUnmodifiable,
             final String model) {
         super(setNeUnmodifiable);
-        
+
         if (model.equals(MODEL_NLPBA)) {
-            m_tagger = new Tagger(Tagger.NLPBA);    
+            m_tagger = new Tagger(Tagger.NLPBA);
         } else if (model.equals(MODEL_BIOCREATIVE)) {
             m_tagger = new Tagger(Tagger.BIOCREATIVE);
         } else {

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -33,13 +33,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.knime.ext.textprocessing.util.TextContainers;
+
 /**
  * Contains a complete sentence as a list of
  * {@link org.knime.ext.textprocessing.data.Term}s.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Sentence implements TextContainer, Externalizable {
+
+    private static final long serialVersionUID = 2908976905629595643L;
 
     private List<Term> m_terms;
 
@@ -57,7 +61,7 @@ public class Sentence implements TextContainer, Externalizable {
      * Creates a new instance of <code>Sentence</code> with the given list of
      * {@link org.knime.ext.textprocessing.data.Term}s as its words . If it is
      * set to <code>null</code> a <code>NullPointerException</code> is thrown.
-     * 
+     *
      * @param sentence The list of terms to set as sentence.
      * @throws NullPointerException If the list of terms is <code>null</code>.
      */
@@ -82,14 +86,16 @@ public class Sentence implements TextContainer, Externalizable {
      */
     @Override
     public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_terms.size(); i++) {
-            sb.append(m_terms.get(i).getText());
-            if (i < m_terms.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
-        }
-        return sb.toString();
+        return TextContainers.getText(m_terms);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public String getTextWithWsSuffix() {
+        return TextContainers.getTextWithWsSuffix(m_terms);
     }
 
     /**
@@ -98,15 +104,9 @@ public class Sentence implements TextContainer, Externalizable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_terms.size(); i++) {
-            sb.append(m_terms.get(i).toString());
-            if (i < m_terms.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            } else {
-                sb.append(".");
-            }
+        for (Term term : m_terms) {
+            sb.append(term.toString());
         }
-
         return sb.toString();
     }
 

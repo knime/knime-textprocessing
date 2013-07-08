@@ -99,6 +99,23 @@ public enum DocumentDataExtractor {
             return new StringCell(text);
         }
     }),
+    /**Returns the text of the body of a document without title, journal or meta info text.
+     * @since 2.8
+     * */
+    DOCUMENTBODYTEXT("Document body text", new Extractor() {
+        @Override
+        public DataType getDataType() {
+            return StringCell.TYPE;
+        }
+        @Override
+        public DataCell getValue(final Document doc) {
+            final String text = doc.getDocumentBodyText();
+            if (text == null) {
+                return DataType.getMissingCell();
+            }
+            return new StringCell(text);
+        }
+    }),
     /**Returns the authors of a document as string.*/
     AUTHOR("Author", new Extractor() {
         @Override

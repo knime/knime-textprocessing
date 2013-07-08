@@ -36,6 +36,8 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.UUID;
 
+import org.knime.ext.textprocessing.util.TextContainers;
+
 /**
  * Contains the documents text as with all its
  * {@link org.knime.ext.textprocessing.data.Section}s, which are, i.e. title,
@@ -347,11 +349,8 @@ public class Document implements TextContainer, Serializable {
     public String getSectionText(final SectionAnnotation annotation) {
         StringBuilder sb = new StringBuilder();
         List<Section> secs = getSection(annotation);
-        for (int i = 0; i < secs.size(); i++) {
-            sb.append(secs.get(i).getText());
-            if (i < secs.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
+        for (Section section : secs) {
+            sb.append(section.getText());
         }
         return sb.toString();
     }
@@ -394,18 +393,37 @@ public class Document implements TextContainer, Serializable {
     }
 
     /**
+     * @return The body text of a document consisting of text from unknown, chapter, and abstract sections. Text from
+     * title and meta info sections are nopt included.
+     * @since 2.8
+     */
+    public String getDocumentBodyText() {
+        List<Section> sections = new ArrayList<Section>();
+        for (Section sec : m_sections) {
+            if (sec.getAnnotation().equals(SectionAnnotation.UNKNOWN)
+                    || sec.getAnnotation().equals(SectionAnnotation.CHAPTER)
+                    || sec.getAnnotation().equals(SectionAnnotation.ABSTRACT)) {
+                sections.add(sec);
+            }
+        }
+        return TextContainers.getText(sections);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_sections.size(); i++) {
-            sb.append(m_sections.get(i).getText());
-            if (i < m_sections.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
-        }
-        return sb.toString();
+        return TextContainers.getText(m_sections);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 2.8
+     */
+    @Override
+    public String getTextWithWsSuffix() {
+        return TextContainers.getTextWithWsSuffix(m_sections);
     }
 
     /**
@@ -414,11 +432,8 @@ public class Document implements TextContainer, Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < m_sections.size(); i++) {
-            sb.append(m_sections.get(i).toString());
-            if (i < m_sections.size() - 1) {
-                sb.append(Term.WORD_SEPARATOR);
-            }
+        for (Section section : m_sections) {
+            sb.append(section.toString());
         }
         return sb.toString();
     }
