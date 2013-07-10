@@ -135,6 +135,15 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
                 DocumentGrabberConfigKeys.CFGKEY_EXTRACT_META_INFO, false);
     }
 
+    /**
+     * @return Creates and returns the settings model of the append query column setting.
+     * @since 2.8
+     */
+    public static final SettingsModelBoolean getAppendQueryColumnModel() {
+        return new SettingsModelBoolean(
+                DocumentGrabberConfigKeys.CFGKEY_APPEND_QUERYCOLUM, false);
+    }
+
     private DialogComponentButtonLabel m_buttonLabel;
     private SettingsModelString m_queryModel;
     private SettingsModelString m_databaseModel;
@@ -146,6 +155,8 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
      */
     public DocumentGrabberNodeDialog() {
 
+        createNewGroup("Query and databse settings");
+
         m_queryModel = getQueryModel();
         addDialogComponent(new DialogComponentMultiLineString(m_queryModel,
                 "Query: "));
@@ -155,15 +166,34 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         m_buttonLabel.addActionListener(new ButtonListener());
         addDialogComponent(m_buttonLabel);
 
+
+        setHorizontalPlacement(true);
+
+        m_maxResultsModel = getMaxResultsModel();
+        addDialogComponent(new DialogComponentNumber(m_maxResultsModel,
+                "Maximal results: ", 100));
+
+        addDialogComponent(new DialogComponentBoolean(
+            getAppendQueryColumnModel(), "Append query column"));
+
+        setHorizontalPlacement(false);
+
+        setHorizontalPlacement(true);
+
         List<String> namesAsList = new ArrayList<String>(
                 DocumentGrabberFactory.getInstance().getGrabberNames());
         m_databaseModel = getDataBaseModel();
         addDialogComponent(new DialogComponentStringSelection(m_databaseModel,
                 "Database: ", namesAsList));
 
-        m_maxResultsModel = getMaxResultsModel();
-        addDialogComponent(new DialogComponentNumber(m_maxResultsModel,
-                "Maximal results: ", 100));
+        addDialogComponent(new DialogComponentBoolean(getExtractMetaInfoModel(),
+                "Extract meta information if provided by database"));
+
+        setHorizontalPlacement(false);
+
+        closeCurrentGroup();
+
+        createNewGroup("Path and document settings");
 
         m_directoryModel = getDirectoryModel();
         addDialogComponent(new DialogComponentFileChooser(
@@ -171,7 +201,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
                 JFileChooser.SAVE_DIALOG, true));
 
         addDialogComponent(new DialogComponentBoolean(
-                getDeleteFilesModel(), "Delete after parsing: "));
+                getDeleteFilesModel(), "Delete after parsing"));
 
         addDialogComponent(new DialogComponentString(
                 getDocumentCategoryModel(), "Document Category:"));
@@ -180,8 +210,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentStringSelection(
                 getDocumentTypeModel(), "Document Type:", types));
 
-        addDialogComponent(new DialogComponentBoolean(getExtractMetaInfoModel(),
-                "Extract meta information if provided by database"));
+        closeCurrentGroup();
     }
 
     /**

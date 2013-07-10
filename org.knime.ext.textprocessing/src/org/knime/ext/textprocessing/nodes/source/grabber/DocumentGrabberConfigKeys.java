@@ -73,4 +73,10 @@ public final class DocumentGrabberConfigKeys {
      * @since 2.7
      */
     public static final String CFGKEY_EXTRACT_META_INFO = "ExtractMetaInfo";
+
+    /**
+     * Config Key for the extract meta info flag.
+     * @since 2.8
+     */
+    public static final String CFGKEY_APPEND_QUERYCOLUM = "AppendQueryColumn";
 }

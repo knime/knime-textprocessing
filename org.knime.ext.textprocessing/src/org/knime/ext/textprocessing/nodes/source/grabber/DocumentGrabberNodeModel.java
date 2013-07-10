@@ -28,7 +28,13 @@ package org.knime.ext.textprocessing.nodes.source.grabber;
 import java.io.File;
 import java.io.IOException;
 
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.container.AbstractCellFactory;
+import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -82,6 +88,11 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     public static final String DEF_DIR = System.getProperty("user.home");
 
+    /**
+     * The name of the query column.
+     */
+    static final String QUERYCOL_NAME = "Query";
+
 
     private SettingsModelString m_queryModel =
         DocumentGrabberNodeDialog.getQueryModel();
@@ -107,6 +118,9 @@ public class DocumentGrabberNodeModel extends NodeModel {
     private SettingsModelBoolean m_extractMetaInfoSettingsModel =
         DocumentGrabberNodeDialog.getExtractMetaInfoModel();
 
+    private SettingsModelBoolean m_appendQueryColumnModel =
+            DocumentGrabberNodeDialog.getAppendQueryColumnModel();
+
     private DocumentDataTableBuilder m_dtBuilder;
 
     /**
@@ -125,7 +139,15 @@ public class DocumentGrabberNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
+        return new DataTableSpec[]{createColumnRearranger(m_dtBuilder.createDataTableSpec()).createSpec()};
+    }
+
+    private ColumnRearranger createColumnRearranger(final DataTableSpec dataSpec) {
+        ColumnRearranger cR = new ColumnRearranger(dataSpec);
+        if (m_appendQueryColumnModel.getBooleanValue()) {
+            cR.append(new QueryStringCellFactory(QUERYCOL_NAME, m_queryModel.getStringValue()));
+        }
+        return cR;
     }
 
     /**
@@ -163,7 +185,13 @@ public class DocumentGrabberNodeModel extends NodeModel {
                     new File(m_directoryModel.getStringValue()), query);
         }
 
-        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
+        BufferedDataTable docTable = m_dtBuilder.getAndCloseDataTable();
+        if (m_appendQueryColumnModel.getBooleanValue()) {
+            ColumnRearranger cR = createColumnRearranger(docTable.getDataTableSpec());
+            docTable = exec.createColumnRearrangeTable(docTable, cR, exec);
+        }
+
+        return new BufferedDataTable[]{docTable};
     }
 
     private class InternalDocumentParsedEventListener implements
@@ -206,6 +234,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_maxResultsModel.saveSettingsTo(settings);
         m_typeModel.saveSettingsTo(settings);
         m_extractMetaInfoSettingsModel.saveSettingsTo(settings);
+        m_appendQueryColumnModel.saveSettingsTo(settings);
     }
 
     /**
@@ -225,6 +254,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
 
         try {
             m_extractMetaInfoSettingsModel.validateSettings(settings);
+            m_appendQueryColumnModel.validateSettings(settings);
         } catch (InvalidSettingsException e) {
             // catch for the sake of downward compatibility
         }
@@ -246,6 +276,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
 
         try {
             m_extractMetaInfoSettingsModel.loadSettingsFrom(settings);
+            m_appendQueryColumnModel.loadSettingsFrom(settings);
         } catch (InvalidSettingsException e) {
             // catch for the sake of downward compatibility
         }
@@ -270,5 +301,25 @@ public class DocumentGrabberNodeModel extends NodeModel {
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
+    }
+
+
+    private class QueryStringCellFactory extends AbstractCellFactory {
+
+        private String m_query;
+
+        QueryStringCellFactory(final String queryColName, final String query) {
+            super(new DataColumnSpecCreator(queryColName, StringCell.TYPE).createSpec());
+            m_query = query;
+        }
+
+        /* (non-Javadoc)
+         * @see org.knime.core.data.container.CellFactory#getCells(org.knime.core.data.DataRow)
+         */
+        @Override
+        public DataCell[] getCells(final DataRow row) {
+            return new DataCell[]{new StringCell(m_query)};
+        }
+
     }
 }

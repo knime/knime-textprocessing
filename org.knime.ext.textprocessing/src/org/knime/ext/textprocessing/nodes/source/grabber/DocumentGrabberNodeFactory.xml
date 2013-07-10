@@ -18,13 +18,23 @@
 			After a click at the button, the number of results related to the
 			specified query will be shown.
 		</option>
+        <option name="Maximal results">
+            The number of maximal resulting documents to download and parse.
+        </option>
+        <option name="Append query column">
+            If checked a string column is appended, containing the specified query string. 
+        </option>
 		<option name="Database">
 			The database to send the query to and receive the resulting 
 			documents from, i.e.: PubMed.
 		</option>
-		<option name="Maximal results">
-			The number of maximal resulting documents to download and parse.
-		</option>
+        <option name="Extract meta information if provided by database">
+            If checked, meta information is extracted if provided by database.
+            In case of PubMed the meta information consists of PubMed ID, the
+            chemical list, and the mesh heading list assigned to the article.
+            The meta information is stored as a regular section in the 
+            documents, annotated as meta information section.
+        </option>
 		<option name="Documents directory">
 			The directory to save the documents to. The specified directory 
 			must exist, be writable and empty.
@@ -39,13 +49,7 @@
         <option name="Document type">
             The type of the documents.
         </option>
-        <option name="Extract meta information if provided by database">
-            If checked, meta information is extracted if provided by database.
-            In case of PubMed the meta information consists of PubMed ID, the
-            chemical list, and the mesh heading list assigned to the article.
-            The meta information is stored as a regular section in the 
-            documents, annotated as meta information section.
-        </option>        
+     
 	</fullDescription>
 		
 	<ports>
