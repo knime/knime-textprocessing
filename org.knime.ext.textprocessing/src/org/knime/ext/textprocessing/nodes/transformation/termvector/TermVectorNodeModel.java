@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -92,7 +92,7 @@ public class TermVectorNodeModel extends NodeModel {
      * The default setting to ignore tags or not.
      */
     public static final boolean DEFAULT_IGNORE_TAGS = true;
-    
+
     /**
      * The default value to the as collection flag.
      */
@@ -101,10 +101,10 @@ public class TermVectorNodeModel extends NodeModel {
     /**
      * Default name of column containing the terms.
      */
-    public static final String DEFAULT_DOCUMENT_COLNAME = 
+    public static final String DEFAULT_DOCUMENT_COLNAME =
         BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME;
-    
-    
+
+
     private int m_documentColIndex = -1;
 
     private int m_termColIndex = -1;
@@ -117,13 +117,13 @@ public class TermVectorNodeModel extends NodeModel {
 
     private final SettingsModelBoolean m_ignoreTagsModel =
         TermVectorNodeDialog.getIgnoreTagsModel();
-    
-    private final SettingsModelString m_documentColModel = 
+
+    private final SettingsModelString m_documentColModel =
         TermVectorNodeDialog.getDocColModel();
-    
-    private SettingsModelBoolean m_asCollectionModel = 
+
+    private SettingsModelBoolean m_asCollectionModel =
         DocumentVectorNodeDialog.getAsCollectionModel();
-    
+
     private static DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
     /**
@@ -142,7 +142,7 @@ public class TermVectorNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        
+
         DataTableSpec spec = null;
         if (m_asCollectionModel.getBooleanValue()) {
             spec = createDataTableSpecAsCollection(null);
@@ -156,12 +156,12 @@ public class TermVectorNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-        
+
         m_documentColIndex = spec.findColumnIndex(
                 m_documentColModel.getStringValue());
         if (m_documentColIndex < 0) {
             throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
+                    "Index of specified document column is not valid! "
                     + "Check your settings!");
         }
     }
@@ -176,7 +176,7 @@ public class TermVectorNodeModel extends NodeModel {
 
         m_documentColIndex = inData[0].getSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
-        
+
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
         // specified !
@@ -205,6 +205,7 @@ public class TermVectorNodeModel extends NodeModel {
         int currIndex = 0;
         RowIterator it = sortedTable.iterator();
         while (it.hasNext()) {
+            exec.checkCanceled();
             DataRow row = it.next();
             Document d = ((DocumentValue)row.getCell(m_documentColIndex))
                         .getDocument();
@@ -245,17 +246,17 @@ public class TermVectorNodeModel extends NodeModel {
             // if current term is not equals last term, create new feature
             // vector for last term
             if (lastTerm != null) {
-                boolean equals = m_ignoreTagsModel.getBooleanValue() 
-                ? currTerm.equalsWordsOnly(lastTerm) 
+                boolean equals = m_ignoreTagsModel.getBooleanValue()
+                ? currTerm.equalsWordsOnly(lastTerm)
                         : currTerm.equals(lastTerm);
                 if (!equals) {
                     // add old feature vector to table
                     DataRow newRow;
                     if (m_asCollectionModel.getBooleanValue()) {
-                        newRow = createDataRowAsCollection(lastTerm, 
+                        newRow = createDataRowAsCollection(lastTerm,
                                 featureVector);
                     } else {
-                        newRow = createDataRowAsColumns(lastTerm, 
+                        newRow = createDataRowAsColumns(lastTerm,
                                 featureVector);
                     }
                     dc.addRowToTable(newRow);
@@ -293,10 +294,10 @@ public class TermVectorNodeModel extends NodeModel {
         m_rowKeyNr++;
         DataCell termCell = new TermCell(term);
         DataCell collectionCell = CollectionCellFactory.createSparseListCell(
-                featureVector, DEFAULT_CELL); 
+                featureVector, DEFAULT_CELL);
         return new DefaultRow(rowKey, new DataCell[]{termCell, collectionCell});
     }
-    
+
     private DataRow createDataRowAsColumns(final Term term,
             final List<DoubleCell> featureVector) {
         DataCell[] cells = new DataCell[featureVector.size() + 1];
@@ -321,15 +322,15 @@ public class TermVectorNodeModel extends NodeModel {
         // add document column
         DataColumnSpecCreator columnSpecCreator =
             new DataColumnSpecCreator(
-                    BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
+                    BagOfWordsDataTableBuilder.DEF_TERM_COLNAME,
                     TermCell.TYPE);
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         // add feature vector columns
         columnSpecCreator = new DataColumnSpecCreator(
                 BagOfWordsDataTableBuilder.DEF_TERM_VECTOR_COLNAME,
-                ListCell.getCollectionType(DoubleCell.TYPE));        
-        
+                ListCell.getCollectionType(DoubleCell.TYPE));
+
         if (featureIndexTable != null) {
             String[] featureNames = new String[featureIndexTable.size()];
             for (Document d : featureIndexTable.keySet()) {
@@ -339,12 +340,12 @@ public class TermVectorNodeModel extends NodeModel {
                 String origTitle = d.getTitle();
                 String title = origTitle;
                 Integer count = columnTitles.get(origTitle);
-                // if title is used the first time initialize the count value 
+                // if title is used the first time initialize the count value
                 // with 1
                 if (count == null || count < 1) {
                     count = 1;
                     columnTitles.put(origTitle, count);
-                
+
                     // if title occurs another time, add the count value
                 } else if (count >= 1) {
                     count++;
@@ -387,7 +388,7 @@ public class TermVectorNodeModel extends NodeModel {
             if (count == null || count < 1) {
                 count = 1;
                 columnTitles.put(origTitle, count);
-                
+
             // if title occurs another time, add the count value
             } else if (count >= 1) {
                 count++;
