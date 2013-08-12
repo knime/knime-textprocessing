@@ -296,7 +296,7 @@ public enum DocumentDataExtractor {
         @Override
         public DataCell getValue(final Document doc) {
             final File file = doc.getDocFile();
-            if (file == null || file.length() <= 0) {
+            if (file == null) {
                 return DataType.getMissingCell();
             }
             return new StringCell(file.getAbsolutePath());
