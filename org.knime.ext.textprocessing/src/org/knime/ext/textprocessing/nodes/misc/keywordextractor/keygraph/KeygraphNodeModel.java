@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -66,8 +66,8 @@ import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
+import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
-import org.knime.ext.textprocessing.util.SoftDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.UnorderedPair;
 
@@ -202,7 +202,7 @@ public class KeygraphNodeModel extends NodeModel {
                 getTermFrequenciesPerSentence(doc);
 
         progress.checkCanceled();
-        progress.setProgress(0.1, 
+        progress.setProgress(0.1,
                 "Adding and linking the high frequency terms");
         List<Term> highFrequencyTerms =
                 new ArrayList<Term>(ev.getTopFrequentTerms());
@@ -237,9 +237,9 @@ public class KeygraphNodeModel extends NodeModel {
         hfLinks = Maps.getTopValues(hfLinks, highFrequencyTerms.size() - 1);
         for (Entry<UnorderedPair<Term>, Integer> edge : hfLinks.entrySet()) {
             progress.checkCanceled();
-            
+
             UnorderedPair<Term> pair = edge.getKey();
-            keyGraph.addEdge(pair.getFirst(), pair.getSecond(), 
+            keyGraph.addEdge(pair.getFirst(), pair.getSecond(),
                     edge.getValue());
         }
 
@@ -251,7 +251,7 @@ public class KeygraphNodeModel extends NodeModel {
         progress.setProgress(0.3, "Finding clusters");
         Set<Set<Term>> clusters = keyGraph.getConnectedSubgraphs();
         if (m_logger.isDebugEnabled()) {
-            m_logger.debug(("Found " + clusters.size() + " clusters: " 
+            m_logger.debug(("Found " + clusters.size() + " clusters: "
                     + clusters));
         }
 
@@ -267,7 +267,7 @@ public class KeygraphNodeModel extends NodeModel {
             for (Entry<Sentence, FrequencyMap<Term>> ent : termFrequencies
                     .entrySet()) {
                 progress.checkCanceled();
-                
+
                 Sentence sen = ent.getKey();
                 FrequencyMap<Term> freqs = ent.getValue();
 
@@ -294,7 +294,7 @@ public class KeygraphNodeModel extends NodeModel {
         for (Term t : ev.getTerms()) {
             for (Set<Term> cluster : clusters) {
                 progress.checkCanceled();
-                
+
                 int based = 0;
                 for (FrequencyMap<Term> freqs : termFrequencies.values()) {
                     int termfreq = freqs.get(t);
@@ -314,11 +314,11 @@ public class KeygraphNodeModel extends NodeModel {
         Map<Term, Double> keys = new HashMap<Term, Double>();
         for (Term t : ev.getTerms()) {
             progress.checkCanceled();
-            
+
             double prob = 1.0;
             for (Set<Term> cluster : clusters) {
                 prob *= 1.0 - (double)basedvalues.get(
-                        new Pair<Term, Set<Term>>(t,cluster)) 
+                        new Pair<Term, Set<Term>>(t,cluster))
                         / neighbourvalues.get(cluster);
             }
 
@@ -341,7 +341,7 @@ public class KeygraphNodeModel extends NodeModel {
         // Find new edges to add
         for (Term hk : highkey) {
             progress.checkCanceled();
-            
+
             Map<UnorderedPair<Term>, Integer> columns =
                     new HashMap<UnorderedPair<Term>, Integer>();
 
@@ -358,7 +358,7 @@ public class KeygraphNodeModel extends NodeModel {
             // add the highest column connecting the term to the cluster
             for (Set<Term> cluster : clusters) {
                 progress.checkCanceled();
-                
+
                 int maxWeight = -1;
                 UnorderedPair<Term> maxEdge = null;
 
@@ -385,7 +385,7 @@ public class KeygraphNodeModel extends NodeModel {
         Map<Term, Integer> scores = new HashMap<Term, Integer>();
         for (Term node : keyGraph.getNodes()) {
             progress.checkCanceled();
-            
+
             int score = 0;
             Set<Term> neighbours = keyGraph.getNeighbours(node);
             // only keep the neighbours from HF
@@ -437,26 +437,26 @@ public class KeygraphNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
                 exec.createDataContainer(createDataTableSpec());
-        DataCellCache docCache = new SoftDataCellCache(
+        DataCellCache docCache = new LRUDataCellCache(
                TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
-        
-        int rowid = 0;
-        for (Entry<Document, Map<Term, Integer>> e : keywords.entrySet()) {
-            exec.checkCanceled();
-            Document doc = e.getKey();
-            for (Entry<Term, Integer> kw : e.getValue().entrySet()) {
-                DefaultRow row =
-                        new DefaultRow(
-                                new RowKey(Integer.toString(rowid)),
-                                new DataCell[]{
-                                        new TermCell(kw.getKey()),
-                                        new DoubleCell(kw.getValue()),
-                                        docCache.getInstance(doc)});
-                con.addRowToTable(row);
-                rowid++;
+
+        try {
+            int rowid = 0;
+            for (Entry<Document, Map<Term, Integer>> e : keywords.entrySet()) {
+                exec.checkCanceled();
+                Document doc = e.getKey();
+                for (Entry<Term, Integer> kw : e.getValue().entrySet()) {
+                    DefaultRow row =
+                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{new TermCell(kw.getKey()),
+                            new DoubleCell(kw.getValue()), docCache.getInstance(doc)});
+                    con.addRowToTable(row);
+                    rowid++;
+                }
             }
+        } finally {
+            con.close();
+            docCache.close();
         }
-        con.close();
 
         return con.getTable();
     }

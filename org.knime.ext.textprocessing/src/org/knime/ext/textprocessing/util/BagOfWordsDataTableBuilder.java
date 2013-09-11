@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -67,19 +67,19 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * The default term column name in bow data tables.
      */
     public static final String DEF_TERM_COLNAME = "Term";
-    
+
     /**
      * The default term vector column name in bow data tables.
      */
-    public static final String DEF_TERM_VECTOR_COLNAME = "Term Vector";    
-    
+    public static final String DEF_TERM_VECTOR_COLNAME = "Term Vector";
+
     private final TextContainerDataCellFactory m_documentCellFac;
 
     /**
      * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
      */
     public BagOfWordsDataTableBuilder() {
-        m_documentCellFac = 
+        m_documentCellFac =
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
     }
 
@@ -113,55 +113,58 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
             final boolean useTermCache) throws CanceledExecutionException,
             IllegalArgumentException {
         // create cache
-        DataCellCache termCache = new SoftDataCellCache(
+        DataCellCache termCache = new LRUDataCellCache(
                 new TermDataCellFactory());
         BufferedDataContainer dc =
                 exec.createDataContainer(this.createDataTableSpec());
 
-        int i = 1;
-        Set<DataCell> keys = docTerms.keySet();
-        int rowCount = keys.size();
-        int currRow = 1;
+        try {
+            int i = 1;
+            Set<DataCell> keys = docTerms.keySet();
+            int rowCount = keys.size();
+            int currRow = 1;
 
-        for (DataCell d : keys) {
-            if (d == null) {
-                continue;
-            }
-
-            if (!d.getType().isCompatible(DocumentValue.class)) {
-                throw new IllegalArgumentException("DataCell is not "
-                        + "compatible with DocumentValue!");
-            }
-
-            Set<Term> terms = docTerms.get(d);
-            for (Term t : terms) {
-                if (t == null) {
+            for (DataCell d : keys) {
+                if (d == null) {
                     continue;
                 }
-                exec.checkCanceled();
-                RowKey rowKey = new RowKey(new Integer(i).toString());
-                i++;
 
-                TermCell termCell;
-                if (!useTermCache) {
-                    termCell = new TermCell(t);
-                } else {
-                    termCell = (TermCell)termCache.getInstance(t);
+                if (!d.getType().isCompatible(DocumentValue.class)) {
+                    throw new IllegalArgumentException("DataCell is not " + "compatible with DocumentValue!");
                 }
 
-                DataRow row = new DefaultRow(rowKey, termCell, d);
-                dc.addRowToTable(row);
+                Set<Term> terms = docTerms.get(d);
+                for (Term t : terms) {
+                    if (t == null) {
+                        continue;
+                    }
+                    exec.checkCanceled();
+                    RowKey rowKey = new RowKey(new Integer(i).toString());
+                    i++;
+
+                    TermCell termCell;
+                    if (!useTermCache) {
+                        termCell = new TermCell(t);
+                    } else {
+                        termCell = (TermCell)termCache.getInstance(t);
+                    }
+
+                    DataRow row = new DefaultRow(rowKey, termCell, d);
+                    dc.addRowToTable(row);
+                }
+
+                double progress = (double)currRow / (double)rowCount;
+                exec.setProgress(progress, "Creating Bow of document " + currRow + " of " + rowCount);
+                exec.checkCanceled();
+                currRow++;
             }
-
-            double progress = (double)currRow / (double)rowCount;
-            exec.setProgress(progress, "Creating Bow of document " + currRow
-                    + " of " + rowCount);
-            exec.checkCanceled();
-            currRow++;
+        } catch (CanceledExecutionException e) {
+            throw e;
+        } finally {
+            dc.close();
+            docTerms.clear();
+            termCache.close();
         }
-        dc.close();
-
-        docTerms.clear();
 
         return dc.getTable();
     }
@@ -173,8 +176,8 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
     public final DataTableSpec createDataTableSpec() {
         return createDataTableSpec(false);
     }
-    
- 
+
+
     /**
      * Creates a new <code>DataTableSpec</code> for <code>DataTable</code>s
      * containing minimum one column of type <code>DocumentCell</code> to
@@ -182,28 +185,28 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * representing the terms contained by a certain document.
      * @param appendExtraDocCol if set <code>true</code> an additional column
      * containing <code>DocumentCell</code> is appended.
-     * 
+     *
      * @return The <code>DataTableSpec</code> for <code>DataTable</code>s
      *         with one column of type <code>DocumentListCell</code> and one
      *         column of type <code>TermCell</code>.
      */
     public final DataTableSpec createDataTableSpec(
-            final boolean appendExtraDocCol) {        
+            final boolean appendExtraDocCol) {
         // create DataTableSpec for output DataTable
         DataColumnSpecCreator docs = new DataColumnSpecCreator(
-                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, 
+                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME,
                 m_documentCellFac.getDataType());
         DataColumnSpecCreator docs2 = new DataColumnSpecCreator(
-                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME, 
-                m_documentCellFac.getDataType());        
+                BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME,
+                m_documentCellFac.getDataType());
         DataColumnSpecCreator terms = new DataColumnSpecCreator(
-                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, 
+                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME,
                 TermCell.TYPE);
-        
+
         if (!appendExtraDocCol) {
             return new DataTableSpec(terms.createSpec(), docs.createSpec());
         }
-        return new DataTableSpec(terms.createSpec(), docs.createSpec(), 
+        return new DataTableSpec(terms.createSpec(), docs.createSpec(),
                 docs2.createSpec());
     }
 }

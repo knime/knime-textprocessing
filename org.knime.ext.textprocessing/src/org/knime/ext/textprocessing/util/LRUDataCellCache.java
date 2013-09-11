@@ -46,75 +46,68 @@
  * ------------------------------------------------------------------------
  *
  * History
- *   08.11.2011 (thiel): created
+ *   02.09.2013 (Kilian Thiel): created
  */
+
 package org.knime.ext.textprocessing.util;
 
 import java.lang.ref.SoftReference;
-import java.util.Hashtable;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.util.memory.MemoryWarningSystem;
+import org.knime.core.data.util.memory.MemoryWarningSystem.MemoryWarningListener;
+import org.knime.core.node.NodeLogger;
+import org.knime.core.util.LRUCache;
 import org.knime.ext.textprocessing.data.TextContainer;
 
 /**
+ * A lru data cell cache for text containers with fixed size.
  *
- * @author Kilian Thiel, University of Konstanz
- * @deprecated use {@link LRUDataCellCache} instead. SoftDataCellCache can run into memory problems. Do not use this
- * cache!
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.8
  */
-@Deprecated
-public class SoftDataCellCache extends DataCellCache {
+public final class LRUDataCellCache extends DataCellCache {
 
-    private SoftReference<Hashtable<TextContainer, DataCell>> m_cacheRef;
+    /** Logger. */
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(LRUDataCellCache.class);
 
-    private static final int INIT_CACHE_SIZE = 1000;
+    private static final int DEF_CACHE_SIZE = 1000;
 
-    private int m_initialCachSize;
+    private LRUCache<TextContainer, SoftReference<DataCell>> m_cache;
 
-    /**
-     * Creates new instance of <code>FullDataCellCache</code> with a
-     * initial cache size of 1000 as default and the given
-     * <code>TextContainerDataCellFactory</code> to create the proper
-     * type of <code>DataCell</code>s.
-     *
-     * @param fac The <code>TextContainerDataCellFactory</code> to create the
-     * proper type of <code>DataCell</code>s.
-     */
-    public SoftDataCellCache(final TextContainerDataCellFactory fac) {
-        this(INIT_CACHE_SIZE, fac);
-    }
+    private int m_maxHistory;
 
-    /**
-     * Creates new instance of <code>FullDataCellCache</code> with the
-     * given initial cache size and the given
-     * <code>TextContainerDataCellFactory</code> to create the proper
-     * type of <code>DataCell</code>s.
-     *
-     * @param initialCacheSize The initial size of the internal cache.
-     * @param fac The <code>TextContainerDataCellFactory</code> to create the
-     * proper type of <code>DataCell</code>s.
-     */
-    public SoftDataCellCache(final int initialCacheSize,
-            final TextContainerDataCellFactory fac) {
-        super(fac);
-        m_initialCachSize = initialCacheSize;
-        createNewCache();
-    }
-
-    private void createNewCache() {
-        Hashtable<TextContainer, DataCell> cache =
-            new Hashtable<TextContainer, DataCell>(m_initialCachSize);
-        m_cacheRef = new SoftReference<Hashtable<TextContainer, DataCell>>(
-                cache);
-    }
-
-    private Hashtable<TextContainer, DataCell> getCache() {
-        Hashtable<TextContainer, DataCell> cache = m_cacheRef.get();
-        if (cache == null) {
-            createNewCache();
-            cache = m_cacheRef.get();
+    /** To check memory usage and react on low memory. */
+    private final MemoryWarningListener m_memoryWarningListener = new MemoryWarningSystem.MemoryWarningListener() {
+        @Override
+        public void memoryUsageLow(final long usedMemory, final long maxMemory) {
+            LOGGER.debug("Low memory encountered in Textprocessing, clearing "
+                    + LRUDataCellCache.class.getSimpleName() + "( " + m_cache.size() + "element(s))");
+            m_cache.clear();
         }
-        return cache;
+    };
+
+    /**
+     * Constructor for class {@link LRUDataCellCache} with given factory to create data cells with. The maximum
+     * history of the cache is set to 1000.
+     *
+     * @param fac The factory to set and create data cells.
+     */
+    public LRUDataCellCache(final TextContainerDataCellFactory fac) {
+        this(DEF_CACHE_SIZE, fac);
+    }
+
+    /**
+     * Constructor for class {@link LRUDataCellCache} with given factory to create data cells and maximal number of
+     * cells in cache history to set.
+     * @param fac The factory to set and create data cells.
+     * @param maxHistory the maximal number of data cells in cache history.
+     */
+    public LRUDataCellCache(final int maxHistory, final TextContainerDataCellFactory fac) {
+        super(fac);
+        m_maxHistory = maxHistory;
+        m_cache = new LRUCache<TextContainer, SoftReference<DataCell>>(m_maxHistory);
+        MemoryWarningSystem.getInstance().registerListener(m_memoryWarningListener);
     }
 
     /**
@@ -122,14 +115,15 @@ public class SoftDataCellCache extends DataCellCache {
      */
     @Override
     public DataCell getInstance(final TextContainer tc) {
-        Hashtable<TextContainer, DataCell> cache = getCache();
-        DataCell dc;
-        dc = cache.get(tc);
-        if (dc == null) {
-            dc = m_dcFac.createDataCell(tc);
-            cache.put(tc, dc);
+        SoftReference<DataCell> srCell = m_cache.get(tc);
+        DataCell cell;
+        if (srCell == null || srCell.get() == null) {
+            cell = m_dcFac.createDataCell(tc);
+            m_cache.put(tc, new SoftReference<DataCell>(cell));
+        } else {
+            cell = srCell.get();
         }
-        return dc;
+        return cell;
     }
 
     /**
@@ -137,17 +131,16 @@ public class SoftDataCellCache extends DataCellCache {
      */
     @Override
     public void reset() {
-        Hashtable<TextContainer, DataCell> cache = m_cacheRef.get();
-        if (cache != null) {
-            cache.clear();
-        }
+        m_cache.clear();
     }
 
     /**
-     * {@inheritDoc}
+     * Unregisters memory warning listener.
      */
     @Override
     public void close() {
+        LOGGER.debug("Closing lru data cell cache.");
         reset();
+        MemoryWarningSystem.getInstance().removeListener(m_memoryWarningListener);
     }
 }

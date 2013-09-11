@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Plug-in
 Bundle-SymbolicName: org.knime.ext.textprocessing;singleton:=true
-Bundle-Version: 2.8.1.qualifier
+Bundle-Version: 2.8.2.qualifier
 Bundle-ClassPath: knime-textprocessing.jar,
  lib/abner.jar,
  lib/Snowball.jar,
@@ -75,7 +75,7 @@ Export-Package: org.knime.ext.textprocessing,
  org.knime.ext.textprocessing.util.similarity
 Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
- org.knime.core;bundle-version="[2.8.0,3.0.0)",
+ org.knime.core;bundle-version="[2.8.2,3.0.0)",
  org.knime.workbench;bundle-version="[2.5.0,3.0.0)",
  org.knime.workbench.repository;bundle-version="[2.5.0,3.0.0)",
  org.knime.base;bundle-version="[2.5.0,3.0.0)",

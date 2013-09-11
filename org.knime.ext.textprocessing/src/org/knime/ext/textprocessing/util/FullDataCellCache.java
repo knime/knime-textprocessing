@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   22.02.2008 (Kilian Thiel): created
  */
@@ -34,8 +34,8 @@ import org.knime.ext.textprocessing.data.TextContainer;
  * Caches all <code>TextContainer</code> and related <code>DataCell</code>s
  * containing the <code>TextContainer</code> in a <code>Hashtable</code>.
  * See {@link org.knime.ext.textprocessing.util.DataCellCache} for more details
- * about the functionality of a cache. 
- * 
+ * about the functionality of a cache.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 @Deprecated
@@ -44,36 +44,36 @@ public class FullDataCellCache extends DataCellCache {
     private Hashtable<TextContainer, DataCell> m_cache;
 
     private static final int INIT_CACHE_SIZE = 1000;
-    
+
     /**
-     * Creates new instance of <code>FullDataCellCache</code> with a 
-     * initial cache size of 1000 as default and the given 
+     * Creates new instance of <code>FullDataCellCache</code> with a
+     * initial cache size of 1000 as default and the given
      * <code>TextContainerDataCellFactory</code> to create the proper
      * type of <code>DataCell</code>s.
-     * 
-     * @param fac The <code>TextContainerDataCellFactory</code> to create the 
-     * proper type of <code>DataCell</code>s. 
+     *
+     * @param fac The <code>TextContainerDataCellFactory</code> to create the
+     * proper type of <code>DataCell</code>s.
      */
     public FullDataCellCache(final TextContainerDataCellFactory fac) {
         this(INIT_CACHE_SIZE, fac);
     }
-    
+
     /**
-     * Creates new instance of <code>FullDataCellCache</code> with the 
-     * given initial cache size and the given 
+     * Creates new instance of <code>FullDataCellCache</code> with the
+     * given initial cache size and the given
      * <code>TextContainerDataCellFactory</code> to create the proper
      * type of <code>DataCell</code>s.
-     * 
+     *
      * @param initialCacheSize The initial size of the internal cache.
-     * @param fac The <code>TextContainerDataCellFactory</code> to create the 
+     * @param fac The <code>TextContainerDataCellFactory</code> to create the
      * proper type of <code>DataCell</code>s.
      */
-    public FullDataCellCache(final int initialCacheSize, 
+    public FullDataCellCache(final int initialCacheSize,
             final TextContainerDataCellFactory fac) {
         super(fac);
         m_cache = new Hashtable<TextContainer, DataCell>(initialCacheSize);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -94,5 +94,13 @@ public class FullDataCellCache extends DataCellCache {
     @Override
     public void reset() {
         m_cache.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close() {
+        reset();
     }
 }

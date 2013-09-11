@@ -117,22 +117,24 @@ public class AbnerTaggerNodeModel extends NodeModel {
         RowIterator it = inData[0].iterator();
         int rowCount = inData[0].getRowCount();
         int currDoc = 1;
-        m_dtBuilder.openDataTable(exec);
-        while (it.hasNext()) {
+        try {
+            m_dtBuilder.openDataTable(exec);
+            while (it.hasNext()) {
 
-            double progress = (double)currDoc / (double)rowCount;
-            exec.setProgress(progress, "Tagging document " + currDoc + " of "
-                    + rowCount);
-            exec.checkCanceled();
-            currDoc++;
+                double progress = (double)currDoc / (double)rowCount;
+                exec.setProgress(progress, "Tagging document " + currDoc + " of " + rowCount);
+                exec.checkCanceled();
+                currDoc++;
 
-            DataRow row = it.next();
-            DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-            m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()),
-                                    row.getKey());
+                DataRow row = it.next();
+                DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
+                m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()), row.getKey());
+            }
+
+            return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
+        } finally {
+            m_dtBuilder.closeCache();
         }
-
-        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
 
     /**
@@ -187,5 +189,8 @@ public class AbnerTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
+        try {
+            m_dtBuilder.getAndCloseDataTable();
+        } catch (Exception e) { /* Do noting just try */ }
     }
 }

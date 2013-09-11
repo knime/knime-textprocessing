@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.ext.textprocessing" version="2">
+    <resource path="META-INF/MANIFEST.MF">
+        <filter id="924844039">
+            <message_arguments>
+                <message_argument value="2.8.2"/>
+                <message_argument value="2.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="META-INF/MANIFEST.MF" type="CreateModel">
         <filter id="305324134">
             <message_arguments>
@@ -6125,6 +6133,14 @@
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpenNlpModel"/>
                 <message_argument value="getModel()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/DataCellCache.java" type="org.knime.ext.textprocessing.util.DataCellCache">
+        <filter id="336695337">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.DataCellCache"/>
+                <message_argument value="close()"/>
             </message_arguments>
         </filter>
     </resource>

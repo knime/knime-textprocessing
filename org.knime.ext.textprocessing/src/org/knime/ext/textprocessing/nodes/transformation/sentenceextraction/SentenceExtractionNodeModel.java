@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   20.11.2008 (thiel): created
  */
@@ -55,11 +55,11 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
-import org.knime.ext.textprocessing.util.SoftDataCellCache;
+import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class SentenceExtractionNodeModel extends NodeModel {
@@ -68,25 +68,25 @@ public class SentenceExtractionNodeModel extends NodeModel {
      * The name of the column containing the number of terms.
      */
     static final String TERMCOUNT_COLNAME = "Number of terms";
-    
+
     /**
      * The name of the column containing the sentence.
      */
     static final String SENTENCE_COLNAME = "Sentence";
-    
+
     private int m_docColIndex = -1;
-    
+
     private SettingsModelString m_documentColModel =
         SentenceExtractionNodeDialog.getDocumentColumnModel();
-    
-    
+
+
     /**
      * Creates a new instance of <code>SentenceStatisticsNodeModel</code>.
      */
     public SentenceExtractionNodeModel() {
         super(1, 1);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -95,33 +95,33 @@ public class SentenceExtractionNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier v = new DataTableSpecVerifier(inSpecs[0]);
         v.verifyMinimumDocumentCells(1, true);
-        
+
         m_docColIndex = inSpecs[0].findColumnIndex(
                 m_documentColModel.getStringValue());
         if (m_docColIndex < 0) {
             throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
+                    "Index of specified document column is not valid! "
                     + "Check your settings!");
         }
-        
+
         return new DataTableSpec[]{createOutDataTableSpec()};
-        
+
     }
-    
+
     private DataTableSpec createOutDataTableSpec() {
         DataColumnSpecCreator docCreator = new DataColumnSpecCreator(
-                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, 
-                DocumentCell.TYPE);        
+                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME,
+                DocumentCell.TYPE);
         DataColumnSpecCreator sentenceCreator = new DataColumnSpecCreator(
                 SENTENCE_COLNAME, StringCell.TYPE);
         DataColumnSpecCreator lengthCreator = new DataColumnSpecCreator(
                 TERMCOUNT_COLNAME, IntCell.TYPE);
-        
-        return new DataTableSpec(docCreator.createSpec(), 
+
+        return new DataTableSpec(docCreator.createSpec(),
                 sentenceCreator.createSpec(), lengthCreator.createSpec());
     }
 
-    
+
     /**
      * {@inheritDoc}
      */
@@ -130,40 +130,42 @@ public class SentenceExtractionNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         m_docColIndex = inData[0].getDataTableSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
-        
+
         // create cache
-        DataCellCache docCache = new SoftDataCellCache(
+        DataCellCache docCache = new LRUDataCellCache(
               TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
         BufferedDataContainer dc = exec.createDataContainer(
                 createOutDataTableSpec());
-        
-        int count = 1;
-        RowIterator it = inData[0].iterator();
-        while (it.hasNext()) {
-            DataRow row = it.next();
-            Document doc = 
-                ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
-            DataCell docCell = docCache.getInstance(doc);
-            
-            Iterator<Sentence> si = doc.sentenceIterator();
-            while (si.hasNext()) {
-                exec.checkCanceled();
-                
-                Sentence s = si.next();
-                String sentenceStr = s.getText();
-                int termCount = s.getTerms().size();
-                
-                RowKey rowKey = RowKey.createRowKey(count);
-                DefaultRow newRow = new DefaultRow(rowKey, docCell, 
-                        new StringCell(sentenceStr), new IntCell(termCount));
-                dc.addRowToTable(newRow);
-                
-                count++;
+
+        try {
+            int count = 1;
+            RowIterator it = inData[0].iterator();
+            while (it.hasNext()) {
+                DataRow row = it.next();
+                Document doc = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
+                DataCell docCell = docCache.getInstance(doc);
+
+                Iterator<Sentence> si = doc.sentenceIterator();
+                while (si.hasNext()) {
+                    exec.checkCanceled();
+
+                    Sentence s = si.next();
+                    String sentenceStr = s.getText();
+                    int termCount = s.getTerms().size();
+
+                    RowKey rowKey = RowKey.createRowKey(count);
+                    DefaultRow newRow =
+                        new DefaultRow(rowKey, docCell, new StringCell(sentenceStr), new IntCell(termCount));
+                    dc.addRowToTable(newRow);
+
+                    count++;
+                }
             }
+        } finally {
+            dc.close();
+            docCache.close();
         }
-        docCache.reset();
-        dc.close();
-        
+
         return new BufferedDataTable[]{dc.getTable()};
     }
 
@@ -204,23 +206,23 @@ public class SentenceExtractionNodeModel extends NodeModel {
         m_documentColModel.validateSettings(settings);
     }
 
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec) 
+    protected void loadInternals(final File nodeInternDir,
+            final ExecutionMonitor exec)
     throws IOException, CanceledExecutionException {
         // Nothing to do ...
-    }  
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
     throws IOException, CanceledExecutionException {
         // Nothing to do ...
