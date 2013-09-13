@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   29.07.2008 (thiel): created
  */
@@ -54,50 +54,50 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class StringsToDocumentNodeModel extends NodeModel {
 
     private static final int INPORT = 0;
-    
-    private SettingsModelString m_titleColModel = 
+
+    private SettingsModelString m_titleColModel =
         StringsToDocumentNodeDialog.getTitleStringModel();
-    
-    private SettingsModelString m_fulltextColModel = 
+
+    private SettingsModelString m_fulltextColModel =
         StringsToDocumentNodeDialog.getTextStringModel();
 
-    private SettingsModelString m_authorsColModel = 
+    private SettingsModelString m_authorsColModel =
         StringsToDocumentNodeDialog.getAuthorsStringModel();
-    
-    private SettingsModelString m_authorNameSeparator = 
+
+    private SettingsModelString m_authorNameSeparator =
         StringsToDocumentNodeDialog.getAuthorSplitStringModel();
-    
-    private SettingsModelString m_docSourceModel = 
+
+    private SettingsModelString m_docSourceModel =
         StringsToDocumentNodeDialog.getDocSourceModel();
-    
-    private SettingsModelString m_docCategoryModel = 
+
+    private SettingsModelString m_docCategoryModel =
         StringsToDocumentNodeDialog.getDocCategoryModel();
-    
-    private SettingsModelString m_docTypeModel = 
+
+    private SettingsModelString m_docTypeModel =
         StringsToDocumentNodeDialog.getTypeModel();
-    
-    private SettingsModelString m_pubDateModel = 
+
+    private SettingsModelString m_pubDateModel =
         StringsToDocumentNodeDialog.getPubDatModel();
-    
-    private SettingsModelBoolean m_useCatColumnModel = 
+
+    private SettingsModelBoolean m_useCatColumnModel =
         StringsToDocumentNodeDialog.getUseCategoryColumnModel();
 
-    private SettingsModelBoolean m_useSourceColumnModel = 
+    private SettingsModelBoolean m_useSourceColumnModel =
         StringsToDocumentNodeDialog.getUseSourceColumnModel();
-    
+
     private SettingsModelString m_catColumnModel =
         StringsToDocumentNodeDialog.getCategoryColumnModel();
 
     private SettingsModelString m_sourceColumnModel =
-        StringsToDocumentNodeDialog.getSourceColumnModel();    
-    
-    
+        StringsToDocumentNodeDialog.getSourceColumnModel();
+
+
     /**
      * Creates new instance of <code>StringsToDocumentNodeModel</code>.
      */
@@ -108,62 +108,62 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_useSourceColumnModel.addChangeListener(
                 new CategorySourceUsageChanceListener());
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        
-        DataTableSpecVerifier verifier = 
+
+        DataTableSpecVerifier verifier =
             new DataTableSpecVerifier(inSpecs[INPORT]);
         verifier.verifyMinimumStringCells(1, true);
-        
+
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INPORT])};
     }
 
     private DataTableSpec createDataTableSpec(
             final DataTableSpec inDataSpec) {
         DataColumnSpec strCol = new DataColumnSpecCreator(
-                DataTableSpec.getUniqueColumnName(inDataSpec, 
-                        DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME), 
+                DataTableSpec.getUniqueColumnName(inDataSpec,
+                        DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME),
                 DocumentCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(strCol));
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        
+
         BufferedDataTable inDataTable = inData[INPORT];
         StringsToDocumentConfig conf = new StringsToDocumentConfig();
-        
+
         // Title
         int titleIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
                 m_titleColModel.getStringValue());
         conf.setTitleStringIndex(titleIndex);
-        
+
         // Fulltext
         int fulltextIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
                 m_fulltextColModel.getStringValue());
         conf.setFulltextStringIndex(fulltextIndex);
-        
+
         // Author names
         int authorIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
                 m_authorsColModel.getStringValue());
         conf.setAuthorsStringIndex(authorIndex);
-        
+
         // Author name separator
         String authorNameSeparator = m_authorNameSeparator.getStringValue();
-        if (!authorNameSeparator.isEmpty() 
+        if (!authorNameSeparator.isEmpty()
                 && authorNameSeparator.length() > 0) {
             conf.setAuthorsSplitChar(authorNameSeparator);
         }
-        
+
         // Document source
         String docSource = m_docSourceModel.getStringValue();
         if (!docSource.isEmpty() && docSource.length() > 0) {
@@ -174,7 +174,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
         conf.setSourceStringIndex(docSourceIndex);
         boolean useSourceCol = m_useSourceColumnModel.getBooleanValue();
         conf.setUseSourceColumn(useSourceCol);
-        
+
         // Document category
         String docCat = m_docCategoryModel.getStringValue();
         if (!docCat.isEmpty() && docCat.length() > 0) {
@@ -185,30 +185,28 @@ public class StringsToDocumentNodeModel extends NodeModel {
         conf.setCategoryStringIndex(docCatIndex);
         boolean useCatColumn = m_useCatColumnModel.getBooleanValue();
         conf.setUseCatColumn(useCatColumn);
-        
+
         // Document type
         String docType = m_docTypeModel.getStringValue();
         if (!docType.isEmpty() && docType.length() > 0) {
             conf.setDocType(docType);
         }
-        
+
         // Publication Date
         String pubDate = m_pubDateModel.getStringValue();
         if (!pubDate.isEmpty() && pubDate.length() > 0) {
             conf.setPublicationDate(pubDate);
         }
-        
-        // initializes the corresponding cell factory
-        StringsToDocumentCellFactory cellFac = 
-            new StringsToDocumentCellFactory(conf);
-        
-        // compute frequency and add column
-        ColumnRearranger rearranger = new ColumnRearranger(
-                inDataTable.getDataTableSpec());
-        rearranger.append(cellFac);
-        
-        return new BufferedDataTable[] {
-                exec.createColumnRearrangeTable(inDataTable, rearranger, exec)};
+
+        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf);
+        try {
+            ColumnRearranger rearranger = new ColumnRearranger(inDataTable.getDataTableSpec());
+            rearranger.append(cellFac);
+
+            return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataTable, rearranger, exec)};
+        } finally {
+            cellFac.closeCache();
+        }
     }
 
     /**
@@ -225,7 +223,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_docCategoryModel.loadSettingsFrom(settings);
         m_docTypeModel.loadSettingsFrom(settings);
         m_pubDateModel.loadSettingsFrom(settings);
-        
+
         try {
             m_useCatColumnModel.loadSettingsFrom(settings);
             m_useSourceColumnModel.loadSettingsFrom(settings);
@@ -243,7 +241,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -277,7 +275,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_docCategoryModel.validateSettings(settings);
         m_docTypeModel.validateSettings(settings);
         m_pubDateModel.validateSettings(settings);
-        
+
         try {
             m_useCatColumnModel.validateSettings(settings);
             m_useSourceColumnModel.validateSettings(settings);
@@ -286,50 +284,50 @@ public class StringsToDocumentNodeModel extends NodeModel {
         } catch (InvalidSettingsException e) {
             // don't throw error msg
         }
-        
+
         String pubDate = ((SettingsModelString)m_pubDateModel.
                 createCloneWithValidatedValue(settings)).getStringValue();
-        
+
         Pattern p = Pattern.compile("(\\d){2}-(\\d){2}-(\\d){4}");
         Matcher m = p.matcher(pubDate);
         if (!m.matches()) {
             throw new InvalidSettingsException(
                     "Publicationdate is not formatted properly (dd-mm-yyyy)!");
         }
-        
+
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         df.setLenient(false);
         try {
             df.parse(pubDate);
         } catch (ParseException e) {
             throw new InvalidSettingsException(
-                     "Specified date is not valid!\n" 
+                     "Specified date is not valid!\n"
                     + e.getMessage());
         }
     }
 
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-    
+
     /**
      * Enables and disables text fields of document source and category.
      * @author Kilian Thiel, KNIME.com, Berlin, Germany

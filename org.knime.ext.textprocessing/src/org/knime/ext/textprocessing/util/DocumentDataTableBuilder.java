@@ -90,28 +90,28 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      * {@link DocumentDataTableBuilder#getAndCloseDataTable()} instead.
      */
     @Deprecated
-    public BufferedDataTable createDataTable(final ExecutionContext exec,
-            final List<Document> docs) throws CanceledExecutionException {
-      // create cache
-      DataCellCache cache = new SoftDataCellCache(m_documentCellFac);
-      BufferedDataContainer dc =
-              exec.createDataContainer(this.createDataTableSpec());
+    public BufferedDataTable createDataTable(final ExecutionContext exec, final List<Document> docs)
+        throws CanceledExecutionException {
+        // create cache
+        DataCellCache cache = new LRUDataCellCache(m_documentCellFac);
+        BufferedDataContainer dc = exec.createDataContainer(this.createDataTableSpec());
 
-      int i = 1;
-      for (Document d : docs) {
-          exec.checkCanceled();
-          RowKey rowKey = new RowKey(new Integer(i).toString());
-          DocumentBlobCell docCell = (DocumentBlobCell)cache.getInstance(d);
-          DataRow row = new DefaultRow(rowKey, docCell);
-          dc.addRowToTable(row);
-          i++;
-      }
-      dc.close();
+        try {
+            int i = 1;
+            for (Document d : docs) {
+                exec.checkCanceled();
+                RowKey rowKey = new RowKey(new Integer(i).toString());
+                DocumentBlobCell docCell = (DocumentBlobCell)cache.getInstance(d);
+                DataRow row = new DefaultRow(rowKey, docCell);
+                dc.addRowToTable(row);
+                i++;
+            }
+        } finally {
+            cache.close();
+            dc.close();
+        }
 
-      cache.reset();
-      docs.clear();
-
-      return dc.getTable();
+        return dc.getTable();
     }
 
 
@@ -136,7 +136,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public void openDataTable(final ExecutionContext exec) {
         // create cache
         //m_cache = new FullDataCellCache(m_documentCellFac);
-        m_cache = new SoftDataCellCache(m_documentCellFac);
+        m_cache = new LRUDataCellCache(m_documentCellFac);
 
         m_dc = exec.createDataContainer(this.createDataTableSpec());
         m_opened = true;
@@ -212,15 +212,25 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      */
     public BufferedDataTable getAndCloseDataTable()
         throws IllegalStateException {
+        closeCache();
         if (m_opened) {
             m_dc.close();
-            m_cache.reset();
             m_rowRey = 0;
             m_opened = false;
             return m_dc.getTable();
         } else {
             throw new IllegalStateException("DocumentDataTableBuilder has "
                     + "not been opened! Open before close.");
+        }
+    }
+
+    /**
+     * Closes cache, removes its entries and unregisters listeners.
+     * @since 2.8
+     */
+    public void closeCache() {
+        if (m_cache != null) {
+            m_cache.close();
         }
     }
 

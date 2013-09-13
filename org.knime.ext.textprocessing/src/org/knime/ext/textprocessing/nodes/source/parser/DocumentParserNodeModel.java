@@ -196,47 +196,48 @@ public class DocumentParserNodeModel extends NodeModel {
         List<File> files = fc.getFiles();
         int fileCount = files.size();
         int currFile = 1;
-        m_dtBuilder.openDataTable(exec);
-        for (File f : files) {
 
-            double progress = (double)currFile / (double)fileCount;
-            exec.setProgress(progress, "Parsing file " + currFile + " of "
-                    + fileCount);
-            exec.checkCanceled();
-            currFile++;
-            LOGGER.info("Parsing file: " + f.getAbsolutePath());
+        try {
+            m_dtBuilder.openDataTable(exec);
+            for (File f : files) {
 
-            InputStream is;
-            if (f.getName().toLowerCase().endsWith(".gz")
-                    || f.getName().toLowerCase().endsWith(".zip")) {
-                is = new GZIPInputStream(new FileInputStream(f));
-            } else {
-                is = new FileInputStream(f);
+                double progress = (double)currFile / (double)fileCount;
+                exec.setProgress(progress, "Parsing file " + currFile + " of " + fileCount);
+                exec.checkCanceled();
+                currFile++;
+                LOGGER.info("Parsing file: " + f.getAbsolutePath());
+
+                InputStream is;
+                if (f.getName().toLowerCase().endsWith(".gz") || f.getName().toLowerCase().endsWith(".zip")) {
+                    is = new GZIPInputStream(new FileInputStream(f));
+                } else {
+                    is = new FileInputStream(f);
+                }
+                m_parser.setDocumentFilepath(f.getAbsolutePath());
+
+                try {
+                    // first remove all listeners in order to avoid that two or more
+                    // listeners are registered, adding the same document twice or
+                    // three times.
+                    m_parser.removeAllDocumentParsedListener();
+                    m_parser.addDocumentParsedListener(new InternalDocumentParsedEventListener());
+                    m_parser.parseDocument(is);
+
+                } catch (Exception e) {
+                    LOGGER.error("Could not parse file: " + f.getAbsolutePath().toString());
+                    setWarningMessage("Could not parse all files properly!");
+                    throw e;
+                }
             }
-            m_parser.setDocumentFilepath(f.getAbsolutePath());
+            m_parser.clean();
 
-            try {
-                // first remove all listeners in order to avoid that two or more
-                // listeners are registered, adding the same document twice or
-                // three times.
-                m_parser.removeAllDocumentParsedListener();
-                m_parser.addDocumentParsedListener(
-                        new InternalDocumentParsedEventListener());
-                m_parser.parseDocument(is);
-
-            } catch (Exception e) {
-                LOGGER.error("Could not parse file: "
-                        + f.getAbsolutePath().toString());
-                setWarningMessage("Could not parse all files properly!");
-                throw e;
-            }
+            return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
+        } finally {
+            m_dtBuilder.closeCache();
         }
-        m_parser.clean();
-
-        return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
     }
-    
-    private class InternalDocumentParsedEventListener implements 
+
+    private class InternalDocumentParsedEventListener implements
     DocumentParsedEventListener {
         /**
          * {@inheritDoc}

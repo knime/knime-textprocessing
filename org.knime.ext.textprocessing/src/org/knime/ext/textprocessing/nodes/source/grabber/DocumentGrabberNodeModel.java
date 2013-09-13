@@ -160,38 +160,39 @@ public class DocumentGrabberNodeModel extends NodeModel {
             DocumentGrabberFactory.getInstance().getGrabber(
                     m_dataBaseModel.getStringValue());
 
-        m_dtBuilder.openDataTable(exec);
+        try {
+            m_dtBuilder.openDataTable(exec);
 
-        if (grabber != null)  {
-            String queryStr = m_queryModel.getStringValue();
-            Query query = new Query(queryStr, m_maxResultsModel.getIntValue());
+            if (grabber != null) {
+                String queryStr = m_queryModel.getStringValue();
+                Query query = new Query(queryStr, m_maxResultsModel.getIntValue());
 
-            if (grabber instanceof AbstractDocumentGrabber) {
-                boolean delete = m_deleteFilesModel.getBooleanValue();
-                DocumentCategory cat = new DocumentCategory(
-                        m_categoryModel.getStringValue());
+                if (grabber instanceof AbstractDocumentGrabber) {
+                    boolean delete = m_deleteFilesModel.getBooleanValue();
+                    DocumentCategory cat = new DocumentCategory(m_categoryModel.getStringValue());
 
-                ((AbstractDocumentGrabber)grabber).setDeleteFiles(delete);
-                ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
-                ((AbstractDocumentGrabber)grabber).setExtractMetaInfo(
-                        m_extractMetaInfoSettingsModel.getBooleanValue());
-                ((AbstractDocumentGrabber)grabber).setExec(exec);
+                    ((AbstractDocumentGrabber)grabber).setDeleteFiles(delete);
+                    ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
+                    ((AbstractDocumentGrabber)grabber).setExtractMetaInfo(m_extractMetaInfoSettingsModel
+                        .getBooleanValue());
+                    ((AbstractDocumentGrabber)grabber).setExec(exec);
+                }
+
+                grabber.removeAllDocumentParsedListener();
+                grabber.addDocumentParsedListener(new InternalDocumentParsedEventListener());
+                grabber.fetchAndParseDocuments(new File(m_directoryModel.getStringValue()), query);
             }
 
-            grabber.removeAllDocumentParsedListener();
-            grabber.addDocumentParsedListener(
-                    new InternalDocumentParsedEventListener());
-            grabber.fetchAndParseDocuments(
-                    new File(m_directoryModel.getStringValue()), query);
-        }
+            BufferedDataTable docTable = m_dtBuilder.getAndCloseDataTable();
+            if (m_appendQueryColumnModel.getBooleanValue()) {
+                ColumnRearranger cR = createColumnRearranger(docTable.getDataTableSpec());
+                docTable = exec.createColumnRearrangeTable(docTable, cR, exec);
+            }
 
-        BufferedDataTable docTable = m_dtBuilder.getAndCloseDataTable();
-        if (m_appendQueryColumnModel.getBooleanValue()) {
-            ColumnRearranger cR = createColumnRearranger(docTable.getDataTableSpec());
-            docTable = exec.createColumnRearrangeTable(docTable, cR, exec);
+            return new BufferedDataTable[]{docTable};
+        } finally {
+            m_dtBuilder.closeCache();
         }
-
-        return new BufferedDataTable[]{docTable};
     }
 
     private class InternalDocumentParsedEventListener implements

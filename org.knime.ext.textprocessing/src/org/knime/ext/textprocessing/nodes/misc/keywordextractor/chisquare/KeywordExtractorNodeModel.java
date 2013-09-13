@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -61,8 +61,8 @@ import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
+import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
-import org.knime.ext.textprocessing.util.SoftDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 import org.knime.ext.textprocessing.util.clustering.ClusteringAlgorithm;
@@ -163,7 +163,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
             ExecutionMonitor subDoc = subExecDocs.createSubProgress(
                     1.0 / nbdocs);
 
-            subExecDocs.setProgress("Processing document " + i + " of " 
+            subExecDocs.setProgress("Processing document " + i + " of "
                     + nbdocs);
 
             if (m_ignoreTermTags.getBooleanValue()) {
@@ -198,7 +198,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
             final Document doc, final ExecutionMonitor subDoc) {
         subDoc.setProgress(0.0, "Analysing the document");
 
-        TermEvent e = new TermEvent(doc, 
+        TermEvent e = new TermEvent(doc,
                 (double)m_frequentTermsProportion.getIntValue()/100);
 
         subDoc.setProgress(0.1, "Clustering the frequent terms");
@@ -318,25 +318,25 @@ public class KeywordExtractorNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
             exec.createDataContainer(createDataTableSpec());
-        DataCellCache docCache = new SoftDataCellCache(
+        DataCellCache docCache = new LRUDataCellCache(
               TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
-        
-        int rowid = 0;
-        for (Entry<Document, Map<Term, Double>> e : keywords.entrySet()) {
-            exec.checkCanceled();
-            Document doc = e.getKey();
-            for (Entry<Term, Double> kw : e.getValue().entrySet()) {
-                DefaultRow row = new DefaultRow(
-                        new RowKey(Integer.toString(rowid)),
-                        new DataCell[]{
-                            new TermCell(kw.getKey()),
-                            new DoubleCell(kw.getValue()),
-                            docCache.getInstance(doc)});
-                con.addRowToTable(row);
-                rowid++;
+        try {
+            int rowid = 0;
+            for (Entry<Document, Map<Term, Double>> e : keywords.entrySet()) {
+                exec.checkCanceled();
+                Document doc = e.getKey();
+                for (Entry<Term, Double> kw : e.getValue().entrySet()) {
+                    DefaultRow row =
+                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{new TermCell(kw.getKey()),
+                            new DoubleCell(kw.getValue()), docCache.getInstance(doc)});
+                    con.addRowToTable(row);
+                    rowid++;
+                }
             }
+        } finally {
+            con.close();
+            docCache.close();
         }
-        con.close();
 
         return con.getTable();
     }
