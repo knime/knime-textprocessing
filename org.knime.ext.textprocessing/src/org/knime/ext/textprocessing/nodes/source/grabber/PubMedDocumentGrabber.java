@@ -365,7 +365,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             LOGGER.error("Connection could not be opened.");
             throw e;
         }
-        InputStreamReader isr = new InputStreamReader(conn.getInputStream());
+        InputStreamReader isr = new InputStreamReader(conn.getInputStream(), "UTF-8");
         BufferedReader in = new BufferedReader(isr);
         OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
         OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
