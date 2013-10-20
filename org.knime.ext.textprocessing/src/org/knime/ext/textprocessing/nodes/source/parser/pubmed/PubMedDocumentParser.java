@@ -26,15 +26,18 @@
 package org.knime.ext.textprocessing.nodes.source.parser.pubmed;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -47,7 +50,10 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.xml.sax.Attributes;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -167,6 +173,18 @@ public class PubMedDocumentParser extends DefaultHandler implements
 
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(PubMedDocumentParser.class);
+
+    private static final String PUBMED_DTD_PUBLICID = "-//NLM//DTD PubMedArticle, 1st May 2013//EN";
+
+    private static final String MEDLINE_DTD_PUBLICID = "-//NLM//DTD Medline, 01 May 2013//EN";
+
+    private static final String BOOKDOC_DTD_PUBLICID = "-//NLM//DTD Bookdoc, 01 Jan 2013//EN";
+
+    private static final String PUBMED_DTD_POSTFIX = "/resources/documentformat/pubmed_130501.dtd";
+
+    private static final String MEDLINE_DTD_POSTFIX = "/resources/documentformat/nlmmedlinecitationset_130501.dtd";
+
+    private static final String BOOKDOC_DTD_POSTFIX = "/resources/documentformat/bookdoc_130101.dtd";
 
     private List<Document> m_docs;
 
@@ -596,7 +614,12 @@ public class PubMedDocumentParser extends DefaultHandler implements
     public void parseDocument(final InputStream is) throws Exception {
         m_storeInList = false;
         try {
-            SAXParserFactory.newInstance().newSAXParser().parse(is, this);
+            final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+            final XMLReader reader = parser.getXMLReader();
+            // set local DTD resolver
+            reader.setEntityResolver(new InternalEntityResolver());
+            reader.setContentHandler(this);
+            reader.parse(new InputSource(is));
         } catch (SAXException e) {
             LOGGER.warn("Could not parse PubMed documents, XML is not valid!");
             throw(e);
@@ -640,5 +663,36 @@ public class PubMedDocumentParser extends DefaultHandler implements
     @Override
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
+    }
+
+    /**
+     * Resolves local DTDs.
+     *
+     * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+     */
+    private class InternalEntityResolver implements EntityResolver {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public InputSource resolveEntity(final String publicId, final String systemId)
+                throws IOException, SAXException {
+            final TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
+            String path = plugin.getPluginRootPath();
+
+            if (publicId != null && publicId.equals(PUBMED_DTD_PUBLICID)) {
+                path += PUBMED_DTD_POSTFIX;
+            } else if (publicId != null && publicId.equals(MEDLINE_DTD_PUBLICID)) {
+                path += MEDLINE_DTD_POSTFIX;
+            } else if (publicId != null && publicId.equals(BOOKDOC_DTD_PUBLICID)) {
+                path += BOOKDOC_DTD_POSTFIX;
+            } else {
+                throw new SAXException("Could not find DTD with public id \"" + publicId + "\" and system id \""
+                        + systemId + "\"");
+            }
+
+            return new InputSource(new FileInputStream(path));
+        }
     }
 }
