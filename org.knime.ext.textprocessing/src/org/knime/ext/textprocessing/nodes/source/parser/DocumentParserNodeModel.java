@@ -25,6 +25,7 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -207,11 +208,11 @@ public class DocumentParserNodeModel extends NodeModel {
                 currFile++;
                 LOGGER.info("Parsing file: " + f.getAbsolutePath());
 
-                InputStream is;
-                if (f.getName().toLowerCase().endsWith(".gz") || f.getName().toLowerCase().endsWith(".zip")) {
-                    is = new GZIPInputStream(new FileInputStream(f));
+                final InputStream is;
+                if (f.getName().toLowerCase().endsWith(".gz")) {
+                    is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(f)));
                 } else {
-                    is = new FileInputStream(f);
+                    is = new BufferedInputStream(new FileInputStream(f));
                 }
                 m_parser.setDocumentFilepath(f.getAbsolutePath());
 
