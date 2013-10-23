@@ -95,8 +95,9 @@ import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 
 /**
@@ -120,6 +121,9 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
 
     private final SettingsModelInteger m_procCount =
         createProcessCountModel();
+
+    private TextContainerDataCellFactory m_termFac =
+            TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     /**Constructor for class CooccurrenceCounterNodeModel.
      *
@@ -528,8 +532,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                 final List<DataCell> cells = new LinkedList<DataCell>();
                 cells.add(docCell);
                 if (m_checkTags.getBooleanValue()) {
-                    cells.add(new TermCell(tuple.getTerm1()));
-                    cells.add(new TermCell(tuple.getTerm2()));
+                    cells.add(m_termFac.createDataCell(tuple.getTerm1()));
+                    cells.add(m_termFac.createDataCell(tuple.getTerm2()));
                 } else {
                     cells.add(new StringCell(tuple.getTerm1().getText()));
                     cells.add(new StringCell(tuple.getTerm2().getText()));

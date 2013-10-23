@@ -43,12 +43,18 @@ public final class TextContainerDataCellFactoryBuilder {
      * document cells.
      */
     public static TextContainerDataCellFactory createDocumentCellFactory() {
-        if (!TextprocessingPreferenceInitializer.useBlobCell()) {
+        if (TextprocessingPreferenceInitializer.cellType().equals(
+            TextprocessingPreferenceInitializer.REGULAR_CELLTYPE)) {
             LOGGER.debug("Creating document cell factory!");
             return new DocumentDataCellFactory();
+        } else if (TextprocessingPreferenceInitializer.cellType().equals(
+            TextprocessingPreferenceInitializer.BLOB_CELLTYPE)) {
+          LOGGER.debug("Creating document blob cell factory!");
+          return new DocumentBlobDataCellFactory();
         }
-        LOGGER.debug("Creating document blob cell factory!");
-        return new DocumentBlobDataCellFactory();
+
+        LOGGER.debug("Creating document file store cell factory!");
+        return new DocumentFileStoreDataCellFactory();
     }
 
     /**
@@ -56,6 +62,6 @@ public final class TextContainerDataCellFactoryBuilder {
      * term cells.
      */
     public static TextContainerDataCellFactory createTermCellFactory() {
-        return new TermDataCellFactory();
+        return new TermDataCell2Factory();
     }
 }

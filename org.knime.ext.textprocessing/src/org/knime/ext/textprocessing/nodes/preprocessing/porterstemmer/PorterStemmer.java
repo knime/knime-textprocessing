@@ -1,6 +1,6 @@
-/* @(#)$RCSfile$ 
+/* @(#)$RCSfile$
  * $Revision$ $Date$ $Author$
- * 
+ *
 ========================================================================
  *
  *  Copyright (C) 2003 - 2013
@@ -9,7 +9,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 18, 2006 (Kilian Thiel): created
  */
@@ -33,23 +33,23 @@ import java.util.List;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(
             PorterStemmer.class);
-    
+
     /**
      * Creates new instance of PorterStemmer.
      */
     public PorterStemmer() { }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -58,19 +58,19 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            newWords.add(new Word(PorterStemmer.stem(w.getWord())));
+            newWords.add(new Word(PorterStemmer.stem(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String preprocessString(final String str) {
         return PorterStemmer.stem(str);
-    }    
-    
+    }
+
     /**
      * Returns the stemed version of str.
      * @param str String to stem
@@ -89,7 +89,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
             return str;
         }
     }
-    
+
     private static final String internalStem(final String str) {
         String s = str;
         // check for zero length
@@ -114,12 +114,12 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         s = step5b(s);
         return s;
     }
-    
-    
+
+
     /**
      * Computes step 1a of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 1a of PorterStemmer 
+     * @return String modified under terms of step 1a of PorterStemmer
      * algorithm.
      */
     protected static final String step1a(final String str) {
@@ -142,7 +142,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
     /**
      * Computes step 1b of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 1b of PorterStemmer 
+     * @return String modified under terms of step 1b of PorterStemmer
      * algorithm.
      */
     protected static final String step1b(final String str) {
@@ -163,11 +163,11 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         } // end if
         return str;
     }
-      
+
     /**
      * Computes step 1b2 of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 1b2 of PorterStemmer 
+     * @return String modified under terms of step 1b2 of PorterStemmer
      * algorithm.
      */
     protected static final String step1b2(final String str) {
@@ -175,7 +175,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         if (str.endsWith("at") || str.endsWith("bl") || str.endsWith("iz")) {
             return str + "e";
         } else if ((endsWithDoubleConsonent(str))
-                && (!(str.endsWith("l") || str.endsWith("s") 
+                && (!(str.endsWith("l") || str.endsWith("s")
                         || str.endsWith("z")))) {
             return str.substring(0, str.length() - 1);
         } else if ((stringMeasure(str) == 1) && (endsWithCVC(str))) {
@@ -188,7 +188,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
     /**
      * Computes step 1c of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 1c of PorterStemmer 
+     * @return String modified under terms of step 1c of PorterStemmer
      * algorithm.
      */
     protected static final String step1c(final String str) {
@@ -200,11 +200,11 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return str;
     }
-    
+
     /**
      * Computes step 2 of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 2 of PorterStemmer 
+     * @return String modified under terms of step 2 of PorterStemmer
      * algorithm.
      */
     protected static final String step2(final String str) {
@@ -291,11 +291,11 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return str;
     }
-    
+
     /**
      * Computes step 3 of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 3 of PorterStemmer 
+     * @return String modified under terms of step 3 of PorterStemmer
      * algorithm.
      */
     protected static final String step3(final String str) {
@@ -330,11 +330,11 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return str;
     }
-    
+
     /**
      * Computes step 4 of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 4 of PorterStemmer 
+     * @return String modified under terms of step 4 of PorterStemmer
      * algorithm.
      */
     protected static final String step4(final String str) {
@@ -416,11 +416,11 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return str;
     }
-    
+
     /**
      * Computes step 5a of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 5a of PorterStemmer 
+     * @return String modified under terms of step 5a of PorterStemmer
      * algorithm.
      */
     protected static final String step5a(final String str) {
@@ -440,7 +440,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
     /**
      * Computes step 5b of PorterStemmer algorithm.
      * @param str String to stem.
-     * @return String modified under terms of step 5b of PorterStemmer 
+     * @return String modified under terms of step 5b of PorterStemmer
      * algorithm.
      */
     protected static final String step5b(final String str) {
@@ -450,9 +450,9 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
             return str.substring(0, str.length() - 1);
         }
         return str;
-    }    
-    
-    
+    }
+
+
     /**
      * Returne true if given String ends with 's'.
      * @param str String to check if it ends with 's'.
@@ -461,7 +461,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
     protected static final boolean endsWithS(final String str) {
         return str.endsWith("s");
     }
-    
+
     /**
      * Returns true if given String contains a vowel.
      * @param str String to check if it contains a vowel.
@@ -479,8 +479,8 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
             return true;
         }
         return false;
-    }    
-    
+    }
+
     /**
      * Returns true is givn Char is a vowel.
      * @param c Char to check if it is a vowel.
@@ -493,10 +493,10 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return false;
     }
-    
+
     /**
      * Returns true if given String end with double consonent.
-     * @param str String to check if it ends with double consonent. 
+     * @param str String to check if it ends with double consonent.
      * @return True if given Strign ends with double consonent.
      */
     protected static final boolean endsWithDoubleConsonent(final String str) {
@@ -510,7 +510,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return false;
     }
-    
+
     /**
      * Returns a CVC measure for the string.
      * @param str String to measure
@@ -531,9 +531,9 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
         return count;
     }
-    
+
     /**
-     * Returns true if given String ends with a CVC phrase. 
+     * Returns true if given String ends with a CVC phrase.
      * @param str String to check if it ends with a CVC phrase.
      * @return True if given String end with a CVC phrase.
      */

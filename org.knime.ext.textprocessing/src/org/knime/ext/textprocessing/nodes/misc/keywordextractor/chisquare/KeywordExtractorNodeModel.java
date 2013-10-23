@@ -54,15 +54,14 @@ import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 import org.knime.ext.textprocessing.util.clustering.ClusteringAlgorithm;
@@ -126,8 +125,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
     private SettingsModelDoubleBounded m_L1Threshold =
         KeywordExtractorNodeDialog.createSetL1ThresholdModel();
 
-    private NodeLogger m_logger =
-        org.knime.core.node.NodeLogger.getLogger(getClass());
+    private NodeLogger m_logger = org.knime.core.node.NodeLogger.getLogger(getClass());
 
     /**
      * One input port, one output port.
@@ -199,7 +197,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
         subDoc.setProgress(0.0, "Analysing the document");
 
         TermEvent e = new TermEvent(doc,
-                (double)m_frequentTermsProportion.getIntValue()/100);
+                (double)m_frequentTermsProportion.getIntValue() / 100);
 
         subDoc.setProgress(0.1, "Clustering the frequent terms");
         Set<Term> frequentTerms = e.getTopFrequentTerms();
@@ -316,10 +314,13 @@ public class KeywordExtractorNodeModel extends NodeModel {
     private static BufferedDataTable buildResultTable(
             final Map<Document, Map<Term, Double>> keywords,
             final ExecutionContext exec) throws CanceledExecutionException {
-        BufferedDataContainer con =
-            exec.createDataContainer(createDataTableSpec());
-        DataCellCache docCache = new LRUDataCellCache(
-              TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
+        final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+
+        BufferedDataContainer con = exec.createDataContainer(createDataTableSpec());
+        docCellFac.prepare(exec);
+        final DataCellCache docCache = new LRUDataCellCache(docCellFac);
+
         try {
             int rowid = 0;
             for (Entry<Document, Map<Term, Double>> e : keywords.entrySet()) {
@@ -327,8 +328,9 @@ public class KeywordExtractorNodeModel extends NodeModel {
                 Document doc = e.getKey();
                 for (Entry<Term, Double> kw : e.getValue().entrySet()) {
                     DefaultRow row =
-                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{new TermCell(kw.getKey()),
-                            new DoubleCell(kw.getValue()), docCache.getInstance(doc)});
+                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{
+                            termFac.createDataCell(kw.getKey()), new DoubleCell(kw.getValue()),
+                            docCache.getInstance(doc)});
                     con.addRowToTable(row);
                     rowid++;
                 }
@@ -383,20 +385,17 @@ public class KeywordExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * Creates a DataTableSpec for the node, namely (Term, Double, Document)
+     * Creates a DataTableSpec for the node, namely (Term, Double, Document).
      * @return the data table spec
      */
     private static DataTableSpec createDataTableSpec() {
-        DataColumnSpecCreator keywords =
-            new DataColumnSpecCreator("Keyword", TermCell.TYPE);
-        DataColumnSpecCreator chivalues =
-            new DataColumnSpecCreator("Chi value", DoubleCell.TYPE);
-        DataColumnSpecCreator docs =
-            new DataColumnSpecCreator("Document", DocumentBlobCell.TYPE);
-        return new DataTableSpec(
-                keywords.createSpec(),
-                chivalues.createSpec(),
-                docs.createSpec());
+        final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+
+        DataColumnSpecCreator keywords = new DataColumnSpecCreator("Keyword", termFac.getDataType());
+        DataColumnSpecCreator chivalues = new DataColumnSpecCreator("Chi value", DoubleCell.TYPE);
+        DataColumnSpecCreator docs = new DataColumnSpecCreator("Document", docCellFac.getDataType());
+        return new DataTableSpec(keywords.createSpec(), chivalues.createSpec(), docs.createSpec());
     }
 
     /**

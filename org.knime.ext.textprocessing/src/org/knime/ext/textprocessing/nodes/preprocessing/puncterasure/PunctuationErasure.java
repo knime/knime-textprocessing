@@ -1,6 +1,6 @@
-/* @(#)$RCSfile$ 
+/* @(#)$RCSfile$
  * $Revision$ $Date$ $Author$
- * 
+ *
 ========================================================================
  *
  *  Copyright (C) 2003 - 2013
@@ -9,7 +9,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -21,7 +21,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 18, 2006 (Kilian Thiel): created
  */
@@ -32,24 +32,24 @@ import java.util.List;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class PunctuationErasure implements TermPreprocessing, StringPreprocessing {
 
-    private static String punctMarks = 
+    private static String punctMarks =
         "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]+";
     private static String replacement = "";
-    
+
     /**
      * Creates new instance of <code>PunctuationErasure</code>.
      */
     public PunctuationErasure() { }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -59,11 +59,11 @@ public class PunctuationErasure implements TermPreprocessing, StringPreprocessin
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
             newWords.add(new Word(
-                    PunctuationErasure.punctuationFilter(w.getWord())));
+                    PunctuationErasure.punctuationFilter(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
-    } 
-    
+    }
+
     /**
      * Filters all punctuation marks and replaces them with "". The filtered
      * String is returend.

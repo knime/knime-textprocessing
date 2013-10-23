@@ -198,7 +198,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
             conf.setPublicationDate(pubDate);
         }
 
-        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf);
+        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf, exec);
         try {
             ColumnRearranger rearranger = new ColumnRearranger(inDataTable.getDataTableSpec());
             rearranger.append(cellFac);

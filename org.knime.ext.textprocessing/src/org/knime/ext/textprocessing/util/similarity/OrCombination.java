@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -54,8 +54,8 @@ public class OrCombination<T> extends SimilarityMeasure<T> {
         super();
 
         if (measures.isEmpty()) {
-            throw new IllegalArgumentException("At least one measure must be " +
-            		"provided.");
+            throw new IllegalArgumentException("At least one measure must be "
+                    + "provided.");
         }
 
         // Infer the bounds from the measures'
@@ -92,8 +92,8 @@ public class OrCombination<T> extends SimilarityMeasure<T> {
      */
     @Override
     public double getSimilarityValue(final T e, final Cluster<T> c) {
-        throw new RuntimeException("This operation is not well defined for " +
-        		"this specific similarity measure. Use getMostSimilar.");
+        throw new RuntimeException("This operation is not well defined for "
+                + "this specific similarity measure. Use getMostSimilar.");
     }
 
     /**

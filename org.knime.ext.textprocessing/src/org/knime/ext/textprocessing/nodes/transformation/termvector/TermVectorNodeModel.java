@@ -62,11 +62,12 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeDialog;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  * The model of the document vector node, creates a document feature vector
@@ -125,6 +126,8 @@ public class TermVectorNodeModel extends NodeModel {
         DocumentVectorNodeDialog.getAsCollectionModel();
 
     private static DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
+
+    private final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     /**
      * Creates a new instance of <code>TermVectorNodeModel</code>.
@@ -290,9 +293,9 @@ public class TermVectorNodeModel extends NodeModel {
 
     private DataRow createDataRowAsCollection(final Term term,
             final List<DoubleCell> featureVector) {
-        RowKey rowKey = new RowKey(new Integer(m_rowKeyNr).toString());
+        final RowKey rowKey = new RowKey(new Integer(m_rowKeyNr).toString());
         m_rowKeyNr++;
-        DataCell termCell = new TermCell(term);
+        final DataCell termCell = m_termFac.createDataCell(term);
         DataCell collectionCell = CollectionCellFactory.createSparseListCell(
                 featureVector, DEFAULT_CELL);
         return new DefaultRow(rowKey, new DataCell[]{termCell, collectionCell});
@@ -300,8 +303,8 @@ public class TermVectorNodeModel extends NodeModel {
 
     private DataRow createDataRowAsColumns(final Term term,
             final List<DoubleCell> featureVector) {
-        DataCell[] cells = new DataCell[featureVector.size() + 1];
-        cells[0] = new TermCell(term);
+        final DataCell[] cells = new DataCell[featureVector.size() + 1];
+        cells[0] = m_termFac.createDataCell(term);
         for (int i = 0; i < cells.length - 1; i++) {
             cells[i + 1] = featureVector.get(i);
         }
@@ -321,9 +324,7 @@ public class TermVectorNodeModel extends NodeModel {
 
         // add document column
         DataColumnSpecCreator columnSpecCreator =
-            new DataColumnSpecCreator(
-                    BagOfWordsDataTableBuilder.DEF_TERM_COLNAME,
-                    TermCell.TYPE);
+            new DataColumnSpecCreator(BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, m_termFac.getDataType());
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         // add feature vector columns
@@ -371,8 +372,7 @@ public class TermVectorNodeModel extends NodeModel {
         DataColumnSpec[] columnSpecs = new DataColumnSpec[featureCount + 1];
 
         // add document column
-        DataColumnSpecCreator columnSpecCreator =
-            new DataColumnSpecCreator("Term", TermCell.TYPE);
+        DataColumnSpecCreator columnSpecCreator = new DataColumnSpecCreator("Term", m_termFac.getDataType());
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         // add feature vector columns

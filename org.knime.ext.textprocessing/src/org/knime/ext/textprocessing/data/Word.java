@@ -83,7 +83,7 @@ public class Word implements TextContainer, Externalizable {
      * @param word The word to set.
      * @throws NullPointerException If the given string to set as word is null
      *             an exception will be thrown.
-     * @deprecated use {@link Word#Word(String, String)} instead. The whitespace suffix should be set explicitely.
+     * @deprecated use {@link Word#Word(String, String)} instead. The whitespace suffix should be set explicitly.
      */
     @Deprecated
     public Word(final String word) throws NullPointerException {

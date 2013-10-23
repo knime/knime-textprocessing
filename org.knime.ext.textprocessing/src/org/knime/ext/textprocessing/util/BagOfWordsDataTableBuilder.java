@@ -40,7 +40,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell;
 
 /**
  * Provides convenient methods that create
@@ -74,6 +73,8 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
     public static final String DEF_TERM_VECTOR_COLNAME = "Term Vector";
 
     private final TextContainerDataCellFactory m_documentCellFac;
+
+    private final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     /**
      * Empty constructor of <code>BagOfWordsDataTableBuilder</code>.
@@ -113,10 +114,8 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
             final boolean useTermCache) throws CanceledExecutionException,
             IllegalArgumentException {
         // create cache
-        DataCellCache termCache = new LRUDataCellCache(
-                new TermDataCellFactory());
-        BufferedDataContainer dc =
-                exec.createDataContainer(this.createDataTableSpec());
+        DataCellCache termCache = new LRUDataCellCache(m_termFac);
+        BufferedDataContainer dc = exec.createDataContainer(this.createDataTableSpec());
 
         try {
             int i = 1;
@@ -142,11 +141,11 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
                     RowKey rowKey = new RowKey(new Integer(i).toString());
                     i++;
 
-                    TermCell termCell;
+                    final DataCell termCell;
                     if (!useTermCache) {
-                        termCell = new TermCell(t);
+                        termCell = m_termFac.createDataCell(t);
                     } else {
-                        termCell = (TermCell)termCache.getInstance(t);
+                        termCell = termCache.getInstance(t);
                     }
 
                     DataRow row = new DefaultRow(rowKey, termCell, d);
@@ -201,7 +200,7 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
                 m_documentCellFac.getDataType());
         DataColumnSpecCreator terms = new DataColumnSpecCreator(
                 BagOfWordsDataTableBuilder.DEF_TERM_COLNAME,
-                TermCell.TYPE);
+                m_termFac.getDataType());
 
         if (!appendExtraDocCol) {
             return new DataTableSpec(terms.createSpec(), docs.createSpec());

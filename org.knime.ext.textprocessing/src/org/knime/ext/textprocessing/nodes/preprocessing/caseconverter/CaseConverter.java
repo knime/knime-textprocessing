@@ -93,7 +93,7 @@ public class CaseConverter implements TermPreprocessing, StringPreprocessing {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            newWords.add(new Word(CaseConverter.convert(w.getWord(), m_case)));
+            newWords.add(new Word(CaseConverter.convert(w.getWord(), m_case), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }

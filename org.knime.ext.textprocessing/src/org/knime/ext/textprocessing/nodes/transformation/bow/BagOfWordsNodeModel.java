@@ -27,13 +27,12 @@ package org.knime.ext.textprocessing.nodes.transformation.bow;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-
-import org.knime.base.data.sort.SortedTable;
+import java.util.UUID;
+import javax.swing.event.ChangeListener;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -49,10 +48,13 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.preprocessing.DefaultSwitchEventListener;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -73,15 +75,29 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  */
 public class BagOfWordsNodeModel extends NodeModel {
 
-    private int m_documentColIndex = -1;
+    /**
+     * The default setting for appending the original document.
+     * @since 2.9
+     */
+    public static final boolean DEF_APPEND_ORIGDOCUMENT = false;
 
-    private BagOfWordsDataTableBuilder m_dtBuilder =
-        new BagOfWordsDataTableBuilder();
 
-    private TextContainerDataCellFactory m_termFac =
-        TextContainerDataCellFactoryBuilder.createTermCellFactory();
+    private final SettingsModelString m_docColModel = BagOfWordsNodeDialog.getDocumentColumnModel();
+
+    private final SettingsModelString m_origDocColModel = BagOfWordsNodeDialog.getOrigDocumentColumnModel();
+
+    private final SettingsModelBoolean m_appendOrigDocModel = BagOfWordsNodeDialog.getAppendIncomingDocument();
+
+
+    private BagOfWordsDataTableBuilder m_dtBuilder = new BagOfWordsDataTableBuilder();
+
+    private TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     private int m_rowId = 1;
+
+    private int m_documentColIndex = -1;
+
+    private int m_origDocumentColIndex = -1;
 
     /**
      * Creates a new instance of <code>BagOfWordsNodeModel</code> with one in
@@ -89,23 +105,45 @@ public class BagOfWordsNodeModel extends NodeModel {
      */
     public BagOfWordsNodeModel() {
         super(1, 1);
+
+        final ChangeListener cl = new DefaultSwitchEventListener(m_origDocColModel, m_appendOrigDocModel);
+        m_appendOrigDocModel.addChangeListener(cl);
+        cl.stateChanged(null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
+        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec(m_appendOrigDocModel.getBooleanValue())};
     }
 
-    private void checkDataTableSpec(final DataTableSpec spec)
-    throws InvalidSettingsException {
+    private void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyDocumentCell(true);
-        m_documentColIndex = verifier.getDocumentCellIndex();
+        verifier.verifyMinimumDocumentCells(1, true);
+
+        // if only one document cell is available use it as doc column
+        if (verifier.verifyDocumentCell(false)) {
+            m_documentColIndex = verifier.getDocumentCellIndex();
+
+        // if there are more than one document columns available check settings
+        } else {
+            final String docColName = m_docColModel.getStringValue();
+            final String origDocColName = m_origDocColModel.getStringValue();
+            m_documentColIndex = spec.findColumnIndex(docColName);
+            m_origDocumentColIndex = spec.findColumnIndex(origDocColName);
+        }
+
+        if (m_documentColIndex < 0) {
+            throw new InvalidSettingsException(
+                "Index of specified document column is not valid! Check your settings!");
+        }
+        if (m_origDocumentColIndex < 0 && m_appendOrigDocModel.getBooleanValue()) {
+            throw new InvalidSettingsException(
+                "Index of specified original document column is not valid! Check your settings!");
+        }
     }
 
     /**
@@ -116,45 +154,38 @@ public class BagOfWordsNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
-        // sort list of documents
-        ExecutionContext subExec = exec.createSubExecutionContext(0.3);
-        List<String> sortBy = new ArrayList<String>();
-        sortBy.add(inData[0].getDataTableSpec().getColumnSpec(
-                m_documentColIndex).getName());
-        BufferedDataTable sortedTable = new SortedTable(inData[0], sortBy,
-                new boolean[]{false}, false, subExec).getBufferedDataTable();
-
         // prepare data container
-        BufferedDataContainer bdc = exec.createDataContainer(
-                m_dtBuilder.createDataTableSpec());
+        final BufferedDataContainer bdc = exec.createDataContainer(m_dtBuilder.createDataTableSpec(
+            m_appendOrigDocModel.getBooleanValue()));
+        final Set<UUID> processedDocUUIDs = new HashSet<UUID>();
 
-        ExecutionContext subExec2 = exec.createSubExecutionContext(0.7);
-        Document currDoc = null;
-        Document lastDoc = null;
         DataCell docCell = null;
-        int rowCount = sortedTable.getRowCount();
+        DataCell origDocCell = null;
+
+        final int rowCount = inData[0].getRowCount();
         int currRow = 1;
-        RowIterator it = sortedTable.iterator();
+        final RowIterator it = inData[0].iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
 
             // get terms for document
             docCell = row.getCell(m_documentColIndex);
-            DocumentValue docVal = (DocumentValue)row
-                    .getCell(m_documentColIndex);
+            Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
 
-            currDoc = docVal.getDocument();
-            if (lastDoc == null || !currDoc.equals(lastDoc)) {
-                lastDoc = currDoc;
+            // get original document cell to append
+            if (m_appendOrigDocModel.getBooleanValue()) {
+                origDocCell = row.getCell(m_origDocumentColIndex);
+            }
 
-                Set<Term> terms = setOfTerms(currDoc);
-                addToBOW(terms, docCell, bdc);
+            if (!processedDocUUIDs.contains(doc.getUUID())) {
+                Set<Term> terms = setOfTerms(doc);
+                addToBOW(terms, docCell, origDocCell, bdc);
+                processedDocUUIDs.add(doc.getUUID());
             }
 
             // report status
             double progress = (double)currRow / (double)rowCount;
-            subExec2.setProgress(progress, "Processing document " + currRow
-                    + " of " + rowCount);
+            exec.setProgress(progress, "Processing document " + currRow + " of " + rowCount);
             exec.checkCanceled();
             currRow++;
         }
@@ -163,12 +194,19 @@ public class BagOfWordsNodeModel extends NodeModel {
         return new BufferedDataTable[]{bdc.getTable()};
     }
 
-    private void addToBOW(final Set<Term> terms, final DataCell docCell,
-            final BufferedDataContainer bdc) {
+    private void addToBOW(final Set<Term> terms, final DataCell docCell, final DataCell origDocCell,
+        final BufferedDataContainer bdc) {
         for (Term t : terms) {
-            RowKey key = RowKey.createRowKey(m_rowId);
-            DataCell tc = m_termFac.createDataCell(t);
-            DataRow newRow = new DefaultRow(key, tc, docCell);
+            final RowKey key = RowKey.createRowKey(m_rowId);
+            final DataCell tc = m_termFac.createDataCell(t);
+
+            DataRow newRow;
+            if (origDocCell == null) {
+                newRow = new DefaultRow(key, tc, docCell);
+            } else {
+                newRow = new DefaultRow(key, tc, docCell, origDocCell);
+            }
+
             bdc.addRowToTable(newRow);
             m_rowId++;
         }
@@ -194,6 +232,9 @@ public class BagOfWordsNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_appendOrigDocModel.saveSettingsTo(settings);
+        m_origDocColModel.saveSettingsTo(settings);
+        m_docColModel.saveSettingsTo(settings);
     }
 
     /**
@@ -202,6 +243,13 @@ public class BagOfWordsNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        try {
+            m_appendOrigDocModel.validateSettings(settings);
+            m_origDocColModel.validateSettings(settings);
+            m_docColModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // do nothing, just catch to ensure backwards compatibility
+        }
     }
 
     /**
@@ -210,6 +258,13 @@ public class BagOfWordsNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        try {
+            m_appendOrigDocModel.loadSettingsFrom(settings);
+            m_origDocColModel.loadSettingsFrom(settings);
+            m_docColModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // do nothing, just catch to ensure backwards compatibility
+        }
     }
 
 

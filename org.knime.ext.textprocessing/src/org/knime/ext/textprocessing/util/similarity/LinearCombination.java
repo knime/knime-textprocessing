@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -28,6 +28,8 @@ package org.knime.ext.textprocessing.util.similarity;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.knime.core.node.NodeLogger;
+
 /**
  * Linearly combines multiple similarity measures. In practice, this is quite
  * hard to achieve properly, as there is a risk of the measures adding up to
@@ -37,6 +39,8 @@ import java.util.Map.Entry;
  * @param <T> the type of elements to compare
  */
 public class LinearCombination<T> extends SimilarityMeasure<T> {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(LinearCombination.class);
 
     private Map<SimilarityMeasure<T>, Double> m_measures;
 
@@ -52,13 +56,13 @@ public class LinearCombination<T> extends SimilarityMeasure<T> {
         super();
 
         if (measures.isEmpty()) {
-            throw new IllegalArgumentException("At least one measure must be " +
-            		"provided.");
+            throw new IllegalArgumentException("At least one measure must be "
+                    + "provided.");
         }
 
         // Infer the bounds from the measures
         m_lowerbound = m_higherbound = 0.0;
-        for (Entry<SimilarityMeasure<T>,Double> e : measures.entrySet()) {
+        for (Entry<SimilarityMeasure<T>, Double> e : measures.entrySet()) {
             SimilarityMeasure<T> m = e.getKey();
             double weight = e.getValue();
 
@@ -84,7 +88,7 @@ public class LinearCombination<T> extends SimilarityMeasure<T> {
 
             s += weight * m.getValue(e1, e2);
         }
-        System.out.println(e1 + "::" + e2 + "=" + s);
+        LOGGER.debug(e1 + "::" + e2 + "=" + s);
         return s;
     }
 

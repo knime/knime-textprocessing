@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,12 +19,13 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   23.09.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -34,26 +35,22 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * The <code>AbstractPreprocessor</code> provides the basic fields and members
- * of preprocessor classes. Since they all work on bag of words data tables
- * it contains the index of term and document columns, flags defining whether
- * deep preprocessing has to be applied or not or unmodifiable terms have to be
- * preprocessed as well. Additionally term and document cell factories, a
- * data container and execution monitor is provided.
- * 
- * To implement another preprocessor strategy, the method 
- * {@link org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor#checkPreprocessing()}
- * needs to be implemented in order to check the type of the preprocessing
- * instance to use. Additionally the method
- * {@link org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor#applyPreprocessing(BufferedDataTable, ExecutionContext)} 
- * needs to be implemented in which the preprocessor strategy has to be 
- * specified.
- * 
+ * The <code>AbstractPreprocessor</code> provides the basic fields and members of preprocessor classes. Since they all
+ * work on bag of words data tables it contains the index of term and document columns, flags defining whether deep
+ * preprocessing has to be applied or not or unmodifiable terms have to be preprocessed as well. Additionally term and
+ * document cell factories, a data container and execution monitor is provided.
+ *
+ * To implement another preprocessor strategy, the method
+ * {@link org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor#checkPreprocessing()} needs to be
+ * implemented in order to check the type of the preprocessing instance to use. Additionally the method
+ * {@link org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor#applyPreprocessing(BufferedDataTable, ExecutionContext)}
+ * needs to be implemented in which the preprocessor strategy has to be specified.
+ *
  * @author Kilian Thiel, University of Konstanz
  *
  */
 public abstract class AbstractPreprocessor {
-    
+
     /**
      * The index of the document column.
      */
@@ -68,134 +65,158 @@ public abstract class AbstractPreprocessor {
      * The index of the term column.
      */
     protected int m_termColIndex = -1;
-    
-    
+
+
     /**
      * The preprocessing method to apply.
      */
     protected Preprocessing m_preprocessing;
-    
+
     /**
-     * Flag specifying whether deep preprocessing has to be applied. 
+     * Flag specifying whether deep preprocessing has to be applied.
      */
     protected boolean m_deepPreprocessing;
-    
+
     /**
      * Flag specifying whether original documents have to be applied.
      */
     protected boolean m_appendIncomingDocument;
-    
+
     /**
-     * Flag specifying whether unmodifiable terms have to be preprocessed as 
+     * Flag specifying whether unmodifiable terms have to be preprocessed as
      * well.
      */
     protected boolean m_preprocessUnmodifiable;
-    
-    
-    /**
-     * 
-     */
-    protected TextContainerDataCellFactory m_docCellFac;
-    
-    /**
-     * The term cell factory.
-     */
-    protected TextContainerDataCellFactory m_termCellFac;
-    
+
+
     /**
      * The document cell factory.
      */
-    protected BagOfWordsDataTableBuilder m_fac;
-    
+    protected TextContainerDataCellFactory m_docCellFac =
+            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+
+    /**
+     * The term cell factory.
+     */
+    protected TextContainerDataCellFactory m_termCellFac =
+            TextContainerDataCellFactoryBuilder.createTermCellFactory();
+
+    /**
+     * The bag of words cell factory.
+     */
+    protected BagOfWordsDataTableBuilder m_fac = new BagOfWordsDataTableBuilder();
+
     /**
      * The data contained to add rows.
      */
     protected BufferedDataContainer m_dc = null;
-    
+
     /**
      * The execution context.
      */
     protected ExecutionContext m_exec;
-        
+
     private boolean m_isInitialized = false;
-    
+
     /**
      * Empty constructor of <code>AbstractPreprocessor</code>.
      */
     public AbstractPreprocessor() { }
-    
+
     /**
      * Initialized the preprocessor by setting all the given parameters.
-     * 
+     *
      * @param documentColIndex The index of the document column.
      * @param origDocumentColIndex The index of the original document column.
      * @param termColIndex The index of the term column.
-     * @param deepPrepro If <code>true</code> deep preprocessing will be 
+     * @param deepPrepro If <code>true</code> deep preprocessing will be
      * applied.
-     * @param appendOrigDoc If <code>true</code> original document will be 
+     * @param appendOrigDoc If <code>true</code> original document will be
      * appended.
-     * @param preproUnmodifiable If <code>true</code> unmodifiable terms will 
+     * @param preproUnmodifiable If <code>true</code> unmodifiable terms will
      * be preprocessed.
      * @param prepro The preprocessing to apply.
      * @throws InvalidSettingsException If given parameters are somehow invalid.
      */
-    public void initialize(final int documentColIndex, 
-            final int origDocumentColIndex, final int termColIndex, 
-            final boolean deepPrepro, final boolean appendOrigDoc, 
+    public void initialize(final int documentColIndex,
+            final int origDocumentColIndex, final int termColIndex,
+            final boolean deepPrepro, final boolean appendOrigDoc,
             final boolean preproUnmodifiable, final Preprocessing prepro)
     throws InvalidSettingsException {
         if (prepro == null) {
-            throw new InvalidSettingsException(
-                    "Preprocessing type may not be null!");
+            throw new InvalidSettingsException("Preprocessing type may not be null!");
         }
-        if (documentColIndex < 0) {
-            throw new InvalidSettingsException("Index of document column [" 
-                    + documentColIndex + "] is not valid!");
-        }
-        if (origDocumentColIndex < 0 && appendOrigDoc) {
-            throw new InvalidSettingsException(
-                    "Index of original document column [" 
-                    + origDocumentColIndex + "] is not valid!");
-        }
-        if (termColIndex < 0) {
-            throw new InvalidSettingsException("Index of term column [" 
-                    + termColIndex + "] is not valid!");
-        }
-        
         m_preprocessing = prepro;
+
+        // concrete preprocessor implementations need to check if they can work properly with the specified settings.
+        validateSettings(documentColIndex, origDocumentColIndex, termColIndex, deepPrepro, appendOrigDoc,
+            preproUnmodifiable);
+
+        // concrete preprocessor implementations need to check if the provided preprocessing strategy can be applied.
         checkPreprocessing();
-        
+
         m_documentColIndex = documentColIndex;
         m_origDocumentColIndex = origDocumentColIndex;
         m_termColIndex = termColIndex;
         m_deepPreprocessing = deepPrepro;
         m_appendIncomingDocument = appendOrigDoc;
         m_preprocessUnmodifiable = preproUnmodifiable;
-        
-        m_docCellFac = 
-            TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        m_termCellFac =
-            TextContainerDataCellFactoryBuilder.createTermCellFactory();
-        m_fac = new BagOfWordsDataTableBuilder();
-        
+
         m_isInitialized = true;
     }
-    
+
+    /**
+     * Creates the spec of the data table created by
+     * {@link AbstractPreprocessor#doPreprocessing(BufferedDataTable, ExecutionContext)}.
+     *
+     * @param appendIncomingDocument If {@code true} the original incoming document will be appended.
+     * @return The spec of the data table to create.
+     * @since 2.9
+     */
+    public abstract DataTableSpec createDataTableSpec(final boolean appendIncomingDocument);
+
+    /**
+     * Checks if preprocessor can work on table with given spec. If preprocessor is not suitable for a data table with
+     * given spec an InvalidSettingsException is thrown.
+     *
+     * @param spec The spec of the data table to check.
+     * @throws InvalidSettingsException If preprocessor can not work a data table with spec to check.
+     * @since 2.9
+     */
+    public abstract void validateDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException;
+
+    /**
+     * Validates given preprocessor settings and throws InvalidSettingsException if settings are invalid or can not
+     * be applied to concrete preprocessor.
+     *
+     * @param documentColIndex The index of the document column.
+     * @param origDocumentColIndex The index of the original document column.
+     * @param termColIndex The index of the term column.
+     * @param deepPrepro If {@code true} deep preprocessing will be applied.
+     * @param appendOrigDoc If {@code true} original document will be appended.
+     * @param preproUnmodifiable If {@code true} unmodifiable terms will be preprocessed.
+     * @throws InvalidSettingsException if settings are invalid or can not be applied on concrete preprocessor.
+     * @since 2.9
+     */
+    public abstract void validateSettings(final int documentColIndex, final int origDocumentColIndex,
+            final int termColIndex, final boolean deepPrepro, final boolean appendOrigDoc,
+            final boolean preproUnmodifiable) throws InvalidSettingsException;
+
     /**
      * Checks if the type of the specified preprocessing instance is compatible
-     * with the underlying preprocessor implementation. 
-     * 
-     * @throws InvalidSettingsException If the type of the specified 
+     * with the underlying preprocessor implementation.
+     *
+     * @throws InvalidSettingsException If the type of the specified
      * preprocessing instance is not compatible.
      */
     public abstract void checkPreprocessing() throws InvalidSettingsException;
-    
+
     /**
-     * Checks if the instance is initialized well and runs the preprocessing 
-     * twist on the given data table if so, otherwise an exception will be 
+     * Checks if the instance is initialized well and runs the preprocessing
+     * twist on the given data table if so, otherwise an exception will be
      * thrown.
-     * 
-     * @param inData The incoming data table 
+     *
+     * @param inData The incoming data table
      * @param exec The execution context.
      * @return The output data table.
      * @throws Exception If something happens.
@@ -208,17 +229,17 @@ public abstract class AbstractPreprocessor {
         }
         return applyPreprocessing(inData, exec);
     }
-    
+
     /**
      * Specifies how the preprocessing twist is applied and works (row by row,
      * or chunk wise etc.).
-     * 
-     * @param inData The incoming data table 
+     *
+     * @param inData The incoming data table
      * @param exec The execution context.
      * @return The output data table.
      * @throws Exception If something happens.
      */
     protected abstract BufferedDataTable applyPreprocessing(
-            final BufferedDataTable inData, final ExecutionContext exec) 
+            final BufferedDataTable inData, final ExecutionContext exec)
     throws Exception;
 }

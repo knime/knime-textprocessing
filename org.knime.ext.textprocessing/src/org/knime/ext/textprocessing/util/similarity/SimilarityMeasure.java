@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -38,7 +38,7 @@ import org.knime.ext.textprocessing.util.clustering.Cluster;
  */
 public abstract class SimilarityMeasure<T> {
     /**
-     * Inclusive value over which two elements are considered similar
+     * Inclusive value over which two elements are considered similar.
      */
     protected double m_threshold = 0.0;
 
@@ -67,8 +67,8 @@ public abstract class SimilarityMeasure<T> {
      */
     public SimilarityMeasure(final double threshold) {
         if (getLowerBound() > getHigherBound()) {
-            throw new IllegalArgumentException("The lower bound must be " +
-                    "less than or equal to the higher bound");
+            throw new IllegalArgumentException("The lower bound must be "
+                    + "less than or equal to the higher bound");
         }
 
         setThreshold(threshold);
@@ -146,8 +146,8 @@ public abstract class SimilarityMeasure<T> {
      */
     protected void setThreshold(final double threshold) {
         if (threshold < getLowerBound() || threshold > getHigherBound()) {
-            throw new IllegalArgumentException("The threshold must be between" +
-                    " " + getLowerBound() + " and " + getHigherBound());
+            throw new IllegalArgumentException("The threshold must be between"
+                    + " " + getLowerBound() + " and " + getHigherBound());
         }
 
         m_threshold = threshold;
@@ -176,9 +176,13 @@ public abstract class SimilarityMeasure<T> {
      */
     protected static double clamp(
             final double x, final double min, final double max) {
-        if (x < min) return min;
+        if (x < min) {
+            return min;
+        }
 
-        if (x > max) return max;
+        if (x > max) {
+            return max;
+        }
 
         return x;
     }

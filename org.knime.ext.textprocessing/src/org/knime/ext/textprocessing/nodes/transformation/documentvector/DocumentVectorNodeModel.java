@@ -183,6 +183,8 @@ public class DocumentVectorNodeModel extends NodeModel {
         m_documentColIndex = inData[0].getSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
 
+        m_documentCellFac.prepare(exec);
+
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
         // specified !

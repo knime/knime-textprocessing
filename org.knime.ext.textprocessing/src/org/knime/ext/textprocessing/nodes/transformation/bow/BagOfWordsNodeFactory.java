@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   03.03.2008 (Kilian Thiel): created
  */
@@ -32,7 +32,7 @@ import org.knime.core.node.NodeView;
 /**
  * The {@link org.knime.core.node.NodeFactory} of the bag of words creator,
  * provides methods to create the model and the dialog instance.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class BagOfWordsNodeFactory extends NodeFactory<BagOfWordsNodeModel> {
@@ -42,7 +42,7 @@ public class BagOfWordsNodeFactory extends NodeFactory<BagOfWordsNodeModel> {
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new BagOfWordsNodeDialog();
     }
 
     /**
@@ -57,7 +57,7 @@ public class BagOfWordsNodeFactory extends NodeFactory<BagOfWordsNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<BagOfWordsNodeModel> createNodeView(final int index, 
+    public NodeView<BagOfWordsNodeModel> createNodeView(final int index,
             final BagOfWordsNodeModel model) {
         return null;
     }
@@ -75,6 +75,6 @@ public class BagOfWordsNodeFactory extends NodeFactory<BagOfWordsNodeModel> {
      */
     @Override
     protected boolean hasDialog() {
-        return false;
+        return true;
     }
 }

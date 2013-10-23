@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   04.01.2007 (thiel): created
  */
@@ -42,9 +42,11 @@ import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
  * {@link org.knime.ext.textprocessing.data.Term} value by storing this value in
  * a private <code>Term</code> member. It provides a term value as well as a
  * string value.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated use {@link TermCell2} instead which provides faster de-serialization.
  */
+@Deprecated
 public class TermCell extends DataCell implements StringValue, TermValue {
 
     /**
@@ -55,7 +57,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     /**
      * Convenience access member for
      * <code>DataType.getType(TermCell.class)</code>.
-     * 
+     *
      * @see DataType#getType(Class)
      */
     public static final DataType TYPE = DataType.getType(TermCell.class);
@@ -64,7 +66,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
      * Returns the preferred value class of this cell implementation. This
      * method is called per reflection to determine which is the preferred
      * renderer, comparator, etc.
-     * 
+     *
      * @return TermValue.class;
      */
     public static final Class<? extends DataValue> getPreferredValueClass() {
@@ -76,7 +78,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     /**
      * Returns the factory to read/write DataCells of this class from/to a
      * DataInput/DataOutput. This method is called via reflection.
-     * 
+     *
      * @return A serializer for reading/writing cells of this kind.
      * @see DataCell
      */
@@ -89,7 +91,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     /**
      * Creates a new instance of <code>TermCell</code> with given
      * {@link org.knime.ext.textprocessing.data.Term}.
-     * 
+     *
      * @param term The <code>Term</code> to set.
      */
     public TermCell(final Term term) {
@@ -142,7 +144,7 @@ public class TermCell extends DataCell implements StringValue, TermValue {
     }
 
     /** Factory for (de-)serializing a TermCell. */
-    private static class TermSerializer implements DataCellSerializer<TermCell> 
+    private static class TermSerializer implements DataCellSerializer<TermCell>
     {
 
         /**

@@ -43,9 +43,10 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
@@ -133,9 +134,9 @@ public class StringToTermNodeModel extends NodeModel {
      * @return The column spec of the term column to append.
      */
     static final DataColumnSpec getTermColumnSpec(final DataTableSpec spec) {
-        return new DataColumnSpecCreator(
-                DataTableSpec.getUniqueColumnName(spec, TERM_COLNAME),
-                TermCell.TYPE).createSpec();
+        final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        return new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(spec, TERM_COLNAME), termFac.getDataType())
+            .createSpec();
     }
 
     /**

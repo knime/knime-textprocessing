@@ -40,63 +40,71 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME. The owner of a Node
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
- * History
- *   09.11.2011 (thiel): created
+ * Created on 21.10.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.nodes.preprocessing;
+package org.knime.ext.textprocessing.util;
 
-import java.util.Hashtable;
-import java.util.Set;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataType;
+import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.util.DocumentChunk;
+import org.knime.ext.textprocessing.data.TermCell2;
+import org.knime.ext.textprocessing.data.TextContainer;
 
 /**
+ * A {@link org.knime.ext.textprocessing.util.TextContainerDataCellFactory} creating
+ * {@link org.knime.ext.textprocessing.data.TermCell2}s for given {@link org.knime.ext.textprocessing.data.Term}s.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.9
  */
-public class ChunkToTermPreprocessingAdapter implements ChunkPreprocessing {
-
-    private TermPreprocessing m_termPreprocessing;
+public class TermDataCell2Factory implements TextContainerDataCellFactory {
 
     /**
-     * Creates instance of <code>ChunkToTermPreprocessingAdapter</code> with
-     * given <code>TermPreprocessing</code> to adapt to chunk wise
-     * preprocessing.
-     * @param termPreprocessing The <code>TermPreprocessing</code> to adapt.
+     * {@inheritDoc}
+     *
+     * Creates {@link TermCell2} out of given <code>TextContainer</code> which have to be {@link Term} instances,
+     * otherwise <code>null</code> is returned.
      */
-    public ChunkToTermPreprocessingAdapter(
-            final TermPreprocessing termPreprocessing) {
-        if (termPreprocessing == null) {
-            throw new IllegalArgumentException("Specified TermPreprocessing "
-                   + "to adapt to chunk wise preprocessing may not be null!");
-            }
-        m_termPreprocessing = termPreprocessing;
+    @Override
+    public DataCell createDataCell(final TextContainer tc) {
+        DataCell dc = null;
+        if (tc instanceof Term) {
+            dc = new TermCell2((Term)tc);
+        }
+        return dc;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Hashtable<Term, Term> preprocessChunk(final DocumentChunk chunk) {
-        if (chunk != null) {
-            Set<Term> termsToPreprocess = chunk.getTerms();
-            Hashtable<Term, Term> preprocessedTerms =
-                    new Hashtable<Term, Term>(termsToPreprocess.size());
+    public DataType getDataType() {
+        return TermCell2.TYPE;
+    }
 
-            for (Term t : termsToPreprocess) {
-                Term preprocessedTerm = m_termPreprocessing.preprocessTerm(t);
-                if (preprocessedTerm != null) {
-                    preprocessedTerms.put(t, preprocessedTerm);
-                }
-            }
-
-            return preprocessedTerms;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean validateCellType(final DataCell cell) {
+        if (cell instanceof TermCell2) {
+            return true;
         }
-        return null;
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.8
+     */
+    @Override
+    public void prepare(final ExecutionContext exec) {
     }
 }

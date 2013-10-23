@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -56,8 +56,8 @@ public class TermEvent extends Event<Term> {
      */
     public TermEvent(final Document doc, final int nrFrequentTerms) {
         if (nrFrequentTerms <= 0) {
-            throw new IllegalArgumentException("The number of frequent terms " +
-            		" must be strictly positive");
+            throw new IllegalArgumentException("The number of frequent terms "
+                    + " must be strictly positive");
         }
 
         init(doc);
@@ -71,8 +71,8 @@ public class TermEvent extends Event<Term> {
      */
     public TermEvent(final Document doc, final double frequentTermsProportion) {
         if (frequentTermsProportion < 0 || frequentTermsProportion > 1) {
-            throw new IllegalArgumentException("frequentTermsProportion must " +
-            		"be between 0 and 1");
+            throw new IllegalArgumentException("frequentTermsProportion must "
+                    + "be between 0 and 1");
         }
 
         init(doc);
@@ -147,11 +147,11 @@ public class TermEvent extends Event<Term> {
     public int getNrCooccurrences(final Term t1, final Term t2) {
         return m_cooccurrences.get(UnorderedPair.makePair(t1, t2));
     }
-    
+
     /**
      * @return all terms contained in the document
      */
     public Set<Term> getTerms() {
         return m_terms;
-    }    
+    }
 }

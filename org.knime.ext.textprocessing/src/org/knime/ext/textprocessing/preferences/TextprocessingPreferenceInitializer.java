@@ -38,21 +38,54 @@ public class TextprocessingPreferenceInitializer extends
 
     /**
      * The default "use blob" setting.
+     * @deprecated use {@link TextprocessingPreferenceInitializer#BLOB_CELLTYPE} instead.
      */
+    @Deprecated
     public static final boolean DEFAULT_USE_BLOB = true;
+
+    /** The blob cell type setting. */
+    public static final String BLOB_CELLTYPE = "blobCell";
+
+    /** The regular cell type setting. */
+    public static final String REGULAR_CELLTYPE = "regularCell";
+
+    /** The file store cell type setting. */
+    public static final String FILESTORE_CELLTYPE = "fileStoreCell";
+
+    /**
+     * The default cell type setting.
+     */
+    public static final String DEFAULT_CELLTYPE = FILESTORE_CELLTYPE;
+
+    /**
+     * The default number of documents to store in a single file store file.
+     */
+    public static final int DEFAULT_FILESTORE_CHUNKSIZE = 1000;
 
     /**
      * The default serialization setting.
      */
-    public static final boolean DEFAULT_DML_DESERIALIZATION = true;
+    public static final boolean DEFAULT_DML_DESERIALIZATION = false;
 
     /**
      * The default row preprocessing setting.
      */
     public static final boolean DEFAULT_ROW_PREPROCESSING = true;
 
-    /** Preference key for the usage of blob cells setting. */
+    /** Preference key for the usage of blob cells setting.
+     * @deprecated use {@link TextprocessingPreferenceInitializer#PREF_CELL_TYPE} instead.
+     * */
+    @Deprecated
     public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";
+
+    /** Preference key for the document cell type. */
+    public static final String PREF_CELL_TYPE = "knime.textprocessing.celltype";
+
+    /**
+     * Preference key for the chunk size of the file store, specifying how many documents are stored in a single
+     * file store file.
+     */
+    public static final String PREF_FILESTORE_CHUNKSIZE = "knime.textprocessing.filestore.chunksize";
 
     /** Preference key for the usage of backwards compatibility. */
     public static final String PREF_DML_DESERIALIZATION =
@@ -71,16 +104,18 @@ public class TextprocessingPreferenceInitializer extends
             .getPreferenceStore();
 
         //set default values
-        store.setDefault(PREF_USE_BLOB, DEFAULT_USE_BLOB);
+        store.setDefault(PREF_CELL_TYPE, DEFAULT_CELLTYPE);
         store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
         store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
+        store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
     }
 
     /**
      * Returns true if Blob cells have to be used.
-     *
+     * @deprecated Use {@link TextprocessingPreferenceInitializer#cellType()} instead.
      * @return the Blob cell setting
      */
+    @Deprecated
     public static boolean useBlobCell() {
         final IPreferenceStore pStore =
             TextprocessingCorePlugin.getDefault().getPreferenceStore();
@@ -88,6 +123,31 @@ public class TextprocessingPreferenceInitializer extends
             return DEFAULT_USE_BLOB;
         }
         return pStore.getBoolean(PREF_USE_BLOB);
+    }
+
+    /**
+     * @return The specified number of documents to store in a single file store file.
+     */
+    public static final int fileStoreChunkSize() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!pStore.contains(PREF_FILESTORE_CHUNKSIZE)) {
+            return DEFAULT_FILESTORE_CHUNKSIZE;
+        }
+        if (pStore.getInt(PREF_FILESTORE_CHUNKSIZE) <= 0) {
+            return 1;
+        }
+        return pStore.getInt(PREF_FILESTORE_CHUNKSIZE);
+    }
+
+    /**
+     * @return The specified cell type to use.
+     */
+    public static String cellType() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!pStore.contains(PREF_CELL_TYPE)) {
+            return DEFAULT_CELLTYPE;
+        }
+        return pStore.getString(PREF_CELL_TYPE);
     }
 
     /**

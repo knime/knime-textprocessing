@@ -6120,6 +6120,32 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/AbstractPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor">
+        <filter id="336695337">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor"/>
+                <message_argument value="checkDataTableSpec(DataTableSpec)"/>
+            </message_arguments>
+        </filter>
+        <filter id="336695337">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor"/>
+                <message_argument value="createDataTableSpec(boolean)"/>
+            </message_arguments>
+        </filter>
+        <filter id="336695337">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor"/>
+                <message_argument value="validateDataTableSpec(DataTableSpec)"/>
+            </message_arguments>
+        </filter>
+        <filter id="336695337">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor"/>
+                <message_argument value="validateSettings(int, int, int, boolean, boolean, boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/source/grabber/DocumentGrabber.java" type="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabber">
         <filter id="403804204">
             <message_arguments>
@@ -6136,11 +6162,27 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/transformation/stringstodocument/StringsToDocumentCellFactory.java" type="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory"/>
+                <message_argument value="StringsToDocumentCellFactory(StringsToDocumentConfig)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/util/DataCellCache.java" type="org.knime.ext.textprocessing.util.DataCellCache">
         <filter id="336695337">
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.util.DataCellCache"/>
                 <message_argument value="close()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/TextContainerDataCellFactory.java" type="org.knime.ext.textprocessing.util.TextContainerDataCellFactory">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.TextContainerDataCellFactory"/>
+                <message_argument value="prepare(ExecutionContext)"/>
             </message_arguments>
         </filter>
     </resource>

@@ -69,6 +69,11 @@ import java.util.Set;
  */
 public class DocumentMetaInfo implements Externalizable {
 
+    /**
+     * SerialVersionID.
+     */
+    private static final long serialVersionUID = -2290368394234923954L;
+
     private Map<String, String> m_metaInfo;
 
     private int m_hashCode = -1;
@@ -97,6 +102,14 @@ public class DocumentMetaInfo implements Externalizable {
                 }
             }
         }
+    }
+
+    /**
+     * @return The size of the map storing the meta info key, value pairs.
+     * @since 2.9
+     */
+    public int size() {
+        return m_metaInfo.size();
     }
 
     /**

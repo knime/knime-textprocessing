@@ -6,6 +6,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.SingleCellFactory;
+import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -23,20 +24,26 @@ public class MetaInfoCellFactory extends SingleCellFactory {
     private TextContainerDataCellFactory m_documentCellFac;
 
     /**
-     * Constructor of {@link MetaInfoCellFactory} with given indices of document, key and value columns to set.
+     * Constructor of {@link MetaInfoCellFactory} with given indices of document, key and value columns to set. The
+     * given execution context is used to prepare the cell factory. To create the data table spec only, without
+     * creating new data cells, the execution context may be {@code null}.
      * @param docColSpec The data column spec of the document column.
      * @param docColIndx The index of the column containing the documents.
      * @param keyColIndx The index of the column containing the keys.
      * @param valueColIndx The index of the column containing the values.
+     * @param exec The execution context to prepare cell factory internally.
      */
     public MetaInfoCellFactory(final DataColumnSpec docColSpec, final int docColIndx, final int keyColIndx,
-                               final int valueColIndx) {
+                               final int valueColIndx, final ExecutionContext exec) {
         super(true, docColSpec);
 
         m_docColIndx = docColIndx;
         m_keyColIndx = keyColIndx;
         m_valueColIndx = valueColIndx;
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        if (exec != null) {
+            m_documentCellFac.prepare(exec);
+        }
     }
 
     /* (non-Javadoc)

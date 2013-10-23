@@ -224,6 +224,7 @@ public class DmlDocumentParser extends DefaultHandler implements
     private static final SAXTransformerFactory transformerFactory =
             (SAXTransformerFactory)TransformerFactory.newInstance();
 
+    private static final String DEF_WHITESPACE_SUFFIX = " ";
 
     private List<Document> m_docs;
 
@@ -450,7 +451,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             }
         } else if (endTag.equals(WORD)) {
             if (m_words != null && m_word != null) {
-                Word w = new Word(m_word.trim());
+                Word w = new Word(m_word.trim(), DEF_WHITESPACE_SUFFIX);
                 m_words.add(w);
             }
         } else if (endTag.equals(TAG)) {

@@ -58,7 +58,7 @@ public class KuhlenStemmer implements TermPreprocessing, StringPreprocessing {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            newWords.add(new Word(KuhlenStemmer.stem(w.getWord())));
+            newWords.add(new Word(KuhlenStemmer.stem(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   23.09.2009 (thiel): created
  */
@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
@@ -47,32 +47,33 @@ import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  * Provides a row by row preprocessing strategy.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  *
  */
 public class RowPreprocessor extends AbstractPreprocessor {
 
     private AtomicInteger m_currRow;
-    
+
     private int m_noRows = 0;
-    
+
     private HashMap<UUID, DataCell> m_preprocessedDocuments;
-    
+
     private HashMap<DataCell, Set<Term>> m_addedRows;
-    
+
     private TermPreprocessing m_termPreprocessing = null;
-    
+
     /**
      * Creates new instance of <code>RowPreprocessor</code>.
      */
     public RowPreprocessor() {
         super();
     }
-        
+
     /**
      * {@inheritDoc}
      */
@@ -84,30 +85,31 @@ public class RowPreprocessor extends AbstractPreprocessor {
         }
         m_termPreprocessing = (TermPreprocessing)m_preprocessing;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public BufferedDataTable applyPreprocessing(
-            final BufferedDataTable inData, final ExecutionContext exec) 
-    throws Exception {        
+            final BufferedDataTable inData, final ExecutionContext exec)
+    throws Exception {
         m_currRow = new AtomicInteger(0);
         m_noRows = inData.getRowCount();
-        m_exec = exec;        
-        
+        m_exec = exec;
+        m_docCellFac.prepare(m_exec);
+
         m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
                 m_appendIncomingDocument));
         // create hash map with appropriate size
         m_preprocessedDocuments = new HashMap<UUID, DataCell>(m_noRows);
         // size is not known before hand but minimum number of documents
         m_addedRows = new HashMap<DataCell, Set<Term>>(m_noRows);
-        
+
         RowIterator i = inData.iterator();
         while (i.hasNext()) {
             exec.checkCanceled();
             DataRow row = i.next();
-            
+
             setProgress();
             processRow(row);
         }
@@ -123,7 +125,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
         m_exec.setProgress(prog, "Preprocessing row " + curr + " of "
                         + m_noRows);
     }
-    
+
     /**
      * Preprocesses the given row.
      * @param row The row to apply preprocessing step on.
@@ -167,7 +169,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
                     for (Paragraph p : s.getParagraphs()) {
                         for (Sentence sen : p.getSentences()) {
                             for (Term t : sen.getTerms()) {
-                                if (!t.isUnmodifiable() 
+                                if (!t.isUnmodifiable()
                                         || m_preprocessUnmodifiable) {
                                     t = m_termPreprocessing.preprocessTerm(t);
                                 }
@@ -191,30 +193,67 @@ public class RowPreprocessor extends AbstractPreprocessor {
         }
         addRowToContainer(rowKey, term, newDocCell, origDocCell);
     }
-    
-    private synchronized void addRowToContainer(final RowKey rk, final Term t, 
+
+    private synchronized void addRowToContainer(final RowKey rk, final Term t,
             final DataCell preprocessedDoc, final DataCell origDoc) {
         Set<Term> terms = m_addedRows.get(preprocessedDoc);
         if (terms == null) {
             terms = new HashSet<Term>();
         } else if (terms.contains(t)) {
-            // do not add row, since this preprocessed term has already been 
+            // do not add row, since this preprocessed term has already been
             // added.
             return;
         }
         // if term has not been added, memorize it
         terms.add(t);
         m_addedRows.put(preprocessedDoc, terms);
-        
+
         // add row with or without unchanged document.
         DataRow row;
         if (m_appendIncomingDocument) {
-            row = new DefaultRow(rk, m_termCellFac.createDataCell(t), 
+            row = new DefaultRow(rk, m_termCellFac.createDataCell(t),
                     preprocessedDoc, origDoc);
         } else {
-            row = new DefaultRow(rk, m_termCellFac.createDataCell(t), 
+            row = new DefaultRow(rk, m_termCellFac.createDataCell(t),
                     preprocessedDoc);
         }
         m_dc.addRowToTable(row);
-    } 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
+        verifier.verifyMinimumTermCells(1, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateSettings(final int documentColIndex, final int origDocumentColIndex, final int termColIndex,
+        final boolean deepPrepro, final boolean appendOrigDoc, final boolean preproUnmodifiable)
+                throws InvalidSettingsException {
+        if (documentColIndex < 0) {
+            throw new InvalidSettingsException("Index of document column [" + documentColIndex + "] is not valid!");
+        }
+        if (origDocumentColIndex < 0 && appendOrigDoc) {
+            throw new InvalidSettingsException("Index of original document column [" + origDocumentColIndex
+                + "] is not valid!");
+        }
+        if (termColIndex < 0) {
+            throw new InvalidSettingsException("Index of term column [" + termColIndex + "] is not valid!");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DataTableSpec createDataTableSpec(final boolean appendIncomingDocument) {
+        return m_fac.createDataTableSpec(appendIncomingDocument);
+    }
 }

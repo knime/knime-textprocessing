@@ -76,7 +76,7 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
 
         ColumnRearranger rearranger = new ColumnRearranger(inSpec);
         rearranger.replace(new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx,
-                                                   valueColIndx), docColIndx);
+                                                   valueColIndx, null), docColIndx);
         if (!keepKeyValCols) {
             rearranger.remove(keyColIndx, valueColIndx);
         }
@@ -101,7 +101,7 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
         // compute frequency and add column
         ColumnRearranger rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
         rearranger.replace(new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx,
-                                                   valueColIndx), docColIndx);
+                                                   valueColIndx, exec), docColIndx);
         if (!keepKeyValCols) {
             rearranger.remove(keyColIndx, valueColIndx);
         }

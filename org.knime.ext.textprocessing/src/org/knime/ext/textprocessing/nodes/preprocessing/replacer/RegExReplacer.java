@@ -9,7 +9,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -27,13 +27,13 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
 
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.Word;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
-import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
  *
@@ -64,9 +64,8 @@ public class RegExReplacer implements TermPreprocessing, StringPreprocessing {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            newWords.add(new Word(
-                    RegExReplacer.replaceAll(w.getWord(), m_regEx,
-                            m_replacement)));
+            newWords.add(new Word(RegExReplacer.replaceAll(w.getWord(), m_regEx, m_replacement),
+                w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }

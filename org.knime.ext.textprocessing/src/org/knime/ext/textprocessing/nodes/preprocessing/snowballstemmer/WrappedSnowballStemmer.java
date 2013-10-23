@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,20 +19,19 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   25.09.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.tartarus.snowball.SnowballStemmer;
 
 /**
@@ -43,17 +42,17 @@ public class WrappedSnowballStemmer implements TermPreprocessing,
         StringPreprocessing {
 
     private SnowballStemmer m_stemmer;
-    
+
     /**
      * Creates new instance of <code>WrappedSnowballStemmer</code> with given
      * stemmer to use.
-     * 
+     *
      * @param stemmer The stemmer to use.
      */
     public WrappedSnowballStemmer(final SnowballStemmer stemmer) {
         m_stemmer = stemmer;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -64,7 +63,7 @@ public class WrappedSnowballStemmer implements TermPreprocessing,
         for (Word w : words) {
             m_stemmer.setCurrent(w.getText());
             m_stemmer.stem();
-            newWords.add(new Word(m_stemmer.getCurrent()));
+            newWords.add(new Word(m_stemmer.getCurrent(), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }

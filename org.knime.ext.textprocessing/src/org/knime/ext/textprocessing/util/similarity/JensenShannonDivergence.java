@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -70,8 +70,8 @@ public class JensenShannonDivergence<T> extends SimilarityMeasure<T> {
             if (p1 > 0) {
                 double p2 = m_event.getConditionalProbability(e, e2);
                 if (p2 > 0) {
-                    double sum = p1+p2;
-                    j += (p1*Math.log(p1) + p2*Math.log(p2) - sum*Math.log(sum));
+                    double sum = p1 + p2;
+                    j += (p1 * Math.log(p1) + p2 * Math.log(p2) - sum * Math.log(sum));
                 }
             }
         }

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   03.03.2008 (thiel): created
  */
@@ -27,7 +27,6 @@ package org.knime.ext.textprocessing.data;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
@@ -43,7 +42,7 @@ import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
  * {@link org.knime.ext.textprocessing.data.Document} value by storing this
  * value in a private <code>Document</code> member. It provides a document value
  * as well as a string value.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentBlobCell extends BlobDataCell implements StringValue,
@@ -57,7 +56,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
     /**
      * Convenience access member for
      * <code>DataType.getType(DocumentCell.class)</code>.
-     * 
+     *
      * @see DataType#getType(Class)
      */
     public static final DataType TYPE = DataType
@@ -67,7 +66,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
      * Returns the preferred value class of this cell implementation. This
      * method is called per reflection to determine which is the preferred
      * renderer, comparator, etc.
-     * 
+     *
      * @return DocumentValue.class;
      */
     public static final Class<? extends DataValue> getPreferredValueClass() {
@@ -80,7 +79,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
     /**
      * Returns the factory to read/write DataCells of this class from/to a
      * DataInput/DataOutput. This method is called via reflection.
-     * 
+     *
      * @return A serializer for reading/writing cells of this kind.
      * @see DataCell
      */
@@ -92,7 +91,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
 
     /**
      * Creates new instance of <code>DocumentCell</code> will given document.
-     * 
+     *
      * @param document The document to set.
      */
     public DocumentBlobCell(final Document document) {
@@ -163,8 +162,7 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
         @Override
         public DocumentBlobCell deserialize(final DataCellDataInput input)
                 throws IOException {
-            return TermDocumentDeSerializationUtil
-                    .deserializeDocumentBlobCell(input);
+            return TermDocumentDeSerializationUtil.deserializeDocumentBlobCell(input);
         }
 
         /**

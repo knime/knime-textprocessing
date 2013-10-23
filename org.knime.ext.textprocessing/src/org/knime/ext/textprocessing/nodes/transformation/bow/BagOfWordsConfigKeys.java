@@ -40,63 +40,37 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME. The owner of a Node
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
- * History
- *   09.11.2011 (thiel): created
+ * Created on 23.10.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import java.util.Hashtable;
-import java.util.Set;
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.util.DocumentChunk;
+package org.knime.ext.textprocessing.nodes.transformation.bow;
 
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.9
  */
-public class ChunkToTermPreprocessingAdapter implements ChunkPreprocessing {
+public final class BagOfWordsConfigKeys {
 
-    private TermPreprocessing m_termPreprocessing;
-
-    /**
-     * Creates instance of <code>ChunkToTermPreprocessingAdapter</code> with
-     * given <code>TermPreprocessing</code> to adapt to chunk wise
-     * preprocessing.
-     * @param termPreprocessing The <code>TermPreprocessing</code> to adapt.
-     */
-    public ChunkToTermPreprocessingAdapter(
-            final TermPreprocessing termPreprocessing) {
-        if (termPreprocessing == null) {
-            throw new IllegalArgumentException("Specified TermPreprocessing "
-                   + "to adapt to chunk wise preprocessing may not be null!");
-            }
-        m_termPreprocessing = termPreprocessing;
-    }
+    private BagOfWordsConfigKeys() { }
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the document column.
      */
-    @Override
-    public Hashtable<Term, Term> preprocessChunk(final DocumentChunk chunk) {
-        if (chunk != null) {
-            Set<Term> termsToPreprocess = chunk.getTerms();
-            Hashtable<Term, Term> preprocessedTerms =
-                    new Hashtable<Term, Term>(termsToPreprocess.size());
+    public static final String CFG_KEY_DOCUMENT_COL = "DocumentColumn";
 
-            for (Term t : termsToPreprocess) {
-                Term preprocessedTerm = m_termPreprocessing.preprocessTerm(t);
-                if (preprocessedTerm != null) {
-                    preprocessedTerms.put(t, preprocessedTerm);
-                }
-            }
+    /**
+     * The configuration key of the original document column.
+     */
+    public static final String CFG_KEY_ORIGDOCUMENT_COL = "OriginalDocumentColumn";
 
-            return preprocessedTerms;
-        }
-        return null;
-    }
+    /**
+     * The configuration key of the flag if original documents will be appended or not.
+     */
+    public static final String CFG_KEY_APPEND_ORIGDOCUMENTS = "AppendOriginalDocuments";
 }

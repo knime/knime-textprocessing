@@ -172,6 +172,7 @@ public class TermPurger {
 
         TextContainerDataCellFactory docCellFac =
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        docCellFac.prepare(m_exec);
         DataCellCache dataCellCache = new LRUDataCellCache(docCellFac);
         BufferedDataContainer dc = m_exec.createDataContainer(
             m_inData.getDataTableSpec());

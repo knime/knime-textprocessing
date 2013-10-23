@@ -26,7 +26,6 @@
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -127,7 +126,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     public PreprocessingNodeModel() {
         this(ProcessingFactory.getPrecessing());
-    }    
+    }
 
     /**
      * The constructor of <code>PreprocessingNodeModel</code> with the specified
@@ -137,30 +136,29 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     public PreprocessingNodeModel(final AbstractPreprocessor preprocessor) {
         this(1, preprocessor);
     }
-    
+
     /**
      * The constructor of <code>PreprocessingNodeModel</code>.
      * The <code>RowPreprocessor</code> is used by default. If
-     * you use this constructor, be aware that the in port at index 0 is 
+     * you use this constructor, be aware that the in port at index 0 is
      * preserved as in port for the bag of words data table.
      * @param inPorts The number of in ports.
      * @since 2.6
      */
     public PreprocessingNodeModel(final int inPorts) {
         this(inPorts, ProcessingFactory.getPrecessing());
-    }     
-    
+    }
+
     /**
      * The constructor of <code>PreprocessingNodeModel</code> with the specified
      * preprocessor to use and the specified number of in ports. If
-     * you use this constructor, be aware that the in port at index 0 is 
+     * you use this constructor, be aware that the in port at index 0 is
      * preserved as in port for the bag of words data table.
      * @param inPorts The number of in ports.
      * @param preprocessor The preprocessor to use.
      * @since 2.6
      */
-    public PreprocessingNodeModel(final int inPorts, 
-            final AbstractPreprocessor preprocessor) {
+    public PreprocessingNodeModel(final int inPorts, final AbstractPreprocessor preprocessor) {
         super(inPorts, 1);
 
         if (preprocessor == null) {
@@ -193,27 +191,22 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     }
 
 
-    private final void checkDataTableSpec(final DataTableSpec spec)
-    throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyMinimumDocumentCells(1, true);
-        verifier.verifyTermCell(true);
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         m_termColIndex = verifier.getTermCellIndex();
 
-        String docColName = m_documentColModel.getStringValue();
-        String origDocColName = m_origDocumentColModel.getStringValue();
+        final String docColName = m_documentColModel.getStringValue();
+        final String origDocColName = m_origDocumentColModel.getStringValue();
         m_documentColIndex = spec.findColumnIndex(docColName);
         m_origDocumentColIndex = spec.findColumnIndex(origDocColName);
 
         if (m_documentColIndex < 0) {
             throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! "
-                    + "Check your settings!");
+                "Index of specified document column is not valid! Check your settings!");
         }
         if (m_origDocumentColIndex < 0) {
             throw new InvalidSettingsException(
-                   "Index of specified original document column is not valid!"
-                    + " Check your settings!");
+                "Index of specified original document column is not valid! Check your settings!");
         }
     }
 
@@ -225,8 +218,30 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
         internalConfigure(inSpecs);
-        return new DataTableSpec[]{m_fac.createDataTableSpec(
-                m_appendIncomingModel.getBooleanValue())};
+
+        // if spec contains no term column switch to DocumentPreprocessor
+        if (m_termColIndex < 0) {
+            m_preprocessor = new DocumentPreprocessor();
+
+            // not all preprocessing strategies can be applied on a list of documents via DocumentPreprocessor, thus a
+            // check is necessary. Therefore the preprocessing needs to be created, which is done during
+            // initPreprocessing(). Afterwards the DocumentPreprocessor needs to be check the given preprocessing, which
+            // is done during initialize().
+            initPreprocessing();
+            m_preprocessor.initialize(m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
+                m_deepPreproModel.getBooleanValue(), m_appendIncomingModel.getBooleanValue(),
+                m_preproUnModifiable.getBooleanValue(), m_preprocessing);
+        }
+
+        // preprocessor needs to check if it can work on data table with given spec.
+        m_preprocessor.validateDataTableSpec(inSpecs[0]);
+
+        // preprocessor need to check if it can work with specified settings
+        m_preprocessor.validateSettings(m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
+            m_deepPreproModel.getBooleanValue(), m_appendIncomingModel.getBooleanValue(),
+            m_preproUnModifiable.getBooleanValue());
+
+        return new DataTableSpec[]{m_preprocessor.createDataTableSpec(m_appendIncomingModel.getBooleanValue())};
     }
 
     /**
@@ -255,7 +270,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     /**
      * This method is empty and called by
      * {@link PreprocessingNodeModel#execute(BufferedDataTable[], ExecutionContext)}.
-     * It can be overwritten if additional computation during the execute have 
+     * It can be overwritten if additional computation during the execute have
      * to be done. This method is called before the regular preprocessing
      * computation is done and before the preprocessor is initialized. It can
      * also be used to initialize the preprocessor instead of using
@@ -265,48 +280,41 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * @throws Exception If something goes terribly wrong
      * @since 2.6
      */
-    protected void internalExecute(final BufferedDataTable[] inData, 
+    protected void internalExecute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         /* empty method, can be used to override and thus apply additional
          * checks and computation.
          */
-    }    
-    
+    }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final BufferedDataTable[] execute(
-            final BufferedDataTable[] inData, final ExecutionContext exec)
-    throws Exception {
+    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         // search indices of document and original document columns.
         checkDataTableSpec(inData[0].getDataTableSpec());
 
         // internal execute
         internalExecute(inData, exec);
-        
+
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {
-            throw new NullPointerException(
-                    "Preprocessing instance may not be null!");
+            throw new NullPointerException("Preprocessing instance may not be null!");
         }
 
         // initialize the underlying preprocessor
         if (m_preprocessor == null) {
-            throw new NullPointerException(
-                    "Preprocessor instance may not be null!");
+            throw new NullPointerException("Preprocessor instance may not be null!");
         }
-        m_preprocessor.initialize(
-                m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
-                m_deepPreproModel.getBooleanValue(),
-                m_appendIncomingModel.getBooleanValue(),
-                m_preproUnModifiable.getBooleanValue(),
-                m_preprocessing);
+        m_preprocessor.initialize(m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
+            m_deepPreproModel.getBooleanValue(), m_appendIncomingModel.getBooleanValue(),
+            m_preproUnModifiable.getBooleanValue(), m_preprocessing);
 
-        return new BufferedDataTable[]{
-                m_preprocessor.doPreprocessing(inData[0], exec)};
+        return new BufferedDataTable[]{m_preprocessor.doPreprocessing(inData[0], exec)};
     }
 
     /**

@@ -76,7 +76,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * The charset to use by the parser.
      */
     protected Charset m_charset;
-    
+
     /**
      * List of listeners.
      */
@@ -109,10 +109,12 @@ public abstract class AbstractDocumentParser implements DocumentParser {
 
     /**
      * {@inheritDoc}
+     * @deprecated use {@link AbstractDocumentParser#parseDocument(InputStream)} instead.
      */
+    @Deprecated
     @Override
     public abstract List<Document> parse(final InputStream is) throws Exception;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -158,7 +160,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     public void setCharset(final Charset charset) {
         m_charset = charset;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -167,7 +169,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
             final DocumentParsedEventListener listener) {
         m_listener.add(listener);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -176,7 +178,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
             final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -184,7 +186,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
     }
-    
+
     /**
      * Notifies all registered listeners with given event.
      * @param event Event to notify listener with

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -81,8 +81,8 @@ public class UndirectedGraph<NodeType, WeightType> {
         NodeType second = e.getSecond();
 
         if (!(m_nodes.contains(first) && m_nodes.contains(second))) {
-            throw new IllegalArgumentException("Both nodes must be present in" +
-            		" the graph before connecting them");
+            throw new IllegalArgumentException("Both nodes must be present in"
+                    + " the graph before connecting them");
         }
 
         m_edges.add(e);
@@ -102,7 +102,7 @@ public class UndirectedGraph<NodeType, WeightType> {
     }
 
     /**
-     * Prunes all edges e from n1 to n2 if no path connects n1 and n2 in G - e
+     * Prunes all edges e from n1 to n2 if no path connects n1 and n2 in G - e.
      *
      * @return the number of pruned edges
      */
@@ -175,8 +175,8 @@ public class UndirectedGraph<NodeType, WeightType> {
      */
     public Set<NodeType> getNeighbours(final NodeType node) {
         if (!m_nodes.contains(node)) {
-            throw new IllegalArgumentException("The node must be present in " +
-            		"the graph");
+            throw new IllegalArgumentException("The node must be present in "
+                    + "the graph");
         }
 
         Set<NodeType> neighbours = new HashSet<NodeType>();
@@ -196,7 +196,7 @@ public class UndirectedGraph<NodeType, WeightType> {
     }
 
     /**
-     * Adds an edge from n1 to n2 to the graph
+     * Adds an edge from n1 to n2 to the graph.
      *
      * @param n1 the first node
      * @param n2 the second node
@@ -234,8 +234,8 @@ public class UndirectedGraph<NodeType, WeightType> {
      */
     private Set<NodeType> getConnectedSubgraph(final NodeType root) {
         if (!m_nodes.contains(root)) {
-            throw new IllegalArgumentException("The node must be present in " +
-                    "the graph");
+            throw new IllegalArgumentException("The node must be present in "
+                    + "the graph");
         }
 
         Set<NodeType> subgraph = new HashSet<NodeType>();
@@ -255,8 +255,8 @@ public class UndirectedGraph<NodeType, WeightType> {
     private void extendSubgraph(final NodeType root,
             final Set<NodeType> subgraph) {
         if (!m_nodes.contains(root)) {
-            throw new IllegalArgumentException("The node must be present in " +
-                    "the graph");
+            throw new IllegalArgumentException("The node must be present in "
+                    + "the graph");
         }
 
         for (NodeType neighbour : getNeighbours(root)) {

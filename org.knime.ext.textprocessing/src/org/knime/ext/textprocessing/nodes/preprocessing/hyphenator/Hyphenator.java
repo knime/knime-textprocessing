@@ -89,7 +89,7 @@ public class Hyphenator implements TermPreprocessing, StringPreprocessing {
     public Term preprocessTerm(final Term term) {
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : term.getWords()) {
-            newWords.add(new Word(preprocessString(w.getText())));
+            newWords.add(new Word(preprocessString(w.getText()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }

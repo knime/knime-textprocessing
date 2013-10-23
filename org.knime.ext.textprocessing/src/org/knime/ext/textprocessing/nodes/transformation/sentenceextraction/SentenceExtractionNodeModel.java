@@ -56,6 +56,7 @@ import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
@@ -132,8 +133,9 @@ public class SentenceExtractionNodeModel extends NodeModel {
                 m_documentColModel.getStringValue());
 
         // create cache
-        DataCellCache docCache = new LRUDataCellCache(
-              TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
+        final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        docCellFac.prepare(exec);
+        final DataCellCache docCache = new LRUDataCellCache(docCellFac);
         BufferedDataContainer dc = exec.createDataContainer(
                 createOutDataTableSpec());
 

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -61,7 +61,7 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
     private static final String DEFAULT_DOCUMENT_COLUMN_NAME = "Document";
 
     /**
-     * Creates a basic dialog for the Keyword Extractor node
+     * Creates a basic dialog for the Keyword Extractor node.
      */
     @SuppressWarnings("unchecked")
     public KeywordExtractorNodeDialog() {
@@ -77,8 +77,8 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentNumber(
                 createSetFrequentTermsProportionModel(),
-                    "Percentage of unique terms in the document to use for " +
-                    "the chi-square measures:", /*step*/ 1));
+                    "Percentage of unique terms in the document to use for "
+                  + "the chi-square measures:", /*step*/ 1));
 
         addDialogComponent(new DialogComponentBoolean(
                 createSetIgnoreTermTagsModel(),

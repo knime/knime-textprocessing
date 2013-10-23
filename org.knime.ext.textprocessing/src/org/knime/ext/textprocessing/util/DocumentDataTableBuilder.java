@@ -27,6 +27,7 @@ package org.knime.ext.textprocessing.util;
 
 import java.util.List;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -38,8 +39,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBlobCell;
-import org.knime.ext.textprocessing.data.DocumentCell;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Provides convenient methods that create
@@ -93,6 +92,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public BufferedDataTable createDataTable(final ExecutionContext exec, final List<Document> docs)
         throws CanceledExecutionException {
         // create cache
+        m_documentCellFac.prepare(exec);
         DataCellCache cache = new LRUDataCellCache(m_documentCellFac);
         BufferedDataContainer dc = exec.createDataContainer(this.createDataTableSpec());
 
@@ -141,6 +141,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
         m_dc = exec.createDataContainer(this.createDataTableSpec());
         m_opened = true;
         m_rowRey = 0;
+        m_documentCellFac.prepare(exec);
     }
 
     /**
@@ -159,19 +160,9 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public synchronized void addDocument(final Document d, final RowKey rowKey)
         throws IllegalStateException {
         if (m_opened) {
-            if (!TextprocessingPreferenceInitializer.useBlobCell()) {
-                // Cast to regular cell
-                DocumentCell docCell =
-                    (DocumentCell)m_cache.getInstance(d);
-                DataRow row = new DefaultRow(rowKey, docCell);
-                m_dc.addRowToTable(row);
-            } else {
-                // Cast to Blob cell
-                DocumentBlobCell docCell =
-                    (DocumentBlobCell)m_cache.getInstance(d);
-                DataRow row = new DefaultRow(rowKey, docCell);
-                m_dc.addRowToTable(row);
-            }
+            final DataCell docCell = m_cache.getInstance(d);
+            final DataRow row = new DefaultRow(rowKey, docCell);
+            m_dc.addRowToTable(row);
         } else {
             throw new IllegalStateException("DocumentDataTableBuilder has "
                     + "not been opened! Open before add.");

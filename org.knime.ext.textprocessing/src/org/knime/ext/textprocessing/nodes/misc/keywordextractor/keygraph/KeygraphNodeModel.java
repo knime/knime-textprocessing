@@ -57,10 +57,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.Pair;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.TermEvent;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
@@ -68,6 +66,7 @@ import org.knime.ext.textprocessing.util.DocumentUtil;
 import org.knime.ext.textprocessing.util.FrequencyMap;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.Maps;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.UnorderedPair;
 
@@ -437,8 +436,11 @@ public class KeygraphNodeModel extends NodeModel {
             final ExecutionContext exec) throws CanceledExecutionException {
         BufferedDataContainer con =
                 exec.createDataContainer(createDataTableSpec());
-        DataCellCache docCache = new LRUDataCellCache(
-               TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
+
+        final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        docCellFac.prepare(exec);
+        final DataCellCache docCache = new LRUDataCellCache(docCellFac);
 
         try {
             int rowid = 0;
@@ -447,8 +449,9 @@ public class KeygraphNodeModel extends NodeModel {
                 Document doc = e.getKey();
                 for (Entry<Term, Integer> kw : e.getValue().entrySet()) {
                     DefaultRow row =
-                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{new TermCell(kw.getKey()),
-                            new DoubleCell(kw.getValue()), docCache.getInstance(doc)});
+                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{
+                            termFac.createDataCell(kw.getKey()), new DoubleCell(kw.getValue()),
+                            docCache.getInstance(doc)});
                     con.addRowToTable(row);
                     rowid++;
                 }
@@ -503,19 +506,18 @@ public class KeygraphNodeModel extends NodeModel {
     }
 
     /**
-     * Creates a DataTableSpec for the node, namely (Term, Double, Document)
+     * Creates a DataTableSpec for the node, namely (Term, Double, Document).
      *
      * @return the data table spec
      */
     private static DataTableSpec createDataTableSpec() {
-        DataColumnSpecCreator keywords =
-                new DataColumnSpecCreator("Keyword", TermCell.TYPE);
-        DataColumnSpecCreator chivalues =
-                new DataColumnSpecCreator("Score", DoubleCell.TYPE);
-        DataColumnSpecCreator docs =
-                new DataColumnSpecCreator("Document", DocumentBlobCell.TYPE);
-        return new DataTableSpec(keywords.createSpec(), chivalues.createSpec(),
-                docs.createSpec());
+        final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+        final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+
+        DataColumnSpecCreator keywords = new DataColumnSpecCreator("Keyword", termFac.getDataType());
+        DataColumnSpecCreator chivalues = new DataColumnSpecCreator("Score", DoubleCell.TYPE);
+        DataColumnSpecCreator docs = new DataColumnSpecCreator("Document", docCellFac.getDataType());
+        return new DataTableSpec(keywords.createSpec(), chivalues.createSpec(), docs.createSpec());
     }
 
     /**

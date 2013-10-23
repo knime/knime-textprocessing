@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -49,7 +49,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * your own tagset, specified in a xml file (see tagset.dtd) use the method
  * {@link org.knime.ext.textprocessing.data.TagFactory#addTagSet(File)}, which
  * registers the specified tags in this factory.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public final class TagFactory {
@@ -103,7 +103,7 @@ public final class TagFactory {
 
     /**
      * Adds the tagset specified in the xml file.
-     * 
+     *
      * @param xmlTagSet The xml file containing the tagset to add.
      */
     public void addTagSet(final File xmlTagSet) {
@@ -138,7 +138,6 @@ public final class TagFactory {
         return m_tagBuilder.get(type);
     }
 
-    @SuppressWarnings("unchecked")
     private void addTags(final Set<String> tagClassNames) {
         Class<? extends TagBuilder> tagClass;
         try {
@@ -183,7 +182,7 @@ public final class TagFactory {
     /**
      * Creates a valid instance of {@link org.knime.ext.textprocessing.data.Tag}
      * with given type and value.
-     * 
+     *
      * @param type The type of the tag to create.
      * @param value The value of the tag to create.
      * @return A new instance of tag with given type and value.

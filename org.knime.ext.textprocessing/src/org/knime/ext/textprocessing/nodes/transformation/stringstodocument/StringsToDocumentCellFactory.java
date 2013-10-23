@@ -28,7 +28,6 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -36,6 +35,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CellFactory;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
@@ -49,6 +49,7 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
@@ -72,18 +73,21 @@ public class StringsToDocumentCellFactory implements CellFactory {
      * given configuration.
      *
      * @param config The configuration how to build a document.
+     * @param exec the execution context to prepare text container cell factory.
      * @throws IllegalArgumentException If given configuration is
      * <code>null</code>.
+     * @since 2.9
      */
-    public StringsToDocumentCellFactory(final StringsToDocumentConfig config)
+    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final ExecutionContext exec)
     throws IllegalArgumentException {
         if (config == null) {
             throw new IllegalArgumentException(
                     "Configuration object may not be null!");
         }
         m_config = config;
-        m_cache = new LRUDataCellCache(
-              TextContainerDataCellFactoryBuilder.createDocumentCellFactory());
+        final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        docCellFac.prepare(exec);
+        m_cache = new LRUDataCellCache(docCellFac);
     }
 
     /**

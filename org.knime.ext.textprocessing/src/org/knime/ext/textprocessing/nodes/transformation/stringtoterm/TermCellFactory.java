@@ -38,8 +38,9 @@ import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell;
 import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
@@ -50,6 +51,10 @@ public class TermCellFactory implements CellFactory {
     private int m_colIndex;
 
     private DataTableSpec m_inSpec;
+
+    private final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+
+    private static final String WHITESPACE_SUFFIX = "";
 
     /**
      * Creates new instance of <code>TermCellFactory</code> with given index
@@ -82,9 +87,8 @@ public class TermCellFactory implements CellFactory {
             return new DataCell[]{DataType.getMissingCell()};
         }
         final List<Word> words = new ArrayList<Word>();
-        words.add(new Word(((StringValue)cell).getStringValue()));
-        final TermCell tc = new TermCell(new Term(words, null, false));
-        return new DataCell[]{tc};
+        words.add(new Word(((StringValue)cell).getStringValue(), WHITESPACE_SUFFIX));
+        return new DataCell[]{m_termFac.createDataCell(new Term(words, null, false))};
     }
 
     /**

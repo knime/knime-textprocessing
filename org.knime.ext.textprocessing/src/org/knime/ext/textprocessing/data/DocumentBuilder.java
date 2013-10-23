@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
@@ -137,6 +136,26 @@ public class DocumentBuilder {
 
         // Add meta info
         addMetaInformation(doc.getMetaInformation());
+    }
+
+    /**
+     * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance containing the given data, such as
+     * authors, sections, etc.
+     * @param sections the section to set
+     * @param type the type to set
+     * @param authors the authors to set
+     * @param sources the sources to set
+     * @param categories the categories to set
+     * @param date the publication date to set
+     * @param docFile the file of the document to set
+     * @param metaInfo the document meta info to set.
+     * @return A new {@link org.knime.ext.textprocessing.data.Document} instance with given data.
+     * @since 2.9
+     */
+    public static final Document createDocument(final List<Section> sections, final DocumentType type,
+        final Set<Author> authors, final Set<DocumentSource> sources, final Set<DocumentCategory> categories,
+        final PublicationDate date, final File docFile, final DocumentMetaInfo metaInfo) {
+        return new Document(sections, type, authors, sources, categories, date, docFile, metaInfo);
     }
 
     /**

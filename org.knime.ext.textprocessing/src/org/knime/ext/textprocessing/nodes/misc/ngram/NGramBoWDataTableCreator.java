@@ -184,10 +184,10 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
     private synchronized void openDataContainer(final ExecutionContext exec) {
         if (exec != null) {
             if (m_dataContainer == null) {
-                m_dataContainer =
-                        exec.createDataContainer(createDataTableSpec());
+                m_dataContainer = exec.createDataContainer(createDataTableSpec());
             }
         }
+        m_documentCellFac.prepare(exec);
     }
 
     private synchronized void addNGramsToDataContainer(
