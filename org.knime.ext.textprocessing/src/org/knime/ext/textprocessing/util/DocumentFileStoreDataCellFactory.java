@@ -133,12 +133,16 @@ public class DocumentFileStoreDataCellFactory implements TextContainerDataCellFa
         DataCell dc = null;
         if (tc instanceof Document) {
             Document doc = (Document)tc;
-            dc = new DocumentFileStoreCell(m_fileStore, doc);
+            try {
+                dc = new DocumentFileStoreCell(m_fileStore, doc);
 
-            m_cellsInFileStore++;
-            if (m_cellsInFileStore >= m_maxCellsInFileStore) {
-                createNewFileStore();
-                m_cellsInFileStore = 0;
+                m_cellsInFileStore++;
+                if (m_cellsInFileStore >= m_maxCellsInFileStore) {
+                    createNewFileStore();
+                    m_cellsInFileStore = 0;
+                }
+            } catch (IOException e) {
+                LOGGER.error("Could not create DocumentFileStoreCell for document: " + doc.getUUID(), e);
             }
         }
         return dc;

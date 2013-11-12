@@ -163,11 +163,34 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
      * document at.
      * @param fileStore File store to store document at.
      * @param document Document to encapsulate and store in file store.
+     * @throws IOException if document can not be serialized into file store file.
      */
-    public DocumentFileStoreCell(final FileStore fileStore, final Document document) {
+    public DocumentFileStoreCell(final FileStore fileStore, final Document document) throws IOException {
         super(fileStore);
         m_document = document;
         m_docUuid = m_document.getUUID();
+
+        // Write document only if it has not been already serialized.
+        if (m_serialized.compareAndSet(false, true)) {
+            // serialize document in byte array (no need to synchronize at this point)
+            byte[] serializedDoc = serializeDocument(m_document);
+            m_length = serializedDoc.length;
+            final File file = getFileStore().getFile();
+
+            // write synchronized to file to avoid parallel writing and mess up serialized document data
+            synchronized (file) {
+                m_offset = file.length();
+                final OutputStream os = new BufferedOutputStream(new FileOutputStream(file, true), m_length);
+                try {
+                    os.write(serializedDoc);
+                } catch (IOException e) {
+                    LOGGER.error("Could not write serialized document to random access file.", e);
+                    throw e;
+                } finally {
+                    os.close();
+                }
+            }
+        }
     }
 
     /**
@@ -336,27 +359,5 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
      * {@inheritDoc}
      */
     @Override
-    protected void flushToFileStore() throws IOException {
-        // Write document only if it has not been already serialized.
-        if (m_serialized.compareAndSet(false, true)) {
-            // serialize document in byte array (no need to synchronize at this point)
-            byte[] serializedDoc = serializeDocument(m_document);
-            m_length = serializedDoc.length;
-            final File file = getFileStore().getFile();
-
-            // write synchronized to file to avoid parallel writing and mess up serialized document data
-            synchronized (file) {
-                m_offset = file.length();
-                final OutputStream os = new BufferedOutputStream(new FileOutputStream(file, true), m_length);
-                try {
-                    os.write(serializedDoc);
-                } catch (IOException e) {
-                    LOGGER.error("Could not write serialized document to random access file.", e);
-                    throw e;
-                } finally {
-                    os.close();
-                }
-            }
-        }
-    }
+    protected void flushToFileStore() throws IOException { }
 }

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,12 +19,25 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   16.04.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -35,48 +48,37 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class StopwordFilterNodeModel extends PreprocessingNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger
     .getLogger(StopwordFilterNodeModel.class);
-    
+
     /**
-     * The default setting for the use of case sensitivity. 
+     * The default setting for the use of case sensitivity.
      */
     public static final boolean DEF_CASE_SENSITIVE = false;
 
     /**
-     * The default setting for the usage of build in lists. 
+     * The default setting for the usage of build in lists.
      */
-    public static final boolean DEF_USE_BUILIN_LIST = true;    
-    
-    private SettingsModelString m_fileModel = 
+    public static final boolean DEF_USE_BUILIN_LIST = true;
+
+    private SettingsModelString m_fileModel =
         StopwordFilterNodeDialog.getFileModel();
-    
-    private SettingsModelBoolean m_caseModel = 
+
+    private SettingsModelBoolean m_caseModel =
         StopwordFilterNodeDialog.getCaseSensitiveModel();
-    
-    private SettingsModelBoolean m_useBuildinListModel = 
+
+    private SettingsModelBoolean m_useBuildinListModel =
         StopwordFilterNodeDialog.getUseBuildInListModel();
-    
-    private SettingsModelString m_buildinListModel = 
+
+    private SettingsModelString m_buildinListModel =
         StopwordFilterNodeDialog.getBuildInListModel();
-    
+
     /**
      * Creates a new instance of <code>StopwordFilterNodeModel</code>.
      */
@@ -85,7 +87,36 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
         m_useBuildinListModel.addChangeListener(new StopwordChangeListener());
         updateModels();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        final boolean useBuildIn = m_useBuildinListModel.getBooleanValue();
+        // check selected file only if no build in list is used
+        if (!useBuildIn) {
+            final String file = m_fileModel.getStringValue();
+
+            File f = null;
+            try {
+                // first try if file string is an URL (files in drop dir come as URLs)
+                final URL url = new URL(file);
+                f = new File(url.toURI());
+            } catch (URISyntaxException e) {
+                // if no URL try string as path to file
+                f = new File(file);
+            } catch (MalformedURLException e) {
+                // if no URL try string as path to file
+                f = new File(file);
+            }
+
+            if (!f.isFile() || !f.exists() || !f.canRead()) {
+                throw new InvalidSettingsException("Selected Stopword file: " + file + " is not valid!");
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -115,7 +146,7 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
                 }
             }
         }
-        m_preprocessing = new StopWordFilter(stopWords, 
+        m_preprocessing = new StopWordFilter(stopWords,
                 m_caseModel.getBooleanValue());
     }
 
@@ -127,7 +158,7 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -164,28 +195,14 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
         m_caseModel.validateSettings(settings);
         m_useBuildinListModel.validateSettings(settings);
         m_buildinListModel.validateSettings(settings);
+    }
 
-        boolean useBuildIn = ((SettingsModelBoolean)m_useBuildinListModel.
-                createCloneWithValidatedValue(settings)).getBooleanValue();
-        
-        // check selected file only if no build in list is used
-        if (!useBuildIn) {
-            String file = ((SettingsModelString)m_fileModel
-                    .createCloneWithValidatedValue(settings)).getStringValue();
-            File f = new File(file);
-            if (!f.isFile() || !f.exists() || !f.canRead()) {
-                throw new InvalidSettingsException("Selected Stopword file: "
-                        + file + " is not valid!");
-            }
-        }
-    }    
-    
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -195,20 +212,20 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-    
+
     private class StopwordChangeListener implements ChangeListener {
 
         @Override
         public void stateChanged(final ChangeEvent arg0) {
             updateModels();
-        }        
+        }
     }
-    
+
     private void updateModels() {
         if (m_useBuildinListModel.getBooleanValue()) {
             m_buildinListModel.setEnabled(true);
@@ -217,5 +234,5 @@ public class StopwordFilterNodeModel extends PreprocessingNodeModel {
             m_buildinListModel.setEnabled(false);
             m_fileModel.setEnabled(true);
         }
-    }    
+    }
 }

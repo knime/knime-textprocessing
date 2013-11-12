@@ -624,10 +624,14 @@ public final class TermDocumentDeSerializationUtil {
 
             // document meta info
             final DocumentMetaInfo metaInfo = doc.getMetaInformation();
-            out.writeInt(metaInfo.size());
-            for (String key : metaInfo.getMetaInfoKeys()) {
-                out.writeUTF(key);
-                out.writeUTF(metaInfo.getMetaInfoValue(key));
+            if (metaInfo == null) {
+                out.writeInt(0);
+            } else {
+                out.writeInt(metaInfo.size());
+                for (String key : metaInfo.getMetaInfoKeys()) {
+                    out.writeUTF(key);
+                    out.writeUTF(metaInfo.getMetaInfoValue(key));
+                }
             }
 
             return;
