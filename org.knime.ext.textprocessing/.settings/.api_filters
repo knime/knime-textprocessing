@@ -6162,14 +6162,6 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/knime/ext/textprocessing/nodes/transformation/stringstodocument/StringsToDocumentCellFactory.java" type="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory">
-        <filter id="338722907">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory"/>
-                <message_argument value="StringsToDocumentCellFactory(StringsToDocumentConfig)"/>
-            </message_arguments>
-        </filter>
-    </resource>
     <resource path="src/org/knime/ext/textprocessing/util/DataCellCache.java" type="org.knime.ext.textprocessing.util.DataCellCache">
         <filter id="336695337">
             <message_arguments>

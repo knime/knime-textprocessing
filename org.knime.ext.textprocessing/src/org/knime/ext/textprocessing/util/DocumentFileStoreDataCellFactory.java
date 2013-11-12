@@ -61,7 +61,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentFileStoreCell;
 import org.knime.ext.textprocessing.data.TextContainer;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
 
 /**
  * A {@link org.knime.ext.textprocessing.util.TextContainerDataCellFactory}
@@ -91,7 +91,7 @@ public class DocumentFileStoreDataCellFactory implements TextContainerDataCellFa
      */
     public DocumentFileStoreDataCellFactory() {
         final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        m_maxCellsInFileStore = pStore.getInt(TextprocessingPreferenceInitializer.PREF_FILESTORE_CHUNKSIZE);
+        m_maxCellsInFileStore = pStore.getInt(StoragePreferenceInitializer.PREF_FILESTORE_CHUNKSIZE);
     }
 
     /**

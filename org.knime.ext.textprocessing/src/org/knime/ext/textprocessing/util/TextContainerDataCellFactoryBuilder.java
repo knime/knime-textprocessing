@@ -26,7 +26,7 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -43,12 +43,12 @@ public final class TextContainerDataCellFactoryBuilder {
      * document cells.
      */
     public static TextContainerDataCellFactory createDocumentCellFactory() {
-        if (TextprocessingPreferenceInitializer.cellType().equals(
-            TextprocessingPreferenceInitializer.REGULAR_CELLTYPE)) {
+        if (StoragePreferenceInitializer.cellType().equals(
+            StoragePreferenceInitializer.REGULAR_CELLTYPE)) {
             LOGGER.debug("Creating document cell factory!");
             return new DocumentDataCellFactory();
-        } else if (TextprocessingPreferenceInitializer.cellType().equals(
-            TextprocessingPreferenceInitializer.BLOB_CELLTYPE)) {
+        } else if (StoragePreferenceInitializer.cellType().equals(
+            StoragePreferenceInitializer.BLOB_CELLTYPE)) {
           LOGGER.debug("Creating document blob cell factory!");
           return new DocumentBlobDataCellFactory();
         }

@@ -400,6 +400,9 @@
       <initializer
             class="org.knime.ext.textprocessing.preferences.SearchEnginePreferenceInitializer">
       </initializer>
+      <initializer
+            class="org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -414,6 +417,12 @@
             class="org.knime.ext.textprocessing.preferences.SerachEnginePreferencePage"
             id="org.knime.ext.textprocessing.preferences.SerachEnginePreferencePage"
             name="Search Engines">
+      </page>
+      <page
+            category="org.knime.ext.textprocessing.preferences.TextprocessingPreferencePage"
+            class="org.knime.ext.textprocessing.preferences.StoragePreferencePage"
+            id="org.knime.ext.textprocessing.preferences.StoragePreferencePage"
+            name="Storage">
       </page>
    </extension>
    <extension
@@ -467,6 +476,11 @@
                suggestAsDefault="false">
          </renderer>
       </dataValue>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.knime.ext.textprocessing.TextprocessingStartup"></startup>
    </extension>
    
 </plugin>

@@ -33,121 +33,47 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TextprocessingPreferenceInitializer extends
-        AbstractPreferenceInitializer {
+public class TextprocessingPreferenceInitializer extends AbstractPreferenceInitializer {
 
-    /**
-     * The default "use blob" setting.
-     * @deprecated use {@link TextprocessingPreferenceInitializer#BLOB_CELLTYPE} instead.
-     */
-    @Deprecated
-    public static final boolean DEFAULT_USE_BLOB = true;
-
-    /** The blob cell type setting. */
-    public static final String BLOB_CELLTYPE = "blobCell";
-
-    /** The regular cell type setting. */
-    public static final String REGULAR_CELLTYPE = "regularCell";
-
-    /** The file store cell type setting. */
-    public static final String FILESTORE_CELLTYPE = "fileStoreCell";
-
-    /**
-     * The default cell type setting.
-     */
-    public static final String DEFAULT_CELLTYPE = FILESTORE_CELLTYPE;
-
-    /**
-     * The default number of documents to store in a single file store file.
-     */
-    public static final int DEFAULT_FILESTORE_CHUNKSIZE = 1000;
-
-    /**
-     * The default serialization setting.
-     */
+    /** The default serialization setting. */
     public static final boolean DEFAULT_DML_DESERIALIZATION = false;
 
-    /**
-     * The default row preprocessing setting.
-     */
+    /** The default row preprocessing setting. */
     public static final boolean DEFAULT_ROW_PREPROCESSING = true;
 
-    /** Preference key for the usage of blob cells setting.
-     * @deprecated use {@link TextprocessingPreferenceInitializer#PREF_CELL_TYPE} instead.
-     * */
-    @Deprecated
-    public static final String PREF_USE_BLOB = "knime.textprocessing.blobcell";
+    /*** The default size of the tokenizer pool. */
+    public static final int DEFAULT_TOKENIZER_POOLSIZE = 10;
 
-    /** Preference key for the document cell type. */
-    public static final String PREF_CELL_TYPE = "knime.textprocessing.celltype";
+    /*** The maximum size of the tokenizer pool. */
+    public static final int MAX_TOKENIZER_POOLSIZE = 1000;
 
-    /**
-     * Preference key for the chunk size of the file store, specifying how many documents are stored in a single
-     * file store file.
-     */
-    public static final String PREF_FILESTORE_CHUNKSIZE = "knime.textprocessing.filestore.chunksize";
+    /** The default setting whether tokenizer pool is initialized on startup. */
+    public static final boolean DEFAULT_TOKENIZER_INIT_ONSTARTUP = true;
 
     /** Preference key for the usage of backwards compatibility. */
-    public static final String PREF_DML_DESERIALIZATION =
-        "knime.textprocessing.dmldeserialization";
+    public static final String PREF_DML_DESERIALIZATION = "knime.textprocessing.dmldeserialization";
 
     /** Preference key for the usage of row preprocessing. */
-    public static final String PREF_ROW_PREPROCESSING =
-        "knime.textprocessing.rowpreprocessing";
+    public static final String PREF_ROW_PREPROCESSING = "knime.textprocessing.rowpreprocessing";
+
+    /** Preference key for the tokenizer pool size. */
+    public static final String PREF_TOKENIZER_POOLSIZE = "knime.textprocessing.tokenizer.poolsize";
+
+    /** Preference key setting whether tokenizer pool is initialized on startup. */
+    public static final String PREF_TOKENIZER_INIT_ONSTARTUP = "knime.textprocessing.tokenizer.initonstartup";
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = TextprocessingCorePlugin.getDefault()
-            .getPreferenceStore();
+        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
 
         //set default values
-        store.setDefault(PREF_CELL_TYPE, DEFAULT_CELLTYPE);
         store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
         store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
-        store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
-    }
-
-    /**
-     * Returns true if Blob cells have to be used.
-     * @deprecated Use {@link TextprocessingPreferenceInitializer#cellType()} instead.
-     * @return the Blob cell setting
-     */
-    @Deprecated
-    public static boolean useBlobCell() {
-        final IPreferenceStore pStore =
-            TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_USE_BLOB)) {
-            return DEFAULT_USE_BLOB;
-        }
-        return pStore.getBoolean(PREF_USE_BLOB);
-    }
-
-    /**
-     * @return The specified number of documents to store in a single file store file.
-     */
-    public static final int fileStoreChunkSize() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_FILESTORE_CHUNKSIZE)) {
-            return DEFAULT_FILESTORE_CHUNKSIZE;
-        }
-        if (pStore.getInt(PREF_FILESTORE_CHUNKSIZE) <= 0) {
-            return 1;
-        }
-        return pStore.getInt(PREF_FILESTORE_CHUNKSIZE);
-    }
-
-    /**
-     * @return The specified cell type to use.
-     */
-    public static String cellType() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_CELL_TYPE)) {
-            return DEFAULT_CELLTYPE;
-        }
-        return pStore.getString(PREF_CELL_TYPE);
+        store.setDefault(PREF_TOKENIZER_POOLSIZE, DEFAULT_TOKENIZER_POOLSIZE);
+        store.setDefault(PREF_TOKENIZER_INIT_ONSTARTUP, DEFAULT_TOKENIZER_INIT_ONSTARTUP);
     }
 
     /**
@@ -156,8 +82,7 @@ public class TextprocessingPreferenceInitializer extends
      * @return the dml deserialization setting
      */
     public static boolean useDmlDeserialization() {
-        final IPreferenceStore pStore =
-            TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
         if (!pStore.contains(PREF_DML_DESERIALIZATION)) {
             return DEFAULT_DML_DESERIALIZATION;
         }
@@ -170,11 +95,36 @@ public class TextprocessingPreferenceInitializer extends
      * @return the preprocessing policy
      */
     public static boolean useRowPreprocessing() {
-        final IPreferenceStore pStore =
-            TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
         if (!pStore.contains(PREF_ROW_PREPROCESSING)) {
             return DEFAULT_ROW_PREPROCESSING;
         }
         return pStore.getBoolean(PREF_ROW_PREPROCESSING);
+    }
+
+    /**
+     * Returns the size of the tokenizer pool.
+     *
+     * @return the size of the tokenizer pool.
+     */
+    public static final int tokenizerPoolSize() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!pStore.contains(PREF_TOKENIZER_POOLSIZE)) {
+            return DEFAULT_TOKENIZER_POOLSIZE;
+        }
+        return pStore.getInt(PREF_TOKENIZER_POOLSIZE);
+    }
+
+    /**
+     * Returns the init on startup flag of the tokenizer pool.
+     *
+     * @return the setting whether the tokenizer pool is initialized on startup or lazy.
+     */
+    public static final boolean initTokenizerPoolOnStartup() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if (!pStore.contains(PREF_TOKENIZER_INIT_ONSTARTUP)) {
+            return DEFAULT_TOKENIZER_INIT_ONSTARTUP;
+        }
+        return pStore.getBoolean(PREF_TOKENIZER_INIT_ONSTARTUP);
     }
 }

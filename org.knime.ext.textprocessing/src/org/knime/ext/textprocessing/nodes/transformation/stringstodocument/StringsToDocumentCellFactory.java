@@ -30,19 +30,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
-import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
@@ -59,7 +55,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class StringsToDocumentCellFactory implements CellFactory {
+public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
     private static final NodeLogger LOGGER =
             NodeLogger.getLogger(StringsToDocumentCellFactory.class);
@@ -78,11 +74,14 @@ public class StringsToDocumentCellFactory implements CellFactory {
      * <code>null</code>.
      * @since 2.9
      */
-    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final ExecutionContext exec)
-    throws IllegalArgumentException {
+    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final ExecutionContext exec,
+        final DataColumnSpec[] newColSpecs, final int numberOfThreads) throws IllegalArgumentException {
+        super(newColSpecs);
+
+        this.setParallelProcessing(true, numberOfThreads, 10 * numberOfThreads);
+
         if (config == null) {
-            throw new IllegalArgumentException(
-                    "Configuration object may not be null!");
+            throw new IllegalArgumentException("Configuration object may not be null!");
         }
         m_config = config;
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
@@ -212,27 +211,6 @@ public class StringsToDocumentCellFactory implements CellFactory {
 
         Document doc = docBuilder.createDocument();
         return new DataCell[]{m_cache.getInstance(doc)};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DataColumnSpec[] getColumnSpecs() {
-        DataColumnSpec docCol = new DataColumnSpecCreator("Document",
-                DocumentCell.TYPE).createSpec();
-        return new DataColumnSpec[]{docCol};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setProgress(final int curRowNr, final int rowCount,
-            final RowKey lastKey, final ExecutionMonitor exec) {
-        double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Processing row: " + curRowNr
-                + " of " + rowCount + " rows");
     }
 
     /**

@@ -96,4 +96,10 @@ public final class StringsToDocumentConfigKeys {
      * @since 2.6
      */
     public static final String CFGKEY_SOURCECOLUMN = "SourceColumn";
+
+    /**
+     * The configuration key of the number of threads to use.
+     * @since 2.9
+     */
+    public static final String CFGKEY_THREADS = "Number of threads";
 }

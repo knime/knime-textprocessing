@@ -29,9 +29,6 @@ package org.knime.ext.textprocessing.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -43,27 +40,23 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
 /**
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TextprocessingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage,
-IPropertyChangeListener {
+public class TextprocessingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
     private Composite m_mainComposite;
-
-    private Composite m_chunkSizeComp;
-
-    private RadioGroupFieldEditor m_dataCellType;
-
-    private IntegerFieldEditor m_fileStoreChunkSize;
-
-    private Label m_lFileStoreSetings;
 
     private BooleanFieldEditor m_useDmlDeserialization;
 
     private BooleanFieldEditor m_useRowPreprocessing;
+
+    private IntegerFieldEditor m_tokenizerPoolSize;
+
+    private BooleanFieldEditor m_initTokenizerPoolOnStartup;
 
     /**
      * Creates a new preference page.
@@ -71,35 +64,32 @@ IPropertyChangeListener {
     public TextprocessingPreferencePage() {
         super();
         setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
-        setDescription("KNIME Textprocessing preferences");
+        setDescription("KNIME Textprocessing Preferences");
     }
 
     private static final String DESC_SERIALIZATION =
         "Check to enable loading of workflows containing old textprocessing "
-        + "nodes (2.4.x and older).\nNote that backwards compatibility slows "
-        + "down deserialization and thus buffering and\nprocessing of nodes. "
-        + "Uncheck to speed up processing. If workflows containing older "
-        + " nodes\nare loaded once, option can be unchecked.";
+      + "nodes (2.4.x and older).\nNote that backwards compatibility slows "
+      + "down deserialization and thus buffering and\nprocessing of nodes. "
+      + "Uncheck to speed up processing. If workflows containing older "
+      + " nodes\nare loaded once, option can be unchecked.";
 
     private static final String DESC_PREPROCESSING =
         "If checked, nodes of the \"Preprocessing\" category process data "
-        + "in memory. Large sets of\ndocuments may not fit into memory and "
-        + "thus can not be processed. Uncheck if documents\ndo not fit into "
-        + "memory. Note that unchecking slows down processing significantly. "
-        + "\nCheck to speed up processing.";
+      + "in memory. Large sets of\ndocuments may not fit into memory and "
+      + "thus can not be processed. Uncheck if documents\ndo not fit into "
+      + "memory. Note that unchecking slows down processing significantly. "
+      + "\nCheck to speed up processing.";
 
-    private static final String DESC_CELLTYPE =
-        "It is recommended to use file store cells in order to save memory and "
-        + "increase the \nprocessing speed. Regular cells are very memory and "
-        + "disk space consuming. Blob cells \ndecrease memory and disk space usage "
-        + "but may slow down processing speed.";
+    private static final String DESC_TOKENIZER_POOLSIZE =
+        "The maximal number of tokenizers which can be used concurrently. "
+      + "All tokenizer will be\ncreated on demand or startup and on change "
+      + "of the pool size. Be aware that tokenizers do\nrequire memory. As a "
+      + "rule of thump, use not more than #documents/100 tokenizers.";
 
-    private static final String DESC_FILESTORE_CHUNKSIZE =
-        "The file store chunk size defines the number of documents to store "
-        + "in a single\nfile store file. The larger the number, the less files "
-        + "will be created to store the documents,\nwhich increases processing "
-        + "speed. For the smallest possible number 1, a file will be created\n"
-        + "for each document, which solws down processing speed.";
+    private static final String DESC_INIT_POOL_ONSTARTUP =
+            "If checked tokenizers are initialized on startup, which slows down "
+          + "KNIME startup time.";
 
     /**
      * {@inheritDoc}
@@ -112,48 +102,32 @@ IPropertyChangeListener {
         gl.verticalSpacing = 15;
         m_mainComposite.setLayout(gl);
 
+        // Tokenizer pool
+        final Group tokenizationGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
+        tokenizationGrp.setText("Tokenization:");
 
-        // Cell Type Settings
-        final Group storageGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
-        storageGrp.setText("Document Storage Settings:");
+        m_tokenizerPoolSize = new IntegerFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER_POOLSIZE,
+                "Tokenizer pool size", tokenizationGrp);
+        m_tokenizerPoolSize.setPage(this);
+        m_tokenizerPoolSize.setPreferenceStore(getPreferenceStore());
+        m_tokenizerPoolSize.load();
+        m_tokenizerPoolSize.setValidRange(1, TextprocessingPreferenceInitializer.MAX_TOKENIZER_POOLSIZE);
 
-        m_dataCellType = new RadioGroupFieldEditor(
-            TextprocessingPreferenceInitializer.PREF_CELL_TYPE, "Document cell type", 1, new String[][] {
-                {"File Store Cells", TextprocessingPreferenceInitializer.FILESTORE_CELLTYPE},
-                {"Blob Cells", TextprocessingPreferenceInitializer.BLOB_CELLTYPE},
-                {"Regular Cells", TextprocessingPreferenceInitializer.REGULAR_CELLTYPE}}, storageGrp);
-        m_dataCellType.setPage(this);
-        m_dataCellType.setPreferenceStore(getPreferenceStore());
-        m_dataCellType.load();
-        m_dataCellType.setPropertyChangeListener(this);
+        final Label lTokenization = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
+        lTokenization.setText(DESC_TOKENIZER_POOLSIZE);
 
-        final Label lStorage = new Label(storageGrp, SWT.LEFT | SWT.WRAP);
-        lStorage.setText(DESC_CELLTYPE);
+        m_initTokenizerPoolOnStartup = new BooleanFieldEditor(
+            TextprocessingPreferenceInitializer.PREF_TOKENIZER_INIT_ONSTARTUP, "Initialize pool on startup",
+            tokenizationGrp);
+        m_initTokenizerPoolOnStartup.setPage(this);
+        m_initTokenizerPoolOnStartup.setPreferenceStore(getPreferenceStore());
+        m_initTokenizerPoolOnStartup.load();
 
-        final Label sep = new Label(storageGrp, SWT.HORIZONTAL | SWT.SEPARATOR);
-        GridData gridData = new GridData();
-        gridData.horizontalSpan = 1;
-        gridData.horizontalAlignment = GridData.FILL;
-        gridData.grabExcessHorizontalSpace = false;
-        gridData.verticalAlignment = GridData.CENTER;
-        gridData.grabExcessVerticalSpace = false;
-        sep.setLayoutData(gridData);
+        final Label lInitialization = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
+        lInitialization.setText(DESC_INIT_POOL_ONSTARTUP);
 
-        // file store chunk size settings
-        m_chunkSizeComp = new Composite(storageGrp, SWT.LEFT);
-        m_chunkSizeComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        m_fileStoreChunkSize = new IntegerFieldEditor(TextprocessingPreferenceInitializer.PREF_FILESTORE_CHUNKSIZE,
-                "File store chunk size", m_chunkSizeComp);
-        m_fileStoreChunkSize.setPage(this);
-        m_fileStoreChunkSize.setPreferenceStore(getPreferenceStore());
-        m_fileStoreChunkSize.load();
-        m_fileStoreChunkSize.setValidRange(1, Integer.MAX_VALUE);
-
-        m_lFileStoreSetings = new Label(storageGrp, SWT.LEFT | SWT.WRAP);
-        m_lFileStoreSetings.setText(DESC_FILESTORE_CHUNKSIZE);
-
-        storageGrp.setLayoutData(getGridData());
-        storageGrp.setLayout(getLayout());
+        tokenizationGrp.setLayoutData(getGridData());
+        tokenizationGrp.setLayout(getLayout());
 
         // Row preprocessing
         final Group preprocessingGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
@@ -216,10 +190,10 @@ IPropertyChangeListener {
      */
     @Override
     protected void performDefaults() {
-        m_dataCellType.loadDefault();
-        m_fileStoreChunkSize.loadDefault();
         m_useDmlDeserialization.loadDefault();
         m_useRowPreprocessing.loadDefault();
+        m_tokenizerPoolSize.loadDefault();
+        m_initTokenizerPoolOnStartup.loadDefault();
         super.performDefaults();
     }
 
@@ -228,24 +202,14 @@ IPropertyChangeListener {
      */
     @Override
     public boolean performOk() {
-        m_dataCellType.store();
-        m_fileStoreChunkSize.store();
         m_useDmlDeserialization.store();
         m_useRowPreprocessing.store();
-        return super.performOk();
-    }
+        m_tokenizerPoolSize.store();
+        m_initTokenizerPoolOnStartup.store();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void propertyChange(final PropertyChangeEvent event) {
-        if (event.getNewValue().equals(TextprocessingPreferenceInitializer.FILESTORE_CELLTYPE)) {
-            m_fileStoreChunkSize.setEnabled(true, m_chunkSizeComp);
-            m_lFileStoreSetings.setEnabled(true);
-        } else {
-            m_fileStoreChunkSize.setEnabled(false, m_chunkSizeComp);
-            m_lFileStoreSetings.setEnabled(false);
-        }
+        // initialize tokenizer pool with new pool size
+        DefaultTokenization.createNewTokenizerPool();
+
+        return super.performOk();
     }
 }

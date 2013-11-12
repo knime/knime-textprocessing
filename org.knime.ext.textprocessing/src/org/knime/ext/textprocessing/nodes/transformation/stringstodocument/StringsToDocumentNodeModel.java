@@ -31,10 +31,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -44,14 +42,16 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
@@ -61,42 +61,41 @@ public class StringsToDocumentNodeModel extends NodeModel {
 
     private static final int INPORT = 0;
 
-    private SettingsModelString m_titleColModel =
-        StringsToDocumentNodeDialog.getTitleStringModel();
+    private SettingsModelString m_titleColModel = StringsToDocumentNodeDialog.getTitleStringModel();
 
-    private SettingsModelString m_fulltextColModel =
-        StringsToDocumentNodeDialog.getTextStringModel();
+    private SettingsModelString m_fulltextColModel = StringsToDocumentNodeDialog.getTextStringModel();
 
-    private SettingsModelString m_authorsColModel =
-        StringsToDocumentNodeDialog.getAuthorsStringModel();
+    private SettingsModelString m_authorsColModel = StringsToDocumentNodeDialog.getAuthorsStringModel();
 
-    private SettingsModelString m_authorNameSeparator =
-        StringsToDocumentNodeDialog.getAuthorSplitStringModel();
+    private SettingsModelString m_authorNameSeparator = StringsToDocumentNodeDialog.getAuthorSplitStringModel();
 
-    private SettingsModelString m_docSourceModel =
-        StringsToDocumentNodeDialog.getDocSourceModel();
+    private SettingsModelString m_docSourceModel = StringsToDocumentNodeDialog.getDocSourceModel();
 
-    private SettingsModelString m_docCategoryModel =
-        StringsToDocumentNodeDialog.getDocCategoryModel();
+    private SettingsModelString m_docCategoryModel = StringsToDocumentNodeDialog.getDocCategoryModel();
 
-    private SettingsModelString m_docTypeModel =
-        StringsToDocumentNodeDialog.getTypeModel();
+    private SettingsModelString m_docTypeModel = StringsToDocumentNodeDialog.getTypeModel();
 
-    private SettingsModelString m_pubDateModel =
-        StringsToDocumentNodeDialog.getPubDatModel();
+    private SettingsModelString m_pubDateModel = StringsToDocumentNodeDialog.getPubDatModel();
 
-    private SettingsModelBoolean m_useCatColumnModel =
-        StringsToDocumentNodeDialog.getUseCategoryColumnModel();
+    private SettingsModelBoolean m_useCatColumnModel = StringsToDocumentNodeDialog.getUseCategoryColumnModel();
 
-    private SettingsModelBoolean m_useSourceColumnModel =
-        StringsToDocumentNodeDialog.getUseSourceColumnModel();
+    private SettingsModelBoolean m_useSourceColumnModel = StringsToDocumentNodeDialog.getUseSourceColumnModel();
 
-    private SettingsModelString m_catColumnModel =
-        StringsToDocumentNodeDialog.getCategoryColumnModel();
+    private SettingsModelString m_catColumnModel = StringsToDocumentNodeDialog.getCategoryColumnModel();
 
-    private SettingsModelString m_sourceColumnModel =
-        StringsToDocumentNodeDialog.getSourceColumnModel();
+    private SettingsModelString m_sourceColumnModel = StringsToDocumentNodeDialog.getSourceColumnModel();
 
+    private SettingsModelIntegerBounded m_maxThreads = StringsToDocumentNodeDialog.getNumberOfThreadsModel();
+
+    /** The default number of threads value. */
+    static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 2,
+        (int)Math.ceil(2.0 * Runtime.getRuntime().availableProcessors()));
+
+    /** The min number of threads. */
+    static final int MIN_THREADS = 1;
+
+    /** The max number of threads. */
+    static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
 
     /**
      * Creates new instance of <code>StringsToDocumentNodeModel</code>.
@@ -115,21 +114,19 @@ public class StringsToDocumentNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-
-        DataTableSpecVerifier verifier =
-            new DataTableSpecVerifier(inSpecs[INPORT]);
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[INPORT]);
         verifier.verifyMinimumStringCells(1, true);
-
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INPORT])};
     }
 
-    private DataTableSpec createDataTableSpec(
-            final DataTableSpec inDataSpec) {
-        DataColumnSpec strCol = new DataColumnSpecCreator(
-                DataTableSpec.getUniqueColumnName(inDataSpec,
-                        DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME),
-                DocumentCell.TYPE).createSpec();
-        return new DataTableSpec(inDataSpec, new DataTableSpec(strCol));
+    private static final DataTableSpec createDataTableSpec(final DataTableSpec inDataSpec) {
+        return new DataTableSpec(inDataSpec, new DataTableSpec(createNewColSpecs()));
+    }
+
+    private static final DataColumnSpec[] createNewColSpecs() {
+        final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        DataColumnSpec docCol = new DataColumnSpecCreator("Document", docFactory.getDataType()).createSpec();
+        return new DataColumnSpec[]{docCol};
     }
 
     /**
@@ -198,11 +195,11 @@ public class StringsToDocumentNodeModel extends NodeModel {
             conf.setPublicationDate(pubDate);
         }
 
-        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf, exec);
+        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf, exec, createNewColSpecs(),
+            m_maxThreads.getIntValue());
         try {
             ColumnRearranger rearranger = new ColumnRearranger(inDataTable.getDataTableSpec());
             rearranger.append(cellFac);
-
             return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataTable, rearranger, exec)};
         } finally {
             cellFac.closeCache();
@@ -229,6 +226,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
             m_useSourceColumnModel.loadSettingsFrom(settings);
             m_catColumnModel.loadSettingsFrom(settings);
             m_sourceColumnModel.loadSettingsFrom(settings);
+            m_maxThreads.loadSettingsFrom(settings);
         } catch (InvalidSettingsException e) {
             // don't throw error msg
         }
@@ -259,6 +257,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
         m_useSourceColumnModel.saveSettingsTo(settings);
         m_catColumnModel.saveSettingsTo(settings);
         m_sourceColumnModel.saveSettingsTo(settings);
+        m_maxThreads.saveSettingsTo(settings);
     }
 
     /**
@@ -281,6 +280,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
             m_useSourceColumnModel.validateSettings(settings);
             m_catColumnModel.validateSettings(settings);
             m_sourceColumnModel.validateSettings(settings);
+            m_maxThreads.validateSettings(settings);
         } catch (InvalidSettingsException e) {
             // don't throw error msg
         }

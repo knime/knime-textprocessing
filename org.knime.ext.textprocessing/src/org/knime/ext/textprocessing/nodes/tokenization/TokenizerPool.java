@@ -45,48 +45,71 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 09.05.2013 by Kilian Thiel
+ * Created on 07.11.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.preferences;
 
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+package org.knime.ext.textprocessing.nodes.tokenization;
 
+import org.knime.core.node.NodeLogger;
 
 /**
+ * Provides a pool of openNLP tokenizer instances. The pool size is the number of available word and sentence
+ * tokenizers. All tokenizer instances are created in the constructor of the pool.
+ *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
- * @since 2.8
  */
-public class SerachEnginePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+class OpenNLPTokenizerPool {
 
-    private SearchEngineListEditor m_linkSources;
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(OpenNLPTokenizerPool.class);
 
+    private final OpenNlpWordTokenizer[] m_wordTokenizer;
+
+    private final OpenNlpSentenceTokenizer[] m_sentenceTokenizer;
+
+    private final int m_poolSize;
+
+    private int m_wordIndex = 0;
+
+    private int m_sentenceIndex = 0;
 
     /**
-    * Creates a new search engine preference page.
-    */
-   public SerachEnginePreferencePage() {
-       super("Textprocessing Search Engine Preferences", null, GRID);
-       setDescription("Specify search engines for linkage in DocumentViewer.");
-   }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     * Constructor for class OpenNLPTokenizerPool.
+     * @param poolSize The number of word and sentence tokenizers of the pool.
      */
-    @Override
-    public void init(final IWorkbench workbench) {
-        setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+    OpenNLPTokenizerPool(final int poolSize) {
+        if (poolSize < 1) {
+            throw new IllegalArgumentException("Tokenizer pool size must be larger than 0!");
+        }
+
+        m_poolSize = poolSize;
+        m_wordTokenizer = new OpenNlpWordTokenizer[m_poolSize];
+        m_sentenceTokenizer = new OpenNlpSentenceTokenizer[m_poolSize];
+
+        LOGGER.info("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
+        for (int i = 0; i < m_poolSize; i++) {
+            m_wordTokenizer[i] = new OpenNlpWordTokenizer();
+            m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
+        }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
+    /**
+     * @return The next available word tokenizer.
      */
-    @Override
-    protected void createFieldEditors() {
-        m_linkSources = new SearchEngineListEditor(getFieldEditorParent());
-        addField(m_linkSources);
+    synchronized OpenNlpWordTokenizer nextWordTokenizer() {
+        return m_wordTokenizer[m_wordIndex++ % m_poolSize];
     }
 
+    /**
+     * @return The next available sentence tokenizer of the pool.
+     */
+    synchronized OpenNlpSentenceTokenizer nextSentenceTokenizer() {
+        return m_sentenceTokenizer[m_sentenceIndex++ % m_poolSize];
+    }
+
+    /**
+     * @return the poolSize
+     */
+    int getPoolSize() {
+        return m_poolSize;
+    }
 }

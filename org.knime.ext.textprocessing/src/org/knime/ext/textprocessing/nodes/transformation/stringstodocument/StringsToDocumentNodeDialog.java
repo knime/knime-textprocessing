@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   29.07.2008 (thiel): created
  */
@@ -27,27 +27,28 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
 
 /**
  * Provides the dialog for the String to Document node with all necessary
  * dialog components.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the column which has to
      * be used as authors column.
      */
@@ -55,19 +56,19 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_AUTHORSCOL, "");
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the separator string.
      */
     static final SettingsModelString getAuthorSplitStringModel() {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_AUTHORSPLIT_STR,
                 StringsToDocumentConfig.DEF_AUTHORS_SPLITCHAR);
-    }    
+    }
 
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the column which has to
      * be used as title column.
      */
@@ -75,9 +76,9 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_TITLECOL, "");
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the column which has to
      * be used as full text column.
      */
@@ -85,19 +86,19 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_TEXTCOL, "");
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the document source.
      */
     static final SettingsModelString getDocSourceModel() {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_DOCSOURCE,
                 StringsToDocumentConfig.DEF_DOCUMENT_SOURCE);
-    } 
-    
+    }
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the document category.
      */
     static final SettingsModelString getDocCategoryModel() {
@@ -105,9 +106,9 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
                 StringsToDocumentConfigKeys.CFGKEY_DOCCAT,
                 StringsToDocumentConfig.DEF_DOCUMENT_CATEGORY);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the document type.
      */
     static final SettingsModelString getTypeModel() {
@@ -115,9 +116,9 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
                 StringsToDocumentConfigKeys.CFGKEY_DOCTYPE,
                 StringsToDocumentConfig.DEF_DOCUMENT_TYPE);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the document category.
      */
     static final SettingsModelString getPubDatModel() {
@@ -125,31 +126,31 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
                 StringsToDocumentConfigKeys.CFGKEY_PUBDATE,
                 StringsToDocumentConfig.DEF_DOCUMENT_PUBDATE);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelBoolean</code> specifying whether a column is used
-     * for category values or not. 
+     * for category values or not.
      */
     static final SettingsModelBoolean getUseCategoryColumnModel() {
         return new SettingsModelBoolean(
         StringsToDocumentConfigKeys.CFGKEY_USE_CATCOLUMN,
         StringsToDocumentConfig.DEF_USE_CATCOLUMN);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelBoolean</code> specifying whether a column is used
-     * for source values or not. 
+     * for source values or not.
      */
     static final SettingsModelBoolean getUseSourceColumnModel() {
         return new SettingsModelBoolean(
         StringsToDocumentConfigKeys.CFGKEY_USE_SOURCECOLUMN,
         StringsToDocumentConfig.DEF_USE_SOURCECOLUMN);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the column with the category
      * values.
      */
@@ -159,7 +160,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> specifying the column with the source
      * values.
      */
@@ -167,21 +168,32 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 StringsToDocumentConfigKeys.CFGKEY_SOURCECOLUMN, "");
     }
-    
+
+    /**
+     * Creates and returns the settings model, storing the number of maximal
+     * parallel threads running.
+     * @return The settings model with number of maximal parallel threads.
+     */
+    static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
+        return new SettingsModelIntegerBounded(
+            StringsToDocumentConfigKeys.CFGKEY_THREADS, StringsToDocumentNodeModel.DEF_THREADS,
+            StringsToDocumentNodeModel.MIN_THREADS, StringsToDocumentNodeModel.MAX_THREADS);
+    }
+
     private SettingsModelString m_docCategoryModel;
-    
+
     private SettingsModelString m_docSourceModel;
-    
+
     private SettingsModelBoolean m_useCatColumnModel;
-    
+
     private SettingsModelBoolean m_useSourceColumnModel;
-    
+
     /**
      * Creates a new instance of <code>StringsToDocumentNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
     public StringsToDocumentNodeDialog() {
-        
+
         createNewGroup("Text");
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentColumnNameSelection(
@@ -191,17 +203,17 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
                 getTextStringModel(), "Full text", 0, StringValue.class));
         setHorizontalPlacement(false);
         closeCurrentGroup();
-        
+
         createNewGroup("Authors");
         addDialogComponent(new DialogComponentColumnNameSelection(
                 getAuthorsStringModel(), "Authors", 0, StringValue.class));
-        
+
         addDialogComponent(new DialogComponentString(
                 getAuthorSplitStringModel(), "Author names separator"));
         closeCurrentGroup();
-        
+
         createNewGroup("Source and Category");
-        m_docSourceModel = getDocSourceModel(); 
+        m_docSourceModel = getDocSourceModel();
         addDialogComponent(new DialogComponentString(
                 m_docSourceModel, "Document source"));
         setHorizontalPlacement(true);
@@ -211,11 +223,11 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(
                 m_useSourceColumnModel, "Use sources from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(
-                getSourceColumnModel(), "Document source column", 0, 
+                getSourceColumnModel(), "Document source column", 0,
                 StringValue.class));
         setHorizontalPlacement(false);
-        
-        m_docCategoryModel = getDocCategoryModel(); 
+
+        m_docCategoryModel = getDocCategoryModel();
         addDialogComponent(new DialogComponentString(
                 m_docCategoryModel, "Document category"));
         setHorizontalPlacement(true);
@@ -225,23 +237,28 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(
                 m_useCatColumnModel, "Use categories from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(
-                getCategoryColumnModel(), "Document category column", 0, 
+                getCategoryColumnModel(), "Document category column", 0,
                 StringValue.class));
         setHorizontalPlacement(false);
         closeCurrentGroup();
-        
+
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(
                 getTypeModel(), "Document type", types));
-        
+
         DialogComponentString dcs = new DialogComponentString(
                 getPubDatModel(), "Publication date (dd-mm-yyyy)");
         dcs.setToolTipText("Date has to be specified like \"dd-mm-yyyy!\"");
         addDialogComponent(dcs);
         closeCurrentGroup();
+
+        createNewGroup("Processes");
+        addDialogComponent(new DialogComponentNumber(getNumberOfThreadsModel(),
+            "Number of maximal parallel processes", 1));
+        closeCurrentGroup();
     }
-    
+
     /**
      * Enables and disables text fields of document source and category.
      * @author Kilian Thiel, KNIME.com, Berlin, Germany

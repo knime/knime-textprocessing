@@ -45,48 +45,30 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 09.05.2013 by Kilian Thiel
+ * Created on 12.11.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.preferences;
 
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+package org.knime.ext.textprocessing;
 
+import org.eclipse.ui.IStartup;
+import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
+ * Startup class, initializing models and instances of the textprocessing plugin.
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
- * @since 2.8
+ * @since 2.9
  */
-public class SerachEnginePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-
-    private SearchEngineListEditor m_linkSources;
-
+public class TextprocessingStartup implements IStartup {
 
     /**
-    * Creates a new search engine preference page.
-    */
-   public SerachEnginePreferencePage() {
-       super("Textprocessing Search Engine Preferences", null, GRID);
-       setDescription("Specify search engines for linkage in DocumentViewer.");
-   }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     * {@inheritDoc}
      */
     @Override
-    public void init(final IWorkbench workbench) {
-        setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+    public void earlyStartup() {
+        // initialize tokenizer pool
+        if (TextprocessingPreferenceInitializer.initTokenizerPoolOnStartup()) {
+            DefaultTokenization.createNewTokenizerPool();
+        }
     }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
-     */
-    @Override
-    protected void createFieldEditors() {
-        m_linkSources = new SearchEngineListEditor(getFieldEditorParent());
-        addField(m_linkSources);
-    }
-
 }
