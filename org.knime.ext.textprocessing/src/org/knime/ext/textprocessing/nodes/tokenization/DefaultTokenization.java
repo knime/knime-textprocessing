@@ -45,6 +45,7 @@ public final class DefaultTokenization {
     /**
      * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
      * preference pool size.
+     * @since 2.9
      */
     public static final void createNewTokenizerPool() {
         final int newPoolSize = TextprocessingPreferenceInitializer.tokenizerPoolSize();
