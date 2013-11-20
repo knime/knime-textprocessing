@@ -45,82 +45,85 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 12.11.2013 by Kilian Thiel
+ * Created on 13.11.2013 by Kilian Thiel
  */
 
-package org.knime.ext.textprocessing.preferences;
+package org.knime.ext.textprocessing.data.filestore;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import java.util.UUID;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 
 /**
- * The initializer for the document cell storage prefrences.
+ * Address of a document in a file store file, containing length of the document, offset in file store file and uuid
+ * of the document.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-public class StoragePreferenceInitializer extends AbstractPreferenceInitializer {
-
-    /** The blob cell type setting. */
-    public static final String BLOB_CELLTYPE = "blobCell";
-
-    /** The regular cell type setting. */
-    public static final String REGULAR_CELLTYPE = "regularCell";
-
-    /** The file store cell type setting. */
-    public static final String FILESTORE_CELLTYPE = "fileStoreCell";
-
-    /** The default cell type setting.*/
-    public static final String DEFAULT_CELLTYPE = FILESTORE_CELLTYPE;
-
-    /** The default number of documents to store in a single file store file.*/
-    public static final int DEFAULT_FILESTORE_CHUNKSIZE = 10000;
-
-
-    /** Preference key for the document cell type. */
-    public static final String PREF_CELL_TYPE = "knime.textprocessing.celltype";
+final class DocumentAddress {
+    private final UUID m_uuid;
+    private final int m_length;
+    private final long m_offset;
 
     /**
-     * Preference key for the chunk size of the file store, specifying how many documents are stored in a single
-     * file store file.
+     * Constructor for class {@link DocumentAddress}.
+     * @param uuid the uuid of the document.
+     * @param offset the offset of the document in its file store file.
+     * @param length the length of the document.
      */
-    public static final String PREF_FILESTORE_CHUNKSIZE = "knime.textprocessing.filestore.chunksize";
+    DocumentAddress(final UUID uuid, final long offset, final int length) {
+        this.m_uuid = uuid;
+        this.m_offset = offset;
+        this.m_length = length;
+    }
+
+    /**
+     * @return the uuid
+     */
+    public UUID getUuid() {
+        return m_uuid;
+    }
+
+    /**
+     * @return the length
+     */
+    public int getLength() {
+        return m_length;
+    }
+
+    /**
+     * @return the offset
+     */
+    public long getOffset() {
+        return m_offset;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void initializeDefaultPreferences() {
-        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-
-        //set default values
-        store.setDefault(PREF_CELL_TYPE, DEFAULT_CELLTYPE);
-        store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
+    public int hashCode() {
+        return new HashCodeBuilder(119, 17).append(m_uuid).append(m_length).append(m_offset).toHashCode();
     }
 
     /**
-     * @return The specified number of documents to store in a single file store file.
+     * {@inheritDoc}
      */
-    public static final int fileStoreChunkSize() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_FILESTORE_CHUNKSIZE)) {
-            return DEFAULT_FILESTORE_CHUNKSIZE;
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof DocumentAddress)) {
+            return false;
         }
-        if (pStore.getInt(PREF_FILESTORE_CHUNKSIZE) <= 0) {
-            return 1;
+        final DocumentAddress da = (DocumentAddress)obj;
+        if (!m_uuid.equals(da.getUuid())) {
+            return false;
+        } else if (m_offset != da.getOffset()) {
+            return false;
+        } else if (m_length != da.getLength()) {
+            return false;
         }
-        return pStore.getInt(PREF_FILESTORE_CHUNKSIZE);
-    }
 
-    /**
-     * @return The specified cell type to use.
-     */
-    public static String cellType() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_CELL_TYPE)) {
-            return DEFAULT_CELLTYPE;
-        }
-        return pStore.getString(PREF_CELL_TYPE);
+        return true;
     }
 }

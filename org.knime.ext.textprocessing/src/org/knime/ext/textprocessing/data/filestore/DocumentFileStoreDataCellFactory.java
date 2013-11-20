@@ -47,7 +47,7 @@
  *
  * Created on 21.10.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.util;
+package org.knime.ext.textprocessing.data.filestore;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -59,20 +59,20 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentFileStoreCell;
 import org.knime.ext.textprocessing.data.TextContainer;
 import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 
 /**
  * A {@link org.knime.ext.textprocessing.util.TextContainerDataCellFactory}
- * creating {@link org.knime.ext.textprocessing.data.DocumentFileStoreCell}s containing given
- * {@link org.knime.ext.textprocessing.data.Document}s. It must be specified how many documents will be stored in one
+ * creating {@link org.knime.ext.textprocessing.data.filestore.DocumentFileStoreCell}s containing given
+ * {@link org.knime.ext.textprocessing.data.Document}s. It can be specified how many documents will be stored in one
  * file store file.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-public class DocumentFileStoreDataCellFactory implements TextContainerDataCellFactory {
+public final class DocumentFileStoreDataCellFactory implements TextContainerDataCellFactory {
 
     /* Logger */
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentFileStoreDataCellFactory.class);

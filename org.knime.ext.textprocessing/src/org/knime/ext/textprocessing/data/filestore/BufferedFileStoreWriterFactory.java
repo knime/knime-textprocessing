@@ -45,82 +45,55 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 12.11.2013 by Kilian Thiel
+ * Created on 19.11.2013 by Kilian Thiel
  */
 
-package org.knime.ext.textprocessing.preferences;
+package org.knime.ext.textprocessing.data.filestore;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.knime.core.data.filestore.FileStore;
+import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
 
 /**
- * The initializer for the document cell storage prefrences.
+ * Singleton factory providing buffered file store writer for file stores.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-public class StoragePreferenceInitializer extends AbstractPreferenceInitializer {
+final class BufferedFileStoreWriterFactory {
 
-    /** The blob cell type setting. */
-    public static final String BLOB_CELLTYPE = "blobCell";
+    private static BufferedFileStoreWriterFactory instance = null;
 
-    /** The regular cell type setting. */
-    public static final String REGULAR_CELLTYPE = "regularCell";
+    private static final int DEFALT_BUFFER_SIZE = 100;
 
-    /** The file store cell type setting. */
-    public static final String FILESTORE_CELLTYPE = "fileStoreCell";
+    private final Map<String, BufferedFileStoreWriter> m_bufferedWriter =
+            new ConcurrentHashMap<String, BufferedFileStoreWriter>();
 
-    /** The default cell type setting.*/
-    public static final String DEFAULT_CELLTYPE = FILESTORE_CELLTYPE;
-
-    /** The default number of documents to store in a single file store file.*/
-    public static final int DEFAULT_FILESTORE_CHUNKSIZE = 10000;
-
-
-    /** Preference key for the document cell type. */
-    public static final String PREF_CELL_TYPE = "knime.textprocessing.celltype";
+    private BufferedFileStoreWriterFactory() { }
 
     /**
-     * Preference key for the chunk size of the file store, specifying how many documents are stored in a single
-     * file store file.
+     * @return the singleton instance of the factory.
      */
-    public static final String PREF_FILESTORE_CHUNKSIZE = "knime.textprocessing.filestore.chunksize";
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initializeDefaultPreferences() {
-        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-
-        //set default values
-        store.setDefault(PREF_CELL_TYPE, DEFAULT_CELLTYPE);
-        store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
+    static synchronized BufferedFileStoreWriterFactory instance() {
+        if (instance == null) {
+            instance = new BufferedFileStoreWriterFactory();
+        }
+        return instance;
     }
 
     /**
-     * @return The specified number of documents to store in a single file store file.
+     * Returns the related buffered writer for the given file store.
+     * @param fileStore The file store to get the related buffered writer for,
+     * @return The buffered writer for the given file store.
      */
-    public static final int fileStoreChunkSize() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_FILESTORE_CHUNKSIZE)) {
-            return DEFAULT_FILESTORE_CHUNKSIZE;
+    BufferedFileStoreWriter getBufferedFileStoreWriter(final FileStore fileStore) {
+        BufferedFileStoreWriter fileStoreWriter = m_bufferedWriter.get(fileStore.toString());
+        if (fileStoreWriter == null) {
+            final int bufferSize = Math.min(DEFALT_BUFFER_SIZE, StoragePreferenceInitializer.fileStoreChunkSize());
+            fileStoreWriter = new BufferedFileStoreWriter(fileStore, bufferSize);
+            m_bufferedWriter.put(fileStore.toString(), fileStoreWriter);
         }
-        if (pStore.getInt(PREF_FILESTORE_CHUNKSIZE) <= 0) {
-            return 1;
-        }
-        return pStore.getInt(PREF_FILESTORE_CHUNKSIZE);
-    }
-
-    /**
-     * @return The specified cell type to use.
-     */
-    public static String cellType() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_CELL_TYPE)) {
-            return DEFAULT_CELLTYPE;
-        }
-        return pStore.getString(PREF_CELL_TYPE);
+        return fileStoreWriter;
     }
 }

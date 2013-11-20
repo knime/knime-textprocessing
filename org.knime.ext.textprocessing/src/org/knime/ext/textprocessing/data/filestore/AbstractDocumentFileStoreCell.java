@@ -47,156 +47,90 @@
  *
  * Created on 21.10.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.data;
+package org.knime.ext.textprocessing.data.filestore;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
-import org.knime.core.data.DataCellSerializer;
-import org.knime.core.data.DataType;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.filestore.FileStore;
 import org.knime.core.data.filestore.FileStoreCell;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.util.LRUCache;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
- * A {@link FileStoreCell} implementation holding a {@link org.knime.ext.textprocessing.data.Document}. It provides a
- * document value as well as a string value. The document data is serialized into the file of the assigned file store.
- * The address (offset), as well as the length and the uuid of the document in the file store file is serialized into
- * the cells data output.
+ * Basic abstract file store cell storing a document and its cell meta information, such as its offset in the file
+ * store file, and the length and uuid of the document. The deserialization of a document from the file store file is
+ * already implemented, as well as all basic cell methods, such as toString(), hashCode(), getSstringValue(), and
+ * getDocumentValue(). Deserialized documents are cached in order to avoid multiple deserialization of the same
+ * document.
+ * Furthermore it provides static methods for the serialization of a document into a byte array, and vice versa.
+ *
+ * Classes extending this class need to implement the serialization of the document (or its byte array) into the file
+ * store file.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-public final class DocumentFileStoreCell extends FileStoreCell implements DocumentValue, StringValue {
+abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements DocumentValue, StringValue {
 
-    /**
-     * SerialVersionID.
-     */
-    private static final long serialVersionUID = -8256678631254743854L;
+    /** SerialVersionID. */
+    private static final long serialVersionUID = -6571228838857812542L;
 
     /* Logger */
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentFileStoreCell.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractDocumentFileStoreCell.class);
 
-    private static final int DEF_CACHE_SIZE = 1000;
+    /** Default cache size. */
+    protected static final int DEF_CACHE_SIZE = 1000;
 
     /* Document cache. */
     private static final LRUCache<UUID, Document> DOCUMENT_CACHE = new LRUCache<UUID, Document>(DEF_CACHE_SIZE);
 
-    /**
-     * Convenience access member for <code>DataType.getType(DocumentFileStoreCell.class)</code>.
-     *
-     * @see DataType#getType(Class)
-     */
-    public static final DataType TYPE = DataType.getType(DocumentFileStoreCell.class);
 
-    /* Document to store. */
-    private Document m_document;
+    /** Document to store. */
+    protected Document m_document;
 
-    /* Flag to specify whether cell was serialized or not, in order to avoid multiple writes. */
-    private AtomicBoolean m_serialized = new AtomicBoolean(false);
+    /** Flag to specify whether document data of cell was serialized or not, in order to avoid multiple writes. */
+    protected AtomicBoolean m_serialized = new AtomicBoolean(false);
 
-    /* Offset marking the documents position in file. */
-    private long m_offset;
+    /** Offset marking the documents position in file. */
+    protected long m_offset;
 
-    /* Length of the byte array storing the serialized document. */
-    private int m_length;
+    /** Length of the byte array storing the serialized document. */
+    protected int m_length;
 
-    /* UUID as unique identifier of document. */
-    private UUID m_docUuid;
+    /** UUID as unique identifier of document. */
+    protected UUID m_docUuid;
 
     /**
-     * @return The serializer of the {@link DocumentFileStoreCell}.
-     */
-    public static DataCellSerializer<DocumentFileStoreCell> getCellSerializer() {
-        return new DataCellSerializer<DocumentFileStoreCell>() {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public DocumentFileStoreCell deserialize(final DataCellDataInput input) throws IOException {
-                DocumentFileStoreCell docCell = new DocumentFileStoreCell();
-                docCell.deserializeCell(input);
-                return docCell;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void serialize(final DocumentFileStoreCell cell, final DataCellDataOutput output)
-                    throws IOException {
-                cell.serializeCell(output);
-            }
-        };
-    }
-
-    /**
-     * Returns the preferred value class of this cell implementation.
-     *
-     * @return {@code DocumentValue.class};
-     */
-    public static final Class<? extends DataValue> getPreferredValueClass() {
-        return DocumentValue.class;
-    }
-
-    /**
-     * Constructor of {@link DocumentFileStoreCell}. Creates new instance with given document and file store to store
-     * document at.
+     * Constructor of AbstractDocumentFileStoreCell. Creates new instance with given document and file store
+     * to store document at.
      * @param fileStore File store to store document at.
      * @param document Document to encapsulate and store in file store.
      * @throws IOException if document can not be serialized into file store file.
      */
-    public DocumentFileStoreCell(final FileStore fileStore, final Document document) throws IOException {
+    public AbstractDocumentFileStoreCell(final FileStore fileStore, final Document document) throws IOException {
         super(fileStore);
         m_document = document;
         m_docUuid = m_document.getUUID();
-
-        // Write document only if it has not been already serialized.
-        if (m_serialized.compareAndSet(false, true)) {
-            // serialize document in byte array (no need to synchronize at this point)
-            byte[] serializedDoc = serializeDocument(m_document);
-            m_length = serializedDoc.length;
-            final File file = getFileStore().getFile();
-
-            // write synchronized to file to avoid parallel writing and mess up serialized document data
-            synchronized (file) {
-                m_offset = file.length();
-                final OutputStream os = new BufferedOutputStream(new FileOutputStream(file, true), m_length);
-                try {
-                    os.write(serializedDoc);
-                } catch (IOException e) {
-                    LOGGER.error("Could not write serialized document to random access file.", e);
-                    throw e;
-                } finally {
-                    os.close();
-                }
-            }
-        }
     }
 
     /**
      * Empty constructor.
      */
-    DocumentFileStoreCell() {
+    AbstractDocumentFileStoreCell() {
         super();
     }
 
@@ -215,21 +149,6 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
     @Override
     public int hashCode() {
         return m_document.hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean equalsDataCell(final DataCell dc) {
-        if (dc == null) {
-            return false;
-        }
-        if (!m_document.equals(((DocumentFileStoreCell)dc).getDocument())) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -260,7 +179,7 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
      * @param output The data output to write the address information of the document to.
      * @throws IOException If document data can not be written to file store file.
      */
-    private void serializeCell(final DataCellDataOutput output) throws IOException {
+    protected void serializeCell(final DataCellDataOutput output) throws IOException {
         // write document to file store (if it has not been written bevore)
         flushToFileStore();
 
@@ -271,44 +190,12 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
     }
 
     /**
-     * Serializes document into a byte array, which is than returned.
-     * @param doc The document to serialize.
-     * @return The byte array containing the serialized document.
-     * @throws IOException If document data can not be serialized.
-     */
-    private byte[] serializeDocument(final Document doc) throws IOException {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-          TermDocumentDeSerializationUtil.fastSerializeDocument(doc, new DataOutputStream(bos));
-          bos.flush();
-          return bos.toByteArray();
-        } finally {
-            bos.close();
-        }
-    }
-
-    /**
-     * Deserializes document from byte array and returns new document instance.
-     * @param bytes The byte array containing the serialized document data.
-     * @return The new document instance.
-     * @throws IOException If document can not be deserialzed from byte array.
-     */
-    private Document deserializedDocument(final byte[] bytes) throws IOException {
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
-        try {
-            return TermDocumentDeSerializationUtil.fastDeserializeDocument(dis);
-        } finally {
-          dis.close();
-        }
-    }
-
-    /**
-     * Deserializes document address information from given data input.The document itself is not deserialzed at this
+     * Deserializes document address information from given data input. The document itself is not deserialzed at this
      * point, only its offset, length and uuid information.
      * @param input The input to read the document address information from.
      * @throws IOException If document address information can not be deserialized from given data input.
      */
-    private void deserializeCell(final DataCellDataInput input) throws IOException {
+    protected void deserializeCell(final DataCellDataInput input) throws IOException {
         // read offset, length, and uuid, set serialized flag true (since cell has obviously been serialized before)
         m_serialized = new AtomicBoolean(true);
         m_offset = input.readLong();
@@ -317,22 +204,29 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
     }
 
     /**
+     * Prepares the read document data process.
+     */
+    protected abstract void prepareReadDocumentData();
+
+    /**
      * If document has not been deserialized and is not already in cache it is deserialized from file store file and
      * than put to cache.
      */
-    private synchronized void readDocumentData() {
+    protected synchronized void readDocumentData() {
         if (m_document == null && m_docUuid != null) {
             m_document = DOCUMENT_CACHE.get(m_docUuid);
+            // only deserialize of document is not in cache
             if (m_document == null) {
+                // first prepare to be ready to deserialize document from file store file
+                prepareReadDocumentData();
+
                 InputStream is = null;
                 try {
-                    final File file = getFileStore().getFile();
-                    final FileInputStream fileInput = new FileInputStream(file);
+                    is = new BufferedInputStream(new FileInputStream(getFileStore().getFile()), m_length);
                     // jump to beginning of document data
-                    fileInput.skip(m_offset);
-                    is = new BufferedInputStream(fileInput, m_length);
+                    is.skip(m_offset);
 
-                    byte[] serializedDoc = new byte[m_length];
+                    final byte[] serializedDoc = new byte[m_length];
                     int redBytes = is.read(serializedDoc, 0, m_length);
                     if (redBytes == m_length) {
                         m_document = deserializedDocument(serializedDoc);
@@ -355,9 +249,36 @@ public final class DocumentFileStoreCell extends FileStoreCell implements Docume
         }
     }
 
+
     /**
-     * {@inheritDoc}
+     * Serializes document into a byte array, which is than returned.
+     * @param doc The document to serialize.
+     * @return The byte array containing the serialized document.
+     * @throws IOException If document data can not be serialized.
      */
-    @Override
-    protected void flushToFileStore() throws IOException { }
+    static byte[] serializeDocument(final Document doc) throws IOException {
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+          TermDocumentDeSerializationUtil.fastSerializeDocument(doc, new DataOutputStream(bos));
+          bos.flush();
+          return bos.toByteArray();
+        } finally {
+            bos.close();
+        }
+    }
+
+    /**
+     * Deserializes document from byte array and returns new document instance.
+     * @param bytes The byte array containing the serialized document data.
+     * @return The new document instance.
+     * @throws IOException If document can not be deserialzed from byte array.
+     */
+    static Document deserializedDocument(final byte[] bytes) throws IOException {
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+        try {
+            return TermDocumentDeSerializationUtil.fastDeserializeDocument(dis);
+        } finally {
+          dis.close();
+        }
+    }
 }

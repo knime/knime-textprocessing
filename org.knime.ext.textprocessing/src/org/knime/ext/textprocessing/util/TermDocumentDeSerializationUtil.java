@@ -444,6 +444,8 @@ public final class TermDocumentDeSerializationUtil {
         return new DocumentCell(TermDocumentDeSerializationUtil.deserializeDocument(bis));
     }
 
+    private static final short DOCUMENT_SERIALIZATION_VERSION = 2;
+
     /**
      * Deserializes a document from given data input by deserializing all fields of the
      * document in a specific order, not using the Java standard object serialization.
@@ -457,6 +459,7 @@ public final class TermDocumentDeSerializationUtil {
      */
     public static Document fastDeserializeDocument(final DataInput in) throws IOException {
         try {
+            in.readShort();
             final UUID uuid = UUID.fromString(in.readUTF());
             final int length = in.readInt();
             final String titleCache = in.readUTF();
@@ -573,6 +576,7 @@ public final class TermDocumentDeSerializationUtil {
      */
     public static void fastSerializeDocument(final Document doc, final DataOutput out) throws IOException {
         try {
+            out.writeShort(DOCUMENT_SERIALIZATION_VERSION);
             out.writeUTF(doc.getUUID().toString());
             out.writeInt(doc.getLength());
             out.writeUTF(doc.getTitle());
@@ -641,6 +645,8 @@ public final class TermDocumentDeSerializationUtil {
         }
     }
 
+    private static final short TERM_SERIALIZATION_VERSION = 2;
+
     /**
      * Serializes the given term on given data output by serializing its lists of words, whitespace suffices
      * and tags. Terms that consist of one word only and have no tags assigned are serialized without serializing the
@@ -653,6 +659,7 @@ public final class TermDocumentDeSerializationUtil {
      */
     public static void fastSerializeTerm(final Term term, final DataOutput out) throws IOException {
         try {
+            out.writeShort(TERM_SERIALIZATION_VERSION);
             boolean isComplex = term.getWords().size() != 1 && term.getTags().isEmpty();
             out.writeBoolean(isComplex);
             out.writeBoolean(term.isUnmodifiable());
@@ -693,6 +700,7 @@ public final class TermDocumentDeSerializationUtil {
      */
     public static Term fastDeserializeTerm(final DataInput in) throws IOException {
         try {
+            in.readShort();
             final boolean isComplex = in.readBoolean();
             final boolean unmodifieable = in.readBoolean();
             final int hashCode = in.readInt();
