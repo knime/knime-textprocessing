@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,47 +19,45 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict;
 
 import java.util.List;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
  * The dialog class of the dictionary named entity recognizer node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
-    
+public class DictionaryTaggerNodeDialog extends TaggerNodeSettingsPane {
+
     /**
-     * Creates and returns a 
-     * {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} 
+     * Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean}
      * containing the user settings whether terms representing named entities
      * have to be set unmodifiable or not.
-     * 
+     *
      * @return A <code>SettingsModelBoolean</code> containing the terms
      * unmodifiable flag.
      */
     public static final SettingsModelBoolean createSetUnmodifiableModel() {
         return new SettingsModelBoolean(
-                DictionaryTaggerConfigKeys.CFGKEY_UNMODIFIABLE, 
+                DictionaryTaggerConfigKeys.CFGKEY_UNMODIFIABLE,
                 DictionaryTaggerNodeModel.DEFAULT_UNMODIFIABLE);
     }
-    
+
     /**
      * @return Creates and returns a
      * {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean}
@@ -71,7 +69,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
                 DictionaryTaggerConfigKeys.CFGKEY_CASE_SENSITIVE,
                 DictionaryTaggerNodeModel.DEFAULT_CASE_SENSITIVE);
     }
-    
+
     /**
      * @return Creates and returns a
      * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
@@ -81,7 +79,7 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 DictionaryTaggerConfigKeys.CFGKEY_FILE, "");
     }
-    
+
     /**
      * @return Creates and returns a
      * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
@@ -91,8 +89,8 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(
                 DictionaryTaggerConfigKeys.CFGKEY_TAG_TYPE,
                 DictionaryTaggerNodeModel.DEFAULT_TAG_TYPE);
-    }    
-    
+    }
+
     /**
      * @return Creates and returns a
      * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
@@ -100,33 +98,37 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString createTagModel() {
         return new SettingsModelString(
-                DictionaryTaggerConfigKeys.CFGKEY_TAG, 
+                DictionaryTaggerConfigKeys.CFGKEY_TAG,
                 DictionaryTaggerNodeModel.DEFAULT_TAG);
     }
-    
+
     /**
      * Creates a new instance of <code>AbnerTaggerNodeDialog</code> providing
      * a checkbox enabling the user to specify whether terms representing named
-     * entities have to be set unmodifiable or not. 
+     * entities have to be set unmodifiable or not.
      */
     public DictionaryTaggerNodeDialog() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
         addDialogComponent(new DialogComponentBoolean(
-                        createSetUnmodifiableModel(), 
+                        createSetUnmodifiableModel(),
                         "Set named entities unmodifiable"));
-        
+
         addDialogComponent(new DialogComponentBoolean(
-                createCaseSensitiveModel(), 
+                createCaseSensitiveModel(),
                 "Case sensitive"));
-        
+
         addDialogComponent(new DialogComponentFileChooser(
-                createFileModel(), 
+                createFileModel(),
                 DictionaryTaggerNodeDialog.class.toString()));
-        
-        
+
+
         // tag type model
         m_tagtypemodel = createTagTypeModel();
         m_tagtypemodel.addChangeListener(new InternalChangeListener());
-        
+
         // tag list
         String selectedTagType = m_tagtypemodel.getStringValue();
         List<String> tags = TagFactory.getInstance()
@@ -136,22 +138,22 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
 
         this.setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentStringSelection(
-                m_tagtypemodel, "Tag type", 
+                m_tagtypemodel, "Tag type",
                 TagFactory.getInstance().getTagTypes()));
-        
+
         addDialogComponent(m_tagSelection);
     }
-    
+
     private DialogComponentStringSelection m_tagSelection;
-    
+
     private SettingsModelString m_tagtypemodel;
-    
+
     /**
-     * 
+     *
      * @author thiel, University of Konstanz
      */
     class InternalChangeListener implements ChangeListener {
-        
+
         /**
          * {@inheritDoc}
          */

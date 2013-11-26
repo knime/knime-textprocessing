@@ -53,7 +53,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -63,26 +62,24 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
 import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeDialog;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 
 /**
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
  */
-public abstract class AbstractDictionaryTaggerModel extends NodeModel {
+public abstract class AbstractDictionaryTaggerModel extends TaggerNodeModel {
 
     /**
      * The default value of the terms unmodifiable flag.
@@ -116,7 +113,7 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
     public static final int DATA_TABLE_INDEX = 0;
 
 
-    private int m_docColIndex = -1;
+    private Set<String> m_dictionary;
 
     private SettingsModelBoolean m_setUnmodifiableModel =
         DictionaryTaggerNodeDialog.createSetUnmodifiableModel();
@@ -133,36 +130,45 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
     private SettingsModelString m_columnModel =
         DictionaryTaggerNodeDialog.createColumnModel();
 
-    private DocumentDataTableBuilder m_dtBuilder;
-
 
     /**
      * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two
      * table in ports and one out port.
      */
     public AbstractDictionaryTaggerModel() {
-        super(2, 1);
-        m_dtBuilder = new DocumentDataTableBuilder();
+        super(2);
     }
 
     /**
-     * {@inheritDoc}
+     * Checks if spec of second input data table contains a string column that can be used as dictionary.
+     * @param inSpecs The specs of the input data tables.
+     * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
+     * @since 2.9
      */
     @Override
-    protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        checkDataTableSpec(inSpecs);
-        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
+    protected final void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[DICT_TABLE_INDEX]);
+        verfier.verifyStringCell(true);
     }
 
-    private final void checkDataTableSpec(final DataTableSpec[] specs)
-    throws InvalidSettingsException {
-        DataTableSpecVerifier verfier = new DataTableSpecVerifier(
-                specs[DICT_TABLE_INDEX]);
-        verfier.verifyStringCell(true);
-        verfier = new DataTableSpecVerifier(specs[DATA_TABLE_INDEX]);
-        verfier.verifyDocumentCell(true);
-        m_docColIndex = verfier.getDocumentCellIndex();
+    /**
+     * Reads strings of string column of second input data table to build dictionary.
+     * @param inData Input data tables.
+     * @param exec The execution context of the node.
+     * @throws Exception If tagger can not be prepared.
+     * @since 2.9
+     */
+    @Override
+    protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
+        // Read table with dictionary
+        final int dictIndex =
+            inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(m_columnModel.getStringValue());
+        m_dictionary = new LinkedHashSet<String>();
+        final RowIterator it = inData[DICT_TABLE_INDEX].iterator();
+        while (it.hasNext()) {
+            final DataRow row = it.next();
+            m_dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+        }
     }
 
     /**
@@ -175,49 +181,11 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
 
     /**
      * {@inheritDoc}
+     * @since 2.9
      */
     @Override
-    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        checkDataTableSpec(new DataTableSpec[]{
-                inData[0].getDataTableSpec(), inData[1].getDataTableSpec()
-        });
-
-        // Read table with dictionary
-        int dictIndex =
-            inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(m_columnModel.getStringValue());
-        Set<String> dictionary = new LinkedHashSet<String>();
-        RowIterator it = inData[DICT_TABLE_INDEX].iterator();
-        while (it.hasNext()) {
-            DataRow row = it.next();
-            dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
-        }
-
-        // tag documents
-        DocumentTagger tagger = createDocumentTagger(dictionary);
-
-        it = inData[DATA_TABLE_INDEX].iterator();
-        int rowCount = inData[DATA_TABLE_INDEX].getRowCount();
-        int currDoc = 1;
-
-        try {
-            m_dtBuilder.openDataTable(exec);
-            while (it.hasNext()) {
-
-                double progress = (double)currDoc / (double)rowCount;
-                exec.setProgress(progress, "Tagging document " + currDoc + " of " + rowCount);
-                exec.checkCanceled();
-                currDoc++;
-
-                DataRow row = it.next();
-                DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-                m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()), row.getKey());
-            }
-
-            return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
-        } finally {
-            m_dtBuilder.closeCache();
-        }
+    public final DocumentTagger createTagger() throws Exception {
+        return createDocumentTagger(m_dictionary);
     }
 
     /**
@@ -248,6 +216,8 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
      */
     @Override
     protected final void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
+
         m_caseSensitiveModel.saveSettingsTo(settings);
         m_tagModel.saveSettingsTo(settings);
         m_tagTypeModel.saveSettingsTo(settings);
@@ -267,6 +237,8 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
      */
     @Override
     protected final void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.validateSettings(settings);
+
         m_caseSensitiveModel.validateSettings(settings);
         m_tagModel.validateSettings(settings);
         m_tagTypeModel.validateSettings(settings);
@@ -287,6 +259,8 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
      */
     @Override
     protected final void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
+
         m_caseSensitiveModel.loadSettingsFrom(settings);
         m_tagModel.loadSettingsFrom(settings);
         m_tagTypeModel.loadSettingsFrom(settings);
@@ -307,11 +281,7 @@ public abstract class AbstractDictionaryTaggerModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        try {
-            m_dtBuilder.getAndCloseDataTable();
-        } catch (Exception e) { /* Do noting just try */ }
-    }
+    protected void reset() { }
 
     /**
      * {@inheritDoc}

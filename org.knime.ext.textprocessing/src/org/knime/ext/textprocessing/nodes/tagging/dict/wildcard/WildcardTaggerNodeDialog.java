@@ -50,18 +50,16 @@
 package org.knime.ext.textprocessing.nodes.tagging.dict.wildcard;
 
 import java.util.List;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.StringValue;
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel;
 import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeDialog;
 
@@ -70,7 +68,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNo
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
  */
-public class WildcardTaggerNodeDialog extends DefaultNodeSettingsPane {
+public class WildcardTaggerNodeDialog extends TaggerNodeSettingsPane {
 
     /**
      * @return Creates and returns a
@@ -97,6 +95,10 @@ public class WildcardTaggerNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public WildcardTaggerNodeDialog() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
         addDialogComponent(new DialogComponentColumnNameSelection(
                 DictionaryTaggerNodeDialog.createColumnModel(), "Expression column",
                 AbstractDictionaryTaggerModel.DICT_TABLE_INDEX,

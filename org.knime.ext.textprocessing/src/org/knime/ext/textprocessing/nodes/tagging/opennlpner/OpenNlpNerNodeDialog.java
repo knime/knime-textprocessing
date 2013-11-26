@@ -27,22 +27,20 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class OpenNlpNerNodeDialog extends DefaultNodeSettingsPane {
+public class OpenNlpNerNodeDialog extends TaggerNodeSettingsPane {
 
     /**
      * Creates and returns a
@@ -118,6 +116,10 @@ public class OpenNlpNerNodeDialog extends DefaultNodeSettingsPane {
      * entities have to be set unmodifiable or not.
      */
     public OpenNlpNerNodeDialog() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
         addDialogComponent(new DialogComponentBoolean(
                 createSetUnmodifiableModel(),
                 "Set named entities unmodifiable"));

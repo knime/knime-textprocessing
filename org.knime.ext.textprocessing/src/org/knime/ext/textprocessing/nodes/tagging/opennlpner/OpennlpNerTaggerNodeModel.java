@@ -27,33 +27,23 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
 import java.io.File;
 import java.io.IOException;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowIterator;
-import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
 
 /**
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class OpennlpNerTaggerNodeModel extends NodeModel {
+public class OpennlpNerTaggerNodeModel extends TaggerNodeModel {
 
     /**
      * The default value for the unmodifiable flag.
@@ -84,10 +74,6 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     public static final String DEFAULT_MODEL_FILENAME =
         System.getProperty("user.home");
 
-    private int m_docColIndex = -1;
-
-    private DocumentDataTableBuilder m_dtBuilder;
-
     private SettingsModelBoolean m_unmodifiableModel =
         OpenNlpNerNodeDialog.createSetUnmodifiableModel();
 
@@ -104,87 +90,40 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
      * Creates new instance of <code>OpennlpNerTaggerNodeModel</code>.
      */
     public OpennlpNerTaggerNodeModel() {
-        super(1, 1);
-        m_dtBuilder = new DocumentDataTableBuilder();
+        super();
         m_useDictFileModel.addChangeListener(new SettingsChangeListener());
         checkSettings();
     }
 
     /**
      * {@inheritDoc}
+     * @since 2.9
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        checkDataTableSpec(inData[0].getDataTableSpec());
+    public DocumentTagger createTagger() throws Exception {
+        final DocumentTagger tagger;
 
-        DocumentTagger tagger;
-
-        String modelFileName = null;
+        final String modelFileName;
         if (m_useDictFileModel.getBooleanValue()) {
             modelFileName = m_modelFileModel.getStringValue();
-            tagger = new OpennlpNerDocumentTagger(
-                m_unmodifiableModel.getBooleanValue(),
-                m_modelNameModel.getStringValue(), modelFileName);
+            tagger =
+                new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(), m_modelNameModel.getStringValue(),
+                    modelFileName);
 
         } else {
-            tagger = new OpennlpNerDocumentTagger(
-                m_unmodifiableModel.getBooleanValue(),
-                OpenNlpModelFactory.getInstance().getModelByName(
-                        m_modelNameModel.getStringValue()));
+            tagger =
+                new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(), OpenNlpModelFactory.getInstance()
+                    .getModelByName(m_modelNameModel.getStringValue()));
         }
 
-        RowIterator it = inData[0].iterator();
-        int rowCount = inData[0].getRowCount();
-        int currDoc = 1;
-
-        try {
-            m_dtBuilder.openDataTable(exec);
-            while (it.hasNext()) {
-
-                double progress = (double)currDoc / (double)rowCount;
-                exec.setProgress(progress, "Tagging document " + currDoc + " of " + rowCount);
-                exec.checkCanceled();
-                currDoc++;
-
-                DataRow row = it.next();
-                DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-                m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()), row.getKey());
-            }
-
-            return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
-        } finally {
-            m_dtBuilder.closeCache();
-        }
+        return tagger;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
-    }
-
-    private void checkDataTableSpec(final DataTableSpec spec)
-    throws InvalidSettingsException {
-        DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
-        verfier.verifyDocumentCell(true);
-        m_docColIndex = verfier.getDocumentCellIndex();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        try {
-            m_dtBuilder.getAndCloseDataTable();
-        } catch (Exception e) { /* Do noting just try */ }
-    }
+    protected void reset() { }
 
     /**
      * {@inheritDoc}
@@ -192,6 +131,7 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
         m_unmodifiableModel.loadSettingsFrom(settings);
         m_modelNameModel.loadSettingsFrom(settings);
         m_useDictFileModel.loadSettingsFrom(settings);
@@ -203,6 +143,7 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
         m_modelNameModel.saveSettingsTo(settings);
         m_unmodifiableModel.saveSettingsTo(settings);
         m_useDictFileModel.saveSettingsTo(settings);
@@ -215,6 +156,7 @@ public class OpennlpNerTaggerNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        super.validateSettings(settings);
         m_modelNameModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
         m_useDictFileModel.validateSettings(settings);

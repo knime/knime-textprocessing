@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,46 +19,49 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   28.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.stanford;
 
 import java.util.Set;
-
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
  * Creates the dialog of the OscarTaggerNode with a checkbox component,
  * to specify whether recognized named entity terms should be set unmodifiable
- * or not. 
- * 
+ * or not.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class StanfordTaggerNodeDialog extends DefaultNodeSettingsPane {
+public class StanfordTaggerNodeDialog extends TaggerNodeSettingsPane {
 
     /**
-     * Creates and returns a 
-     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString} 
+     * Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
      * containing the user settings of the specified tagger model to use.
-     * 
-     * @return A <code>SettingsModelString</code> containing the tagger model 
+     *
+     * @return A <code>SettingsModelString</code> containing the tagger model
      * to use.
      */
     public static SettingsModelString createTaggerModelModel() {
         return new SettingsModelString(
-                StanfordTaggerConfigKeys.CFGKEY_MODEL, 
+                StanfordTaggerConfigKeys.CFGKEY_MODEL,
                 StanfordTaggerNodeModel.DEF_MODEL);
     }
-    
+
     /**
-     * Creates a new instance of <code>StanfordTaggerNodeDialog</code> a drop 
+     * Creates a new instance of <code>StanfordTaggerNodeDialog</code> a drop
      * down box to choose a tagger model to use.
      */
     public StanfordTaggerNodeDialog() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
         Set<String> models = StanfordDocumentTagger.TAGGERMODELS.keySet();
         addDialogComponent(new DialogComponentStringSelection(
                 createTaggerModelModel(), "Tagger model", models));

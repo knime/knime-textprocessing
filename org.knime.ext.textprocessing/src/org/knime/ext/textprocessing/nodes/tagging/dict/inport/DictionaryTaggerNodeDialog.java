@@ -26,18 +26,16 @@
 package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
 
 import java.util.List;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.StringValue;
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel;
 
 /**
@@ -45,7 +43,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerM
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
+public class DictionaryTaggerNodeDialog extends TaggerNodeSettingsPane {
 
     /**
      * Creates and returns a
@@ -124,6 +122,10 @@ public class DictionaryTaggerNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public DictionaryTaggerNodeDialog() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
         addDialogComponent(new DialogComponentColumnNameSelection(
                 createColumnModel(), "Dictionary column",
                 AbstractDictionaryTaggerModel.DICT_TABLE_INDEX,

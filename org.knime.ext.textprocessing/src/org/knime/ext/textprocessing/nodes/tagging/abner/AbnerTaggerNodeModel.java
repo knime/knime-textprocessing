@@ -27,24 +27,15 @@ package org.knime.ext.textprocessing.nodes.tagging.abner;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowIterator;
-import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
 
 /**
  * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger.
@@ -53,7 +44,7 @@ import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class AbnerTaggerNodeModel extends NodeModel {
+public class AbnerTaggerNodeModel extends TaggerNodeModel {
 
     /**
      * The default value of the terms unmodifiable flag.
@@ -66,75 +57,26 @@ public class AbnerTaggerNodeModel extends NodeModel {
     public static final String DEF_ABNERMODEL =
         AbnerDocumentTagger.MODEL_BIOCREATIVE;
 
-    private int m_docColIndex = -1;
-
     private SettingsModelBoolean m_setUnmodifiableModel =
         AbnerTaggerNodeDialog.createSetUnmodifiableModel();
 
     private SettingsModelString m_abnerTaggingModel =
         AbnerTaggerNodeDialog.createAbnerModelModel();
 
-    private DocumentDataTableBuilder m_dtBuilder;
-
     /**
-     * Creates a new instance of <code>AbnerTaggerNodeModel</code> with one
-     * table in and one out port.
+     * Creates a new instance of <code>AbnerTaggerNodeModel</code> with one table in and one out port.
      */
     public AbnerTaggerNodeModel() {
-        super(1, 1);
-        m_dtBuilder = new DocumentDataTableBuilder();
+        super();
     }
 
     /**
      * {@inheritDoc}
+     * @since 2.9
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
-    }
-
-    private void checkDataTableSpec(final DataTableSpec spec)
-    throws InvalidSettingsException {
-        DataTableSpecVerifier verfier = new DataTableSpecVerifier(spec);
-        verfier.verifyDocumentCell(true);
-        m_docColIndex = verfier.getDocumentCellIndex();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        checkDataTableSpec(inData[0].getDataTableSpec());
-
-        DocumentTagger tagger = new AbnerDocumentTagger(
-                m_setUnmodifiableModel.getBooleanValue(),
-                m_abnerTaggingModel.getStringValue());
-
-        RowIterator it = inData[0].iterator();
-        int rowCount = inData[0].getRowCount();
-        int currDoc = 1;
-        try {
-            m_dtBuilder.openDataTable(exec);
-            while (it.hasNext()) {
-
-                double progress = (double)currDoc / (double)rowCount;
-                exec.setProgress(progress, "Tagging document " + currDoc + " of " + rowCount);
-                exec.checkCanceled();
-                currDoc++;
-
-                DataRow row = it.next();
-                DocumentValue docVal = (DocumentValue)row.getCell(m_docColIndex);
-                m_dtBuilder.addDocument(tagger.tag(docVal.getDocument()), row.getKey());
-            }
-
-            return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
-        } finally {
-            m_dtBuilder.closeCache();
-        }
+    public DocumentTagger createTagger() throws Exception {
+        return new AbnerDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), m_abnerTaggingModel.getStringValue());
     }
 
     /**
@@ -143,6 +85,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.loadSettingsFrom(settings);
     }
@@ -152,6 +95,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
         m_abnerTaggingModel.saveSettingsTo(settings);
     }
@@ -162,6 +106,7 @@ public class AbnerTaggerNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
+        super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.validateSettings(settings);
     }
@@ -188,9 +133,5 @@ public class AbnerTaggerNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        try {
-            m_dtBuilder.getAndCloseDataTable();
-        } catch (Exception e) { /* Do noting just try */ }
-    }
+    protected void reset() { }
 }
