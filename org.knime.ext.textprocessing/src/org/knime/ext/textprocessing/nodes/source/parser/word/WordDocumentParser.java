@@ -28,24 +28,29 @@ package org.knime.ext.textprocessing.nodes.source.parser.word;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-
+import org.apache.poi.hpsf.PropertySet;
+import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.HWPFDocumentCore;
-import org.apache.poi.hwpf.HWPFOldDocument;
-import org.apache.poi.hwpf.extractor.Word6Extractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.hwpf.model.FileInformationBlock;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
@@ -88,8 +93,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public WordDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public WordDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         super(docPath, category, source);
     }
 
@@ -106,7 +110,9 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
@@ -114,10 +120,10 @@ public class WordDocumentParser extends AbstractDocumentParser {
         return m_docs;
     }
 
-    private static Pattern symbolPattern = Pattern.compile("[\\s]+");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("[\\s]+");
 
     private static boolean onlyWhitepscaes(final String str) {
-        if (symbolPattern.matcher(str).matches()) {
+        if (WHITESPACE_PATTERN.matcher(str).matches()) {
             return true;
         }
         return false;
@@ -127,8 +133,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
         if (title == null) {
             return false;
         }
-        String t = title.trim();
-        if (t.equals("")) {
+        if (title.trim().isEmpty()) {
             return false;
         }
         return true;
@@ -142,56 +147,63 @@ public class WordDocumentParser extends AbstractDocumentParser {
         m_currentDoc.addDocumentSource(m_source);
 
         try {
-            boolean oldVersion = false;
+            // doc files
+            if (m_docPath.endsWith(".doc")) {
+                // copy content of input stream into byte array since content have to be red twice unfortunately.
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                final byte[] buf = new byte[1024];
+                int i = 0;
+                while ((i = is.read(buf)) >= 0) {
+                    baos.write(buf, 0, i);
+                }
+                final byte[] content = baos.toByteArray();
 
-            // first copy stream content into byte array os
-            // this is unfortunately necessary in order to check for the version
-            // of the word file. The version is checked to use the proper
-            // document (HWPFDocument or HWPFOldDocument).
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int c;
-            while ((c = is.read()) != -1) {
-                baos.write((char) c);
-            }
-            ByteArrayInputStream bais =
-                new ByteArrayInputStream(baos.toByteArray());
-            oldVersion = isOldVersion(bais);
-            // reset stream here in order to enable reading again and parsing
-            bais.reset();
-
-            // if Word97-2003 version use HWPFDocument
-            if (!oldVersion) {
-                HWPFDocument hwpfDoc = new HWPFDocument(bais);
-                WordExtractor extractor = new WordExtractor(hwpfDoc);
+                // open stream with copied content to read text
+                InputStream copiedInput = new ByteArrayInputStream(content);
+                final HWPFDocument hdoc = new HWPFDocument(copiedInput);
+                final WordExtractor extractor = new WordExtractor(hdoc);
                 for (String p : extractor.getParagraphText()) {
                     p = p.trim();
                     if (!onlyWhitepscaes(p)) {
                         m_currentDoc.addParagraph(p);
                     }
                 }
-            // if Word95 version use HWPFOldDocument
-            } else {
-                HWPFOldDocument hwpfOldDoc = new HWPFOldDocument(
-                        HWPFDocumentCore.verifyAndBuildPOIFS(bais));
-                Word6Extractor oldExtractor = new Word6Extractor(hwpfOldDoc);
 
-                for (String p : oldExtractor.getParagraphText()) {
-                    p = p.trim();
-                    if (!onlyWhitepscaes(p)) {
-                        m_currentDoc.addParagraph(p);
+                // open stream again with copied content to read meta info
+                copiedInput = new ByteArrayInputStream(content);
+                final POIFSFileSystem poifs = new POIFSFileSystem(copiedInput);
+                final DirectoryEntry dir = poifs.getRoot();
+                final DocumentEntry siEntry = (DocumentEntry)dir.getEntry(SummaryInformation.DEFAULT_STREAM_NAME);
+                final PropertySet ps = new PropertySet(new DocumentInputStream(siEntry));
+
+                final SummaryInformation si = new SummaryInformation(ps);
+
+                setAuthor(si.getAuthor());
+                setPublicationDate(si.getCreateDateTime());
+
+            // docx files
+            } else if (m_docPath.endsWith(".docx")) {
+                final XWPFDocument hdoc = new XWPFDocument(is);
+                final List<XWPFParagraph> paragraphs = hdoc.getParagraphs();
+                for (final XWPFParagraph paragraph : paragraphs) {
+                    final String text = paragraph.getText();
+                    if (!onlyWhitepscaes(text)) {
+                        m_currentDoc.addParagraph(text);
                     }
                 }
+
+                setAuthor(hdoc.getProperties().getCoreProperties().getCreator());
+                setPublicationDate(hdoc.getProperties().getCoreProperties().getCreated());
             }
 
-            m_currentDoc.createNewSection(SectionAnnotation.UNKNOWN);
+            m_currentDoc.createNewSection(SectionAnnotation.CHAPTER);
 
             // find title
             String title = null;
             if (!checkTitle(title)) {
-                List<Section> sections = m_currentDoc.getSections();
+                final List<Section> sections = m_currentDoc.getSections();
                 if (sections.size() > 0) {
-                    title = sections.get(0).getParagraphs().get(0)
-                            .getSentences().get(0).getText().trim();
+                    title = sections.get(0).getParagraphs().get(0).getSentences().get(0).getText().trim();
                 }
             }
             if (!checkTitle(title)) {
@@ -205,21 +217,20 @@ public class WordDocumentParser extends AbstractDocumentParser {
         }
     }
 
-    private static boolean isOldVersion(final InputStream istream)
-    throws IOException {
-        DirectoryNode dir = HWPFDocumentCore.verifyAndBuildPOIFS(istream)
-                            .getRoot();
-        DocumentEntry documentProps =
-            (DocumentEntry)dir.getEntry("WordDocument");
+    private void setPublicationDate(final Date creationDate) throws ParseException {
+        final Calendar cal = Calendar.getInstance();
+        cal.setTime(creationDate);
+        final int year = cal.get(Calendar.YEAR);
+        final int month = cal.get(Calendar.MONTH) + 1;
+        final int day = cal.get(Calendar.DAY_OF_MONTH);
+        m_currentDoc.setPublicationDate(new PublicationDate(year, month, day));
+    }
 
-        // Create our FIB, and check for the doc being encrypted
-        FileInformationBlock fib = new FileInformationBlock(
-                new byte[documentProps.getSize()]);
-        // Is this document too old for us?
-        if (fib.getNFib() < 106) {
-            return true;
+    private void setAuthor(final String authorName) {
+        final String trimmedName = authorName.trim();
+        if (!trimmedName.isEmpty()) {
+            m_currentDoc.addAuthor(new Author("", trimmedName));
         }
-        return false;
     }
 
     /**
@@ -227,7 +238,6 @@ public class WordDocumentParser extends AbstractDocumentParser {
      */
     @Override
     public void parseDocument(final InputStream is) throws Exception {
-        Document d = parseInternal(is);
-        notifyAllListener(new DocumentParsedEvent(d, this));
+        notifyAllListener(new DocumentParsedEvent(parseInternal(is), this));
     }
 }

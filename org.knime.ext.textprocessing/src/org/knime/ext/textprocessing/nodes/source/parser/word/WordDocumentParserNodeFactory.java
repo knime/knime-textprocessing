@@ -53,8 +53,7 @@ NodeFactory<DocumentParserNodeModel> {
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(
-                new WordDocumentParser(), false, "doc");
+        return new DocumentParserNodeModel(new WordDocumentParser(), false, new String[]{"doc", "docx"});
     }
 
     /**
