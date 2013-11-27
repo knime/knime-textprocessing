@@ -36,7 +36,6 @@ import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
-import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
@@ -57,12 +56,13 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  */
 public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
-    private static final NodeLogger LOGGER =
-            NodeLogger.getLogger(StringsToDocumentCellFactory.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(StringsToDocumentCellFactory.class);
 
-    private StringsToDocumentConfig m_config;
+    private static final Pattern DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})-([\\d]{4})");
 
-    private DataCellCache m_cache;
+    private final StringsToDocumentConfig m_config;
+
+    private final DataCellCache m_cache;
 
     /**
      * Creates new instance of <code>StringsToDocumentCellFactory</code> with
@@ -70,6 +70,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
      *
      * @param config The configuration how to build a document.
      * @param exec the execution context to prepare text container cell factory.
+     * @param newColSpecs The specs of the new columns that are created.
+     * @param numberOfThreads The number of parallel threads to use.
      * @throws IllegalArgumentException If given configuration is
      * <code>null</code>.
      * @since 2.9
@@ -94,14 +96,13 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
-        DocumentBuilder docBuilder = new DocumentBuilder();
+        final DocumentBuilder docBuilder = new DocumentBuilder();
 
         // Set title
         if (m_config.getTitleStringIndex() >= 0) {
             DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
             String title = "";
-            if (!titleCell.isMissing()
-                    && titleCell.getType().isCompatible(StringValue.class)) {
+            if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
                 title = ((StringValue)titleCell).getStringValue();
             }
 
@@ -110,10 +111,9 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
         //Set fulltext
         if (m_config.getFulltextStringIndex() >= 0) {
-            DataCell textCell = row.getCell(m_config.getFulltextStringIndex());
+            final DataCell textCell = row.getCell(m_config.getFulltextStringIndex());
             String fulltext = "";
-            if (!textCell.isMissing()
-                    && textCell.getType().isCompatible(StringValue.class)) {
+            if (!textCell.isMissing() && textCell.getType().isCompatible(StringValue.class)) {
                 fulltext = ((StringValue)textCell).getStringValue();
             }
             docBuilder.addSection(fulltext, SectionAnnotation.UNKNOWN);
@@ -121,17 +121,15 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
         // Set authors
         if (m_config.getAuthorsStringIndex() >= 0) {
-            DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
-            if (!auhorsCell.isMissing()
-                    && auhorsCell.getType().isCompatible(StringValue.class)) {
-                String authors = ((StringValue)auhorsCell).getStringValue();
-                String[]authorsArr = authors.split(
-                        m_config.getAuthorsSplitChar());
+            final DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
+            if (!auhorsCell.isMissing() && auhorsCell.getType().isCompatible(StringValue.class)) {
+                final String authors = ((StringValue)auhorsCell).getStringValue();
+                final String[]authorsArr = authors.split(m_config.getAuthorsSplitChar());
                 for (String author : authorsArr) {
                     String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
                     String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
 
-                    String[] names = author.split(" ");
+                    final String[] names = author.split(" ");
                     if (names.length > 1) {
                         firstName = "";
                         for (int i = 0; i < names.length - 1; i++) {
@@ -142,9 +140,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
                         lastName = names[0];
                     }
 
-                    Author docAuthor = new Author(firstName.trim(),
-                            lastName.trim());
-                    docBuilder.addAuthor(docAuthor);
+                    docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
                 }
             }
         }
@@ -153,10 +149,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         String docSource = m_config.getDocSource();
         if (m_config.getUseSourceColumn()) {
             if (m_config.getSourceStringIndex() >= 0) {
-                DataCell sourceCell = row.getCell(
-                        m_config.getSourceStringIndex());
-                if (!sourceCell.isMissing()
-                    && sourceCell.getType().isCompatible(StringValue.class)) {
+                final DataCell sourceCell = row.getCell(m_config.getSourceStringIndex());
+                if (!sourceCell.isMissing() && sourceCell.getType().isCompatible(StringValue.class)) {
                     docSource = ((StringValue)sourceCell).getStringValue();
                 } else {
                     docSource = "";
@@ -164,18 +158,15 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
             }
         }
         if (docSource.length() > 0) {
-            DocumentSource ds = new DocumentSource(docSource);
-            docBuilder.addDocumentSource(ds);
+            docBuilder.addDocumentSource(new DocumentSource(docSource));
         }
 
         // set document category
         String docCat = m_config.getDocCat();
         if (m_config.getUseCatColumn()) {
             if (m_config.getCategoryStringIndex() >= 0) {
-                DataCell catCell = row.getCell(
-                        m_config.getCategoryStringIndex());
-                if (!catCell.isMissing()
-                    && catCell.getType().isCompatible(StringValue.class)) {
+                final DataCell catCell = row.getCell(m_config.getCategoryStringIndex());
+                if (!catCell.isMissing() && catCell.getType().isCompatible(StringValue.class)) {
                     docCat = ((StringValue)catCell).getStringValue();
                 } else {
                     docCat = "";
@@ -183,34 +174,27 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
             }
         }
         if (docCat.length() > 0) {
-            DocumentCategory dc = new DocumentCategory(docCat);
-            docBuilder.addDocumentCategory(dc);
+            docBuilder.addDocumentCategory(new DocumentCategory(docCat));
         }
 
         // set document type
-        String docType = m_config.getDocType();
-        docBuilder.setDocumentType(DocumentType.stringToDocumentType(docType));
+        docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_config.getDocType()));
 
         // set publication date
-        String pubDate = m_config.getPublicationDate();
-        Pattern p = Pattern.compile("([\\d]{2})-([\\d]{2})-([\\d]{4})");
-        Matcher m = p.matcher(pubDate);
+        final Matcher m = DATE_PATTERN.matcher(m_config.getPublicationDate());
         if (m.matches()) {
-            int day = Integer.parseInt(m.group(1));
-            int month = Integer.parseInt(m.group(2));
-            int year = Integer.parseInt(m.group(3));
+            final int day = Integer.parseInt(m.group(1));
+            final int month = Integer.parseInt(m.group(2));
+            final int year = Integer.parseInt(m.group(3));
 
             try {
-                PublicationDate date = new PublicationDate(year, month, day);
-                docBuilder.setPublicationDate(date);
+                docBuilder.setPublicationDate(new PublicationDate(year, month, day));
             } catch (ParseException e) {
                 LOGGER.info("Publication date could not be set!");
             }
         }
 
-
-        Document doc = docBuilder.createDocument();
-        return new DataCell[]{m_cache.getInstance(doc)};
+        return new DataCell[]{m_cache.getInstance(docBuilder.createDocument())};
     }
 
     /**
