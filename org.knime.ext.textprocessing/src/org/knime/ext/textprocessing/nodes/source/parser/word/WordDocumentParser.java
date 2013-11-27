@@ -45,6 +45,7 @@ import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -70,6 +71,8 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
  * @since 2.7
  */
 public class WordDocumentParser extends AbstractDocumentParser {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(WordDocumentParser.class);
 
     private List<Document> m_docs;
 
@@ -203,7 +206,12 @@ public class WordDocumentParser extends AbstractDocumentParser {
             if (!checkTitle(title)) {
                 final List<Section> sections = m_currentDoc.getSections();
                 if (sections.size() > 0) {
-                    title = sections.get(0).getParagraphs().get(0).getSentences().get(0).getText().trim();
+                    try {
+                        title = sections.get(0).getParagraphs().get(0).getSentences().get(0).getText().trim();
+                    } catch (IndexOutOfBoundsException e) {
+                        LOGGER.debug("Parsed word document " + m_docPath + " is empty.");
+                        title = "";
+                    }
                 }
             }
             if (!checkTitle(title)) {

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,25 +19,26 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmer;
-import org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmer;
+import org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer;
 
 
 /**
  * The enum registers all provided stemming methods and enables a generic usage
  * of them.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public enum Stemming {
 
     /**
@@ -51,7 +52,7 @@ public enum Stemming {
         public TermPreprocessing getPreprocessing() {
             return new KuhlenStemmer();
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -60,7 +61,7 @@ public enum Stemming {
             return new KuhlenStemmer();
         }
     },
-    
+
     /**
      * The Porter Stemmer.
      */
@@ -72,7 +73,7 @@ public enum Stemming {
         public TermPreprocessing getPreprocessing() {
             return new PorterStemmer();
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -81,22 +82,22 @@ public enum Stemming {
             return new PorterStemmer();
         }
     };
-    
+
     /**
      * @return a certain stemmer as <code>Preprocessing</code> instance, which
      * is used to preprocess <code>Term</code>s.
      */
     public abstract TermPreprocessing getPreprocessing();
-    
+
     /**
-     * @return a certain stemmer as <code>StringPreprocessing</code> instance, 
+     * @return a certain stemmer as <code>StringPreprocessing</code> instance,
      * which is used to preprocess <code>String</code>s
      */
     public abstract StringPreprocessing getStringPreprocessing();
-    
+
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     public static List<String> asStringList() {
@@ -106,5 +107,5 @@ public enum Stemming {
             list.add(values[i].name());
         }
         return list;
-    }    
+    }
 }

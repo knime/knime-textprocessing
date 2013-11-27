@@ -31,7 +31,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchemaDublinCore;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -39,6 +38,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -64,6 +64,8 @@ import org.knime.ext.textprocessing.util.AuthorUtil;
  * @since 2.7
  */
 public class PDFDocumentParser extends AbstractDocumentParser {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(PDFDocumentParser.class);
 
     private List<Document> m_docs;
 
@@ -105,7 +107,9 @@ public class PDFDocumentParser extends AbstractDocumentParser {
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
@@ -170,8 +174,12 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             if (!checkTitle(title)) {
                 List<Section> sections = m_currentDoc.getSections();
                 if (sections.size() > 0) {
-                    title = sections.get(0).getParagraphs().get(0)
-                            .getSentences().get(0).getText().trim();
+                    try {
+                        title = sections.get(0).getParagraphs().get(0).getSentences().get(0).getText().trim();
+                    } catch (IndexOutOfBoundsException e) {
+                        LOGGER.debug("Parsed PDF document " + m_docPath + " is empty.");
+                        title = "";
+                    }
                 }
             }
             // if no useful first sentence exist use filename
