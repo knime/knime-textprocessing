@@ -25,17 +25,15 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.abner;
 
+import abner.Tagger;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
-
-import abner.Tagger;
 
 /**
  * <code>AbnerDocumentTagger</code> is a concrete implementation of
@@ -81,8 +79,6 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
 
         if (model.equals(MODEL_NLPBA)) {
             m_tagger = new Tagger(Tagger.NLPBA);
-        } else if (model.equals(MODEL_BIOCREATIVE)) {
-            m_tagger = new Tagger(Tagger.BIOCREATIVE);
         } else {
             m_tagger = new Tagger(Tagger.BIOCREATIVE);
         }

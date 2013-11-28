@@ -131,10 +131,12 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
                     final String[] names = author.split(" ");
                     if (names.length > 1) {
-                        firstName = "";
+                        final StringBuilder sb = new StringBuilder();
                         for (int i = 0; i < names.length - 1; i++) {
-                            firstName += names[i] + " ";
+                            sb.append(names[i]);
+                            sb.append(" ");
                         }
+                        firstName = sb.toString();
                         lastName = names[names.length - 1];
                     } else if (names.length == 1) {
                         lastName = names[0];

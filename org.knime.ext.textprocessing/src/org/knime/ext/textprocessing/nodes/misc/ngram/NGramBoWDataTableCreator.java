@@ -53,7 +53,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Map.Entry;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -71,11 +71,11 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
-* A {@link NGramDataTableCreator} which creates bag of words like data tables.
-*
-* @author Kilian Thiel, KNIME.com, Zurich, Switzerland
-* @since 2.8
-*/
+ * A {@link NGramDataTableCreator} which creates bag of words like data tables.
+ *
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.8
+ */
 public class NGramBoWDataTableCreator implements NGramDataTableCreator {
 
     private final NGramIterator m_nGramIterator;
@@ -86,24 +86,21 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
 
     private final TextContainerDataCellFactory m_documentCellFac;
 
-    private final Map<Document, Map<String, Integer>> m_nGramFrequencies =
-            new HashMap<Document, Map<String, Integer>>(1000);
+    private final Map<Document, Map<String, Integer>> m_nGramFrequencies = new HashMap<Document, Map<String, Integer>>(
+        1000);
 
     /**
-     * Creates a new instance of {@link NGramBoWDataTableCreator} with given
-     * ngram iterator.
+     * Creates a new instance of {@link NGramBoWDataTableCreator} with given ngram iterator.
      *
      * @param nGramIterator The ngram iterator.
      */
     public NGramBoWDataTableCreator(final NGramIterator nGramIterator) {
         if (nGramIterator == null) {
-            throw new IllegalArgumentException(
-                    "N gram iterator must not be null!");
+            throw new IllegalArgumentException("N gram iterator must not be null!");
         }
 
         m_nGramIterator = nGramIterator;
-        m_documentCellFac =
-                TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
     }
 
     /**
@@ -112,8 +109,7 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
     @Override
     public void addDocument(final Document doc) {
         m_nGramIterator.setDocument(doc);
-        Map<String, Integer> nGramFrequencies =
-                new HashMap<String, Integer>(1000);
+        final Map<String, Integer> nGramFrequencies = new HashMap<String, Integer>(1000);
 
         // iterate over all blocks
         while (m_nGramIterator.hasNextBlock()) {
@@ -121,8 +117,7 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
 
             // generate all ngrams of current block
             while (m_nGramIterator.hasNextNGram()) {
-                String nGram = m_nGramIterator.nextNGram();
-
+                final String nGram = m_nGramIterator.nextNGram();
                 Integer freq = nGramFrequencies.get(nGram);
                 if (freq == null) {
                     freq = 0;
@@ -139,12 +134,11 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
      * {@inheritDoc}
      */
     @Override
-    public synchronized BufferedDataTable createDataTable(
-        final ExecutionContext exec) {
+    public synchronized BufferedDataTable createDataTable(final ExecutionContext exec) {
         openDataContainer(exec);
 
-        for (Document doc : m_nGramFrequencies.keySet()) {
-            addNGramsToDataContainer(m_nGramFrequencies.get(doc), doc);
+        for (Entry<Document, Map<String, Integer>> entry : m_nGramFrequencies.entrySet()) {
+            addNGramsToDataContainer(entry.getValue(), entry.getKey());
         }
 
         if (m_dataContainer != null && m_dataContainer.isOpen()) {
@@ -158,24 +152,21 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
      * {@inheritDoc}
      */
     @Override
-    public void joinResults(final NGramDataTableCreator nGramCreator,
-                            final ExecutionContext exec) {
-        if (nGramCreator != null && exec != null
-                && nGramCreator instanceof NGramBoWDataTableCreator) {
-
+    public void joinResults(final NGramDataTableCreator nGramCreator, final ExecutionContext exec) {
+        if (nGramCreator != null && exec != null && nGramCreator instanceof NGramBoWDataTableCreator) {
             openDataContainer(exec);
 
-            Map<Document, Map<String, Integer>> nGramFrequencies =
-                    ((NGramBoWDataTableCreator)nGramCreator).getResults();
-            for (Document doc : nGramFrequencies.keySet()) {
-                addNGramsToDataContainer(nGramFrequencies.get(doc), doc);
+            final Map<Document, Map<String, Integer>> nGramFrequencies =
+                ((NGramBoWDataTableCreator)nGramCreator).getResults();
+
+            for (Entry<Document, Map<String, Integer>> entry : nGramFrequencies.entrySet()) {
+                addNGramsToDataContainer(entry.getValue(), entry.getKey());
             }
         }
     }
 
     /**
-     * @return Returns the ngrams and their frequencies, where ngrams are keys
-     * and frequencies the corresponding values.
+     * @return Returns the ngrams and their frequencies, where ngrams are keys and frequencies the corresponding values.
      */
     public Map<Document, Map<String, Integer>> getResults() {
         return m_nGramFrequencies;
@@ -190,21 +181,19 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
         m_documentCellFac.prepare(exec);
     }
 
-    private synchronized void addNGramsToDataContainer(
-        final Map<String, Integer> nGrams, final Document doc) {
-        if (nGrams != null && doc != null && m_dataContainer != null
-                && m_dataContainer.isOpen()) {
+    private synchronized void addNGramsToDataContainer(final Map<String, Integer> nGrams, final Document doc) {
+        if (nGrams != null && doc != null && m_dataContainer != null && m_dataContainer.isOpen()) {
             DataCell documentCell = m_documentCellFac.createDataCell(doc);
 
-            for (String nGram : nGrams.keySet()) {
-                Integer freq = nGrams.get(nGram);
+            for (Entry<String, Integer> nGramEntry : nGrams.entrySet()) {
+                final String nGram = nGramEntry.getKey();
+                final Integer freq = nGramEntry.getValue();
 
-                RowKey rowKey = new RowKey(new Integer(m_rowCount).toString());
-                StringCell nGramCell = new StringCell(nGram);
-                IntCell freqCell = new IntCell(freq);
+                final RowKey rowKey = new RowKey(Integer.valueOf(m_rowCount).toString());
+                final StringCell nGramCell = new StringCell(nGram);
+                final IntCell freqCell = new IntCell(freq);
 
-                DataRow newRow = new DefaultRow(rowKey, nGramCell, documentCell,
-                                             freqCell);
+                final DataRow newRow = new DefaultRow(rowKey, nGramCell, documentCell, freqCell);
                 m_dataContainer.addRowToTable(newRow);
 
                 m_rowCount++;
@@ -217,20 +206,14 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
      */
     @Override
     public DataTableSpec createDataTableSpec() {
-        List<DataColumnSpec> dcscList = new ArrayList<DataColumnSpec>();
+        final List<DataColumnSpec> dcscList = new ArrayList<DataColumnSpec>();
 
-        dcscList.add(new DataColumnSpecCreator(
-                NGramNodeModel.NGRAM_OUTPUT_COLNAME, StringCell.TYPE)
-                .createSpec());
-        dcscList.add(new DataColumnSpecCreator(
-                NGramNodeModel.DOCUMENT_OUTPUT_COLNAME,
-                m_documentCellFac.getDataType()).createSpec());
-        dcscList.add(new DataColumnSpecCreator(
-                NGramNodeModel.DOC_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
-                .createSpec());
+        dcscList.add(new DataColumnSpecCreator(NGramNodeModel.NGRAM_OUTPUT_COLNAME, StringCell.TYPE).createSpec());
+        dcscList.add(new DataColumnSpecCreator(NGramNodeModel.DOCUMENT_OUTPUT_COLNAME, m_documentCellFac.getDataType())
+            .createSpec());
+        dcscList.add(new DataColumnSpecCreator(NGramNodeModel.DOC_FREQ_OUTPUT_COLNAME, IntCell.TYPE).createSpec());
 
-        return new DataTableSpec(dcscList.toArray(
-                new DataColumnSpec[dcscList.size()]));
+        return new DataTableSpec(dcscList.toArray(new DataColumnSpec[dcscList.size()]));
     }
 
 }

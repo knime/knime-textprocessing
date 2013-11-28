@@ -53,10 +53,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
@@ -71,16 +71,14 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.TextContainer;
 
-
 /**
- * A {@link NGramDataTableCreator} which creates data tables containing the
- * ngrams and their corresponding frequencies in the corpus and documents.
+ * A {@link NGramDataTableCreator} which creates data tables containing the ngrams and their corresponding frequencies
+ * in the corpus and documents.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
  */
-public final class NGramFrequencyDataTableCreator implements
-NGramDataTableCreator {
+public final class NGramFrequencyDataTableCreator implements NGramDataTableCreator {
 
     private static final int DEFAULT_MAP_SIZE = 1000;
 
@@ -95,31 +93,24 @@ NGramDataTableCreator {
     private final Map<String, Set<TextContainer>> m_nGramBlockFreq;
 
     /**
-     * Creates an instance of <code>NGramCreator</code> with given ngram
-     * iterator, and a flag specifying whether frequencies for documents
-     * are counted or not.
+     * Creates an instance of <code>NGramCreator</code> with given ngram iterator, and a flag specifying whether
+     * frequencies for documents are counted or not.
      *
      * @param nGramIterator the n gram iterator to use for n gram creation.
-     * @param countDocumentFrequencies a flag specifying whether frequencies
-     * for documents are counted or not.
+     * @param countDocumentFrequencies a flag specifying whether frequencies for documents are counted or not.
      */
-    public NGramFrequencyDataTableCreator(final NGramIterator nGramIterator,
-                        final boolean countDocumentFrequencies) {
+    public NGramFrequencyDataTableCreator(final NGramIterator nGramIterator, final boolean countDocumentFrequencies) {
         if (nGramIterator == null) {
-            throw new IllegalArgumentException(
-                    "N gram iterator must not be null!");
+            throw new IllegalArgumentException("N gram iterator must not be null!");
         }
 
         m_nGramIterator = nGramIterator;
 
         m_countDocumentFreqs = countDocumentFrequencies;
 
-        m_nGramFreqs = new ConcurrentHashMap<String, Integer>(
-                DEFAULT_MAP_SIZE);
-        m_nGramDocumentFreqs = new ConcurrentHashMap<String, Set<UUID>>(
-                DEFAULT_MAP_SIZE);
-        m_nGramBlockFreq = new ConcurrentHashMap<String, Set<TextContainer>>(
-                DEFAULT_MAP_SIZE);
+        m_nGramFreqs = new ConcurrentHashMap<String, Integer>(DEFAULT_MAP_SIZE);
+        m_nGramDocumentFreqs = new ConcurrentHashMap<String, Set<UUID>>(DEFAULT_MAP_SIZE);
+        m_nGramBlockFreq = new ConcurrentHashMap<String, Set<TextContainer>>(DEFAULT_MAP_SIZE);
     }
 
     /**
@@ -131,11 +122,11 @@ NGramDataTableCreator {
 
         // iterate over all blocks
         while (m_nGramIterator.hasNextBlock()) {
-            TextContainer currentBlock = m_nGramIterator.nextBlock();
+            final TextContainer currentBlock = m_nGramIterator.nextBlock();
 
             // generate all ngrams of current block
             while (m_nGramIterator.hasNextNGram()) {
-                String nGram = m_nGramIterator.nextNGram();
+                final String nGram = m_nGramIterator.nextNGram();
 
                 countCorpusFreqs(nGram);
                 countDocumentFreqs(nGram, doc);
@@ -162,19 +153,19 @@ NGramDataTableCreator {
         m_nGramFreqs.put(nGram, freq);
     }
 
-    private synchronized void addCorpusFreqs(
-        final Map<String, Integer> corpusFreqs) {
+    private synchronized void addCorpusFreqs(final Map<String, Integer> corpusFreqs) {
         if (corpusFreqs != null) {
-            for (String nGram : corpusFreqs.keySet()) {
-                Integer freqToAdd = corpusFreqs.get(nGram);
-                Integer freq = m_nGramFreqs.get(nGram);
+
+            for (Entry<String, Integer> entry : corpusFreqs.entrySet()) {
+                final Integer freqToAdd = entry.getValue();
+                Integer freq = m_nGramFreqs.get(entry.getKey());
 
                 if (freqToAdd != null) {
                     if (freq == null) {
                         freq = 0;
                     }
                     freq += freqToAdd;
-                    m_nGramFreqs.put(nGram, freq);
+                    m_nGramFreqs.put(entry.getKey(), freq);
                 }
             }
         }
@@ -191,26 +182,24 @@ NGramDataTableCreator {
         }
     }
 
-    private synchronized void addDocumentFrequencies(
-        final Map<String, Set<UUID>> ngramDocs) {
+    private synchronized void addDocumentFrequencies(final Map<String, Set<UUID>> ngramDocs) {
         if (ngramDocs != null) {
-            for (String nGram : ngramDocs.keySet()) {
-                Set<UUID> docsToAdd = ngramDocs.get(nGram);
-                Set<UUID> docs = m_nGramDocumentFreqs.get(nGram);
+            for (Entry<String, Set<UUID>> entry : ngramDocs.entrySet()) {
+                final Set<UUID> docsToAdd = entry.getValue();
+                Set<UUID> docs = m_nGramDocumentFreqs.get(entry.getKey());
 
                 if (docsToAdd != null) {
                     if (docs == null) {
                         docs = new HashSet<UUID>();
                     }
                     docs.addAll(docsToAdd);
-                    m_nGramDocumentFreqs.put(nGram, docs);
+                    m_nGramDocumentFreqs.put(entry.getKey(), docs);
                 }
             }
         }
     }
 
-    private void countBlockFreqs(final String nGram,
-                                 final TextContainer block) {
+    private void countBlockFreqs(final String nGram, final TextContainer block) {
         if (m_countDocumentFreqs) {
             Set<TextContainer> blocks = m_nGramBlockFreq.get(nGram);
             if (blocks == null) {
@@ -221,19 +210,18 @@ NGramDataTableCreator {
         }
     }
 
-    private synchronized void addBlockFrequencies(
-        final Map<String, Set<TextContainer>> nGramBlocks) {
+    private synchronized void addBlockFrequencies(final Map<String, Set<TextContainer>> nGramBlocks) {
         if (nGramBlocks != null) {
-            for (String nGram : nGramBlocks.keySet()) {
-                Set<TextContainer> blocksToAdd = nGramBlocks.get(nGram);
-                Set<TextContainer> blocks = m_nGramBlockFreq.get(nGram);
+            for (Entry<String, Set<TextContainer>> entry : nGramBlocks.entrySet()) {
+                final Set<TextContainer> blocksToAdd = entry.getValue();
+                Set<TextContainer> blocks = m_nGramBlockFreq.get(entry.getKey());
 
                 if (blocksToAdd != null) {
                     if (blocks == null) {
                         blocks = new HashSet<TextContainer>();
                     }
                     blocks.addAll(blocksToAdd);
-                    m_nGramBlockFreq.put(nGram, blocks);
+                    m_nGramBlockFreq.put(entry.getKey(), blocks);
                 }
             }
         }
@@ -243,43 +231,39 @@ NGramDataTableCreator {
      * {@inheritDoc}
      */
     @Override
-    public void joinResults(final NGramDataTableCreator nGramCreator,
-                            final ExecutionContext exec) {
-        if (nGramCreator != null && exec != null
-                && nGramCreator instanceof NGramFrequencyDataTableCreator) {
+    public void joinResults(final NGramDataTableCreator nGramCreator, final ExecutionContext exec) {
+        if (nGramCreator != null && exec != null && nGramCreator instanceof NGramFrequencyDataTableCreator) {
 
-            NGramFrequencyDataTableCreator freqNGramCreator =
-                    (NGramFrequencyDataTableCreator)nGramCreator;
+            final NGramFrequencyDataTableCreator freqNGramCreator = (NGramFrequencyDataTableCreator)nGramCreator;
 
             addCorpusFreqs(freqNGramCreator.getCorpusFrequencies());
 
             if (m_countDocumentFreqs) {
-                addDocumentFrequencies(
-                        freqNGramCreator.getDocumentFrequencies());
+                addDocumentFrequencies(freqNGramCreator.getDocumentFrequencies());
                 addBlockFrequencies(freqNGramCreator.getBlockFrequencies());
             }
         }
     }
 
     /**
-     * @return Returns the ngrams and their frequencies in the corpus, where
-     * ngrams are the keys and the frequencies the corresponding values.
+     * @return Returns the ngrams and their frequencies in the corpus, where ngrams are the keys and the frequencies the
+     *         corresponding values.
      */
     public Map<String, Integer> getCorpusFrequencies() {
         return m_nGramFreqs;
     }
 
     /**
-     * @return Returns the ngrams and their frequencies in the documents, where
-     * ngrams are the keys and the frequencies the corresponding values.
+     * @return Returns the ngrams and their frequencies in the documents, where ngrams are the keys and the frequencies
+     *         the corresponding values.
      */
     public Map<String, Set<UUID>> getDocumentFrequencies() {
         return m_nGramDocumentFreqs;
     }
 
     /**
-     * @return Returns the ngrams and their frequencies in the blocks, where
-     * ngrams are the keys and the frequencies the corresponding values.
+     * @return Returns the ngrams and their frequencies in the blocks, where ngrams are the keys and the frequencies the
+     *         corresponding values.
      */
     public Map<String, Set<TextContainer>> getBlockFrequencies() {
         return m_nGramBlockFreq;
@@ -289,40 +273,37 @@ NGramDataTableCreator {
      * {@inheritDoc}
      */
     @Override
-    public synchronized  BufferedDataTable createDataTable(
-        final ExecutionContext exec) {
-        BufferedDataContainer dc =
-                exec.createDataContainer(createDataTableSpec());
+    public synchronized BufferedDataTable createDataTable(final ExecutionContext exec) {
+        BufferedDataContainer dc = exec.createDataContainer(createDataTableSpec());
 
         int rowCount = -1;
         for (String ngram : m_nGramFreqs.keySet()) {
             rowCount++;
-            int totalFreq = m_nGramFreqs.get(ngram);
+            final int totalFreq = m_nGramFreqs.get(ngram);
 
-            RowKey rowKey = new RowKey(new Integer(rowCount).toString());
+            final RowKey rowKey = new RowKey(Integer.valueOf(rowCount).toString());
 
-            StringCell nGramCell = new StringCell(ngram);
-            IntCell totalFreqCell = new IntCell(totalFreq);
+            final StringCell nGramCell = new StringCell(ngram);
+            final IntCell totalFreqCell = new IntCell(totalFreq);
 
             DataRow row;
             if (m_countDocumentFreqs) {
-                Set<UUID> docUUIDs = m_nGramDocumentFreqs.get(ngram);
+                final Set<UUID> docUUIDs = m_nGramDocumentFreqs.get(ngram);
                 Integer decFreq = 0;
                 if (docUUIDs != null) {
                     decFreq = docUUIDs.size();
                 }
 
-                Set<TextContainer> blocks = m_nGramBlockFreq.get(ngram);
+                final Set<TextContainer> blocks = m_nGramBlockFreq.get(ngram);
                 Integer blockFreq = 0;
                 if (blocks != null) {
                     blockFreq = blocks.size();
                 }
 
-                IntCell docFreqCell = new IntCell(decFreq);
-                IntCell blockFreqCell = new IntCell(blockFreq);
+                final IntCell docFreqCell = new IntCell(decFreq);
+                final IntCell blockFreqCell = new IntCell(blockFreq);
 
-                row = new DefaultRow(rowKey, nGramCell, totalFreqCell,
-                                     docFreqCell, blockFreqCell);
+                row = new DefaultRow(rowKey, nGramCell, totalFreqCell, docFreqCell, blockFreqCell);
             } else {
                 row = new DefaultRow(rowKey, nGramCell, totalFreqCell);
             }
@@ -346,32 +327,23 @@ NGramDataTableCreator {
             wordNGramType = false;
         }
 
-        List<DataColumnSpec> dcscList = new ArrayList<DataColumnSpec>();
+        final List<DataColumnSpec> dcscList = new ArrayList<DataColumnSpec>();
 
-        dcscList.add(new DataColumnSpecCreator(
-                NGramNodeModel.NGRAM_OUTPUT_COLNAME, StringCell.TYPE)
-                .createSpec());
-        dcscList.add(new DataColumnSpecCreator(
-                NGramNodeModel.CORPUS_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
-                .createSpec());
+        dcscList.add(new DataColumnSpecCreator(NGramNodeModel.NGRAM_OUTPUT_COLNAME, StringCell.TYPE).createSpec());
+        dcscList.add(new DataColumnSpecCreator(NGramNodeModel.CORPUS_FREQ_OUTPUT_COLNAME, IntCell.TYPE).createSpec());
 
         if (m_countDocumentFreqs) {
-            dcscList.add(new DataColumnSpecCreator(
-                NGramNodeModel.DOC_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
-                .createSpec());
+            dcscList.add(new DataColumnSpecCreator(NGramNodeModel.DOC_FREQ_OUTPUT_COLNAME, IntCell.TYPE).createSpec());
 
             if (wordNGramType) {
-                dcscList.add(new DataColumnSpecCreator(
-                    NGramNodeModel.SENT_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
+                dcscList.add(new DataColumnSpecCreator(NGramNodeModel.SENT_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
                     .createSpec());
             } else {
-                dcscList.add(new DataColumnSpecCreator(
-                    NGramNodeModel.WORD_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
+                dcscList.add(new DataColumnSpecCreator(NGramNodeModel.WORD_FREQ_OUTPUT_COLNAME, IntCell.TYPE)
                     .createSpec());
             }
         }
 
-        return new DataTableSpec(dcscList.toArray(
-                new DataColumnSpec[dcscList.size()]));
+        return new DataTableSpec(dcscList.toArray(new DataColumnSpec[dcscList.size()]));
     }
 }

@@ -65,11 +65,7 @@ public enum SectionAnnotation {
      *         the given string.
      */
     public static SectionAnnotation stringToAnnotation(final String str) {
-        SectionAnnotation sa = valueOf(str);
-        if (sa != null) {
-            return sa;
-        }
-        return SectionAnnotation.UNKNOWN;
+        return valueOf(str);
     }
 
     /**
@@ -78,8 +74,8 @@ public enum SectionAnnotation {
      * @return - the enum fields as a String list of their names.
      */
     public static List<String> asStringList() {
-        Enum<SectionAnnotation>[] values = values();
-        List<String> list = new ArrayList<String>();
+        final Enum<SectionAnnotation>[] values = values();
+        final List<String> list = new ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
             list.add(values[i].name());
         }

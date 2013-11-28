@@ -29,7 +29,6 @@ package org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -42,8 +41,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(
-            PorterStemmer.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(PorterStemmer.class);
 
     /**
      * Creates new instance of PorterStemmer.
@@ -55,9 +53,9 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      */
     @Override
     public Term preprocessTerm(final Term term) {
-        List<Word> words = term.getWords();
-        List<Word> newWords = new ArrayList<Word>();
-        for (Word w : words) {
+        final List<Word> words = term.getWords();
+        final List<Word> newWords = new ArrayList<Word>();
+        for (final Word w : words) {
             newWords.add(new Word(PorterStemmer.stem(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
@@ -79,7 +77,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      */
     public static final String stem(final String str) {
         try {
-            String results = internalStem(str);
+            final String results = internalStem(str);
             if (results != null) {
                 return results;
             }

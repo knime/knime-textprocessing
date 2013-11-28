@@ -179,7 +179,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      * @param output The data output to write the address information of the document to.
      * @throws IOException If document data can not be written to file store file.
      */
-    protected void serializeCell(final DataCellDataOutput output) throws IOException {
+    protected synchronized void serializeCell(final DataCellDataOutput output) throws IOException {
         // write document to file store (if it has not been written bevore)
         flushToFileStore();
 
@@ -195,7 +195,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      * @param input The input to read the document address information from.
      * @throws IOException If document address information can not be deserialized from given data input.
      */
-    protected void deserializeCell(final DataCellDataInput input) throws IOException {
+    protected synchronized void deserializeCell(final DataCellDataInput input) throws IOException {
         // read offset, length, and uuid, set serialized flag true (since cell has obviously been serialized before)
         m_serialized = new AtomicBoolean(true);
         m_offset = input.readLong();

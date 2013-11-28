@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import org.knime.base.util.WildcardMatcher;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -155,13 +154,13 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
 
         // prepare warning msg if invalid pattern have been detected
         if (invalidPattern.size() > 0) {
-            String invalidPatternMsg = "";
+            final StringBuilder invalidPatternMsg = new StringBuilder();
             int count = 0;
             for (String ip : invalidPattern) {
                 if (invalidPatternMsg.length() > 0) {
-                    invalidPatternMsg += ", ";
+                    invalidPatternMsg.append(", ");
                 }
-                invalidPatternMsg += ip;
+                invalidPatternMsg.append(ip);
                 count++;
 
                 if (count > 3) {
@@ -169,11 +168,11 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
                 }
             }
             if (invalidPattern.size() > count) {
-                invalidPatternMsg += ", ...";
+                invalidPatternMsg.append(", ...");
             }
 
             this.setWarningMessage("Found " + invalidPattern.size() + " invalid pattern in dictionary ["
-                    + invalidPatternMsg + "]!");
+                    + invalidPatternMsg.toString() + "]!");
         }
 
         // create single or multi term tagger
