@@ -18,34 +18,35 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
+import java.nio.charset.Charset;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
-import java.nio.charset.Charset;
-
 /**
- * The <code>CharsetDocumentParserNodeDialog</code> extends
- * <code>DocumentParserNodeDialog</code> and shows a drop down box allowing
- * for the selection of a charset which has to be used by the parser.
- * All available charset are shown in the drop down box.
+ * The <code>CharsetDocumentParserNodeDialog</code> extends <code>DocumentParserNodeDialog</code> and shows a drop down
+ * box allowing for the selection of a charset which has to be used by the parser. All available charset are shown in
+ * the drop down box.
  *
  * @author Kilian Thiel, University of Konstanz
  *
  */
 public class CharsetDocumentParserNodeDialog extends DocumentParserNodeDialog {
 
+    /**
+     * @return The settings model containing the charset to use by parser.
+     */
     static SettingsModelString getCharsetModel() {
-        return new SettingsModelString(
-                DocumentParserConfigKeys.CFGKEY_CHARSET,
-                DocumentParserNodeModel.DEFAULT_CHARSET);
+        return new SettingsModelString(DocumentParserConfigKeys.CFGKEY_CHARSET,
+            DocumentParserNodeModel.DEFAULT_CHARSET);
     }
 
+    /**
+     * Constructor for class {@link CharsetDocumentParserNodeDialog}.
+     */
     public CharsetDocumentParserNodeDialog() {
         super();
 
-        String[] charsets = Charset.availableCharsets().keySet().toArray(
-                new String[] {});
-        addDialogComponent(new DialogComponentStringSelection(
-                getCharsetModel(), "Charset", charsets));
+        final String[] charsets = Charset.availableCharsets().keySet().toArray(new String[]{});
+        addDialogComponent(new DialogComponentStringSelection(getCharsetModel(), "Charset", charsets));
     }
 }

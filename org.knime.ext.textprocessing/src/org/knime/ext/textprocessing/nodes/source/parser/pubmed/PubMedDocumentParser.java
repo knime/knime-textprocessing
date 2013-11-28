@@ -32,10 +32,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -57,19 +55,15 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Implements the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
- * is able to parse the data of the given input stream containing PubMed
- * (http://www.pubmed.org) document search results. For more details
- * about the xml format used by PubMed to deliver search results see
+ * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)} is able to parse
+ * the data of the given input stream containing PubMed (http://www.pubmed.org) document search results. For more
+ * details about the xml format used by PubMed to deliver search results see
  * (http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_060101.dtd).
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class PubMedDocumentParser extends DefaultHandler implements
-        DocumentParser {
+public class PubMedDocumentParser extends DefaultHandler implements DocumentParser {
 
     /**
      * The default source of the pub med parser.
@@ -143,36 +137,40 @@ public class PubMedDocumentParser extends DefaultHandler implements
 
     /**
      * The pub med id.
+     *
      * @since 2.7
      */
     public static final String PMID = "pmid";
 
     /**
      * The chemical list.
+     *
      * @since 2.7
      */
     public static final String CHEMICAL_LIST = "chemicallist";
 
     /**
      * The chemical name.
+     *
      * @since 2.7
      */
     public static final String NAME_OF_SUBSTANCE = "nameofsubstance";
 
     /**
      * The mesh heading list.
+     *
      * @since 2.7
      */
     public static final String MESH_HEADING_LIST = "meshheadinglist";
 
     /**
      * The mesh descriptor name.
+     *
      * @since 2.7
      */
     public static final String DESCRIPTOR_NAME = "descriptorname";
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(PubMedDocumentParser.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(PubMedDocumentParser.class);
 
     private static final String PUBMED_DTD_PUBLICID = "-//NLM//DTD PubMedArticle, 1st May 2013//EN";
 
@@ -236,27 +234,21 @@ public class PubMedDocumentParser extends DefaultHandler implements
 
     private boolean m_extractMetaData = false;
 
-
     /**
-     * Creates a new instance of <code>PubMedDocumentParser</code>. The
-     * document source is set to
-     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE}
-     * by default. The document category and file path will be set to
-     * <code>null</code> by default.
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The document source is set to
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} by default.
+     * The document category and file path will be set to <code>null</code> by default.
      */
     public PubMedDocumentParser() {
         this(null, null, new DocumentSource(DEFAULT_SOURCE), false);
     }
 
     /**
-     * Creates a new instance of <code>PubMedDocumentParser</code>. The
-     * document source is set to
-     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE}
-     * by default. The document category and file path will be set to
-     * <code>null</code> by default.
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The document source is set to
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} by default.
+     * The document category and file path will be set to <code>null</code> by default.
      *
-     * @param extractMetaData The flag whether meta data (mesh info and pub med
-     * id) are extracted or not.
+     * @param extractMetaData The flag whether meta data (mesh info and pub med id) are extracted or not.
      * @since 2.7
      */
     public PubMedDocumentParser(final boolean extractMetaData) {
@@ -264,32 +256,29 @@ public class PubMedDocumentParser extends DefaultHandler implements
     }
 
     /**
-     * Creates a new instance of <code>PubMedDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The given source, category and file path is set to
+     * the created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public PubMedDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public PubMedDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         this(docPath, category, source, false);
     }
 
     /**
-     * Creates a new instance of <code>PubMedDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>PubMedDocumentParser</code>. The given source, category and file path is set to
+     * the created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
-     * @param extractMetaData The flag whether meta data (mesh info and pub med
-     * id) are extracted or not.
+     * @param extractMetaData The flag whether meta data (mesh info and pub med id) are extracted or not.
      * @since 2.7
      */
-    public PubMedDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source,
-            final boolean extractMetaData) {
+    public PubMedDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final boolean extractMetaData) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
@@ -310,10 +299,10 @@ public class PubMedDocumentParser extends DefaultHandler implements
             fac.newSAXParser().parse(is, this);
         } catch (SAXException e) {
             LOGGER.warn("Could not parse PubMed documents, XML is not valid!");
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             LOGGER.warn("Could not read PubMed documents!");
-            throw(e);
+            throw (e);
         }
         return m_docs;
     }
@@ -333,8 +322,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName,
-            final String qName, final Attributes attributes) {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(PUBMEDARTICLE)) {
@@ -391,8 +379,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void endElement(final String uri, final String localName,
-            final String qName) {
+    public void endElement(final String uri, final String localName, final String qName) {
         String name = qName.toLowerCase();
         if (name.equals(PUBMEDARTICLE) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
@@ -421,28 +408,25 @@ public class PubMedDocumentParser extends DefaultHandler implements
             m_pmidIsSet = false;
         } else if (name.equals(ABSTRACTTEXT)) {
             if (m_currentDoc != null) {
-                m_currentDoc.addSection(m_abstract.trim(),
-                        SectionAnnotation.ABSTRACT);
+                m_currentDoc.addSection(m_abstract.trim(), SectionAnnotation.ABSTRACT);
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Abstract (" + ABSTRACTTEXT + ") can not be set.");
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Abstract (" + ABSTRACTTEXT
+                    + ") can not be set.");
             }
         } else if (name.equals(ARTICLETITLE)) {
             if (m_currentDoc != null) {
                 m_currentDoc.addTitle(m_title.trim());
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Title (" + ARTICLETITLE + ":" + m_title.trim()
-                        + ") can not be set.");
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Title (" + ARTICLETITLE + ":"
+                    + m_title.trim() + ") can not be set.");
             }
         } else if (name.equals(AUTHOR) && m_currentDoc != null) {
             if (m_currentDoc != null) {
                 Author a = new Author(m_firstName.trim(), m_lastName.trim());
                 m_currentDoc.addAuthor(a);
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Author (" + AUTHOR + ":" + m_firstName.trim()
-                        + " " + m_lastName.trim() + ") can not be set.");
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Author (" + AUTHOR + ":"
+                    + m_firstName.trim() + " " + m_lastName.trim() + ") can not be set.");
             }
         } else if (name.equals(PUBDATE)) {
             if (m_currentDoc != null) {
@@ -456,9 +440,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                     day = Integer.parseInt(m_day);
                 }
                 try {
-                    PublicationDate pubDate =
-                            PublicationDate.createPublicationDate(year,
-                                    m_month, day);
+                    PublicationDate pubDate = PublicationDate.createPublicationDate(year, m_month, day);
                     m_currentDoc.setPublicationDate(pubDate);
                 } catch (Exception e) {
                     LOGGER.info("Publication date could not be created!");
@@ -468,19 +450,16 @@ public class PubMedDocumentParser extends DefaultHandler implements
                     m_currentDoc.setPublicationDate(new PublicationDate());
                 }
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Date (" + PUBDATE + ") can not be set.");
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Date (" + PUBDATE + ") can not be set.");
             }
         } else if (name.equals(TITLE)) {
             if (m_journalTitle.length() > 0) {
                 if (m_currentDoc != null) {
-                    m_currentDoc.addSection(m_journalTitle.trim(),
-                            SectionAnnotation.JOURNAL_TITLE);
+                    m_currentDoc.addSection(m_journalTitle.trim(), SectionAnnotation.JOURNAL_TITLE);
                 }
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: "
-                        + "Journal title (" + TITLE + ":"
-                        + m_journalTitle.trim() + ") can not be set.");
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Journal title (" + TITLE + ":"
+                    + m_journalTitle.trim() + ") can not be set.");
             }
         } else if (name.equals(JOURNAL)) {
             m_journalFlag = false;
@@ -509,8 +488,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                         for (String chem : m_chemicalList) {
                             chemicalInfo.append(chem + "; ");
                         }
-                        m_currentDoc.addMetaInformation(CHEMICAL_LIST,
-                                chemicalInfo.toString());
+                        m_currentDoc.addMetaInformation(CHEMICAL_LIST, chemicalInfo.toString());
                     }
                 }
             }
@@ -522,8 +500,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                         for (String chem : m_meshHeadingList) {
                             meshInfo.append(chem + "; ");
                         }
-                        m_currentDoc.addMetaInformation(MESH_HEADING_LIST,
-                                meshInfo.toString());
+                        m_currentDoc.addMetaInformation(MESH_HEADING_LIST, meshInfo.toString());
                     }
                 }
             }
@@ -595,12 +572,11 @@ public class PubMedDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      *
-     * The given charset is ignored since the SAX parser takes it from the xml
-     * file.
+     * The given charset is ignored since the SAX parser takes it from the xml file.
      */
     @Override
-    public void setCharset(final Charset charset) { }
-
+    public void setCharset(final Charset charset) {
+    }
 
     /**
      * List of listeners.
@@ -622,15 +598,16 @@ public class PubMedDocumentParser extends DefaultHandler implements
             reader.parse(new InputSource(is));
         } catch (SAXException e) {
             LOGGER.warn("Could not parse PubMed documents, XML is not valid!");
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             LOGGER.warn("Could not read PubMed documents!");
-            throw(e);
+            throw (e);
         }
     }
 
     /**
      * Notifies all registered listeners with given event.
+     *
      * @param event Event to notify listener with
      */
     public void notifyAllListener(final DocumentParsedEvent event) {
@@ -643,8 +620,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void addDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void addDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.add(listener);
     }
 
@@ -652,8 +628,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void removeDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void removeDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
     }
 
@@ -676,8 +651,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
          * {@inheritDoc}
          */
         @Override
-        public InputSource resolveEntity(final String publicId, final String systemId)
-                throws IOException, SAXException {
+        public InputSource resolveEntity(final String publicId, final String systemId) throws IOException, SAXException {
             final TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
 
@@ -689,7 +663,7 @@ public class PubMedDocumentParser extends DefaultHandler implements
                 path += BOOKDOC_DTD_POSTFIX;
             } else {
                 throw new SAXException("Could not find DTD with public id \"" + publicId + "\" and system id \""
-                        + systemId + "\"");
+                    + systemId + "\"");
             }
 
             return new InputSource(new FileInputStream(path));

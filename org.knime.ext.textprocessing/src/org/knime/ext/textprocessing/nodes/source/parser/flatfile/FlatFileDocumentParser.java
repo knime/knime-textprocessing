@@ -32,7 +32,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -46,15 +45,11 @@ import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 
 /**
- * Implements the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
- * is able to read the data of the given input stream and store it as a
- * {@link org.knime.ext.textprocessing.data.Document}s full text. The title
- * of the document is the absolut name of the file containing the text data.
- * The file name has to be set before calling the parser method, otherwise no
- * title will be set. The complete data of the input stream is set as full text.
+ * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)} is able to read the
+ * data of the given input stream and store it as a {@link org.knime.ext.textprocessing.data.Document}s full text. The
+ * title of the document is the absolut name of the file containing the text data. The file name has to be set before
+ * calling the parser method, otherwise no title will be set. The complete data of the input stream is set as full text.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -64,26 +59,23 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
 
     private DocumentBuilder m_currentDoc;
 
-
     /**
-     * Creates a new instance of <code>FlatFileDocumentParser</code>.
-     * The document source, category and file path will be set to
-     * <code>null</code> by default.
+     * Creates a new instance of <code>FlatFileDocumentParser</code>. The document source, category and file path will
+     * be set to <code>null</code> by default.
      */
     public FlatFileDocumentParser() {
         super(null, null, null);
     }
 
     /**
-     * Creates a new instance of <code>FlatFileDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>FlatFileDocumentParser</code>. The given source, category and file path is set to
+     * the created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public FlatFileDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public FlatFileDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         super(docPath, category, source);
     }
 
@@ -93,11 +85,11 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
     @Override
     public void clean() {
         if (m_docs != null) {
-           m_docs.clear();
+            m_docs.clear();
         }
         m_currentDoc = null;
-    }       
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -116,7 +108,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         Document d = parseInternal(is);
         notifyAllListener(new DocumentParsedEvent(d, this));
     }
-    
+
     private Document parseInternal(final InputStream is) throws Exception {
         m_currentDoc = new DocumentBuilder();
         m_currentDoc.setDocumentFile(new File(m_docPath));
@@ -127,8 +119,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
         if (m_charset == null) {
             m_charset = Charset.defaultCharset();
         }
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(is, m_charset));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, m_charset));
         String line = null;
         StringBuilder text = new StringBuilder();
         while ((line = br.readLine()) != null) {

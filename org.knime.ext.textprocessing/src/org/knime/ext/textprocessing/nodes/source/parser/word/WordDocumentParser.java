@@ -58,12 +58,9 @@ import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 
 /**
- * Implements the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}
- * is able to read the data of the given input stream and store it as a
- * {@link org.knime.ext.textprocessing.data.Document}s full text.
+ * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)} is able to read the data
+ * of the given input stream and store it as a {@link org.knime.ext.textprocessing.data.Document}s full text.
  *
  * To parse PDF files the Apache POI library is used.
  *
@@ -78,19 +75,17 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
     private DocumentBuilder m_currentDoc;
 
-
     /**
-     * Creates a new instance of <code>PDFDocumentParser</code>.
-     * The document source, category and file path will be set to
-     * <code>null</code> by default.
+     * Creates a new instance of <code>PDFDocumentParser</code>. The document source, category and file path will be set
+     * to <code>null</code> by default.
      */
     public WordDocumentParser() {
         super(null, null, null);
     }
 
     /**
-     * Creates a new instance of <code>PDFDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>PDFDocumentParser</code>. The given source, category and file path is set to the
+     * created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
@@ -113,6 +108,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated
      */
     @Deprecated
@@ -184,7 +180,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
                 setAuthor(si.getAuthor());
                 setPublicationDate(si.getCreateDateTime());
 
-            // docx files
+                // docx files
             } else if (m_docPath.endsWith(".docx")) {
                 final XWPFDocument hdoc = new XWPFDocument(is);
                 final List<XWPFParagraph> paragraphs = hdoc.getParagraphs();

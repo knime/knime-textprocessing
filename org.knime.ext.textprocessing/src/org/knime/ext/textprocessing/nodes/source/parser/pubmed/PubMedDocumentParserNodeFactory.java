@@ -32,13 +32,12 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeDialog
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the PubMed document parser
- * node provides methods to create the model and the dialog instance.
+ * The {@link org.knime.core.node.NodeFactory} of the PubMed document parser node provides methods to create the model
+ * and the dialog instance.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class PubMedDocumentParserNodeFactory extends
-NodeFactory<DocumentParserNodeModel> {
+public class PubMedDocumentParserNodeFactory extends NodeFactory<DocumentParserNodeModel> {
 
     /**
      * {@inheritDoc}
@@ -53,16 +52,14 @@ NodeFactory<DocumentParserNodeModel> {
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(
-                new PubMedDocumentParser(), false, "xml", "gz", "zip");
+        return new DocumentParserNodeModel(new PubMedDocumentParser(), false, "xml", "gz", "zip");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentParserNodeModel> createNodeView(final int index,
-            final DocumentParserNodeModel model) {
+    public NodeView<DocumentParserNodeModel> createNodeView(final int index, final DocumentParserNodeModel model) {
         return null;
     }
 

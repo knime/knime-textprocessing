@@ -34,7 +34,6 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -42,7 +41,6 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -70,24 +68,17 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Implements the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
- * is able to parse the data of the given input stream representing <i>dml</i>
- * (<b>D</b>ocument <b>M</b>arkup <b>L</b>anguage) formatted text documents.
- * See the <i>dml.dtd</i> file for more details about the format.
- * This format is also used to serialize the
- * {@link org.knime.ext.textprocessing.data.DocumentCell}s. Furthermore this
- * class provides the method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#documentAsDml(Document)}
- * which creates the serialized dml representation of the given document as
- * a string.
+ * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)} is able to parse
+ * the data of the given input stream representing <i>dml</i> (<b>D</b>ocument <b>M</b>arkup <b>L</b>anguage) formatted
+ * text documents. See the <i>dml.dtd</i> file for more details about the format. This format is also used to serialize
+ * the {@link org.knime.ext.textprocessing.data.DocumentCell}s. Furthermore this class provides the method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#documentAsDml(Document)} which creates
+ * the serialized dml representation of the given document as a string.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DmlDocumentParser extends DefaultHandler implements
-        DocumentParser {
+public class DmlDocumentParser extends DefaultHandler implements DocumentParser {
 
     /**
      * The name of the document tag.
@@ -205,24 +196,19 @@ public class DmlDocumentParser extends DefaultHandler implements
     public static final String YEAR = "year";
 
     /**
-     * The path (postfix) of the dml.dtd file relative to the plugin
-     * directory.
+     * The path (postfix) of the dml.dtd file relative to the plugin directory.
      */
-    public static final String DML_DTD_POSTFIX =
-        "/resources/documentformat/dml.dtd";
+    public static final String DML_DTD_POSTFIX = "/resources/documentformat/dml.dtd";
 
     /**
      * The public identifier for (dml) xml files.
      */
-    public static final String PUBLIC_IDENTIFIER =
-        "-//UNIKN//DTD KNIME Dml 2.0//EN";
+    public static final String PUBLIC_IDENTIFIER = "-//UNIKN//DTD KNIME Dml 2.0//EN";
 
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DmlDocumentParser.class);
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(DmlDocumentParser.class);
-
-    private static final SAXTransformerFactory transformerFactory =
-            (SAXTransformerFactory)TransformerFactory.newInstance();
+    private static final SAXTransformerFactory transformerFactory = (SAXTransformerFactory)TransformerFactory
+        .newInstance();
 
     private static final String DEF_WHITESPACE_SUFFIX = " ";
 
@@ -241,7 +227,6 @@ public class DmlDocumentParser extends DefaultHandler implements
     private String m_currentType = "";
 
     private String m_docPath;
-
 
     private DocumentBuilder m_currentDoc;
 
@@ -273,26 +258,23 @@ public class DmlDocumentParser extends DefaultHandler implements
 
     private boolean m_storeInList = false;
 
-
     /**
-     * Creates a new instance of <code>DmlDocumentParser</code>. The documents
-     * source, category and file path will be set to <code>null</code> by
-     * default.
+     * Creates a new instance of <code>DmlDocumentParser</code>. The documents source, category and file path will be
+     * set to <code>null</code> by default.
      */
     public DmlDocumentParser() {
         this(null, null, null);
     }
 
     /**
-     * Creates a new instance of <code>DmlDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>DmlDocumentParser</code>. The given source, category and file path is set to the
+     * created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public DmlDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public DmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
@@ -310,10 +292,10 @@ public class DmlDocumentParser extends DefaultHandler implements
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {
             LOGGER.warn("Could not parse DML documents, XML is not valid!");
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             LOGGER.warn("Could not read DML documents!");
-            throw(e);
+            throw (e);
         }
         return m_docs;
     }
@@ -339,11 +321,9 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public InputSource resolveEntity(final String pubId,
-            final String sysId) throws IOException, SAXException {
+    public InputSource resolveEntity(final String pubId, final String sysId) throws IOException, SAXException {
         if (pubId != null) {
-            TextprocessingCorePlugin plugin =
-                TextprocessingCorePlugin.getDefault();
+            TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
             if (pubId.equals(PUBLIC_IDENTIFIER)) {
                 path += DML_DTD_POSTFIX;
@@ -358,8 +338,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName,
-            final String qName, final Attributes attributes) {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(DOCUMENT)) {
@@ -417,8 +396,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void endElement(final String uri, final String localName,
-            final String qName) {
+    public void endElement(final String uri, final String localName, final String qName) {
         String endTag = qName.toLowerCase();
         if (endTag.equals(DOCUMENT) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
@@ -444,9 +422,7 @@ public class DmlDocumentParser extends DefaultHandler implements
                 pd = PublicationDate.createPublicationDate(year, month, day);
                 m_currentDoc.setPublicationDate(pd);
             } catch (ParseException e) {
-                LOGGER.warn("Publication date ("
-                        + year + "-" + month + "-" + day
-                        + ") could not be parsed !");
+                LOGGER.warn("Publication date (" + year + "-" + month + "-" + day + ") could not be parsed !");
                 LOGGER.warn(e.getStackTrace());
             }
         } else if (endTag.equals(WORD)) {
@@ -456,8 +432,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             }
         } else if (endTag.equals(TAG)) {
             if (m_tags != null && m_tagType != null && m_tagValue != null) {
-                Tag t = TagFactory.getInstance().createTag(m_tagType.trim(),
-                        m_tagValue.trim());
+                Tag t = TagFactory.getInstance().createTag(m_tagType.trim(), m_tagValue.trim());
                 m_tags.add(t);
             }
         } else if (endTag.equals(TERM)) {
@@ -471,8 +446,7 @@ public class DmlDocumentParser extends DefaultHandler implements
         } else if (endTag.equals(PARAGRAPH)) {
             m_currentDoc.createNewParagraph();
         } else if (endTag.equals(SECTION)) {
-            m_currentDoc.createNewSection(
-                    SectionAnnotation.stringToAnnotation(m_annotation));
+            m_currentDoc.createNewSection(SectionAnnotation.stringToAnnotation(m_annotation));
         } else if (endTag.equals(FILENAME)) {
             File f = new File(m_docPath);
             if (f.exists()) {
@@ -486,8 +460,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             m_currentDoc.addDocumentSource(source);
         } else if (endTag.equals(DOCUMENT_TYPE)) {
             if (m_type == null) {
-                DocumentType type =
-                        DocumentType.stringToDocumentType(m_currentType);
+                DocumentType type = DocumentType.stringToDocumentType(m_currentType);
                 m_currentDoc.setDocumentType(type);
             }
         }
@@ -517,19 +490,18 @@ public class DmlDocumentParser extends DefaultHandler implements
         } else if (m_lastTag.equals(FILENAME)) {
             m_docPath += new String(ch, start, length);
         } else if (m_lastTag.equals(MODIFIABILITY)) {
-            m_modifiability +=  new String(ch, start, length);
+            m_modifiability += new String(ch, start, length);
         } else if (m_lastTag.equals(CATEGORY)) {
-            m_currentCategory +=  new String(ch, start, length);
+            m_currentCategory += new String(ch, start, length);
         } else if (m_lastTag.equals(SOURCE)) {
-            m_currentSource +=  new String(ch, start, length);
+            m_currentSource += new String(ch, start, length);
         } else if (m_lastTag.equals(DOCUMENT_TYPE)) {
-            m_currentType +=  new String(ch, start, length);
+            m_currentType += new String(ch, start, length);
         }
     }
 
     /**
-     * Creates a <i>dml</i> out of the given document. See the <i>dml.dtd</i>
-     * for more details about the format.
+     * Creates a <i>dml</i> out of the given document. See the <i>dml.dtd</i> for more details about the format.
      *
      * @param doc The document to create the <i>dml</i> representation for.
      * @return The <i>dml</i> representation of the given document.
@@ -549,7 +521,6 @@ public class DmlDocumentParser extends DefaultHandler implements
             transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, PUBLIC_IDENTIFIER);
             transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "./dml.dtd");
 
-
             hd.startDocument();
             AttributesImpl atts = new AttributesImpl();
             hd.startElement("", "", DOCUMENT, atts);
@@ -558,8 +529,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             if (doc.getDocFile() != null && doc.getDocFile().length() > 0) {
                 atts.clear();
                 hd.startElement("", "", FILENAME, atts);
-                String filename = stripNonValidXMLCharacters(
-                        doc.getDocFile().getAbsolutePath());
+                String filename = stripNonValidXMLCharacters(doc.getDocFile().getAbsolutePath());
                 hd.characters(filename.toCharArray(), 0, filename.length());
                 hd.endElement("", "", FILENAME);
             }
@@ -568,8 +538,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             for (DocumentCategory cat : doc.getCategories()) {
                 atts.clear();
                 hd.startElement("", "", CATEGORY, atts);
-                String category = stripNonValidXMLCharacters(
-                        cat.getCategoryName());
+                String category = stripNonValidXMLCharacters(cat.getCategoryName());
                 hd.characters(category.toCharArray(), 0, category.length());
                 hd.endElement("", "", CATEGORY);
             }
@@ -578,8 +547,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             for (DocumentSource source : doc.getSources()) {
                 atts.clear();
                 hd.startElement("", "", SOURCE, atts);
-                String docSource = stripNonValidXMLCharacters(
-                        source.getSourceName());
+                String docSource = stripNonValidXMLCharacters(source.getSourceName());
                 hd.characters(docSource.toCharArray(), 0, docSource.length());
                 hd.endElement("", "", SOURCE);
             }
@@ -588,8 +556,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             if (doc.getType() != null) {
                 atts.clear();
                 hd.startElement("", "", DOCUMENT_TYPE, atts);
-                String type = stripNonValidXMLCharacters(
-                        doc.getType().toString());
+                String type = stripNonValidXMLCharacters(doc.getType().toString());
                 hd.characters(type.toCharArray(), 0, type.length());
                 hd.endElement("", "", DOCUMENT_TYPE);
             }
@@ -604,19 +571,15 @@ public class DmlDocumentParser extends DefaultHandler implements
                     if (a.getFirstName().length() > 0) {
                         atts.clear();
                         hd.startElement("", "", FIRSTNAME, atts);
-                        String firstname = stripNonValidXMLCharacters(
-                                a.getFirstName());
-                        hd.characters(firstname.toCharArray(), 0,
-                                firstname.length());
+                        String firstname = stripNonValidXMLCharacters(a.getFirstName());
+                        hd.characters(firstname.toCharArray(), 0, firstname.length());
                         hd.endElement("", "", FIRSTNAME);
                     }
                     if (a.getLastName().length() > 0) {
                         atts.clear();
                         hd.startElement("", "", LASTNAME, atts);
-                        String lastname = stripNonValidXMLCharacters(
-                                a.getLastName());
-                        hd.characters(lastname.toCharArray(), 0,
-                                lastname.length());
+                        String lastname = stripNonValidXMLCharacters(a.getLastName());
+                        hd.characters(lastname.toCharArray(), 0, lastname.length());
                         hd.endElement("", "", LASTNAME);
                     }
                     hd.endElement("", "", AUTHOR);
@@ -630,22 +593,19 @@ public class DmlDocumentParser extends DefaultHandler implements
             // Day
             atts.clear();
             hd.startElement("", "", DAY, atts);
-            String day = stripNonValidXMLCharacters(
-                    Integer.toString(doc.getPubDate().getDay()));
+            String day = stripNonValidXMLCharacters(Integer.toString(doc.getPubDate().getDay()));
             hd.characters(day.toCharArray(), 0, day.length());
             hd.endElement("", "", DAY);
             // Month
             atts.clear();
             hd.startElement("", "", MONTH, atts);
-            String month = stripNonValidXMLCharacters(
-                    Integer.toString(doc.getPubDate().getMonth()));
+            String month = stripNonValidXMLCharacters(Integer.toString(doc.getPubDate().getMonth()));
             hd.characters(month.toCharArray(), 0, month.length());
             hd.endElement("", "", MONTH);
             // Year
             atts.clear();
             hd.startElement("", "", YEAR, atts);
-            String year = stripNonValidXMLCharacters(
-                    Integer.toString(doc.getPubDate().getYear()));
+            String year = stripNonValidXMLCharacters(Integer.toString(doc.getPubDate().getYear()));
             hd.characters(year.toCharArray(), 0, year.length());
             hd.endElement("", "", YEAR);
             hd.endElement("", "", PUBLICATIONDATE);
@@ -653,8 +613,7 @@ public class DmlDocumentParser extends DefaultHandler implements
             // Sections (except title section)
             for (Section s : doc.getSections()) {
                 atts.clear();
-                atts.addAttribute("", "", ANNOTATION, "CDATA", s
-                        .getAnnotation().toString());
+                atts.addAttribute("", "", ANNOTATION, "CDATA", s.getAnnotation().toString());
                 hd.startElement("", "", SECTION, atts);
 
                 // Paragraphs
@@ -682,10 +641,8 @@ public class DmlDocumentParser extends DefaultHandler implements
                             for (Word w : t.getWords()) {
                                 atts.clear();
                                 hd.startElement("", "", WORD, atts);
-                                String word = stripNonValidXMLCharacters(
-                                        w.getWord());
-                                hd.characters(word.toCharArray(), 0,
-                                        word.length());
+                                String word = stripNonValidXMLCharacters(w.getWord());
+                                hd.characters(word.toCharArray(), 0, word.length());
                                 hd.endElement("", "", WORD);
                             }
 
@@ -695,13 +652,11 @@ public class DmlDocumentParser extends DefaultHandler implements
                                 hd.startElement("", "", TAG, atts);
                                 // TagValue
                                 hd.startElement("", "", TAG_VALUE, atts);
-                                hd.characters(tag.getTagValue().toCharArray(),
-                                        0, tag.getTagValue().length());
+                                hd.characters(tag.getTagValue().toCharArray(), 0, tag.getTagValue().length());
                                 hd.endElement("", "", TAG_VALUE);
                                 // TagType
                                 hd.startElement("", "", TAG_TYPE, atts);
-                                hd.characters(tag.getTagType().toCharArray(),
-                                        0, tag.getTagType().length());
+                                hd.characters(tag.getTagType().toCharArray(), 0, tag.getTagType().length());
                                 hd.endElement("", "", TAG_TYPE);
                                 hd.endElement("", "", TAG);
                             }
@@ -720,21 +675,18 @@ public class DmlDocumentParser extends DefaultHandler implements
 
             str = os.toString("UTF-8");
         } catch (SAXException e1) {
-            LOGGER.error("Could not create xml output of documemnt "
-                    + "file:" + doc.getDocFile()
-                    + " / title:" + doc.getTitle());
+            LOGGER.error("Could not create xml output of documemnt " + "file:" + doc.getDocFile() + " / title:"
+                + doc.getTitle());
             LOGGER.info(e1.getMessage());
             e1.printStackTrace();
         } catch (IOException e2) {
-            LOGGER.error("Could not write xml output to output stream "
-                    + "of document file:" + doc.getDocFile()
-                    + " / title:" + doc.getTitle());
+            LOGGER.error("Could not write xml output to output stream " + "of document file:" + doc.getDocFile()
+                + " / title:" + doc.getTitle());
             LOGGER.info(e2.getMessage());
             e2.printStackTrace();
         } catch (TransformerConfigurationException ex) {
-            LOGGER.error("Could not create xml output of documemnt "
-                    + "file:" + doc.getDocFile()
-                    + " / title:" + doc.getTitle());
+            LOGGER.error("Could not create xml output of documemnt " + "file:" + doc.getDocFile() + " / title:"
+                + doc.getTitle());
             LOGGER.info(ex.getMessage());
             ex.printStackTrace();
         }
@@ -756,20 +708,15 @@ public class DmlDocumentParser extends DefaultHandler implements
         }
         for (int i = 0; i < in.length(); i++) {
             curr = in.charAt(i);
-            if ((curr == 0x9)
-                    || (curr == 0xA)
-                    || (curr == 0xD)
-                    || ((curr >= 0x20) && (curr <= 0xD7FF))
-                    || ((curr >= 0xE000) && (curr <= 0xFFFD))
-                    || ((curr >= 0x10000) && (curr <= 0x10FFFF))) {
+            if ((curr == 0x9) || (curr == 0xA) || (curr == 0xD) || ((curr >= 0x20) && (curr <= 0xD7FF))
+                || ((curr >= 0xE000) && (curr <= 0xFFFD)) || ((curr >= 0x10000) && (curr <= 0x10FFFF))) {
                 out.append(curr);
             }
         }
         return out.toString();
     }
 
-//    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
-
+    //    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
     /**
      * {@inheritDoc}
@@ -806,12 +753,11 @@ public class DmlDocumentParser extends DefaultHandler implements
     /**
      * {@inheritDoc}
      *
-     * The given charset is ignored since the SAX parser takes it from the xml
-     * file.
+     * The given charset is ignored since the SAX parser takes it from the xml file.
      */
     @Override
-    public void setCharset(final Charset charset) { }
-
+    public void setCharset(final Charset charset) {
+    }
 
     /**
      * List of listeners.
@@ -828,15 +774,16 @@ public class DmlDocumentParser extends DefaultHandler implements
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {
             LOGGER.warn("Could not parse DML documents, XML is not valid!");
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             LOGGER.warn("Could not read DML documents!");
-            throw(e);
+            throw (e);
         }
     }
 
     /**
      * Notifies all registered listeners with given event.
+     *
      * @param event Event to notify listener with
      */
     public void notifyAllListener(final DocumentParsedEvent event) {
@@ -849,8 +796,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void addDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void addDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.add(listener);
     }
 
@@ -858,8 +804,7 @@ public class DmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void removeDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void removeDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
     }
 

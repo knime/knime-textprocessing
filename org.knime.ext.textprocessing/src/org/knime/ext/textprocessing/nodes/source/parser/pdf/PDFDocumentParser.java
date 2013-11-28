@@ -51,12 +51,9 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.util.AuthorUtil;
 
 /**
- * Implements the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}
- * is able to read the data of the given input stream and store it as a
- * {@link org.knime.ext.textprocessing.data.Document}s full text.
+ * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)} is able to read the data
+ * of the given input stream and store it as a {@link org.knime.ext.textprocessing.data.Document}s full text.
  *
  * To parse PDF files the PDFBox library is used.
  *
@@ -71,26 +68,23 @@ public class PDFDocumentParser extends AbstractDocumentParser {
 
     private DocumentBuilder m_currentDoc;
 
-
     /**
-     * Creates a new instance of <code>PDFDocumentParser</code>.
-     * The document source, category and file path will be set to
-     * <code>null</code> by default.
+     * Creates a new instance of <code>PDFDocumentParser</code>. The document source, category and file path will be set
+     * to <code>null</code> by default.
      */
     public PDFDocumentParser() {
         super(null, null, null);
     }
 
     /**
-     * Creates a new instance of <code>PDFDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>PDFDocumentParser</code>. The given source, category and file path is set to the
+     * created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public PDFDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public PDFDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         super(docPath, category, source);
     }
 
@@ -107,6 +101,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated
      */
     @Deprecated
@@ -161,8 +156,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
                     title = dc.getTitle();
                 }
             }
-            PDDocumentInformation information =
-                document.getDocumentInformation();
+            PDDocumentInformation information = document.getDocumentInformation();
             if (information != null) {
                 if (title == null || title.length() <= 1) {
                     title = information.getTitle();

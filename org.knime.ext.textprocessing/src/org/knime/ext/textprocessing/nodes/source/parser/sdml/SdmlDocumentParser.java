@@ -33,9 +33,7 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.SAXParserFactory;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -55,23 +53,18 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Implements the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * interface. The provided method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)}
- * is able to parse the data of the given input stream representing <i>sdml</i>
- * (<b>S</b>imple <b>D</b>ocument <b>M</b>arkup <b>L</b>anguage) formatted text
- * documents. See the <i>sdml.dtd</i> file for more details about the format.
- * This format enables a simple representation of textual documents and can be
- * used as a transfer format to get text documents formatted in various kinds
- * of xml formats into knime without implementing an extra parser node for each
- * format. The only thing what have to be done is to transform documents in
- * other xml formats via xslt transformation into sdml.
+ * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)} is able to parse
+ * the data of the given input stream representing <i>sdml</i> (<b>S</b>imple <b>D</b>ocument <b>M</b>arkup
+ * <b>L</b>anguage) formatted text documents. See the <i>sdml.dtd</i> file for more details about the format. This
+ * format enables a simple representation of textual documents and can be used as a transfer format to get text
+ * documents formatted in various kinds of xml formats into knime without implementing an extra parser node for each
+ * format. The only thing what have to be done is to transform documents in other xml formats via xslt transformation
+ * into sdml.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class SdmlDocumentParser extends DefaultHandler implements
-        DocumentParser {
+public class SdmlDocumentParser extends DefaultHandler implements DocumentParser {
 
     /**
      * The name of the document tag.
@@ -129,20 +122,16 @@ public class SdmlDocumentParser extends DefaultHandler implements
     public static final String YEAR = "year";
 
     /**
-     * The path (postfix) of the sdml.dtd file relative to the plugin
-     * directory.
+     * The path (postfix) of the sdml.dtd file relative to the plugin directory.
      */
-    public static final String SDML_DTD_POSTFIX =
-        "/resources/documentformat/sdml.dtd";
+    public static final String SDML_DTD_POSTFIX = "/resources/documentformat/sdml.dtd";
 
     /**
      * The public identifier for (sdml) xml files.
      */
-    public static final String PUBLIC_IDENTIFIER =
-        "-//UNIKN//DTD KNIME Sdml 2.0//EN";
+    public static final String PUBLIC_IDENTIFIER = "-//UNIKN//DTD KNIME Sdml 2.0//EN";
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(SdmlDocumentParser.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(SdmlDocumentParser.class);
 
     private List<Document> m_docs;
 
@@ -153,7 +142,6 @@ public class SdmlDocumentParser extends DefaultHandler implements
     private DocumentType m_type;
 
     private String m_docPath;
-
 
     private DocumentBuilder m_currentDoc;
 
@@ -178,30 +166,27 @@ public class SdmlDocumentParser extends DefaultHandler implements
     private boolean m_storeInList = false;
 
     /**
-     * Creates a new instance of <code>SdmlDocumentParser</code>. The documents
-     * source, category and file path will be set to <code>null</code> by
-     * default.
+     * Creates a new instance of <code>SdmlDocumentParser</code>. The documents source, category and file path will be
+     * set to <code>null</code> by default.
      */
     public SdmlDocumentParser() {
         this(null, null, null);
     }
 
     /**
-     * Creates a new instance of <code>SdmlDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Creates a new instance of <code>SdmlDocumentParser</code>. The given source, category and file path is set to the
+     * created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public SdmlDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public SdmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
         m_listener = new ArrayList<DocumentParsedEventListener>();
     }
-
 
     /**
      * {@inheritDoc}
@@ -216,12 +201,12 @@ public class SdmlDocumentParser extends DefaultHandler implements
             fac.newSAXParser().parse(is, this);
         } catch (SAXException e) {
             LOGGER.warn("Could not parse SDML documents, XML is not valid!");
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             LOGGER.warn("Could not read SDML documents!");
-            throw(e);
+            throw (e);
         }
-        
+
         return m_docs;
     }
 
@@ -234,17 +219,15 @@ public class SdmlDocumentParser extends DefaultHandler implements
             m_docs.clear();
         }
         m_currentDoc = null;
-    }       
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public InputSource resolveEntity(final String pubId,
-            final String sysId) throws IOException, SAXException {
+    public InputSource resolveEntity(final String pubId, final String sysId) throws IOException, SAXException {
         if (pubId != null) {
-            TextprocessingCorePlugin plugin =
-                TextprocessingCorePlugin.getDefault();
+            TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
             if (pubId.equals(PUBLIC_IDENTIFIER)) {
                 path += SDML_DTD_POSTFIX;
@@ -259,8 +242,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName,
-            final String qName, final Attributes attributes) {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(DOCUMENT)) {
@@ -302,12 +284,11 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void endElement(final String uri, final String localName,
-            final String qName) {
+    public void endElement(final String uri, final String localName, final String qName) {
         String endTag = qName.toLowerCase();
         if (endTag.equals(DOCUMENT) && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
-            
+
             // due to memory issues documents are not all stored in list anymore
             // but handed out via listener mechanism
             //m_docs.add(doc);
@@ -315,7 +296,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
                 m_docs.add(doc);
             }
             notifyAllListener(new DocumentParsedEvent(doc, this));
-            
+
             m_currentDoc = null;
         } else if (endTag.equals(AUTHOR)) {
             Author a = new Author(m_firstName.trim(), m_lastName.trim());
@@ -329,16 +310,13 @@ public class SdmlDocumentParser extends DefaultHandler implements
                 pd = new PublicationDate(year, month, day);
                 m_currentDoc.setPublicationDate(pd);
             } catch (ParseException e) {
-                LOGGER.warn("Publication date ("
-                        + year + "-" + month + "-" + day
-                        + ") could not be parsed !");
+                LOGGER.warn("Publication date (" + year + "-" + month + "-" + day + ") could not be parsed !");
                 LOGGER.info(e.getMessage());
             }
         } else if (endTag.equals(TITLE)) {
             m_currentDoc.addTitle(m_title.trim());
         } else if (endTag.equals(SECTION)) {
-            m_currentDoc.addSection(m_section.trim(),
-                    SectionAnnotation.stringToAnnotation(m_annotation));
+            m_currentDoc.addSection(m_section.trim(), SectionAnnotation.stringToAnnotation(m_annotation));
         }
     }
 
@@ -396,22 +374,20 @@ public class SdmlDocumentParser extends DefaultHandler implements
         m_docPath = filePath;
     }
 
-
     /**
      * {@inheritDoc}
      *
-     * The given charset is ignored since the SAX parser takes it from the xml
-     * file.
+     * The given charset is ignored since the SAX parser takes it from the xml file.
      */
     @Override
-    public void setCharset(final Charset charset) { }
-    
-    
+    public void setCharset(final Charset charset) {
+    }
+
     /**
      * List of listeners.
      */
     private List<DocumentParsedEventListener> m_listener;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -422,29 +398,29 @@ public class SdmlDocumentParser extends DefaultHandler implements
             SAXParserFactory.newInstance().newSAXParser().parse(is, this);
         } catch (SAXException e) {
             LOGGER.warn("Could not parse DML documents, XML is not valid!");
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             LOGGER.warn("Could not read DML documents!");
-            throw(e);
+            throw (e);
         }
     }
 
     /**
      * Notifies all registered listeners with given event.
+     *
      * @param event Event to notify listener with
      */
     public void notifyAllListener(final DocumentParsedEvent event) {
         for (DocumentParsedEventListener l : m_listener) {
             l.documentParsed(event);
         }
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void addDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void addDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.add(listener);
     }
 
@@ -452,8 +428,7 @@ public class SdmlDocumentParser extends DefaultHandler implements
      * {@inheritDoc}
      */
     @Override
-    public void removeDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void removeDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
     }
 

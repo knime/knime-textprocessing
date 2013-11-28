@@ -34,7 +34,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -53,11 +52,9 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
-
 /**
- * The model for all {@link org.knime.ext.textprocessing.data.Document} parser
- * nodes, no matter what format they parse. The factory provides them with the
- * right {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
+ * The model for all {@link org.knime.ext.textprocessing.data.Document} parser nodes, no matter what format they parse.
+ * The factory provides them with the right {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
  * instance they use to parse the specified files.
  *
  * @author Kilian Thiel, University of Konstanz
@@ -70,15 +67,13 @@ public class DocumentParserNodeModel extends NodeModel {
     public static final String DEFAULT_PATH = System.getProperty("user.home");
 
     /**
-     * The default value of the recursive flag (if set <code>true</code> the
-     * specified directory is search recursively).
+     * The default value of the recursive flag (if set <code>true</code> the specified directory is search recursively).
      */
     public static final boolean DEFAULT_RECURSIVE = false;
 
     /**
-     * The default value of the ignore hidden files flag
-     * (if set <code>true</code> the hidden files will be not considered for
-     * parsing.
+     * The default value of the ignore hidden files flag (if set <code>true</code> the hidden files will be not
+     * considered for parsing.
      */
     public static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
 
@@ -95,61 +90,50 @@ public class DocumentParserNodeModel extends NodeModel {
     /**
      * The default charset.
      */
-    public static final String DEFAULT_CHARSET =
-        Charset.defaultCharset().name();
+    public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
 
     /**
      * The default document type.
      */
     public static final DocumentType DEFAULT_DOCTYPE = DocumentType.UNKNOWN;
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(DocumentParserNodeModel.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentParserNodeModel.class);
 
-    private SettingsModelString m_pathModel =
-        DocumentParserNodeDialog.getPathModel();
+    private SettingsModelString m_pathModel = DocumentParserNodeDialog.getPathModel();
 
-    private SettingsModelBoolean m_recursiveModel =
-        DocumentParserNodeDialog.getRecursiveModel();
+    private SettingsModelBoolean m_recursiveModel = DocumentParserNodeDialog.getRecursiveModel();
 
-    private SettingsModelString m_categoryModel =
-        DocumentParserNodeDialog.getCategoryModel();
+    private SettingsModelString m_categoryModel = DocumentParserNodeDialog.getCategoryModel();
 
-    private SettingsModelString m_sourceModel =
-        DocumentParserNodeDialog.getSourceModel();
+    private SettingsModelString m_sourceModel = DocumentParserNodeDialog.getSourceModel();
 
-    private SettingsModelString m_typeModel =
-        DocumentParserNodeDialog.getTypeModel();
+    private SettingsModelString m_typeModel = DocumentParserNodeDialog.getTypeModel();
 
-    private SettingsModelBoolean m_ignoreHiddenFilesModel =
-        DocumentParserNodeDialog.getIgnoreHiddenFilesModel();
+    private SettingsModelBoolean m_ignoreHiddenFilesModel = DocumentParserNodeDialog.getIgnoreHiddenFilesModel();
 
-    private SettingsModelString m_charsetModel =
-        CharsetDocumentParserNodeDialog.getCharsetModel();
+    private SettingsModelString m_charsetModel = CharsetDocumentParserNodeDialog.getCharsetModel();
 
     private boolean m_withCharset = false;
 
-    private DocumentParser m_parser;
+    private final DocumentParser m_parser;
 
-    private List<String> m_validExtensions;
+    private final List<String> m_validExtensions;
 
-    private DocumentDataTableBuilder m_dtBuilder;
+    private final DocumentDataTableBuilder m_dtBuilder;
 
     /**
-     * Creates a new instance of <code>DocumentParserNodeModel</code> with the
-     * specified parser to use and the valid extensions of files to parse.
+     * Creates a new instance of <code>DocumentParserNodeModel</code> with the specified parser to use and the valid
+     * extensions of files to parse.
      *
      * @param parser The parser to use.
-     * @param withCharset if <code>true</code> the character set of the
-     * character set model is handed to the parser in order to properly decode
-     * the text to parse, otherwise not. Be aware that if <code>true</code> is
-     * set the {@link org.knime.ext.textprocessing.nodes.source.parser.CharsetDocumentParserNodeDialog}
-     * needs to be used in order to enable the user to specify a certain
-     * encoding via the dialog.
+     * @param withCharset if <code>true</code> the character set of the character set model is handed to the parser in
+     *            order to properly decode the text to parse, otherwise not. Be aware that if <code>true</code> is set
+     *            the {@link org.knime.ext.textprocessing.nodes.source.parser.CharsetDocumentParserNodeDialog} needs to
+     *            be used in order to enable the user to specify a certain encoding via the dialog.
      * @param validFileExtensions The valid extensions of files to parse.
      */
-    public DocumentParserNodeModel(final DocumentParser parser,
-            final boolean withCharset, final String... validFileExtensions) {
+    public DocumentParserNodeModel(final DocumentParser parser, final boolean withCharset,
+        final String... validFileExtensions) {
         super(0, 1);
         m_parser = parser;
         m_validExtensions = Arrays.asList(validFileExtensions);
@@ -161,8 +145,14 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        // check selected directory
+        final String dir = m_pathModel.getStringValue();
+        final File f = new File(dir);
+        if (!f.isDirectory() || !f.exists() || !f.canRead()) {
+            throw new InvalidSettingsException("Selected directory: " + dir + " is not valid!");
+        }
+
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
@@ -170,41 +160,39 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        File dir = new File(m_pathModel.getStringValue());
-        boolean recursive = m_recursiveModel.getBooleanValue();
-        boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-        String category = m_categoryModel.getStringValue();
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
+        final File dir = new File(m_pathModel.getStringValue());
+        final boolean recursive = m_recursiveModel.getBooleanValue();
+        final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
+        final String category = m_categoryModel.getStringValue();
         if (category != null && category.length() > 0) {
             m_parser.setDocumentCategory(new DocumentCategory(category));
         }
-        String source = m_sourceModel.getStringValue();
+        final String source = m_sourceModel.getStringValue();
         if (source != null && source.length() > 0) {
             m_parser.setDocumentSource(new DocumentSource(source));
         }
-        DocumentType type = DocumentType.valueOf(m_typeModel.getStringValue());
+        final DocumentType type = DocumentType.valueOf(m_typeModel.getStringValue());
         if (type != null) {
             m_parser.setDocumentType(type);
         }
         if (m_withCharset) {
-            Charset charset = Charset.forName(m_charsetModel.getStringValue());
-            m_parser.setCharset(charset);
+            m_parser.setCharset(Charset.forName(m_charsetModel.getStringValue()));
         }
 
-        FileCollector fc = new FileCollector(dir, m_validExtensions, recursive,
-                ignoreHiddenFiles);
-        List<File> files = fc.getFiles();
-        int fileCount = files.size();
+        final FileCollector fc = new FileCollector(dir, m_validExtensions, recursive, ignoreHiddenFiles);
+        final List<File> files = fc.getFiles();
+        final int fileCount = files.size();
         int currFile = 1;
 
         try {
             m_dtBuilder.openDataTable(exec);
-            for (File f : files) {
-
-                double progress = (double)currFile / (double)fileCount;
+            for (final File f : files) {
+                final double progress = (double)currFile / (double)fileCount;
                 exec.setProgress(progress, "Parsing file " + currFile + " of " + fileCount);
                 exec.checkCanceled();
+
                 currFile++;
                 LOGGER.info("Parsing file: " + f.getAbsolutePath());
 
@@ -217,13 +205,11 @@ public class DocumentParserNodeModel extends NodeModel {
                 m_parser.setDocumentFilepath(f.getAbsolutePath());
 
                 try {
-                    // first remove all listeners in order to avoid that two or more
-                    // listeners are registered, adding the same document twice or
-                    // three times.
+                    // first remove all listeners in order to avoid that two or more listeners are registered,
+                    // adding the same document twice or more times.
                     m_parser.removeAllDocumentParsedListener();
                     m_parser.addDocumentParsedListener(new InternalDocumentParsedEventListener());
                     m_parser.parseDocument(is);
-
                 } catch (Exception e) {
                     LOGGER.error("Could not parse file: " + f.getAbsolutePath().toString());
                     setWarningMessage("Could not parse all files properly!");
@@ -238,15 +224,14 @@ public class DocumentParserNodeModel extends NodeModel {
         }
     }
 
-    private class InternalDocumentParsedEventListener implements
-    DocumentParsedEventListener {
+    private class InternalDocumentParsedEventListener implements DocumentParsedEventListener {
         /**
          * {@inheritDoc}
          */
         @Override
         public void documentParsed(final DocumentParsedEvent event) {
             if (m_dtBuilder != null) {
-                Document d = event.getDocument();
+                final Document d = event.getDocument();
                 if (d != null) {
                     m_dtBuilder.addDocument(d);
                 }
@@ -258,20 +243,17 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
     }
-
 
     /**
      * {@inheritDoc}
@@ -281,18 +263,15 @@ public class DocumentParserNodeModel extends NodeModel {
         m_parser.clean();
         try {
             m_dtBuilder.getAndCloseDataTable();
-        } catch (Exception e) { /* Do noting just try */ }
+        } catch (Exception e) { /* Do noting just try */
+        }
     }
-
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_pathModel.loadSettingsFrom(settings);
         m_recursiveModel.loadSettingsFrom(settings);
         m_categoryModel.loadSettingsFrom(settings);
@@ -326,8 +305,7 @@ public class DocumentParserNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_pathModel.validateSettings(settings);
         m_recursiveModel.validateSettings(settings);
         m_categoryModel.validateSettings(settings);
@@ -338,15 +316,5 @@ public class DocumentParserNodeModel extends NodeModel {
         if (m_withCharset) {
             m_charsetModel.validateSettings(settings);
         }
-
-        // check selected directory
-        String dir = ((SettingsModelString)m_pathModel.
-                createCloneWithValidatedValue(settings)).getStringValue();
-        File f = new File(dir);
-        if (!f.isDirectory() || !f.exists() || !f.canRead()) {
-            throw new InvalidSettingsException("Selected directory: "
-                    + dir + " is not valid!");
-        }
     }
-
 }

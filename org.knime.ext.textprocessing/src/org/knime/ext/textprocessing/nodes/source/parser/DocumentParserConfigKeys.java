@@ -26,25 +26,23 @@
 package org.knime.ext.textprocessing.nodes.source.parser;
 
 /**
- * Holds the configuration keys of the
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel}
+ * Holds the configuration keys of the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel}
  * node.
  *
  * @author Kilian Thiel, University of Konstanz
  */
 public final class DocumentParserConfigKeys {
 
-    private DocumentParserConfigKeys() { }
+    private DocumentParserConfigKeys() {
+    }
 
     /**
-     * The configuration key of the path of the directory containing the files
-     * to parse.
+     * The configuration key of the path of the directory containing the files to parse.
      */
     public static final String CFGKEY_PATH = "Path";
 
     /**
-     * The configuration key of the recursive flag (if set the specified
-     * directory is search recursively).
+     * The configuration key of the recursive flag (if set the specified directory is search recursively).
      */
     public static final String CFGKEY_RECURSIVE = "Rec";
 

@@ -44,7 +44,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   03.11.2011 (thiel): created
  */
@@ -53,10 +53,18 @@ package org.knime.ext.textprocessing.nodes.source.parser;
 import java.util.EventListener;
 
 /**
- * 
+ * Provides {@code DocumentParsedEventListener#documentParsed(DocumentParsedEvent)} which is called by parses when a
+ * document has been completely parsed.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public interface DocumentParsedEventListener extends EventListener {
 
+    /**
+     * Is called by parses when a document has been completely parsed.
+     *
+     * @param event Is created by the parsed when a document has been parsed and contains the parsed document as well as
+     *            the corresponding parser.
+     */
     public void documentParsed(final DocumentParsedEvent event);
 }

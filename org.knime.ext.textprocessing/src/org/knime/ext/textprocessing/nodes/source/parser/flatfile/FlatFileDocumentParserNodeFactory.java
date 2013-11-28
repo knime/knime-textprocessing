@@ -32,13 +32,12 @@ import org.knime.ext.textprocessing.nodes.source.parser.CharsetDocumentParserNod
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the flat file document
- * parser node, provides methods to create the model and the dialog instance.
+ * The {@link org.knime.core.node.NodeFactory} of the flat file document parser node, provides methods to create the
+ * model and the dialog instance.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class FlatFileDocumentParserNodeFactory extends
-NodeFactory<DocumentParserNodeModel> {
+public class FlatFileDocumentParserNodeFactory extends NodeFactory<DocumentParserNodeModel> {
 
     /**
      * {@inheritDoc}
@@ -53,16 +52,14 @@ NodeFactory<DocumentParserNodeModel> {
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(
-                new FlatFileDocumentParser(), true);
+        return new DocumentParserNodeModel(new FlatFileDocumentParser(), true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentParserNodeModel> createNodeView(final int index,
-            final DocumentParserNodeModel model) {
+    public NodeView<DocumentParserNodeModel> createNodeView(final int index, final DocumentParserNodeModel model) {
         return null;
     }
 

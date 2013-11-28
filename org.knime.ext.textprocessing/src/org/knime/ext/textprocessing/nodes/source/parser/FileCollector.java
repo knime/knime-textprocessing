@@ -35,41 +35,37 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Provides functionality to search a specified directory for files with
- * given extensions. The directory can be searched recursively or not.
+ * Provides functionality to search a specified directory for files with given extensions. The directory can be searched
+ * recursively or not.
  *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FileCollector {
 
-    private File m_directory;
+    private final File m_directory;
 
-    private List<String> m_extensions;
+    private final List<String> m_extensions;
 
-    private boolean m_recursive;
+    private final boolean m_recursive;
 
-    private boolean m_ignoreHidden;
+    private final boolean m_ignoreHidden;
 
     private List<File> m_files;
 
     /**
-     * Creates a new instance of <code>FileCollector</code> with given
-     * directory, to search for file with given extensions. If
-     * <code>recursive</code> is set <code>true</code> the directory will be
-     * searched recursively which means that subdirectories will by searched
-     * too.
+     * Creates a new instance of <code>FileCollector</code> with given directory, to search for file with given
+     * extensions. If <code>recursive</code> is set <code>true</code> the directory will be searched recursively which
+     * means that subdirectories will by searched too.
+     *
      * @param dir Directory to search for files.
      * @param ext Extensions of file to search for.
      * @param recursive if set <code>true</code> the directory will be
-     * @param ignoreHiddenFiles if set <code>true</code> hidden files will not
-     * be collected.
-     * searched recursively.
+     * @param ignoreHiddenFiles if set <code>true</code> hidden files will not be collected. searched recursively.
      */
-    public FileCollector(final File dir, final List<String> ext,
-            final boolean recursive, final boolean ignoreHiddenFiles) {
+    public FileCollector(final File dir, final List<String> ext, final boolean recursive,
+        final boolean ignoreHiddenFiles) {
         if (!dir.isDirectory()) {
-            throw new IllegalArgumentException(dir.getName()
-                    + " is not a directory ");
+            throw new IllegalArgumentException(dir.getName() + " is not a directory ");
         }
 
         m_directory = dir;
@@ -83,6 +79,7 @@ public class FileCollector {
 
     /**
      * Returns a list with collected files.
+     *
      * @return A list with collected files.
      */
     public List<File> getFiles() {
@@ -120,11 +117,11 @@ public class FileCollector {
     private void collectFiles(final File dir, final FileFilter filter) {
         if (dir.isDirectory()) {
             // ad files to list
-            File[] filesWithExt = dir.listFiles(filter);
+            final File[] filesWithExt = dir.listFiles(filter);
 
             // check for hidden files
             if (m_ignoreHidden) {
-                for (File f : filesWithExt) {
+                for (final File f : filesWithExt) {
                     if (!f.isHidden()) {
                         m_files.add(f);
                     }
@@ -135,8 +132,8 @@ public class FileCollector {
 
             // go recursively through all sub dirs
             if (m_recursive) {
-                File[] dirs = dir.listFiles();
-                for (File s : dirs) {
+                final File[] dirs = dir.listFiles();
+                for (final File s : dirs) {
                     if (s.isDirectory()) {
                         collectFiles(s, filter);
                     }
@@ -158,7 +155,7 @@ public class FileCollector {
             if (m_extensions.size() == 0) {
                 return true;
             }
-            for (String ext : m_extensions) {
+            for (final String ext : m_extensions) {
                 if (s.toLowerCase().endsWith("." + ext)) {
                     return true;
                 }

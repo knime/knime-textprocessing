@@ -29,24 +29,19 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 
 /**
- * This abstract class implements conveniently all setter methods of the
- * interface
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser},
- * such as
+ * This abstract class implements conveniently all setter methods of the interface
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}, such as
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentCategory(DocumentCategory)},
  * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentSource(DocumentSource)},
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentFilepath(String)}
- * and
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentType(DocumentType)}.
- * The parse method is still not implemented since the parsing technique
- * is still up to the concrete underlying parser.
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentFilepath(String)} and
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#setDocumentType(DocumentType)}. The parse
+ * method is still not implemented since the parsing technique is still up to the concrete underlying parser.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -83,8 +78,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     protected List<DocumentParsedEventListener> m_listener;
 
     /**
-     * Constructor of <code>AbstractDocumentParser</code>.
-     * The document source, category and file path will be set to
+     * Constructor of <code>AbstractDocumentParser</code>. The document source, category and file path will be set to
      * <code>null</code> by default.
      */
     public AbstractDocumentParser() {
@@ -92,15 +86,14 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     }
 
     /**
-     * Constructor of <code>AbstractDocumentParser</code>. The given
-     * source, category and file path is set to the created documents.
+     * Constructor of <code>AbstractDocumentParser</code>. The given source, category and file path is set to the
+     * created documents.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
      */
-    public AbstractDocumentParser(final String docPath,
-            final DocumentCategory category, final DocumentSource source) {
+    public AbstractDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
@@ -109,6 +102,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated use {@link AbstractDocumentParser#parseDocument(InputStream)} instead.
      */
     @Deprecated
@@ -165,8 +159,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * {@inheritDoc}
      */
     @Override
-    public void addDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void addDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.add(listener);
     }
 
@@ -174,8 +167,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * {@inheritDoc}
      */
     @Override
-    public void removeDocumentParsedListener(
-            final DocumentParsedEventListener listener) {
+    public void removeDocumentParsedListener(final DocumentParsedEventListener listener) {
         m_listener.remove(listener);
     }
 
@@ -189,10 +181,11 @@ public abstract class AbstractDocumentParser implements DocumentParser {
 
     /**
      * Notifies all registered listeners with given event.
+     *
      * @param event Event to notify listener with
      */
     public void notifyAllListener(final DocumentParsedEvent event) {
-        for (DocumentParsedEventListener l : m_listener) {
+        for (final DocumentParsedEventListener l : m_listener) {
             l.documentParsed(event);
         }
     }

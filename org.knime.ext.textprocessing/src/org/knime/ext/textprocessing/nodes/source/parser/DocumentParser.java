@@ -28,20 +28,17 @@ package org.knime.ext.textprocessing.nodes.source.parser;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 
 /**
- * All parser, parsing various document formats, like Reuters, PubMed, etc.
- * and create {@link org.knime.ext.textprocessing.data.Document} instances,
- * have to implement this interface, to enable compatibility with
- * classes using different parsers. The interface provides the method
- * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}.
- * Underlying implementations have to use the given <code>InputStream</code>
- * and, parse its data and create a list of
+ * All parser, parsing various document formats, like Reuters, PubMed, etc. and create
+ * {@link org.knime.ext.textprocessing.data.Document} instances, have to implement this interface, to enable
+ * compatibility with classes using different parsers. The interface provides the method
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser#parse(InputStream)}. Underlying
+ * implementations have to use the given <code>InputStream</code> and, parse its data and create a list of
  * {@link org.knime.ext.textprocessing.data.Document}s which is then returned.
  *
  * @author Kilian Thiel, University of Konstanz
@@ -49,9 +46,8 @@ import org.knime.ext.textprocessing.data.DocumentType;
 public interface DocumentParser {
 
     /**
-     * Parses the data of the given <code>InputStream</code> and creates
-     * instances of {@link org.knime.ext.textprocessing.data.Document}s, which
-     * are finally returned as a list.
+     * Parses the data of the given <code>InputStream</code> and creates instances of
+     * {@link org.knime.ext.textprocessing.data.Document}s, which are finally returned as a list.
      *
      * @param is the <code>InputStream</code> providing the data to parse.
      * @return A list of documents parsed out of the input stream's data.
@@ -59,40 +55,39 @@ public interface DocumentParser {
      */
     @Deprecated
     public List<Document> parse(final InputStream is) throws Exception;
-    
+
     /**
-     * Parses the data of the given <code>InputStream</code> and creates
-     * instances of {@link org.knime.ext.textprocessing.data.Document}s after 
-     * each parsed document all {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
-     * are notified.
+     * Parses the data of the given <code>InputStream</code> and creates instances of
+     * {@link org.knime.ext.textprocessing.data.Document}s after each parsed document all
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener} are notified.
      *
      * @param is the <code>InputStream</code> providing the data to parse.
      * @throws Exception If something is not working properly.
      */
     public void parseDocument(final InputStream is) throws Exception;
-    
-    /**
-     * Adds the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
-     * from the list of listeners. 
-     * @param listener Listener to add.
-     */
-    public void addDocumentParsedListener(
-            final DocumentParsedEventListener listener);
-    
-    /**
-     * Removes the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
-     * from the list of listeners. 
-     * @param listener Listener to remove.
-     */
-    public void removeDocumentParsedListener(
-            final DocumentParsedEventListener listener);
 
     /**
-     * Removes all {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener}
-     * from the list of listeners. 
-     */    
+     * Adds the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener} from the list
+     * of listeners.
+     *
+     * @param listener Listener to add.
+     */
+    public void addDocumentParsedListener(final DocumentParsedEventListener listener);
+
+    /**
+     * Removes the given {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener} from the
+     * list of listeners.
+     *
+     * @param listener Listener to remove.
+     */
+    public void removeDocumentParsedListener(final DocumentParsedEventListener listener);
+
+    /**
+     * Removes all {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener} from the list of
+     * listeners.
+     */
     public void removeAllDocumentParsedListener();
-    
+
     /**
      * Cleans list of parsed documents.
      */

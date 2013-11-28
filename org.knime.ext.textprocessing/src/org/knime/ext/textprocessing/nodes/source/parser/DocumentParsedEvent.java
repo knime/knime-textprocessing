@@ -44,7 +44,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   03.11.2011 (thiel): created
  */
@@ -53,24 +53,37 @@ package org.knime.ext.textprocessing.nodes.source.parser;
 import org.knime.ext.textprocessing.data.Document;
 
 /**
- * 
+ * Event indicating that a document has been parsed. The event contains the parsed document as well as the parser that
+ * parsed the document.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentParsedEvent {
 
-    private Document m_doc;
-    
-    private DocumentParser m_parser;
-    
+    private final Document m_doc;
+
+    private final DocumentParser m_parser;
+
+    /**
+     * Constructor for class {@link DocumentParsedEvent} with parsed document and parser that parsed tha document.
+     * @param d The parsed document.
+     * @param parser Parser that parsed the document.
+     */
     public DocumentParsedEvent(final Document d, final DocumentParser parser) {
         m_doc = d;
         m_parser = parser;
     }
-    
+
+    /**
+     * @return The parsed document.
+     */
     public Document getDocument() {
         return m_doc;
     }
-    
+
+    /**
+     * @return The parser that parsed the document.
+     */
     public DocumentParser getSource() {
         return m_parser;
     }
