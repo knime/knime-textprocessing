@@ -660,7 +660,8 @@ public final class TermDocumentDeSerializationUtil {
     public static void fastSerializeTerm(final Term term, final DataOutput out) throws IOException {
         try {
             out.writeShort(TERM_SERIALIZATION_VERSION);
-            boolean isComplex = term.getWords().size() != 1 && term.getTags().isEmpty();
+            // term is complex if it consists of more than 1 words or if it has tags assigned
+            final boolean isComplex = term.getWords().size() != 1 || !term.getTags().isEmpty();
             out.writeBoolean(isComplex);
             out.writeBoolean(term.isUnmodifiable());
             out.writeInt(term.hashCode());

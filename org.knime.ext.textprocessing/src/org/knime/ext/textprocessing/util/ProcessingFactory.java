@@ -44,7 +44,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   10.11.2011 (thiel): created
  */
@@ -56,13 +56,15 @@ import org.knime.ext.textprocessing.nodes.preprocessing.RowPreprocessor;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated is not used to create default preprocessors anymore.
  */
+@Deprecated
 public final class ProcessingFactory {
 
     private ProcessingFactory() { /* empty */ }
-    
+
     /**
      * @return The specified processing policy.
      */

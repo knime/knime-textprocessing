@@ -53,7 +53,10 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
     /** Preference key for the usage of backwards compatibility. */
     public static final String PREF_DML_DESERIALIZATION = "knime.textprocessing.dmldeserialization";
 
-    /** Preference key for the usage of row preprocessing. */
+    /** Preference key for the usage of row preprocessing.
+     * @deprecated setting is not used anymore.
+     * */
+    @Deprecated
     public static final String PREF_ROW_PREPROCESSING = "knime.textprocessing.rowpreprocessing";
 
     /** Preference key for the tokenizer pool size. */
@@ -93,7 +96,9 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      * Returns true if row preprocessing has to be applied.
      *
      * @return the preprocessing policy
+     * @deprecated setting is not used anymore.
      */
+    @Deprecated
     public static boolean useRowPreprocessing() {
         final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
         if (!pStore.contains(PREF_ROW_PREPROCESSING)) {

@@ -52,8 +52,6 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 
     private BooleanFieldEditor m_useDmlDeserialization;
 
-    private BooleanFieldEditor m_useRowPreprocessing;
-
     private IntegerFieldEditor m_tokenizerPoolSize;
 
     private BooleanFieldEditor m_initTokenizerPoolOnStartup;
@@ -74,12 +72,12 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
       + "Uncheck to speed up processing. If workflows containing older "
       + " nodes\nare loaded once, option can be unchecked.";
 
-    private static final String DESC_PREPROCESSING =
-        "If checked, nodes of the \"Preprocessing\" category process data "
-      + "in memory. Large sets of\ndocuments may not fit into memory and "
-      + "thus can not be processed. Uncheck if documents\ndo not fit into "
-      + "memory. Note that unchecking slows down processing significantly. "
-      + "\nCheck to speed up processing.";
+//    private static final String DESC_PREPROCESSING =
+//        "If checked, nodes of the \"Preprocessing\" category process data "
+//      + "in memory. Large sets of\ndocuments may not fit into memory and "
+//      + "thus can not be processed. Uncheck if documents\ndo not fit into "
+//      + "memory. Note that unchecking slows down processing significantly. "
+//      + "\nCheck to speed up processing.";
 
     private static final String DESC_TOKENIZER_POOLSIZE =
         "The maximal number of tokenizers which can be used concurrently. "
@@ -129,23 +127,6 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         tokenizationGrp.setLayoutData(getGridData());
         tokenizationGrp.setLayout(getLayout());
 
-        // Row preprocessing
-        final Group preprocessingGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
-        preprocessingGrp.setText("Preprocessing:");
-
-        m_useRowPreprocessing =
-            new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_ROW_PREPROCESSING,
-                "Process preprocessing nodes in memory.", preprocessingGrp);
-        m_useRowPreprocessing.setPage(this);
-        m_useRowPreprocessing.setPreferenceStore(getPreferenceStore());
-        m_useRowPreprocessing.load();
-
-        final Label lPrepro = new Label(preprocessingGrp, SWT.LEFT | SWT.WRAP);
-        lPrepro.setText(DESC_PREPROCESSING);
-
-        preprocessingGrp.setLayoutData(getGridData());
-        preprocessingGrp.setLayout(getLayout());
-
         // Dml deserialization setting
         final Group serializationGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
         serializationGrp.setText("Serialization:");
@@ -191,7 +172,6 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
     @Override
     protected void performDefaults() {
         m_useDmlDeserialization.loadDefault();
-        m_useRowPreprocessing.loadDefault();
         m_tokenizerPoolSize.loadDefault();
         m_initTokenizerPoolOnStartup.loadDefault();
         super.performDefaults();
@@ -203,7 +183,6 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
     @Override
     public boolean performOk() {
         m_useDmlDeserialization.store();
-        m_useRowPreprocessing.store();
         m_tokenizerPoolSize.store();
         m_initTokenizerPoolOnStartup.store();
 

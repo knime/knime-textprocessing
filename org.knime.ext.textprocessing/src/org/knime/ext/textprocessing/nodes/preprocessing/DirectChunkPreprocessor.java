@@ -45,11 +45,15 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 23.10.2013 by Kilian Thiel
+ * Created on 28.11.2013 by Kilian Thiel
  */
 
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -61,46 +65,42 @@ import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentChunk;
 
 /**
- * Provides a row by row preprocessing strategy on a data table of documents (not a bag of words as the
- * {@link RowPreprocessor}). This preprocessor applies only deep preprocessing of documents and thus does not require
- * and create a bag of words.
+ * Provides a chunk preprocessor strategy based on document lists. For each document of the input data table a chunk
+ * is created which can be preprocessed by a concrete {@link ChunkPreprocessing} instance.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-public final class DocumentPreprocessor extends AbstractPreprocessor {
+public final class DirectChunkPreprocessor extends AbstractPreprocessor {
 
     private AtomicInteger m_currRow;
 
     private int m_noRows = 0;
 
-    private TermPreprocessing m_termPreprocessing = null;
-
-    /**
-     * Empty constructor of {@link DocumentPreprocessor}.
-     */
-    public DocumentPreprocessor() {
-        super();
-    }
+    private ChunkPreprocessing m_chunkPreprocessing = null;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void checkPreprocessing() throws InvalidSettingsException {
-        if (!TermPreprocessing.class.isInstance(m_preprocessing)) {
-            throw new InvalidSettingsException("This preprocessing can not be applied on list of documents.");
+        if (!ChunkPreprocessing.class.isInstance(m_preprocessing)) {
+            throw new InvalidSettingsException("This preprocessing can not be applied on this data table.");
         }
-        m_termPreprocessing = (TermPreprocessing)m_preprocessing;
+        m_chunkPreprocessing = (ChunkPreprocessing)m_preprocessing;
     }
 
     /**
-     * Creates the data table spec of the data table created by the {@link DocumentPreprocessor}.
+     * Creates the data table spec of the data table created by the {@link DirectChunkPreprocessor}.
      * @return The created data table spec.
      */
     private DataTableSpec createDataTableSpec() {
@@ -120,7 +120,7 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
      */
     @Override
     protected BufferedDataTable applyPreprocessing(final BufferedDataTable inData, final ExecutionContext exec)
-        throws Exception {
+            throws Exception {
         // check deep preprocessing
         if (!m_deepPreprocessing) {
             throw new IllegalStateException("Deep preprocessing must be enabled to apply document preprocessing.");
@@ -139,15 +139,33 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
             setProgress();
 
             final DataRow row = i.next();
-            final RowKey rk = row.getKey();
-            final DataCell documentCell = row.getCell(m_documentColIndex);
-            final DataCell origDocumentCell = row.getCell(m_origDocumentColIndex);
 
-            // apply preprocessing
-            final DataCell preprocessedDocumentCell = deepPreprocessing(documentCell);
+            // check missing values
+            if (row.getCell(m_documentColIndex).isMissing()) {
+                continue;
+            }
 
-            // add row to data container
-            m_dc.addRowToTable(createDataRow(rk, preprocessedDocumentCell, origDocumentCell));
+            final DataCell origDocCell = row.getCell(m_documentColIndex);
+            final Document doc = ((DocumentValue)origDocCell).getDocument();
+
+            // create chunk of current document
+            final Set<Term> terms = new HashSet<Term>();
+            final Iterator<Sentence> si = doc.sentenceIterator();
+            while (si.hasNext()) {
+                final Sentence s = si.next();
+                for (final Term term : s.getTerms()) {
+                    // add only terms to preprocess that are not unmodifieable or flag is set true
+                    if (!term.isUnmodifiable() || m_preprocessUnmodifiable) {
+                        terms.add(term);
+                    }
+                }
+            }
+
+            // process chunk and add new rows to data table with existing key
+            final DataCell preprocessedDocCell = processChunk(new DocumentChunk(doc, terms), origDocCell);
+
+            // add new row to data container
+            m_dc.addRowToTable(createDataRow(row.getKey(), preprocessedDocCell, origDocCell));
         }
 
         m_dc.close();
@@ -155,31 +173,24 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
     }
 
     /**
-     * Sets progress to execution context.
-     */
-    private void setProgress() {
-        int curr = m_currRow.incrementAndGet();
-        double prog = curr / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocessing row " + curr + " of " + m_noRows);
-    }
-
-    /**
-     * Applies deep preprocesing to document contained in given data cell.
+     * Processes chunk by using corresponding {@link ChunkPreprocessing} to create term mapping and deep preprocess
+     * document assigned to chunk. Finally a new data cell is create and returned. If deep preprocessing flag is set
+     * {@code false} document is not preprocessed and original cell is returend.
      *
-     * @param docCell The cell containing the document to preprocess.
-     * @return A new data cell containing the preprocessed document.
+     * @param chunk Chunk of document and contained term to preprocess.
+     * @param origDocCell The cell containing the original document.
+     * @return A new cell containing the preprocessed document, or the original cell in case deep preprocessing flag is
+     *         set {@code false}.
      */
-    private DataCell deepPreprocessing(final DataCell docCell) {
-        if (!docCell.getType().isCompatible(DocumentValue.class)) {
-            throw new IllegalArgumentException("DataCell is not compaitle with DocumentValue!");
+    private DataCell processChunk(final DocumentChunk chunk, final DataCell origDocCell) {
+        final Hashtable<Term, Term> termMapping = m_chunkPreprocessing.preprocessChunk(chunk);
+
+        if (m_deepPreprocessing && termMapping != null) {
+            return m_docCellFac.createDataCell(PreprocessingUtils.deepPPWithTermMapping(chunk.getDocument(),
+                termMapping, m_preprocessUnmodifiable));
         }
 
-        if (m_deepPreprocessing && !docCell.isMissing()) {
-            return m_docCellFac.createDataCell(PreprocessingUtils.deepPPWithPreprocessing(
-                ((DocumentValue)docCell).getDocument(), m_termPreprocessing, m_preprocessUnmodifiable));
-        }
-
-        return docCell;
+        return origDocCell;
     }
 
     /**
@@ -191,14 +202,23 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
      * @param origDoc The original document to add.
      * @return The create data row with row key and documents.
      */
-    private DataRow createDataRow(final RowKey rk, final DataCell preprocessedDoc, final DataCell origDoc) {
+    private DataRow createDataRow(final RowKey rk, final DataCell preprocessedDocCell, final DataCell origDocCell) {
         final DataRow row;
         if (m_appendIncomingDocument) {
-            row = new DefaultRow(rk, preprocessedDoc, origDoc);
+            row = new DefaultRow(rk, preprocessedDocCell, origDocCell);
         } else {
-            row = new DefaultRow(rk, preprocessedDoc);
+            row = new DefaultRow(rk, preprocessedDocCell);
         }
         return row;
+    }
+
+    /**
+     * Sets progress to execution context.
+     */
+    private void setProgress() {
+        final int curr = m_currRow.incrementAndGet();
+        final double prog = curr / (double)m_noRows;
+        m_exec.setProgress(prog, "Preprocessing row " + curr + " of " + m_noRows);
     }
 
     /**
@@ -216,7 +236,7 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
     @Override
     public void validateSettings(final int documentColIndex, final int origDocumentColIndex, final int termColIndex,
         final boolean deepPrepro, final boolean appendOrigDoc, final boolean preproUnmodifiable)
-                throws InvalidSettingsException {
+        throws InvalidSettingsException {
         if (documentColIndex < 0) {
             throw new InvalidSettingsException("Index of document column [" + documentColIndex + "] is not valid!");
         }
@@ -234,8 +254,8 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
      */
     @Override
     public DataTableSpec createDataTableSpec(final boolean appendIncomingDocument) {
-        final DataColumnSpecCreator docs = new DataColumnSpecCreator(BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME,
-            m_docCellFac.getDataType());
+        final DataColumnSpecCreator docs =
+            new DataColumnSpecCreator(BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, m_docCellFac.getDataType());
         final DataColumnSpecCreator origDoc =
             new DataColumnSpecCreator(BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME, m_docCellFac.getDataType());
 

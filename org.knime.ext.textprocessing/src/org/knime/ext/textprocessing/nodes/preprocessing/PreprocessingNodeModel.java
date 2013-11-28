@@ -35,7 +35,6 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.ProcessingFactory;
 
@@ -90,23 +89,21 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      */
     public static final boolean DEF_APPEND_INCOMING = true;
 
-
-
     private int m_documentColIndex = -1;
 
     private int m_origDocumentColIndex = -1;
 
     private int m_termColIndex = -1;
 
-    private SettingsModelBoolean m_deepPreproModel;
+    private SettingsModelBoolean m_deepPreproModel = PreprocessingNodeSettingsPane.getDeepPrepressingModel();
 
-    private SettingsModelBoolean m_appendIncomingModel;
+    private SettingsModelBoolean m_appendIncomingModel = PreprocessingNodeSettingsPane.getAppendIncomingDocument();
 
-    private SettingsModelString m_documentColModel;
+    private SettingsModelString m_documentColModel = PreprocessingNodeSettingsPane.getDocumentColumnModel();
 
-    private SettingsModelString m_origDocumentColModel;
+    private SettingsModelString m_origDocumentColModel = PreprocessingNodeSettingsPane.getOrigDocumentColumnModel();
 
-    private SettingsModelBoolean m_preproUnModifiable;
+    private SettingsModelBoolean m_preproUnModifiable = PreprocessingNodeSettingsPane.getPreprocessUnmodifiableModel();
 
     /**
      * The <code>Preprocessing</code> instance to use for term preprocessing.
@@ -116,48 +113,55 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     /**
      * The preprocessor to use.
      */
-    protected AbstractPreprocessor m_preprocessor;
-
-    private BagOfWordsDataTableBuilder m_fac;
+    private AbstractPreprocessor m_preprocessor;
 
     /**
-     * The constructor of <code>PreprocessingNodeModel</code>.
-     * The <code>RowPreprocessor</code> is used by default.
+     * The constructor of {@link PreprocessingNodeModel} creatin one in port and one out port.
      */
     public PreprocessingNodeModel() {
-        this(ProcessingFactory.getPrecessing());
+        super(1, 1);
     }
 
     /**
-     * The constructor of <code>PreprocessingNodeModel</code> with the specified
-     * preprocessor to use.
+     * The constructor of <code>PreprocessingNodeModel</code> with the specified preprocessor to use.
+     *
      * @param preprocessor The preprocessor to use.
+     * @deprecated use {@link PreprocessingNodeModel#PreprocessingNodeModel()} instead and overwrite
+     *             {@link PreprocessingNodeModel#getPreprocessorForBowPP()} and
+     *             {@link PreprocessingNodeModel#getPreprocessorForDirectPP()} to specify certain preprocessors if
+     *             needed.
      */
+    @Deprecated
     public PreprocessingNodeModel(final AbstractPreprocessor preprocessor) {
         this(1, preprocessor);
     }
 
     /**
-     * The constructor of <code>PreprocessingNodeModel</code>.
-     * The <code>RowPreprocessor</code> is used by default. If
-     * you use this constructor, be aware that the in port at index 0 is
-     * preserved as in port for the bag of words data table.
+     * Constructor of {@link PreprocessingNodeModel} with given inports to set. Ifyou use this constructor, be aware
+     * that the in port at index 0 is preserved as in port for the bag of words data table.
+     *
      * @param inPorts The number of in ports.
      * @since 2.6
      */
     public PreprocessingNodeModel(final int inPorts) {
-        this(inPorts, ProcessingFactory.getPrecessing());
+        super(inPorts, 1);
+        initSettingsListener();
     }
 
     /**
-     * The constructor of <code>PreprocessingNodeModel</code> with the specified
-     * preprocessor to use and the specified number of in ports. If
-     * you use this constructor, be aware that the in port at index 0 is
-     * preserved as in port for the bag of words data table.
+     * The constructor of <code>PreprocessingNodeModel</code> with the specified preprocessor to use and the specified
+     * number of in ports. If you use this constructor, be aware that the in port at index 0 is preserved as in port for
+     * the bag of words data table.
+     *
      * @param inPorts The number of in ports.
      * @param preprocessor The preprocessor to use.
      * @since 2.6
+     * @deprecated use {@link PreprocessingNodeModel#PreprocessingNodeModel(int)} instead and overwrite
+     *             {@link PreprocessingNodeModel#getPreprocessorForBowPP()} and
+     *             {@link PreprocessingNodeModel#getPreprocessorForDirectPP()} to specify certain preprocessors if
+     *             needed.
      */
+    @Deprecated
     public PreprocessingNodeModel(final int inPorts, final AbstractPreprocessor preprocessor) {
         super(inPorts, 1);
 
@@ -166,26 +170,20 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         } else {
             m_preprocessor = preprocessor;
         }
-        m_fac = new BagOfWordsDataTableBuilder();
 
-        m_deepPreproModel =
-            PreprocessingNodeSettingsPane.getDeepPrepressingModel();
-        m_appendIncomingModel =
-            PreprocessingNodeSettingsPane.getAppendIncomingDocument();
-        m_documentColModel =
-            PreprocessingNodeSettingsPane.getDocumentColumnModel();
-        m_origDocumentColModel =
-            PreprocessingNodeSettingsPane.getOrigDocumentColumnModel();
-        m_preproUnModifiable =
-            PreprocessingNodeSettingsPane.getPreprocessUnmodifiableModel();
+        initSettingsListener();
+    }
 
-        ChangeListener cl1 = new DefaultSwitchEventListener(m_documentColModel,
-                m_deepPreproModel);
+
+    /**
+     * Initializes settings listener to enable or disable column selection if deep preprocessing is on or off.
+     */
+    private final void initSettingsListener() {
+        ChangeListener cl1 = new DefaultSwitchEventListener(m_documentColModel, m_deepPreproModel);
         m_deepPreproModel.addChangeListener(cl1);
         cl1.stateChanged(null);
 
-        ChangeListener cl2 = new DefaultSwitchEventListener(
-                m_origDocumentColModel, m_appendIncomingModel);
+        ChangeListener cl2 = new DefaultSwitchEventListener(m_origDocumentColModel, m_appendIncomingModel);
         m_appendIncomingModel.addChangeListener(cl2);
         cl2.stateChanged(null);
     }
@@ -211,6 +209,27 @@ public abstract class PreprocessingNodeModel extends NodeModel {
     }
 
     /**
+     * Creates and returns a {@link RowPreprocessor} as default for preprocessing of bag of words. In order to
+     * specify an other preprocessor this method has to be overwritten.
+     * @return a {@link RowPreprocessor} as default for preprocessing of bag of words.
+     * @since 2.9
+     */
+    protected AbstractPreprocessor getPreprocessorForBowPP() {
+        return new RowPreprocessor();
+    }
+
+    /**
+     * Creates and returns a {@link DocumentPreprocessor} as default for direct preprocessing of document lists. In
+     * order to specify an other preprocessor this method has to be overwritten. If the underlying preprocessing
+     * strategy is not applicable for direct preprocessing {@code null} should be returned.
+     * @return a {@link DocumentPreprocessor} as default for direct preprocessing of document lists.
+     * @since 2.9
+     */
+    protected AbstractPreprocessor getPreprocessorForDirectPP() {
+        return new DocumentPreprocessor();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -219,9 +238,13 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         checkDataTableSpec(inSpecs[0]);
         internalConfigure(inSpecs);
 
-        // if spec contains no term column switch to DocumentPreprocessor
+        // if spec contains no term column switch to direct preprocessing (preprocessing on document lists)
         if (m_termColIndex < 0) {
-            m_preprocessor = new DocumentPreprocessor();
+            m_preprocessor = getPreprocessorForDirectPP();
+            if (m_preprocessor == null) {
+                throw new IllegalStateException("Preprocessing can not be applied directly on a document list. "
+                    + "It has to be aplpied on a bag of words.");
+            }
 
             // not all preprocessing strategies can be applied on a list of documents via DocumentPreprocessor, thus a
             // check is necessary. Therefore the preprocessing needs to be created, which is done during
@@ -231,12 +254,19 @@ public abstract class PreprocessingNodeModel extends NodeModel {
             m_preprocessor.initialize(m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
                 m_deepPreproModel.getBooleanValue(), m_appendIncomingModel.getBooleanValue(),
                 m_preproUnModifiable.getBooleanValue(), m_preprocessing);
+
+        // if spec contains term column switch to regular bag of word preprocessing
+        } else {
+            m_preprocessor = getPreprocessorForBowPP();
+            if (m_preprocessor == null) {
+                throw new IllegalStateException("Preprocessing can not be applied on a bag of words.");
+            }
         }
 
         // preprocessor needs to check if it can work on data table with given spec.
         m_preprocessor.validateDataTableSpec(inSpecs[0]);
 
-        // preprocessor need to check if it can work with specified settings
+        // preprocessor needs to check if it can work with specified settings
         m_preprocessor.validateSettings(m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
             m_deepPreproModel.getBooleanValue(), m_appendIncomingModel.getBooleanValue(),
             m_preproUnModifiable.getBooleanValue());
@@ -303,12 +333,12 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         // initialize the underlying preprocessing
         initPreprocessing();
         if (m_preprocessing == null) {
-            throw new NullPointerException("Preprocessing instance may not be null!");
+            throw new IllegalStateException("Preprocessing instance has not been initialized!");
         }
 
         // initialize the underlying preprocessor
         if (m_preprocessor == null) {
-            throw new NullPointerException("Preprocessor instance may not be null!");
+            throw new IllegalStateException("Preprocessor instance has not been initialized!");
         }
         m_preprocessor.initialize(m_documentColIndex, m_origDocumentColIndex, m_termColIndex,
             m_deepPreproModel.getBooleanValue(), m_appendIncomingModel.getBooleanValue(),

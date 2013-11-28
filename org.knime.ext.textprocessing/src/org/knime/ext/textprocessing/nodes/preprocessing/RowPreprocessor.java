@@ -40,11 +40,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.data.Paragraph;
-import org.knime.ext.textprocessing.data.Section;
-import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
@@ -90,25 +86,23 @@ public class RowPreprocessor extends AbstractPreprocessor {
      * {@inheritDoc}
      */
     @Override
-    public BufferedDataTable applyPreprocessing(
-            final BufferedDataTable inData, final ExecutionContext exec)
-    throws Exception {
+    public BufferedDataTable applyPreprocessing(final BufferedDataTable inData, final ExecutionContext exec)
+        throws Exception {
         m_currRow = new AtomicInteger(0);
         m_noRows = inData.getRowCount();
         m_exec = exec;
         m_docCellFac.prepare(m_exec);
 
-        m_dc = exec.createDataContainer(m_fac.createDataTableSpec(
-                m_appendIncomingDocument));
+        m_dc = exec.createDataContainer(m_fac.createDataTableSpec(m_appendIncomingDocument));
         // create hash map with appropriate size
         m_preprocessedDocuments = new HashMap<UUID, DataCell>(m_noRows);
         // size is not known before hand but minimum number of documents
         m_addedRows = new HashMap<DataCell, Set<Term>>(m_noRows);
 
-        RowIterator i = inData.iterator();
+        final RowIterator i = inData.iterator();
         while (i.hasNext()) {
             exec.checkCanceled();
-            DataRow row = i.next();
+            final DataRow row = i.next();
 
             setProgress();
             processRow(row);
@@ -120,10 +114,9 @@ public class RowPreprocessor extends AbstractPreprocessor {
     }
 
     private void setProgress() {
-        int curr = m_currRow.incrementAndGet();
-        double prog = (double)curr / (double)m_noRows;
-        m_exec.setProgress(prog, "Preprocessing row " + curr + " of "
-                        + m_noRows);
+        final int curr = m_currRow.incrementAndGet();
+        final double prog = (double)curr / (double)m_noRows;
+        m_exec.setProgress(prog, "Preprocessing row " + curr + " of " + m_noRows);
     }
 
     /**
@@ -132,10 +125,10 @@ public class RowPreprocessor extends AbstractPreprocessor {
      */
     private void processRow(final DataRow row) {
         DataCell newDocCell = null;
-        RowKey rowKey = row.getKey();
-        DataCell termcell = row.getCell(m_termColIndex);
-        DataCell doccell = row.getCell(m_documentColIndex);
-        DataCell origDocCell = row.getCell(m_origDocumentColIndex);
+        final RowKey rowKey = row.getKey();
+        final DataCell termcell = row.getCell(m_termColIndex);
+        final DataCell doccell = row.getCell(m_documentColIndex);
+        final DataCell origDocCell = row.getCell(m_origDocumentColIndex);
 
         // handle missing value (ignore rows with missing values)
         if (termcell.isMissing() || doccell.isMissing()) {
@@ -143,9 +136,6 @@ public class RowPreprocessor extends AbstractPreprocessor {
         }
         Term term = ((TermValue)termcell).getTermValue();
 
-        //
-        // do the preprocessing twist
-        //
         // is the term unmodifiable ???
         if (!term.isUnmodifiable() || m_preprocessUnmodifiable) {
             term = m_termPreprocessing.preprocessTerm(term);
@@ -157,34 +147,15 @@ public class RowPreprocessor extends AbstractPreprocessor {
         }
         // do we have to preprocess the documents itself too ?
         if (m_deepPreprocessing) {
-            Document doc = ((DocumentValue)doccell).getDocument();
+            final Document doc = ((DocumentValue)doccell).getDocument();
             newDocCell = m_preprocessedDocuments.get(doc.getUUID());
 
             // deep-preprocess only if document has not been preprocessed yet
             // (is not in cache m_preprocessedDocuments)
             if (newDocCell == null) {
-                // preprocess doc here !!!
-                DocumentBuilder builder = new DocumentBuilder(doc);
-                for (Section s : doc.getSections()) {
-                    for (Paragraph p : s.getParagraphs()) {
-                        for (Sentence sen : p.getSentences()) {
-                            for (Term t : sen.getTerms()) {
-                                if (!t.isUnmodifiable()
-                                        || m_preprocessUnmodifiable) {
-                                    t = m_termPreprocessing.preprocessTerm(t);
-                                }
-                                if (t != null && t.getText().length() > 0) {
-                                    builder.addTerm(t);
-                                }
-                            }
-                            builder.createNewSentence();
-                        }
-                        builder.createNewParagraph();
-                    }
-                    builder.createNewSection(s.getAnnotation());
-                }
-                Document newDoc = builder.createDocument();
-                newDocCell = m_docCellFac.createDataCell(newDoc);
+                newDocCell =
+                    m_docCellFac.createDataCell(PreprocessingUtils.deepPPWithPreprocessing(doc, m_termPreprocessing,
+                        m_preprocessUnmodifiable));
                 m_preprocessedDocuments.put(doc.getUUID(), newDocCell);
             }
         } else {
@@ -194,14 +165,13 @@ public class RowPreprocessor extends AbstractPreprocessor {
         addRowToContainer(rowKey, term, newDocCell, origDocCell);
     }
 
-    private synchronized void addRowToContainer(final RowKey rk, final Term t,
-            final DataCell preprocessedDoc, final DataCell origDoc) {
+    private synchronized void addRowToContainer(final RowKey rk, final Term t, final DataCell preprocessedDoc,
+        final DataCell origDoc) {
         Set<Term> terms = m_addedRows.get(preprocessedDoc);
         if (terms == null) {
             terms = new HashSet<Term>();
         } else if (terms.contains(t)) {
-            // do not add row, since this preprocessed term has already been
-            // added.
+            // do not add row, since this preprocessed term has already been added.
             return;
         }
         // if term has not been added, memorize it
@@ -209,13 +179,11 @@ public class RowPreprocessor extends AbstractPreprocessor {
         m_addedRows.put(preprocessedDoc, terms);
 
         // add row with or without unchanged document.
-        DataRow row;
+        final DataRow row;
         if (m_appendIncomingDocument) {
-            row = new DefaultRow(rk, m_termCellFac.createDataCell(t),
-                    preprocessedDoc, origDoc);
+            row = new DefaultRow(rk, m_termCellFac.createDataCell(t), preprocessedDoc, origDoc);
         } else {
-            row = new DefaultRow(rk, m_termCellFac.createDataCell(t),
-                    preprocessedDoc);
+            row = new DefaultRow(rk, m_termCellFac.createDataCell(t), preprocessedDoc);
         }
         m_dc.addRowToTable(row);
     }
@@ -225,7 +193,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
      */
     @Override
     public void validateDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyMinimumTermCells(1, true);
     }

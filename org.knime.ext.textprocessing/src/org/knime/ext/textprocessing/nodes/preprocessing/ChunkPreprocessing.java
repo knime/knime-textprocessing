@@ -26,7 +26,6 @@
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import java.util.Hashtable;
-
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.util.DocumentChunk;
 
@@ -55,6 +54,5 @@ public interface ChunkPreprocessing extends Preprocessing {
      * @return A term-term mapping, which maps the input terms, contained in the
      * given chunk, onto output or preprocessed terms.
      */
-    public abstract Hashtable<Term, Term> preprocessChunk(
-            final DocumentChunk chunk);
+    public abstract Hashtable<Term, Term> preprocessChunk(final DocumentChunk chunk);
 }

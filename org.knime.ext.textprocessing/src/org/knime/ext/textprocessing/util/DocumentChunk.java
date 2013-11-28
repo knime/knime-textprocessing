@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,34 +19,33 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   24.09.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.util;
 
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.Term;
-
 import java.util.Collections;
 import java.util.Set;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.Term;
 
 /**
  * Bundles a document and a set of terms into a chunk. The data can not be
  * changed once the chunk has been created.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentChunk {
 
-    private Document m_doc;
-    
-    private Set<Term> m_terms;
-    
+    private final Document m_doc;
+
+    private final Set<Term> m_terms;
+
     /**
      * Creates a new instance of <code>DocumentChunk</code> with given document
      * and set of terms to set.
-     * 
+     *
      * @param doc The document to set.
      * @param terms The set of terms to set.
      */
@@ -54,14 +53,14 @@ public class DocumentChunk {
         m_doc = doc;
         m_terms = terms;
     }
-    
+
     /**
      * @return The document.
      */
     public Document getDocument() {
         return m_doc;
     }
-    
+
     /**
      * @return The set of terms.
      */

@@ -7,7 +7,7 @@
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License, version 2, as 
+ *  it under the terms of the GNU General Public License, version 2, as
  *  published by the Free Software Foundation.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -19,23 +19,24 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   24.09.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.termgrouper;
 
+import java.io.File;
+import java.io.IOException;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor;
 import org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessor;
+import org.knime.ext.textprocessing.nodes.preprocessing.DirectChunkPreprocessor;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
-
-import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -48,25 +49,44 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
      * The default tag grouping policy.
      */
     public static final String DEFAULT_POLICY = TermGrouper.DELETE_ALL;
-    
-    private SettingsModelString m_tagGroupingPolicyModel = 
+
+    private SettingsModelString m_tagGroupingPolicyModel =
         TermGrouperNodeDialog.getTagGroupingPolicyModel();
-    
+
     /**
      * Creates new instance of <code>TermGrouperNodeModel</code> with a
      * <code>ChunkPreprocessor</code>.
      */
     public TermGrouperNodeModel() {
-        super(new ChunkPreprocessor());
+        super();
     }
-    
+
+    /**
+     * Creates and returns a new instance of {@link ChunkPreprocessor}.
+     * @return a new instance of {@link ChunkPreprocessor}.
+     * @since 2.9
+     */
+    @Override
+    protected AbstractPreprocessor getPreprocessorForBowPP() {
+        return new ChunkPreprocessor();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link DirectChunkPreprocessor}.
+     * @return a new instance of {@link DirectChunkPreprocessor}.
+     * @since 2.9
+     */
+    @Override
+    protected AbstractPreprocessor getPreprocessorForDirectPP() {
+        return new DirectChunkPreprocessor();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initPreprocessing() {
-        m_preprocessing = new TermGrouper(
-                m_tagGroupingPolicyModel.getStringValue());
+        m_preprocessing = new TermGrouper(m_tagGroupingPolicyModel.getStringValue());
     }
 
     /**
@@ -78,7 +98,7 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
         super.loadValidatedSettingsFrom(settings);
         m_tagGroupingPolicyModel.loadSettingsFrom(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -87,7 +107,7 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
         super.saveSettingsTo(settings);
         m_tagGroupingPolicyModel.saveSettingsTo(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -97,7 +117,7 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
         super.validateSettings(settings);
         m_tagGroupingPolicyModel.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -110,7 +130,7 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
     throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -120,7 +140,7 @@ public class TermGrouperNodeModel extends PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
     throws IOException, CanceledExecutionException {
         // Nothing to do ...
