@@ -288,7 +288,9 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
@@ -322,7 +324,8 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
+    {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(PUBMEDARTICLE)) {
@@ -651,7 +654,8 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
          * {@inheritDoc}
          */
         @Override
-        public InputSource resolveEntity(final String publicId, final String systemId) throws IOException, SAXException {
+        public InputSource resolveEntity(final String publicId, final String systemId)
+                throws IOException, SAXException {
             final TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
             String path = plugin.getPluginRootPath();
 

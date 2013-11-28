@@ -31,8 +31,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -40,12 +43,14 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
@@ -55,9 +60,16 @@ import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 /**
  * The model for all {@link org.knime.ext.textprocessing.data.Document} parser nodes, no matter what format they parse.
  * The factory provides them with the right {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser}
- * instance they use to parse the specified files.
+ * instance to use for parsing the files with the specified file extensions in the specified directory. <br/>
+ * All files partitioned into several chunks of files. The chunks of files are then parsed concurrently the worker
+ * threads of the KNIME thread pool. For each thread a new concrete {@link DocumentParser} instance is created using the
+ * specified {@link DocumentParserFactory}.
  *
  * @author Kilian Thiel, University of Konstanz
+ */
+/**
+ *
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  */
 public class DocumentParserNodeModel extends NodeModel {
 
@@ -115,27 +127,28 @@ public class DocumentParserNodeModel extends NodeModel {
 
     private boolean m_withCharset = false;
 
-    private final DocumentParser m_parser;
+    private final DocumentParserFactory m_parserFactory;
 
     private final List<String> m_validExtensions;
 
     private final DocumentDataTableBuilder m_dtBuilder;
 
     /**
-     * Creates a new instance of <code>DocumentParserNodeModel</code> with the specified parser to use and the valid
-     * extensions of files to parse.
+     * Creates a new instance of <code>DocumentParserNodeModel</code> with the specified parser factory to create the
+     * parser to use, and the valid extensions of files to parse.
      *
-     * @param parser The parser to use.
+     * @param parserFac The factory creating the parser instances to use.
      * @param withCharset if <code>true</code> the character set of the character set model is handed to the parser in
      *            order to properly decode the text to parse, otherwise not. Be aware that if <code>true</code> is set
      *            the {@link org.knime.ext.textprocessing.nodes.source.parser.CharsetDocumentParserNodeDialog} needs to
      *            be used in order to enable the user to specify a certain encoding via the dialog.
      * @param validFileExtensions The valid extensions of files to parse.
+     * @since 2.9
      */
-    public DocumentParserNodeModel(final DocumentParser parser, final boolean withCharset,
+    public DocumentParserNodeModel(final DocumentParserFactory parserFac, final boolean withCharset,
         final String... validFileExtensions) {
         super(0, 1);
-        m_parser = parser;
+        m_parserFactory = parserFac;
         m_validExtensions = Arrays.asList(validFileExtensions);
         m_dtBuilder = new DocumentDataTableBuilder();
         m_withCharset = withCharset;
@@ -157,6 +170,35 @@ public class DocumentParserNodeModel extends NodeModel {
     }
 
     /**
+     * Creates and returns a new instance of {@link DocumentParser} using the {@link DocumentParserFactory}. Category,
+     * source, and type of the document are set to the parser.
+     *
+     * @return The new parser instance.
+     * @throws Exception If parser could not be created.
+     */
+    private final DocumentParser createParser() throws InstantiationException {
+        final DocumentParser parser = m_parserFactory.createParser();
+
+        final String category = m_categoryModel.getStringValue();
+        if (category != null && category.length() > 0) {
+            parser.setDocumentCategory(new DocumentCategory(category));
+        }
+        final String source = m_sourceModel.getStringValue();
+        if (source != null && source.length() > 0) {
+            parser.setDocumentSource(new DocumentSource(source));
+        }
+        final DocumentType type = DocumentType.valueOf(m_typeModel.getStringValue());
+        if (type != null) {
+            parser.setDocumentType(type);
+        }
+        if (m_withCharset) {
+            parser.setCharset(Charset.forName(m_charsetModel.getStringValue()));
+        }
+
+        return parser;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -165,58 +207,34 @@ public class DocumentParserNodeModel extends NodeModel {
         final File dir = new File(m_pathModel.getStringValue());
         final boolean recursive = m_recursiveModel.getBooleanValue();
         final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-        final String category = m_categoryModel.getStringValue();
-        if (category != null && category.length() > 0) {
-            m_parser.setDocumentCategory(new DocumentCategory(category));
-        }
-        final String source = m_sourceModel.getStringValue();
-        if (source != null && source.length() > 0) {
-            m_parser.setDocumentSource(new DocumentSource(source));
-        }
-        final DocumentType type = DocumentType.valueOf(m_typeModel.getStringValue());
-        if (type != null) {
-            m_parser.setDocumentType(type);
-        }
-        if (m_withCharset) {
-            m_parser.setCharset(Charset.forName(m_charsetModel.getStringValue()));
-        }
 
         final FileCollector fc = new FileCollector(dir, m_validExtensions, recursive, ignoreHiddenFiles);
         final List<File> files = fc.getFiles();
-        final int fileCount = files.size();
-        int currFile = 1;
+        final int numberOfFiles = files.size();
+
+        final int numberOfThreads = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
+        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
+        final Semaphore semaphore = new Semaphore(numberOfThreads);
+        final int chunkSize = numberOfFiles / numberOfThreads;
+        final AtomicInteger fileCount = new AtomicInteger(0);
 
         try {
             m_dtBuilder.openDataTable(exec);
+
+            List<File> chunk = new ArrayList<File>(chunkSize);
             for (final File f : files) {
-                final double progress = (double)currFile / (double)fileCount;
-                exec.setProgress(progress, "Parsing file " + currFile + " of " + fileCount);
-                exec.checkCanceled();
-
-                currFile++;
-                LOGGER.info("Parsing file: " + f.getAbsolutePath());
-
-                final InputStream is;
-                if (f.getName().toLowerCase().endsWith(".gz")) {
-                    is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(f)));
-                } else {
-                    is = new BufferedInputStream(new FileInputStream(f));
-                }
-                m_parser.setDocumentFilepath(f.getAbsolutePath());
-
-                try {
-                    // first remove all listeners in order to avoid that two or more listeners are registered,
-                    // adding the same document twice or more times.
-                    m_parser.removeAllDocumentParsedListener();
-                    m_parser.addDocumentParsedListener(new InternalDocumentParsedEventListener());
-                    m_parser.parseDocument(is);
-                } catch (Exception e) {
-                    LOGGER.error("Could not parse file: " + f.getAbsolutePath().toString());
-                    setWarningMessage("Could not parse all files properly!");
-                    throw e;
+                chunk.add(f);
+                if (chunk.size() >= chunkSize) {
+                    pool.enqueue(parseFiles(chunk, exec, semaphore, fileCount, numberOfFiles));
+                    chunk = new ArrayList<File>(chunkSize);
                 }
             }
-            m_parser.clean();
+            // process last chunk
+            if (chunk.size() > 0) {
+                pool.enqueue(parseFiles(chunk, exec, semaphore, fileCount, numberOfFiles));
+            }
+
+            pool.waitForTermination();
 
             return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
         } finally {
@@ -224,12 +242,87 @@ public class DocumentParserNodeModel extends NodeModel {
         }
     }
 
+    /**
+     * Creates and returns new anonymous {@link Runnable} instance that parses the given chunk of files.
+     * @param files The files to parse.
+     * @param exec The exection context.
+     * @param semaphore Semaphore to accquire.
+     * @param fileCount Count of parsed files.
+     * @param noFiles Number of files to parse in total, over all threads.
+     * @return new anonymous {@link Runnable} instance that parses given files.
+     * @throws CanceledExecutionException If execution was canceled.
+     */
+    private Runnable parseFiles(final List<File> files, final ExecutionContext exec, final Semaphore semaphore,
+        final AtomicInteger fileCount, final int noFiles) throws CanceledExecutionException {
+        exec.checkCanceled();
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    semaphore.acquire();
+
+                    final DocumentParser parser = createParser();
+
+                    for (final File f : files) {
+                        exec.checkCanceled();
+                        final int count = fileCount.incrementAndGet();
+                        final double progress = count / (double)noFiles;
+                        exec.setProgress(progress, "Parsing file " + count + " of " + noFiles + " ...");
+
+                        LOGGER.info("Parsing file: " + f.getAbsolutePath());
+
+                        InputStream is = null;
+                        try {
+                            if (f.getName().toLowerCase().endsWith(".gz")) {
+                                is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(f)));
+                            } else {
+                                is = new BufferedInputStream(new FileInputStream(f));
+                            }
+                            parser.setDocumentFilepath(f.getAbsolutePath());
+
+                            // first remove all listeners in order to avoid that two or more listeners are registered,
+                            // adding the same document twice or more times.
+                            parser.removeAllDocumentParsedListener();
+                            parser.addDocumentParsedListener(new InternalDocumentParsedEventListener());
+
+                            parser.parseDocument(is);
+                        } catch (Exception e) {
+                            LOGGER.error("Could not parse file: " + f.getAbsolutePath().toString());
+                            setWarningMessage("Could not parse all files properly!");
+                        } finally {
+                            if (is != null) {
+                                try {
+                                    is.close();
+                                } catch (IOException e) {
+                                    LOGGER.debug("Could not close input stream of file:"
+                                        + f.getAbsolutePath().toString());
+                                }
+                            }
+                        }
+                    }
+                    parser.clean();
+                } catch (InstantiationException e) {
+                    LOGGER.error("Parser instance could not be created.");
+                    setWarningMessage("Could not parse files!");
+                } catch (InterruptedException e) {
+                    LOGGER.warn("Parser thread was interrupted, could not parse all files.");
+                    setWarningMessage("Could not parse all files properly!");
+                } catch (CanceledExecutionException e) {
+                    // handled by main executor thread
+                } finally {
+                    semaphore.release();
+                }
+            }
+        };
+    }
+
     private class InternalDocumentParsedEventListener implements DocumentParsedEventListener {
         /**
          * {@inheritDoc}
          */
         @Override
-        public void documentParsed(final DocumentParsedEvent event) {
+        public synchronized void documentParsed(final DocumentParsedEvent event) {
             if (m_dtBuilder != null) {
                 final Document d = event.getDocument();
                 if (d != null) {
@@ -260,7 +353,6 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        m_parser.clean();
         try {
             m_dtBuilder.getAndCloseDataTable();
         } catch (Exception e) { /* Do noting just try */

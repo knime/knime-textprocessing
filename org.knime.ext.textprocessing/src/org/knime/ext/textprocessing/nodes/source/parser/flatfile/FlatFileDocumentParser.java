@@ -92,7 +92,9 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();

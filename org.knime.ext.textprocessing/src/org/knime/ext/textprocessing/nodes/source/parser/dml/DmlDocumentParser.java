@@ -207,7 +207,7 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DmlDocumentParser.class);
 
-    private static final SAXTransformerFactory transformerFactory = (SAXTransformerFactory)TransformerFactory
+    private static final SAXTransformerFactory TRANSFORMER_FACTORY = (SAXTransformerFactory)TransformerFactory
         .newInstance();
 
     private static final String DEF_WHITESPACE_SUFFIX = " ";
@@ -283,7 +283,9 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
@@ -338,7 +340,8 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
+    {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(DOCUMENT)) {
@@ -512,7 +515,7 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
         // header
         String str = null;
         try {
-            TransformerHandler hd = transformerFactory.newTransformerHandler();
+            TransformerHandler hd = TRANSFORMER_FACTORY.newTransformerHandler();
             Transformer transformer = hd.getTransformer();
 
             final String encoding = "UTF-8";

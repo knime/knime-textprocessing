@@ -52,7 +52,7 @@ public class SdmlDocumentParserNodeFactory extends NodeFactory<DocumentParserNod
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new SdmlDocumentParser(), false, "xml");
+        return new DocumentParserNodeModel(new SdmlDocumentParserFactory(), false, "xml");
     }
 
     /**

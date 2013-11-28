@@ -6162,6 +6162,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/DocumentParserNodeModel.java" type="org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel"/>
+                <message_argument value="DocumentParserNodeModel(DocumentParser, boolean, String[])"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/tagging/opennlpner/OpenNlpModel.java" type="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpenNlpModel">
         <filter id="338792546">
             <message_arguments>

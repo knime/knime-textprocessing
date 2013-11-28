@@ -52,7 +52,7 @@ public class DmlDocumentParserNodeFactory extends NodeFactory<DocumentParserNode
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new DmlDocumentParser(), false, "xml");
+        return new DocumentParserNodeModel(new DmlDocumentParserFactory(), false, "xml");
     }
 
     /**

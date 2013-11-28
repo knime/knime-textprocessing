@@ -190,7 +190,9 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     @Override
     public List<Document> parse(final InputStream is) throws Exception {
         m_docs = new ArrayList<Document>();
@@ -242,7 +244,8 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
+    {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(DOCUMENT)) {

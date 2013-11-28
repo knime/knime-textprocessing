@@ -52,7 +52,7 @@ public class PDFDocumentParserNodeFactory extends NodeFactory<DocumentParserNode
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new PDFDocumentParser(), true, "pdf");
+        return new DocumentParserNodeModel(new PDFDocumentParserFactory(), true, "pdf");
     }
 
     /**

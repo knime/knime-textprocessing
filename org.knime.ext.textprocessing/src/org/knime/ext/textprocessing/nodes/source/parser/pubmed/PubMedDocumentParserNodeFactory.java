@@ -52,7 +52,7 @@ public class PubMedDocumentParserNodeFactory extends NodeFactory<DocumentParserN
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new PubMedDocumentParser(), false, "xml", "gz", "zip");
+        return new DocumentParserNodeModel(new PubMedDocumentParserFactory(), false, "xml", "gz", "zip");
     }
 
     /**

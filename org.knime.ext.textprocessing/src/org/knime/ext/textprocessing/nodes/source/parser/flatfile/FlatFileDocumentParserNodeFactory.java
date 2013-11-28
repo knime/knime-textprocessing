@@ -52,7 +52,7 @@ public class FlatFileDocumentParserNodeFactory extends NodeFactory<DocumentParse
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new FlatFileDocumentParser(), true);
+        return new DocumentParserNodeModel(new FlatFileDocumentParserFactory(), true);
     }
 
     /**
