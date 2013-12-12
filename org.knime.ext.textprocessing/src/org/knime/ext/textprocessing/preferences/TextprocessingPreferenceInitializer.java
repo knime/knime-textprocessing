@@ -36,7 +36,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 public class TextprocessingPreferenceInitializer extends AbstractPreferenceInitializer {
 
     /** The default serialization setting. */
-    public static final boolean DEFAULT_DML_DESERIALIZATION = false;
+    public static final boolean DEFAULT_DML_DESERIALIZATION = true;
 
     /** The default row preprocessing setting. */
     public static final boolean DEFAULT_ROW_PREPROCESSING = true;

@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.StringValue;
@@ -148,7 +149,17 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      */
     @Override
     public int hashCode() {
+        readDocumentData();
         return m_document.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean equalsDataCell(final DataCell dc) {
+        readDocumentData();
+        return m_document.equals(((DocumentValue)dc).getDocument());
     }
 
     /**
