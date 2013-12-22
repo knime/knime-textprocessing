@@ -115,6 +115,7 @@ final class TaggerCellFactory extends AbstractCellFactory {
             try {
                 tagger = m_taggerFac.createTagger();
                 m_threadLocalTagger.set(tagger);
+                LOGGER.debug("Creating new thread local tagger instance: " + tagger.getClass());
             } catch (Exception e) {
                 LOGGER.error("Tagger could not be created.", e);
                 return new DataCell[] {DataType.getMissingCell()};

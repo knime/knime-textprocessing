@@ -288,7 +288,7 @@ public class DocumentParserNodeModel extends NodeModel {
 
                             parser.parseDocument(is);
                         } catch (Exception e) {
-                            LOGGER.error("Could not parse file: " + f.getAbsolutePath().toString());
+                            LOGGER.error("Could not parse file: " + f.getAbsolutePath().toString(), e);
                             setWarningMessage("Could not parse all files properly!");
                         } finally {
                             if (is != null) {
