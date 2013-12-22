@@ -353,9 +353,8 @@ public class DocumentVectorNodeModel extends NodeModel {
         StringBuilder sb = new StringBuilder(documentColumnName);
         while (featureIndexTable.containsKey(documentColumnName)) {
             sb.append("#");
-
+            documentColumnName = sb.toString();
         }
-        documentColumnName = sb.toString();
 
         DataColumnSpecCreator columnSpecCreator =
             new DataColumnSpecCreator(documentColumnName, m_documentCellFac.getDataType());
