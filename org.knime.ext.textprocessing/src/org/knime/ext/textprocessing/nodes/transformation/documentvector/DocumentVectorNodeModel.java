@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -59,6 +61,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.util.UniqueNameGenerator;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
@@ -349,12 +352,8 @@ public class DocumentVectorNodeModel extends NodeModel {
         final DataColumnSpec[] columnSpecs = new DataColumnSpec[featureCount + 1];
 
         // add document column
-        String documentColumnName = DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME;
-        StringBuilder sb = new StringBuilder(documentColumnName);
-        while (featureIndexTable.containsKey(documentColumnName)) {
-            sb.append("#");
-            documentColumnName = sb.toString();
-        }
+        UniqueNameGenerator uniqueNameGen = new UniqueNameGenerator(featureIndexTable.keySet());
+        String documentColumnName = uniqueNameGen.newName(DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME);
 
         DataColumnSpecCreator columnSpecCreator =
             new DataColumnSpecCreator(documentColumnName, m_documentCellFac.getDataType());
