@@ -50,6 +50,8 @@
 
 package org.knime.ext.textprocessing.nodes.tagging;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
@@ -79,7 +81,9 @@ final class TaggerCellFactory extends AbstractCellFactory {
 
     private final TextContainerDataCellFactory m_documentCellFac;
 
-    private final ThreadLocal<DocumentTagger> m_threadLocalTagger;
+    private DocumentTagger[] m_taggerPool = null;
+
+    private AtomicInteger m_taggerCount = new AtomicInteger(0);
 
     /**
      * Constructor for class TaggerCellFactory, with tagger factory, index of the document column, new column specs,
@@ -102,7 +106,6 @@ final class TaggerCellFactory extends AbstractCellFactory {
         m_docColIndex = documentColIndex;
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_documentCellFac.prepare(exec);
-        m_threadLocalTagger = new ThreadLocal<DocumentTagger>();
     }
 
     /**
@@ -110,19 +113,55 @@ final class TaggerCellFactory extends AbstractCellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
-        DocumentTagger tagger = m_threadLocalTagger.get();
-        if (tagger == null) {
-            try {
-                tagger = m_taggerFac.createTagger();
-                m_threadLocalTagger.set(tagger);
-                LOGGER.debug("Creating new thread local tagger instance: " + tagger.getClass());
-            } catch (Exception e) {
-                LOGGER.error("Tagger could not be created.", e);
-                return new DataCell[] {DataType.getMissingCell()};
-            }
+        DocumentTagger tagger;
+        try {
+            tagger = getTaggerFromPool();
+        } catch (Exception e) {
+            LOGGER.error("Tagger could not be borrowed from pool.", e);
+            return new DataCell[] {DataType.getMissingCell()};
         }
 
         final Document d = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
-        return new DataCell[] {m_documentCellFac.createDataCell(tagger.tag(d))};
+
+        synchronized (tagger) {
+            return new DataCell[]{m_documentCellFac.createDataCell(tagger.tag(d))};
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterProcessing() {
+        // clean up thread local tagger models here!
+        LOGGER.debug("Clearing tagger pool.");
+        for (int i = 0; i < m_taggerPool.length; i++) {
+            m_taggerPool[i] = null;
+        }
+        m_taggerPool = null;
+        m_taggerCount = new AtomicInteger(0);
+    }
+
+    private synchronized DocumentTagger getTaggerFromPool() throws Exception {
+        // initialize pool with number of threads to use if it has not been initialized
+        if (m_taggerPool == null) {
+            LOGGER.debug("Creating tagger pool of size: " + getMaxParallelWorkers());
+            m_taggerPool = new DocumentTagger[getMaxParallelWorkers()];
+        }
+        // get tagger from pool
+        final int index = m_taggerCount.get() % getMaxParallelWorkers();
+        DocumentTagger tagger = m_taggerPool[index];
+        // initialize tagger if it has not been initialized and put to pool
+        if (tagger == null) {
+            tagger = m_taggerFac.createTagger();
+            m_taggerPool[index] = tagger;
+            LOGGER.debug("Created new pooled tagger instance: " + tagger.getClass()
+                + " (" + (m_taggerCount.get() + 1) + ")");
+        }
+
+        // update current index of tagger in pool
+        m_taggerCount.incrementAndGet();
+
+        return tagger;
     }
 }
