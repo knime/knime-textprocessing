@@ -22,6 +22,14 @@
             <a href="http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php">http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php</a>.
             </p>
             <p>
+            <b>Note:</b> the provided tagger models vary in memory consumption and processing speed. Especially the 
+            models English bidirectional, German hgc, and Germany dewac require a lot of memory. For the usage of these
+            models it is recommended to run KNIME with at least 2GB of heap space. To increase the head space, change
+            the -Xmx setting in the knime.ini file. If KNIME is running with less than 1.5GB heap space it is 
+            recommended to use English left3words, English left3words caseless, or German fast models for tagging of 
+            english or german texts. 
+            </p>
+            <p>
             Descriptions of the models (taken from the website of the Stanford
             NLP group):
             <ul>
