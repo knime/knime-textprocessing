@@ -116,14 +116,11 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
 
     private final SettingsModelBoolean m_skipMetaInfo = createSkipMetaInfoSection();
 
-    private final SettingsModelString m_coocLevel =
-        createCoocLevelModel();
+    private final SettingsModelString m_coocLevel = createCoocLevelModel();
 
-    private final SettingsModelInteger m_procCount =
-        createProcessCountModel();
+    private final SettingsModelInteger m_procCount = createProcessCountModel();
 
-    private TextContainerDataCellFactory m_termFac =
-            TextContainerDataCellFactoryBuilder.createTermCellFactory();
+    private TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     /**Constructor for class CooccurrenceCounterNodeModel.
      *
@@ -136,8 +133,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @return the co-occurrence level model
      */
     static SettingsModelString createCoocLevelModel() {
-        return new SettingsModelString("inclNeighbors",
-                CooccurrenceLevel.getDefault().getActionCommand());
+        return new SettingsModelString("inclNeighbors", CooccurrenceLevel.getDefault().getActionCommand());
     }
 
     /**
@@ -158,9 +154,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @return the number of processes model
      */
     static SettingsModelInteger createProcessCountModel() {
-        return new SettingsModelIntegerBounded("noOfThreads",
-                KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(), 1,
-                Integer.MAX_VALUE);
+        return new SettingsModelIntegerBounded("noOfThreads", KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(), 1,
+                                                Integer.MAX_VALUE);
     }
 
     /**
@@ -191,32 +186,25 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         final DataTableSpec spec = inSpecs[0];
-        if (m_docCol.getStringValue() == null
-                && m_termCol.getStringValue() == null) {
+        if (m_docCol.getStringValue() == null && m_termCol.getStringValue() == null) {
             //preselect the first matching column
-            m_docCol.setStringValue(
-                    findCompatibleColumn(spec, DocumentValue.class));
+            m_docCol.setStringValue(findCompatibleColumn(spec, DocumentValue.class));
             if (m_docCol.getStringValue() == null) {
-                throw new InvalidSettingsException(
-                        "Input table contains no document column");
+                throw new InvalidSettingsException("Input table contains no document column");
             }
-            m_termCol.setStringValue(findCompatibleColumn(spec,
-                    TermValue.class));
+            m_termCol.setStringValue(findCompatibleColumn(spec, TermValue.class));
             if (m_termCol.getStringValue() == null) {
-                throw new InvalidSettingsException(
-                        "Input table contains no term column");
+                throw new InvalidSettingsException( "Input table contains no term column");
             }
         }
         //check that the table contains the selected columns
         if (!spec.containsName(m_docCol.getStringValue())) {
-            throw new InvalidSettingsException(
-                    "Input table does not contain document column "
+            throw new InvalidSettingsException("Input table does not contain document column "
                     + m_docCol.getStringValue());
         }
         if (!spec.containsName(m_termCol.getStringValue())) {
-            throw new InvalidSettingsException(
-                    "Input table does not contain term column "
-                    + m_termCol.getStringValue());
+            throw new InvalidSettingsException("Input table does not contain term column "
+        + m_termCol.getStringValue());
         }
         return new DataTableSpec[] {createResultSpec(spec)};
     }
@@ -235,8 +223,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+            throws Exception {
         final DataTableSpec spec = inData[0].getDataTableSpec();
         final int docIdx = spec.findColumnIndex(m_docCol.getStringValue());
         final int termIdx = spec.findColumnIndex(m_termCol.getStringValue());
@@ -247,15 +235,13 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             exec.setMessage("Sorting table...");
             final LinkedList<String> inclList = new LinkedList<String>();
             inclList.add(m_docCol.getStringValue());
-            table = new SortedTable(inData[0], inclList, new boolean[] {true},
-                    exec.createSubExecutionContext(0.2));
+            table = new SortedTable(inData[0], inclList, new boolean[] {true}, exec.createSubExecutionContext(0.2));
             myExec = exec.createSubExecutionContext(0.8);
         } else {
             table = inData[0];
             myExec = exec;
         }
-        final BufferedDataContainer dc =
-            exec.createDataContainer(createResultSpec(spec));
+        final BufferedDataContainer dc = exec.createDataContainer(createResultSpec(spec));
         DataCell previousDocCell = null;
         final boolean checkTags = m_checkTags.getBooleanValue();
         final boolean skipMetaInfo = m_skipMetaInfo.getBooleanValue();
@@ -266,15 +252,13 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         final AtomicInteger progressCounter = new AtomicInteger();
         exec.setMessage("Processing documents...");
       //initialize the thread pool
-        final ThreadPool pool =
-            KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
+        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
         //The semaphore restricts the number of concurrent processes
         final Semaphore semaphore = new Semaphore(m_procCount.getIntValue());
         for (final DataRow row : table) {
             docRowCounter++;
             totalRowCounter++;
-            myExec.setMessage("Reading row " + totalRowCounter
-                    + " of " + rowCount);
+            myExec.setMessage("Reading row " + totalRowCounter + " of " + rowCount);
             exec.checkCanceled();
             final DataCell docCell = row.getCell(docIdx);
             if (docCell.isMissing()) {
@@ -293,19 +277,18 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             if (previousDocCell.equals(docCell)) {
                 terms.addTerm(term);
             } else {
-                pool.enqueue(processDocument(myExec, rowCount,
-                        progressCounter, docRowCounter, semaphore, rowId, dc,
-                        previousDocCell, terms, skipMetaInfo, checkTags));
+                pool.enqueue(processDocument(myExec, rowCount, progressCounter, docRowCounter, semaphore, rowId, dc,
+                                                previousDocCell, terms, skipMetaInfo, checkTags));
                 previousDocCell = docCell;
                 terms = new TermChecker(checkTags);
+                terms.addTerm(term);
                 docRowCounter = 0;
             }
         }
         //process the last document
         exec.setMessage("Processing documents...");
-        pool.enqueue(processDocument(myExec, rowCount, progressCounter,
-                docRowCounter, semaphore, rowId, dc, previousDocCell,
-                terms, skipMetaInfo, checkTags));
+        pool.enqueue(processDocument(myExec, rowCount, progressCounter, docRowCounter, semaphore, rowId, dc,
+                                        previousDocCell, terms, skipMetaInfo, checkTags));
         pool.waitForTermination();
         dc.close();
         return new BufferedDataTable[] {dc.getTable()};
@@ -325,11 +308,10 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                 try {
                     semaphore.acquire();
                     final Document doc = ((DocumentValue)docCell).getDocument();
-                    final Map<TermTuple, TermTuple> tuples =
-                        new HashMap<TermTuple, TermTuple>();
+                    final Map<TermTuple, TermTuple> tuples = new HashMap<TermTuple, TermTuple>();
                     final List<Section> sections = doc.getSections();
                     final Map<TermContainer, MutableInteger> documentTerms =
-                        new LinkedHashMap<TermContainer, MutableInteger>();
+                            new LinkedHashMap<TermContainer, MutableInteger>();
                     final Map<TermContainer, MutableInteger> titleTerms =
                         new LinkedHashMap<TermContainer, MutableInteger>();
                     final Map<TermContainer, MutableInteger> sectionTerms =
@@ -339,47 +321,35 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                     final Map<TermContainer, MutableInteger> sentenceTerms =
                         new LinkedHashMap<TermContainer, MutableInteger>();
                     for (final Section section : sections) {
-                        final SectionAnnotation annotation =
-                            section.getAnnotation();
-                        final boolean title =
-                            SectionAnnotation.TITLE.equals(annotation)
-                            || SectionAnnotation.CONFERENCE_TITLE.equals(
-                                    annotation)
-                            || SectionAnnotation.JOURNAL_TITLE.equals(
-                                    annotation);
+                        final SectionAnnotation annotation = section.getAnnotation();
+                        final boolean title = SectionAnnotation.TITLE.equals(annotation)
+                                                || SectionAnnotation.CONFERENCE_TITLE.equals(annotation)
+                                                    || SectionAnnotation.JOURNAL_TITLE.equals(annotation);
                         if (skipMetaInformation && SectionAnnotation.META_INFORMATION.equals(annotation)) {
                             //this is a meta information section that should be skipped -> continue
                             continue;
                         }
-                        final List<Paragraph> paragraphs =
-                            section.getParagraphs();
+                        final List<Paragraph> paragraphs = section.getParagraphs();
                         for (final Paragraph paragraph : paragraphs) {
-                            final List<Sentence> sentences =
-                                paragraph.getSentences();
+                            final List<Sentence> sentences = paragraph.getSentences();
                             TermContainer previousTermContainer = null;
                             for (final Sentence sentence : sentences) {
                                 exec.checkCanceled();
                                 final List<Term> termList = sentence.getTerms();
                                 for (final Term term : termList) {
                                     if (terms.containsTerm(term)) {
-                                        final TermContainer termContainer =
-                                                new TermContainer(checkTags,
-                                                        term);
+                                        final TermContainer termContainer = new TermContainer(checkTags, term);
                                         if (inclDoc()) {
-                                            addTerm(documentTerms,
-                                                    termContainer);
+                                            addTerm(documentTerms, termContainer);
                                         }
                                         if (inclSection()) {
-                                            addTerm(sectionTerms,
-                                                    termContainer);
+                                            addTerm(sectionTerms, termContainer);
                                         }
                                         if (inclParagraph()) {
-                                            addTerm(paragraphTerms,
-                                                    termContainer);
+                                            addTerm(paragraphTerms, termContainer);
                                         }
                                         if (inclSentence()) {
-                                            addTerm(sentenceTerms,
-                                                    termContainer);
+                                            addTerm(sentenceTerms, termContainer);
                                         }
                                         //tread the title section extra
                                         if (title && inclTitle()) {
@@ -388,46 +358,35 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                                         if (inclNeighbors()) {
                                             if (previousTermContainer != null) {
                                                 //the two terms are neighbors
-                                                processNeighbors(tuples,
-                                                        previousTermContainer,
-                                                        termContainer);
+                                                processNeighbors(tuples, previousTermContainer,
+                                                    termContainer);
                                             }
-                                            previousTermContainer =
-                                                termContainer;
+                                            previousTermContainer = termContainer;
                                         }
                                     } else {
                                         previousTermContainer = null;
                                     }
                                 }
-                                //process all terms that co-occur in this
-                                //sentence
-                                processTerms(tuples, sentenceTerms,
-                                        CooccurrenceLevel.SENTENCE);
+                                //process all terms that co-occur in this sentence
+                                processTerms(tuples, sentenceTerms, CooccurrenceLevel.SENTENCE);
                                 //count neighbors only within a sentence
                                 previousTermContainer = null;
                             }
                             //process all terms that co-occur in this paragraph
-                            processTerms(tuples, paragraphTerms,
-                                    CooccurrenceLevel.PARAGRAPH);
+                            processTerms(tuples, paragraphTerms, CooccurrenceLevel.PARAGRAPH);
                         }
                         if (title) {
-                            //process all terms that co-occur in the title of
-                            //this document
-                            processTerms(tuples, titleTerms,
-                                    CooccurrenceLevel.TITLE);
+                            //process all terms that co-occur in the title of this document
+                            processTerms(tuples, titleTerms, CooccurrenceLevel.TITLE);
                         }
                         //process all terms that co-occur in this section
-                        processTerms(tuples, sectionTerms,
-                                CooccurrenceLevel.SECTION);
+                        processTerms(tuples, sectionTerms, CooccurrenceLevel.SECTION);
                     }
                     //process all terms that co-occur in this document
-                    processTerms(tuples, documentTerms,
-                            CooccurrenceLevel.DOCUMENT);
+                    processTerms(tuples, documentTerms, CooccurrenceLevel.DOCUMENT);
                     //create a data row for each tuple
-                    createRows(exec, rowId, dc, docCell,
-                            tuples);
-                    exec.setProgress(progressCounter.addAndGet(docRowCounter)
-                            / (double)totalRowCount);
+                    createRows(exec, rowId, dc, docCell, tuples);
+                    exec.setProgress(progressCounter.addAndGet(docRowCounter) / (double)totalRowCount);
                 } catch (final CanceledExecutionException e) {
                     // this exception is handled outside of the thread
                 } catch (final InterruptedException e) {
@@ -440,15 +399,14 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
     }
 
     /**
-     * @param termConatainer the term container and their occurrence counter
+     * @param containerMap the term container and their occurrence counter
      * @param termContainer the term to add to the map
      */
-    void addTerm(final Map<TermContainer, MutableInteger> termConatainer,
-            final TermContainer termContainer) {
-        MutableInteger counter = termConatainer.get(termContainer);
+    void addTerm(final Map<TermContainer, MutableInteger> containerMap, final TermContainer termContainer) {
+        MutableInteger counter = containerMap.get(termContainer);
         if (counter == null) {
             counter = new MutableInteger(0);
-            termConatainer.put(termContainer, counter);
+            containerMap.put(termContainer, counter);
         }
         counter.inc();
     }
@@ -458,34 +416,29 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @param terms the terms to add to the tuple map
      * @param occurrence the type of occurrence
      */
-    void processTerms(final Map<TermTuple, TermTuple> tuples,
-            final Map<TermContainer, MutableInteger> terms,
+    void processTerms(final Map<TermTuple, TermTuple> tuples, final Map<TermContainer, MutableInteger> terms,
             final CooccurrenceLevel occurrence) {
         if (terms.size() < 2) {
             //the map might contain one element which we need to remove as well
             terms.clear();
             return;
         }
-        for (final Entry<TermContainer, MutableInteger> outerTerm
-                : terms.entrySet()) {
+        for (final Entry<TermContainer, MutableInteger> outerTerm : terms.entrySet()) {
             boolean skip = true;
-            for (final Entry<TermContainer, MutableInteger> innerTerm
-                    : terms.entrySet()) {
+            for (final Entry<TermContainer, MutableInteger> innerTerm : terms.entrySet()) {
                 if (skip) {
                     if (innerTerm.equals(outerTerm)) {
                         skip = false;
                     }
                     continue;
                 }
-                final TermTuple tuple =
-                    new TermTuple(outerTerm.getKey(), innerTerm.getKey());
+                final TermTuple tuple = new TermTuple(outerTerm.getKey(), innerTerm.getKey());
                 TermTuple termTuple = tuples.get(tuple);
                 if (termTuple == null) {
                     tuples.put(tuple, tuple);
                     termTuple = tuple;
                 }
-                termTuple.inc(occurrence, outerTerm.getValue().intValue(),
-                        innerTerm.getValue().intValue());
+                termTuple.inc(occurrence, outerTerm.getValue().intValue(), innerTerm.getValue().intValue());
             }
         }
         terms.clear();
@@ -496,8 +449,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @param termContainer1 the first term
      * @param termContainer2 the second term
      */
-    void processNeighbors(final Map<TermTuple, TermTuple> tuples,
-            final TermContainer termContainer1,
+    void processNeighbors(final Map<TermTuple, TermTuple> tuples, final TermContainer termContainer1,
             final TermContainer termContainer2) {
         //ignore terms that are equal
         if (termContainer1.equals(termContainer2)) {
@@ -509,7 +461,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             tuples.put(tuple, tuple);
             termTuple = tuple;
         }
-        tuple.incNeighbors();
+        termTuple.incNeighbors();
     }
 
     /**
@@ -653,9 +605,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * includes the given level
      */
     private boolean includes(final CooccurrenceLevel level) {
-        final CooccurrenceLevel selectedLevel =
-            CooccurrenceLevel.getCooccurrenceLevel(
-                    m_coocLevel.getStringValue());
+        final CooccurrenceLevel selectedLevel = CooccurrenceLevel.getCooccurrenceLevel(m_coocLevel.getStringValue());
         return level.getLevel() <= selectedLevel.getLevel();
     }
 
@@ -702,7 +652,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         try {
             m_skipMetaInfo.loadSettingsFrom(settings);
         } catch (Exception e) {
-            //new intorduce in KNIME 2.8
+            //new introduced in KNIME 2.8
             m_skipMetaInfo.setBooleanValue(false);
         }
     }

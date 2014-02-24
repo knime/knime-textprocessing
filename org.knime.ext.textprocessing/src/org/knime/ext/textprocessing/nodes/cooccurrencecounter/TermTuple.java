@@ -67,26 +67,36 @@ public class TermTuple {
     private int m_sentence = 0;
     private int m_neighbor = 0;
     private int m_title = 0;
+    private final boolean m_ignoreTermOrder;
 
     /**Constructor for class TermTuple.
      * @param termContainer the first term
      * @param termContainer2 the second term
      */
-    public TermTuple(final TermContainer termContainer,
-            final TermContainer termContainer2) {
-        if (termContainer == null) {
+    public TermTuple(final TermContainer termContainer, final TermContainer termContainer2) {
+        this(termContainer, termContainer2, true);
+    }
+    /**Constructor for class TermTuple.
+     * @param term1 the first term
+     * @param term2 the second term
+     * @param ignoreTermOrder <code>true</code> if the term order is ignored
+     */
+    public TermTuple(final TermContainer term1, final TermContainer term2,
+        final boolean ignoreTermOrder) {
+        if (term1 == null) {
             throw new NullPointerException("term1 must not be null");
         }
-        if (termContainer2 == null) {
+        if (term2 == null) {
             throw new NullPointerException("term2 must not be null");
         }
+        m_ignoreTermOrder = ignoreTermOrder;
         //ensure that the first term is lexicographical smaller than the second
-        if (termContainer.getText().compareTo(termContainer2.getText()) <= 0) {
-            m_term1 = termContainer;
-            m_term2 = termContainer2;
+        if (!m_ignoreTermOrder || term1.getText().compareTo(term2.getText()) <= 0) {
+            m_term1 = term1;
+            m_term2 = term2;
         } else {
-            m_term1 = termContainer2;
-            m_term2 = termContainer;
+            m_term1 = term2;
+            m_term2 = term1;
         }
     }
 
@@ -273,11 +283,9 @@ public class TermTuple {
             return false;
         }
         final TermTuple other = (TermTuple)obj;
-        //the node could be also an edge so we have to check both ways
-        if ((m_term1.equals(other.m_term1)
-                    && m_term2.equals(other.m_term2))
-                || (m_term1.equals(other.m_term2)
-                        && m_term2.equals(other.m_term1))) {
+        if ((m_term1.equals(other.m_term1) && m_term2.equals(other.m_term2))
+                //check both ways if the order should be ignored
+                || (m_ignoreTermOrder && m_term1.equals(other.m_term2) && m_term2.equals(other.m_term1))) {
             return true;
         }
         return false;

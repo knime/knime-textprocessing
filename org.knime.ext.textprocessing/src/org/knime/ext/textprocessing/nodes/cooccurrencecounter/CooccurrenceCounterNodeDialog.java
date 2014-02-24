@@ -69,33 +69,27 @@ public class CooccurrenceCounterNodeDialog extends DefaultNodeSettingsPane {
     public CooccurrenceCounterNodeDialog() {
         createNewGroup(" Input Columns ");
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                CooccurrenceCounterNodeModel.createDocColModel(),
-                "Document column: ", 0, DocumentValue.class));
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                CooccurrenceCounterNodeModel.createTermColModel(),
-                "Term column: ", 0, TermValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(CooccurrenceCounterNodeModel.createDocColModel(),
+                                                                    "Document column: ", 0, DocumentValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(CooccurrenceCounterNodeModel.createTermColModel(),
+                                                                    "Term column: ", 0, TermValue.class));
         setHorizontalPlacement(false);
         closeCurrentGroup();
         createNewGroup(" Co-occurrence level ");
-        addDialogComponent(new DialogComponentButtonGroup(
-                CooccurrenceCounterNodeModel.createCoocLevelModel(),
-                null, false,
-                CooccurrenceLevel.values()));
+        addDialogComponent(new DialogComponentButtonGroup(CooccurrenceCounterNodeModel.createCoocLevelModel(),
+                                                            null, false, CooccurrenceLevel.values()));
         createNewGroup(" Advanced settings ");
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(
-                CooccurrenceCounterNodeModel.createCheckTagsModel(),
-                "Check term tags"));
-        addDialogComponent(new DialogComponentBoolean(
-                  CooccurrenceCounterNodeModel.createSkipMetaInfoSection(),
-                  "Skip meta information sections"));
-        addDialogComponent(new DialogComponentBoolean(
-                CooccurrenceCounterNodeModel.createSortModel(),
-                "Sort input table"));
+        addDialogComponent(new DialogComponentBoolean(CooccurrenceCounterNodeModel.createCheckTagsModel(),
+                                                        "Check term tags"));
+        addDialogComponent(new DialogComponentBoolean(CooccurrenceCounterNodeModel.createSkipMetaInfoSection(),
+                                                        "Skip meta information sections"));
+        addDialogComponent(new DialogComponentBoolean(CooccurrenceCounterNodeModel.createSortModel(),
+                                                        "Sort input table"));
         setHorizontalPlacement(false);
-        addDialogComponent(new DialogComponentNumber(
-                CooccurrenceCounterNodeModel.createProcessCountModel(),
-                "Maximum number of parallel processes", Integer.valueOf(1), 3));
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentNumber(CooccurrenceCounterNodeModel.createProcessCountModel(),
+                                                        "Maximum number of parallel processes", Integer.valueOf(1), 3));
+        setHorizontalPlacement(false);
     }
 }
