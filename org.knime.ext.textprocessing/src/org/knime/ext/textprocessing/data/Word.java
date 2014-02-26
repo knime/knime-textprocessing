@@ -110,6 +110,24 @@ public class Word implements TextContainer, Externalizable {
     }
 
     /**
+     * Sets the given string as white space suffix.
+     * @param whiteSpaceSuffix String to set as white space suffix.
+     * @since 2.9
+     */
+    public void setWhiteSpaceSuffix(final String whiteSpaceSuffix) {
+        m_whiteSpaceSuffix = whiteSpaceSuffix;
+    }
+
+    /**
+     * Adds the given string to white space suffix.
+     * @param whiteSpaceSuffix String to add to white space suffix.
+     * @since 2.9
+     */
+    public void addWhiteSpaceSuffix(final String whiteSpaceSuffix) {
+        m_whiteSpaceSuffix += whiteSpaceSuffix;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

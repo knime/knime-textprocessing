@@ -51,6 +51,7 @@
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import java.util.Map;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.Paragraph;
@@ -76,25 +77,42 @@ final class PreprocessingUtils {
      *
      * @param document The document to preprocess.
      * @param preprocessing The preprocessing instruction.
-     * @param preprocessUnmodifieable If set {@code true} unmodifieable terms are processed as well, if {@code false}
+     * @param preprocessUnmodifiable If set {@code true} unmodifiable terms are processed as well, if {@code false}
      *            they will be not replaced.
      * @return The preprocessed document.
      * @since 2.9
      */
     public static final Document deepPPWithPreprocessing(final Document document, final TermPreprocessing preprocessing,
-        final boolean preprocessUnmodifieable) {
+        final boolean preprocessUnmodifiable) {
         final DocumentBuilder builder = new DocumentBuilder(document);
         for (final Section s : document.getSections()) {
             for (final Paragraph p : s.getParagraphs()) {
                 for (final Sentence sen : p.getSentences()) {
+                    Term previous = null;
                     for (Term t : sen.getTerms()) {
-                        if (!t.isUnmodifiable() || preprocessUnmodifieable) {
+                        // check unmodifiability, or ignore flag and preprocess term
+                        if (!t.isUnmodifiable() || preprocessUnmodifiable) {
                             t = preprocessing.preprocessTerm(t);
                         }
-                        if (t != null && t.getText().length() > 0) {
-                            builder.addTerm(t);
+                        // if current term is empty (filtered, replaced) shift white space suffix to previous term
+                        if (t != null && t.getText().isEmpty() && previous != null) {
+                            final String whiteSpaceSuffix =
+                                t.getWords().get(t.getWords().size() - 1).getWhitespaceSuffix();
+                            previous.getWords().get(previous.getWords().size() - 1)
+                                .addWhiteSpaceSuffix(whiteSpaceSuffix);
                         }
+                        // add previous term if not empty
+                        if (previous != null && !previous.getText().isEmpty()) {
+                            builder.addTerm(previous);
+                        }
+                        // shift current term to previous
+                        previous = t;
                     }
+                    // add last term if not empty
+                    if (previous != null && !previous.getText().isEmpty()) {
+                        builder.addTerm(previous);
+                    }
+
                     builder.createNewSentence();
                 }
                 builder.createNewParagraph();
@@ -113,34 +131,44 @@ final class PreprocessingUtils {
      * @param document The document to preprocess.
      * @param termMapping The terms which are replaced in documents and their replacement term. Terms of the documents
      *            that are contained in the key set of the map are replaced by the corresponding value term.
-     * @param preprocessUnmodifieable If set {@code true} unmodifieable terms are processed as well, if {@code false}
+     * @param preprocessUnmodifiable If set {@code true} unmodifieable terms are processed as well, if {@code false}
      *            they will be not replaced.
      * @return The preprocessed document.
      */
     public static final Document deepPPWithTermMapping(final Document document, final Map<Term, Term> termMapping,
-        final boolean preprocessUnmodifieable) {
+        final boolean preprocessUnmodifiable) {
         final DocumentBuilder builder = new DocumentBuilder(document);
         for (final Section s : document.getSections()) {
             for (final Paragraph p : s.getParagraphs()) {
                 for (final Sentence sen : p.getSentences()) {
-                    for (final Term t : sen.getTerms()) {
+                    Term previous = null;
+                    for (Term t : sen.getTerms()) {
                         // preprocess only if term is not unmodifieable or flag ist set true
-                        if (!t.isUnmodifiable() || preprocessUnmodifieable) {
+                        if (!t.isUnmodifiable() || preprocessUnmodifiable) {
                             // if term mapping exists use mapping
                             if (termMapping.containsKey(t)) {
-                                final Term mappedTerm = termMapping.get(t);
-                                if (mappedTerm != null && mappedTerm.getText().length() > 0) {
-                                    builder.addTerm(mappedTerm);
-                                }
-                            // if no mapping exists add old term
-                            } else {
-                                builder.addTerm(t);
+                                t = termMapping.get(t);
                             }
-                        // if term must not be preprocessed add old term
-                        } else {
-                            builder.addTerm(t);
                         }
+                        // if current term is empty (filtered, replaced) shift white space suffix to previous term
+                        if (t != null && t.getText().isEmpty() && previous != null) {
+                            final String whiteSpaceSuffix =
+                                t.getWords().get(t.getWords().size() - 1).getWhitespaceSuffix();
+                            previous.getWords().get(previous.getWords().size() - 1)
+                                .addWhiteSpaceSuffix(whiteSpaceSuffix);
+                        }
+                        // add previous term if not empty
+                        if (previous != null && !previous.getText().isEmpty()) {
+                            builder.addTerm(previous);
+                        }
+                        // shift current term to previous
+                        previous = t;
                     }
+                    // add last term if not empty
+                    if (previous != null && !previous.getText().isEmpty()) {
+                        builder.addTerm(previous);
+                    }
+
                     builder.createNewSentence();
                 }
                 builder.createNewParagraph();
