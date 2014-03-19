@@ -12,5 +12,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.knime.base,
  org.knime.ext.textprocessing
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
