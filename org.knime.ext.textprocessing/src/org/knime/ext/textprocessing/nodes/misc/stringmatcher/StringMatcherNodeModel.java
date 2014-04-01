@@ -1,6 +1,11 @@
 package org.knime.ext.textprocessing.nodes.misc.stringmatcher;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
@@ -23,12 +28,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
 /**
- * 
+ *
  * @author adae, University of Konstanz
  */
 public class StringMatcherNodeModel extends NodeModel {
@@ -42,36 +43,23 @@ public class StringMatcherNodeModel extends NodeModel {
     /** Config key for sort in memory. */
     protected static final String CFG_SORT_IN_MEMORY = "workInMemory";
 
-    /**
-     * The configuration key to en and disable the distance column.
-     */
+    /** The configuration key to en and disable the distance column. */
     protected static final String CFG_SHOW_DISTANCE = "Show minimal distance";
 
-    /**
-     * The configuration key for the cost of one deletion.
-     */
+    /** The configuration key for the cost of one deletion. */
     protected static final String CFG_WD = "Cost for deletion";
 
-    /**
-     * The configuration key for the cost of one insert.
-     */
+    /** The configuration key for the cost of one insert.*/
     protected static final String CFG_WI = "Cost for insertion";
 
-    /**
-     * The configuration key for the cost of one change.
-     */
+    /** The configuration key for the cost of one change. */
     protected static final String CFG_WC = "Cost for changing";
 
-    /**
-     * The configuration key for the cost of one switch.
-     */
+    /** The configuration key for the cost of one switch. */
     protected static final String CFG_WS = "Cost for switching";
 
-    /**
-     * The configuration key for the maximal number of words to print.
-     */
-    protected static final String CFG_NUMBER =
-            "Maximal number of related words";
+    /** The configuration key for the maximal number of words to print. */
+    protected static final String CFG_NUMBER = "Maximal number of related words";
 
     private final SettingsModelString m_col1;
 
@@ -91,8 +79,9 @@ public class StringMatcherNodeModel extends NodeModel {
 
     private final SettingsModelInteger m_numberofrelatedwords;
 
+
     /**
-     * 
+     *
      */
     public StringMatcherNodeModel() {
         super(2, 1);
@@ -117,29 +106,57 @@ public class StringMatcherNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
 
+        String mess = "";
         if (inSpecs.length < 2) {
             throw new IllegalArgumentException("Two input tables expected");
         }
-        final String col1 = m_col1.getStringValue();
-        if (col1 == null) {
-            throw new InvalidSettingsException("No column 1 defined");
+        if (m_col1.getStringValue() == null) {
+            m_col1.setStringValue(autoguess(inSpecs[0]));
+            mess += "Autoconfigure: Used column " + m_col1.getStringValue();
         }
-        final String col2 = m_col2.getStringValue();
-        if (col2 == null) {
-            throw new InvalidSettingsException("No column 2 defined");
+        if (m_col2.getStringValue() == null) {
+            m_col2.setStringValue(autoguess(inSpecs[1]));
+            mess += "Autoconfigure: Used column " + m_col2.getStringValue();
         }
         if (2 * m_ws.getIntValue() < m_wi.getIntValue() + m_wd.getIntValue()) {
-            throw new InvalidSettingsException("2*weight(switch) must be"
-                    + " >= weight(insert)+weight(delete)");
+            throw new InvalidSettingsException("2*weight(switch) must be >= weight(insert)+weight(delete)");
+        }
+
+        // Check fields
+
+        if (inSpecs[0].findColumnIndex(m_col1.getStringValue()) < 0) {
+            throw new InvalidSettingsException("Column '" + m_col1.getStringValue() + "' not available in input data!");
+        }
+
+        if (inSpecs[1].findColumnIndex(m_col2.getStringValue()) < 0) {
+           throw new InvalidSettingsException("Column '" + m_col2.getStringValue() + "' not available in input data!'");
+        }
+
+        if (mess.length() > 0) {
+            setWarningMessage(mess);
         }
         return new DataTableSpec[]{createSpec()};
     }
 
     /**
+     * @return the first column compatible with the compatible Value.
+     * @throws InvalidSettingsException if no compatible column is available.
+     */
+    private String autoguess(final DataTableSpec inSpecs) throws InvalidSettingsException {
+        // count number of String columns
+        for (DataColumnSpec dcs : inSpecs) {
+            if (dcs.getType().isCompatible(StringValue.class)) {
+                    return dcs.getName();
+            }
+        }
+        throw new InvalidSettingsException("No String column available in one input port");
+    }
+
+    /**
      * Creates the DataTablespec. Using the given configuration.
-     * 
+     *
      * @return the new data table spec.
-     * 
+     *
      */
     protected DataTableSpec createSpec() {
         int numberofrelatedwords = m_numberofrelatedwords.getIntValue();
@@ -189,24 +206,20 @@ public class StringMatcherNodeModel extends NodeModel {
         }
         DataTable searchdata = inData[0]; // searching table
 
-        LevenDamerau ld =
-                new LevenDamerau(inData[1], inData[1].getDataTableSpec()
-                        .findColumnIndex(m_col2.getStringValue()),
-                        m_sortInMemory.getBooleanValue(), exec);
-        ld.setweight(m_wd.getIntValue(), m_wi.getIntValue(),
-                m_wc.getIntValue(), m_ws.getIntValue());
+        int dictcol = inData[1].getDataTableSpec().findColumnIndex(m_col2.getStringValue());
+        int searchcol = inData[0].getDataTableSpec().findColumnIndex(m_col1.getStringValue());
+        if (searchcol < 0 || dictcol < 0) {
+            // should never happen
+            throw new InvalidSettingsException("Input table changed, please reconfigure!");
+        }
+
+        LevenDamerau ld = new LevenDamerau(inData[1], dictcol, m_sortInMemory.getBooleanValue(), exec);
+        ld.setweight(m_wd.getIntValue(), m_wi.getIntValue(), m_wc.getIntValue(), m_ws.getIntValue());
         ArrayList<char[]> words; // found words
-        int searchcol =
-                inData[0].getDataTableSpec().findColumnIndex(
-                        m_col1.getStringValue());
 
         DataCell[] related;
 
-        /**
-         * Initialize the buffer with one colum for the origin word and as
-         * wished for the related words
-         */
-
+        // Initialize the buffer with one column for the origin word and if selected for related words
         BufferedDataContainer buf = exec.createDataContainer(createSpec());
 
         int startwords = 0; // if the min dist is not shown, the first word
@@ -219,37 +232,31 @@ public class StringMatcherNodeModel extends NodeModel {
         }
 
         for (DataRow row : searchdata) {
-
             exec.checkCanceled();
-            if (row.getCell(searchcol).getType().isCompatible(TermValue.class)) 
-            {
-                related[0] = new StringCell(
-                        ((TermValue)row.getCell(searchcol)).getTermValue()
-                        .getText());
+            DataCell cell = row.getCell(searchcol);
+            if (!cell.isMissing() && cell.getType().isCompatible(TermValue.class)) {
+                related[0] = new StringCell(((TermValue)cell).getTermValue().getText());
             } else {
-                related[0] = row.getCell(searchcol);
+                related[0] = cell;
             }
-            if (!row.getCell(searchcol).isMissing()) {
+            if (!cell.isMissing()) {
                 /**
                  * the field related representates the new row in the output the
                  * first output column is the origin word the second one the
                  * minimal found distance
                  */
-               
+
                 double prog = (double)(count++) / (double)max;
-                exec.setProgress(prog, "Searching related words for '"
-                        + related[0] + "'");
+                exec.setProgress(prog, "Searching related words for '" + related[0] + "'");
 
                 /**
                  * words includes all words from bibdata, which have the minimal
                  * distance
                  */
-                words = ld.getNearestWord(((StringValue)related[0])
-                        .getStringValue().toCharArray());
+                words = ld.getNearestWord(((StringValue)related[0]).getStringValue().toCharArray());
 
                 if (m_showdist.getBooleanValue()) {
-                    related[1] 
-                         = new IntCell(ld.getlastdistance());
+                    related[1] = new IntCell(ld.getlastdistance());
                 }
 
             } else {
@@ -258,8 +265,7 @@ public class StringMatcherNodeModel extends NodeModel {
 
             for (int i = 1; i <= numberofrelatedwords; i++) {
                 if (words.size() > i - 1) {
-                    related[i + startwords]
-                             = new StringCell(String.valueOf(words.get(i - 1)));
+                    related[i + startwords] = new StringCell(String.valueOf(words.get(i - 1)));
 
                 } else {
                     related[i + startwords] = DataType.getMissingCell();
@@ -299,9 +305,7 @@ public class StringMatcherNodeModel extends NodeModel {
         m_wi.loadSettingsFrom(settings);
         m_wc.loadSettingsFrom(settings);
         m_ws.loadSettingsFrom(settings);
-
         m_numberofrelatedwords.loadSettingsFrom(settings);
-
     }
 
     /**
@@ -334,12 +338,10 @@ public class StringMatcherNodeModel extends NodeModel {
         m_col2.saveSettingsTo(settings);
         m_sortInMemory.saveSettingsTo(settings);
         m_showdist.saveSettingsTo(settings);
-
         m_wd.saveSettingsTo(settings);
         m_wi.saveSettingsTo(settings);
         m_wc.saveSettingsTo(settings);
         m_ws.saveSettingsTo(settings);
-
         m_numberofrelatedwords.saveSettingsTo(settings);
 
     }
