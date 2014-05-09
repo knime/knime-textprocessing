@@ -17,7 +17,7 @@ import org.knime.core.node.port.PortObjectSpec;
 
 /**The configuration dialog for the string matcher.
  *
- * @author Iris Adae, University Konstanz
+ * @author Iris Adae, University of Konstanz
  *
  */
 public class StringMatcherNodeDialog extends DefaultNodeSettingsPane {

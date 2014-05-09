@@ -17,14 +17,14 @@ import org.knime.ext.textprocessing.data.TermValue;
  * operations you can set them to zero
  *
  * Each operation can be given an individual weight. But mind, because of the optimal algorithm, it is necessary that
- * the weight of 2 switchoperation must be equal or larger than the sum of the weight of an insert and a deletion.
+ * the weight of 2 switch operations must be equal or larger than the sum of the weight of an insert and a deletion.
  *
  * The method getNearestWord(word) gives a list of all words in the biblist which have the smallest distance to the
  * origin word (this can be more than one)
  *
  * Using the method calculate the distance of the two given strings is returned.
  *
- * @author Iris Adae, University Konstanz
+ * @author Iris Adae, University of Konstanz
  *
  */
 public class LevenDamerau {

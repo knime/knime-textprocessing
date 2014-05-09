@@ -14,8 +14,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 /**
  * Panel for the costs.
  *
- * @author Iris Adae, University Konstanz
- *
+ * @author Iris Adae, University of Konstanz
  */
 public class CostPanel extends JPanel {
 

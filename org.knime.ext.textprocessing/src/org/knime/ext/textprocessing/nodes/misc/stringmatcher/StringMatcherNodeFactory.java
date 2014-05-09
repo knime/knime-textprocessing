@@ -7,7 +7,7 @@ import org.knime.core.node.NodeView;
 /**
  * Node Factory for the string matcher node.
  *
- * @author Iris Adae, University Konstanz
+ * @author Iris Adae, University of Konstanz
  */
 public class StringMatcherNodeFactory
                 extends NodeFactory<StringMatcherNodeModel> {
