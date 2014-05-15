@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -85,7 +85,7 @@ class OpenNLPTokenizerPool {
         m_wordTokenizer = new OpenNlpWordTokenizer[m_poolSize];
         m_sentenceTokenizer = new OpenNlpSentenceTokenizer[m_poolSize];
 
-        LOGGER.info("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
+        LOGGER.debug("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
         for (int i = 0; i < m_poolSize; i++) {
             m_wordTokenizer[i] = new OpenNlpWordTokenizer();
             m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
