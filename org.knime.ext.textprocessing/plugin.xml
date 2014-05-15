@@ -63,7 +63,7 @@
             description="Contains textprocessing meta nodes"
             icon="resources/missing.gif"
             level-id="meta"
-            name="Meta"
+            name="Meta Nodes"
             path="/labs/textprocessing">
       </category>
    </extension>
