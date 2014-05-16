@@ -61,7 +61,7 @@
       <category
             after="misc"
             description="Contains textprocessing meta nodes"
-            icon="resources/missing.gif"
+            icon="resources/metanode.png"
             level-id="meta"
             name="Meta Nodes"
             path="/labs/textprocessing">
