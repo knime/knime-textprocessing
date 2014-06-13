@@ -224,7 +224,7 @@ public final class DocumentPanel extends JPanel implements Observer {
 
     private static final boolean searchMatch(final Term term, final String search) {
         try {
-            return term.getText().toLowerCase().matches(search);
+            return term.getText().matches(search);
         } catch (Exception e) {
             // do nothing
         }

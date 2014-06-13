@@ -48,6 +48,7 @@ package org.knime.ext.textprocessing.data.filestore;
 
 import java.io.IOException;
 import java.util.UUID;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
@@ -104,7 +105,7 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
      * {@inheritDoc}
      */
     @Override
-    public void prepare(final ExecutionContext exec) {
+    public synchronized void prepare(final ExecutionContext exec) {
         m_exec = exec;
         createNewFileStore();
     }
@@ -126,7 +127,7 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
      * {@inheritDoc}
      */
     @Override
-    public DataCell createDataCell(final TextContainer tc) {
+    public synchronized DataCell createDataCell(final TextContainer tc) {
         DataCell dc = null;
         if (tc instanceof Document) {
             Document doc = (Document)tc;
