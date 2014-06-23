@@ -97,6 +97,7 @@ public class MultiTermRegexDocumentTagger extends RegexDocumentTagger {
         final List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
 
         final Set<Pattern> pattern = getRegexpattern();
+        final String origSentenceStr = sentence.getText();
         String sentenceStr = sentence.getText();
 
         for (Pattern p : pattern) {
@@ -112,7 +113,7 @@ public class MultiTermRegexDocumentTagger extends RegexDocumentTagger {
 
                 if (start >= lastEnd) {
                     lastEnd = end;
-                    String substr = sentenceStr.substring(start, end);
+                    String substr = origSentenceStr.substring(start, end);
 
                     TaggedEntity taggedEntity = new TaggedEntity(substr, getTag().getTagValue());
                     foundEntities.add(taggedEntity);

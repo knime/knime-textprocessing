@@ -105,7 +105,7 @@ public class SingleTermRegexDocumentTagger extends RegexDocumentTagger {
               }
 
               if (p.matcher(termStr).matches()) {
-                  TaggedEntity taggedEntity = new TaggedEntity(termStr, getTag().getTagValue());
+                  TaggedEntity taggedEntity = new TaggedEntity(t.getText(), getTag().getTagValue());
                   foundEntities.add(taggedEntity);
               }
           }
