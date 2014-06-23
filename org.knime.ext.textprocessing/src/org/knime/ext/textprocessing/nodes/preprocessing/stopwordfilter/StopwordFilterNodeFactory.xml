@@ -8,7 +8,7 @@
         <intro>
         	Filters all terms contained in the specified stop word file.
         	Stop words need to be written among each other in one column,
-        	in a way that each line contains only one stop words.
+        	in a way that each line contains only one stop word.
 		</intro>
 
         <tab name="Preprocessing options">
