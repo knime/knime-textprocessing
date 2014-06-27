@@ -51,7 +51,7 @@
             path="/labs/textprocessing">
       </category>
       <category
-            after="frequencies"
+            after="mining"
             description="Contains misc nodes of the textprocessing plugin"
             icon="resources/missing.gif"
             level-id="misc"
@@ -64,6 +64,15 @@
             icon="resources/metanode.png"
             level-id="meta"
             name="Meta Nodes"
+            path="/labs/textprocessing">
+      </category>
+      <category
+            after="frequencies"
+            description="Contains nodes for mining texts"
+            icon="resources/missing.gif"
+            level-id="mining"
+            locked="true"
+            name="Mining"
             path="/labs/textprocessing">
       </category>
    </extension>
@@ -210,12 +219,12 @@
             id="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory">
       </node>
       <node
-            category-path="/labs/textprocessing/misc"
+            category-path="/labs/textprocessing/mining"
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory"
             id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory">
       </node>
       <node
-            category-path="/labs/textprocessing/misc"
+            category-path="/labs/textprocessing/mining"
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory"
             id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory">
       </node>
@@ -390,6 +399,12 @@
             expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory">
+      </node>
+      <node
+            category-path="/labs/textprocessing/mining"
+            expert-flag="false"
+            factory-class="org.knime.ext.textprocessing.nodes.mining.topic.ParallelTopicExtractorNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.mining.topic.ParallelTopicExtractorNodeFactory">
       </node>
    </extension>
    <extension

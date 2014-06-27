@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode type="Other" icon="../../../icons/TextProcDefault.png">
+    <name>Topic Extractor (Parallel LDA)</name>
+
+    <shortDescription>
+        Simple parallel threaded implementation of LDA for topic detection.
+    </shortDescription>
+
+    <fullDescription>
+        <intro>
+            Simple parallel threaded implementation of 
+            <a href="http://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">LDA</a>, 
+            following Newman, Asuncion, Smyth and Welling, 
+            <a href="http://machinelearning.wustl.edu/mlpapers/paper_files/jmlr10_newman09a.pdf">
+            Distributed Algorithms for Topic Models JMLR (2009), with SparseLDA sampling scheme and data structure</a> 
+            from Yao, Mimno and McCallum, <a href="http://www.cs.umass.edu/~lmyao/papers/fast-topic-model10.pdf">
+            Efficient Methods for Topic Model Inference on Streaming Document Collections,</a> KDD (2009).
+            <p>
+            The node uses the <a href="http://mallet.cs.umass.edu/">"MALLET: A Machine Learning for Language Toolkit."</a> 
+            topic modeling library.
+            </p>
+        </intro>
+        <option name="Document column">
+            The column that contains the pre-processed document.
+        </option>
+        <option name="Seed">
+            The seed used for random number drawing.
+        </option>
+        <option name="No of topics">
+            The number of topics to detect.
+        </option>
+        <option name="No of words per topic">
+            The number of top words to extract per topic.
+        </option>
+        <option name="No of iterations">
+            Number of iterations to perform (influences the runtime of the algorithm).
+        </option>
+        <option name="Alpha">
+            The alpha parameter defines the Dirichlet prior on the per-document topic distributions.
+            It defines the prior weight of topic k in a document. The library uses the given alpha for all topics. 
+            Normally a number less than 1, e.g. 0.1, to prefer sparse topic distributions, 
+            i.e. few topics per document.
+        </option>
+        <option name="Beta">
+            The beta parameter defines the prior on per-topic multinomial distribution over words.
+            It defines the prior weight of word w in a topic. The library uses the given beta for all words.
+            Normally a number much less than 1, e.g. 0.001, to strongly prefer sparse word distributions, 
+            i.e. few words per topic.
+        </option>
+        <option name="No of threads">
+            Divides the input document collection into the specified number of threads and merges the 
+            calculated statistics afterwards.
+        </option>
+    </fullDescription>
+
+    <ports>
+        <inPort index="0" name="Document table">
+            Data table with the document collection to analyze. Each row contains one document.
+        </inPort>
+        <outPort index="0" name="Document table with topics">
+            The document collection with topic assignments and the probability for each document to belong to a
+            certain topic
+        </outPort>
+        <outPort index="1" name="Topic terms">
+            The topic models with the terms and their weight per topic 
+        </outPort>
+        <outPort index="2" name="Iteration statistics">
+            Table with statistics for each iteration 
+        </outPort>
+    </ports>
+</knimeNode>
