@@ -13,20 +13,20 @@
 
         <tab name="Preprocessing options">
         <option name="Case sensitive">
-              If checked the stop word are matched case sensitive otherwise not.
+              If checked the stop words are matched case sensitive otherwise not.
         </option>
-        <option name="Use build in list">
-              Specifies if build in stop word list is used or not. If checked
+        <option name="Use built-in list">
+              Specifies if built-in stop word list is used or not. If checked
               the specified path will be ignored.
         </option>
         <option name="Stopword lists">
-              Available build in stop word lists. If "Use build in list" is
-              checked, the build in stop word list to use can be specified here.
+              Available built-in stop word lists. If "Use built-in list" is
+              checked, the built-in stop word list to use can be specified here.
         </option>
         <option name="Selected file">
               The location of the stop word file. Stop words need to be written
-              among each other in one column, in a way that each line contains
-              only one stop words.
+              below each other in one column, in a way that each line contains
+              only one stop word.
         </option>
         </tab>
 
@@ -41,7 +41,7 @@
         </option>
         <option name="Append unchanged documents">
             If checked, the documents contained in the specified "Original
-            Document column" are appended unchanged even if deep preprocessing
+            Document" column are appended unchanged even if deep preprocessing
             is checked. This helps to keep the original documents in the
             output data table without the agonizing pain of joining.
         </option>
