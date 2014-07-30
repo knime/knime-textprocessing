@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
@@ -69,12 +70,12 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
- * Basic abstract file store cell storing a document and its cell meta information, such as its offset in the file
- * store file, and the length and uuid of the document. The deserialization of a document from the file store file is
- * already implemented, as well as all basic cell methods, such as toString(), hashCode(), getSstringValue(), and
+ * Basic abstract file store cell storing a document and its cell meta information, such as its offset in the file store
+ * file, and the length and uuid of the document. The deserialization of a document from the file store file is already
+ * implemented, as well as all basic cell methods, such as toString(), hashCode(), getSstringValue(), and
  * getDocumentValue(). Deserialized documents are cached in order to avoid multiple deserialization of the same
- * document.
- * Furthermore it provides static methods for the serialization of a document into a byte array, and vice versa.
+ * document. Furthermore it provides static methods for the serialization of a document into a byte array, and vice
+ * versa.
  *
  * Classes extending this class need to implement the serialization of the document (or its byte array) into the file
  * store file.
@@ -96,7 +97,6 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
     /* Document cache. */
     private static final LRUCache<UUID, Document> DOCUMENT_CACHE = new LRUCache<UUID, Document>(DEF_CACHE_SIZE);
 
-
     /** Document to store. */
     protected Document m_document;
 
@@ -113,8 +113,9 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
     protected UUID m_docUuid;
 
     /**
-     * Constructor of AbstractDocumentFileStoreCell. Creates new instance with given document and file store
-     * to store document at.
+     * Constructor of AbstractDocumentFileStoreCell. Creates new instance with given document and file store to store
+     * document at.
+     *
      * @param fileStore File store to store document at.
      * @param document Document to encapsulate and store in file store.
      * @throws IOException if document can not be serialized into file store file.
@@ -141,8 +142,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
     }
 
     /**
-     * {@inheritDoc}
-     * Returns hash code of encapsulated document.
+     * {@inheritDoc} Returns hash code of encapsulated document.
      */
     @Override
     public int hashCode() {
@@ -184,6 +184,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
     /**
      * Serializes the document data into the file store file and the address (offset) of the document as well as its
      * length and uuid into the given data output.
+     *
      * @param output The data output to write the address information of the document to.
      * @throws IOException If document data can not be written to file store file.
      */
@@ -200,6 +201,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
     /**
      * Deserializes document address information from given data input. The document itself is not deserialzed at this
      * point, only its offset, length and uuid information.
+     *
      * @param input The input to read the document address information from.
      * @throws IOException If document address information can not be deserialized from given data input.
      */
@@ -222,7 +224,9 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      */
     protected synchronized void readDocumentData() {
         if (m_document == null && m_docUuid != null) {
-            m_document = DOCUMENT_CACHE.get(m_docUuid);
+            synchronized (DOCUMENT_CACHE) {
+                m_document = DOCUMENT_CACHE.get(m_docUuid);
+            }
             // only deserialize of document is not in cache
             if (m_document == null) {
                 // first prepare to be ready to deserialize document from file store file
@@ -238,7 +242,14 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
                     int redBytes = is.read(serializedDoc, 0, m_length);
                     if (redBytes == m_length) {
                         m_document = deserializedDocument(serializedDoc);
-                        DOCUMENT_CACHE.put(m_docUuid, m_document);
+                        synchronized (DOCUMENT_CACHE) {
+                            final Document d = DOCUMENT_CACHE.get(m_docUuid);
+                            if (d == null) {
+                                DOCUMENT_CACHE.put(m_docUuid, m_document);
+                            } else {
+                                m_document = d; // race condition, another thread "won"
+                            }
+                        }
                     } else {
                         LOGGER.error("Could not read all bytes of document.");
                     }
@@ -257,9 +268,9 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
         }
     }
 
-
     /**
      * Serializes document into a byte array, which is than returned.
+     *
      * @param doc The document to serialize.
      * @return The byte array containing the serialized document.
      * @throws IOException If document data can not be serialized.
@@ -267,9 +278,9 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
     static byte[] serializeDocument(final Document doc) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-          TermDocumentDeSerializationUtil.fastSerializeDocument(doc, new DataOutputStream(bos));
-          bos.flush();
-          return bos.toByteArray();
+            TermDocumentDeSerializationUtil.fastSerializeDocument(doc, new DataOutputStream(bos));
+            bos.flush();
+            return bos.toByteArray();
         } finally {
             bos.close();
         }
@@ -277,6 +288,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
 
     /**
      * Deserializes document from byte array and returns new document instance.
+     *
      * @param bytes The byte array containing the serialized document data.
      * @return The new document instance.
      * @throws IOException If document can not be deserialzed from byte array.
@@ -286,7 +298,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
         try {
             return TermDocumentDeSerializationUtil.fastDeserializeDocument(dis);
         } finally {
-          dis.close();
+            dis.close();
         }
     }
 }
