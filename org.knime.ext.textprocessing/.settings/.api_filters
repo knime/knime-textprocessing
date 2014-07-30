@@ -15,6 +15,12 @@
         </filter>
         <filter id="924844039">
             <message_arguments>
+                <message_argument value="2.10.1"/>
+                <message_argument value="2.10.0"/>
+            </message_arguments>
+        </filter>
+        <filter id="924844039">
+            <message_arguments>
                 <message_argument value="2.8.2"/>
                 <message_argument value="2.8.0"/>
             </message_arguments>
