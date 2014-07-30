@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.ext.textprocessing" version="2">
     <resource path="META-INF/MANIFEST.MF">
+        <filter id="923795461">
+            <message_arguments>
+                <message_argument value="2.10.0"/>
+                <message_argument value="2.10.0"/>
+            </message_arguments>
+        </filter>
+        <filter id="924844039">
+            <message_arguments>
+                <message_argument value="2.10.0"/>
+                <message_argument value="2.10.0"/>
+            </message_arguments>
+        </filter>
         <filter id="924844039">
             <message_arguments>
                 <message_argument value="2.8.2"/>
@@ -6127,6 +6139,35 @@
             <message_arguments>
                 <message_argument value="org.tartarus.snowball.ext.turkishStemmer"/>
                 <message_argument value="org.knime.ext.textprocessing_2.7.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/data/SentimentTag.java" type="org.knime.ext.textprocessing.data.SentimentTag">
+        <filter id="372293724">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.data.SentimentTag"/>
+                <message_argument value="EXAGGEGATION"/>
+            </message_arguments>
+        </filter>
+        <filter id="372293724">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.data.SentimentTag"/>
+                <message_argument value="NEUTAL"/>
+            </message_arguments>
+        </filter>
+        <filter id="1177550852">
+            <message_arguments>
+                <message_argument value="EXAGGERATION"/>
+            </message_arguments>
+        </filter>
+        <filter id="1177550852">
+            <message_arguments>
+                <message_argument value="NEUTRAL"/>
+            </message_arguments>
+        </filter>
+        <filter id="1177550852">
+            <message_arguments>
+                <message_argument value="UNCERTAINTY"/>
             </message_arguments>
         </filter>
     </resource>
