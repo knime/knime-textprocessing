@@ -13,12 +13,16 @@
 			kept. For each key, value pair of a document a row in the output table exists. The output table contains
 			at least two columns, one with the keys and another with the values. A third column containing the documents
 			itself is appended if specified in the dialog. 
+			
+			Documents that are missing or that do not contain selected keys, or any keys at all will be omitted.
 		</intro>
 		<option name="Document column">The document column to use.</option>
 		<option name="Append documents">If checked a column containing the documents is appended.</option>
 		<option name="For distinct documents only">If checked duplicate documents are ignored.</option>
-		<option name="Meta info for keys">If checked only meta infos with specified keys are extracted.</option>
-		<option name="Meta keys">The keys of the meta infos to extract. Multiple keys must be comma separated.</option>
+		<option name="Extract only meta info for specified keys">If checked only meta infos for specified keys are 
+        extracted. Otherwise all key value pairs will be extracted.</option>
+		<option name="Meta info keys (comma separated)">The keys of the meta infos to extract. Multiple keys must be 
+        comma separated.</option>
 	</fullDescription>
 		
 	<ports>

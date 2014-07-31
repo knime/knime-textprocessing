@@ -61,6 +61,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
@@ -169,32 +170,33 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
 
         int docColIndx = inData[0].getDataTableSpec().findColumnIndex(m_docColModel.getStringValue());
 
-        BufferedDataContainer bdc = exec.createDataContainer(createDataTableSpec());
-        Set<UUID> processedDocs = new HashSet<UUID>();
+        final BufferedDataContainer bdc = exec.createDataContainer(createDataTableSpec());
+        final Set<UUID> processedDocs = new HashSet<UUID>();
 
         int rowCount = 0;
-        for (DataRow row : inData[0]) {
+        for (final DataRow row : inData[0]) {
             if (!row.getCell(docColIndx).isMissing()) {
-                Document d = ((DocumentValue)row.getCell(docColIndx)).getDocument();
+                final Document d = ((DocumentValue)row.getCell(docColIndx)).getDocument();
 
                 if (!distinctDocs || !processedDocs.contains(d.getUUID())) {
                     if (distinctDocs) {
                         processedDocs.add(d.getUUID());
                     }
 
-                    DocumentMetaInfo metaInfo = d.getMetaInformation();
+                    final DocumentMetaInfo metaInfo = d.getMetaInformation();
                     if (metaInfo != null) {
-                        for (String key : metaInfo.getMetaInfoKeys()) {
-                            String value = metaInfo.getMetaInfoValue(key);
+                        for (final String key : metaInfo.getMetaInfoKeys()) {
+                            final String value = metaInfo.getMetaInfoValue(key);
 
                             if (key != null && value != null && (!keysOnly || keySet.contains(key))) {
-                                DataRow newRow;
+                                final DataRow newRow;
+
                                 if (m_appendDocsModel.getBooleanValue()) {
                                     newRow = new DefaultRow(RowKey.createRowKey(rowCount), row.getCell(docColIndx),
-                                                            new StringCell(key), new StringCell(value));
+                                        new StringCell(key), new StringCell(value));
                                 } else {
                                     newRow = new DefaultRow(RowKey.createRowKey(rowCount), new StringCell(key),
-                                                            new StringCell(value));
+                                        new StringCell(value));
                                 }
 
                                 bdc.addRowToTable(newRow);

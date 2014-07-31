@@ -107,6 +107,6 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
 
-        addDialogComponent(new DialogComponentBoolean(createKeepKeyValColsModel(), "Keep key, value cols"));
+        addDialogComponent(new DialogComponentBoolean(createKeepKeyValColsModel(), "Keep key and value columns"));
     }
 }

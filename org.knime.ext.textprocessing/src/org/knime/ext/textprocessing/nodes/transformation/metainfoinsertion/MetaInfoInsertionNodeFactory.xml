@@ -14,7 +14,7 @@
 		<option name="Document column">The document column to use.</option>
 		<option name="Key column">The column containing the keys to insert.</option>
 		<option name="Value column">The column containing the values to insert.</option>
-		<option name="Keep key, value cols">If checked, specified key and value columns are kept, otherwise they
+		<option name="Keep key and value columns">If checked, specified key and value columns are kept, otherwise they
 		will be filtered.</option>
 	</fullDescription>
 		

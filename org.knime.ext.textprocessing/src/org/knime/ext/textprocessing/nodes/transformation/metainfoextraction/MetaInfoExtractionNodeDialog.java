@@ -117,14 +117,17 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(createDocColModel(), "Document column", 0,
                                                                   DocumentValue.class));
 
+        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(createAppendDocsModel(), "Append documents"));
 
         addDialogComponent(new DialogComponentBoolean(createDistinctDocsModel(), "For distinct documents only"));
+        setHorizontalPlacement(false);
 
         m_keysOnlyModel.addChangeListener(new MetaInfoDialogChangeListener());
-        addDialogComponent(new DialogComponentBoolean(m_keysOnlyModel, "Meta info for keys"));
+        addDialogComponent(new DialogComponentBoolean(m_keysOnlyModel, "Extract only meta info for specified keys"));
 
-        addDialogComponent(new DialogComponentMultiLineString(m_keysModel, "Meta keys, comma separated", false, 4, 2));
+        addDialogComponent(new DialogComponentMultiLineString(m_keysModel, "Meta info keys (comma separated)", false,
+            4, 2));
 
         enableDialogs();
     }
