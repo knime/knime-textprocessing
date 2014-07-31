@@ -143,7 +143,7 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
         final boolean keepKeyValCols = m_keepKeyValColModel.getBooleanValue();
 
         // compute frequency and add column
-        ColumnRearranger rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
+        final ColumnRearranger rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
         rearranger.replace(new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx,
                                                    valueColIndx, exec), docColIndx);
         if (!keepKeyValCols) {

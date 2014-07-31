@@ -47,7 +47,6 @@ package org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.SingleCellFactory;
 import org.knime.core.node.ExecutionContext;
@@ -95,17 +94,18 @@ public class MetaInfoCellFactory extends SingleCellFactory {
      */
     @Override
     public DataCell getCell(final DataRow row) {
-        DataCell newCell = DataType.getMissingCell();
+        // value of new cell is value of old cell until new document has been created successfully (Bug: 4996)
+        DataCell newCell = row.getCell(m_docColIndx);
         if (!row.getCell(m_docColIndx).isMissing() && !row.getCell(m_keyColIndx).isMissing()
                 && !row.getCell(m_valueColIndx).isMissing()) {
-            Document d = ((DocumentValue)row.getCell(m_docColIndx)).getDocument();
-            String key = ((StringValue)row.getCell(m_keyColIndx)).getStringValue();
-            String value = ((StringValue)row.getCell(m_valueColIndx)).getStringValue();
+            final Document d = ((DocumentValue)row.getCell(m_docColIndx)).getDocument();
+            final String key = ((StringValue)row.getCell(m_keyColIndx)).getStringValue();
+            final String value = ((StringValue)row.getCell(m_valueColIndx)).getStringValue();
 
-            DocumentBuilder db = new DocumentBuilder(d);
+            final DocumentBuilder db = new DocumentBuilder(d);
             db.setSections(d.getSections());
             db.addMetaInformation(key, value);
-            Document newDoc = db.createDocument();
+            final Document newDoc = db.createDocument();
 
             newCell = m_documentCellFac.createDataCell(newDoc);
         }

@@ -68,7 +68,7 @@ public enum SentimentTag implements TagBuilder {
     /** positive sentiment. */
     POSITIVE,
     /** neutral sentiment. */
-    NEUTAL,
+    NEUTRAL,
     /** negative sentiment. */
     NEGATIVE,
     /** very negative sentiment. */
@@ -76,7 +76,7 @@ public enum SentimentTag implements TagBuilder {
     /** understatement. */
     UNDERSTATEMENT,
     /** exaggeration. */
-    EXAGGEGATION,
+    EXAGGERATION,
     /** irony. */
     IRONY,
     /** amplification. */
@@ -85,6 +85,8 @@ public enum SentimentTag implements TagBuilder {
     NEGATION,
     /** abbreviation. */
     ABBREVIATION,
+    /** uncertain sentiment. */
+    UNCERTAINTY,
     /** unknown sentiment. */
     UNKNOWN;
 
