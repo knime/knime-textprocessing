@@ -91,7 +91,7 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      * The tagger model names and their corresponding model file.
      */
     public static final Hashtable<String, String> TAGGERMODELS =
-        new Hashtable<String, String>();
+        new Hashtable<>();
     static {
         TAGGERMODELS.put("English bidirectional",
                 PATHS.getEnglishBidirectionalPosModelFile());
@@ -162,7 +162,7 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      */
     @Override
     protected List<Tag> getTags(final String tag) {
-        List<Tag> tags = new ArrayList<Tag>();
+        List<Tag> tags = new ArrayList<>();
         if (m_lang.equals(Language.GERMAN)) {
             tags.add(STTSPartOfSpeechTag.stringToTag(tag));
         } else if (m_lang.equals(Language.FRENCH)) {
@@ -178,17 +178,16 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      */
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-        List<HasWord> wordList = new ArrayList<HasWord>();
+        List<HasWord> wordList = new ArrayList<>();
         for (Term t : sentence.getTerms()) {
             for (Word w : t.getWords()) {
                 wordList.add(new edu.stanford.nlp.ling.Word(w.getText()));
             }
         }
-        ArrayList<TaggedWord> taggedWords = m_tagger.tagSentence(wordList);
+        final List<TaggedWord> taggedWords = m_tagger.tagSentence(wordList);
 
-        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(
-                wordList.size());
-        for (TaggedWord tw : taggedWords) {
+        final List<TaggedEntity> taggedEntities = new ArrayList<>(wordList.size());
+        for (final TaggedWord tw : taggedWords) {
             taggedEntities.add(new TaggedEntity(tw.word(), tw.tag()));
         }
         return taggedEntities;
