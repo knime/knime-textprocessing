@@ -55,7 +55,7 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud.outport;
 public final class TagCloudConfigKeys {
 
     private TagCloudConfigKeys() { }
-    
+
     /**
      * The configuration key for the column containing he documents to process.
      */
@@ -79,14 +79,12 @@ public final class TagCloudConfigKeys {
     /**
      * Configuration key and label for the font size distribution.
      */
-    public static final String CFG_TYPEOFFSCALC =
-            "Kind of fontsize distribution";
+    public static final String CFG_TYPEOFFSCALC = "Kind of fontsize distribution";
 
     /**
      * Entryset for the kind of font size calculation.
      */
-    public static final String[] CFG_TYPEOFFSCALCI =
-            {"linear", "logarithmic", "exponential"};
+    public static final String[] CFG_TYPEOFFSCALCI = {"linear", "logarithmic", "exponential"};
 
     /**
      * Configuration key and label for the kind of tagcloud.
@@ -97,14 +95,13 @@ public final class TagCloudConfigKeys {
      * Entry set for the different kinds of font size calculation.
      */
     public static final String[] CFG_TYPEOFTCCALCI =
-            {"Simple Table", "Alphabetic Table", "Size-Sorted Table",
-                    "InsideOut Table"};
+            {"Simple Table", "Alphabetic Table", "Size-Sorted Table", "InsideOut Table"};
 
     /**
      * Index of default tag cloud type.
      */
     public static final int DEFAULT_TAGCLOUD_TYPE = 3;
-    
+
     /**
      * Configuration key and label for ignoring the tags.
      */
@@ -129,44 +126,44 @@ public final class TagCloudConfigKeys {
      */
     public static final String NO_OF_ROWS_LABEL = "No. of rows to display:";
 
-    
-    /** 
-     * Config Key for image width.  
+
+    /**
+     * Config Key for image width.
      */
     public static final String CFGKEY_WIDTH = "Width";
 
-    /** 
-     * Config Key for image height.  
+    /**
+     * Config Key for image height.
      */
     public static final String CFGKEY_HEIGHT = "Height";
-    
-    /** 
+
+    /**
      * Config Key for image export type.
      */
     public static final String CFGKEY_EXPORTTYPE = "ExportType";
-    
-    /** 
+
+    /**
      * Config Key for anti aliasing.
      */
     public static final String CFGKEY_ANTIALIASING = "Anti Aliasing";
-    
-    /** 
+
+    /**
      * Config Key for background color.
      */
     public static final String CFGKEY_BACKGROUND_COLOR = "Background Color";
-    
-    /** 
+
+    /**
      * Config Key for alpha value.
      */
     public static final String CFGKEY_ALPHA_VALUE = "Alpha value";
-    
-    /** 
+
+    /**
      * Config Key for bold value.
      */
     public static final String CFGKEY_BOLD_VALUE = "Bold value";
-    
-    /** 
+
+    /**
      * Config Key for font.
      */
-    public static final String CFGKEY_FONT_VALUE = "Font value";    
+    public static final String CFGKEY_FONT_VALUE = "Font value";
 }

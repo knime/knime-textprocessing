@@ -47,22 +47,24 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
-import org.knime.base.node.viz.plotter.AbstractDrawingPane;
-
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.font.TextLayout;
 
+import org.knime.base.node.viz.plotter.AbstractDrawingPane;
+
 /**
  * The drawing pane of the tag cloud.
- * 
+ *
  * The data of the tag cloud is painted, using the information stored in the
  * {@link TagCloud} object.
- * 
+ *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloudViewDrawingPane extends AbstractDrawingPane {
 
     /**
@@ -120,7 +122,7 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
 
     /**
      * Called when the tag cloud has changed.
-     * 
+     *
      * @param tagcloud new tagcloud
      */
     public void modelChanged(final TagCloud tagcloud) {

@@ -79,8 +79,7 @@ public class TagCloudNodeFactory extends NodeFactory<TagCloudNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<TagCloudNodeModel> createNodeView(final int index,
-            final TagCloudNodeModel model) {
+    public NodeView<TagCloudNodeModel> createNodeView(final int index, final TagCloudNodeModel model) {
         return new TagCloudNodeView(model);
     }
 

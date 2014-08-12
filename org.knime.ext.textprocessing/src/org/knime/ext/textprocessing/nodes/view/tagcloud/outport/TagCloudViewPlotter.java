@@ -93,21 +93,17 @@ public class TagCloudViewPlotter extends AbstractPlotter {
         super(drawingPane, properties);
         if (getProperties() instanceof TagCloudViewPlotterProperties) {
 
-            m_fs = ((TagCloudViewPlotterProperties)getProperties())
-                    .getFontStyleTab();
+            m_fs = ((TagCloudViewPlotterProperties)getProperties()).getFontStyleTab();
 
-            ((TagCloudViewPlotterProperties)getProperties())
-                    .getFitToScreenButton().addActionListener(
+            ((TagCloudViewPlotterProperties)getProperties()).getFitToScreenButton().addActionListener(
                             new ActionListener() {
                                 @Override
-                                public void actionPerformed(
-                                        final ActionEvent arg0) {
+                                public void actionPerformed(final ActionEvent arg0) {
                                     fitTomyScreen();
                                 }
                             });
 
-            final ColorLegendTab legend = 
-              ((TagCloudViewPlotterProperties)getProperties()).getColorLegend();
+            final ColorLegendTab legend = ((TagCloudViewPlotterProperties)getProperties()).getColorLegend();
 
             legend.addChangeListener(new ChangeListener() {
                 /**
@@ -127,10 +123,8 @@ public class TagCloudViewPlotter extends AbstractPlotter {
 
                     updateSize();
                     m_tagcloud.restore();
-                    m_fs.setAll(m_tagcloud.getminFontsize(), m_tagcloud
-                            .getmaxFontsize(), m_tagcloud.getfontName(),
-                            m_tagcloud.getCalcType(), m_tagcloud.getBold(),
-                            m_tagcloud.getAlpha());
+                    m_fs.setAll(m_tagcloud.getminFontsize(), m_tagcloud .getmaxFontsize(), m_tagcloud.getfontName(),
+                            m_tagcloud.getCalcType(), m_tagcloud.getBold(), m_tagcloud.getAlpha());
                     updatePaintModel();
                 }
             });
@@ -141,9 +135,8 @@ public class TagCloudViewPlotter extends AbstractPlotter {
                 public void stateChanged(final ChangeEvent e) {
 
                     updateSize();
-                    m_tagcloud.changeFontsizes(m_fs.getMinFontsize(), m_fs
-                            .getMaxFontsize(), m_fs.getFontName(), m_fs
-                            .getCalcType(), m_fs.getbold());
+                    m_tagcloud.changeFontsizes(m_fs.getMinFontsize(), m_fs.getMaxFontsize(), m_fs.getFontName(),
+                        m_fs.getCalcType(), m_fs.getbold());
                     m_tagcloud.changealpha(m_fs.getAlpha());
                     updatePaintModel();
                 }
@@ -160,17 +153,15 @@ public class TagCloudViewPlotter extends AbstractPlotter {
         m_tagcloud = tc;
         if (getProperties() instanceof TagCloudViewPlotterProperties) {
 
-            ((TagCloudViewPlotterProperties)getProperties())
-            .updateColorLegend(m_tagcloud.getColorMap());
+            ((TagCloudViewPlotterProperties)getProperties()).updateColorLegend(m_tagcloud.getColorMap());
 
-            ((TagCloudViewPlotterProperties)getProperties())
-            .updateFontStyle(m_tagcloud.getminFontsize(),
-                    m_tagcloud.getmaxFontsize() ,
+            ((TagCloudViewPlotterProperties)getProperties()).updateFontStyle(m_tagcloud.getminFontsize(),
+                    m_tagcloud.getmaxFontsize(),
                     m_tagcloud.getfontName(),
                     m_tagcloud.getCalcType(),
                     m_tagcloud.getBold(),
                     m_tagcloud.getAlpha());
-            
+
             updatePaintModel();
         }
     }
@@ -179,8 +170,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
      * creates a new Object
      */
     public TagCloudViewPlotter() {
-        this(new TagCloudViewDrawingPane(), 
-                new TagCloudViewPlotterProperties());
+        this(new TagCloudViewDrawingPane(), new TagCloudViewPlotterProperties());
     }
 
 
@@ -296,8 +286,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
 
         int min = m_tagcloud.getminFontsize();
         int max = m_tagcloud.getmaxFontsize();
-        if ((min != m_fs.getMinFontsize())
-                || (max != m_fs.getMaxFontsize())) {
+        if ((min != m_fs.getMinFontsize()) || (max != m_fs.getMaxFontsize())) {
                 m_fs.setMinMaxFonsize(min, max);
                 m_tagcloud.changeFontsizes(m_fs.getMinFontsize(),
                             m_fs.getMaxFontsize(),
@@ -306,17 +295,17 @@ public class TagCloudViewPlotter extends AbstractPlotter {
                             m_fs.getbold());
         }
     }
-    
+
     /**
      * fits the tag cloud into the current screen.
+     * @param dim the new dimension of the tagcloud panel
      */
     public void fitToSize(final Dimension dim) {
         m_tagcloud.fittoscreen(dim);
 
         int min = m_tagcloud.getminFontsize();
         int max = m_tagcloud.getmaxFontsize();
-        if ((min != m_fs.getMinFontsize())
-                || (max != m_fs.getMaxFontsize())) {
+        if ((min != m_fs.getMinFontsize()) || (max != m_fs.getMaxFontsize())) {
                 m_fs.setMinMaxFonsize(min, max);
                 m_tagcloud.changeFontsizes(m_fs.getMinFontsize(),
                             m_fs.getMaxFontsize(),
@@ -325,7 +314,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
                             m_fs.getbold());
         }
     }
-      
+
 
     /**
      * {@inheritDoc}
@@ -334,8 +323,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
     protected void zoomByClick(final Point clicked) {
         super.zoomByClick(clicked);
         m_tagcloud.zoombyfactor(DEFAULT_ZOOM_FACTOR);
-        m_fs.setMinMaxFonsize(m_tagcloud.getminFontsize(),
-                m_tagcloud.getmaxFontsize());
+        m_fs.setMinMaxFonsize(m_tagcloud.getminFontsize(), m_tagcloud.getmaxFontsize());
         repaint();
         revalidate();
     }

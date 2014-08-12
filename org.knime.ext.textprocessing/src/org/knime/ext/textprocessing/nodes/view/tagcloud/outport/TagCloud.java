@@ -72,7 +72,7 @@ import org.knime.ext.textprocessing.data.Term;
  * as proposed by Seifert et al. in their paper On the beauty and usability
  * of tag clouds.
  *
- *@see AbstractTagCloud
+ * @see AbstractTagCloud
  *
  * @author Iris Adae, University of Konstanz
  */
@@ -130,8 +130,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      *            will be at least the given size but can be larger.
      */
     private void createInsideOutTable(final Dimension drawingPaneDimension) {
-        double w = Math.min(Double.MAX_VALUE,
-                drawingPaneDimension.getWidth()) - 2 * BOUNDLABEL;
+        double w = Math.min(Double.MAX_VALUE, drawingPaneDimension.getWidth()) - 2 * BOUNDLABEL;
         double h = Math.min(Double.MAX_VALUE, drawingPaneDimension.getHeight());
 
         boolean stop = false;
@@ -149,21 +148,19 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      * <code>TagCloudNodeModel</code>.
      *
      * @param totalexec the current <code>ExecutionContext</code> needed to
-     *            check for cancel actions made by the user during the
-     *            execution.
+     *            check for cancel actions made by the user during the execution.
      * @param tagModel containing necessary data information
      * @throws CanceledExecutionException If execution was canceled by the user.
      */
     public void createTagCloud(final ExecutionContext totalexec,
-            final TagCloudNodeModel tagModel)
-                        throws CanceledExecutionException {
+            final TagCloudNodeModel tagModel) throws CanceledExecutionException {
         final int tablewidth = 1000;
 
         totalexec.setProgress(0, "Starting TagCloud Calculation");
 
         /** the Data is read and the minimal an maximal is determined */
         initMinMaxandData((DataArray)tagModel.getData(), tagModel.ignoreTags(),
-                tagModel.getTermCol(), tagModel.getValueCol());
+            tagModel.getTermCol(), tagModel.getValueCol());
 
         totalexec.checkCanceled();
         initAllLabels(System.currentTimeMillis());
@@ -181,21 +178,17 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
             createTable(tablewidth);
             // DictionarysortedTable
         } else if (calctype.equals(TagCloudConfigKeys.CFG_TYPEOFTCCALCI[1])) {
-            createArray(
-                    TagCloudGeneral.getsortedAlphabeticalIterator(
-                            getDataMap().keySet()));
+            createArray(TagCloudGeneral.getsortedAlphabeticalIterator(getDataMap().keySet()));
             m_typeoftagcloud = 1;
             createTable(tablewidth);
             // FontsizesortedTable
         } else if (calctype.equals(TagCloudConfigKeys.CFG_TYPEOFTCCALCI[2])) {
-            createArray(TagCloudGeneral.getsortedFontsizeIterator(getDataMap(),
-                    false));
+            createArray(TagCloudGeneral.getsortedFontsizeIterator(getDataMap(), false));
             m_typeoftagcloud = 2;
             createTable(tablewidth);
             // InsideOutTable
         } else if (calctype.equals(TagCloudConfigKeys.CFG_TYPEOFTCCALCI[3])) {
-            createArray(TagCloudGeneral
-                    .getsortedFontsizeIterator(getDataMap(), true));
+            createArray(TagCloudGeneral.getsortedFontsizeIterator(getDataMap(), true));
             m_typeoftagcloud = 3;
             createInsideOutTable(getPreferredSize());
         }
@@ -203,7 +196,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         totalexec.setProgress(0.9, "Creating positions");
         /** the tag cloud is going to be painted */
         setlabelsontheiplaces();
-        
+
         changealpha(DEFAULT_ALPHA);
     }
 
@@ -276,8 +269,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
          * @param rect contains some white space
          *
          */
-        public InsidePlaces(final Placetype t,
-                            final Rectangle2D.Double rect) {
+        public InsidePlaces(final Placetype t, final Rectangle2D.Double rect) {
             m_type = t;
             m_place = rect;
         }
@@ -296,8 +288,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
     }
 
     /**
-     * The four type of places are used for the class
-     * <code>InsidePlaces</code>.
+     * The four type of places are used for the class <code>InsidePlaces</code>.
      *
      * @author Iris Adae, University of Konstanz
      */
@@ -305,24 +296,22 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         /** will be placed on top of the current position. */
         top,
         /** will be placed on bottom of the current position. */
-         bottom,
-         /** will be placed left of the current position. */
-          left,
-          /** will be placed right of the current position. */
+        bottom,
+        /** will be placed left of the current position. */
+        left,
+        /** will be placed right of the current position. */
         right
     }
 
     /**
      * Creates a new tagcloud view. The most important words, will be shown in
      * the middle of the cloud and the others around.
-     * 
+     *
      * @param width the preferred maximum width of the tagcloud
      * @param height the preferred maximum height of the tagcloud
-     * @return true if the data could be fit inside the given rectangle,
-     *         otherwise false
+     * @return true if the data could be fit inside the given rectangle, otherwise false
      */
-    private boolean createInsideOutTable(final double width, 
-            final double height) {
+    private boolean createInsideOutTable(final double width, final double height) {
         LinkedList<InsidePlaces> placequ = new LinkedList<InsidePlaces>();
         boolean lastlabelfoundaplace = true;
         double w = width * 0.5;
@@ -338,23 +327,19 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                 tcd.setXY(0, 0);
                 // the area above will be inserted
                 placequ.addLast(new InsidePlaces(Placetype.top,
-                        new Rectangle2D.Double(tcd.getWidth() / 2 - w,
-                                (-1) * h, 2 * w, h)));
+                        new Rectangle2D.Double(tcd.getWidth() / 2 - w, (-1) * h, 2 * w, h)));
 
                 // the area in the right will be inserted
                 placequ.add(new InsidePlaces(Placetype.right,
-                        new Rectangle2D.Double(tcd.getWidth(), 0, w - datawidth
-                                / 2, tcd.getHeight())));
+                        new Rectangle2D.Double(tcd.getWidth(), 0, w - datawidth / 2, tcd.getHeight())));
 
                 // the area below will be inserted
                 placequ.addLast(new InsidePlaces(Placetype.bottom,
-                        new Rectangle2D.Double(datawidth / 2 - w, tcd
-                                .getHeight(), 2 * w, h - tcd.getHeight())));
+                        new Rectangle2D.Double(datawidth / 2 - w, tcd.getHeight(), 2 * w, h - tcd.getHeight())));
 
                 // the area left of the label will be inserted
                 placequ.addLast(new InsidePlaces(Placetype.left,
-                        new Rectangle2D.Double(datawidth / 2 - w, 0, w
-                                - datawidth / 2, tcd.getHeight())));
+                        new Rectangle2D.Double(datawidth / 2 - w, 0, w - datawidth / 2, tcd.getHeight())));
             } else {
                 // if the first term already was to big, the method ends.
                 lastlabelfoundaplace = false;
@@ -362,8 +347,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         }
         // as the four initializations are done, we are now going to place
         // all other labels
-        for (int count = 1; count < dataarray.length && lastlabelfoundaplace; 
-        count++) {
+        for (int count = 1; count < dataarray.length && lastlabelfoundaplace; count++) {
             TagCloudData tcd = dataarray[count];
             dataheight = tcd.getHeight();
             // to get a nicer view, we put some free space
@@ -371,8 +355,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
             datawidth = tcd.getWidth() + BOUNDLABEL;
             InsidePlaces now;
             Rectangle2D.Double rect = new Rectangle2D.Double();
-            LinkedList<InsidePlaces> zwischenspeicher = 
-                new LinkedList<InsidePlaces>();
+            LinkedList<InsidePlaces> zwischenspeicher = new LinkedList<InsidePlaces>();
             lastlabelfoundaplace = false;
 
             while ((!lastlabelfoundaplace) && !(placequ.isEmpty())) {
@@ -394,24 +377,18 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                 case top:
                     // we found a top type. So the label will be placed on
                     // the center of the ground of the space.
-                    tcd.setXY(rect.x + (rect.width / 2) - (datawidth / 2),
-                            rect.y + rect.height - tcd.getHeight());
+                    tcd.setXY(rect.x + (rect.width / 2) - (datawidth / 2), rect.y + rect.height - tcd.getHeight());
 
                     // we know slice the area into three parts. left, top and
                     // right of the newly insert label.
                     placequ.addLast((new InsidePlaces(Placetype.left,
-                            new Rectangle2D.Double(rect.x, tcd.getY(), tcd
-                                    .getX()
-                                    - rect.x, tcd.getHeight()))));
+                            new Rectangle2D.Double(rect.x, tcd.getY(), tcd.getX() - rect.x, tcd.getHeight()))));
                     placequ.addLast((new InsidePlaces(Placetype.top,
-                            new Rectangle2D.Double(rect.x, rect.y, rect.width,
-                                    rect.height - tcd.getHeight()))));
+                            new Rectangle2D.Double(rect.x, rect.y, rect.width, rect.height - tcd.getHeight()))));
 
                     placequ.addLast((new InsidePlaces(Placetype.right,
-                            new Rectangle2D.Double(tcd.getX() + datawidth, tcd
-                                    .getY(),
-                                    (rect.width / 2) - (datawidth / 2), tcd
-                                            .getHeight()))));
+                            new Rectangle2D.Double(tcd.getX() + datawidth, tcd.getY(),
+                                    (rect.width / 2) - (datawidth / 2), tcd.getHeight()))));
                     break;
                 case right:
                     tcd.setXY(rect.x, rect.y);
@@ -425,38 +402,31 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                     // show the cause)
                     placequ.addLast((new InsidePlaces(Placetype.right,
                             new Rectangle2D.Double(rect.x, rect.y
-                                    + tcd.getHeight(), rect.width, rect.height
-                                    - tcd.getHeight()))));
+                                    + tcd.getHeight(), rect.width, rect.height - tcd.getHeight()))));
                     break;
                 case bottom:
-                    tcd.setXY(rect.x + (rect.width / 2) - (datawidth / 2),
-                            rect.y);
+                    tcd.setXY(rect.x + (rect.width / 2) - (datawidth / 2), rect.y);
                     // we know slice the area into three parts. below, right and
                     // left of the newly insert label.
 
                     placequ.addLast((new InsidePlaces(Placetype.right,
                             new Rectangle2D.Double(tcd.getX() + datawidth,
-                                    rect.y, rect.width / 2 - datawidth / 2, tcd
-                                            .getHeight()))));
+                                    rect.y, rect.width / 2 - datawidth / 2, tcd.getHeight()))));
                     placequ.addLast((new InsidePlaces(Placetype.bottom,
                             new Rectangle2D.Double(rect.x, rect.y
-                                    + tcd.getHeight(), rect.width, rect.height
-                                    - tcd.getHeight()))));
+                                    + tcd.getHeight(), rect.width, rect.height - tcd.getHeight()))));
                     placequ.addLast((new InsidePlaces(Placetype.left,
                             new Rectangle2D.Double(rect.x, rect.y,
-                                    (rect.width / 2) - (datawidth / 2), tcd
-                                            .getHeight()))));
+                                    (rect.width / 2) - (datawidth / 2), tcd.getHeight()))));
                     break;
                 case left:
                     tcd.setXY(rect.x + rect.width - datawidth, rect.y);
                     // again slicing into two (left and above)
                     placequ.addLast((new InsidePlaces(Placetype.left,
                             new Rectangle2D.Double(rect.x, rect.y
-                                    + tcd.getHeight(), rect.width, rect.height
-                                    - tcd.getHeight()))));
+                                    + tcd.getHeight(), rect.width, rect.height - tcd.getHeight()))));
                     placequ.addLast((new InsidePlaces(Placetype.left,
-                            new Rectangle2D.Double(rect.x, rect.y, rect.width
-                                    - datawidth, tcd.getHeight()))));
+                            new Rectangle2D.Double(rect.x, rect.y, rect.width - datawidth, tcd.getHeight()))));
                     break;
                 }
             }
@@ -528,8 +498,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      * {@inheritDoc}
      */
     @Override
-    public TagCloudData createTagCloudData(final Term term, final double i,
-            final RowKey rowk) {
+    public TagCloudData createTagCloudData(final Term term, final double i, final RowKey rowk) {
         return new TagCloudData(term, i, rowk);
     }
 
@@ -539,10 +508,8 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      */
     public void fittoscreen(final Dimension drawingPaneDimension) {
         double fontSizeScalingFactor =
-                (drawingPaneDimension.getWidth() * drawingPaneDimension
-                        .getHeight())
-                        / (getPreferredSize().getWidth() * getPreferredSize()
-                                .getHeight());
+                (drawingPaneDimension.getWidth() * drawingPaneDimension.getHeight())
+                        / (getPreferredSize().getWidth() * getPreferredSize().getHeight());
 
         double maxiterations = 20;
         /** the width is set to the width of the given dimension*/
@@ -552,10 +519,8 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         futureminmax[1] = getmaxFontsize();
 
         double[] futureminmaxhigh = new double[2];
-        futureminmaxhigh[0] =
-                ((fontSizeScalingFactor - 1) * getminFontsize()) / 3;
-        futureminmaxhigh[1] =
-                ((fontSizeScalingFactor - 1) * getmaxFontsize()) / 3;
+        futureminmaxhigh[0] = ((fontSizeScalingFactor - 1) * getminFontsize()) / 3;
+        futureminmaxhigh[1] = ((fontSizeScalingFactor - 1) * getmaxFontsize()) / 3;
 
         int i = 0;
         /**
@@ -571,29 +536,21 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         while (!fitsin && i <= maxiterations) {
 
             /** reduce factor to just a partial adjusting */
-            if ((drawingPaneDimension.getWidth()
-                    * drawingPaneDimension.getHeight())
-                    < (getPreferredSize().getWidth()
-                            * getPreferredSize().getHeight())) {
+            if ((drawingPaneDimension.getWidth() * drawingPaneDimension.getHeight())
+                    < (getPreferredSize().getWidth() * getPreferredSize().getHeight())) {
                 bigger = true;
-            } else if (0.95 * (drawingPaneDimension.getWidth()
-                    * drawingPaneDimension.getHeight())
-                    > (getPreferredSize().getWidth()
-                      * getPreferredSize().getHeight())) {
+            } else if (0.95 * (drawingPaneDimension.getWidth() * drawingPaneDimension.getHeight())
+                    > (getPreferredSize().getWidth() * getPreferredSize().getHeight())) {
                 bigger = false;
-
             } else {
                 fitsin = true;
             }
-            if ((bigger && futureminmaxhigh[i % 2] > 0)
-                    || (!bigger && futureminmaxhigh[i % 2] < 0)) {
-                // in these
-                // cases we adjusted the font sizes too much,  and have
+            if ((bigger && futureminmaxhigh[i % 2] > 0) || (!bigger && futureminmaxhigh[i % 2] < 0)) {
+                // in these cases we adjusted the font sizes too much,  and have
                 // to go  back a little bit
                 futureminmaxhigh[i % 2] *= -0.5;
             }
-            if (Math.abs(futureminmaxhigh[0]) < 0.1
-                    && Math.abs(futureminmaxhigh[1]) < 0.1) {
+            if (Math.abs(futureminmaxhigh[0]) < 0.1 && Math.abs(futureminmaxhigh[1]) < 0.1) {
                 // if both adjustments are such small, we found a good solution
                 // and going to end.
                 fitsin = true;
@@ -601,18 +558,15 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
             if (!fitsin && Math.abs(futureminmaxhigh[i % 2]) >= 0.1) {
                 futureminmax[i % 2] += futureminmaxhigh[i % 2];
                 setWidth((int)drawingPaneDimension.getWidth());
-                changeFontsizes((int)(Math.round(futureminmax[0])), (int)(Math
-                        .round(futureminmax[1])));
+                changeFontsizes((int)(Math.round(futureminmax[0])), (int)(Math.round(futureminmax[1])));
             }
             i++;
             if (i % 2 == 0) {
-                LOGGER.debug("Fontsizes were adjusted to min: "
-                        + futureminmax[0] + " and max: " + futureminmax[1]);
+                LOGGER.debug("Fontsizes were adjusted to min: " + futureminmax[0] + " and max: " + futureminmax[1]);
             }
         }
         if (i % 2 == 1) {
-            LOGGER.debug("Fontsizes were adjusted to min: " + futureminmax[0]
-                    + " and max: " + futureminmax[1]);
+            LOGGER.debug("Fontsizes were adjusted to min: " + futureminmax[0] + " and max: " + futureminmax[1]);
         }
     }
 
@@ -622,11 +576,8 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      * @param scalingFactor the factor to increase
      */
     public void zoombyfactor(final double scalingFactor) {
-        LOGGER.debug("The fontsize will be increased with "
-                + scalingFactor
-                + ".");
-        changeFontsizes((int)(scalingFactor * getminFontsize()),
-                (int)(scalingFactor * getmaxFontsize()));
+        LOGGER.debug("The fontsize will be increased with " + scalingFactor + ".");
+        changeFontsizes((int)(scalingFactor * getminFontsize()), (int)(scalingFactor * getmaxFontsize()));
 
     }
 
@@ -643,8 +594,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
                 size = modelContent.getInt(CFG_LS_DATASIZE);
         } catch (InvalidSettingsException e1) {
             InvalidSettingsException ioe =
-                    new InvalidSettingsException("Could not load settings,"
-                            + "due to invalid settings in model content !");
+                   new InvalidSettingsException("Could not load settings, due to invalid settings in model content !");
         ioe.initCause(e1);
         throw ioe;
     }

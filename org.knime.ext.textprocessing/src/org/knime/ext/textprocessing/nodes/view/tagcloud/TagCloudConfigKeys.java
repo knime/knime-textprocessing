@@ -51,11 +51,13 @@ package org.knime.ext.textprocessing.nodes.view.tagcloud;
  * Summarizing all ConfigKeys necessary for the TagCloud dialog components.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public final class TagCloudConfigKeys {
 
     private TagCloudConfigKeys() { }
-    
+
     /**
      * The configuration key for the column containing he documents to process.
      */

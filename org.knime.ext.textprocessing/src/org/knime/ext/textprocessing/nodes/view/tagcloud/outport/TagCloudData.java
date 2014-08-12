@@ -203,7 +203,7 @@ public class TagCloudData {
                         comp.m_height);
         return akt.intersects(cur);
     }
-    
+
     /**Checks if two labels intersect.
     *
     * @param comp another tagclouddata
@@ -557,13 +557,13 @@ public class TagCloudData {
 
         return akt.intersects(selectionRectangle);
     }
-    
+
     /**
      * @param selectionRectangle a Rectangle in the view.
      * @param perc amount of allowed overlapping.
      * @return true if the term and the rectangle intersect
      */
-    public boolean intersects(final Rectangle selectionRectangle, 
+    public boolean intersects(final Rectangle selectionRectangle,
             final int perc) {
         Rectangle akt =
                 new Rectangle((int)this.m_x, (int)this.m_y, (int)this.m_width,
@@ -709,12 +709,9 @@ public class TagCloudData {
      * @throws InvalidSettingsException If setting to load is not valid.
      *
      */
-    public void loadFrom(final ModelContentRO modelContent,
-            final String config) throws InvalidSettingsException {
-        m_color = new Color(modelContent.getInt(config + CFG_KEY_TERM_COLOR),
-                true);
-        m_colorfixed = modelContent.getBoolean(
-                config + CFG_KEY_TERM_COLORFIXED);
+    public void loadFrom(final ModelContentRO modelContent, final String config) throws InvalidSettingsException {
+        m_color = new Color(modelContent.getInt(config + CFG_KEY_TERM_COLOR), true);
+        m_colorfixed = modelContent.getBoolean(config + CFG_KEY_TERM_COLORFIXED);
         m_isHighlighted = modelContent.getBoolean(config + CFG_KEY_TERM_HILITE);
         m_isselected = modelContent.getBoolean(config + CFG_KEY_TERM_SELECTED);
         m_sumFreq = modelContent.getDouble(config + CFG_KEY_TERM_VALUE);
@@ -728,10 +725,8 @@ public class TagCloudData {
 
         // loading first tag (others aren't needed here)
         List<Tag> taglist = new LinkedList<Tag>();
-        String tagtype =
-            modelContent.getString(config + CFG_KEY_TERM_TAG_TYPE);
-        String tagvalue =
-            modelContent.getString(config + CFG_KEY_TERM_TAG_VALUE);
+        String tagtype = modelContent.getString(config + CFG_KEY_TERM_TAG_TYPE);
+        String tagvalue = modelContent.getString(config + CFG_KEY_TERM_TAG_VALUE);
 
         Tag t = TagFactory.getInstance().createTag(tagtype, tagvalue);
 
@@ -741,8 +736,7 @@ public class TagCloudData {
         m_term = new Term(wordlist, taglist, true);
 
         // loading row keys
-        RowKey[] rk = modelContent.getRowKeyArray(
-                config + CFG_KEY_TERM_ROWKEYS);
+        RowKey[] rk = modelContent.getRowKeyArray(config + CFG_KEY_TERM_ROWKEYS);
         m_rowID = new ArrayList<RowKey>();
        for (int i = 0; i < rk.length; i++) {
             m_rowID.add(rk[i]);

@@ -47,21 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
-import org.knime.base.node.util.DataArray;
-import org.knime.core.data.DataRow;
-import org.knime.core.data.DoubleValue;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.property.ColorAttr;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContent;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.property.hilite.HiLiteListener;
-import org.knime.core.node.property.hilite.KeyEvent;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -78,6 +63,21 @@ import java.util.Set;
 
 import javax.swing.JLabel;
 
+import org.knime.base.node.util.DataArray;
+import org.knime.core.data.DataRow;
+import org.knime.core.data.DoubleValue;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.property.ColorAttr;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.ModelContent;
+import org.knime.core.node.ModelContentRO;
+import org.knime.core.node.property.hilite.HiLiteListener;
+import org.knime.core.node.property.hilite.KeyEvent;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
+
 /**
  * A tag cloud is a representation of words indicating the importance of the
  * words by distributions of the font size, the intensity of the color and
@@ -93,7 +93,9 @@ import javax.swing.JLabel;
  * @param <TC> the implementation of the {@link TagCloudData} this tag cloud is
  *            based on. The {@link TagCloudData} contains all information n
  *            necessary for displaying one single term.
+ * @deprecated
  */
+@Deprecated
 public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         HiLiteListener, Serializable {
 
@@ -362,7 +364,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         HashMap<Term, Term> termtags = new HashMap<Term, Term>();
 
         for (final DataRow row : data) {
-            if (!row.getCell(termColumn).isMissing() 
+            if (!row.getCell(termColumn).isMissing()
                     && !row.getCell(valueColumn).isMissing()) {
                 Term term =
                         ((TermValue)row.getCell(termColumn))
@@ -373,10 +375,10 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                                 .getDoubleValue();
                 RowKey rowk = row.getKey();
                 // m_hiliteTool.put(rowk, term);
-    
+
                 if (m_hashi.containsKey(termwithouttags)) {
                     i = m_hashi.get(termwithouttags).addFreq(i, rowk);
-    
+
                 } else {
                     m_hashi.put(termwithouttags, createTagCloudData(
                             termwithouttags, i, rowk));
@@ -392,7 +394,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                 }
                 if (i > m_maxvalue) {
                     m_maxvalue = i;
-                }            
+                }
             }
         }
 
@@ -423,7 +425,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             final int termColumn, final int valueColumn) {
 
         for (final DataRow row : data) {
-            if (!row.getCell(termColumn).isMissing() 
+            if (!row.getCell(termColumn).isMissing()
                     && !row.getCell(valueColumn).isMissing()) {
                  Term term =
                         ((TermValue)row.getCell(termColumn))
@@ -432,10 +434,10 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                         ((DoubleValue)row.getCell(valueColumn))
                                 .getDoubleValue();
                 RowKey rowk = row.getKey();
-    
+
                 if (m_hashi.containsKey(term)) {
                     i = m_hashi.get(term).addFreq(i, rowk);
-    
+
                 } else {
                     m_hashi.put(term, createTagCloudData(term, i, rowk));
                     Color c = data.getDataTableSpec()
@@ -541,7 +543,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             }
         }
     }
-    
+
     /**
      * Changes the minimal and maximal font size. These two bounds are used for
      * the font size distribution algorithm.
@@ -643,7 +645,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         } else if (m_bold <= 0) {
             return m_maxvalue + 1;
         }
-        double maxvalue = m_minvalue + ((m_maxvalue - m_minvalue) 
+        double maxvalue = m_minvalue + ((m_maxvalue - m_minvalue)
                 * (99 - m_bold) / (99));
         return maxvalue;
     }

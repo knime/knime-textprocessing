@@ -57,10 +57,10 @@ import org.knime.base.node.viz.plotter.AbstractDrawingPane;
 
 /**
  * The drawing pane of the tag cloud.
- * 
+ *
  * The data of the tag cloud is painted, using the information stored in the
  * {@link TagCloud} object.
- * 
+ *
  * @author Iris Adae, University of Konstanz
  */
 public class TagCloudViewDrawingPane extends AbstractDrawingPane {
@@ -74,7 +74,7 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
      * the TagCloud object contains all data necessary to paint the cloud.
      */
     private TagCloud m_tagcloud;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -82,8 +82,7 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
     public void paintContent(final Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
 
-        Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud
-                .getmaxFontsize());
+        Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud.getmaxFontsize());
         TagCloudData[] points = m_tagcloud.getDataArray();
 
         // through all points
@@ -100,10 +99,8 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
             if (tcd.isBold()) {
                 myfont = myfont.deriveFont(Font.BOLD);
             }
-            TextLayout tl = new TextLayout(tcd.getTerm().getText(), myfont, g2
-                    .getFontRenderContext());
-            tl.draw(g2, (float)tcd.getX(),
-                    (float)(tcd.getY() + tcd.getHeight() * 0.8));
+            TextLayout tl = new TextLayout(tcd.getTerm().getText(), myfont, g2.getFontRenderContext());
+            tl.draw(g2, (float)tcd.getX(), (float)(tcd.getY() + tcd.getHeight() * 0.8));
         }
     }
 
@@ -120,7 +117,7 @@ public class TagCloudViewDrawingPane extends AbstractDrawingPane {
 
     /**
      * Called when the tag cloud has changed.
-     * 
+     *
      * @param tagcloud new tagcloud
      */
     public void modelChanged(final TagCloud tagcloud) {

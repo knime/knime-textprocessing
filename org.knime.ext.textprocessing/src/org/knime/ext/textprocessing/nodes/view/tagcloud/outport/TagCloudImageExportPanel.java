@@ -37,11 +37,11 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  propagated with or for interoperation with KNIME. The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   15.11.2011 (thiel): created
  */
@@ -57,19 +57,24 @@ import java.awt.font.TextLayout;
 import javax.swing.JPanel;
 
 /**
- * 
+ * The panel for the image.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TagCloudImageExportPanel extends JPanel {
 
     private TagCloud m_tagcloud = null;
-    
+
     private boolean m_antialiasing = false;
 
+    /**
+     * Constructor.
+     * @param tagCloud The tagcloud to visualize.
+     */
     public TagCloudImageExportPanel(final TagCloud tagCloud) {
         m_tagcloud = tagCloud;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -79,12 +84,10 @@ public class TagCloudImageExportPanel extends JPanel {
         Graphics2D g2 = (Graphics2D)g;
 
         if (m_antialiasing) {
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
-        
-        Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud
-                .getmaxFontsize());
+
+        Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud.getmaxFontsize());
         TagCloudData[] points = m_tagcloud.getDataArray();
 
         // through all points
@@ -101,13 +104,11 @@ public class TagCloudImageExportPanel extends JPanel {
             if (tcd.isBold()) {
                 myfont = myfont.deriveFont(Font.BOLD);
             }
-            TextLayout tl = new TextLayout(tcd.getTerm().getText(), myfont, 
-                    g2.getFontRenderContext());
-            tl.draw(g2, (float)tcd.getX(), 
-                    (float)(tcd.getY() + tcd.getHeight() * 0.8));
+            TextLayout tl = new TextLayout(tcd.getTerm().getText(), myfont, g2.getFontRenderContext());
+            tl.draw(g2, (float)tcd.getX(), (float)(tcd.getY() + tcd.getHeight() * 0.8));
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -118,11 +119,11 @@ public class TagCloudImageExportPanel extends JPanel {
         }
         return super.getPreferredSize();
     }
-    
+
     /**
      * @param antialiasing the antialiasing to set
      */
     public void setAntialiasing(final boolean antialiasing) {
         m_antialiasing = antialiasing;
-    }    
+    }
 }

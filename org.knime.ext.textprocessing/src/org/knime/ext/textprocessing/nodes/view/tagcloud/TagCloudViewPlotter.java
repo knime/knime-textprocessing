@@ -47,13 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
-import org.knime.base.node.viz.plotter.AbstractDrawingPane;
-import org.knime.base.node.viz.plotter.AbstractPlotter;
-import org.knime.base.node.viz.plotter.AbstractPlotterProperties;
-import org.knime.base.node.viz.plotter.props.ColorLegendTab;
-import org.knime.core.data.RowKey;
-import org.knime.core.node.property.hilite.KeyEvent;
-
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -63,6 +56,13 @@ import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.knime.base.node.viz.plotter.AbstractDrawingPane;
+import org.knime.base.node.viz.plotter.AbstractPlotter;
+import org.knime.base.node.viz.plotter.AbstractPlotterProperties;
+import org.knime.base.node.viz.plotter.props.ColorLegendTab;
+import org.knime.core.data.RowKey;
+import org.knime.core.node.property.hilite.KeyEvent;
+
 /**
  * The plotter for the tag cloud.
  *
@@ -70,7 +70,9 @@ import javax.swing.event.ChangeListener;
  * highlighting elements, zooming and fitting to screen.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloudViewPlotter extends AbstractPlotter {
 
     /**
@@ -105,7 +107,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
                                 }
                             });
 
-            final ColorLegendTab legend = 
+            final ColorLegendTab legend =
               ((TagCloudViewPlotterProperties)getProperties()).getColorLegend();
 
             legend.addChangeListener(new ChangeListener() {
@@ -169,7 +171,7 @@ public class TagCloudViewPlotter extends AbstractPlotter {
                     m_tagcloud.getCalcType(),
                     m_tagcloud.getBold(),
                     m_tagcloud.getAlpha());
-            
+
             updatePaintModel();
         }
     }

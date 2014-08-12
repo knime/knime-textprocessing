@@ -111,96 +111,100 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
                 m_noOfRows.setEnabled(!m_allRows.getBooleanValue());
             }
         });
-        addDialogComponent(new DialogComponentBoolean(m_allRows,
-                TagCloudConfigKeys.ALL_ROWS_LABEL));
-        addDialogComponent(new DialogComponentNumber(m_noOfRows,
-                TagCloudConfigKeys.NO_OF_ROWS_LABEL, new Integer(1)));
+        addDialogComponent(new DialogComponentBoolean(m_allRows, TagCloudConfigKeys.ALL_ROWS_LABEL));
+        addDialogComponent(new DialogComponentNumber(m_noOfRows, TagCloudConfigKeys.NO_OF_ROWS_LABEL, new Integer(1)));
         closeCurrentGroup();
 
         createNewGroup("Column settings:");
-        addDialogComponent(new DialogComponentColumnNameSelection(m_term,
-                "Term column", 0, TermValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_term, "Term column", 0, TermValue.class));
 
         addDialogComponent(new DialogComponentColumnNameSelection(m_columnvalue,
                 "Value column", 0, IntValue.class, DoubleValue.class));
         closeCurrentGroup();
 
         createNewGroup("Tag Cloud settings:");
-        addDialogComponent(new DialogComponentBoolean(m_ignoretags,
-                TagCloudConfigKeys.CFGKEY_IGNORE_TAGS));
+        addDialogComponent(new DialogComponentBoolean(m_ignoretags, TagCloudConfigKeys.CFGKEY_IGNORE_TAGS));
 
         ArrayList<String> list = new ArrayList<String>();
         for (int i = 0; i < TagCloudConfigKeys.CFG_TYPEOFTCCALCI.length; i++) {
             list.add(TagCloudConfigKeys.CFG_TYPEOFTCCALCI[i]);
         }
         addDialogComponent(new DialogComponentStringSelection(m_typeofcalctc,
-                TagCloudConfigKeys.CFG_TYPEOFTCCALC, list));
+            TagCloudConfigKeys.CFG_TYPEOFTCCALC, list));
         closeCurrentGroup();
 
 
         createNewTab("Image Export");
         createNewGroup("Image properties:");
-        final Set<String> exportTypes =
-            NodeViewExport.getViewExportMap().keySet();
-        addDialogComponent(new DialogComponentStringSelection(
-                getImageTypeModel(), "Image type:", exportTypes));
+        final Set<String> exportTypes = NodeViewExport.getViewExportMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(getImageTypeModel(), "Image type:", exportTypes));
 
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentNumber(
-                getWidthModel(), "Width:", Integer.valueOf(10)));
-        addDialogComponent(new DialogComponentNumber(
-                getHeightModel(), "Height:", Integer.valueOf(10)));
+        addDialogComponent(new DialogComponentNumber(getWidthModel(), "Width:", Integer.valueOf(10)));
+        addDialogComponent(new DialogComponentNumber(getHeightModel(), "Height:", Integer.valueOf(10)));
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Font and color:");
-        addDialogComponent(new DialogComponentFontChooser(getFontModel(),
-                "Font", true, new Dimension(150, 20)));
+        addDialogComponent(new DialogComponentFontChooser(getFontModel(), "Font", true, new Dimension(150, 20)));
 
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentNumber(
-                getAlphaModel(), "Alpha:", 1));
+        addDialogComponent(new DialogComponentNumber(getAlphaModel(), "Alpha:", 1));
 
-        addDialogComponent(new DialogComponentNumber(
-                getBoldModel(), "Bold:", 1));
+        addDialogComponent(new DialogComponentNumber(getBoldModel(), "Bold:", 1));
 
         setHorizontalPlacement(false);
-        addDialogComponent(new DialogComponentBoolean(
-                getAntiAliasingModel(), "Antialiasing"));
-        
-        addDialogComponent(new DialogComponentColorChooser(
-                getBackgroundColorModel(), "Background color:", true));
+        addDialogComponent(new DialogComponentBoolean(getAntiAliasingModel(), "Antialiasing"));
+
+        addDialogComponent(new DialogComponentColorChooser(getBackgroundColorModel(), "Background color:", true));
         closeCurrentGroup();
     }
 
+    /**
+     * @return the settings model for the font size.
+     */
     public static SettingsModelFont getFontModel() {
-        return new SettingsModelFont(TagCloudConfigKeys.CFGKEY_FONT_VALUE,
-                TagCloudNodeModel.DEFAULT_FONT);
+        return new SettingsModelFont(TagCloudConfigKeys.CFGKEY_FONT_VALUE, TagCloudNodeModel.DEFAULT_FONT);
     }
-    
+
+    /**
+     * @return  the settings model for the amount of bold terms.
+     */
     public static SettingsModelIntegerBounded getBoldModel() {
         return new SettingsModelIntegerBounded(
                 TagCloudConfigKeys.CFGKEY_BOLD_VALUE,
                 AbstractTagCloud.DEFAULT_BOLD, 0, 100);
     }
 
+    /**
+     * @return  the settings model for the amount of faded terms.
+     */
     public static SettingsModelIntegerBounded getAlphaModel() {
         return new SettingsModelIntegerBounded(
                 TagCloudConfigKeys.CFGKEY_ALPHA_VALUE,
                 AbstractTagCloud.DEFAULT_ALPHA, 0, 100);
     }
 
+    /**
+     * @return  the settings model for the back ground color.
+     */
     public static SettingsModelColor getBackgroundColorModel() {
         return new SettingsModelColor(
                 TagCloudConfigKeys.CFGKEY_BACKGROUND_COLOR,
                 TagCloudNodeModel.DEFAULT_BACKGROUND_COLOR);
     }
 
+    /**
+     * @return  the settings model for anti aliasing the terms.
+     */
     public static SettingsModelBoolean getAntiAliasingModel() {
         return new SettingsModelBoolean(TagCloudConfigKeys.CFGKEY_ANTIALIASING,
                 TagCloudNodeModel.DEFAULT_ANTIALIASING);
     }
 
+    /**
+     * @return  the settings model for the type of image in the outport.
+     */
     public static SettingsModelString getImageTypeModel() {
         final Set<String> types = NodeViewExport.getViewExportMap().keySet();
         String preset;
@@ -209,15 +213,20 @@ public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
         } else {
             preset = null;
         }
-        return new SettingsModelString(TagCloudConfigKeys.CFGKEY_EXPORTTYPE,
-                preset);
+        return new SettingsModelString(TagCloudConfigKeys.CFGKEY_EXPORTTYPE, preset);
     }
 
+    /**
+     * @return  the settings model for the width of the image.
+     */
     public static final SettingsModelIntegerBounded getWidthModel() {
         return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_WIDTH,
                 TagCloudNodeModel.DEFAULT_WIDTH, 0, Integer.MAX_VALUE);
     }
 
+    /**
+     * @return  the settings model for the height of the image.
+     */
     public static final SettingsModelIntegerBounded getHeightModel() {
         return new SettingsModelIntegerBounded(TagCloudConfigKeys.CFGKEY_HEIGHT,
                 TagCloudNodeModel.DEFAULT_HEIGHT, 0, Integer.MAX_VALUE);

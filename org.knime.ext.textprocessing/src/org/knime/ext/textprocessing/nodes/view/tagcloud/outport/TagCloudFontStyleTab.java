@@ -69,31 +69,31 @@ import org.knime.base.node.viz.plotter.props.PropertiesTab;
 
 /**
  * This tab is used to improve the look of the tag cloud.
- * 
+ *
  * There will be two sliders for the minimal and maximal font size. Each slider
  * is supported with a spinner. On the one hand, to show the user the currently
  * selected value as a number. And on the other hand, to give the possibility
  * for an exact adjustment of the values.
- * 
+ *
  * There will also be a selection box containing the three different
  * possibilities of font size distribution (linear, logarithm or exponential)
- * 
+ *
  * The alpha slider can be used to change the color intensity of the terms. The
  * lower the value the more labels will loose intensity.
- * 
+ *
  * The bold slider changes the bold distribution. The higher the slider, the
  * more terms with the highest values will be painted in bold.
- * 
+ *
  * All values can be received and set with the typical get - and set methods.
- * 
+ *
  * If any of the above elements is changed or activated the listener, given
  * through addChangeListener will be invoked.
- * 
+ *
  * The default button restores all default value.
- * 
+ *
  * When the default button is hit, the listener given through
  * addReverseChangeListener will be invoked.
- * 
+ *
  * @author Iris Adae, University of Konstanz
  */
 public class TagCloudFontStyleTab extends PropertiesTab {
@@ -147,7 +147,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
     /**
      * Updates the complete fontstyle with the given parameters.
-     * 
+     *
      * @param min minimal fontsize
      * @param max maximal fontsize
      * @param fontname Name of the font
@@ -167,7 +167,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
     /**
      * Updates the font style with the sizes and the font name and paints the
      * panel.
-     * 
+     *
      * @param min minimal font size
      * @param max maximal font size
      * @param fontname Name of the font
@@ -179,8 +179,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
             final int calcID, final int bold, final int alpha) {
         removeAll();
 
-        GraphicsEnvironment ge = GraphicsEnvironment
-                .getLocalGraphicsEnvironment();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
         String[] fontnames = ge.getAvailableFontFamilyNames();
 
@@ -414,7 +413,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
     /**
      * creates a {@link JSlider}.
-     * 
+     *
      * @param value the preselected value
      * @return a new {@link JSlider}
      */
@@ -423,8 +422,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
         if (val > CFG_SLIDER_MAX_FONTSIZE) {
             val = CFG_SLIDER_MAX_FONTSIZE;
         }
-        JSlider t = new JSlider(CFG_SLIDER_MIN_FONTSIZE,
-                CFG_SLIDER_MAX_FONTSIZE, val);
+        JSlider t = new JSlider(CFG_SLIDER_MIN_FONTSIZE, CFG_SLIDER_MAX_FONTSIZE, val);
         t.setLabelTable(t.createStandardLabels(CFG_SLIDER_STEPSIZE));
         t.setPaintLabels(true);
         t.setPaintTicks(true);
@@ -434,7 +432,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
     /**
      * creates a {@link JSpinner}.
-     * 
+     *
      * @param value the preselected value
      * @return a new {@link JSpinner}
      */
@@ -444,14 +442,13 @@ public class TagCloudFontStyleTab extends PropertiesTab {
             val = CFG_SLIDER_MAX_FONTSIZE;
         }
         JSpinner t = new JSpinner(new SpinnerNumberModel(val,
-                CFG_SPINNER_MIN_FONTSIZE, CFG_SPINNER_MAX_FONTSIZE,
-                CFG_SPINNER_STEPSIZE));
+                CFG_SPINNER_MIN_FONTSIZE, CFG_SPINNER_MAX_FONTSIZE, CFG_SPINNER_STEPSIZE));
         return t;
     }
 
     /**
      * creates a {@link JSlider} for selecting the alphavalue.
-     * 
+     *
      * @return a new {@link JSlider}
      */
     private JSlider createAlphaSlider(final int init) {
@@ -463,7 +460,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
     /**
      * Adds the listener to the sliders.
-     * 
+     *
      * @param a ChangeListener
      */
     public void addChangeListener(final ChangeListener a) {
@@ -472,7 +469,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
     /**
      * Adds the listener to the reverse button.
-     * 
+     *
      * @param a ChangeListener
      */
     public void addReverseChangeListener(final ChangeListener a) {
@@ -510,7 +507,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
     /**
      * Sets the value of the minimal and maximal font size sliders and the
      * associated spinners.
-     * 
+     *
      * @param min new chosen minimal value
      * @param max new chosen maximal value
      */

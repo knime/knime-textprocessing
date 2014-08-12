@@ -58,7 +58,9 @@ import org.knime.core.node.property.hilite.HiLiteHandler;
  * The plotter is registered.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloudNodeView extends NodeView<TagCloudNodeModel>  {
 
     private TagCloudViewPlotter m_plotter;

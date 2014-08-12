@@ -56,7 +56,9 @@ import org.knime.core.node.NodeView;
  * The factory of the tag cloud node.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloudNodeFactory extends NodeFactory<TagCloudNodeModel> {
 
     /**

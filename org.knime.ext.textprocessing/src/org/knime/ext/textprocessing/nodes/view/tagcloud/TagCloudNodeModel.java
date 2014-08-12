@@ -75,8 +75,10 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  * The NodeModel of the tag cloud node.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
 
+@Deprecated
 public class TagCloudNodeModel extends NodeModel {
 
     /** stores the input data table. */
@@ -165,7 +167,7 @@ public class TagCloudNodeModel extends NodeModel {
         int numofRows = inData[0].getRowCount();
         if (!m_allRows.getBooleanValue()) {
             numofRows = Math.min(m_noOfRows.getIntValue(), numofRows);
-            
+
         }
         if (numofRows <= 0) {
             m_tagcloud = null;
@@ -193,7 +195,7 @@ public class TagCloudNodeModel extends NodeModel {
             m_valueColIndex = (new DataTableSpecVerifier(
                     inData[0].getSpec())).getNumberCellIndex();
         }
-        
+
         m_tagcloud = new TagCloud();
         m_tagcloud.createTagCloud(exec, this);
 

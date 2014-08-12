@@ -47,16 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
-import org.knime.core.data.RowKey;
-import org.knime.core.data.property.ColorAttr;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.ModelContentWO;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagFactory;
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.Word;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
@@ -69,6 +59,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import org.knime.core.data.RowKey;
+import org.knime.core.data.property.ColorAttr;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.ModelContentRO;
+import org.knime.core.node.ModelContentWO;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.Word;
 
 /**
  * This class wraps all information and methods needed for displaying one term.
@@ -89,7 +89,9 @@ import java.util.Random;
  * are stored in a list.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloudData {
 
     /** the following configuration keys are used for loading and saving. */
@@ -203,7 +205,7 @@ public class TagCloudData {
                         comp.m_height);
         return akt.intersects(cur);
     }
-    
+
     /**Checks if two labels intersect.
     *
     * @param comp another tagclouddata
@@ -557,13 +559,13 @@ public class TagCloudData {
 
         return akt.intersects(selectionRectangle);
     }
-    
+
     /**
      * @param selectionRectangle a Rectangle in the view.
      * @param perc amount of allowed overlapping.
      * @return true if the term and the rectangle intersect
      */
-    public boolean intersects(final Rectangle selectionRectangle, 
+    public boolean intersects(final Rectangle selectionRectangle,
             final int perc) {
         Rectangle akt =
                 new Rectangle((int)this.m_x, (int)this.m_y, (int)this.m_width,

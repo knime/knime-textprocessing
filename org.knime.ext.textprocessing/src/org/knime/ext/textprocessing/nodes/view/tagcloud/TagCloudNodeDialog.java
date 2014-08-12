@@ -69,7 +69,9 @@ import org.knime.ext.textprocessing.data.TermValue;
  * The configuration dialog for the tagcloud.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloudNodeDialog extends DefaultNodeSettingsPane {
 
     private final SettingsModelString m_term;

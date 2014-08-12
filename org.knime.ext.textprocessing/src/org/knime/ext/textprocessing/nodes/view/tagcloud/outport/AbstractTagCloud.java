@@ -94,8 +94,7 @@ import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
  *            based on. The {@link TagCloudData} contains all information n
  *            necessary for displaying one single term.
  */
-public abstract class AbstractTagCloud<TC extends TagCloudData> implements
-        HiLiteListener, Serializable {
+public abstract class AbstractTagCloud<TC extends TagCloudData> implements HiLiteListener, Serializable {
 
     /**
      * The constant defines the horizontal distance between two
@@ -178,8 +177,14 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     /** default value for the maximal font.*/
     protected static final int DEFAULT_MAXFONT = 50;
 
+    /**
+     * The maximal font size.
+     */
     protected static final int MAX_FONT = 150;
 
+    /**
+     * The minimal font size.
+     */
     protected static final int MIN_FONT = 1;
 
     /** default value for the alpha value.*/
@@ -341,11 +346,9 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         m_hiliteTool = new HashMap<RowKey, Integer>();
 
         if (ignoretags) {
-            initMinMaxandDataignoreTags(data, termColumn,
-                    valueColumn);
+            initMinMaxandDataignoreTags(data, termColumn, valueColumn);
         } else {
-            initMinMaxandData(data, termColumn,
-                    valueColumn);
+            initMinMaxandData(data, termColumn, valueColumn);
 
         }
     }
@@ -366,27 +369,19 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         HashMap<Term, Term> termtags = new HashMap<Term, Term>();
 
         for (final DataRow row : data) {
-            if (!row.getCell(termColumn).isMissing()
-                    && !row.getCell(valueColumn).isMissing()) {
-                Term term =
-                        ((TermValue)row.getCell(termColumn))
-                                .getTermValue();
+            if (!row.getCell(termColumn).isMissing() && !row.getCell(valueColumn).isMissing()) {
+                Term term = ((TermValue)row.getCell(termColumn)) .getTermValue();
                 Term termwithouttags = new Term(term.getWords(), null, true);
-                double i =
-                        ((DoubleValue)row.getCell(valueColumn))
-                                .getDoubleValue();
+                double i = ((DoubleValue)row.getCell(valueColumn)) .getDoubleValue();
                 RowKey rowk = row.getKey();
                 // m_hiliteTool.put(rowk, term);
 
                 if (m_hashi.containsKey(termwithouttags)) {
                     i = m_hashi.get(termwithouttags).addFreq(i, rowk);
-
                 } else {
-                    m_hashi.put(termwithouttags, createTagCloudData(
-                            termwithouttags, i, rowk));
+                    m_hashi.put(termwithouttags, createTagCloudData(termwithouttags, i, rowk));
                     termtags.put(termwithouttags, term);
-                    Color c = data.getDataTableSpec()
-                                .getRowColor(row).getColor();
+                    Color c = data.getDataTableSpec().getRowColor(row).getColor();
                     if (!c.equals(ColorAttr.DEFAULT.getColor())) {
                         m_hashi.get(termwithouttags).setColorPrefixed(c);
                     }
@@ -423,27 +418,19 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
      * @param termColumn id of the column containing the terms
      * @param valueColumn id of the column containing the values
      */
-    private void initMinMaxandData(final DataArray data,
-            final int termColumn, final int valueColumn) {
+    private void initMinMaxandData(final DataArray data, final int termColumn, final int valueColumn) {
 
         for (final DataRow row : data) {
-            if (!row.getCell(termColumn).isMissing()
-                    && !row.getCell(valueColumn).isMissing()) {
-                 Term term =
-                        ((TermValue)row.getCell(termColumn))
-                                .getTermValue();
-                double i =
-                        ((DoubleValue)row.getCell(valueColumn))
-                                .getDoubleValue();
+            if (!row.getCell(termColumn).isMissing() && !row.getCell(valueColumn).isMissing()) {
+                 Term term = ((TermValue)row.getCell(termColumn)).getTermValue();
+                double i = ((DoubleValue)row.getCell(valueColumn)).getDoubleValue();
                 RowKey rowk = row.getKey();
 
                 if (m_hashi.containsKey(term)) {
                     i = m_hashi.get(term).addFreq(i, rowk);
-
                 } else {
                     m_hashi.put(term, createTagCloudData(term, i, rowk));
-                    Color c = data.getDataTableSpec()
-                            .getRowColor(row).getColor();
+                    Color c = data.getDataTableSpec().getRowColor(row).getColor();
                     if (!c.equals(ColorAttr.DEFAULT.getColor())) {
                         m_hashi.get(term).setColorPrefixed(c);
                     }
@@ -461,8 +448,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     /**
      * Creates a new Object of TC.
      *
-     * @param term representing the whole object and containing the words to be
-     *            shown.
+     * @param term representing the whole object and containing the words to be shown.
      * @param i value for the calculating the font size
      * @param rowk rowkey for hiliting
      * @return extends TagCloudData
@@ -481,8 +467,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         m_color = TagCloudGeneral.getStandardColorMap();
         Random rt = new Random(seed);
         FontRenderContext fontrender =
-                new FontRenderContext(new Font(m_fontname, Font.PLAIN,
-                        DEFAULT_MINFONT).getTransform(), true, true);
+                new FontRenderContext(new Font(m_fontname, Font.PLAIN, DEFAULT_MINFONT).getTransform(), true, true);
         // copy is used to erase the unnecessary entries of the color map
         Map<String, Color> copy = TagCloudGeneral.getStandardColorMap();
         Color standard = m_color.get(CFG_UNKNOWN_TAG_COLOR);
@@ -511,8 +496,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                 }
             }
             data.initLabel((int)fs.getSize(m_minfont, m_maxfont, m_minvalue,
-                    m_maxvalue, data.getsumFreq()), c, m_fontname, fontrender,
-                    rt.nextLong());
+                    m_maxvalue, data.getsumFreq()), c, m_fontname, fontrender, rt.nextLong());
         }
 
         Iterator<String> stringit = copy.keySet().iterator();
@@ -620,8 +604,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     public void changeFontsizes(final int minFont, final int maxFont,
             final String fontname, final int calcType, final int bold) {
         if (m_minfont != minFont || m_maxfont != maxFont
-                || !m_fontname.equals(fontname) || calcType != m_calcType
-                || m_bold != bold) {
+                || !m_fontname.equals(fontname) || calcType != m_calcType || m_bold != bold) {
             int minF = minFont;
             int maxF = maxFont;
             if (minF < MIN_FONT) {
@@ -642,8 +625,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
                 boolean b = false;
                 b = tcd.getsumFreq() > bound ? true : false;
                 tcd.setFontStyle((int)fs.getSize(m_minfont, m_maxfont,
-                        m_minvalue, m_maxvalue, tcd.getsumFreq()), m_fontname,
-                        b);
+                        m_minvalue, m_maxvalue, tcd.getsumFreq()), m_fontname, b);
             }
             recreateTagCloud();
         }
@@ -663,8 +645,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         } else if (m_bold <= 0) {
             return m_maxvalue + 1;
         }
-        double maxvalue = m_minvalue + ((m_maxvalue - m_minvalue)
-                * (99 - m_bold) / (99));
+        double maxvalue = m_minvalue + ((m_maxvalue - m_minvalue) * (99 - m_bold) / (99));
         return maxvalue;
     }
 
@@ -803,7 +784,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     public void selectClickedElement(final Point clicked) {
         for (int j = 0; j < m_dataarray.length; j++) {
             TC tcd = m_dataarray[j];
-                tcd.setSelected(tcd.contains(clicked));
+            tcd.setSelected(tcd.contains(clicked));
         }
     }
 
@@ -873,16 +854,14 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             TCFontsize fs = TagCloudGeneral.getfontsizeobject(m_calcType);
 
             int a = 100 - getAlpha();
-            double maxvalue =
-                    m_minvalue + (m_maxvalue - m_minvalue) * a / (100);
+            double maxvalue = m_minvalue + (m_maxvalue - m_minvalue) * a / (100);
 
             for (int j = 0; j < m_dataarray.length; j++) {
                 TC tcd = m_dataarray[j];
                 double freq = tcd.getsumFreq();
                 double d = MAX_TRANSPARENCY;
                 if (freq < maxvalue) {
-                    d = fs.getSize(MIN_TRANSPARENCY, MAX_TRANSPARENCY,
-                                    m_minvalue, maxvalue, freq);
+                    d = fs.getSize(MIN_TRANSPARENCY, MAX_TRANSPARENCY, m_minvalue, maxvalue, freq);
                 }
                 tcd.setColorTransparency((int)d);
             }
@@ -904,8 +883,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
             } else if (bold < 0) {
                 boldvalue = 0;
             }
-            changeFontsizes(getminFontsize(), getmaxFontsize(), getfontName(),
-                    getCalcType(), boldvalue);
+            changeFontsizes(getminFontsize(), getmaxFontsize(), getfontName(), getCalcType(), boldvalue);
         }
     }
 
@@ -951,8 +929,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
      * @param min new minimal font size
      * @param max new maximal font size
      */
-    protected void setMinMaxFontsize(final int min,
-            final int max) {
+    protected void setMinMaxFontsize(final int min, final int max) {
         int minF = min;
         int maxF = max;
         if (minF < MIN_FONT) {
@@ -971,8 +948,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
      * @param minvalue new minimal found data value
      * @param maxvalue new maximal found data value
      */
-    protected void setMinMaxValue(final double minvalue,
-            final double maxvalue) {
+    protected void setMinMaxValue(final double minvalue, final double maxvalue) {
        m_minvalue = minvalue;
        m_maxvalue = maxvalue;
     }
@@ -1016,7 +992,6 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         modelContent.addInt(CFG_LS_MINFONT, getminFontsize());
         modelContent.addDouble(CFG_LS_MINVALUE, m_minvalue);
         modelContent.addDouble(CFG_LS_MAXVALUE, m_maxvalue);
-
         modelContent.addInt(CFG_LS_DATASIZE, m_dataarray.length);
 
         for (int i = 0; i < m_dataarray.length; i++) {
@@ -1027,23 +1002,19 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements
     /**
      * Loads the data from the given <code>ModelContentRO</code>.
      *
-     * @param modelContent The <code>ModelContentRO</code> to load the cells
-     * from.
-     *  @throws InvalidSettingsException If setting to load is not valid.
+     * @param modelContent The <code>ModelContentRO</code> to load the cells from.
+     * @throws InvalidSettingsException If setting to load is not valid.
      */
-    public void loadFrom(final ModelContentRO modelContent)
-    throws InvalidSettingsException {
+    public void loadFrom(final ModelContentRO modelContent) throws InvalidSettingsException {
         m_minvalue = modelContent.getDouble(CFG_LS_MINVALUE);
         m_maxvalue = modelContent.getDouble(CFG_LS_MAXVALUE);
 
         m_height = modelContent.getInt(CFG_LS_HEIGHT);
         m_width = modelContent.getInt(CFG_LS_WIDTH);
 
-        changeFontsizes(modelContent.getInt(CFG_LS_MINFONT),
-                modelContent.getInt(CFG_LS_MAXFONT),
-                modelContent.getString(CFG_LS_FONTNAME),
-                modelContent.getInt(CFG_LS_CALCTYPE),
-                modelContent.getInt(CFG_LS_BOLD));
+        changeFontsizes(modelContent.getInt(CFG_LS_MINFONT), modelContent.getInt(CFG_LS_MAXFONT),
+            modelContent.getString(CFG_LS_FONTNAME), modelContent.getInt(CFG_LS_CALCTYPE),
+            modelContent.getInt(CFG_LS_BOLD));
         changealpha(modelContent.getInt(CFG_LS_ALPHA));
 
         rebuiltHiliteTable();

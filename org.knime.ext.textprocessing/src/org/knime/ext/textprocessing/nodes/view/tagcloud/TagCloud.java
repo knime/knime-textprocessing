@@ -48,6 +48,11 @@
 
 package org.knime.ext.textprocessing.nodes.view.tagcloud;
 
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import org.knime.base.node.util.DataArray;
 import org.knime.core.data.RowKey;
 import org.knime.core.node.CanceledExecutionException;
@@ -59,11 +64,6 @@ import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 
-import java.awt.Dimension;
-import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 /**
  * Contains all methods to create a basic tag cloud and stores the
  * calculated solution.
@@ -72,10 +72,12 @@ import java.util.LinkedList;
  * as proposed by Seifert et al. in their paper On the beauty and usability
  * of tag clouds.
  *
- *@see AbstractTagCloud
+ * @see AbstractTagCloud
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class TagCloud extends AbstractTagCloud<TagCloudData> {
     /**
      * The serialVersionUID.
@@ -203,7 +205,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         totalexec.setProgress(0.9, "Creating positions");
         /** the tag cloud is going to be painted */
         setlabelsontheiplaces();
-        
+
         changealpha(DEFAULT_ALPHA);
     }
 
@@ -315,13 +317,13 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
     /**
      * Creates a new tagcloud view. The most important words, will be shown in
      * the middle of the cloud and the others around.
-     * 
+     *
      * @param width the preferred maximum width of the tagcloud
      * @param height the preferred maximum height of the tagcloud
      * @return true if the data could be fit inside the given rectangle,
      *         otherwise false
      */
-    private boolean createInsideOutTable(final double width, 
+    private boolean createInsideOutTable(final double width,
             final double height) {
         LinkedList<InsidePlaces> placequ = new LinkedList<InsidePlaces>();
         boolean lastlabelfoundaplace = true;
@@ -362,7 +364,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         }
         // as the four initializations are done, we are now going to place
         // all other labels
-        for (int count = 1; count < dataarray.length && lastlabelfoundaplace; 
+        for (int count = 1; count < dataarray.length && lastlabelfoundaplace;
         count++) {
             TagCloudData tcd = dataarray[count];
             dataheight = tcd.getHeight();
@@ -371,7 +373,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
             datawidth = tcd.getWidth() + BOUNDLABEL;
             InsidePlaces now;
             Rectangle2D.Double rect = new Rectangle2D.Double();
-            LinkedList<InsidePlaces> zwischenspeicher = 
+            LinkedList<InsidePlaces> zwischenspeicher =
                 new LinkedList<InsidePlaces>();
             lastlabelfoundaplace = false;
 

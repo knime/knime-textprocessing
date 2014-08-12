@@ -69,7 +69,9 @@ import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLog
  * mapping.
  *
  * @author Iris Adae, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public final class TagCloudGeneral {
 
     /**

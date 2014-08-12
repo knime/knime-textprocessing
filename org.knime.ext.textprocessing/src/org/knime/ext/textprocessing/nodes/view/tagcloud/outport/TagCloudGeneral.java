@@ -60,7 +60,6 @@ import java.util.Set;
 
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.view.tagcloud.AbstractTagCloud;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeExponential;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsizeLinear;
@@ -121,9 +120,7 @@ public final class TagCloudGeneral {
                 } else if (tcd1.getsumFreq() < tcd2.getsumFreq()) {
                     return reverse * (-1);
                 } else {
-                    return (reverse)
-                            * (tcd1.getTerm().getText().compareTo(tcd2
-                                    .getTerm().getText()));
+                    return (reverse) * (tcd1.getTerm().getText().compareTo(tcd2.getTerm().getText()));
                 }
             }
         });
@@ -140,8 +137,7 @@ public final class TagCloudGeneral {
         Set<String> tagsFirstLetters = new HashSet<String>();
         Set<String> tagTypes = TagFactory.getInstance().getTagTypes();
         for (String tagType : tagTypes) {
-            List<String> tags = TagFactory.getInstance()
-                    .getTagSetByType(tagType).asStringList();
+            List<String> tags = TagFactory.getInstance().getTagSetByType(tagType).asStringList();
             for (String tag : tags) {
                 tagsFirstLetters.add(tag);
             }
