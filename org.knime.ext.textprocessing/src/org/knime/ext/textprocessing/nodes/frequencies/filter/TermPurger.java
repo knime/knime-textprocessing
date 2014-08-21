@@ -56,6 +56,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -194,7 +195,7 @@ public class TermPurger {
 
         TextContainerDataCellFactory docCellFac =
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        docCellFac.prepare(m_exec);
+        docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(m_exec));
         DataCellCache dataCellCache = new LRUDataCellCache(docCellFac);
         BufferedDataContainer dc = m_exec.createDataContainer(
             m_inData.getDataTableSpec());

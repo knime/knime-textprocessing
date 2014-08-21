@@ -49,7 +49,7 @@ package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
-import org.knime.core.node.ExecutionContext;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBlobCell;
 import org.knime.ext.textprocessing.data.TextContainer;
@@ -61,8 +61,7 @@ import org.knime.ext.textprocessing.data.TextContainer;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentBlobDataCellFactory implements
-        TextContainerDataCellFactory {
+public class DocumentBlobDataCellFactory implements TextContainerDataCellFactory {
 
     /**
      * {@inheritDoc}
@@ -101,8 +100,8 @@ public class DocumentBlobDataCellFactory implements
 
     /**
      * {@inheritDoc}
-     * @since 2.9
+     * @since 2.11
      */
     @Override
-    public void prepare(final ExecutionContext exec) { }
+    public void prepare(final FileStoreFactory fileStoreFactory) { }
 }

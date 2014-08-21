@@ -40,75 +40,91 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
- * Created on 25.11.2013 by Kilian Thiel
+ * History
+ *   Aug 20, 2014 (thiel): created
  */
-
 package org.knime.ext.textprocessing.nodes.tagging;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.streamable.InputPortRole;
+import org.knime.core.node.streamable.OutputPortRole;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.StreamableFunction;
+import org.knime.core.node.streamable.StreamableFunctionProducer;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
-
 /**
- * An abstract node model for tagger nodes.
+ * Abstract definition of a node that applies a tagger using a {@link ColumnRearranger}.
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
- * @since 2.9
- * @deprecated use {@link StreamableTaggerNodeModel} instead, which supports streaming.
+ * @author Kilian Thiel, KNIME.com, Berlin, Germany
+ * @since 2.11
  */
-@Deprecated
-public abstract class TaggerNodeModel extends NodeModel implements DocumentTaggerFactory {
+public abstract class StreamableTaggerNodeModel extends NodeModel implements StreamableFunctionProducer,
+    DocumentTaggerFactory {
 
-    /**
-     * Default number of threads to use for parallel tagging.
-     */
-    public static final int DEFAULT_NUMBER_OF_THREADS = 1;
-
-    /**
-     * Default number of threads to use for parallel tagging.
-     */
-    public static final int MAX_NUMBER_OF_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
+    private InputPortRole[] m_roles;
 
     /** The settings model storing the number of threads to use for tagging. */
     private SettingsModelIntegerBounded m_numberOfThreadsModel = TaggerNodeSettingsPane.getNumberOfThreadsModel();
 
     /**
-     * Constructor of {@link TaggerNodeModel} creating one data in and one data out port.
+     * Default constructor, defining one data input and one data output port.
      */
-    public TaggerNodeModel() {
-        super(1, 1);
+    public StreamableTaggerNodeModel() {
+        this(1, new InputPortRole[] {});
     }
 
     /**
-     * Constructor for class {@link TaggerNodeModel} with the specified number of in ports and one out port.
-     * @param inports The number of input data ports.
+     * Constructor defining a specified number of data input and one data output port.
+     * @param dataInPorts The number of data input ports.
+     * @param roles The roles of the input ports after the first port.
      */
-    public TaggerNodeModel(final int inports) {
-        super(inports, 1);
+    public StreamableTaggerNodeModel(final int dataInPorts, final InputPortRole[] roles) {
+        super(dataInPorts, 1);
+
+        if (roles.length != dataInPorts - 1) {
+            throw new IllegalArgumentException(
+                "Number of input port roles must be equal to number of data in ports -1!");
+        }
+        m_roles = new InputPortRole[dataInPorts];
+        m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
+        for (int i = 1; i < m_roles.length; i++) {
+            m_roles[i] = roles[i - 1];
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        // TODO: offering additional verification possibilities via method that can be overwritten, is this useful?
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
+        prepareTagger(inData, exec);
+        final ColumnRearranger rearranger = createColumnRearranger(inData[0].getDataTableSpec());
+        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkInputDataTableSpecs(inSpecs);
 
         DataTableSpec in = inSpecs[0];
@@ -116,6 +132,23 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
         DataTableSpec out = r.createSpec();
         return new DataTableSpec[]{out};
     }
+
+    /**
+     * Method to check specs of input data tables. This method can be overwritten to apply specific checks.
+     *
+     * @param inSpecs Specs of the input data tables.
+     * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
+     */
+    protected void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException { }
+
+    /**
+     * Method to prepare the tagger model. This method can be overwritten to apply loading of data from input data
+     * tables for tagging.
+     * @param inData Input data tables.
+     * @param exec The execution context of the node.
+     * @throws Exception If tagger can not be prepared.
+     */
+    protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception { }
 
     /**
      * Creates column rearranger for creation of new data table.
@@ -140,33 +173,47 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
         return rearranger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        prepareTagger(inData, exec);
-        final ColumnRearranger rearranger = createColumnRearranger(inData[0].getDataTableSpec());
-        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
+    public InputPortRole[] getInputPortRoles() {
+        return m_roles;
     }
 
-    /**
-     * Method to check specs of input data tables. This method can be overwritten to apply specific checks.
-     *
-     * @param inSpecs Specs of the input data tables.
-     * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
-     */
-    protected void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException { }
+    /** {@inheritDoc} */
+    @Override
+    public OutputPortRole[] getOutputPortRoles() {
+        OutputPortRole out = OutputPortRole.DISTRIBUTED;
+        return new OutputPortRole[]{out};
+    }
 
-    /**
-     * Method to prepare the tagger model. This method can be overwritten to apply loading of data from input data
-     * tables for tagging.
-     * @param inData Input data tables.
-     * @param exec The execution context of the node.
-     * @throws Exception If tagger can not be prepared.
-     */
-    protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception { }
+    /** {@inheritDoc} */
+    @Override
+    public StreamableFunction
+        createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
+            throws InvalidSettingsException {
+        DataTableSpec in = (DataTableSpec)inSpecs[0];
+        return createColumnRearranger(in).createStreamableFunction();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void reset() {
+        // possibly overwritten
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        // possibly overwritten
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        // possibly overwritten
+    }
 
     /**
      * {@inheritDoc}

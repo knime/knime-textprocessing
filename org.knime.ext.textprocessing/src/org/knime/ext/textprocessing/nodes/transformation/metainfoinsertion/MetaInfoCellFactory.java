@@ -49,6 +49,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.SingleCellFactory;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -85,7 +86,7 @@ public class MetaInfoCellFactory extends SingleCellFactory {
         m_valueColIndx = valueColIndx;
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         if (exec != null) {
-            m_documentCellFac.prepare(exec);
+            m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
         }
     }
 

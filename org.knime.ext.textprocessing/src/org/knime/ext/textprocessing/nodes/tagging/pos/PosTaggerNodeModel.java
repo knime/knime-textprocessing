@@ -49,13 +49,14 @@ package org.knime.ext.textprocessing.nodes.tagging.pos;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
 
 /**
  * The node model of the POS (part of speech) tagger. Extends
@@ -64,7 +65,7 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTaggerNodeModel extends TaggerNodeModel {
+public class PosTaggerNodeModel extends StreamableTaggerNodeModel {
 
     /**
      * Creates new instance of <code>PosTaggerNodeModel</code> which adds

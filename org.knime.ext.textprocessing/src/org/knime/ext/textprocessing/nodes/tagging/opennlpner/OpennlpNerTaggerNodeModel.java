@@ -49,8 +49,10 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
 import java.io.File;
 import java.io.IOException;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -59,13 +61,13 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
 
 /**
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class OpennlpNerTaggerNodeModel extends TaggerNodeModel {
+public class OpennlpNerTaggerNodeModel extends StreamableTaggerNodeModel {
 
     /**
      * The default value for the unmodifiable flag.

@@ -55,6 +55,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -114,7 +115,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public BufferedDataTable createDataTable(final ExecutionContext exec, final List<Document> docs)
         throws CanceledExecutionException {
         // create cache
-        m_documentCellFac.prepare(exec);
+        m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
         DataCellCache cache = new LRUDataCellCache(m_documentCellFac);
         BufferedDataContainer dc = exec.createDataContainer(this.createDataTableSpec());
 
@@ -163,7 +164,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
         m_dc = exec.createDataContainer(this.createDataTableSpec());
         m_opened = true;
         m_rowRey = 0;
-        m_documentCellFac.prepare(exec);
+        m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
     }
 
     /**

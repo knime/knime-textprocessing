@@ -53,8 +53,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
-import org.knime.core.data.container.AbstractCellFactory;
-import org.knime.core.node.ExecutionContext;
+import org.knime.core.data.container.SingleCellFactory;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -68,7 +67,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-final class TaggerCellFactory extends AbstractCellFactory {
+final class TaggerCellFactory extends SingleCellFactory {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TaggerCellFactory.class);
 
@@ -88,13 +87,12 @@ final class TaggerCellFactory extends AbstractCellFactory {
      *
      * @param taggerFac The factory, creating tagger instances for thread local use.
      * @param documentColIndex The index of the column containing the documents to tag.
-     * @param newColSpecs The spec of the create columns.
+     * @param newColSpec The spec of the create column.
      * @param numberOfThreads The number of threads to use.
-     * @param exec The execution context.
      */
     public TaggerCellFactory(final DocumentTaggerFactory taggerFac, final int documentColIndex,
-        final DataColumnSpec[] newColSpecs, final int numberOfThreads, final ExecutionContext exec) {
-        super(true, newColSpecs);
+        final DataColumnSpec newColSpec, final int numberOfThreads) {
+        super(true, newColSpec);
         this.setParallelProcessing(true, numberOfThreads, 20 * numberOfThreads);
 
         LOGGER.debug("Tagging with " + numberOfThreads + " parallel threads.");
@@ -102,26 +100,26 @@ final class TaggerCellFactory extends AbstractCellFactory {
         m_taggerFac = taggerFac;
         m_docColIndex = documentColIndex;
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        m_documentCellFac.prepare(exec);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DataCell[] getCells(final DataRow row) {
-        DocumentTagger tagger;
+    public DataCell getCell(final DataRow row) {
+        m_documentCellFac.prepare(getFileStoreFactory());
+
+        final DocumentTagger tagger;
         try {
             tagger = getTaggerFromPool();
         } catch (Exception e) {
             LOGGER.error("Tagger could not be borrowed from pool.", e);
-            return new DataCell[] {DataType.getMissingCell()};
+            return DataType.getMissingCell();
         }
 
         final Document d = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
-
         synchronized (tagger) {
-            return new DataCell[]{m_documentCellFac.createDataCell(tagger.tag(d))};
+            return m_documentCellFac.createDataCell(tagger.tag(d));
         }
     }
 

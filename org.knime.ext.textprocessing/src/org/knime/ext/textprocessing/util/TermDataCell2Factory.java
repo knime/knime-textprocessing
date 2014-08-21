@@ -48,7 +48,7 @@ package org.knime.ext.textprocessing.util;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
-import org.knime.core.node.ExecutionContext;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell2;
 import org.knime.ext.textprocessing.data.TextContainer;
@@ -98,10 +98,8 @@ public class TermDataCell2Factory implements TextContainerDataCellFactory {
 
     /**
      * {@inheritDoc}
-     *
-     * @since 2.8
+     * @since 2.11
      */
     @Override
-    public void prepare(final ExecutionContext exec) {
-    }
+    public void prepare(final FileStoreFactory fileStoreFactory) { }
 }

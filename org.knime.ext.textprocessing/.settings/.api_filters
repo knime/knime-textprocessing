@@ -37,4 +37,50 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/DocumentBlobDataCellFactory.java" type="org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory"/>
+                <message_argument value="prepare(ExecutionContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/DocumentDataCellFactory.java" type="org.knime.ext.textprocessing.util.DocumentDataCellFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.DocumentDataCellFactory"/>
+                <message_argument value="prepare(ExecutionContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/TermDataCell2Factory.java" type="org.knime.ext.textprocessing.util.TermDataCell2Factory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.TermDataCell2Factory"/>
+                <message_argument value="prepare(ExecutionContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/TermDataCellFactory.java" type="org.knime.ext.textprocessing.util.TermDataCellFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.TermDataCellFactory"/>
+                <message_argument value="prepare(ExecutionContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/TextContainerDataCellFactory.java" type="org.knime.ext.textprocessing.util.TextContainerDataCellFactory">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.TextContainerDataCellFactory"/>
+                <message_argument value="prepare(FileStoreFactory)"/>
+            </message_arguments>
+        </filter>
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.TextContainerDataCellFactory"/>
+                <message_argument value="prepare(ExecutionContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>

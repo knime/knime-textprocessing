@@ -53,6 +53,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -60,6 +61,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
@@ -116,7 +118,7 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
         m_currRow = new AtomicInteger(0);
         m_noRows = inData.getRowCount();
         m_exec = exec;
-        m_docCellFac.prepare(m_exec);
+        m_docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(m_exec));
 
         // sort data table by documents
         final String docColName = inData.getDataTableSpec().getColumnSpec(m_documentColIndex).getName();

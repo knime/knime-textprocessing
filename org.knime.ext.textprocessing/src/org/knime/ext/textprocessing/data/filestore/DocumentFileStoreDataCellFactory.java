@@ -53,7 +53,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
 import org.knime.core.data.filestore.FileStore;
-import org.knime.core.node.ExecutionContext;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Document;
@@ -77,11 +77,12 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
 
     private FileStore m_fileStore;
 
-    private ExecutionContext m_exec;
+    private FileStoreFactory m_fileStoreFactory;
 
     private int m_cellsInFileStore = 0;
 
     private int m_maxCellsInFileStore;
+
 
     /**
      * Creates new instance of {@link DocumentFileStoreDataCellFactory} with default number of maximal documents stored
@@ -103,11 +104,14 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
 
     /**
      * {@inheritDoc}
+     * Prepares the factory and creates a file store to store cells in.
      */
     @Override
-    public synchronized void prepare(final ExecutionContext exec) {
-        m_exec = exec;
-        createNewFileStore();
+    public synchronized void prepare(final FileStoreFactory fileStoreFactory) {
+        if (m_fileStoreFactory == null) {
+            m_fileStoreFactory = fileStoreFactory;
+            createNewFileStore();
+        }
     }
 
     /**
@@ -117,7 +121,7 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
         try {
             final String fileStore = UUID.randomUUID().toString();
             LOGGER.debug("Creating file store: " + fileStore);
-            m_fileStore = m_exec.createFileStore(fileStore);
+            m_fileStore = m_fileStoreFactory.createFileStore(fileStore);
         } catch (IOException e) {
             LOGGER.error("Could not create file store.", e);
         }
@@ -125,9 +129,16 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
 
     /**
      * {@inheritDoc}
+     * Factory has to be prepared before {@link DocumentFileStoreDataCellFactory#createDataCell(TextContainer)}
+     * can be called. Otherwise an {@link IllegalStateException} will be thrown.
      */
     @Override
     public synchronized DataCell createDataCell(final TextContainer tc) {
+        if (m_fileStoreFactory == null) {
+            throw new IllegalStateException(
+                "Factory is not prepared, FileStore has not been created. Prepare factory before creating data cells!");
+        }
+
         DataCell dc = null;
         if (tc instanceof Document) {
             Document doc = (Document)tc;

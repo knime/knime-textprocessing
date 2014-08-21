@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -60,6 +61,7 @@ import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -175,7 +177,7 @@ public class NGramBoWDataTableCreator implements NGramDataTableCreator {
                 m_dataContainer = exec.createDataContainer(createDataTableSpec());
             }
         }
-        m_documentCellFac.prepare(exec);
+        m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
     }
 
     private synchronized void addNGramsToDataContainer(final Map<String, Integer> nGrams, final Document doc) {

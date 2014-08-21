@@ -52,12 +52,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -113,7 +115,7 @@ public class RowPreprocessor extends AbstractPreprocessor {
         m_currRow = new AtomicInteger(0);
         m_noRows = inData.getRowCount();
         m_exec = exec;
-        m_docCellFac.prepare(m_exec);
+        m_docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(m_exec));
 
         m_dc = exec.createDataContainer(m_fac.createDataTableSpec(m_appendIncomingDocument));
         // create hash map with appropriate size

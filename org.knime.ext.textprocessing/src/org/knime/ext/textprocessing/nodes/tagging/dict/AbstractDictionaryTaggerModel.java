@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -63,11 +64,12 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.streamable.InputPortRole;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
 import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeDialog;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -76,7 +78,7 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
  */
-public abstract class AbstractDictionaryTaggerModel extends TaggerNodeModel {
+public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNodeModel {
 
     /**
      * The default value of the terms unmodifiable flag.
@@ -133,7 +135,7 @@ public abstract class AbstractDictionaryTaggerModel extends TaggerNodeModel {
      * table in ports and one out port.
      */
     public AbstractDictionaryTaggerModel() {
-        super(2);
+        super(2, new InputPortRole[] {InputPortRole.NONDISTRIBUTED_STREAMABLE});
     }
 
     /**

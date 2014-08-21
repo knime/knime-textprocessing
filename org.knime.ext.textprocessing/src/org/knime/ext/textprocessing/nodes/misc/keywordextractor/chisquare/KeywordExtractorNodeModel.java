@@ -61,6 +61,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -340,7 +341,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
 
         BufferedDataContainer con = exec.createDataContainer(createDataTableSpec());
-        docCellFac.prepare(exec);
+        docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
         final DataCellCache docCache = new LRUDataCellCache(docCellFac);
 
         try {

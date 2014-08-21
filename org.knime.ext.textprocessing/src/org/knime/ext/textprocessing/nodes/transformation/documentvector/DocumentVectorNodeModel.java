@@ -72,6 +72,7 @@ import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -197,7 +198,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         // document column index.
         m_documentColIndex = inData[0].getSpec().findColumnIndex(m_documentColModel.getStringValue());
 
-        m_documentCellFac.prepare(exec);
+        m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
 
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is

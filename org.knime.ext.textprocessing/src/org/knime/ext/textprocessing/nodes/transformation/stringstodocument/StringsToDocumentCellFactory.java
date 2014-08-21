@@ -50,11 +50,13 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
@@ -109,7 +111,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         }
         m_config = config;
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        docCellFac.prepare(exec);
+        docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
         m_cache = new LRUDataCellCache(docCellFac);
     }
 
