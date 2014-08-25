@@ -47,7 +47,7 @@
 package org.knime.ext.textprocessing.data.filestore;
 
 import java.io.IOException;
-import org.knime.core.data.DataCell;
+
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
@@ -152,21 +152,6 @@ public final class DocumentBufferedFileStoreCell extends AbstractDocumentFileSto
      */
     DocumentBufferedFileStoreCell() {
         super();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean equalsDataCell(final DataCell dc) {
-        if (dc == null) {
-            return false;
-        }
-        if (!m_document.equals(((DocumentBufferedFileStoreCell)dc).getDocument())) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

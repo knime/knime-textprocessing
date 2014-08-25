@@ -155,6 +155,9 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      */
     @Override
     protected boolean equalsDataCell(final DataCell dc) {
+        if (dc == null) {
+            return false;
+        }
         readDocumentData();
         return m_document.equals(((DocumentValue)dc).getDocument());
     }
