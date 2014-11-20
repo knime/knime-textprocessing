@@ -41,11 +41,18 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   23.09.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Hashtable;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -54,14 +61,8 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Hashtable;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -71,25 +72,40 @@ public class DictionaryReplacerNodeModel extends PreprocessingNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger
     .getLogger(DictionaryReplacerNodeModel.class);
-    
+
     /**
      * The default dictionary file path.
      */
     public static final String DEF_DICTFILE = System.getProperty("user.home");
-    
+
     /**
      * The default valid dictionary file extensions (txt).
      */
     public static final String[] VALID_DICTFILE_EXTENIONS = new String[]{"txt"};
-    
+
     /**
      * The default separator.
      */
     public static final String DEFAULT_SEPARATOR = ",";
-    
-    private SettingsModelString m_fileModel = 
-        DictionaryReplacerNodeDialog.getDictionaryFileModel();    
-    
+
+    private SettingsModelString m_fileModel =
+        DictionaryReplacerNodeDialog.getDictionaryFileModel();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        String file = m_fileModel.getStringValue();
+
+        File f = new File(file);
+        if (!f.isFile() || !f.exists() || !f.canRead()) {
+            throw new InvalidSettingsException("Selected dictionary file: "
+                    + file + " is not valid!");
+        }
+        return super.configure(inSpecs);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -127,7 +143,7 @@ public class DictionaryReplacerNodeModel extends PreprocessingNodeModel {
         super.loadValidatedSettingsFrom(settings);
         m_fileModel.loadSettingsFrom(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -136,7 +152,7 @@ public class DictionaryReplacerNodeModel extends PreprocessingNodeModel {
         super.saveSettingsTo(settings);
         m_fileModel.saveSettingsTo(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -145,16 +161,12 @@ public class DictionaryReplacerNodeModel extends PreprocessingNodeModel {
             throws InvalidSettingsException {
         super.validateSettings(settings);
         m_fileModel.validateSettings(settings);
-        
-        String file = ((SettingsModelString)m_fileModel
+
+        ((SettingsModelString)m_fileModel
                 .createCloneWithValidatedValue(settings)).getStringValue();
-        File f = new File(file);
-        if (!f.isFile() || !f.exists() || !f.canRead()) {
-            throw new InvalidSettingsException("Selected dictionary file: "
-                    + file + " is not valid!");
-        }
+
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -162,12 +174,12 @@ public class DictionaryReplacerNodeModel extends PreprocessingNodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -177,7 +189,7 @@ public class DictionaryReplacerNodeModel extends PreprocessingNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
