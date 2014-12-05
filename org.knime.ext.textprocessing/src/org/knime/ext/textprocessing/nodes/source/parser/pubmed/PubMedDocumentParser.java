@@ -53,8 +53,10 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
@@ -421,14 +423,14 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
                 m_currentDoc.addSection(m_abstract.trim(), SectionAnnotation.ABSTRACT);
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Abstract (" + ABSTRACTTEXT
-                    + ") can not be set.");
+                    + ") cannot be set.");
             }
         } else if (name.equals(ARTICLETITLE)) {
             if (m_currentDoc != null) {
                 m_currentDoc.addTitle(m_title.trim());
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Title (" + ARTICLETITLE + ":"
-                    + m_title.trim() + ") can not be set.");
+                    + m_title.trim() + ") cannot be set.");
             }
         } else if (name.equals(AUTHOR) && m_currentDoc != null) {
             if (m_currentDoc != null) {
@@ -436,7 +438,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
                 m_currentDoc.addAuthor(a);
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Author (" + AUTHOR + ":"
-                    + m_firstName.trim() + " " + m_lastName.trim() + ") can not be set.");
+                    + m_firstName.trim() + " " + m_lastName.trim() + ") cannot be set.");
             }
         } else if (name.equals(PUBDATE)) {
             if (m_currentDoc != null) {
@@ -464,7 +466,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
                     m_currentDoc.setPublicationDate(new PublicationDate());
                 }
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Date (" + PUBDATE + ") can not be set.");
+                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Date (" + PUBDATE + ") cannot be set.");
             }
         } else if (name.equals(TITLE)) {
             if (m_journalTitle.length() > 0) {
@@ -473,7 +475,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
                 }
             } else {
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Journal title (" + TITLE + ":"
-                    + m_journalTitle.trim() + ") can not be set.");
+                    + m_journalTitle.trim() + ") cannot be set.");
             }
         } else if (name.equals(JOURNAL)) {
             m_journalFlag = false;
