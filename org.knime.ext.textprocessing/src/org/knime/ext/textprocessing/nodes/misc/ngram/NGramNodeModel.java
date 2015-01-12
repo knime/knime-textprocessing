@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -294,6 +295,7 @@ public class NGramNodeModel extends NodeModel {
 
         AtomicInteger docCount = new AtomicInteger(0);
         RowIterator it = inputTable.iterator();
+        List<Future<?>> futures = new ArrayList<>();
         while (it.hasNext()) {
             exec.checkCanceled();
             DataRow row = it.next();
@@ -316,9 +318,9 @@ public class NGramNodeModel extends NodeModel {
             } else {
                 documentChunk.add(((DocumentValue)row
                         .getCell(m_documentColIndex)).getDocument());
-                pool.enqueue(processChunk(documentChunk,
+                futures.add(pool.enqueue(processChunk(documentChunk,
                                           joiner, exec, semaphore, docCount,
-                                          inputTableSize));
+                                          inputTableSize)));
                 documentChunk = null;
                 count = 0;
             }
@@ -326,11 +328,13 @@ public class NGramNodeModel extends NodeModel {
 
         // enqueue the last chunk and wait
         if (documentChunk != null && documentChunk.size() > 0) {
-            pool.enqueue(processChunk(documentChunk, joiner, exec, semaphore,
-                                      docCount, inputTableSize));
+            futures.add(pool.enqueue(processChunk(documentChunk, joiner, exec, semaphore,
+                                      docCount, inputTableSize)));
         }
 
-        pool.waitForTermination();
+        for (Future<?> f : futures) {
+            f.get(); // this call allows an additional thread from pool to run
+        }
 
         exec.setMessage("Creating output table.");
         return new BufferedDataTable[]{joiner.createDataTable(exec)};
