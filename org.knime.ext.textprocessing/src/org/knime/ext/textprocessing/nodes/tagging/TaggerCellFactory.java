@@ -77,6 +77,8 @@ final class TaggerCellFactory extends SingleCellFactory {
 
     private final TextContainerDataCellFactory m_documentCellFac;
 
+    private boolean m_isFactoryPrepared = false;
+
     private DocumentTagger[] m_taggerPool = null;
 
     private AtomicInteger m_taggerCount = new AtomicInteger(0);
@@ -107,7 +109,12 @@ final class TaggerCellFactory extends SingleCellFactory {
      */
     @Override
     public DataCell getCell(final DataRow row) {
-        m_documentCellFac.prepare(getFileStoreFactory());
+        synchronized (m_documentCellFac) {
+            if (!m_isFactoryPrepared) {
+                m_documentCellFac.prepare(getFileStoreFactory());
+                m_isFactoryPrepared = true;
+            }
+        }
 
         final DocumentTagger tagger;
         try {
@@ -118,9 +125,11 @@ final class TaggerCellFactory extends SingleCellFactory {
         }
 
         final Document d = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
+        final Document taggedDocument;
         synchronized (tagger) {
-            return m_documentCellFac.createDataCell(tagger.tag(d));
+            taggedDocument = tagger.tag(d);
         }
+        return m_documentCellFac.createDataCell(taggedDocument);
     }
 
     /**

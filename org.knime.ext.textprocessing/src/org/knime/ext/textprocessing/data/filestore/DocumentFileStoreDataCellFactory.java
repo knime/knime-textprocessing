@@ -108,10 +108,9 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
      */
     @Override
     public synchronized void prepare(final FileStoreFactory fileStoreFactory) {
-        if (m_fileStoreFactory == null) {
-            m_fileStoreFactory = fileStoreFactory;
-            createNewFileStore();
-        }
+        // Bug 5936: null check has been removed, factory should be re-prepared every time.
+        m_fileStoreFactory = fileStoreFactory;
+        createNewFileStore();
     }
 
     /**
