@@ -99,7 +99,7 @@ public class StringMatcherNodeDialog extends DefaultNodeSettingsPane {
         // adding the column selection
         addDialogComponent(new DialogComponentColumnNameSelection(
                             m_col1, "Search string column:", 0, StringValue.class));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_col2, "Ditionary column:", 1, StringValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_col2, "Dictionary column:", 1, StringValue.class));
         addDialogComponent(new DialogComponentNumber(m_numberofrelatedwords, StringMatcherNodeModel.CFG_NUMBER, 1, 5));
 
         // adding the buttons.
