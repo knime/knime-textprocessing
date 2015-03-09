@@ -49,6 +49,7 @@
 package org.knime.ext.textprocessing.data.hittisau;
 
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.knime.ext.textprocessing.data.DocumentMetaInfo;
 import org.knime.ext.textprocessing.data.Sentence;
@@ -60,12 +61,17 @@ import org.knime.ext.textprocessing.data.Sentence;
 public interface Document {
 
     /**
+     * @return the UUID of a document.
+     */
+    public UUID getUUID();
+
+    /**
      * @return the title of a document.
      */
     public String getTitle();
 
     /**
-     * @return an iterator that iteratesover all sentences of the document.
+     * @return an iterator that iterates over all sentences of the document.
      */
     public Iterator<Sentence> sentenceIterator();
 
@@ -74,7 +80,9 @@ public interface Document {
      */
     public int getLength();
 
-
+    /**
+     * @return the meta information of the document as key value pairs.
+     */
     public DocumentMetaInfo getMetaInformation();
 
 }
