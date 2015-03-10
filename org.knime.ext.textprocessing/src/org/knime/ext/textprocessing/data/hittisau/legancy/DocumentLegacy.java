@@ -86,6 +86,19 @@ public class DocumentLegacy implements Document {
     private InternalTerm[][] m_sentences;
 
 
+    DocumentLegacy(final UUID uuid, final String title, final int numberOfTerms,
+        final DocumentMetaInfo metaInfo, final String[] terms, final String[] whiteSpaces,
+        final TagBuilder[] tagBuilder, final InternalTerm[][] sentences) {
+        m_uuid = uuid;
+        m_title = title;
+        m_numberOfTerms = numberOfTerms;
+        m_metaInfo = metaInfo;
+        m_terms = terms;
+        m_whiteSpaces = whiteSpaces;
+        m_tagBuilder = tagBuilder;
+        m_sentences = sentences;
+    }
+
     /**
      * {@inheritDoc}
      */

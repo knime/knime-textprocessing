@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   07.10.2011 (thiel): created
  */
@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public enum OscarChemDefaultTag implements TagBuilder {
@@ -114,7 +114,7 @@ public enum OscarChemDefaultTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -132,7 +132,7 @@ public enum OscarChemDefaultTag implements TagBuilder {
      * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     * 
+     *
      * @param str The string representing a
      *            {@link org.knime.ext.textprocessing.data.Tag}.
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
@@ -182,4 +182,21 @@ public enum OscarChemDefaultTag implements TagBuilder {
         }
         return tagSet;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag buildTag(final int index) {
+        return new Tag(OscarChemDefaultTag.values()[index].toString(), OscarChemDefaultTag.TAG_TYPE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getTagIndex(final String value) {
+        return OscarChemDefaultTag.valueOf(value).ordinal();
+    }
+
 }

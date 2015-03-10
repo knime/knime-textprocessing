@@ -187,4 +187,20 @@ public enum PharmaDefaultTag implements TagBuilder {
         }
         return tagSet;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag buildTag(final int index) {
+        return new Tag(PharmaDefaultTag.values()[index].toString(), PharmaDefaultTag.TAG_TYPE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getTagIndex(final String value) {
+        return PharmaDefaultTag.valueOf(value).ordinal();
+    }
 }
