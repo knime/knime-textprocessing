@@ -44,55 +44,21 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   09.03.2015 (Kilian): created
+ *   10.03.2015 (Kilian): created
  */
 package org.knime.ext.textprocessing.data.hittisau;
 
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.stream.Stream;
-
-import org.knime.ext.textprocessing.data.DocumentMetaInfo;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  *
  * @author Kilian
  */
-public interface Document extends Iterable<Sentence>, TermLookupTable {
+public interface Serializer {
 
-    /**
-     * @return the UUID of a document.
-     */
-    public UUID getUUID();
+    public void serialize(final DataOutput out) throws IOException;
 
-    /**
-     * @return the title of a document.
-     */
-    public String getTitle();
-
-    /**
-     * @return an iterator that iterates over all sentences of the document.
-     */
-    @Override
-    public Iterator<Sentence> iterator();
-
-    public Stream<Sentence> stream();
-
-    /**
-     * @return the number of terms of a document.
-     */
-    public int getNumberOfTerms();
-
-    /**
-     * @return the number of sentences.
-     */
-    public int getNumberOfSentences();
-
-    /**
-     * @return the meta information of the document as key value pairs.
-     */
-    public DocumentMetaInfo getMetaInformation();
-
-    public Serializer createSerializer();
-
+    public void deserialize(final DataInput in) throws IOException;
 }

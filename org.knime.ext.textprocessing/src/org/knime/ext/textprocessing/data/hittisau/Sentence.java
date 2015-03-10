@@ -44,55 +44,28 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   09.03.2015 (Kilian): created
+ *   10.03.2015 (Kilian): created
  */
 package org.knime.ext.textprocessing.data.hittisau;
 
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.stream.Stream;
+import java.io.Externalizable;
+import java.util.List;
 
-import org.knime.ext.textprocessing.data.DocumentMetaInfo;
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.TextContainer;
 
 /**
  *
  * @author Kilian
  */
-public interface Document extends Iterable<Sentence>, TermLookupTable {
+public interface Sentence extends TextContainer, Externalizable {
 
-    /**
-     * @return the UUID of a document.
-     */
-    public UUID getUUID();
+    public List<Term> getTerms();
 
-    /**
-     * @return the title of a document.
-     */
-    public String getTitle();
-
-    /**
-     * @return an iterator that iterates over all sentences of the document.
-     */
     @Override
-    public Iterator<Sentence> iterator();
+    public String getText();
 
-    public Stream<Sentence> stream();
-
-    /**
-     * @return the number of terms of a document.
-     */
-    public int getNumberOfTerms();
-
-    /**
-     * @return the number of sentences.
-     */
-    public int getNumberOfSentences();
-
-    /**
-     * @return the meta information of the document as key value pairs.
-     */
-    public DocumentMetaInfo getMetaInformation();
-
-    public Serializer createSerializer();
+    @Override
+    public String getTextWithWsSuffix();
 
 }
