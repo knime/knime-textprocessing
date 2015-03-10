@@ -77,6 +77,12 @@ public interface Document extends Iterable<Sentence> {
     public Iterator<Sentence> iterator();
 
     /**
+     * @param i
+     * @return
+     */
+    public Sentence getSentenceAt(final int i);
+
+    /**
      * @return the number of terms of a document.
      */
     public int getNumberOfTerms();
