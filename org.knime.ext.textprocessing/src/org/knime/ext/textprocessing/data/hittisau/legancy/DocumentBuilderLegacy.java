@@ -64,127 +64,127 @@ import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
  */
 public final class DocumentBuilderLegacy {
 
-    public static final DocumentLegacy createDocument(final String title, final String text) {
+    public static final DocumentLegacy createDocument(final String title, final String text)
+        throws IllegalArgumentException {
 
-        if (text != null && !text.isEmpty()) {
+        if (text == null || text.isEmpty()) {
+            throw new IllegalArgumentException("Document text may not be null or empty!");
+        }
 
-            final UUID uuid = UUID.randomUUID();
-            final String tit;
-            if (title == null) {
-                tit = uuid.toString();
-            } else {
-                tit = title;
+        final UUID uuid = UUID.randomUUID();
+        final String tit;
+        if (title == null) {
+            tit = uuid.toString();
+        } else {
+            tit = title;
+        }
+
+        final DocumentMetaInfo metaInfo = new DocumentMetaInfo();
+
+        int numberOfTerms = 0;
+        InternalTerm[][] internalSentences;
+        TagBuilder[] internalTagBuilder = new TagBuilder[0];
+        String[] terms;
+        String[] whiteSpaces;
+
+        // tokenize sentences
+        List<String> strSentences = DefaultTokenization.getSentenceTokenizer().tokenize(text);
+
+        internalSentences = new InternalTerm[strSentences.size()][];
+        int currentTermIndex = 0;
+        int currentWsIndex = 0;
+        Map<String, Integer> uniqueTerms = new LinkedHashMap<>();
+        Map<String, Integer> uniqueWs = new LinkedHashMap<>();
+
+        String cpyText = text;
+        for (int i = 0; i < strSentences.size(); i++) {
+            final String sentence = strSentences.get(i);
+            final String whiteSpaceSuffixSentence;
+            String nextSentence = null;
+            if (i < strSentences.size() - 1) {
+                nextSentence = strSentences.get(i + 1);
             }
 
-            final DocumentMetaInfo metaInfo = new DocumentMetaInfo();
+            // extract whitespace suffix characters
+            int tokenStart = cpyText.indexOf(sentence);
+            cpyText = cpyText.substring(tokenStart + sentence.length());
 
-            int numberOfTerms = 0;
-            InternalTerm[][] internalSentences;
-            TagBuilder[] internalTagBuilder = new TagBuilder[0];
-            String[] terms;
-            String[] whiteSpaces;
+            if (nextSentence != null) {
+                int nextTokenStart = cpyText.indexOf(nextSentence);
+                whiteSpaceSuffixSentence = cpyText.substring(0, nextTokenStart);
+                cpyText = cpyText.substring(nextTokenStart);
+            } else {
+                if (cpyText.length() > 0) {
+                    whiteSpaceSuffixSentence = cpyText;
+                } else {
+                    whiteSpaceSuffixSentence = "";
+                }
+            }
 
-            // tokenize sentences
-            List<String> strSentences = DefaultTokenization.getSentenceTokenizer().tokenize(text);
+            final String sentenceStrWithWs = sentence + whiteSpaceSuffixSentence;
 
-            internalSentences = new InternalTerm[strSentences.size()][];
-            int currentTermIndex = 0;
-            int currentWsIndex = 0;
-            Map<String, Integer> uniqueTerms = new LinkedHashMap<>();
-            Map<String, Integer> uniqueWs = new LinkedHashMap<>();
+            // tokenize words
+            List<String> tokens = DefaultTokenization.getWordTokenizer().tokenize(sentenceStrWithWs);
 
-            String cpyText = text;
-            for (int i = 0; i < strSentences.size(); i++) {
-                final String sentence = strSentences.get(i);
-                final String whiteSpaceSuffixSentence;
-                String nextSentence = null;
-                if (i < strSentences.size() - 1) {
-                    nextSentence = strSentences.get(i + 1);
+            // internal sentence
+            InternalTerm[] sentenceIT = new InternalTerm[tokens.size()];
+            numberOfTerms += tokens.size();
+
+            String cpySentence = sentenceStrWithWs;
+            for (int j = 0; j < tokens.size(); j++) {
+                final String token = tokens.get(j);
+                final String whiteSpaceSuffix;
+                String nextToken = null;
+                if (i < tokens.size() - 1) {
+                    nextToken = tokens.get(i + 1);
                 }
 
                 // extract whitespace suffix characters
-                int tokenStart = cpyText.indexOf(sentence);
-                cpyText = cpyText.substring(tokenStart + sentence.length());
+                tokenStart = cpySentence.indexOf(token);
+                cpySentence = cpySentence.substring(tokenStart + token.length());
 
-                if (nextSentence != null) {
-                    int nextTokenStart = cpyText.indexOf(nextSentence);
-                    whiteSpaceSuffixSentence = cpyText.substring(0, nextTokenStart);
-                    cpyText = cpyText.substring(nextTokenStart);
+                if (nextToken != null) {
+                    int nextTokenStart = cpySentence.indexOf(nextToken);
+                    whiteSpaceSuffix = cpySentence.substring(0, nextTokenStart);
+                    cpySentence = cpySentence.substring(nextTokenStart);
                 } else {
-                    if (cpyText.length() > 0) {
-                        whiteSpaceSuffixSentence = cpyText;
+                    if (cpySentence.length() > 0) {
+                        whiteSpaceSuffix = cpySentence;
                     } else {
-                        whiteSpaceSuffixSentence = "";
+                        whiteSpaceSuffix = "";
                     }
                 }
 
-                final String sentenceStrWithWs = sentence + whiteSpaceSuffixSentence;
-
-                // tokenize words
-                List<String> tokens = DefaultTokenization.getWordTokenizer().tokenize(sentenceStrWithWs);
-
-                // internal sentence
-                InternalTerm[] sentenceIT = new InternalTerm[tokens.size()];
-                numberOfTerms += tokens.size();
-
-                String cpySentence = sentenceStrWithWs;
-                for (int j = 0; j < tokens.size(); j++) {
-                    final String token = tokens.get(i);
-                    final String whiteSpaceSuffix;
-                    String nextToken = null;
-                    if (i < tokens.size() - 1) {
-                        nextToken = tokens.get(i + 1);
-                    }
-
-                    // extract whitespace suffix characters
-                    tokenStart = cpySentence.indexOf(token);
-                    cpySentence = cpySentence.substring(tokenStart + token.length());
-
-                    if (nextToken != null) {
-                        int nextTokenStart = cpySentence.indexOf(nextToken);
-                        whiteSpaceSuffix = cpySentence.substring(0, nextTokenStart);
-                        cpySentence = cpySentence.substring(nextTokenStart);
-                    } else {
-                        if (cpySentence.length() > 0) {
-                            whiteSpaceSuffix = cpySentence;
-                        } else {
-                            whiteSpaceSuffix = "";
-                        }
-                    }
-
-                    // add word if it does not exist
-                    if (!uniqueTerms.containsKey(token)) {
-                        uniqueTerms.put(token, currentTermIndex);
-                        currentTermIndex++;
-                    }
-                    // add white space if it does not exist
-                    if (!uniqueWs.containsKey(whiteSpaceSuffix)) {
-                        uniqueWs.put(whiteSpaceSuffix, currentWsIndex);
-                        currentWsIndex++;
-                    }
-
-                    final int tidx = uniqueTerms.get(token);
-                    final int widx = uniqueWs.get(whiteSpaceSuffix);
-                    sentenceIT[j] = new InternalTerm(tidx, widx, new int[0][0], false);
+                // add word if it does not exist
+                if (!uniqueTerms.containsKey(token)) {
+                    uniqueTerms.put(token, currentTermIndex);
+                    currentTermIndex++;
+                }
+                // add white space if it does not exist
+                if (!uniqueWs.containsKey(whiteSpaceSuffix)) {
+                    uniqueWs.put(whiteSpaceSuffix, currentWsIndex);
+                    currentWsIndex++;
                 }
 
-                internalSentences[i] = sentenceIT;
+                final int tidx = uniqueTerms.get(token);
+                final int widx = uniqueWs.get(whiteSpaceSuffix);
+                sentenceIT[j] = new InternalTerm(tidx, widx, new int[0][0], false);
             }
 
-            terms = new String[uniqueTerms.size()];
-            for (Entry<String, Integer> e : uniqueTerms.entrySet()) {
-                terms[e.getValue()] = e.getKey();
-            }
-
-            whiteSpaces = new String[uniqueWs.size()];
-            for (Entry<String, Integer> e : uniqueWs.entrySet()) {
-                whiteSpaces[e.getValue()] = e.getKey();
-            }
-
-            return new DocumentLegacy(uuid, title, numberOfTerms, metaInfo, terms, whiteSpaces, internalTagBuilder,
-                internalSentences);
+            internalSentences[i] = sentenceIT;
         }
 
-        return null;
+        terms = new String[uniqueTerms.size()];
+        for (Entry<String, Integer> e : uniqueTerms.entrySet()) {
+            terms[e.getValue()] = e.getKey();
+        }
+
+        whiteSpaces = new String[uniqueWs.size()];
+        for (Entry<String, Integer> e : uniqueWs.entrySet()) {
+            whiteSpaces[e.getValue()] = e.getKey();
+        }
+
+        return new DocumentLegacy(uuid, title, numberOfTerms, metaInfo, terms, whiteSpaces, internalTagBuilder,
+            internalSentences);
     }
 }
