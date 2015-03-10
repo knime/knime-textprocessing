@@ -58,7 +58,7 @@ import org.knime.ext.textprocessing.data.Sentence;
  *
  * @author Kilian
  */
-public interface Document {
+public interface Document extends Iterable<Sentence> {
 
     /**
      * @return the UUID of a document.
@@ -73,12 +73,18 @@ public interface Document {
     /**
      * @return an iterator that iterates over all sentences of the document.
      */
-    public Iterator<Sentence> sentenceIterator();
+    @Override
+    public Iterator<Sentence> iterator();
 
     /**
      * @return the number of terms of a document.
      */
     public int getNumberOfTerms();
+
+    /**
+     * @return the number of sentences.
+     */
+    public int getNumberOfSentences();
 
     /**
      * @return the meta information of the document as key value pairs.
