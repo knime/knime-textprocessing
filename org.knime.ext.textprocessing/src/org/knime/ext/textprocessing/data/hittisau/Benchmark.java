@@ -55,8 +55,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Test;
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentBuilderLegacy;
 
 /**
  *
@@ -70,18 +70,18 @@ public class Benchmark {
 
     private final static String DATA_FILE = "25k-lines.csv";
 
-
+    @Test
     public void creationBenchmark() {
         // read string data
         List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
 
         // create documents (measure time)
-
-        for (String line : strs) {
-
-            DocumentBuilderLegacy.createDocument(null, line);
-
-        }
+//
+//        for (String line : strs) {
+//
+//            DocumentBuilderLegacy.createDocument(null, line);
+//
+//        }
 
 //        DocumentBuilder db = new DocumentBuilder();
 //        db.addTitle("");
