@@ -48,41 +48,59 @@
  */
 package org.knime.ext.textprocessing.data.hittisau;
 
-import java.util.Iterator;
-import java.util.UUID;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.knime.ext.textprocessing.data.DocumentMetaInfo;
-import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.core.node.NodeLogger;
 
 /**
  *
  * @author Kilian
  */
-public interface Document {
+public class Benchmark {
 
-    /**
-     * @return the UUID of a document.
-     */
-    public UUID getUUID();
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(Benchmark.class);
 
-    /**
-     * @return the title of a document.
-     */
-    public String getTitle();
+    private final static String DATA_PATH = "D:/Data/Text/Benchmarking/";
 
-    /**
-     * @return an iterator that iterates over all sentences of the document.
-     */
-    public Iterator<Sentence> sentenceIterator();
+    private final static String DATA_FILE = "25k-lines.csv";
 
-    /**
-     * @return the number of terms of a document.
-     */
-    public int getNumberOfTerms();
 
-    /**
-     * @return the meta information of the document as key value pairs.
-     */
-    public DocumentMetaInfo getMetaInformation();
+    public void doBenchmark() {
+        // read string data
+
+        // create documents (measure time)
+
+        // iterate over sentences and terms (measure time)
+
+        // serialize documents (measure time)
+
+        // deserialize documents (measure time)
+    }
+
+    public List<String> readStringData (final File f) {
+        List<String> strings = new LinkedList<String>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            String line = null;
+            while((line = br.readLine()) != null) {
+                line.trim();
+                String[] splits = line.split("<@:@>");
+                strings.add(splits[0].trim());
+            }
+        } catch (IOException e) {
+            LOGGER.error("Can not read benchmark data file.");
+            e.printStackTrace();
+        }
+
+        return strings;
+    }
+
+
 
 }
