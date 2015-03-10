@@ -200,6 +200,7 @@ public class DocumentLegacy implements Document {
         @Override
         public Sentence next() {
             InternalTerm[] internalSentence = m_sentences[m_currentIndex];
+            m_currentIndex++;
 
             List<Term> legacyTerms = new ArrayList<>(internalSentence.length);
 
@@ -250,5 +251,17 @@ public class DocumentLegacy implements Document {
     @Override
     public int hashCode() {
         return getUUID().hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Sentence s : this) {
+            sb.append(s.toString());
+        }
+        return sb.toString();
     }
 }

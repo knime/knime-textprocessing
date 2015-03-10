@@ -70,11 +70,21 @@ public class SerializerTest {
     public void testDocumentLegacyCreation() throws IOException {
         Document doc = DocumentBuilderLegacy.createDocument("Test Document", "The quick fox jumps over the brown dog. "
             + "The brown dog likes to play with the ball.");
+
+        String strBefore = doc.toString();
+
         Serializer ser = doc.createSerializer();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutput dout = new DataOutputStream(bos);
         ser.serialize(doc, dout);
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         Document doc2 = ser.deserialize(new DataInputStream(bis));
+
+        String strAfter = doc2.toString();
+
+        System.out.println(strBefore);
+        System.out.println(strAfter);
+
+        assert strBefore.equals(strAfter);
     }
 }
