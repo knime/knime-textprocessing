@@ -58,7 +58,7 @@ import java.io.IOException;
  */
 public interface Serializer {
 
-    public void serialize(final DataOutput out) throws IOException;
+    public void serialize(final Document doc, final DataOutput out) throws IOException;
 
-    public void deserialize(final DataInput in) throws IOException;
+    public Document deserialize(final DataInput in) throws IOException;
 }
