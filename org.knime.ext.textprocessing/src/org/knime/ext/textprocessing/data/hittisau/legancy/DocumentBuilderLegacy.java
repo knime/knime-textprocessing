@@ -165,7 +165,7 @@ public final class DocumentBuilderLegacy {
 
                     final int tidx = uniqueTerms.get(token);
                     final int widx = uniqueWs.get(whiteSpaceSuffix);
-                    sentenceIT[j] = new InternalTerm(tidx, widx, null, false);
+                    sentenceIT[j] = new InternalTerm(tidx, widx, new int[0][0], false);
                 }
 
                 internalSentences[i] = sentenceIT;
