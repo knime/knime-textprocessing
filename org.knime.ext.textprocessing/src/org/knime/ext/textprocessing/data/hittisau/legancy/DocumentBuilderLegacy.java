@@ -135,8 +135,8 @@ public final class DocumentBuilderLegacy {
                 final String token = tokens.get(j);
                 final String whiteSpaceSuffix;
                 String nextToken = null;
-                if (i < tokens.size() - 1) {
-                    nextToken = tokens.get(i + 1);
+                if (j < tokens.size() - 1) {
+                    nextToken = tokens.get(j + 1);
                 }
 
                 // extract whitespace suffix characters

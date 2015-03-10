@@ -64,10 +64,10 @@ import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentBuilderLegacy;
  *
  * @author Alexander
  */
-public class SerializerTests {
+public class SerializerTest {
 
     @Test
-    public void test() throws IOException {
+    public void testDocumentLegacyCreation() throws IOException {
         Document doc = DocumentBuilderLegacy.createDocument("Test Document", "The quick fox jumps over the brown dog. "
             + "The brown dog likes to play with the ball.");
         Serializer ser = doc.createSerializer();
