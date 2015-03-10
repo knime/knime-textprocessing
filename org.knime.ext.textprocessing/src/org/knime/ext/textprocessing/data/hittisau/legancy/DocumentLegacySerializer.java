@@ -79,6 +79,7 @@ public class DocumentLegacySerializer implements Serializer {
         out.writeUTF(docLeg.getUUID().toString());
         out.writeUTF(docLeg.getTitle());
         out.writeInt(docLeg.getNumberOfTerms());
+        out.writeInt(docLeg.getTerms().length);
         for (String t : docLeg.getTerms()) {
             out.writeUTF(t);
         }
@@ -91,26 +92,26 @@ public class DocumentLegacySerializer implements Serializer {
             out.writeUTF(tb.getType());
         }
         DocumentMetaInfo metaInfo = docLeg.getMetaInformation();
-        out.write(metaInfo.size());
+        out.writeInt(metaInfo.size());
         for (String key : metaInfo.getMetaInfoKeys()) {
             out.writeUTF(key);
             out.writeUTF(metaInfo.getMetaInfoValue(key));
         }
-        out.write(docLeg.getNumberOfSentences());
+        out.writeInt(docLeg.getNumberOfSentences());
         for (int si = 0; si < docLeg.getNumberOfSentences(); si++) {
             InternalTerm[] terms = docLeg.getSentences()[si];
-            out.write(terms.length);
+            out.writeInt(terms.length);
             for (int ti = 0; ti < terms.length; ti++) {
                 InternalTerm term = terms[ti];
-                out.write(term.getTermIndex());
-                out.write(term.getWhiteSpaceIndex());
+                out.writeInt(term.getTermIndex());
+                out.writeInt(term.getWhiteSpaceIndex());
                 out.writeBoolean(term.isImmutable());
-                out.write(term.getTags().length);
+                out.writeInt(term.getTags().length);
                 for (int tgi = 0; tgi < term.getTags().length; tgi++) {
                     int[] tagValues = term.getTags()[tgi];
-                    out.write(tagValues.length);
+                    out.writeInt(tagValues.length);
                     for (int tvi = 0; tvi < tagValues.length; tvi++) {
-                        out.write(tagValues[tvi]);
+                        out.writeInt(tagValues[tvi]);
                     }
                 }
             }
@@ -131,14 +132,13 @@ public class DocumentLegacySerializer implements Serializer {
         TagBuilder[] tagBuilders;
         InternalTerm[][] sentences;
 
-        title = in.readUTF();
-
         uuid = UUID.fromString(in.readUTF());
+        title = in.readUTF();
 
         // Terms
         numTerms = in.readInt();
-        terms = new String[numTerms];
-        for (int i = 0; i < numTerms; i++) {
+        terms = new String[in.readInt()];
+        for (int i = 0; i < terms.length; i++) {
             terms[i] = in.readUTF();
         }
 
@@ -154,7 +154,8 @@ public class DocumentLegacySerializer implements Serializer {
         }
 
         // Metainfo
-        for (int i = 0; i < in.readInt(); i++) {
+        int metaSize = in.readInt();
+        for (int i = 0; i < metaSize; i++) {
             metaInfo.put(in.readUTF(), in.readUTF());
         }
 

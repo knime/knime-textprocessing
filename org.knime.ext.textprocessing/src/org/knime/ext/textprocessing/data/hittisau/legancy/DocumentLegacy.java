@@ -176,8 +176,7 @@ public class DocumentLegacy implements Document {
      */
     @Override
     public Serializer createSerializer() {
-        // TODO Auto-generated method stub
-        return null;
+        return new DocumentLegacySerializer();
     }
 
     class SentenceIterator implements Iterator<Sentence> {
@@ -234,4 +233,22 @@ public class DocumentLegacy implements Document {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof DocumentLegacy)) {
+            return false;
+        }
+        return ((DocumentLegacy)obj).getUUID().equals(getUUID());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return getUUID().hashCode();
+    }
 }
