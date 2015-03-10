@@ -58,7 +58,7 @@ import org.knime.ext.textprocessing.data.DocumentMetaInfo;
  *
  * @author Kilian
  */
-public interface Document extends Iterable<Sentence>, TermLookupTable {
+public interface Document extends Iterable<Sentence> {
 
     /**
      * @return the UUID of a document.

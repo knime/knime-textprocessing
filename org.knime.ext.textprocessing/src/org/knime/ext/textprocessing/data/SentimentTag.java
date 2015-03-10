@@ -176,4 +176,22 @@ public enum SentimentTag implements TagBuilder {
         }
         return tagSet;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tag buildTag(final int index) {
+        return new Tag(SentimentTag.values()[index].toString(), SentimentTag.TAG_TYPE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getTagIndex(final String value) {
+        return SentimentTag.valueOf(value).ordinal();
+    }
+
+
 }

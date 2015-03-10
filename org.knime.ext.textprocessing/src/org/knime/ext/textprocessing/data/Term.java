@@ -47,7 +47,6 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -69,7 +68,7 @@ import org.knime.ext.textprocessing.util.TextContainers;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Term implements TextContainer, Externalizable {
+public class Term implements org.knime.ext.textprocessing.data.hittisau.Term {
 
     /**
      * The default string which separates the words, which is used e.g. in {@link Term#toString()}.
@@ -132,6 +131,7 @@ public class Term implements TextContainer, Externalizable {
      *         {@link org.knime.ext.textprocessing.data.Word}s the
      *         {@link org.knime.ext.textprocessing.data.Word}sterm consist of.
      */
+    @Override
     public List<Word> getWords() {
         return Collections.unmodifiableList(m_words);
     }
@@ -141,6 +141,7 @@ public class Term implements TextContainer, Externalizable {
      *         {@link org.knime.ext.textprocessing.data.Tag}s assigned to the
      *         term.
      */
+    @Override
     public List<Tag> getTags() {
         return Collections.unmodifiableList(m_tags);
     }

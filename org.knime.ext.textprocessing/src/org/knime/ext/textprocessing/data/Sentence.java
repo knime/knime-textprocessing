@@ -47,7 +47,6 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -63,7 +62,7 @@ import org.knime.ext.textprocessing.util.TextContainers;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Sentence implements TextContainer, Externalizable {
+public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sentence {
 
     private static final long serialVersionUID = 2908976905629595643L;
 
@@ -99,6 +98,7 @@ public class Sentence implements TextContainer, Externalizable {
     /**
      * @return the unmodifiable list of terms representing the sentence.
      */
+    @Override
     public List<Term> getTerms() {
         return Collections.unmodifiableList(m_terms);
     }
