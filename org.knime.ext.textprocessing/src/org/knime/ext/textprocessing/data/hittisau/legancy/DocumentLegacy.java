@@ -85,6 +85,21 @@ public class DocumentLegacy implements Document {
 
     private InternalTerm[][] m_sentences;
 
+    String[] getWhitespaces()  {
+        return m_whiteSpaces;
+    }
+
+    String[] getTerms()  {
+        return m_terms;
+    }
+
+    TagBuilder[] getTagBuilders() {
+        return m_tagBuilder;
+    }
+
+    InternalTerm[][] getSentences() {
+        return m_sentences;
+    }
 
     DocumentLegacy(final UUID uuid, final String title, final int numberOfTerms,
         final DocumentMetaInfo metaInfo, final String[] terms, final String[] whiteSpaces,

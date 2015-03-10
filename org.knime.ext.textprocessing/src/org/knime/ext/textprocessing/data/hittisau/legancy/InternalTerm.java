@@ -55,6 +55,27 @@ package org.knime.ext.textprocessing.data.hittisau.legancy;
  */
 public class InternalTerm {
 
+    /**
+     *
+     */
+    public InternalTerm() {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param termIdx the term index
+     * @param wsIdx the whitespace index
+     * @param tags the tag values
+     * @param immutable if the term is immutable
+     *
+     */
+    public InternalTerm(final int termIdx, final int wsIdx, final int[][] tags, final boolean immutable) {
+        m_termIndex = termIdx;
+        m_whiteSpaceIndex = wsIdx;
+        m_tags = tags;
+        m_immutable = immutable;
+    }
+
     private int m_termIndex;
 
     private int m_whiteSpaceIndex;
