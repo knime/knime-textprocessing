@@ -66,7 +66,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
 
     private static final long serialVersionUID = 2908976905629595643L;
 
-    private List<Term> m_terms;
+    private List<org.knime.ext.textprocessing.data.hittisau.Term> m_terms;
 
     private int m_hashCode = -1;
 
@@ -86,7 +86,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
      * @param sentence The list of terms to set as sentence.
      * @throws NullPointerException If the list of terms is <code>null</code>.
      */
-    public Sentence(final List<Term> sentence) throws NullPointerException {
+    public Sentence(final List<org.knime.ext.textprocessing.data.hittisau.Term> sentence) throws NullPointerException {
         if (sentence == null) {
             throw new NullPointerException(
                     "Term list \"sentence\" may not be null!");
@@ -99,7 +99,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
      * @return the unmodifiable list of terms representing the sentence.
      */
     @Override
-    public List<Term> getTerms() {
+    public List<org.knime.ext.textprocessing.data.hittisau.Term> getTerms() {
         return Collections.unmodifiableList(m_terms);
     }
 
@@ -126,7 +126,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Term term : m_terms) {
+        for (org.knime.ext.textprocessing.data.hittisau.Term term : m_terms) {
             sb.append(term.toString());
         }
         return sb.toString();
@@ -159,7 +159,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
             int fac = 119;
             int div = 13;
             m_hashCode = 0;
-            for (Term t : m_terms) {
+            for (org.knime.ext.textprocessing.data.hittisau.Term t : m_terms) {
                 m_hashCode += fac * t.hashCode() / div;
             }
         }
@@ -173,7 +173,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
     public void writeExternal(final ObjectOutput out) throws IOException {
         out.writeInt(m_hashCode);
         out.writeInt(m_terms.size());
-        for (Term t : m_terms) {
+        for (org.knime.ext.textprocessing.data.hittisau.Term t : m_terms) {
             out.writeObject(t);
         }
     }
@@ -186,7 +186,7 @@ public class Sentence implements org.knime.ext.textprocessing.data.hittisau.Sent
             ClassNotFoundException {
         m_hashCode = in.readInt();
         int size = in.readInt();
-        m_terms = new ArrayList<Term>(size);
+        m_terms = new ArrayList<org.knime.ext.textprocessing.data.hittisau.Term>(size);
         for (int i = 0; i < size; i++) {
             m_terms.add((Term)in.readObject());
         }
