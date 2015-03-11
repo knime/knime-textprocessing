@@ -72,9 +72,12 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentBuilderLegacy;
 import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacy;
 import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacySerializer;
+import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
  *
@@ -86,115 +89,204 @@ public class Benchmark {
 
     private final static String DATA_PATH = "D:/Data/Text/Benchmarking/";
 
-    private final static String DATA_FILE = "25k-lines.csv";
+    private final static String DATA_FILE = "5k-lines.csv";
+
+    private final static int NUMBER_OF_RUNS = 1;
 
     @Test
-    public void creationBenchmark() {
+    public void runBenchmark() {
+        for (int i = 1; i <= NUMBER_OF_RUNS; i++) {
+            doBenchmarkDocumentOld();
+            //doBenchmarkDocumentLegacy();
+        }
+    }
+
+    public void doBenchmarkDocumentOld() {
         // read string data
         List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
+        List<org.knime.ext.textprocessing.data.Document> documents = new LinkedList<>();
 
-        long start;
-        long end;
-        long sumDeltaLegacy = 0 ;
+        // benchmark creation
+        long start, end;
+        long sumDeltaLegacy = 0;
 
-        for (String line : strs) {
-            start = System.nanoTime();
-            DocumentBuilderLegacy.createDocument(null, line);
-            end = System.nanoTime();
-            sumDeltaLegacy += (end - start) / 100;
-
-        }
-
-        sumDeltaLegacy = sumDeltaLegacy/strs.size();
-        long sumDeltaOld = 0;
         Author a = new Author();
         DocumentSource ds = new DocumentSource();
         DocumentCategory cat = new DocumentCategory();
         PublicationDate pd = new PublicationDate();
         DocumentMetaInfo mi = new DocumentMetaInfo();
-        for ( String line : strs) {
-        start = System.nanoTime();
-        DocumentBuilder db = new DocumentBuilder();
+        for (String line : strs) {
+            start = System.currentTimeMillis();
+            DocumentBuilder db = new DocumentBuilder();
+            db.addTitle("");
+            db.addSection(line, SectionAnnotation.ABSTRACT);
+            db.addAuthor(a);
+            db.addDocumentSource(ds);
+            db.setDocumentType(DocumentType.UNKNOWN);
+            db.addDocumentCategory(cat);
+            db.setPublicationDate(pd);
+            db.addMetaInformation(mi);
+            org.knime.ext.textprocessing.data.Document d = db.createDocument();
 
-        db.addTitle("");
-        db.addSection(line, SectionAnnotation.ABSTRACT);
-        db.addAuthor(a);
-        db.addDocumentSource(ds);
-        db.setDocumentType(DocumentType.UNKNOWN);
-        db.addDocumentCategory(cat);
-        db.setPublicationDate(pd);
-        db.addMetaInformation(mi);
-
-        db.createDocument();
-        end = System.nanoTime();
-        sumDeltaOld += (end - start) / 100;
+            end = System.currentTimeMillis();
+            sumDeltaLegacy += (end - start);
+            documents.add(d);
         }
-        sumDeltaOld = sumDeltaOld/strs.size();
+        double sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
 
-        System.out.println("delta Old"+sumDeltaOld);
-        System.out.println("delta New"+sumDeltaLegacy);
+        System.out.println("Document Old;Creation;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+
+        // iteration benchmark
+        for (org.knime.ext.textprocessing.data.Document d : documents) {
+            start = System.currentTimeMillis();
+            Iterator<org.knime.ext.textprocessing.data.Sentence> it = d.sentenceIterator();
+            while (it.hasNext()) {
+                org.knime.ext.textprocessing.data.Sentence s = it.next();
+                for (Term t : s.getTerms()) {
+                    for (Word w : t.getWords()) {
+                        w.getWhitespaceSuffix();
+                    }
+                    for (Tag ta : t.getTags()) {
+
+                    }
+                }
+            }
+            end = System.currentTimeMillis();
+            sumDeltaLegacy += (end - start);
+        }
+        sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
+
+        System.out.println("Document Old;Iteration;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+
+        // serialization
+        List<org.knime.ext.textprocessing.data.Document> deserializedDocs = new LinkedList<>();
+
+        long sumDeltaLegacyD = 0;
+        long numberOfBytes = 0;
+        for (org.knime.ext.textprocessing.data.Document d : documents) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutput out = new DataOutputStream(baos);
+
+            try {
+                start = System.currentTimeMillis();
+                TermDocumentDeSerializationUtil.fastSerializeDocument(d, out);
+                end = System.currentTimeMillis();
+                sumDeltaLegacy += (end - start);
+
+                baos.flush();
+                byte[] docAsByteArr = baos.toByteArray();
+                numberOfBytes += docAsByteArr.length;
+                ByteArrayInputStream bis = new ByteArrayInputStream(docAsByteArr);
+                DataInput in = new DataInputStream(bis);
+
+                long startD = System.currentTimeMillis();
+                org.knime.ext.textprocessing.data.Document newD =
+                    TermDocumentDeSerializationUtil.fastDeserializeDocument(in);
+                long endD = System.currentTimeMillis();
+                sumDeltaLegacyD += (endD - startD);
+
+                deserializedDocs.add(d);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
+        double sumDeltaLegacyAvgD = (double)sumDeltaLegacyD / (double)strs.size();
+        double numberOfBytesAvg = (double)numberOfBytes / (double)strs.size();
+
+        System.out.println("Document Old;Serialization;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+        System.out.println("Document Old;Deserialization;" + strs.size() + ";" + sumDeltaLegacyD + ";" + sumDeltaLegacyAvgD);
+        System.out.println("Document Old;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
     }
 
-    public void serializationBenchmark(final Document oldDoc, final DocumentLegacy newDoc) {
-        // iterate over sentences and terms (measure time)
+    public void doBenchmarkDocumentLegacy() {
+        // read string data
+        List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
+        List<DocumentLegacy> documents = new LinkedList<>();
 
-        Iterator<Sentence> itr =   newDoc.iterator();
-        long start;
-        long end;
-        long sumDeltaLegacy = 0 ;
-        start = System.nanoTime();
-         while(itr.hasNext()) {
+        // benchmark creation
+        long start, end;
+        long sumDeltaLegacy = 0;
 
-            Sentence element = itr.next();
+        for (String line : strs) {
+            start = System.currentTimeMillis();
+            DocumentLegacy d = DocumentBuilderLegacy.createDocument(null, line);
+            end = System.currentTimeMillis();
+            sumDeltaLegacy += (end - start);
+            documents.add(d);
+        }
+        double sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
 
-         }
-         end = System.nanoTime();
-         sumDeltaLegacy += end-start;
+        System.out.println("Document Legay;Creation;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
 
-        // serialize documents (measure time)
-      DocumentLegacySerializer serial = new DocumentLegacySerializer();
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // iteration benchmark
+        for (Document d : documents) {
+            start = System.currentTimeMillis();
+            for (Sentence s : d) {
+                for (Term t : s.getTerms()) {
+                    for (Word w : t.getWords()) {
+                        w.getWhitespaceSuffix();
+                    }
+                    for (Tag ta : t.getTags()) {
 
+                    }
+                }
+            }
+            end = System.currentTimeMillis();
+            sumDeltaLegacy += (end - start);
+        }
+        sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
 
-      DataOutput out = new DataOutputStream(baos) ;
-     long sumDeltaLegacySerialize=0;
-     long sumDeltaLegacyDeserialize=0;
- //    for(collection){
-     try{
-      byte[] b = null;
-      start = System.nanoTime();
-      serial.serialize(newDoc, out);
-      end = System.nanoTime();
-      sumDeltaLegacySerialize += end-start;
-      out.write(b);
-      ByteArrayInputStream bais = new ByteArrayInputStream(b);
-      DataInput in = new DataInputStream(bais);
-   // deserialize documents (measure time)
-      start = System.nanoTime();
-      serial.deserialize(in);
-      end = System.nanoTime();
-      sumDeltaLegacyDeserialize += end-start;
+        System.out.println("Document Legay;Iteration;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
 
-//}
-      }
-      catch(IOException io)
-      {
+        // serialization
+        DocumentLegacySerializer serial = new DocumentLegacySerializer();
+        List<Document> deserializedDocs = new LinkedList<>();
 
-      };
+        long sumDeltaLegacyD = 0;
+        long numberOfBytes = 0;
+        for (DocumentLegacy d : documents) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutput out = new DataOutputStream(baos);
 
+            try {
+                start = System.currentTimeMillis();
+                serial.serialize(d, out);
+                end = System.currentTimeMillis();
+                sumDeltaLegacy += (end - start);
 
+                baos.flush();
+                byte[] docAsByteArr = baos.toByteArray();
+                numberOfBytes += docAsByteArr.length;
+                ByteArrayInputStream bis = new ByteArrayInputStream(docAsByteArr);
+                DataInput in = new DataInputStream(bis);
 
+                long startD = System.currentTimeMillis();
+                Document newD = serial.deserialize(in);
+                long endD = System.currentTimeMillis();
+                sumDeltaLegacyD += (endD - startD);
 
+                deserializedDocs.add(d);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
+        double sumDeltaLegacyAvgD = (double)sumDeltaLegacyD / (double)strs.size();
+        double numberOfBytesAvg = (double)numberOfBytes / (double)strs.size();
 
+        System.out.println("Document Legay;Serialization;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+        System.out.println("Document Legay;Deserialization;" + strs.size() + ";" + sumDeltaLegacyD + ";" + sumDeltaLegacyAvgD);
+        System.out.println("Document Legay;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
     }
 
-    public List<String> readStringData (final File f) {
+    public List<String> readStringData(final File f) {
         List<String> strings = new LinkedList<String>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
             String line = null;
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 line.trim();
                 String[] splits = line.split("<@:@>");
                 strings.add(splits[0].trim());
@@ -206,7 +298,5 @@ public class Benchmark {
 
         return strings;
     }
-
-
 
 }

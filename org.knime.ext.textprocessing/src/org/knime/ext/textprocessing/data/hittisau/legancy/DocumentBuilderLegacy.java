@@ -184,7 +184,7 @@ public final class DocumentBuilderLegacy {
             whiteSpaces[e.getValue()] = e.getKey();
         }
 
-        return new DocumentLegacy(uuid, title, numberOfTerms, metaInfo, terms, whiteSpaces, internalTagBuilder,
+        return new DocumentLegacy(uuid, tit, numberOfTerms, metaInfo, terms, whiteSpaces, internalTagBuilder,
             internalSentences);
     }
 }
