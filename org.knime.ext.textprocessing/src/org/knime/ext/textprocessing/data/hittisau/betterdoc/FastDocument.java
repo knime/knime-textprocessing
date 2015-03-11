@@ -44,30 +44,27 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   10.03.2015 (Kilian): created
+ *   10.03.2015 (Alexander): created
  */
-package org.knime.ext.textprocessing.data.hittisau.legancy;
+package org.knime.ext.textprocessing.data.hittisau.betterdoc;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.knime.ext.textprocessing.data.DocumentMetaInfo;
-import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.data.hittisau.Document;
 import org.knime.ext.textprocessing.data.hittisau.Sentence;
 import org.knime.ext.textprocessing.data.hittisau.Serializer;
-import org.knime.ext.textprocessing.data.hittisau.Term;
+import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacySerializer;
 
 /**
  *
- * @author Kilian
+ * @author Alexander
  */
-public class DocumentLegacy implements Document {
+public class FastDocument implements Document, TermLookupTable, TagBuilderLookupTable {
 
     private UUID m_uuid;
 
@@ -81,9 +78,9 @@ public class DocumentLegacy implements Document {
 
     private String[] m_whiteSpaces;
 
-    private TagBuilder[] m_tagBuilder;
+    private TagBuilder[] m_tagBuilders;
 
-    private InternalTerm[][] m_sentences;
+    private FastSentence[] m_sentences;
 
     String[] getWhitespaces()  {
         return m_whiteSpaces;
@@ -94,23 +91,23 @@ public class DocumentLegacy implements Document {
     }
 
     TagBuilder[] getTagBuilders() {
-        return m_tagBuilder;
+        return m_tagBuilders;
     }
 
-    InternalTerm[][] getSentences() {
+    FastSentence[] getSentences() {
         return m_sentences;
     }
 
-    DocumentLegacy(final UUID uuid, final String title, final int numberOfTerms,
+    public FastDocument(final UUID uuid, final String title, final int numberOfTerms,
         final DocumentMetaInfo metaInfo, final String[] terms, final String[] whiteSpaces,
-        final TagBuilder[] tagBuilder, final InternalTerm[][] sentences) {
+        final TagBuilder[] tagBuilder, final FastSentence[] sentences) {
         m_uuid = uuid;
         m_title = title;
         m_numberOfTerms = numberOfTerms;
         m_metaInfo = metaInfo;
         m_terms = terms;
         m_whiteSpaces = whiteSpaces;
-        m_tagBuilder = tagBuilder;
+        m_tagBuilders = tagBuilder;
         m_sentences = sentences;
     }
 
@@ -143,8 +140,7 @@ public class DocumentLegacy implements Document {
      */
     @Override
     public Stream<Sentence> stream() {
-        // TODO Auto-generated method stub
-        return null;
+        return  Arrays.stream(m_sentences);
     }
 
     /**
@@ -199,38 +195,7 @@ public class DocumentLegacy implements Document {
          */
         @Override
         public Sentence next() {
-            InternalTerm[] internalSentence = m_sentences[m_currentIndex];
-            m_currentIndex++;
-
-            List<Term> legacyTerms = new ArrayList<>(internalSentence.length);
-
-            for (int i = 0; i < internalSentence.length; i++) {
-
-                InternalTerm it = internalSentence[i];
-                String word = m_terms[it.getTermIndex()];
-                String ws = m_whiteSpaces[it.getWhiteSpaceIndex()];
-
-                // Words (incl. Whitespaces)
-                List<Word> legacyWords = new ArrayList<>(1);
-                legacyWords.add(new Word(word, ws));
-
-                // Tags
-                List<Tag> legacyTags = new ArrayList<>();
-                for (int tbi = 0; tbi < m_tagBuilder.length; tbi++) {
-                    TagBuilder tb = m_tagBuilder[tbi];
-
-                    int noTags = it.getTags()[tbi].length;
-                    for (int nt = 0; nt < noTags; nt++) {
-                        Tag legacyTag = new Tag(tb.buildTag(it.getTags()[tbi][nt]).getTagValue(), tb.getType());
-                        legacyTags.add(legacyTag);
-                    }
-                }
-
-                Term t = new org.knime.ext.textprocessing.data.Term(legacyWords,  legacyTags, it.isImmutable());
-                legacyTerms.add(t);
-            }
-
-            return new org.knime.ext.textprocessing.data.Sentence(legacyTerms);
+            return m_sentences[m_currentIndex++];
         }
     }
 
@@ -239,10 +204,10 @@ public class DocumentLegacy implements Document {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof DocumentLegacy)) {
+        if (!(obj instanceof FastDocument)) {
             return false;
         }
-        return ((DocumentLegacy)obj).getUUID().equals(getUUID());
+        return ((FastDocument)obj).getUUID().equals(getUUID());
     }
 
     /**
@@ -257,11 +222,19 @@ public class DocumentLegacy implements Document {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Sentence s : this) {
-            sb.append(s.toString());
+    public String getTermAt(final int i) {
+        if (i < 0) {
+            return m_whiteSpaces[i + 1];
+        } else {
+            return m_terms[i];
         }
-        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TagBuilder getTagBuilderAt(final int i) {
+        return m_tagBuilders[i];
     }
 }

@@ -74,6 +74,9 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.data.hittisau.betterdoc.FastDocument;
+import org.knime.ext.textprocessing.data.hittisau.betterdoc.FastDocumentBuilder;
+import org.knime.ext.textprocessing.data.hittisau.betterdoc.FastDocumentSerializer;
 import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentBuilderLegacy;
 import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacy;
 import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacySerializer;
@@ -87,7 +90,7 @@ public class Benchmark {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(Benchmark.class);
 
-    private final static String DATA_PATH = "D:/Data/Text/Benchmarking/";
+    private final static String DATA_PATH = "/Users/Alexander/Desktop/";
 
     private final static String DATA_FILE = "5k-lines.csv";
 
@@ -96,8 +99,9 @@ public class Benchmark {
     @Test
     public void runBenchmark() {
         for (int i = 1; i <= NUMBER_OF_RUNS; i++) {
-            //doBenchmarkDocumentOld();
+            doBenchmarkDocumentOld();
             doBenchmarkDocumentLegacy();
+            doBenchmarkFastDocument();
         }
     }
 
@@ -280,11 +284,92 @@ public class Benchmark {
         System.out.println("Document Legay;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
     }
 
+    public void doBenchmarkFastDocument() {
+        // read string data
+        List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
+        List<FastDocument> documents = new LinkedList<>();
+
+        // benchmark creation
+        long start, end;
+        long sumDeltaLegacy = 0;
+
+        for (String line : strs) {
+            start = System.currentTimeMillis();
+            FastDocument d = FastDocumentBuilder.createDocument(null, line);
+            end = System.currentTimeMillis();
+            sumDeltaLegacy += (end - start);
+            documents.add(d);
+        }
+        double sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
+
+        System.out.println("Document New;Creation;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+
+        // iteration benchmark
+        for (Document d : documents) {
+            start = System.currentTimeMillis();
+            for (Sentence s : d) {
+                for (Term t : s.getTerms()) {
+                    for (Word w : t.getWords()) {
+                        w.getWhitespaceSuffix();
+                    }
+                    for (Tag ta : t.getTags()) {
+
+                    }
+                }
+            }
+            end = System.currentTimeMillis();
+            sumDeltaLegacy += (end - start);
+        }
+        sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
+
+        System.out.println("Document New;Iteration;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+
+        // serialization
+        FastDocumentSerializer serial = new FastDocumentSerializer();
+        List<Document> deserializedDocs = new LinkedList<>();
+
+        long sumDeltaLegacyD = 0;
+        long numberOfBytes = 0;
+        for (FastDocument d : documents) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutput out = new DataOutputStream(baos);
+
+            try {
+                start = System.currentTimeMillis();
+                serial.serialize(d, out);
+                end = System.currentTimeMillis();
+                sumDeltaLegacy += (end - start);
+
+                baos.flush();
+                byte[] docAsByteArr = baos.toByteArray();
+                numberOfBytes += docAsByteArr.length;
+                ByteArrayInputStream bis = new ByteArrayInputStream(docAsByteArr);
+                DataInput in = new DataInputStream(bis);
+
+                long startD = System.currentTimeMillis();
+                Document newD = serial.deserialize(in);
+                long endD = System.currentTimeMillis();
+                sumDeltaLegacyD += (endD - startD);
+
+                deserializedDocs.add(d);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        sumDeltaLegacyAvg = (double)sumDeltaLegacy / (double)strs.size();
+        double sumDeltaLegacyAvgD = (double)sumDeltaLegacyD / (double)strs.size();
+        double numberOfBytesAvg = (double)numberOfBytes / (double)strs.size();
+
+        System.out.println("Document New;Serialization;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+        System.out.println("Document New;Deserialization;" + strs.size() + ";" + sumDeltaLegacyD + ";" + sumDeltaLegacyAvgD);
+        System.out.println("Document New;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
+    }
+
     public List<String> readStringData(final File f) {
         List<String> strings = new LinkedList<String>();
-
+        BufferedReader br = null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(f));
+            br = new BufferedReader(new FileReader(f));
             String line = null;
             while ((line = br.readLine()) != null) {
                 line.trim();
@@ -294,6 +379,14 @@ public class Benchmark {
         } catch (IOException e) {
             LOGGER.error("Can not read benchmark data file.");
             e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    System.out.println("Cannot close buffered reader");
+                }
+            }
         }
 
         return strings;

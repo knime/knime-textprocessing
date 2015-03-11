@@ -46,25 +46,16 @@
  * History
  *   10.03.2015 (Kilian): created
  */
-package org.knime.ext.textprocessing.data.hittisau;
+package org.knime.ext.textprocessing.data.hittisau.betterdoc;
 
-import java.io.Externalizable;
-import java.util.List;
+import org.knime.ext.textprocessing.data.TagBuilder;
 
-import org.knime.ext.textprocessing.data.TextContainer;
 
 /**
  *
  * @author Kilian
  */
-public interface Sentence extends TextContainer, Externalizable {
-
-    public List<org.knime.ext.textprocessing.data.hittisau.Term> getTerms();
-
-    @Override
-    public String getText();
-
-    @Override
-    public String getTextWithWsSuffix();
-
+@FunctionalInterface
+public interface TagBuilderLookupTable {
+   public TagBuilder getTagBuilderAt(final int i);
 }

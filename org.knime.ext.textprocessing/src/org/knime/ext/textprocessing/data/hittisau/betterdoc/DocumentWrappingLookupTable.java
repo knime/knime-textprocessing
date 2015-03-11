@@ -44,19 +44,42 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   10.03.2015 (Kilian): created
+ *   11.03.2015 (Alexander): created
  */
-package org.knime.ext.textprocessing.data.hittisau;
+package org.knime.ext.textprocessing.data.hittisau.betterdoc;
 
-import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.TagBuilder;
 
 /**
  *
- * @author Kilian
+ * @author Alexander
  */
-@FunctionalInterface
-public interface TermLookupTable {
+public class DocumentWrappingLookupTable implements TermLookupTable, TagBuilderLookupTable {
 
-   public Term getTermAt(final int i);
+    private FastDocument m_doc;
+
+    public DocumentWrappingLookupTable(final FastDocument doc) {
+        m_doc = doc;
+    }
+
+    public void setDocument(final FastDocument doc) {
+        m_doc = doc;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TagBuilder getTagBuilderAt(final int i) {
+        return m_doc.getTagBuilderAt(i);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTermAt(final int i) {
+        return m_doc.getTermAt(i);
+    }
 
 }

@@ -44,27 +44,87 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   10.03.2015 (Kilian): created
+ *   10.03.2015 (Alexander): created
  */
-package org.knime.ext.textprocessing.data.hittisau;
+package org.knime.ext.textprocessing.data.hittisau.betterdoc;
 
-import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 
-import org.knime.ext.textprocessing.data.TextContainer;
+import org.knime.ext.textprocessing.data.hittisau.Sentence;
+import org.knime.ext.textprocessing.data.hittisau.Term;
 
 /**
  *
- * @author Kilian
+ * @author Alexander
  */
-public interface Sentence extends TextContainer, Externalizable {
+public class FastSentence implements Sentence {
 
-    public List<org.knime.ext.textprocessing.data.hittisau.Term> getTerms();
+    private FastTerm[] m_terms;
 
+    public FastSentence(final FastTerm[] terms) {
+        m_terms = terms;
+    }
+
+    public FastTerm[] getTermArray() {
+        return m_terms;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String getText();
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String getTextWithWsSuffix();
+    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+        // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Term> getTerms() {
+        return new FastTermList(m_terms);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getText() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < m_terms.length; i++) {
+            FastTerm term = m_terms[i];
+            if (i < m_terms.length - 1) {
+               sb.append(term.getTextWithWsSuffix());
+            } else {
+                sb.append(term.getText());
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTextWithWsSuffix() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < m_terms.length; i++) {
+            FastTerm term = m_terms[i];
+            sb.append(term.getTextWithWsSuffix());
+        }
+        return sb.toString();
+    }
 }
