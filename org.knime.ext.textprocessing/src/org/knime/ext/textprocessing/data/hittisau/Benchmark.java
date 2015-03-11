@@ -90,9 +90,18 @@ public class Benchmark {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(Benchmark.class);
 
-    private final static String DATA_PATH = "/Users/Alexander/Desktop/";
+    //private final static String DATA_PATH = "/Users/Alexander/Desktop/";
+    private final static String DATA_PATH = "D:/Data/Text/Benchmarking";
 
     private final static String DATA_FILE = "5k-lines.csv";
+
+    private static final List<String> ARTIFICIAL_DATA_FILES = new LinkedList<>();
+    static {
+        ARTIFICIAL_DATA_FILES.add("doc10.csv");
+        ARTIFICIAL_DATA_FILES.add("doc50.csv");
+        ARTIFICIAL_DATA_FILES.add("doc100.csv");
+        ARTIFICIAL_DATA_FILES.add("doc500.csv");
+    }
 
     private final static int NUMBER_OF_RUNS = 20;
 
