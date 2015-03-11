@@ -107,16 +107,18 @@ public class Benchmark {
 
     @Test
     public void runBenchmark() {
+        final File f = new File(DATA_PATH + DATA_FILE);
+
         for (int i = 1; i <= NUMBER_OF_RUNS; i++) {
-            doBenchmarkDocumentOld();
-            doBenchmarkDocumentLegacy();
-            doBenchmarkFastDocument();
+            doBenchmarkDocumentOld(f);
+            doBenchmarkDocumentLegacy(f);
+            doBenchmarkFastDocument(f);
         }
     }
 
-    public void doBenchmarkDocumentOld() {
+    public void doBenchmarkDocumentOld(final File f) {
         // read string data
-        List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
+        List<String> strs = readStringData(f);
         List<org.knime.ext.textprocessing.data.Document> documents = new LinkedList<>();
 
         // benchmark creation
@@ -212,9 +214,9 @@ public class Benchmark {
         System.out.println("Document Old;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
     }
 
-    public void doBenchmarkDocumentLegacy() {
+    public void doBenchmarkDocumentLegacy(final File f) {
         // read string data
-        List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
+        List<String> strs = readStringData(f);
         List<DocumentLegacy> documents = new LinkedList<>();
 
         // benchmark creation
@@ -293,9 +295,9 @@ public class Benchmark {
         System.out.println("Document Legay;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
     }
 
-    public void doBenchmarkFastDocument() {
+    public void doBenchmarkFastDocument(final File f) {
         // read string data
-        List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
+        List<String> strs = readStringData(f);
         List<FastDocument> documents = new LinkedList<>();
 
         // benchmark creation
