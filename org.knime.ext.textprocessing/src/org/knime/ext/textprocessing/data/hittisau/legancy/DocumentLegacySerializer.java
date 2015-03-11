@@ -103,15 +103,21 @@ public class DocumentLegacySerializer implements Serializer {
             out.writeInt(terms.length);
             for (int ti = 0; ti < terms.length; ti++) {
                 InternalTerm term = terms[ti];
+                final boolean isComplex = (term.getTags().length > 0);
+
+                out.writeBoolean(isComplex);
                 out.writeInt(term.getTermIndex());
                 out.writeInt(term.getWhiteSpaceIndex());
                 out.writeBoolean(term.isImmutable());
-                out.writeInt(term.getTags().length);
-                for (int tgi = 0; tgi < term.getTags().length; tgi++) {
-                    int[] tagValues = term.getTags()[tgi];
-                    out.writeInt(tagValues.length);
-                    for (int tvi = 0; tvi < tagValues.length; tvi++) {
-                        out.writeInt(tagValues[tvi]);
+
+                if (isComplex) {
+                    out.writeInt(term.getTags().length);
+                    for (int tgi = 0; tgi < term.getTags().length; tgi++) {
+                        int[] tagValues = term.getTags()[tgi];
+                        out.writeInt(tagValues.length);
+                        for (int tvi = 0; tvi < tagValues.length; tvi++) {
+                            out.writeInt(tagValues[tvi]);
+                        }
                     }
                 }
             }
@@ -128,7 +134,7 @@ public class DocumentLegacySerializer implements Serializer {
         int numTerms;
         String[] terms;
         String[] whitespaces;
-        Map<String,String> metaInfo = new HashMap<String,String>();
+        Map<String, String> metaInfo = new HashMap<String, String>();
         TagBuilder[] tagBuilders;
         InternalTerm[][] sentences;
 
@@ -167,22 +173,30 @@ public class DocumentLegacySerializer implements Serializer {
             sentences[i] = new InternalTerm[nt];
             for (int ti = 0; ti < nt; ti++) {
                 InternalTerm t = new InternalTerm();
+                final boolean isComplex = in.readBoolean();
                 t.setTermIndex(in.readInt());
                 t.setWhiteSpaceIndex(in.readInt());
                 t.setImmutable(in.readBoolean());
-                int[][] values = new int[in.readInt()][];
-                for (int tgi = 0; tgi < values.length; tgi++) {
-                    values[tgi] = new int[in.readInt()];
-                    for (int tvi = 0; tvi < values[tgi].length; tvi++) {
-                        values[tgi][tvi] = in.readInt();
+
+                if (isComplex) {
+                    int[][] values = new int[in.readInt()][];
+                    for (int tgi = 0; tgi < values.length; tgi++) {
+                        values[tgi] = new int[in.readInt()];
+                        for (int tvi = 0; tvi < values[tgi].length; tvi++) {
+                            values[tgi][tvi] = in.readInt();
+                        }
                     }
+                    t.setTags(values);
+                } else {
+                    int[][] values = new int[0][0];
+                    t.setTags(values);
                 }
-                t.setTags(values);
+
                 sentences[i][ti] = t;
             }
         }
 
-        return new DocumentLegacy(uuid, title, numTerms, new DocumentMetaInfo(metaInfo),
-                                    terms, whitespaces, tagBuilders, sentences);
+        return new DocumentLegacy(uuid, title, numTerms, new DocumentMetaInfo(metaInfo), terms, whitespaces,
+            tagBuilders, sentences);
     }
 }

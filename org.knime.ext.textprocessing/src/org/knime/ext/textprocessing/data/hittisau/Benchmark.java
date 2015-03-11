@@ -91,13 +91,13 @@ public class Benchmark {
 
     private final static String DATA_FILE = "5k-lines.csv";
 
-    private final static int NUMBER_OF_RUNS = 1;
+    private final static int NUMBER_OF_RUNS = 20;
 
     @Test
     public void runBenchmark() {
         for (int i = 1; i <= NUMBER_OF_RUNS; i++) {
-            doBenchmarkDocumentOld();
-            //doBenchmarkDocumentLegacy();
+            //doBenchmarkDocumentOld();
+            doBenchmarkDocumentLegacy();
         }
     }
 
