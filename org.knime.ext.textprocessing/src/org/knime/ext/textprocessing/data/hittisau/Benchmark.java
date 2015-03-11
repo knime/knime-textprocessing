@@ -49,14 +49,32 @@
 package org.knime.ext.textprocessing.data.hittisau;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.data.Author;
+import org.knime.ext.textprocessing.data.DocumentBuilder;
+import org.knime.ext.textprocessing.data.DocumentCategory;
+import org.knime.ext.textprocessing.data.DocumentMetaInfo;
+import org.knime.ext.textprocessing.data.DocumentSource;
+import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.data.PublicationDate;
+import org.knime.ext.textprocessing.data.SectionAnnotation;
+import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentBuilderLegacy;
+import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacy;
+import org.knime.ext.textprocessing.data.hittisau.legancy.DocumentLegacySerializer;
 
 /**
  *
@@ -75,25 +93,99 @@ public class Benchmark {
         // read string data
         List<String> strs = readStringData(new File(DATA_PATH + DATA_FILE));
 
-        // create documents (measure time)
-//
-//        for (String line : strs) {
-//
-//            DocumentBuilderLegacy.createDocument(null, line);
-//
-//        }
+        long start;
+        long end;
+        long sumDeltaLegacy = 0 ;
 
-//        DocumentBuilder db = new DocumentBuilder();
-//        db.addTitle("");
-//        db.addSection(line, SectionAnnotation.ABSTRACT);
+        for (String line : strs) {
+            start = System.nanoTime();
+            DocumentBuilderLegacy.createDocument(null, line);
+            end = System.nanoTime();
+            sumDeltaLegacy += (end - start) / 100;
+
+        }
+
+        sumDeltaLegacy = sumDeltaLegacy/strs.size();
+        long sumDeltaOld = 0;
+        Author a = new Author();
+        DocumentSource ds = new DocumentSource();
+        DocumentCategory cat = new DocumentCategory();
+        PublicationDate pd = new PublicationDate();
+        DocumentMetaInfo mi = new DocumentMetaInfo();
+        for ( String line : strs) {
+        start = System.nanoTime();
+        DocumentBuilder db = new DocumentBuilder();
+
+        db.addTitle("");
+        db.addSection(line, SectionAnnotation.ABSTRACT);
+        db.addAuthor(a);
+        db.addDocumentSource(ds);
+        db.setDocumentType(DocumentType.UNKNOWN);
+        db.addDocumentCategory(cat);
+        db.setPublicationDate(pd);
+        db.addMetaInformation(mi);
+
+        db.createDocument();
+        end = System.nanoTime();
+        sumDeltaOld += (end - start) / 100;
+        }
+        sumDeltaOld = sumDeltaOld/strs.size();
+
+        System.out.println("delta Old"+sumDeltaOld);
+        System.out.println("delta New"+sumDeltaLegacy);
     }
 
-    public void serializationBenchmark() {
+    public void serializationBenchmark(final Document oldDoc, final DocumentLegacy newDoc) {
         // iterate over sentences and terms (measure time)
 
-        // serialize documents (measure time)
+        Iterator<Sentence> itr =   newDoc.iterator();
+        long start;
+        long end;
+        long sumDeltaLegacy = 0 ;
+        start = System.nanoTime();
+         while(itr.hasNext()) {
 
-        // deserialize documents (measure time)
+            Sentence element = itr.next();
+
+         }
+         end = System.nanoTime();
+         sumDeltaLegacy += end-start;
+
+        // serialize documents (measure time)
+      DocumentLegacySerializer serial = new DocumentLegacySerializer();
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+
+      DataOutput out = new DataOutputStream(baos) ;
+     long sumDeltaLegacySerialize=0;
+     long sumDeltaLegacyDeserialize=0;
+ //    for(collection){
+     try{
+      byte[] b = null;
+      start = System.nanoTime();
+      serial.serialize(newDoc, out);
+      end = System.nanoTime();
+      sumDeltaLegacySerialize += end-start;
+      out.write(b);
+      ByteArrayInputStream bais = new ByteArrayInputStream(b);
+      DataInput in = new DataInputStream(bais);
+   // deserialize documents (measure time)
+      start = System.nanoTime();
+      serial.deserialize(in);
+      end = System.nanoTime();
+      sumDeltaLegacyDeserialize += end-start;
+
+//}
+      }
+      catch(IOException io)
+      {
+
+      };
+
+
+
+
+
     }
 
     public List<String> readStringData (final File f) {
