@@ -90,8 +90,8 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
  */
 public class DocumentBuilder {
 
-    private List<org.knime.ext.textprocessing.data.hittisau.Term> m_terms
-    = new ArrayList<org.knime.ext.textprocessing.data.hittisau.Term>();
+    private List<Term> m_terms
+    = new ArrayList<Term>();
 
     private List<Sentence> m_sentences = new ArrayList<Sentence>();
 
@@ -319,7 +319,7 @@ public class DocumentBuilder {
             Sentence s = new Sentence(m_terms);
             m_sentences.add(s);
         }
-        m_terms = new ArrayList<org.knime.ext.textprocessing.data.hittisau.Term>();
+        m_terms = new ArrayList<Term>();
     }
 
     /**
@@ -366,7 +366,7 @@ public class DocumentBuilder {
         if (term != null && m_terms != null) {
             m_terms.add(term);
         } else if (m_terms == null) {
-            m_terms = new ArrayList<org.knime.ext.textprocessing.data.hittisau.Term>();
+            m_terms = new ArrayList<Term>();
             m_terms.add(term);
         }
     }
@@ -565,8 +565,8 @@ public class DocumentBuilder {
             List<String> tokens = m_wordTokenizer.tokenize(sentence);
 
             if (tokens != null) {
-                List<org.knime.ext.textprocessing.data.hittisau.Term> terms
-                = new ArrayList<org.knime.ext.textprocessing.data.hittisau.Term>(tokens.size());
+                List<Term> terms
+                = new ArrayList<Term>(tokens.size());
                 String cpySentence = sentence;
 
                 for (int i = 0; i < tokens.size(); i++) {
