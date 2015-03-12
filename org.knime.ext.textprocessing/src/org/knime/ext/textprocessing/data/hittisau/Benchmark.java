@@ -94,29 +94,34 @@ public class Benchmark {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(Benchmark.class);
 
     //private final static String DATA_PATH = "/Users/Alexander/Desktop/";
-    private final static String DATA_PATH = "D:/Data/Text/Benchmarking";
+    private final static String DATA_PATH = "D:/Data/Text/Benchmarking/";
 
     private final static String DATA_FILE = "Tweets.csv";
 
+    private final static String TWEETS_FILE = "Tweets.csv";
+
     private static final List<String> ARTIFICIAL_DATA_FILES = new LinkedList<>();
     static {
-        ARTIFICIAL_DATA_FILES.add("doc10.csv");
-        ARTIFICIAL_DATA_FILES.add("doc50.csv");
-        ARTIFICIAL_DATA_FILES.add("doc100.csv");
-        ARTIFICIAL_DATA_FILES.add("doc500.csv");
+        ARTIFICIAL_DATA_FILES.add("docs10.csv");
+        ARTIFICIAL_DATA_FILES.add("docs50.csv");
+        ARTIFICIAL_DATA_FILES.add("docs100.csv");
+        ARTIFICIAL_DATA_FILES.add("docs500.csv");
     }
 
-    private final static int NUMBER_OF_RUNS = 20;
+    private final static int NUMBER_OF_RUNS = 50;
 
     @Test
     public void runBenchmark() {
-        final File f = new File(DATA_PATH + DATA_FILE);
+        final File f = new File(DATA_PATH + TWEETS_FILE);
 
         for (int i = 1; i <= NUMBER_OF_RUNS; i++) {
-            doBenchmarkDocumentOld(f);
             doBenchmarkDocumentLegacy(f);
             doBenchmarkFastDocument(f);
+<<<<<<< .mine
+            doBenchmarkDocumentOld(f);
+=======
             doBenchmarkSimpleDocument();
+>>>>>>> .r46497
         }
     }
 
@@ -129,13 +134,15 @@ public class Benchmark {
         long start, end;
         long sumDeltaLegacy = 0;
 
-        Author a = new Author();
-        DocumentSource ds = new DocumentSource();
-        DocumentCategory cat = new DocumentCategory();
-        PublicationDate pd = new PublicationDate();
-        DocumentMetaInfo mi = new DocumentMetaInfo();
         for (String line : strs) {
             start = System.currentTimeMillis();
+
+            Author a = new Author();
+            DocumentSource ds = new DocumentSource();
+            DocumentCategory cat = new DocumentCategory();
+            PublicationDate pd = new PublicationDate();
+            DocumentMetaInfo mi = new DocumentMetaInfo();
+
             DocumentBuilder db = new DocumentBuilder();
             db.addTitle("");
             db.addSection(line, SectionAnnotation.ABSTRACT);
@@ -473,7 +480,10 @@ public class Benchmark {
                 }
                 line.trim();
                 String[] splits = line.split("<@:@>");
-                strings.add(splits[0].trim());
+                String text = splits[0].trim();
+                if (text != null && !text.isEmpty()) {
+                    strings.add(text);
+                }
             }
         } catch (IOException e) {
             LOGGER.error("Can not read benchmark data file.");
