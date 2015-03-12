@@ -44,9 +44,9 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   10.03.2015 (Alexander): created
+ *   12.03.2015 (Alexander): created
  */
-package org.knime.ext.textprocessing.data.hittisau.betterdoc;
+package org.knime.ext.textprocessing.data.hittisau.simpledoc;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -58,12 +58,14 @@ import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.data.hittisau.Document;
 import org.knime.ext.textprocessing.data.hittisau.Sentence;
 import org.knime.ext.textprocessing.data.hittisau.Serializer;
+import org.knime.ext.textprocessing.data.hittisau.betterdoc.TagBuilderLookupTable;
+import org.knime.ext.textprocessing.data.hittisau.betterdoc.TermLookupTable;
 
 /**
  *
  * @author Alexander
  */
-public class FastDocument implements Document, TermLookupTable, TagBuilderLookupTable {
+public class SimpleDocument implements Document, TermLookupTable, TagBuilderLookupTable {
 
     private UUID m_uuid;
 
@@ -79,7 +81,20 @@ public class FastDocument implements Document, TermLookupTable, TagBuilderLookup
 
     private TagBuilder[] m_tagBuilders;
 
-    private FastSentence[] m_sentences;
+    private SimpleSentence[] m_sentences;
+
+    public SimpleDocument(final UUID uuid, final String title, final int numberOfTerms,
+        final DocumentMetaInfo metaInfo, final String[] terms, final String[] whiteSpaces,
+        final TagBuilder[] tagBuilder, final SimpleSentence[] sentences) {
+        m_uuid = uuid;
+        m_title = title;
+        m_numberOfTerms = numberOfTerms;
+        m_metaInfo = metaInfo;
+        m_terms = terms;
+        m_whiteSpaces = whiteSpaces;
+        m_tagBuilders = tagBuilder;
+        m_sentences = sentences;
+    }
 
     String[] getWhitespaces()  {
         return m_whiteSpaces;
@@ -93,21 +108,8 @@ public class FastDocument implements Document, TermLookupTable, TagBuilderLookup
         return m_tagBuilders;
     }
 
-    FastSentence[] getSentences() {
+    SimpleSentence[] getSentences() {
         return m_sentences;
-    }
-
-    public FastDocument(final UUID uuid, final String title, final int numberOfTerms,
-        final DocumentMetaInfo metaInfo, final String[] terms, final String[] whiteSpaces,
-        final TagBuilder[] tagBuilder, final FastSentence[] sentences) {
-        m_uuid = uuid;
-        m_title = title;
-        m_numberOfTerms = numberOfTerms;
-        m_metaInfo = metaInfo;
-        m_terms = terms;
-        m_whiteSpaces = whiteSpaces;
-        m_tagBuilders = tagBuilder;
-        m_sentences = sentences;
     }
 
     /**
@@ -139,7 +141,7 @@ public class FastDocument implements Document, TermLookupTable, TagBuilderLookup
      */
     @Override
     public Stream<Sentence> stream() {
-        return  Arrays.stream(m_sentences);
+        return Arrays.stream(m_sentences);
     }
 
     /**
@@ -171,7 +173,26 @@ public class FastDocument implements Document, TermLookupTable, TagBuilderLookup
      */
     @Override
     public Serializer createSerializer() {
-        return new FastDocumentSerializer();
+        return new SimpleDocumentSerializer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof SimpleDocument)) {
+            return false;
+        }
+        return ((SimpleDocument)obj).getUUID().equals(getUUID());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return getUUID().hashCode();
     }
 
     class SentenceIterator implements Iterator<Sentence> {
@@ -202,19 +223,8 @@ public class FastDocument implements Document, TermLookupTable, TagBuilderLookup
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(final Object obj) {
-        if (!(obj instanceof FastDocument)) {
-            return false;
-        }
-        return ((FastDocument)obj).getUUID().equals(getUUID());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return getUUID().hashCode();
+    public TagBuilder getTagBuilderAt(final int i) {
+        return m_tagBuilders[i];
     }
 
     /**
@@ -227,13 +237,5 @@ public class FastDocument implements Document, TermLookupTable, TagBuilderLookup
         } else {
             return m_terms[i];
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TagBuilder getTagBuilderAt(final int i) {
-        return m_tagBuilders[i];
     }
 }
