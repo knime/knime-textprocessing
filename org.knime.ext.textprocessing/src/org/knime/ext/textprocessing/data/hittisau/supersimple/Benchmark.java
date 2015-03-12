@@ -63,7 +63,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
 /**
  *
@@ -88,11 +87,11 @@ public class Benchmark {
         ARTIFICIAL_DATA_FILES.add("docs500.csv");
     }
 
-    private final static int NUMBER_OF_RUNS = 50;
+    private final static int NUMBER_OF_RUNS = 20;
 
     @Test
     public void runBenchmark() {
-        final File f = new File(DATA_PATH + TWEETS_FILE);
+        final File f = new File(DATA_PATH + DATA_FILE);
 
         for (int i = 1; i <= NUMBER_OF_RUNS; i++) {
             doBenchmarkDocumentSuperSimple(f);
@@ -138,6 +137,7 @@ public class Benchmark {
 
         // serialization
         List<SuperSimpleDocument> deserializedDocs = new LinkedList<>();
+        SuperSimpleDocumentSerializer serializer = new SuperSimpleDocumentSerializer();
 
         long sumDeltaLegacyD = 0;
         long numberOfBytes = 0;
@@ -147,7 +147,7 @@ public class Benchmark {
 
             try {
                 start = System.currentTimeMillis();
-                TermDocumentDeSerializationUtil.fastSerializeDocument(d, out);
+                serializer.serialize(d, out);
                 end = System.currentTimeMillis();
                 sumDeltaLegacy += (end - start);
 
@@ -158,12 +158,11 @@ public class Benchmark {
                 DataInput in = new DataInputStream(bis);
 
                 long startD = System.currentTimeMillis();
-                org.knime.ext.textprocessing.data.Document newD =
-                    TermDocumentDeSerializationUtil.fastDeserializeDocument(in);
+                SuperSimpleDocument newD = serializer.deserialize(in);
                 long endD = System.currentTimeMillis();
                 sumDeltaLegacyD += (endD - startD);
 
-                deserializedDocs.add(d);
+                deserializedDocs.add(newD);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -172,9 +171,9 @@ public class Benchmark {
         double sumDeltaLegacyAvgD = (double)sumDeltaLegacyD / (double)strs.size();
         double numberOfBytesAvg = (double)numberOfBytes / (double)strs.size();
 
-        System.out.println("Document Old;Serialization;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
-        System.out.println("Document Old;Deserialization;" + strs.size() + ";" + sumDeltaLegacyD + ";" + sumDeltaLegacyAvgD);
-        System.out.println("Document Old;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
+        System.out.println("Document SuperSimple;Serialization;" + strs.size() + ";" + sumDeltaLegacy + ";" + sumDeltaLegacyAvg);
+        System.out.println("Document SuperSimple;Deserialization;" + strs.size() + ";" + sumDeltaLegacyD + ";" + sumDeltaLegacyAvgD);
+        System.out.println("Document SuperSimple;Size;" + strs.size() + ";" + numberOfBytes + ";" + numberOfBytesAvg);
     }
 
     public List<String> readStringData(final File f) {

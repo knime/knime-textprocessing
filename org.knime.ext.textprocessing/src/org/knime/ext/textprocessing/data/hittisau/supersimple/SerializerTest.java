@@ -44,47 +44,44 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   12.03.2015 (Kilian): created
+ *   10.03.2015 (Alexander): created
  */
 package org.knime.ext.textprocessing.data.hittisau.supersimple;
 
-import java.util.Iterator;
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+import org.junit.Test;
 
 /**
  *
- * @author Kilian
+ * @author Alexander
  */
-public class SuperSimpleDocument implements Iterable<SuperSimpleSentence> {
+public class SerializerTest {
 
-    private List<SuperSimpleSentence> m_sentences;
+    @Test
+    public void testDocumentLegacyCreation() throws IOException {
+        SuperSimpleDocument doc = SuperSimpleDocumentBuilder.createDocument("The quick fox jumps over the brown dog. "
+            + "The brown dog likes to play with the ball.");
 
-    SuperSimpleDocument(final List<SuperSimpleSentence> sentences) {
-        m_sentences = sentences;
-    }
+        String strBefore = doc.toString();
 
-    public int size() {
-        return m_sentences.size();
-    }
+        SuperSimpleDocumentSerializer ser = new SuperSimpleDocumentSerializer();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutput dout = new DataOutputStream(bos);
+        ser.serialize(doc, dout);
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        SuperSimpleDocument doc2 = ser.deserialize(new DataInputStream(bis));
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterator<SuperSimpleSentence> iterator() {
-        return m_sentences.iterator();
-    }
+        String strAfter = doc2.toString();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (SuperSimpleSentence s : this) {
-            sb.append(s.toString());
-        }
-        return sb.toString();
+        System.out.println(strBefore);
+        System.out.println(strAfter);
+
+        assert strBefore.equals(strAfter);
     }
 }

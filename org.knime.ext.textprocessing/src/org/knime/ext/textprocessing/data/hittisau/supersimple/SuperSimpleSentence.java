@@ -74,4 +74,16 @@ public class SuperSimpleSentence implements Iterable<String> {
     public Iterator<String> iterator() {
         return m_words.iterator();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (String token : this) {
+            sb.append(token);
+        }
+        return sb.toString();
+    }
 }
