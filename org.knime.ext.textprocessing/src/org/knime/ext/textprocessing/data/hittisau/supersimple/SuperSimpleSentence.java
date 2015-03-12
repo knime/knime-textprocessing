@@ -48,32 +48,30 @@
  */
 package org.knime.ext.textprocessing.data.hittisau.supersimple;
 
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
-
-import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
 /**
  *
  * @author Kilian
  */
-public class SuperSimpleDocumentBuilder {
+public class SuperSimpleSentence implements Iterable<String> {
 
+    private List<String> m_words;
 
-    public static final SuperSimpleDocument createDocument(final String text)
-            throws IllegalArgumentException {
-        if (text == null || text.isEmpty()) {
-            throw new IllegalArgumentException("Document text may not be null or empty!");
-        }
+    public SuperSimpleSentence(final List<String> words) {
+        m_words = words;
+    }
 
-        // tokenize sentences
-        final List<String> strSentences = DefaultTokenization.getSentenceTokenizer().tokenize(text);
-        final List<SuperSimpleSentence> sentenceList = new LinkedList<>();
+    public int size() {
+        return m_words.size();
+    }
 
-        for (String sentence : strSentences) {
-            sentenceList.add(new SuperSimpleSentence(DefaultTokenization.getWordTokenizer().tokenize(sentence)));
-        }
-
-        return new SuperSimpleDocument(sentenceList);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<String> iterator() {
+        return m_words.iterator();
     }
 }

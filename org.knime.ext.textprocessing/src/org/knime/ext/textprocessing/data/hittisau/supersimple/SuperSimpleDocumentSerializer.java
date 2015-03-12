@@ -48,32 +48,41 @@
  */
 package org.knime.ext.textprocessing.data.hittisau.supersimple;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 
 /**
  *
  * @author Kilian
  */
-public class SuperSimpleDocumentBuilder {
+public class SuperSimpleDocumentSerializer {
 
-
-    public static final SuperSimpleDocument createDocument(final String text)
-            throws IllegalArgumentException {
-        if (text == null || text.isEmpty()) {
-            throw new IllegalArgumentException("Document text may not be null or empty!");
+    public void serialize(final SuperSimpleDocument doc, final DataOutput out) throws IOException {
+        out.writeInt(doc.size());
+        for (SuperSimpleSentence s : doc) {
+            out.writeInt(s.size());
+            for (String token : s) {
+                out.writeUTF(token);
+            }
         }
-
-        // tokenize sentences
-        final List<String> strSentences = DefaultTokenization.getSentenceTokenizer().tokenize(text);
-        final List<SuperSimpleSentence> sentenceList = new LinkedList<>();
-
-        for (String sentence : strSentences) {
-            sentenceList.add(new SuperSimpleSentence(DefaultTokenization.getWordTokenizer().tokenize(sentence)));
-        }
-
-        return new SuperSimpleDocument(sentenceList);
     }
+
+    public SuperSimpleDocument deserialize(final DataInput in) throws IOException {
+        int noSentences = in.readInt();
+        List<SuperSimpleSentence> sentences = new LinkedList<>();
+        for (int i = 0; i < noSentences; i++) {
+            int noTokens = in.readInt();
+            List<String> tokens = new LinkedList<>();
+            for (int j = 0; j < noTokens; j++) {
+                tokens.add(in.readUTF());
+            }
+            sentences.add(new SuperSimpleSentence(tokens));
+        }
+
+        return new SuperSimpleDocument(sentences);
+    }
+
 }
