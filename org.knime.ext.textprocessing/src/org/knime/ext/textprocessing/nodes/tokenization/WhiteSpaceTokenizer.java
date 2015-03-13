@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,51 +44,25 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   12.03.2015 (Kilian): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
-
-
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * Is a utility class which provides methods for the default tokenization of
- * {@link org.knime.ext.textprocessing.data.Document}s.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian
  */
-public final class DefaultTokenization {
-
-    private static OpenNLPTokenizerPool tokenizerPool = new OpenNLPTokenizerPool(
-        TextprocessingPreferenceInitializer.tokenizerPoolSize());
-
-    private DefaultTokenization() { }
+public class WhiteSpaceTokenizer implements Tokenizer {
 
     /**
-     * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
-     * preference pool size.
-     * @since 2.9
+     * {@inheritDoc}
      */
-    public static final void createNewTokenizerPool() {
-        final int newPoolSize = TextprocessingPreferenceInitializer.tokenizerPoolSize();
-        if (newPoolSize != tokenizerPool.getPoolSize()) {
-            tokenizerPool = new OpenNLPTokenizerPool(newPoolSize);
-        }
+    @Override
+    public List<String> tokenize(final String text) {
+        return Arrays.asList(text.split("\\s+"));
     }
 
-    /**
-     * @return The default sentence tokenizer.
-     */
-    public static final Tokenizer getSentenceTokenizer() {
-        return tokenizerPool.nextSentenceTokenizer();
-    }
-
-    /**
-     * @return The default word tokenizer.
-     */
-    public static final Tokenizer getWordTokenizer() {
-        return new WhiteSpaceTokenizer();
-        //return tokenizerPool.nextWordTokenizer();
-    }
 }
