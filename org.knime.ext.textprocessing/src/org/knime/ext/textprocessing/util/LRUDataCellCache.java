@@ -51,8 +51,9 @@ package org.knime.ext.textprocessing.util;
 import java.lang.ref.SoftReference;
 
 import org.knime.core.data.DataCell;
-import org.knime.core.data.util.memory.MemoryWarningSystem;
-import org.knime.core.data.util.memory.MemoryWarningSystem.MemoryWarningListener;
+import org.knime.core.data.util.memory.MemoryAlert;
+import org.knime.core.data.util.memory.MemoryAlertListener;
+import org.knime.core.data.util.memory.MemoryAlertSystem;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.util.LRUCache;
 import org.knime.ext.textprocessing.data.TextContainer;
@@ -75,12 +76,13 @@ public final class LRUDataCellCache extends DataCellCache {
     private int m_maxHistory;
 
     /** To check memory usage and react on low memory. */
-    private final MemoryWarningListener m_memoryWarningListener = new MemoryWarningSystem.MemoryWarningListener() {
+    private final MemoryAlertListener m_memoryWarningListener = new MemoryAlertListener() {
         @Override
-        public void memoryUsageLow(final long usedMemory, final long maxMemory) {
+        protected boolean memoryAlert(final MemoryAlert alert) {
             LOGGER.debug("Low memory encountered in Textprocessing, clearing "
                     + LRUDataCellCache.class.getSimpleName() + "( " + m_cache.size() + "element(s))");
             m_cache.clear();
+            return false;
         }
     };
 
@@ -104,7 +106,7 @@ public final class LRUDataCellCache extends DataCellCache {
         super(fac);
         m_maxHistory = maxHistory;
         m_cache = new LRUCache<TextContainer, SoftReference<DataCell>>(m_maxHistory);
-        MemoryWarningSystem.getInstance().registerListener(m_memoryWarningListener);
+        MemoryAlertSystem.getInstance().addListener(m_memoryWarningListener);
     }
 
     /**
@@ -138,6 +140,6 @@ public final class LRUDataCellCache extends DataCellCache {
     public void close() {
         LOGGER.debug("Closing lru data cell cache.");
         reset();
-        MemoryWarningSystem.getInstance().removeListener(m_memoryWarningListener);
+        MemoryAlertSystem.getInstance().removeListener(m_memoryWarningListener);
     }
 }
