@@ -55,7 +55,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
@@ -90,8 +89,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
  */
 public class DocumentBuilder {
 
-    private List<Term> m_terms
-    = new ArrayList<Term>();
+    private List<Term> m_terms = new ArrayList<Term>();
 
     private List<Sentence> m_sentences = new ArrayList<Sentence>();
 
@@ -565,8 +563,7 @@ public class DocumentBuilder {
             List<String> tokens = m_wordTokenizer.tokenize(sentence);
 
             if (tokens != null) {
-                List<Term> terms
-                = new ArrayList<Term>(tokens.size());
+                List<Term> terms = new ArrayList<Term>(tokens.size());
                 String cpySentence = sentence;
 
                 for (int i = 0; i < tokens.size(); i++) {

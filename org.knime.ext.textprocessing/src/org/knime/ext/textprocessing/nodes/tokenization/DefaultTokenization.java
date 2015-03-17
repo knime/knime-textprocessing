@@ -87,7 +87,6 @@ public final class DefaultTokenization {
      * @return The default word tokenizer.
      */
     public static final Tokenizer getWordTokenizer() {
-        return new WhiteSpaceTokenizer();
-        //return tokenizerPool.nextWordTokenizer();
+        return tokenizerPool.nextWordTokenizer();
     }
 }

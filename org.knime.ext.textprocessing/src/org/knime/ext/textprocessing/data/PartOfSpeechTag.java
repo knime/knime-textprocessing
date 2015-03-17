@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag#getTag()}, i.e: <br>
  * <br>
  * <code>Tag t = PartOfSpeechTag.NN.getTag();</code>
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public enum PartOfSpeechTag implements TagBuilder {
@@ -173,7 +173,7 @@ public enum PartOfSpeechTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     *
+     * 
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -191,7 +191,7 @@ public enum PartOfSpeechTag implements TagBuilder {
      * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     *
+     * 
      * @param str The string representing a
      *            {@link org.knime.ext.textprocessing.data.Tag}.
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
@@ -255,21 +255,4 @@ public enum PartOfSpeechTag implements TagBuilder {
         }
         return tagSet;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tag buildTag(final int index) {
-        return new Tag(PartOfSpeechTag.values()[index].toString(), PartOfSpeechTag.TAG_TYPE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTagIndex(final String value) {
-        return PartOfSpeechTag.valueOf(value).ordinal();
-    }
-
 }

@@ -282,20 +282,4 @@ public enum STTSPartOfSpeechTag implements TagBuilder {
         }
         return tagSet;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tag buildTag(final int index) {
-        return new Tag(STTSPartOfSpeechTag.values()[index].toString(), STTSPartOfSpeechTag.TAG_TYPE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTagIndex(final String value) {
-        return STTSPartOfSpeechTag.valueOf(value).ordinal();
-    }
 }

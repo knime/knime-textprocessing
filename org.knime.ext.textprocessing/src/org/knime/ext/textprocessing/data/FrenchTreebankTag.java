@@ -216,20 +216,4 @@ public enum FrenchTreebankTag implements TagBuilder {
         }
         return tagSet;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tag buildTag(final int index) {
-        return new Tag(FrenchTreebankTag.values()[index].toString(), FrenchTreebankTag.TAG_TYPE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTagIndex(final String value) {
-        return FrenchTreebankTag.valueOf(value).ordinal();
-    }
 }

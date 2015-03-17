@@ -68,10 +68,10 @@ import java.util.Set;
  * file (see tagset.dtd for details) at the
  * {@link org.knime.ext.textprocessing.data.TagFactory} by calling
  * {@link org.knime.ext.textprocessing.data.TagFactory#addTagSet(java.io.File)}.
- * For more details see: <br/>
+ * For more details see: <br/> 
  * {@link org.knime.ext.textprocessing.data.TagFactory}
  * or <br/> {@link org.knime.ext.textprocessing.data.PartOfSpeechTag}.
- *
+ * 
  * @author Kilian Thiel, University of Konstanz
  */
 public interface TagBuilder {
@@ -79,28 +79,24 @@ public interface TagBuilder {
     /**
      * Builds a valid {@link org.knime.ext.textprocessing.data.Tag} instance if
      * there exists a tag with the given string value, otherwise null.
-     *
+     * 
      * @param value The value of the tag to create.
      * @return The valid instance of a tag if there exists a tag with the given
      *         string value, otherwise <code>null</code>.
      */
     public Tag buildTag(final String value);
 
-    public Tag buildTag(final int index);
-
-    public int getTagIndex(final String value);
-
     /**
      * Returns a list of all valid tag values of the underlying tag set as
      * strings.
-     *
+     * 
      * @return a list of all valid tag values of the underlying tag set.
      */
     public List<String> asStringList();
 
     /**
      * Returns a set of all valid tags of the underlying tag set.
-     *
+     * 
      * @return a set of all valid tags of the underlying tag set.
      */
     public Set<Tag> getTags();
