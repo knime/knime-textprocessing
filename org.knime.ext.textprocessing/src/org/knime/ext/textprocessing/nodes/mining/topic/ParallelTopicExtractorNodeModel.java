@@ -114,7 +114,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
          */
         private static final int MIN_SEQUENTIAL_THREAD_ID = Integer.MAX_VALUE / 2;
 
-        private final Pattern m_progressPattern = Pattern.compile("<([0-9]+)> .* (-?[0-9]*,?[0-9]+)");
+        private final Pattern m_progressPattern = Pattern.compile("<([0-9]+)> .* (-?[0-9]*[,\\.]?[0-9]+)");
         private final int m_maxNoOfIterations;
         private final ExecutionMonitor m_exec;
         private final long m_threadId;
