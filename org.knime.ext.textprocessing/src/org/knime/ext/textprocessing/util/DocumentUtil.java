@@ -47,6 +47,16 @@
  */
 package org.knime.ext.textprocessing.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowIterator;
 import org.knime.core.node.BufferedDataTable;
@@ -61,15 +71,6 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Provides various Document analysis methods.
  *
@@ -78,7 +79,7 @@ import java.util.Set;
  * @author Pierre-Francois Laquerre, University of Konstanz
  */
 public final class DocumentUtil {
-    
+
     private DocumentUtil() { }
 
     /**
@@ -211,7 +212,7 @@ public final class DocumentUtil {
     }
 
     /**
-     * Calculates the total number of possible cooccurrences for each given 
+     * Calculates the total number of possible cooccurrences for each given
      * term.
      * @param doc the document to analyse
      * @param terms the terms to calculate the number of cooccurrences for
@@ -294,7 +295,7 @@ public final class DocumentUtil {
 
                     // the number of cooccurrences in a sentence s is
                     // |s|*freq(c in s) - [summation from i = 1 to freq(c in s)]
-                    nrcoocs.increment(c, senlength * clusterfreqs 
+                    nrcoocs.increment(c, senlength * clusterfreqs
                             - (sumOverOne(clusterfreqs)));
                 }
             }
@@ -348,7 +349,7 @@ public final class DocumentUtil {
 
                         if (c.contains(t)) {
                             cCoocs.increment(t,
-                              (clusterfreqs - 1) * freqt 
+                              (clusterfreqs - 1) * freqt
                               - sumOverOne(freqt - 1));
                         } else {
                             cCoocs.increment(t, freqt * clusterfreqs);
@@ -409,7 +410,7 @@ public final class DocumentUtil {
             }
         }
 
-        Set<Document> docs = new HashSet<Document>();
+        Set<Document> docs = new LinkedHashSet<>();
         RowIterator it = data.iterator();
         int n = data.getRowCount();
         int i = 1;

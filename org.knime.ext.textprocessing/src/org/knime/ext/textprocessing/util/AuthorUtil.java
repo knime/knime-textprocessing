@@ -41,34 +41,34 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   11.10.2011 (thiel): created
  */
 package org.knime.ext.textprocessing.util;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.data.Author;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public final class AuthorUtil {
 
     private AuthorUtil() { /* empty */ }
-    
+
     /**
      * Utility method to parse author from string with unknown separators.
      * Separators are guessed and may be wrong.
-     * 
+     *
      * @param authors The string containing the authors to parse.
      * @return A set consisting of the parse authors.
      */
     public static Set<Author> parseAuthors(final String authors) {
-        Set<Author> authorSet = new HashSet<Author>();
+        Set<Author> authorSet = new LinkedHashSet<>();
         String authSep = guessAuthorSeparator(authors);
         String[] splits = authors.split(authSep);
         for (String split : splits) {
@@ -77,7 +77,7 @@ public final class AuthorUtil {
             String[] nameSplits = split.trim().split(guessNameSeparator(split));
             if (nameSplits.length > 1) {
                 fName = nameSplits[0].trim();
-                
+
                 for (int i = 1; i < nameSplits.length; i++) {
                     lName += nameSplits[i].trim() + " ";
                 }
@@ -89,7 +89,7 @@ public final class AuthorUtil {
         }
         return authorSet;
     }
-    
+
     private static String guessAuthorSeparator(final String authors) {
         if (authors.contains(", ")) {
             return ", ";
@@ -98,7 +98,7 @@ public final class AuthorUtil {
         }
         return "-";
     }
-    
+
     private static String guessNameSeparator(final String author) {
         if (author.contains(" ")) {
             return " ";
