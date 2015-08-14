@@ -300,109 +300,91 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.oscar.OscarTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.oscar.OscarTagFilterNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termtostructure.TermToStructureNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.termtostructure.TermToStructureNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.stts.STTSTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.stts.STTSTagFilterNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/io"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/io"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory"
             id="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/misc"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
             id="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.cooccurrencecounter.CooccurrenceCounterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.cooccurrencecounter.CooccurrenceCounterNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.frenchtreebank.FrenchTreebankTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.frenchtreebank.FrenchTreebankTagFilterNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.misc.ngram.NGramNodeFactory"
             id="org.knime.ext.textprocessing.nodes.misc.ngram.NGramNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.general.GeneralTagFilterNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.general.GeneralTagFilterNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory"
             id="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/mining"
-            expert-flag="false"
             factory-class="org.knime.ext.textprocessing.nodes.mining.topic.ParallelTopicExtractorNodeFactory"
             id="org.knime.ext.textprocessing.nodes.mining.topic.ParallelTopicExtractorNodeFactory">
       </node>
