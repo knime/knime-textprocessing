@@ -1,4 +1,4 @@
-/* 
+/*
 ========================================================================
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   19.12.2006 (Kilian Thiel): created
  */
@@ -55,7 +55,6 @@ import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
@@ -64,11 +63,10 @@ import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
  * {@link org.knime.ext.textprocessing.data.Document} value by storing this
  * value in a private <code>Document</code> member. It provides a document value
  * as well as a string value.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentCell extends DataCell implements StringValue,
-        DocumentValue {
+public class DocumentCell extends DataCell implements DocumentValue, StringValue {
 
     /**
      * Serial Version ID.
@@ -78,41 +76,16 @@ public class DocumentCell extends DataCell implements StringValue,
     /**
      * Convenience access member for
      * <code>DataType.getType(DocumentCell.class)</code>.
-     * 
+     *
      * @see DataType#getType(Class)
      */
     public static final DataType TYPE = DataType.getType(DocumentCell.class);
-
-    /**
-     * Returns the preferred value class of this cell implementation. This
-     * method is called per reflection to determine which is the preferred
-     * renderer, comparator, etc.
-     * 
-     * @return DocumentValue.class;
-     */
-    public static final Class<? extends DataValue> getPreferredValueClass() {
-        return DocumentValue.class;
-    }
-
-    private static final DocumentSerializer SERIALIZER =
-            new DocumentSerializer();
-
-    /**
-     * Returns the factory to read/write DataCells of this class from/to a
-     * DataInput/DataOutput. This method is called via reflection.
-     * 
-     * @return A serializer for reading/writing cells of this kind.
-     * @see DataCell
-     */
-    public static final DocumentSerializer getCellSerializer() {
-        return SERIALIZER;
-    }
 
     private Document m_document;
 
     /**
      * Creates new instance of <code>DocumentCell</code> will given document.
-     * 
+     *
      * @param document The document to set.
      */
     public DocumentCell(final Document document) {
@@ -173,10 +146,12 @@ public class DocumentCell extends DataCell implements StringValue,
         return m_document;
     }
 
-    /** Factory for (de-)serializing a DocumentCell. */
-    private static class DocumentSerializer implements
-            DataCellSerializer<DocumentCell> {
-
+    /**
+     * Factory for (de-)serializing a DocumentCell.
+     *
+     * @noreference This class is not intended to be referenced by clients.
+     */
+    public static final class DocumentSerializer implements DataCellSerializer<DocumentCell> {
         /**
          * {@inheritDoc}
          */

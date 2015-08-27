@@ -91,7 +91,7 @@ public abstract class DataCellCache {
      * yet, containing the given <code>TextContainer</code>, otherwise the
      * already existing cell is returned. The specific type of the
      * <code>DataCell</code>, i.e.
-     * {@link org.knime.ext.textprocessing.data.TermCell} or
+     * {@link org.knime.ext.textprocessing.data.TermCell2} or
      * {@link org.knime.ext.textprocessing.data.DocumentCell} depends on the
      * specified <code>TextContainerDataCellFactory</code>.
      *

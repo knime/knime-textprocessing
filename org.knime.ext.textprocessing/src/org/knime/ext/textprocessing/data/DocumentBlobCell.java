@@ -49,12 +49,12 @@ package org.knime.ext.textprocessing.data;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.BlobDataCell;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
@@ -67,9 +67,7 @@ import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentBlobCell extends BlobDataCell implements StringValue,
-        DocumentValue {
-
+public class DocumentBlobCell extends BlobDataCell implements DocumentValue, StringValue {
     /**
      * Serial Version ID.
      */
@@ -83,31 +81,6 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
      */
     public static final DataType TYPE = DataType
             .getType(DocumentBlobCell.class);
-
-    /**
-     * Returns the preferred value class of this cell implementation. This
-     * method is called per reflection to determine which is the preferred
-     * renderer, comparator, etc.
-     *
-     * @return DocumentValue.class;
-     */
-    public static final Class<? extends DataValue> getPreferredValueClass() {
-        return DocumentValue.class;
-    }
-
-    private static final DocumentSerializer SERIALIZER =
-            new DocumentSerializer();
-
-    /**
-     * Returns the factory to read/write DataCells of this class from/to a
-     * DataInput/DataOutput. This method is called via reflection.
-     *
-     * @return A serializer for reading/writing cells of this kind.
-     * @see DataCell
-     */
-    public static final DocumentSerializer getCellSerializer() {
-        return SERIALIZER;
-    }
 
     private Document m_document;
 
@@ -174,10 +147,12 @@ public class DocumentBlobCell extends BlobDataCell implements StringValue,
         return m_document;
     }
 
-    /** Factory for (de-)serializing a DocumentBlobCell. */
-    private static class DocumentSerializer implements
-            DataCellSerializer<DocumentBlobCell> {
-
+    /**
+     * Factory for (de-)serializing a DocumentBlobCell.
+     *
+     * @noreference This class is not intended to be referenced by clients.
+     */
+    public static final class DocumentSerializer implements DataCellSerializer<DocumentBlobCell> {
         /**
          * {@inheritDoc}
          */

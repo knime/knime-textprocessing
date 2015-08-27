@@ -52,12 +52,10 @@ import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.filestore.FileStore;
 import org.knime.core.data.filestore.FileStoreCell;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * A {@link FileStoreCell} implementation holding a {@link org.knime.ext.textprocessing.data.Document}. It provides a
@@ -70,6 +68,31 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * @since 2.9
  */
 public final class DocumentBufferedFileStoreCell extends AbstractDocumentFileStoreCell {
+    /**
+     * Serializer for {@link DocumentBufferedFileStoreCell}s.
+     *
+     * @noreference This class is not intended to be referenced by clients.
+     */
+    public static final class Serializer implements DataCellSerializer<DocumentBufferedFileStoreCell> {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public DocumentBufferedFileStoreCell deserialize(final DataCellDataInput input) throws IOException {
+            DocumentBufferedFileStoreCell docCell = new DocumentBufferedFileStoreCell();
+            docCell.deserializeCell(input);
+            return docCell;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void serialize(final DocumentBufferedFileStoreCell cell, final DataCellDataOutput output)
+            throws IOException {
+            cell.serializeCell(output);
+        }
+    }
 
     /** SerialVersionID. */
     private static final long serialVersionUID = -8256678631254743854L;
@@ -86,43 +109,6 @@ public final class DocumentBufferedFileStoreCell extends AbstractDocumentFileSto
 
     /* Buffered file store writer, writing document data to file store file. */
     private BufferedFileStoreWriter m_bufferedFileStoreWriter;
-
-
-    /**
-     * Returns the preferred value class of this cell implementation.
-     *
-     * @return {@code DocumentValue.class};
-     */
-    public static final Class<? extends DataValue> getPreferredValueClass() {
-        return DocumentValue.class;
-    }
-
-    /**
-     * @return The serializer of the {@link DocumentBufferedFileStoreCell}.
-     */
-    public static DataCellSerializer<DocumentBufferedFileStoreCell> getCellSerializer() {
-        return new DataCellSerializer<DocumentBufferedFileStoreCell>() {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public DocumentBufferedFileStoreCell deserialize(final DataCellDataInput input) throws IOException {
-                DocumentBufferedFileStoreCell docCell = new DocumentBufferedFileStoreCell();
-                docCell.deserializeCell(input);
-                return docCell;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void serialize(final DocumentBufferedFileStoreCell cell, final DataCellDataOutput output)
-                    throws IOException {
-                cell.serializeCell(output);
-            }
-        };
-    }
 
     /**
      * Constructor of {@link DocumentBufferedFileStoreCell}. Creates new instance with given document and file store

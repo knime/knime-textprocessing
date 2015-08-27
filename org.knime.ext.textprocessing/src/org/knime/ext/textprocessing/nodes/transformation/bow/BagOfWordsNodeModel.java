@@ -54,7 +54,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -88,7 +90,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * {@link org.knime.core.data.DataTableSpec}. Only one column containing
  * {@link org.knime.ext.textprocessing.data.DocumentCell}s is allowed.
  * The output table contains two columns. The first consists of
- * {@link org.knime.ext.textprocessing.data.TermCell}s the second of
+ * {@link org.knime.ext.textprocessing.data.TermCell2}s the second of
  * {@link org.knime.ext.textprocessing.data.DocumentCell}s. A single row
  * represents a tupel of a term and a document meaning that the term is
  * contained in the document.

@@ -47,12 +47,12 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.IOException;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
 
@@ -66,8 +66,7 @@ import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
  */
-public class TermCell2 extends DataCell implements StringValue, TermValue {
-
+public class TermCell2 extends DataCell implements TermValue, StringValue {
     /**
      * SerialVersionID.
      */
@@ -79,29 +78,6 @@ public class TermCell2 extends DataCell implements StringValue, TermValue {
      * @see DataType#getType(Class)
      */
     public static final DataType TYPE = DataType.getType(TermCell2.class);
-
-    /**
-     * Returns the preferred value class of this cell implementation. This method is called per reflection to determine
-     * which is the preferred renderer, comparator, etc.
-     *
-     * @return TermValue.class;
-     */
-    public static final Class<? extends DataValue> getPreferredValueClass() {
-        return TermValue.class;
-    }
-
-    private static final TermSerializer SERIALIZER = new TermSerializer();
-
-    /**
-     * Returns the factory to read/write DataCells of this class from/to a DataInput/DataOutput. This method is called
-     * via reflection.
-     *
-     * @return A serializer for reading/writing cells of this kind.
-     * @see DataCell
-     */
-    public static final TermSerializer getCellSerializer() {
-        return SERIALIZER;
-    }
 
     private Term m_term;
 
@@ -159,9 +135,12 @@ public class TermCell2 extends DataCell implements StringValue, TermValue {
         return m_term;
     }
 
-    /** Factory for (de-)serializing a TermCell. */
-    private static class TermSerializer implements DataCellSerializer<TermCell2> {
-
+    /**
+     * Factory for (de-)serializing a TermCell.
+     *
+     *  @noreference This class is not intended to be referenced by clients.
+     */
+    public static final class TermSerializer implements DataCellSerializer<TermCell2> {
         /**
          * {@inheritDoc}
          */

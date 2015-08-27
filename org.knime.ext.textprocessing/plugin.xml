@@ -478,5 +478,47 @@
       <startup
             class="org.knime.ext.textprocessing.TextprocessingStartup"></startup>
    </extension>
+   <extension
+         point="org.knime.core.DataType">
+      <DataType
+            cellClass="org.knime.ext.textprocessing.data.filestore.DocumentBufferedFileStoreCell">
+         <serializer
+               cellClass="org.knime.ext.textprocessing.data.filestore.DocumentBufferedFileStoreCell"
+               serializerClass="org.knime.ext.textprocessing.data.filestore.DocumentBufferedFileStoreCell$Serializer">
+         </serializer>
+      </DataType>
+      <DataType
+            cellClass="org.knime.ext.textprocessing.data.filestore.DocumentFileStoreCell">
+         <serializer
+               cellClass="org.knime.ext.textprocessing.data.filestore.DocumentFileStoreCell"
+               serializerClass="org.knime.ext.textprocessing.data.filestore.DocumentFileStoreCell$Serializer">
+         </serializer>
+      </DataType>
+      <DataType
+            cellClass="org.knime.ext.textprocessing.data.DocumentCell">
+         <serializer
+               cellClass="org.knime.ext.textprocessing.data.DocumentCell"
+               serializerClass="org.knime.ext.textprocessing.data.DocumentCell$DocumentSerializer">
+         </serializer>
+         <serializer
+               cellClass="org.knime.ext.textprocessing.data.DocumentBlobCell"
+               serializerClass="org.knime.ext.textprocessing.data.DocumentBlobCell$DocumentSerializer">
+         </serializer>
+      </DataType>
+      <DataType
+            cellClass="org.knime.ext.textprocessing.data.TermCell">
+         <serializer
+               cellClass="org.knime.ext.textprocessing.data.TermCell"
+               serializerClass="org.knime.ext.textprocessing.data.TermCell$TermSerializer">
+         </serializer>
+      </DataType>
+      <DataType
+            cellClass="org.knime.ext.textprocessing.data.TermCell2">
+         <serializer
+               cellClass="org.knime.ext.textprocessing.data.TermCell2"
+               serializerClass="org.knime.ext.textprocessing.data.TermCell2$TermSerializer">
+         </serializer>
+      </DataType>
+   </extension>
    
 </plugin>
