@@ -47,13 +47,15 @@
 package org.knime.ext.textprocessing.nodes.misc.ngram;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
@@ -105,9 +107,9 @@ public final class NGramFrequencyDataTableCreator implements NGramDataTableCreat
 
         m_countDocumentFreqs = countDocumentFrequencies;
 
-        m_nGramFreqs = new ConcurrentHashMap<String, Integer>(DEFAULT_MAP_SIZE);
-        m_nGramDocumentFreqs = new ConcurrentHashMap<String, Set<UUID>>(DEFAULT_MAP_SIZE);
-        m_nGramBlockFreq = new ConcurrentHashMap<String, Set<TextContainer>>(DEFAULT_MAP_SIZE);
+        m_nGramFreqs = Collections.synchronizedMap(new LinkedHashMap<String, Integer>(DEFAULT_MAP_SIZE));
+        m_nGramDocumentFreqs = Collections.synchronizedMap(new LinkedHashMap<String, Set<UUID>>(DEFAULT_MAP_SIZE));
+        m_nGramBlockFreq = Collections.synchronizedMap(new LinkedHashMap<String, Set<TextContainer>>(DEFAULT_MAP_SIZE));
     }
 
     /**
@@ -172,7 +174,7 @@ public final class NGramFrequencyDataTableCreator implements NGramDataTableCreat
         if (m_countDocumentFreqs) {
             Set<UUID> docUUIDs = m_nGramDocumentFreqs.get(nGram);
             if (docUUIDs == null) {
-                docUUIDs = new HashSet<UUID>();
+                docUUIDs = new LinkedHashSet<UUID>();
             }
             docUUIDs.add(doc.getUUID());
             m_nGramDocumentFreqs.put(nGram, docUUIDs);
@@ -187,7 +189,7 @@ public final class NGramFrequencyDataTableCreator implements NGramDataTableCreat
 
                 if (docsToAdd != null) {
                     if (docs == null) {
-                        docs = new HashSet<UUID>();
+                        docs = new LinkedHashSet<UUID>();
                     }
                     docs.addAll(docsToAdd);
                     m_nGramDocumentFreqs.put(entry.getKey(), docs);
@@ -200,7 +202,7 @@ public final class NGramFrequencyDataTableCreator implements NGramDataTableCreat
         if (m_countDocumentFreqs) {
             Set<TextContainer> blocks = m_nGramBlockFreq.get(nGram);
             if (blocks == null) {
-                blocks = new HashSet<TextContainer>();
+                blocks = new LinkedHashSet<TextContainer>();
             }
             blocks.add(block);
             m_nGramBlockFreq.put(nGram, blocks);
@@ -215,7 +217,7 @@ public final class NGramFrequencyDataTableCreator implements NGramDataTableCreat
 
                 if (blocksToAdd != null) {
                     if (blocks == null) {
-                        blocks = new HashSet<TextContainer>();
+                        blocks = new LinkedHashSet<TextContainer>();
                     }
                     blocks.addAll(blocksToAdd);
                     m_nGramBlockFreq.put(entry.getKey(), blocks);

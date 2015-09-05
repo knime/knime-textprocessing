@@ -48,10 +48,11 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.termgrouper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessing;
@@ -99,8 +100,8 @@ public class TermGrouper implements ChunkPreprocessing {
     @Override
     public Hashtable<Term, Term> preprocessChunk(final DocumentChunk chunk) {
         final Hashtable<Term, Term> mapping = new Hashtable<Term, Term>();
-        final Map<String, Term> newTerms = new HashMap<String, Term>(chunk.getTerms().size());
-        final Map<String, Integer> tagTypeCount = new HashMap<String, Integer>();
+        final Map<String, Term> newTerms = new LinkedHashMap<String, Term>(chunk.getTerms().size());
+        final Map<String, Integer> tagTypeCount = new LinkedHashMap<String, Integer>();
 
         for (final Term t : chunk.getTerms()) {
             if (m_policy.equals(DELETE_ALL)) {

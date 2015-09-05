@@ -48,9 +48,10 @@
 package org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -78,9 +79,9 @@ public class UndirectedGraph<NodeType, WeightType> {
      * Default constructor.
      */
     public UndirectedGraph() {
-        m_edges = new HashSet<Edge>();
-        m_incident = new HashMap<NodeType, Set<Edge>>();
-        m_nodes = new HashSet<NodeType>();
+        m_edges = new LinkedHashSet<Edge>();
+        m_incident = new LinkedHashMap<NodeType, Set<Edge>>();
+        m_nodes = new LinkedHashSet<NodeType>();
     }
 
     /**
@@ -90,7 +91,7 @@ public class UndirectedGraph<NodeType, WeightType> {
      */
     public void addNode(final NodeType n) {
         m_nodes.add(n);
-        m_incident.put(n, new HashSet<Edge>());
+        m_incident.put(n, new LinkedHashSet<Edge>());
     }
 
     /**

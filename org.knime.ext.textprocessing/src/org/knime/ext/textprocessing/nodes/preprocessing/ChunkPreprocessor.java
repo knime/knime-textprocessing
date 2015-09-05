@@ -48,8 +48,8 @@
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -180,7 +180,7 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
     private void processChunk(final List<DataRow> chunk) {
         if (chunk != null && chunk.size() > 0) {
             // To save unmodifieable term that will not be preprocessed
-            final Set<Term> unmodifieableTerms = new HashSet<Term>();
+            final Set<Term> unmodifieableTerms = new LinkedHashSet<Term>();
 
             // CREATE DOCUMENT CHUNK
             DataCell newDocCell = null;
@@ -193,7 +193,7 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
                 return;
             }
             // get all terms
-            final Set<Term> termSet = new HashSet<Term>();
+            final Set<Term> termSet = new LinkedHashSet<Term>();
             for (final DataRow row : chunk) {
                 final DataCell termcell = row.getCell(m_termColIndex);
                 // handle missing value (ignore rows with missing values)
@@ -232,7 +232,7 @@ public class ChunkPreprocessor extends AbstractPreprocessor {
             }
             // than add preprocessed terms
             if (termMapping != null) {
-                final Set<Term> uniqeTerms = new HashSet<Term>(termMapping.values());
+                final Set<Term> uniqeTerms = new LinkedHashSet<Term>(termMapping.values());
                 for (final Term t : uniqeTerms) {
                     // if term is null or empty don't add it to data table
                     if (t != null && t.getText().length() > 0) {

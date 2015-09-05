@@ -49,6 +49,7 @@ package org.knime.ext.textprocessing.util.clustering;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.knime.ext.textprocessing.util.similarity.SimilarityMeasure;
@@ -78,7 +79,7 @@ public class DBScanClusteringAlgorithm<T> implements ClusteringAlgorithm<T> {
     @Override
     public Set<Cluster<T>> cluster(
             final Set<T> elements, final SimilarityMeasure<T> measure) {
-        Set<Cluster<T>> clusters = new HashSet<Cluster<T>>();
+        Set<Cluster<T>> clusters = new LinkedHashSet<Cluster<T>>();
 
         Set<T> unvisited = new HashSet<T>(elements);
         while (!unvisited.isEmpty()) {
@@ -138,7 +139,7 @@ public class DBScanClusteringAlgorithm<T> implements ClusteringAlgorithm<T> {
      */
     private static <T> Set<T> getNeighbours(final T e, final Set<T> candidates,
             final SimilarityMeasure<T> measure) {
-        Set<T> neighbours = new HashSet<T>();
+        Set<T> neighbours = new LinkedHashSet<T>();
 
         for (T candidate : candidates) {
             if (measure.areSimilar(e, candidate)) {
@@ -162,7 +163,7 @@ public class DBScanClusteringAlgorithm<T> implements ClusteringAlgorithm<T> {
             T e = it.next();
             set.remove(e);
             return e;
-        }   
+        }
         return null;
     }
 }

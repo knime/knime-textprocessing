@@ -47,7 +47,7 @@
  */
 package org.knime.ext.textprocessing.util.clustering;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -69,7 +69,7 @@ public class GreedyClustering<T> implements ClusteringAlgorithm<T> {
     @Override
     public Set<Cluster<T>> cluster(
             final Set<T> elements, final SimilarityMeasure<T> measure) {
-        Set<Cluster<T>> clusters = new HashSet<Cluster<T>>();
+        Set<Cluster<T>> clusters = new LinkedHashSet<Cluster<T>>();
 
         for (T e : elements) {
             try {

@@ -129,7 +129,12 @@ public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
      * @throws CanceledExecutionException If execution was canceled.
      * @throws IllegalArgumentException If a data cell is not compatible with
      * <code>DocumentValue</code>.
+     *
+     * @deprecated This method should not be used to create bag of words data tables! The complete bow is held in memory
+     * in the {@code Hashtable docTerms}, which is highly discouraged. Instead create a bow data table using a
+     * {@link BufferedDataContainer}.
      */
+    @Deprecated
     public synchronized BufferedDataTable createDataTable(
             final ExecutionContext exec,
             final Hashtable<DataCell, Set<Term>> docTerms,

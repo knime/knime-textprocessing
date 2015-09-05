@@ -51,10 +51,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
@@ -103,14 +104,13 @@ public class DocumentBuilder {
 
     private DocumentType m_type = DocumentType.UNKNOWN;
 
-    private Set<Author> m_authors = new HashSet<Author>();
+    private Set<Author> m_authors = new LinkedHashSet<Author>();
 
-    private Set<DocumentSource> m_sources = new HashSet<DocumentSource>();
+    private Set<DocumentSource> m_sources = new LinkedHashSet<DocumentSource>();
 
-    private Set<DocumentCategory> m_categories =
-            new HashSet<DocumentCategory>();
+    private Set<DocumentCategory> m_categories = new LinkedHashSet<DocumentCategory>();
 
-    private Map<String, String> m_metaInfo = new HashMap<String, String>();
+    private HashMap<String, String> m_metaInfo = new LinkedHashMap<String, String>();
 
     private Tokenizer m_sentenceTokenizer = DefaultTokenization
             .getSentenceTokenizer();
@@ -172,7 +172,7 @@ public class DocumentBuilder {
      * @param docFile the file of the document to set
      * @param metaInfo the document meta info to set.
      * @return A new {@link org.knime.ext.textprocessing.data.Document} instance with given data.
-     * @since 2.9
+     * @since 3.0
      */
     public static final Document createDocument(final List<Section> sections, final DocumentType type,
         final Set<Author> authors, final Set<DocumentSource> sources, final Set<DocumentCategory> categories,

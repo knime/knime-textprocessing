@@ -47,9 +47,9 @@
 
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -148,7 +148,7 @@ public final class DirectChunkPreprocessor extends AbstractPreprocessor {
             final Document doc = ((DocumentValue)origDocCell).getDocument();
 
             // create chunk of current document
-            final Set<Term> terms = new HashSet<Term>();
+            final Set<Term> terms = new LinkedHashSet<Term>();
             final Iterator<Sentence> si = doc.sentenceIterator();
             while (si.hasNext()) {
                 final Sentence s = si.next();

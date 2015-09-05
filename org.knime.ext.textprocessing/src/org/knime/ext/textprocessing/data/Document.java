@@ -51,8 +51,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -256,8 +256,8 @@ public class Document implements TextContainer, Serializable {
      *             <code>null</code>.
      */
     Document(final List<Section> sections) throws NullPointerException {
-        this(sections, DEFAULT_TYPE, new HashSet<Author>(),
-                new HashSet<DocumentSource>(), new HashSet<DocumentCategory>(),
+        this(sections, DEFAULT_TYPE, new LinkedHashSet<Author>(),
+                new LinkedHashSet<DocumentSource>(), new LinkedHashSet<DocumentCategory>(),
                 new PublicationDate(), null);
     }
 
@@ -278,8 +278,8 @@ public class Document implements TextContainer, Serializable {
      */
     Document(final List<Section> sections, final Set<Author> authors,
             final PublicationDate date, final File documentFile) {
-        this(sections, DEFAULT_TYPE, authors, new HashSet<DocumentSource>(),
-                new HashSet<DocumentCategory>(), date, documentFile);
+        this(sections, DEFAULT_TYPE, authors, new LinkedHashSet<DocumentSource>(),
+                new LinkedHashSet<DocumentCategory>(), date, documentFile);
     }
 
     /**

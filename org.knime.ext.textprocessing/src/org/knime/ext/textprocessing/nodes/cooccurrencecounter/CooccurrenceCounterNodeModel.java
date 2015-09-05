@@ -305,7 +305,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                 try {
                     semaphore.acquire();
                     final Document doc = ((DocumentValue)docCell).getDocument();
-                    final Map<TermTuple, TermTuple> tuples = new HashMap<TermTuple, TermTuple>();
+                    final HashMap<TermTuple, TermTuple> tuples = new LinkedHashMap<TermTuple, TermTuple>();
                     final List<Section> sections = doc.getSections();
                     final Map<TermContainer, MutableInteger> documentTerms =
                             new LinkedHashMap<TermContainer, MutableInteger>();
@@ -471,7 +471,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      */
     void createRows(final ExecutionMonitor exec,
             final AtomicInteger rowId, final BufferedDataContainer dc,
-            final DataCell docCell, final Map<TermTuple, TermTuple> tuples)
+            final DataCell docCell, final HashMap<TermTuple, TermTuple> tuples)
     throws CanceledExecutionException {
         synchronized (dc) {
             //we synchronize the whole block to ensure that the tuples of a

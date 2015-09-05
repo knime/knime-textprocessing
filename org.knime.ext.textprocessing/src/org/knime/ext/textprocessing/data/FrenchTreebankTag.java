@@ -48,7 +48,7 @@
 package org.knime.ext.textprocessing.data;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -210,7 +210,7 @@ public enum FrenchTreebankTag implements TagBuilder {
      */
     @Override
     public Set<Tag> getTags() {
-        Set<Tag> tagSet = new HashSet<Tag>(values().length);
+        Set<Tag> tagSet = new LinkedHashSet<Tag>(values().length);
         for (FrenchTreebankTag tag : values()) {
             tagSet.add(tag.getTag());
         }

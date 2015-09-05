@@ -63,12 +63,11 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -492,21 +491,21 @@ public final class TermDocumentDeSerializationUtil {
 
             // authors
             final int noAuthors = in.readInt();
-            final Set<Author> authors = new LinkedHashSet<Author>(noAuthors);
+            final LinkedHashSet<Author> authors = new LinkedHashSet<Author>(noAuthors);
             for (int i = 0; i < noAuthors; i++) {
                 authors.add(new Author(in.readUTF(), in.readUTF()));
             }
 
             // document sources
             final int noDocSources = in.readInt();
-            final Set<DocumentSource> sources = new LinkedHashSet<DocumentSource>(noDocSources);
+            final LinkedHashSet<DocumentSource> sources = new LinkedHashSet<DocumentSource>(noDocSources);
             for (int i = 0; i < noDocSources; i++) {
                 sources.add(new DocumentSource(in.readUTF()));
             }
 
             // document categories
             final int noDocCategories = in.readInt();
-            final Set<DocumentCategory> categories = new LinkedHashSet<DocumentCategory>(noDocCategories);
+            final LinkedHashSet<DocumentCategory> categories = new LinkedHashSet<DocumentCategory>(noDocCategories);
             for (int i = 0; i < noDocCategories; i++) {
                 categories.add(new DocumentCategory(in.readUTF()));
             }
@@ -520,7 +519,7 @@ public final class TermDocumentDeSerializationUtil {
 
             // document meta info
             final int noMetaInfo = in.readInt();
-            final Map<String, String> metaInfo = new HashMap<String, String>();
+            final LinkedHashMap<String, String> metaInfo = new LinkedHashMap<String, String>();
             for (int i = 0; i < noMetaInfo; i++) {
                 metaInfo.put(in.readUTF(), in.readUTF());
             }

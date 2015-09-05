@@ -50,7 +50,8 @@ package org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -173,7 +174,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
                 m_documentColumnName.getStringValue());
 
         Map<Document, Map<Term, Double>> keywords =
-                new HashMap<Document, Map<Term, Double>>();
+                new LinkedHashMap<Document, Map<Term, Double>>();
 
         // Process each document
         int i = 1;
@@ -231,7 +232,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
         ClusteringAlgorithm<Term> c = new GreedyClustering<Term>();
 
         Set<SimilarityMeasure<Term>> measures =
-            new HashSet<SimilarityMeasure<Term>>();
+            new LinkedHashSet<SimilarityMeasure<Term>>();
 
         measures.add(new NormalizedL1<Term>(
                 m_L1Threshold.getDoubleValue(), e));
@@ -296,7 +297,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
             DocumentUtil.getTotalCoocs(doc, e.getDomain());
 
         // Calculate the deviation for each term (chi-square)
-        Map<Term, Double> chivalues = new HashMap<Term, Double>();
+        Map<Term, Double> chivalues = new LinkedHashMap<Term, Double>();
 
         for (Term term : e.getDomain()) {
             double chi = 0.0;

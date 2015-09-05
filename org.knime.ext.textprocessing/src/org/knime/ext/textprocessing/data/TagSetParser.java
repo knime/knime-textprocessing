@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   21.02.2008 (Kilian Thiel): created
  */
@@ -51,7 +51,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TagSetParser extends DefaultHandler {
@@ -99,13 +99,13 @@ public class TagSetParser extends DefaultHandler {
     /**
      * Parses the given file consisting of the tagset data and creates a set of
      * all contained tags.
-     * 
+     *
      * @param file The file to parse.
      * @return The set containing all parsed available tags.
      */
     public Set<String> parse(final File file) {
         try {
-            m_tagClassNames = new HashSet<String>();
+            m_tagClassNames = new LinkedHashSet<String>();
             SAXParserFactory fac = SAXParserFactory.newInstance();
             fac.setValidating(true);
             fac.newSAXParser().parse(file, this);

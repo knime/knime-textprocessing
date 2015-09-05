@@ -53,7 +53,7 @@ import java.io.ObjectOutput;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 /**
@@ -71,7 +71,7 @@ public class DocumentMetaInfo implements Externalizable {
      */
     private static final long serialVersionUID = -2290368394234923954L;
 
-    private Map<String, String> m_metaInfo;
+    private HashMap<String, String> m_metaInfo;
 
     private int m_hashCode = -1;
 
@@ -80,7 +80,7 @@ public class DocumentMetaInfo implements Externalizable {
      * instance.
      */
     public DocumentMetaInfo() {
-        m_metaInfo = new HashMap<String, String>();
+        m_metaInfo = new LinkedHashMap<String, String>();
     }
 
     /**
@@ -88,9 +88,10 @@ public class DocumentMetaInfo implements Externalizable {
      * instance with given key value pairs to add. Keys and values are only
      * added if not <code>null</code>.
      * @param metaInfo The key value pairs to add.
+     * @since 3.0
      */
-    public DocumentMetaInfo(final Map<String, String> metaInfo) {
-        m_metaInfo = new HashMap<String, String>();
+    public DocumentMetaInfo(final HashMap<String, String> metaInfo) {
+        m_metaInfo = new LinkedHashMap<String, String>();
         if (metaInfo != null) {
             for (String key : metaInfo.keySet()) {
                 String value = metaInfo.get(key);
@@ -195,7 +196,7 @@ public class DocumentMetaInfo implements Externalizable {
     ClassNotFoundException {
         m_hashCode = in.readInt();
         int size = in.readInt();
-        m_metaInfo = new HashMap<String, String>(size);
+        m_metaInfo = new LinkedHashMap<String, String>(size);
         for (int i = 0; i < size; i++) {
             String key = in.readUTF();
             String value = in.readUTF();

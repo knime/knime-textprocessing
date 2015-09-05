@@ -48,7 +48,7 @@
 package org.knime.ext.textprocessing.data;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  * {@link org.knime.ext.textprocessing.data.PartOfSpeechTag#getTag()}, i.e: <br>
  * <br>
  * <code>Tag t = PartOfSpeechTag.NN.getTag();</code>
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public enum PartOfSpeechTag implements TagBuilder {
@@ -173,7 +173,7 @@ public enum PartOfSpeechTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -191,7 +191,7 @@ public enum PartOfSpeechTag implements TagBuilder {
      * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     * 
+     *
      * @param str The string representing a
      *            {@link org.knime.ext.textprocessing.data.Tag}.
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
@@ -249,7 +249,7 @@ public enum PartOfSpeechTag implements TagBuilder {
      */
     @Override
     public Set<Tag> getTags() {
-        Set<Tag> tagSet = new HashSet<Tag>(values().length);
+        Set<Tag> tagSet = new LinkedHashSet<Tag>(values().length);
         for (PartOfSpeechTag tag : values()) {
             tagSet.add(tag.getTag());
         }

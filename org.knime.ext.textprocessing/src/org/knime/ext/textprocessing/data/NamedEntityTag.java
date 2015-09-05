@@ -48,12 +48,12 @@
 package org.knime.ext.textprocessing.data;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public enum NamedEntityTag implements TagBuilder {
@@ -98,7 +98,7 @@ public enum NamedEntityTag implements TagBuilder {
 
     /**
      * Returns the enum fields as a String list of their names.
-     * 
+     *
      * @return - the enum fields as a String list of their names.
      */
     @Override
@@ -116,7 +116,7 @@ public enum NamedEntityTag implements TagBuilder {
      * given string. If no corresponding
      * {@link org.knime.ext.textprocessing.data.Tag} is available the
      * <code>UNKNOWN</code> tag is returned.
-     * 
+     *
      * @param str The string representing a
      *            {@link org.knime.ext.textprocessing.data.Tag}.
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
@@ -160,7 +160,7 @@ public enum NamedEntityTag implements TagBuilder {
      */
     @Override
     public Set<Tag> getTags() {
-        Set<Tag> tagSet = new HashSet<Tag>(values().length);
+        Set<Tag> tagSet = new LinkedHashSet<Tag>(values().length);
         for (NamedEntityTag tag : values()) {
             tagSet.add(tag.getTag());
         }

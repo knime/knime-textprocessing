@@ -50,9 +50,9 @@ package org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -164,7 +164,7 @@ public class KeygraphNodeModel extends NodeModel {
                         .getStringValue());
 
         Map<Document, Map<Term, Integer>> keywords =
-                new HashMap<Document, Map<Term, Integer>>();
+                new LinkedHashMap<Document, Map<Term, Integer>>();
 
         // Process each document
         int i = 1;
@@ -239,7 +239,7 @@ public class KeygraphNodeModel extends NodeModel {
         }
 
         Map<UnorderedPair<Term>, Integer> hfLinks =
-                new HashMap<UnorderedPair<Term>, Integer>();
+                new LinkedHashMap<UnorderedPair<Term>, Integer>();
         for (int it1 = 0; it1 < highFrequencyTerms.size(); it1++) {
             progress.checkCanceled();
             Term t1 = highFrequencyTerms.get(it1);
@@ -282,7 +282,7 @@ public class KeygraphNodeModel extends NodeModel {
 
         // Calculate neighbour values (used for 'key')
         Map<Set<Term>, Integer> neighbourvalues =
-                new HashMap<Set<Term>, Integer>();
+                new LinkedHashMap<Set<Term>, Integer>();
         for (Set<Term> cluster : clusters) {
             int score = 0;
 
@@ -312,7 +312,7 @@ public class KeygraphNodeModel extends NodeModel {
 
         // Calculate based values (used for 'key')
         Map<Pair<Term, Set<Term>>, Integer> basedvalues =
-                new HashMap<Pair<Term, Set<Term>>, Integer>();
+                new LinkedHashMap<Pair<Term, Set<Term>>, Integer>();
         for (Term t : ev.getTerms()) {
             for (Set<Term> cluster : clusters) {
                 progress.checkCanceled();
@@ -333,7 +333,7 @@ public class KeygraphNodeModel extends NodeModel {
         }
 
         // Calculate keys
-        Map<Term, Double> keys = new HashMap<Term, Double>();
+        Map<Term, Double> keys = new LinkedHashMap<Term, Double>();
         for (Term t : ev.getTerms()) {
             progress.checkCanceled();
 
@@ -365,7 +365,7 @@ public class KeygraphNodeModel extends NodeModel {
             progress.checkCanceled();
 
             Map<UnorderedPair<Term>, Integer> columns =
-                    new HashMap<UnorderedPair<Term>, Integer>();
+                    new LinkedHashMap<UnorderedPair<Term>, Integer>();
 
             for (Term hf : highFrequencyTerms) {
                 int colvalue = 0;
@@ -404,7 +404,7 @@ public class KeygraphNodeModel extends NodeModel {
         progress.setProgress(0.8, "Calculating the final keyword score");
         // And now, calculate an actual score for every single node, which is
         // simply the sum of the column score for each edge connected to it
-        Map<Term, Integer> scores = new HashMap<Term, Integer>();
+        Map<Term, Integer> scores = new LinkedHashMap<Term, Integer>();
         for (Term node : keyGraph.getNodes()) {
             progress.checkCanceled();
 
@@ -435,7 +435,7 @@ public class KeygraphNodeModel extends NodeModel {
     private Map<Sentence, FrequencyMap<Term>> getTermFrequenciesPerSentence(
             final Document doc) {
         Map<Sentence, FrequencyMap<Term>> freqs =
-                new HashMap<Sentence, FrequencyMap<Term>>();
+                new LinkedHashMap<Sentence, FrequencyMap<Term>>();
 
         Iterator<Sentence> senit = doc.sentenceIterator();
         while (senit.hasNext()) {

@@ -51,8 +51,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -127,7 +128,7 @@ public class DictionaryTaggerNodeModel extends TaggerNodeModel {
     @Override
     public DocumentTagger createTagger() throws Exception {
         // Read file with named entities
-        final Set<String> namedEntities = new HashSet<String>();
+        final Set<String> namedEntities = new LinkedHashSet<String>();
         final File file = new File(m_fileModel.getStringValue());
         if (file.exists() && file.canRead() && file.isFile()) {
             final BufferedReader br = new BufferedReader(new FileReader(file));
