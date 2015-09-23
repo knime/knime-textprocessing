@@ -92,10 +92,6 @@ public class Term implements TextContainer, Externalizable {
      * values.
      */
     public Term() {
-        m_words = null;
-        m_tags = null;
-        m_hashCode = -1;
-        m_unmodifiable = false;
     }
 
     /**
@@ -262,7 +258,7 @@ public class Term implements TextContainer, Externalizable {
                 m_hashCode -= fac * t.hashCode();
             }
 
-            m_hashCode += fac * new Boolean(m_unmodifiable).hashCode();
+            m_hashCode += fac * Boolean.hashCode(m_unmodifiable);
         }
 
         return m_hashCode;
@@ -293,7 +289,9 @@ public class Term implements TextContainer, Externalizable {
     public void readExternal(final ObjectInput in) throws IOException,
             ClassNotFoundException {
         m_unmodifiable = in.readBoolean();
-        m_hashCode = in.readInt();
+
+        // was the serialized hash code, but we should *not* use it because the hash code implementation may change!
+        in.readInt();
 
         int size = in.readInt();
         m_words = new ArrayList<Word>(size);

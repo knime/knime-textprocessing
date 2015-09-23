@@ -47,6 +47,8 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.util.Objects;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -71,6 +73,30 @@ public interface DocumentValue extends DataValue {
      * @see DataValue#UTILITY
      */
     UtilityFactory UTILITY = new DocumentUtilityFactory();
+
+    /**
+     * Returns whether the two data values have the same content.
+     *
+     * @param v1 the first data value
+     * @param v2 the second data value
+     * @return <code>true</code> if both values are equal, <code>false</code> otherwise
+     * @since 3.0
+     */
+    static boolean equalContent(final DocumentValue v1, final DocumentValue v2) {
+        return Objects.equals(v1.getDocument(), v2.getDocument());
+    }
+
+    /**
+     * Returns a hash code for the given data value.
+     *
+     * @param v a data value
+     * @return the hashcode
+     * @since 3.0
+     */
+    static int hashCode(final DocumentValue v) {
+        return Objects.hashCode(v.getDocument());
+    }
+
 
     /** Implementations of the meta information of this value class. */
     class DocumentUtilityFactory extends ExtensibleUtilityFactory {

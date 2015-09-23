@@ -55,6 +55,7 @@ import org.knime.core.data.DataCellDataInput;
 import org.knime.core.data.DataCellDataOutput;
 import org.knime.core.data.DataCellSerializer;
 import org.knime.core.data.DataType;
+import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.BlobDataCell;
 import org.knime.ext.textprocessing.util.TermDocumentDeSerializationUtil;
@@ -114,8 +115,16 @@ public class DocumentBlobCell extends BlobDataCell implements DocumentValue, Str
      * {@inheritDoc}
      */
     @Override
+    protected boolean equalContent(final DataValue otherValue) {
+        return DocumentValue.equalContent(this, (DocumentValue)otherValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode() {
-        return m_document.hashCode();
+        return DocumentValue.hashCode(this);
     }
 
     /**
