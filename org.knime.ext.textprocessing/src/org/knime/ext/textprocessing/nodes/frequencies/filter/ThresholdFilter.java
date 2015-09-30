@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   22.04.2008 (thiel): created
  */
@@ -56,34 +56,34 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 
 /**
- * Filters rows accordant to a specified frequency column. If the frequency 
+ * Filters rows accordant to a specified frequency column. If the frequency
  * value is less than the given minimum value or greater than the given
  * maximum value, the row is filtered out.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class ThresholdFilter extends FrequencyFilter {
-    
+
     private double m_min;
-    
+
     private double m_max;
-    
+
     /**
      * Creates a new instance of <code>FrequencyFilter</code> with the given
-     * index of the term column, of the frequency column to apply the filtering 
+     * index of the term column, of the frequency column to apply the filtering
      * to and the min and max values.
-     * 
+     *
      * @param termColIndex The index of the term column.
-     * @param colIndex The index of the frequency column to apply the filtering 
+     * @param colIndex The index of the frequency column to apply the filtering
      * to.
      * @param min The minimum value.
      * @param max The maximum value.
-     * @param modifyUnmodifiable if set <code>true</code>, unmodifiable terms 
-     * are modified or filtered even if they are set unmodifiable, otherwise 
+     * @param modifyUnmodifiable if set <code>true</code>, unmodifiable terms
+     * are modified or filtered even if they are set unmodifiable, otherwise
      * not.
      */
-    public ThresholdFilter(final int termColIndex, final int colIndex, 
-            final double min, final double max, 
+    public ThresholdFilter(final int termColIndex, final int colIndex,
+            final double min, final double max,
             final boolean modifyUnmodifiable) {
         super(colIndex, termColIndex, modifyUnmodifiable);
         m_min = min;
@@ -94,7 +94,7 @@ public class ThresholdFilter extends FrequencyFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean internalMatches(final DataRow row, final int rowIndex) {
+    public boolean internalMatches(final DataRow row, final long rowIndex) {
         DataCell cell = row.getCell(m_filterColIndex);
         if (cell.getType().isCompatible(DoubleValue.class)) {
             double val = ((DoubleValue)cell).getDoubleValue();
@@ -108,7 +108,7 @@ public class ThresholdFilter extends FrequencyFilter {
             }
         }
         return false;
-    }    
+    }
 
     /**
      * {@inheritDoc}
