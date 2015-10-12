@@ -150,7 +150,7 @@ public interface DocumentValue extends DataValue {
          */
         @Override
         public String getName() {
-            return "Text documents";
+            return "Text document";
         }
     }
 }

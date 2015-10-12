@@ -149,7 +149,7 @@ public interface TermValue extends DataValue {
          */
         @Override
         public String getName() {
-            return "Terms";
+            return "Term";
         }
     }
 }
