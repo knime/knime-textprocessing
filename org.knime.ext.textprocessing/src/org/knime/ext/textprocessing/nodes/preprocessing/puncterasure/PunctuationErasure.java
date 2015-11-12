@@ -63,8 +63,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class PunctuationErasure implements TermPreprocessing, StringPreprocessing {
 
-    private static String punctMarks =
-        "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]+";
+    private static String punctMarks = "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]+";
     private static String replacement = "";
 
     /**
@@ -80,8 +79,7 @@ public class PunctuationErasure implements TermPreprocessing, StringPreprocessin
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            newWords.add(new Word(
-                    PunctuationErasure.punctuationFilter(w.getWord()), w.getWhitespaceSuffix()));
+            newWords.add(new Word(punctuationFilter(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
@@ -92,7 +90,7 @@ public class PunctuationErasure implements TermPreprocessing, StringPreprocessin
      * @param str String to filter punctuation marks from.
      * @return Filtered String.
      */
-    public static String punctuationFilter(final String str) {
+    private String punctuationFilter(final String str) {
         return str.replaceAll(punctMarks, replacement);
     }
 
@@ -101,6 +99,6 @@ public class PunctuationErasure implements TermPreprocessing, StringPreprocessin
      */
     @Override
     public String preprocessString(final String str) {
-        return PunctuationErasure.punctuationFilter(str);
+        return punctuationFilter(str);
     }
 }

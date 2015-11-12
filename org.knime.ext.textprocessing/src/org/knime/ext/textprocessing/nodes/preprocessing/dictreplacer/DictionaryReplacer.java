@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -64,20 +65,37 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
  */
 public class DictionaryReplacer implements TermPreprocessing, StringPreprocessing {
 
-    private Hashtable<String, String> m_replaceDict;
+    private HashMap<String, String> m_replaceDict;
 
     private Tokenizer m_wordTokenizer;
 
     /**
-     * Creates new instance of <code>DictionaryReplacer</code> with give
-     * dictionary, containing key value pairs for replacement.
+     * Creates new instance of <code>DictionaryReplacer</code> with give dictionary, containing key value pairs for
+     * replacement.
      *
-     * @param replaceDict The dictionary consisting of key value pairs for
-     * replacement (keys will be replaced by their corresponding values).
+     * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
+     *            corresponding values).
+     * @deprecated use {@link DictionaryReplacer#DictionaryReplacer(HashMap)} instead.
+     * @since 3.1
      */
+    @Deprecated
     public DictionaryReplacer(final Hashtable<String, String> replaceDict) {
         super();
-        m_replaceDict = replaceDict;
+        m_replaceDict = new HashMap<String, String>(replaceDict);
+        m_wordTokenizer = DefaultTokenization.getWordTokenizer();
+    }
+
+    /**
+     * Creates new instance of {@link DictionaryReplacer} with give dictionary, containing key value pairs for
+     * replacement.
+     *
+     * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
+     *            corresponding values).
+     * @since 3.1
+     */
+    public DictionaryReplacer(final HashMap<String, String> replaceDict) {
+        super();
+        m_replaceDict = new HashMap<String, String>(replaceDict);
         m_wordTokenizer = DefaultTokenization.getWordTokenizer();
     }
 
@@ -93,7 +111,10 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
 
             List<Word> newWords = new ArrayList<Word>();
             for (String s : tokenizedWords) {
-                newWords.add(new Word(s));
+                // TODO here the original white space suffix of the document term will be added to ALL words of the
+                // replacement term. This suffix should just be added to the LAST word. The other words should get
+                // their original suffix (from the term/string of the replacement table).
+                newWords.add(new Word(s, term.getTextWithWsSuffix()));
             }
             return new Term(newWords, term.getTags(), term.isUnmodifiable());
         }

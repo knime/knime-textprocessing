@@ -55,12 +55,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
@@ -157,17 +157,6 @@ public final class BuildInStopwordListFactory {
         List<String> listName = new LinkedList<String>(m_buildInStopwordLists.keySet());
         Collections.sort(listName);
         return new LinkedHashSet<String>(listName);
-    }
-
-    /**
-     * @return The <code>Hashtable</code> containing the names and the corresponding stopword lists.
-     * @deprecated use {@link BuildInStopwordListFactory#getStopwordLists()} instead.
-     */
-    @Deprecated
-    public Hashtable<String, Set<String>> getNamesAndLists() {
-        Hashtable<String, Set<String>> stopWordLists = new Hashtable<String, Set<String>>();
-        stopWordLists.putAll(m_buildInStopwordLists);
-        return stopWordLists;
     }
 
     /**

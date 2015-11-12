@@ -1,10 +1,270 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.ext.textprocessing" version="2">
     <resource path="META-INF/MANIFEST.MF">
+        <filter id="923795461">
+            <message_arguments>
+                <message_argument value="3.1.0"/>
+                <message_argument value="3.0.0"/>
+            </message_arguments>
+        </filter>
         <filter id="924844039">
             <message_arguments>
                 <message_argument value="2.10.1"/>
                 <message_argument value="2.10.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilter">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilter"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/AbstractPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/ChunkPreprocessing.java" type="org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessing">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessing"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/ChunkPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessor">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessor"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/ChunkToTermPreprocessingAdapter.java" type="org.knime.ext.textprocessing.nodes.preprocessing.ChunkToTermPreprocessingAdapter">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.ChunkToTermPreprocessingAdapter"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/DirectChunkPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.DirectChunkPreprocessor">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.DirectChunkPreprocessor"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/DocumentPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.DocumentPreprocessor">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.DocumentPreprocessor"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/RowPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.RowPreprocessor">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.RowPreprocessor"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/caseconverter/CaseConverterConfigKeys.java" type="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterConfigKeys">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterConfigKeys"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/caseconverter/CaseConverterNodeDialog.java" type="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeDialog"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/caseconverter/CaseConverterNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory"/>
+                <message_argument value="createNodeView(int, CaseConverterNodeModel)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/caseconverter/CaseConverterNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/dictreplacer/DictionaryReplacerConfigKeys.java" type="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerConfigKeys">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerConfigKeys"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/dictreplacer/DictionaryReplacerNodeDialog.java" type="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeDialog"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/dictreplacer/DictionaryReplacerNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/dictreplacer/DictionaryReplacerNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/kuhlenstemmer/KuhlenStemmerNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/kuhlenstemmer/KuhlenStemmerNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/numberfilter/NumberFilterNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/numberfilter/NumberFilterNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/puncterasure/PunctuationErasureNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/puncterasure/PunctuationErasureNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/regexfilter/RegExFilterNodeDialog.java" type="org.knime.ext.textprocessing.nodes.preprocessing.regexfilter.RegExFilterNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.regexfilter.RegExFilterNodeDialog"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/replacer/RegExReplacerNodeDialog.java" type="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeDialog"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/replacer/RegExReplacerNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/replacer/RegExReplacerNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/termgrouper/TermGrouper.java" type="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouper">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouper"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/termgrouper/TermGrouperConfigKeys.java" type="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperConfigKeys">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperConfigKeys"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/termgrouper/TermGrouperNodeDialog.java" type="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeDialog"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/termgrouper/TermGrouperNodeFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/termgrouper/TermGrouperNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
             </message_arguments>
         </filter>
     </resource>
@@ -34,6 +294,166 @@
         <filter id="1177550852">
             <message_arguments>
                 <message_argument value="UNCERTAINTY"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/caseconverter/CaseConverter.java" type="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverter">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverter"/>
+                <message_argument value="convert(String, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/kuhlenstemmer/KuhlenStemmer.java" type="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmer">
+        <filter id="337768515">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmer"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/numberfilter/NumberFilter.java" type="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilter">
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilter"/>
+                <message_argument value="numberFilter(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/porterstemmer/PorterStemmer.java" type="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer">
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="containsVowel(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="endsWithCVC(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="endsWithDoubleConsonent(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="endsWithS(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="isVowel(char)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="stem(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step1a(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step1b(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step1b2(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step1c(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step2(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step3(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step4(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step5a(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="step5b(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer"/>
+                <message_argument value="stringMeasure(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/puncterasure/PunctuationErasure.java" type="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasure">
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasure"/>
+                <message_argument value="punctuationFilter(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/snowballstemmer/SnowballStemmerFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerFactory"/>
+                <message_argument value="getInstance()"/>
+            </message_arguments>
+        </filter>
+        <filter id="643842064">
+            <message_arguments>
+                <message_argument value="SnowballStemmer"/>
+                <message_argument value="SnowballStemmerFactory"/>
+                <message_argument value="getStemmerByName(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/stopwordfilter/BuildInStopwordListFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.BuildInStopwordListFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.BuildInStopwordListFactory"/>
+                <message_argument value="getNamesAndLists()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/stopwordfilter/StopWordFilter.java" type="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilter">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilter"/>
+                <message_argument value="StopWordFilter(HashSet&lt;String&gt;, boolean)"/>
             </message_arguments>
         </filter>
     </resource>

@@ -1,6 +1,6 @@
-/* @(#)$RCSfile$ 
+/* @(#)$RCSfile$
  * $Revision$ $Date$ $Author$
- * 
+ *
 ========================================================================
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -43,42 +43,42 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 18, 2006 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
 
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
-import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
-
 import java.util.HashSet;
+import java.util.Set;
+
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- * A stop word filter, filtering strings contained in the given set of stop 
- * words. See {@link StopWordFilter#preprocessTerm(Term)} for details to filter 
+ * A stop word filter, filtering strings contained in the given set of stop
+ * words. See {@link StopWordFilter#preprocessTerm(Term)} for details to filter
  * terms.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
 
-    private HashSet < String > m_wordList;
-    
+    private Set < String > m_wordList;
+
     private boolean m_caseSensitive;
-    
+
     /**
-     * Creates new instance of <code>StopWordFilter</code> with given 
+     * Creates new instance of <code>StopWordFilter</code> with given
      * list containing the stop words to filter.
      *
      * @param stopWordList List with stop word to filter.
      * @param caseSensitive If set <code>true</code> the case matters when
      * filtering given string, otherwise not.
+     * @since 3.1
      */
-    public StopWordFilter(final HashSet < String > stopWordList, 
-            final boolean caseSensitive) {
-        
+    public StopWordFilter(final Set < String > stopWordList, final boolean caseSensitive) {
         m_caseSensitive = caseSensitive;
         if (caseSensitive) {
             m_wordList = stopWordList;
@@ -86,15 +86,30 @@ public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
             m_wordList = convert(stopWordList);
         }
     }
-    
-    private HashSet<String> convert(final HashSet<String> set) {
-        HashSet<String> convertedSet = new HashSet<String>();
+
+    /**
+     * Adds the given stop words to the existing stop word list. If caseSensitive is set {@code true} the stop words
+     * will be added lower case.
+     * @param stopWords The stop word to add.
+     * @param caseSensitive If caseSensitive is set {@code true} the stop words will be added lower case.
+     * @since 3.1
+     */
+    public void addStopWords(final Set<String> stopWords, final boolean caseSensitive) {
+        if (caseSensitive) {
+            m_wordList.addAll(stopWords);
+        } else {
+            m_wordList.addAll(convert(stopWords));
+        }
+    }
+
+    private Set<String> convert(final Set<String> set) {
+        Set<String> convertedSet = new HashSet<String>();
         for (String s : set) {
             convertedSet.add(s.toLowerCase());
         }
         return convertedSet;
     }
-    
+
     /**
      * Returns true if given String is a stop word, false if not.
      * @param word String to check if it is a stop word.
@@ -109,13 +124,13 @@ public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
      */
     @Override
     public Term preprocessTerm(final Term term) {
-        String t;
+        final String t;
         if (m_caseSensitive) {
             t = term.getText();
         } else {
             t = term.getText().toLowerCase();
         }
-        
+
         if (isStopWord(t)) {
             return null;
         }
@@ -127,13 +142,13 @@ public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
      */
     @Override
     public String preprocessString(final String str) {
-        String t;
+        final String t;
         if (m_caseSensitive) {
             t = str;
         } else {
             t = str.toLowerCase();
         }
-        
+
         if (isStopWord(t)) {
             return null;
         }

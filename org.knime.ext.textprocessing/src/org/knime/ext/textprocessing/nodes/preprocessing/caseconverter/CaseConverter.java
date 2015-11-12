@@ -61,18 +61,20 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class CaseConverter implements TermPreprocessing, StringPreprocessing {
 
-    /**
-     * Constant for lower case conversion.
-     */
+    /** Constant for lower case conversion. */
     public static final String LOWER_CASE = "Lower case";
 
-    /**
-     * Constant for upper case conversion.
-     */
+    /** Constant for upper case conversion. */
     public static final String UPPER_CASE = "Upper case";
 
+    /** Constant for default case (lower case).
+     * @since 3.1
+     * */
+    public static final String DEF_CASE = LOWER_CASE;
 
-    private String m_case = CaseConverter.LOWER_CASE;
+    private String m_case = CaseConverter.DEF_CASE;
+
+    private boolean m_lowerCase = true;
 
     /**
      * Creates new instance of <code>CaseConverter</code> with given case
@@ -82,6 +84,7 @@ public class CaseConverter implements TermPreprocessing, StringPreprocessing {
      */
     public CaseConverter(final String caseConversion) {
         m_case = caseConversion;
+        checkCase();
     }
 
     /**
@@ -98,6 +101,7 @@ public class CaseConverter implements TermPreprocessing, StringPreprocessing {
      */
     public void setCase(final String caseConversion) {
         m_case = caseConversion;
+        checkCase();
     }
 
     /**
@@ -115,7 +119,7 @@ public class CaseConverter implements TermPreprocessing, StringPreprocessing {
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            newWords.add(new Word(CaseConverter.convert(w.getWord(), m_case), w.getWhitespaceSuffix()));
+            newWords.add(new Word(convert(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
@@ -125,26 +129,24 @@ public class CaseConverter implements TermPreprocessing, StringPreprocessing {
      */
     @Override
     public String preprocessString(final String str) {
-        return CaseConverter.convert(str, m_case);
+        return convert(str);
     }
 
-    /**
-     * Converts the case of the given string to lower or upper case depending
-     * on the second string parameter, which specifies whether the conversion
-     * is to lower case or to upper case.
-     *
-     * @param str The string to convert
-     * @param convCase The string specifying the was of conversion, to upper
-     * or to lower case.
-     * @return The converted string.
-     */
-    public static String convert(final String str, final String convCase) {
+    private String convert(final String str) {
         String newTerm;
-        if (convCase.equals(CaseConverter.LOWER_CASE)) {
+        if (m_lowerCase) {
             newTerm = str.toLowerCase();
         } else {
             newTerm = str.toUpperCase();
         }
         return newTerm;
+    }
+
+    private void checkCase() {
+        if (m_case.equals(LOWER_CASE)) {
+            m_lowerCase = true;
+        } else {
+            m_lowerCase = false;
+        }
     }
 }

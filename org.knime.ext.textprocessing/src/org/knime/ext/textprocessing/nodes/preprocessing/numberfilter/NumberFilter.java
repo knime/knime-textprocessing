@@ -41,56 +41,54 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   11.05.2007 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class NumberFilter implements TermPreprocessing, StringPreprocessing {
 
     private static String numbers = "^[-+]?[\\d.,]+";
-    
+
     private static String replacement = "";
-        
+
     /**
-     * Filters all strings containing numbers . or , the strings may also 
-     * start with + or - and replaces them with "". The filtered String is 
+     * Filters all strings containing numbers . or , the strings may also
+     * start with + or - and replaces them with "". The filtered String is
      * returned.
      * @param str String to filter numbers from.
      * @return Filtered String.
      */
-    public static String numberFilter(final String str) {        
+    private String numberFilter(final String str) {
         return str.replaceAll(numbers, replacement);
     }
-
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Term preprocessTerm(final Term term) {
-        String filtered = NumberFilter.numberFilter(term.getText());
+        String filtered = numberFilter(term.getText());
         if (filtered.length() <= 0) {
             return null;
         }
         return term;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public String preprocessString(final String str) {
-        return NumberFilter.numberFilter(str);
+        return numberFilter(str);
     }
 }

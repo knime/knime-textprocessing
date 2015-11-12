@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Number Filter</name>
+    <shortDescription>Filters document terms consisting of digits.</shortDescription>
+    <fullDescription>
+        <intro>
+        	Filters all terms contained in the input documents that consist of digits, including decimal separators
+        	"," or "." and possible leading "+" or "-".
+		</intro>
+
+        <tab name="Preprocessing options">
+        <option name="Document column">
+            The column containing the documents to preprocess.
+        </option>
+        
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
+            documents will be appended as new column. 
+        </option>
+
+        <option name="Append column">
+            The name of the new appended column, containing the preprocessed documents.            
+        </option>
+        
+        <option name="Ignore unmodifiable tag">
+              If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+    </fullDescription>
+
+    <ports>
+        <inPort name="Documents to preprocess" index="0">
+            The input table which contains the documents to preprocess.
+        </inPort>
+        <outPort name="Preprocessed documents." index="0">
+            The output table which contains the preprocessed documents.
+        </outPort>
+    </ports>
+</knimeNode>

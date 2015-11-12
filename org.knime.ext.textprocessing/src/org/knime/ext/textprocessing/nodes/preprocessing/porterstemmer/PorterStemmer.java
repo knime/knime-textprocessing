@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -78,7 +79,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         final List<Word> words = term.getWords();
         final List<Word> newWords = new ArrayList<Word>();
         for (final Word w : words) {
-            newWords.add(new Word(PorterStemmer.stem(w.getWord()), w.getWhitespaceSuffix()));
+            newWords.add(new Word(stem(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
@@ -88,7 +89,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      */
     @Override
     public String preprocessString(final String str) {
-        return PorterStemmer.stem(str);
+        return stem(str);
     }
 
     /**
@@ -97,7 +98,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return If the word can not be stemmed or there
      * is some sort of error str is returned.
      */
-    public static final String stem(final String str) {
+    private String stem(final String str) {
         try {
             final String results = internalStem(str);
             if (results != null) {
@@ -110,7 +111,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         }
     }
 
-    private static final String internalStem(final String str) {
+    private String internalStem(final String str) {
         String s = str;
         // check for zero length
         if (s.length() > 0) {
@@ -142,7 +143,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 1a of PorterStemmer
      * algorithm.
      */
-    protected static final String step1a(final String str) {
+    private String step1a(final String str) {
         // SSES -> SS
         if (str.endsWith("sses")) {
             return str.substring(0, str.length() - 2);
@@ -165,7 +166,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 1b of PorterStemmer
      * algorithm.
      */
-    protected static final String step1b(final String str) {
+    private String step1b(final String str) {
         // (m > 0) EED -> EE
         if (str.endsWith("eed")) {
             if (stringMeasure(str.substring(0, str.length() - 3)) > 0) {
@@ -190,7 +191,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 1b2 of PorterStemmer
      * algorithm.
      */
-    protected static final String step1b2(final String str) {
+    private String step1b2(final String str) {
         // AT -> ATE
         if (str.endsWith("at") || str.endsWith("bl") || str.endsWith("iz")) {
             return str + "e";
@@ -211,7 +212,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 1c of PorterStemmer
      * algorithm.
      */
-    protected static final String step1c(final String str) {
+    private String step1c(final String str) {
         // (*v*) Y -> I
         if (str.endsWith("y")) {
             if (containsVowel(str.substring(0, str.length() - 1))) {
@@ -227,7 +228,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 2 of PorterStemmer
      * algorithm.
      */
-    protected static final String step2(final String str) {
+    private String step2(final String str) {
         // (m > 0) ATIONAL -> ATE
         if ((str.endsWith("ational"))
                 && (stringMeasure(str.substring(0, str.length() - 5)) > 0)) {
@@ -318,7 +319,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 3 of PorterStemmer
      * algorithm.
      */
-    protected static final String step3(final String str) {
+    private String step3(final String str) {
         // (m > 0) ICATE -> IC
         if ((str.endsWith("icate"))
                 && (stringMeasure(str.substring(0, str.length() - 3)) > 0)) {
@@ -357,7 +358,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 4 of PorterStemmer
      * algorithm.
      */
-    protected static final String step4(final String str) {
+    private String step4(final String str) {
         if ((str.endsWith("al"))
                 && (stringMeasure(str.substring(0, str.length() - 2)) > 1)) {
             return str.substring(0, str.length() - 2);
@@ -443,7 +444,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 5a of PorterStemmer
      * algorithm.
      */
-    protected static final String step5a(final String str) {
+    private String step5a(final String str) {
         // (m > 1) E ->
         if ((stringMeasure(str.substring(0, str.length() - 1)) > 1)
                 && str.endsWith("e")) {
@@ -463,7 +464,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @return String modified under terms of step 5b of PorterStemmer
      * algorithm.
      */
-    protected static final String step5b(final String str) {
+    private String step5b(final String str) {
         // (m > 1 and *d and *L) ->
         if (str.endsWith("l") && endsWithDoubleConsonent(str)
                 && (stringMeasure(str.substring(0, str.length() - 1)) > 1)) {
@@ -478,7 +479,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @param str String to check if it ends with 's'.
      * @return True if given String end with 's'.
      */
-    protected static final boolean endsWithS(final String str) {
+    private boolean endsWithS(final String str) {
         return str.endsWith("s");
     }
 
@@ -487,7 +488,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @param str String to check if it contains a vowel.
      * @return True if given String contains a vowel.
      */
-    protected static final boolean containsVowel(final String str) {
+    private boolean containsVowel(final String str) {
         char[] strchars = str.toCharArray();
         for (int i = 0; i < strchars.length; i++) {
             if (isVowel(strchars[i])) {
@@ -506,7 +507,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @param c Char to check if it is a vowel.
      * @return True if given Char is a vowel
      */
-    public static final boolean isVowel(final char c) {
+    private boolean isVowel(final char c) {
         if ((c == 'a') || (c == 'e') || (c == 'i') || (c == 'o')
                 || (c == 'u')) {
             return true;
@@ -519,7 +520,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @param str String to check if it ends with double consonent.
      * @return True if given Strign ends with double consonent.
      */
-    protected static final boolean endsWithDoubleConsonent(final String str) {
+    private boolean endsWithDoubleConsonent(final String str) {
         char c = str.charAt(str.length() - 1);
         if (str.length() >= 2) {
             if (c == str.charAt(str.length() - 2)) {
@@ -536,7 +537,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @param str String to measure
      * @return The CVC measure of given String.
      */
-    protected static final int stringMeasure(final String str) {
+    private int stringMeasure(final String str) {
         int count = 0;
         boolean vowelSeen = false;
         char[] strchars = str.toCharArray();
@@ -557,7 +558,7 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
      * @param str String to check if it ends with a CVC phrase.
      * @return True if given String end with a CVC phrase.
      */
-    protected static final boolean endsWithCVC(final String str) {
+    private boolean endsWithCVC(final String str) {
         char c, v, c2 = ' ';
         if (str.length() >= 3) {
             c = str.charAt(str.length() - 1);

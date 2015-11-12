@@ -48,8 +48,9 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer;
 
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Set;
+
+import javax.naming.NameNotFoundException;
 
 import org.tartarus.snowball.SnowballStemmer;
 
@@ -65,21 +66,15 @@ public final class SnowballStemmerFactory {
 
     private Set<String> m_stemmerNames = new HashSet<String>();
 
-    private Hashtable<String, SnowballStemmer> m_stemmer =
-        new Hashtable<String, SnowballStemmer>();
-
     /**
      * Creates an instance of <code>SnowballStemmerFactory</code>.
-     * @throws ClassNotFoundException If snowball stemmer classes could not be
-     * found.
-     * @throws InstantiationException If snowball stemmer classes could not be
-     * instantiated.
-     * @throws IllegalAccessException If snowball stemmer classes could not be
-     * accessed.
+     *
+     * @throws ClassNotFoundException If snowball stemmer classes could not be found.
+     * @throws InstantiationException If snowball stemmer classes could not be instantiated.
+     * @throws IllegalAccessException If snowball stemmer classes could not be accessed.
      * @since 2.8
      */
-    public SnowballStemmerFactory() throws ClassNotFoundException,
-    InstantiationException, IllegalAccessException {
+    public SnowballStemmerFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         m_stemmerNames.add("Danish");
         m_stemmerNames.add("Dutch");
         m_stemmerNames.add("English");
@@ -96,48 +91,35 @@ public final class SnowballStemmerFactory {
         m_stemmerNames.add("Spanish");
         m_stemmerNames.add("Swedish");
         m_stemmerNames.add("Turkish");
-
-        for (String name : m_stemmerNames) {
-            @SuppressWarnings("unchecked")
-            Class<SnowballStemmer> stemClass =
-                (Class<SnowballStemmer>)Class.forName(
-                PACKAGE_PREFIX + name.toLowerCase() + PACKAGE_POSTFIX);
-            SnowballStemmer stemmer = stemClass.newInstance();
-            m_stemmer.put(name, stemmer);
-        }
-    }
-
-    /**
-     * @return The singleton instance of <code>SnowballStemmerFactory</code>.
-     * @throws ClassNotFoundException If snowball stemmer class could not be
-     * found.
-     * @throws InstantiationException If snowball stemmer class could not be
-     * instanciated.
-     * @throws IllegalAccessException If snowball stemmer class could not be
-     * accessed.
-     * @deprecated SnowballStemmerFactory is no longer a singleton due to
-     * concurrency issues. Instead use constructor to create instance.
-     */
-    @Deprecated
-    public static SnowballStemmerFactory getInstance() throws
-    ClassNotFoundException, InstantiationException, IllegalAccessException {
-        return new SnowballStemmerFactory();
     }
 
     /**
      * @return The set of available snowball stemmer names.
      */
     public Set<String> getStemmerNames() {
-        return m_stemmer.keySet();
+        return m_stemmerNames;
     }
 
     /**
-     * Returns the Snowball stemmer corresponding to the given name.
+     * Creates a new snowball stemmer instance for the given name and returns it. If the name could not be found in the
+     * list of valid names, or the stemmer instance could not be create an exception will be thrown.
      *
-     * @param name The name to get the Snowball stemmer for.
+     * @param name The name of the Snowball stemmer to create.
      * @return the Snowball stemmer corresponding to the given name.
+     * @throws NameNotFoundException If given name of snowball stemmer could not be found in the list of valid names.
+     * @throws ClassNotFoundException If snowball stemmer classes could not be found.
+     * @throws IllegalAccessException If snowball stemmer classes could not be instantiated.
+     * @throws InstantiationException If snowball stemmer classes could not be instantiated.
      */
-    public SnowballStemmer getStemmerByName(final String name) {
-        return m_stemmer.get(name);
+    public SnowballStemmer getStemmerByName(final String name)
+        throws NameNotFoundException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        if (!m_stemmerNames.contains(name)) {
+            throw new NameNotFoundException("Stemmer name \"" + name + "\" not found in Snowball library.");
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<SnowballStemmer> stemmerClass =
+            (Class<SnowballStemmer>)Class.forName(PACKAGE_PREFIX + name.toLowerCase() + PACKAGE_POSTFIX);
+        return stemmerClass.newInstance();
     }
 }

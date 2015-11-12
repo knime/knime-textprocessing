@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Tag Filter</name>
+    <shortDescription>Filters document terms with certain tags assigned.</shortDescription>
+    <fullDescription>
+        <intro>
+            Filters terms contained in the input documents that have specific tags assigned.
+            A term if not filtered out if at least one of it assigned tags is part of the specified tags. 
+            If strict filtering is set, all assigned tags of a term have to be specified tags.
+        </intro>
+
+        <tab name="Tag filter options">
+        <option name="Strict filtering">
+             If strict filtering is checked, terms need to have all specified
+             tags assigned. If  not checked, at least one assigned tag has to be part of the specified tags.
+        </option>
+        <option name="Filter matching">
+             If checked, terms that have the specified tags assigned are filtered out,
+             otherwise they are not filtered. If strict filtering is checked, all tags
+             must match to filter or not a term.
+        </option>
+        <option name="Tag type">
+             The type of the tags to filter.
+        </option>
+        <option name="Tags">
+             The tags to filter for.
+        </option>
+        </tab>
+
+        <tab name="Preprocessing options">
+        <option name="Document column">
+            The column containing the documents to preprocess.
+        </option>
+        
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
+            documents will be appended as new column. 
+        </option>
+
+        <option name="Append column">
+            The name of the new appended column, containing the preprocessed documents.            
+        </option>
+        
+        <option name="Ignore unmodifiable tag">
+              If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+    </fullDescription>
+
+    <ports>
+        <inPort name="Documents to preprocess" index="0">
+            The input table which contains the documents to preprocess.
+        </inPort>
+        <outPort name="Preprocessed documents." index="0">
+            The output table which contains the preprocessed documents.
+        </outPort>
+    </ports>
+</knimeNode>

@@ -60,14 +60,12 @@ import org.tartarus.snowball.SnowballStemmer;
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class WrappedSnowballStemmer implements TermPreprocessing,
-        StringPreprocessing {
+public class WrappedSnowballStemmer implements TermPreprocessing, StringPreprocessing {
 
     private SnowballStemmer m_stemmer;
 
     /**
-     * Creates new instance of <code>WrappedSnowballStemmer</code> with given
-     * stemmer to use.
+     * Creates new instance of {@code WrappedSnowballStemmer} with given stemmer to use.
      *
      * @param stemmer The stemmer to use.
      */
@@ -83,9 +81,7 @@ public class WrappedSnowballStemmer implements TermPreprocessing,
         List<Word> words = term.getWords();
         List<Word> newWords = new ArrayList<Word>();
         for (Word w : words) {
-            m_stemmer.setCurrent(w.getText());
-            m_stemmer.stem();
-            newWords.add(new Word(m_stemmer.getCurrent(), w.getWhitespaceSuffix()));
+            newWords.add(new Word(stem(w.getText()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
@@ -95,6 +91,10 @@ public class WrappedSnowballStemmer implements TermPreprocessing,
      */
     @Override
     public String preprocessString(final String str) {
+        return stem(str);
+    }
+
+    private synchronized String stem(final String str) {
         m_stemmer.setCurrent(str);
         m_stemmer.stem();
         return m_stemmer.getCurrent();
