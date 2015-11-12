@@ -111,10 +111,8 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
 
             List<Word> newWords = new ArrayList<Word>();
             for (String s : tokenizedWords) {
-                // TODO here the original white space suffix of the document term will be added to ALL words of the
-                // replacement term. This suffix should just be added to the LAST word. The other words should get
-                // their original suffix (from the term/string of the replacement table).
-                newWords.add(new Word(s, term.getTextWithWsSuffix()));
+                // TODO here the original white space suffix of the term should be added as suffix of last word.
+                newWords.add(new Word(s));
             }
             return new Term(newWords, term.getTags(), term.isUnmodifiable());
         }
