@@ -53,8 +53,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -110,8 +112,8 @@ public class StringsToDocumentNodeModel extends NodeModel {
     private SettingsModelIntegerBounded m_maxThreads = StringsToDocumentNodeDialog.getNumberOfThreadsModel();
 
     /** The default number of threads value. */
-    static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 2,
-        (int)Math.ceil(2.0 * Runtime.getRuntime().availableProcessors()));
+    static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
+        (int)Math.ceil(Runtime.getRuntime().availableProcessors()));
 
     /** The min number of threads. */
     static final int MIN_THREADS = 1;
