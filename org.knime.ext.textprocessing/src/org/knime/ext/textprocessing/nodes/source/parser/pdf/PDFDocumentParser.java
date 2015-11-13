@@ -53,6 +53,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchemaDublinCore;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -169,18 +170,22 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             String title = null;
             String authors = null;
 
+            if (m_filenameAsTitle) {
+                title = m_docPath.toString().trim();
+            }
+
             PDDocumentCatalog catalog = document.getDocumentCatalog();
             PDMetadata meta = catalog.getMetadata();
             if (meta != null) {
                 XMPMetadata metadata = meta.exportXMPMetadata();
                 XMPSchemaDublinCore dc = metadata.getDublinCoreSchema();
-                if (dc != null) {
+                if (dc != null && !checkTitle(title)) {
                     title = dc.getTitle();
                 }
             }
             PDDocumentInformation information = document.getDocumentInformation();
             if (information != null) {
-                if (title == null || title.length() <= 1) {
+                if (!checkTitle(title)) {
                     title = information.getTitle();
                 }
                 authors = information.getAuthor();

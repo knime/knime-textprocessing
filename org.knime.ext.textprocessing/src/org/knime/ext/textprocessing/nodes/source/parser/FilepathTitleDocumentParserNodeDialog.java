@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,61 +44,35 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   20.02.2008 (thiel): created
+ *   13.11.2015 (Kilian): created
  */
-package org.knime.ext.textprocessing.nodes.source.parser.word;
+package org.knime.ext.textprocessing.nodes.source.parser;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserNodeModel;
-import org.knime.ext.textprocessing.nodes.source.parser.FilepathTitleDocumentParserNodeDialog;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the flat file document parser node, provides methods to create the
- * model and the dialog instance.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian Thiel, KNIME.com, Berlin, Germany
+ * @since 3.1
  */
-public class WordDocumentParserNodeFactory extends NodeFactory<DocumentParserNodeModel> {
+public class FilepathTitleDocumentParserNodeDialog extends DocumentParserNodeDialog {
 
     /**
-     * {@inheritDoc}
+     * @return The {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the
+     *         setting whether the file path will be used as title or not.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new FilepathTitleDocumentParserNodeDialog();
+    static SettingsModelBoolean getFileNameAsTitleModel() {
+        return new SettingsModelBoolean(DocumentParserConfigKeys.CFGKEY_FILENAME_TITLE,
+            DocumentParserNodeModel.DEFAULT_FILENAME_TITLE);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructor for class {@link FilepathTitleDocumentParserNodeDialog}.
      */
-    @Override
-    public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new WordDocumentParserFactory(), false, new String[]{"doc", "docx"});
-    }
+    public FilepathTitleDocumentParserNodeDialog() {
+        super();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<DocumentParserNodeModel> createNodeView(final int index, final DocumentParserNodeModel model) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
+        addDialogComponent(new DialogComponentBoolean(getFileNameAsTitleModel(), "Use file path as title"));
     }
 }

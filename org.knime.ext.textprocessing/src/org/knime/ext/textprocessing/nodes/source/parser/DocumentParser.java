@@ -50,6 +50,7 @@ package org.knime.ext.textprocessing.nodes.source.parser;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
@@ -139,4 +140,11 @@ public interface DocumentParser {
      * @param charset The charset to use by the parser.
      */
     public void setCharset(final Charset charset);
+
+    /**
+     * @param filenameAsTitle If {@code true} filename will be set as title, otherwise the concrete parser
+     * implementation will define the title.
+     * @since 3.1
+     */
+    public void setFilenameAsTitle(final boolean filenameAsTitle);
 }

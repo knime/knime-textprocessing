@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -131,6 +132,10 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     public static final DocumentType DEFAULT_DOCTYPE = DocumentType.UNKNOWN;
 
+    /** The default setting to use the filepath as title
+     * @since 3.1*/
+    public static final boolean DEFAULT_FILENAME_TITLE = false;
+
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentParserNodeModel.class);
 
     private SettingsModelString m_pathModel = DocumentParserNodeDialog.getPathModel();
@@ -146,6 +151,9 @@ public class DocumentParserNodeModel extends NodeModel {
     private SettingsModelBoolean m_ignoreHiddenFilesModel = DocumentParserNodeDialog.getIgnoreHiddenFilesModel();
 
     private SettingsModelString m_charsetModel = CharsetDocumentParserNodeDialog.getCharsetModel();
+
+    private SettingsModelBoolean m_fileNameAsTitleModel =
+        FilepathTitleDocumentParserNodeDialog.getFileNameAsTitleModel();
 
     private boolean m_withCharset = false;
 
@@ -216,6 +224,7 @@ public class DocumentParserNodeModel extends NodeModel {
         if (m_withCharset) {
             parser.setCharset(Charset.forName(m_charsetModel.getStringValue()));
         }
+        parser.setFilenameAsTitle(m_fileNameAsTitleModel.getBooleanValue());
 
         return parser;
     }
@@ -396,6 +405,12 @@ public class DocumentParserNodeModel extends NodeModel {
         if (m_withCharset) {
             m_charsetModel.loadSettingsFrom(settings);
         }
+
+        try {
+            m_fileNameAsTitleModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // catch exception for backwards compatibility
+        }
     }
 
     /**
@@ -413,6 +428,8 @@ public class DocumentParserNodeModel extends NodeModel {
         if (m_withCharset) {
             m_charsetModel.saveSettingsTo(settings);
         }
+
+        m_fileNameAsTitleModel.saveSettingsTo(settings);
     }
 
     /**
@@ -429,6 +446,12 @@ public class DocumentParserNodeModel extends NodeModel {
 
         if (m_withCharset) {
             m_charsetModel.validateSettings(settings);
+        }
+
+        try {
+            m_fileNameAsTitleModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // catch exception for backwards compatibility
         }
     }
 }

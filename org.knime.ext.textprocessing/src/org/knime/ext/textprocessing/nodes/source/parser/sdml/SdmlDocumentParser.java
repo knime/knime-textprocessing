@@ -55,7 +55,9 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.parsers.SAXParserFactory;
+
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Author;
@@ -464,4 +466,11 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
     }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.1
+     */
+    @Override
+    public void setFilenameAsTitle(final boolean filenameAsTitle) { }
 }

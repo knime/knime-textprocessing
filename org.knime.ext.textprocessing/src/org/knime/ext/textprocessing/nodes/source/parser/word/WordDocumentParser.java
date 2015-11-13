@@ -57,6 +57,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import org.apache.poi.hpsf.PropertySet;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hwpf.HWPFDocument;
@@ -221,7 +222,10 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
             // find title
             String title = null;
-            if (!checkTitle(title)) {
+
+            if (m_filenameAsTitle) {
+                title = m_docPath.trim();
+            } else {
                 final List<Section> sections = m_currentDoc.getSections();
                 if (sections.size() > 0) {
                     try {

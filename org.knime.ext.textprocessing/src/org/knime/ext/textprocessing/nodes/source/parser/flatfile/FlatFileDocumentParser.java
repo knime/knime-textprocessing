@@ -54,6 +54,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -170,10 +171,11 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
                 }
             }
         }
-        if (firstSentence != null) {
-            m_currentDoc.addTitle(firstSentence);
+
+        if (m_filenameAsTitle || firstSentence == null) {
+            m_currentDoc.addTitle(m_docPath.trim());
         } else {
-            m_currentDoc.addTitle(m_docPath);
+            m_currentDoc.addTitle(firstSentence);
         }
         return m_currentDoc.createDocument();
     }

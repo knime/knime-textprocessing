@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
@@ -93,6 +94,12 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * The charset to use by the parser.
      */
     protected Charset m_charset;
+
+    /**
+     * If filename should be used as title or not.
+     * @since 3.1
+     */
+    protected boolean m_filenameAsTitle;
 
     /**
      * List of listeners.
@@ -175,6 +182,15 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     @Override
     public void setCharset(final Charset charset) {
         m_charset = charset;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.1
+     */
+    @Override
+    public void setFilenameAsTitle(final boolean filenameAsTitle) {
+        m_filenameAsTitle = filenameAsTitle;
     }
 
     /**

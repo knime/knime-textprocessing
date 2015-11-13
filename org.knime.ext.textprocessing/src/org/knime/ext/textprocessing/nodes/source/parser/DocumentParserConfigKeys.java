@@ -92,4 +92,8 @@ public final class DocumentParserConfigKeys {
      * The configuration key of the charset settings string.
      */
     public static final String CFGKEY_CHARSET = "Charset";
+
+    /** The configuration key of the filepath as title setting.
+     * @since 3.1*/
+    public static final String CFGKEY_FILENAME_TITLE = "Filepath as title";
 }

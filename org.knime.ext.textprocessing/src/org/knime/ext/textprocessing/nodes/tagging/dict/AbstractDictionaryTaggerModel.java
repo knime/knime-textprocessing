@@ -166,7 +166,9 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
         final RowIterator it = inData[DICT_TABLE_INDEX].iterator();
         while (it.hasNext()) {
             final DataRow row = it.next();
-            m_dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+            if (!row.getCell(dictIndex).isMissing()) {
+                m_dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+            }
         }
     }
 

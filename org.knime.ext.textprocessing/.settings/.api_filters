@@ -457,6 +457,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/DocumentParser.java" type="org.knime.ext.textprocessing.nodes.source.parser.DocumentParser">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.DocumentParser"/>
+                <message_argument value="setFilenameAsTitle(boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/util/DocumentBlobDataCellFactory.java" type="org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory">
         <filter id="338792546">
             <message_arguments>

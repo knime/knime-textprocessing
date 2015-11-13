@@ -659,4 +659,11 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     public void removeAllDocumentParsedListener() {
         m_listener.clear();
     }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.1
+     */
+    @Override
+    public void setFilenameAsTitle(final boolean filenameAsTitle) { }
 }

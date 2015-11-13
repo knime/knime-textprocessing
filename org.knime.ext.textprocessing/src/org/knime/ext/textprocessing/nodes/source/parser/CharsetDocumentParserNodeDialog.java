@@ -45,6 +45,8 @@
 package org.knime.ext.textprocessing.nodes.source.parser;
 
 import java.nio.charset.Charset;
+
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
@@ -66,6 +68,7 @@ public class CharsetDocumentParserNodeDialog extends DocumentParserNodeDialog {
             DocumentParserNodeModel.DEFAULT_CHARSET);
     }
 
+
     /**
      * Constructor for class {@link CharsetDocumentParserNodeDialog}.
      */
@@ -74,5 +77,8 @@ public class CharsetDocumentParserNodeDialog extends DocumentParserNodeDialog {
 
         final String[] charsets = Charset.availableCharsets().keySet().toArray(new String[]{});
         addDialogComponent(new DialogComponentStringSelection(getCharsetModel(), "Charset", charsets));
+
+        addDialogComponent(new DialogComponentBoolean(FilepathTitleDocumentParserNodeDialog.getFileNameAsTitleModel(),
+            "Use file path as title"));
     }
 }
