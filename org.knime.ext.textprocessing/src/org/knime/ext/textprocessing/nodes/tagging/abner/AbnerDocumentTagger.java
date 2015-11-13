@@ -47,15 +47,17 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.abner;
 
-import abner.Tagger;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.knime.ext.textprocessing.data.BiomedicalNeTag;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
+
+import abner.Tagger;
 
 /**
  * <code>AbnerDocumentTagger</code> is a concrete implementation of
@@ -72,7 +74,6 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
  * @author Kilian Thiel, University of Konstanz
  */
 public class AbnerDocumentTagger extends AbstractDocumentTagger {
-
     /**
      * Name of the Biocreative model of ABNER.
      */
@@ -121,7 +122,12 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
      */
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-        String[][] nes = m_tagger.getEntities(sentence.getText());
+        String[][] nes;
+
+        synchronized (Tagger.class) {
+            nes = m_tagger.getEntities(sentence.getText());
+        }
+
         List<TaggedEntity> entities = new ArrayList<TaggedEntity>();
         for (int i = 0; i < nes[0].length; i++) {
             entities.add(new TaggedEntity(nes[0][i], nes[1][i]));
