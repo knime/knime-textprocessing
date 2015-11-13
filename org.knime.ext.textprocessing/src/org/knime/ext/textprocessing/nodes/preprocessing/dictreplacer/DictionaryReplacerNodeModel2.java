@@ -53,14 +53,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -68,7 +69,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public final class DictionaryReplacerNodeModel2 extends StreamablePreprocessingNodeModel {
+public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DictionaryReplacerNodeModel2.class);
@@ -90,7 +91,7 @@ public final class DictionaryReplacerNodeModel2 extends StreamablePreprocessingN
      */
     @Override
     protected TermPreprocessing createPreprocessing() throws Exception {
-        Hashtable<String, String> dictionary = new Hashtable<String, String>();
+        Map<String, String> dictionary = new HashMap<String, String>();
         File f = new File(m_fileModel.getStringValue());
         if (f.exists() && f.canRead() && f.isFile()) {
             try {

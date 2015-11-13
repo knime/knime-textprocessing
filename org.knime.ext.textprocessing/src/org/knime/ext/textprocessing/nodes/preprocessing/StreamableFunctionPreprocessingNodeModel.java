@@ -44,25 +44,38 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.10.2015 (Kilian): created
+ *   12.11.2015 (Kilian): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer;
+package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.streamable.InputPortRole;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.StreamableFunction;
+import org.knime.core.node.streamable.StreamableFunctionProducer;
 
 /**
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public final class PorterStemmerNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
+public abstract class StreamableFunctionPreprocessingNodeModel extends StreamablePreprocessingNodeModel
+    implements StreamableFunctionProducer {
+
+    /** Default constructor, defining one data input and one data output port. */
+    public StreamableFunctionPreprocessingNodeModel() {
+        super(1, new InputPortRole[] {});
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected TermPreprocessing createPreprocessing() throws Exception {
-        return new PorterStemmer();
+    public final StreamableFunction createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
+        throws InvalidSettingsException {
+        DataTableSpec in = (DataTableSpec)inSpecs[0];
+        return createColumnRearranger(in).createStreamableFunction();
     }
 }

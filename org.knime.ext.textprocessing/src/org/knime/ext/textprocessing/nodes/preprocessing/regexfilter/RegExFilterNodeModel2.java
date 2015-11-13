@@ -55,7 +55,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -63,7 +63,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public final class RegExFilterNodeModel2 extends StreamablePreprocessingNodeModel {
+public final class RegExFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
     /** The default regular expression (an empty string). */
     public static final String DEFAULT_REGEX = "";

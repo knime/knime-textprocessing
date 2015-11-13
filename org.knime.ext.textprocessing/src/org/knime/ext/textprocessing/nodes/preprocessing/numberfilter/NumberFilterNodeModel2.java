@@ -48,7 +48,7 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -56,7 +56,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public final class NumberFilterNodeModel2 extends StreamablePreprocessingNodeModel {
+public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
     /**
      * {@inheritDoc}

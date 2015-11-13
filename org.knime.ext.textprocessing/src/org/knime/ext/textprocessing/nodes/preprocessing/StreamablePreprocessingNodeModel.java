@@ -140,7 +140,7 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
 
     /** {@inheritDoc} */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
         preparePreprocessing(inData, exec);
         final ColumnRearranger rearranger = createColumnRearranger(inData[0].getDataTableSpec());
@@ -149,7 +149,7 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
 
     /** {@inheritDoc} */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+    protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         internalConfigure(inSpecs);
         ColumnRearranger r = createColumnRearranger(inSpecs[0]);
         DataTableSpec out = r.createSpec();
@@ -169,12 +169,20 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * preprocessing routines.
      *
      * @param inData input data tables.
+     * @param exec the {@link ExecutionContext} during node execution.
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      */
     protected void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws InvalidSettingsException {
     }
 
+    /**
+     * Creates a new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the
+     * input documents. Extending classes need to create the corresponding preprocessing instance here.
+     * @return A new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
+     * documents.
+     * @throws Exception If preprocessing instance can not be created.
+     */
     protected abstract TermPreprocessing createPreprocessing() throws Exception;
 
     /**
@@ -184,7 +192,7 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * @throws InvalidSettingsException
      * @throws Exception If preprocessing instance could not be created
      */
-    private ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
+    protected final ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(in);
         verfier.verifyMinimumDocumentCells(1, true);
         String docColName = m_documentColModel.getStringValue();

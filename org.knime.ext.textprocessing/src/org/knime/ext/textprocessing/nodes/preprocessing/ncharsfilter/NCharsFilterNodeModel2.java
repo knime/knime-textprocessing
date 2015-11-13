@@ -52,7 +52,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -60,7 +60,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public final class NCharsFilterNodeModel2 extends StreamablePreprocessingNodeModel {
+public final class NCharsFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
     /** The minimum number of N to specify. */
     public static final int MIN_N = 1;

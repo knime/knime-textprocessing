@@ -52,7 +52,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -60,7 +60,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public final class ModifiableTermFilterNodeModel extends StreamablePreprocessingNodeModel {
+public final class ModifiableTermFilterNodeModel extends StreamableFunctionPreprocessingNodeModel {
 
     /**
      * The default setting of filtering of modifiable terms.

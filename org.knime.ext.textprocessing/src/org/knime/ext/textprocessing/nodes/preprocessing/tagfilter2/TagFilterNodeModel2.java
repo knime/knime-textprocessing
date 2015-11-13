@@ -60,7 +60,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.data.TagFactory;
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -68,7 +68,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public class TagFilterNodeModel2 extends StreamablePreprocessingNodeModel {
+public class TagFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
     /** The default value of the "strict filtering" setting. */
     public static final boolean DEF_STRICT = false;

@@ -113,9 +113,9 @@ public class TagFilter implements TermPreprocessing {
         for (final Tag t : tags) {
             if (t.getTagType().equals(m_validTagType)) {
                 if (m_filterMatching) {
-                    if (!m_validTags.contains(t)) {
+                    if (m_validTags.contains(t)) {
                         if (!m_strict) {
-                            return term;
+                            return null;
                         }
                     } else {
                         allValid = false;
@@ -134,7 +134,7 @@ public class TagFilter implements TermPreprocessing {
             }
         }
 
-        if (m_strict && allValid) {
+        if ((m_strict && allValid) || (m_filterMatching && !allValid)) {
             return term;
         }
         return null;

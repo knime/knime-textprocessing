@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -93,7 +94,7 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      *            corresponding values).
      * @since 3.1
      */
-    public DictionaryReplacer(final HashMap<String, String> replaceDict) {
+    public DictionaryReplacer(final Map<String, String> replaceDict) {
         super();
         m_replaceDict = new HashMap<String, String>(replaceDict);
         m_wordTokenizer = DefaultTokenization.getWordTokenizer();
