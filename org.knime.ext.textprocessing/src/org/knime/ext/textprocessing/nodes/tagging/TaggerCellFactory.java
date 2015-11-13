@@ -124,12 +124,18 @@ final class TaggerCellFactory extends SingleCellFactory {
             return DataType.getMissingCell();
         }
 
-        final Document d = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
-        final Document taggedDocument;
-        synchronized (tagger) {
-            taggedDocument = tagger.tag(d);
+        // if not missing
+        if (!row.getCell(m_docColIndex).isMissing()) {
+            final Document d = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
+            final Document taggedDocument;
+            synchronized (tagger) {
+                taggedDocument = tagger.tag(d);
+            }
+            return m_documentCellFac.createDataCell(taggedDocument);
         }
-        return m_documentCellFac.createDataCell(taggedDocument);
+
+        // if missing
+        return DataType.getMissingCell();
     }
 
     /**
