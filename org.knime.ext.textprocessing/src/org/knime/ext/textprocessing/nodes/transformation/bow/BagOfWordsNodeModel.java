@@ -186,25 +186,29 @@ public class BagOfWordsNodeModel extends NodeModel {
         DataCell docCell = null;
         DataCell origDocCell = null;
 
-        final int rowCount = inData[0].getRowCount();
-        int currRow = 1;
+        final long rowCount = inData[0].size();
+        long currRow = 1;
         final RowIterator it = inData[0].iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
 
             // get terms for document
             docCell = row.getCell(m_documentColIndex);
-            Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
 
-            // get original document cell to append
-            if (m_appendOrigDocModel.getBooleanValue()) {
-                origDocCell = row.getCell(m_origDocumentColIndex);
-            }
+            // if cell is not missing
+            if (!docCell.isMissing()) {
+                Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
 
-            if (!processedDocUUIDs.contains(doc.getUUID())) {
-                Set<Term> terms = setOfTerms(doc);
-                addToBOW(terms, docCell, origDocCell, bdc);
-                processedDocUUIDs.add(doc.getUUID());
+                // get original document cell to append
+                if (m_appendOrigDocModel.getBooleanValue()) {
+                    origDocCell = row.getCell(m_origDocumentColIndex);
+                }
+
+                if (!processedDocUUIDs.contains(doc.getUUID())) {
+                    Set<Term> terms = setOfTerms(doc);
+                    addToBOW(terms, docCell, origDocCell, bdc);
+                    processedDocUUIDs.add(doc.getUUID());
+                }
             }
 
             // report status
