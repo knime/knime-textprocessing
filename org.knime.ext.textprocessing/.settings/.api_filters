@@ -465,6 +465,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/StreamableTaggerNodeModel.java" type="org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel"/>
+                <message_argument value="createStreamableOperator(PartitionInfo, PortObjectSpec[])"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/util/DocumentBlobDataCellFactory.java" type="org.knime.ext.textprocessing.util.DocumentBlobDataCellFactory">
         <filter id="338792546">
             <message_arguments>

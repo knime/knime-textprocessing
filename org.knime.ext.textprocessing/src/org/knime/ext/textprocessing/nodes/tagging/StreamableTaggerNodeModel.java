@@ -67,8 +67,10 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
 import org.knime.core.node.streamable.PartitionInfo;
-import org.knime.core.node.streamable.StreamableFunction;
-import org.knime.core.node.streamable.StreamableFunctionProducer;
+import org.knime.core.node.streamable.PortInput;
+import org.knime.core.node.streamable.PortObjectInput;
+import org.knime.core.node.streamable.PortOutput;
+import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -79,8 +81,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 2.11
  */
-public abstract class StreamableTaggerNodeModel extends NodeModel implements StreamableFunctionProducer,
-    DocumentTaggerFactory {
+public abstract class StreamableTaggerNodeModel extends NodeModel implements DocumentTaggerFactory {
 
     private InputPortRole[] m_roles;
 
@@ -155,8 +156,9 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Str
      * @param in the input data table spec.
      * @return A new instance of column rearranger to create output data table
      * @throws InvalidSettingsException If tagger instance can not be created.
+     * @since 3.1
      */
-    private ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
+    protected final ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(in);
         verfier.verifyDocumentCell(true);
         final int docColIndex = verfier.getDocumentCellIndex();
@@ -186,13 +188,33 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Str
         return new OutputPortRole[]{out};
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public StreamableFunction
-        createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
-            throws InvalidSettingsException {
-        DataTableSpec in = (DataTableSpec)inSpecs[0];
-        return createColumnRearranger(in).createStreamableFunction();
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
+        throws InvalidSettingsException {
+         return new StreamableOperator() {
+
+            @Override
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec) throws Exception {
+
+                // covert non streamable in ports to BufferedDatatables
+                BufferedDataTable[] inData = new BufferedDataTable[inputs.length];
+                for (int i = 0; i < inputs.length; i++) {
+                    if (m_roles[i].equals(InputPortRole.DISTRIBUTED_STREAMABLE)
+                        || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
+                        inData[i] = null;
+                    } else {
+                        inData[i] = (BufferedDataTable) ((PortObjectInput) inputs[i]).getPortObject();
+                    }
+                }
+
+                prepareTagger(inData, exec);
+                ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
+                colre.createStreamableFunction().runFinal(inputs, outputs, exec);
+            }
+        };
     }
 
     /** {@inheritDoc} */

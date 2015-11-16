@@ -63,14 +63,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
@@ -165,8 +164,7 @@ public final class StopWordFilterNodeModel2 extends StreamableFunctionPreprocess
      * {@inheritDoc}
      */
     @Override
-    protected void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
-        throws InvalidSettingsException {
+    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         if (!m_useBuildinListModel.getBooleanValue()) {
             File f = getFile();
             m_stopWords = new HashSet<String>();

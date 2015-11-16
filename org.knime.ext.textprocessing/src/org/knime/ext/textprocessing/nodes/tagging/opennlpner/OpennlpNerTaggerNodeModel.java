@@ -61,13 +61,13 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
  * @author Kilian Thiel, University of Konstanz
  *
  */
-public class OpennlpNerTaggerNodeModel extends StreamableTaggerNodeModel {
+public class OpennlpNerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
 
     /**
      * The default value for the unmodifiable flag.

@@ -44,16 +44,15 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   12.11.2015 (Kilian): created
+ *   16.11.2015 (Kilian): created
  */
-package org.knime.ext.textprocessing.nodes.preprocessing;
+package org.knime.ext.textprocessing.nodes.tagging;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.PartitionInfo;
 import org.knime.core.node.streamable.StreamableFunction;
 import org.knime.core.node.streamable.StreamableFunctionProducer;
@@ -63,27 +62,21 @@ import org.knime.core.node.streamable.StreamableFunctionProducer;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
-public abstract class StreamableFunctionPreprocessingNodeModel extends StreamablePreprocessingNodeModel
+public abstract class StreamableFunctionTaggerNodeModel extends StreamableTaggerNodeModel
     implements StreamableFunctionProducer {
-
-    /** Default constructor, defining one data input and one data output port. */
-    public StreamableFunctionPreprocessingNodeModel() {
-        super(1, new InputPortRole[] {});
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
-        throws InvalidSettingsException {
+    protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
         // empty implementation, must not be overwritten by NodeModels that extend from
         // StreamableFunctionPreprocessingNodeModel, since it can not be called.
     }
 
     /**
-     * Method to prepare preprocessing instance before it can be applied. This method can be overwritten to apply
-     * preprocessing routines.
+     * Method to prepare tagger instance before it can be applied. This method can be overwritten to apply
+     * preprocessing routines before creating a tagger.
      *
      * @param inSpecs the specs of the input port objects.
      * @throws InvalidSettingsException If settings or specs are invalid.

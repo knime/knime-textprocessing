@@ -56,7 +56,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
  * The node model of the POS (part of speech) tagger. Extends
@@ -65,7 +65,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class PosTaggerNodeModel extends StreamableTaggerNodeModel {
+public class PosTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
 
     /**
      * Creates new instance of <code>PosTaggerNodeModel</code> which adds

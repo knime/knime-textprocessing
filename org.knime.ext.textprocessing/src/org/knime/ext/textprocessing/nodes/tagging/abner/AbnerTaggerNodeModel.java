@@ -58,7 +58,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
  * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger.
@@ -67,7 +67,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class AbnerTaggerNodeModel extends StreamableTaggerNodeModel {
+public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
 
     /**
      * The default value of the terms unmodifiable flag.

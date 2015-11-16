@@ -57,7 +57,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
  * The node model of the POS (part of speech) tagger. Extends
@@ -66,7 +66,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class StanfordTaggerNodeModel extends StreamableTaggerNodeModel {
+public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
 
     /**
      * Default tagger model.
