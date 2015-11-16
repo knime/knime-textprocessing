@@ -163,7 +163,7 @@ public class SentenceExtractionNodeModel extends NodeModel {
                 createOutDataTableSpec());
 
         try {
-            int count = 1;
+            long count = 0;
             RowIterator it = inData[0].iterator();
             while (it.hasNext()) {
                 DataRow row = it.next();

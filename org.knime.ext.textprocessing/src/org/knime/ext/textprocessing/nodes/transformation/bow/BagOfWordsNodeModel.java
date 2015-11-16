@@ -117,7 +117,7 @@ public class BagOfWordsNodeModel extends NodeModel {
 
     private TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
-    private int m_rowId = 1;
+    private long m_rowId = 0;
 
     private int m_documentColIndex = -1;
 

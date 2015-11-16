@@ -54,8 +54,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -287,10 +289,10 @@ public class TermVectorNodeModel extends NodeModel {
     }
 
 
-    private int m_rowKeyNr = 1;
+    private long m_rowKeyNr = 1;
 
     private DataRow createDataRowAsCollection(final Term term, final List<DoubleCell> featureVector) {
-        final RowKey rowKey = new RowKey(Integer.valueOf(m_rowKeyNr).toString());
+        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
         m_rowKeyNr++;
         final DataCell termCell = m_termFac.createDataCell(term);
         final DataCell collectionCell = CollectionCellFactory.createSparseListCell(featureVector, DEFAULT_CELL);
@@ -304,7 +306,7 @@ public class TermVectorNodeModel extends NodeModel {
             cells[i + 1] = featureVector.get(i);
         }
 
-        final RowKey rowKey = new RowKey(Integer.valueOf(m_rowKeyNr).toString());
+        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
         m_rowKeyNr++;
         final DataRow newRow = new DefaultRow(rowKey, cells);
 

@@ -255,7 +255,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         Document lastDoc = null;
         List<DoubleCell> featureVector = initFeatureVector(featureIndexTable.size());
 
-        final int numberOfRows = sortedTable.getRowCount();
+        final long numberOfRows = sortedTable.size();
         int currRow = 1;
         it = sortedTable.iterator();
         while (it.hasNext()) {
@@ -317,13 +317,13 @@ public class DocumentVectorNodeModel extends NodeModel {
     }
 
 
-    private int m_rowKeyNr = 1;
+    private long m_rowKeyNr = 0;
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
     private DataRow createDataRowAsCollection(final Document doc,
             final List<DoubleCell> featureVector) {
-        final RowKey rowKey = new RowKey(Integer.valueOf(m_rowKeyNr).toString());
+        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
         m_rowKeyNr++;
         final DataCell docCell = m_documentCellFac.createDataCell(doc);
         final DataCell vectorCell = CollectionCellFactory.createSparseListCell(featureVector, DEFAULT_CELL);
@@ -333,7 +333,7 @@ public class DocumentVectorNodeModel extends NodeModel {
 
     private DataRow createDataRowAsColumns(final Document doc,
             final List<DoubleCell> featureVector) {
-        final RowKey rowKey = new RowKey(Integer.valueOf(m_rowKeyNr).toString());
+        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
         m_rowKeyNr++;
         final DataCell[] cells = new DataCell[featureVector.size() + 1];
         cells[0] = m_documentCellFac.createDataCell(doc);

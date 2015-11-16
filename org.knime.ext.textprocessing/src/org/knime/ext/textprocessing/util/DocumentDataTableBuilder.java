@@ -144,7 +144,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
 
     private boolean m_opened = false;
 
-    private int m_rowRey = 0;
+    private long m_rowRey = 0;
 
     /**
      * Creates new DataContainer to add rows to and create a
@@ -208,8 +208,7 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      */
     public synchronized void addDocument(final Document d)
     throws IllegalStateException {
-        m_rowRey++;
-        RowKey rowKey = RowKey.createRowKey(m_rowRey);
+        RowKey rowKey = RowKey.createRowKey(m_rowRey++);
         addDocument(d, rowKey);
     }
 

@@ -61,7 +61,6 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
@@ -173,7 +172,7 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
         final BufferedDataContainer bdc = exec.createDataContainer(createDataTableSpec());
         final Set<UUID> processedDocs = new HashSet<UUID>();
 
-        int rowCount = 0;
+        long rowCount = 0;
         for (final DataRow row : inData[0]) {
             if (!row.getCell(docColIndx).isMissing()) {
                 final Document d = ((DocumentValue)row.getCell(docColIndx)).getDocument();
