@@ -164,7 +164,14 @@ public class DocumentGrabberNodeModel extends NodeModel {
         return new DataTableSpec[]{createColumnRearranger(m_dtBuilder.createDataTableSpec()).createSpec()};
     }
 
-    private ColumnRearranger createColumnRearranger(final DataTableSpec dataSpec) {
+    private ColumnRearranger createColumnRearranger(final DataTableSpec dataSpec) throws InvalidSettingsException {
+        // check target directory
+        File dir = new File(m_directoryModel.getStringValue());
+        if (!dir.exists() || !dir.isDirectory() || !dir.canWrite()) {
+            throw new InvalidSettingsException("Directory " + m_directoryModel.getStringValue()
+                + " can not be accessed.");
+        }
+
         ColumnRearranger cR = new ColumnRearranger(dataSpec);
         if (m_appendQueryColumnModel.getBooleanValue()) {
             cR.append(new QueryStringCellFactory(QUERYCOL_NAME, m_queryModel.getStringValue()));
