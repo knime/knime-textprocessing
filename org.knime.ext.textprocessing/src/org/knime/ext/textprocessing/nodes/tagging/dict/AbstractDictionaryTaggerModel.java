@@ -135,7 +135,7 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
      * table in ports and one out port.
      */
     public AbstractDictionaryTaggerModel() {
-        super(2, new InputPortRole[] {InputPortRole.NONDISTRIBUTED_STREAMABLE});
+        super(2, new InputPortRole[] {InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
     }
 
     /**
