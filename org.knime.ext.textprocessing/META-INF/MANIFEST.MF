@@ -8,8 +8,6 @@ Bundle-ClassPath: knime-textprocessing.jar,
  lib/Snowball.jar,
  lib/json.jar,
  lib/pdfbox-app-1.6.0.jar,
- lib/opennlp-maxent-3.0.2-incubating.jar,
- lib/opennlp-tools-1.5.2-incubating.jar,
  lib/oscar4-all-4.1.2-with-dependencies.jar,
  lib/poi-3.9-20121203.jar,
  lib/poi-scratchpad-3.9-20121203.jar,
@@ -20,7 +18,8 @@ Bundle-ClassPath: knime-textprocessing.jar,
  lib/xmlbeans-2.3.0.jar,
  lib/mallet/mallet.jar,
  lib/mallet/mallet-deps.jar,
- lib/stanford-postagger-3.4.jar
+ lib/stanford-postagger-3.4.jar,
+ lib/opennlp-tools-1.6.0.jar
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Export-Package: org.knime.ext.textprocessing,
