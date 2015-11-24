@@ -51,14 +51,16 @@ import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.concurrent.ConcurrentException;
+import org.apache.commons.lang3.concurrent.LazyInitializer;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.filestore.FileStoreFactory;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -86,22 +88,21 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
     private final StringsToDocumentConfig m_config;
 
-    private final DataCellCache m_cache;
+    private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
     /**
      * Creates new instance of <code>StringsToDocumentCellFactory</code> with
      * given configuration.
      *
      * @param config The configuration how to build a document.
-     * @param exec the execution context to prepare text container cell factory.
      * @param newColSpecs The specs of the new columns that are created.
      * @param numberOfThreads The number of parallel threads to use.
      * @throws IllegalArgumentException If given configuration is
      * <code>null</code>.
      * @since 2.9
      */
-    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final ExecutionContext exec,
-        final DataColumnSpec[] newColSpecs, final int numberOfThreads) throws IllegalArgumentException {
+    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
+        final int numberOfThreads) throws IllegalArgumentException {
         super(newColSpecs);
 
         this.setParallelProcessing(true, numberOfThreads, 10 * numberOfThreads);
@@ -109,10 +110,33 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         if (config == null) {
             throw new IllegalArgumentException("Configuration object may not be null!");
         }
+        m_cacheInitializer = new LazyInitializer<DataCellCache>() {
+            @Override
+            protected DataCellCache initialize() throws ConcurrentException {
+                return initializeDataCellCache();
+            }
+        };
         m_config = config;
+    }
+
+    /** Callback from initializer - only be called when executing. */
+    private DataCellCache initializeDataCellCache() {
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
-        m_cache = new LRUDataCellCache(docCellFac);
+        final FileStoreFactory fileStoreFactory = getFileStoreFactory();
+        CheckUtils.checkState(fileStoreFactory != null, "File store factory not expected to be null at this point");
+        docCellFac.prepare(fileStoreFactory);
+        return new LRUDataCellCache(docCellFac);
+    }
+
+    /** @return the cache from the initializer, not null. Throws RuntimeException if needed. */
+    private DataCellCache getDataCellCache() {
+        DataCellCache dataCellCache;
+        try {
+            dataCellCache = m_cacheInitializer.get();
+        } catch (ConcurrentException e) {
+            throw new RuntimeException("Couldn't retrieve data cell cache", e);
+        }
+        return dataCellCache;
     }
 
     /**
@@ -220,14 +244,17 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
             }
         }
 
-        return new DataCell[]{m_cache.getInstance(docBuilder.createDocument())};
+        DataCellCache dataCellCache = getDataCellCache();
+        return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
     }
 
     /**
      * Closes data cell cache.
      * @since 2.8
      */
-    public void closeCache() {
-        m_cache.close();
+    @Override
+    public void afterProcessing() {
+        super.afterProcessing();
+        getDataCellCache().close();
     }
 }

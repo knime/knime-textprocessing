@@ -61,18 +61,16 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.ColumnRearranger;
-import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -81,9 +79,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class StringsToDocumentNodeModel extends NodeModel {
-
-    private static final int INPORT = 0;
+public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeModel {
 
     private SettingsModelString m_titleColModel = StringsToDocumentNodeDialog.getTitleStringModel();
 
@@ -125,26 +121,8 @@ public class StringsToDocumentNodeModel extends NodeModel {
      * Creates new instance of <code>StringsToDocumentNodeModel</code>.
      */
     public StringsToDocumentNodeModel() {
-        super(1, 1);
-        m_useCatColumnModel.addChangeListener(
-                new CategorySourceUsageChanceListener());
-        m_useSourceColumnModel.addChangeListener(
-                new CategorySourceUsageChanceListener());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[INPORT]);
-        verifier.verifyMinimumStringCells(1, true);
-        return new DataTableSpec[]{createDataTableSpec(inSpecs[INPORT])};
-    }
-
-    private static final DataTableSpec createDataTableSpec(final DataTableSpec inDataSpec) {
-        return new DataTableSpec(inDataSpec, new DataTableSpec(createNewColSpecs()));
+        m_useCatColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
+        m_useSourceColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
     }
 
     private static final DataColumnSpec[] createNewColSpecs() {
@@ -153,35 +131,29 @@ public class StringsToDocumentNodeModel extends NodeModel {
         return new DataColumnSpec[]{docCol};
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected ColumnRearranger createColumnRearranger(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumStringCells(1, true);
 
-        BufferedDataTable inDataTable = inData[INPORT];
         StringsToDocumentConfig conf = new StringsToDocumentConfig();
 
         // Title
-        int titleIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
-                m_titleColModel.getStringValue());
+        int titleIndex = spec.findColumnIndex(m_titleColModel.getStringValue());
         conf.setTitleStringIndex(titleIndex);
 
         // Fulltext
-        int fulltextIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
-                m_fulltextColModel.getStringValue());
+        int fulltextIndex = spec.findColumnIndex(m_fulltextColModel.getStringValue());
         conf.setFulltextStringIndex(fulltextIndex);
 
         // Author names
-        int authorIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
-                m_authorsColModel.getStringValue());
+        int authorIndex = spec.findColumnIndex(m_authorsColModel.getStringValue());
         conf.setAuthorsStringIndex(authorIndex);
 
         // Author name separator
         String authorNameSeparator = m_authorNameSeparator.getStringValue();
-        if (!authorNameSeparator.isEmpty()
-                && authorNameSeparator.length() > 0) {
+        if (!authorNameSeparator.isEmpty() && authorNameSeparator.length() > 0) {
             conf.setAuthorsSplitChar(authorNameSeparator);
         }
 
@@ -190,8 +162,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
         if (!docSource.isEmpty() && docSource.length() > 0) {
             conf.setDocSource(docSource);
         }
-        int docSourceIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
-                m_sourceColumnModel.getStringValue());
+        int docSourceIndex = spec.findColumnIndex(m_sourceColumnModel.getStringValue());
         conf.setSourceStringIndex(docSourceIndex);
         boolean useSourceCol = m_useSourceColumnModel.getBooleanValue();
         conf.setUseSourceColumn(useSourceCol);
@@ -201,8 +172,7 @@ public class StringsToDocumentNodeModel extends NodeModel {
         if (!docCat.isEmpty() && docCat.length() > 0) {
             conf.setDocCat(docCat);
         }
-        int docCatIndex = inData[INPORT].getDataTableSpec().findColumnIndex(
-                m_catColumnModel.getStringValue());
+        int docCatIndex = spec.findColumnIndex(m_catColumnModel.getStringValue());
         conf.setCategoryStringIndex(docCatIndex);
         boolean useCatColumn = m_useCatColumnModel.getBooleanValue();
         conf.setUseCatColumn(useCatColumn);
@@ -219,15 +189,11 @@ public class StringsToDocumentNodeModel extends NodeModel {
             conf.setPublicationDate(pubDate);
         }
 
-        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf, exec, createNewColSpecs(),
-            m_maxThreads.getIntValue());
-        try {
-            ColumnRearranger rearranger = new ColumnRearranger(inDataTable.getDataTableSpec());
-            rearranger.append(cellFac);
-            return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataTable, rearranger, exec)};
-        } finally {
-            cellFac.closeCache();
-        }
+        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(
+            conf, createNewColSpecs(), m_maxThreads.getIntValue());
+        ColumnRearranger rearranger = new ColumnRearranger(spec);
+        rearranger.append(cellFac);
+        return rearranger;
     }
 
     /**
