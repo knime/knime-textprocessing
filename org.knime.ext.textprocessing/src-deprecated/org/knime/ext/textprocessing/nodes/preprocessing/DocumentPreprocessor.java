@@ -95,7 +95,7 @@ public final class DocumentPreprocessor extends AbstractPreprocessor {
     @Override
     public void checkPreprocessing() throws InvalidSettingsException {
         if (!TermPreprocessing.class.isInstance(m_preprocessing)) {
-            throw new InvalidSettingsException("This preprocessing can not be applied on list of documents.");
+            throw new InvalidSettingsException("This preprocessing cannot be applied on list of documents.");
         }
         m_termPreprocessing = (TermPreprocessing)m_preprocessing;
     }

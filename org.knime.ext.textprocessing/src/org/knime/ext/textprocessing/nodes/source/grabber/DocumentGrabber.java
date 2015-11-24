@@ -78,7 +78,7 @@ public interface DocumentGrabber {
      *
      * @param directory The directory to save the documents to.
      * @param query The query to send to the bibliographic database.
-     * @throws Exception If grabber can not connect to the server or something
+     * @throws Exception If grabber cannot connect to the server or something
      * else goes wrong.
      * @return The list of parsed documents.
      */
@@ -94,7 +94,7 @@ public interface DocumentGrabber {
      *
      * @param query The query to send to the bibliographic database.
      * @return The number of resulting documents related to the given query.
-     * @throws Exception If grabber can not connect to the server of something
+     * @throws Exception If grabber cannot connect to the server of something
      * else goes wrong.
      */
     public int numberOfResults(final Query query) throws Exception;
@@ -109,7 +109,7 @@ public interface DocumentGrabber {
      *
      * @param directory The directory to save the documents to.
      * @param query The query to send to the bibliographic database.
-     * @throws Exception If grabber can not connect to the server or something
+     * @throws Exception If grabber cannot connect to the server or something
      * else goes wrong.
      */
     public void fetchAndParseDocuments(final File directory, final Query query)

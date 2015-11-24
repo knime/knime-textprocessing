@@ -267,7 +267,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         if (m_termColIndex < 0) {
             m_preprocessor = getPreprocessorForDirectPP();
             if (m_preprocessor == null) {
-                throw new IllegalStateException("Preprocessing can not be applied directly on a document list. "
+                throw new IllegalStateException("Preprocessing cannot be applied directly on a document list. "
                     + "It has to be aplpied on a bag of words.");
             }
 
@@ -284,7 +284,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
         } else {
             m_preprocessor = getPreprocessorForBowPP();
             if (m_preprocessor == null) {
-                throw new IllegalStateException("Preprocessing can not be applied on a bag of words.");
+                throw new IllegalStateException("Preprocessing cannot be applied on a bag of words.");
             }
         }
 
@@ -303,7 +303,7 @@ public abstract class PreprocessingNodeModel extends NodeModel {
      * This method is empty and called by
      * {@link PreprocessingNodeModel#configure(DataTableSpec[])}.
      * It can be overwritten if additional checks during the configure
-     * procedure have to be done. The data table specs can not be chanced only
+     * procedure have to be done. The data table specs cannot be chanced only
      * additional parameter checks can be applied.
      * @param inSpecs The input data table specs.
      * @throws InvalidSettingsException Is thrown if specified settings are

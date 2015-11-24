@@ -97,7 +97,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 //    private static final String DESC_PREPROCESSING =
 //        "If checked, nodes of the \"Preprocessing\" category process data "
 //      + "in memory. Large sets of\ndocuments may not fit into memory and "
-//      + "thus can not be processed. Uncheck if documents\ndo not fit into "
+//      + "thus cannot be processed. Uncheck if documents\ndo not fit into "
 //      + "memory. Note that unchecking slows down processing significantly. "
 //      + "\nCheck to speed up processing.";
 

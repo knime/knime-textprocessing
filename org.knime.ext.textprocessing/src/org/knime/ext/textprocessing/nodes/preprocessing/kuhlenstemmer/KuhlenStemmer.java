@@ -96,7 +96,7 @@ public final class KuhlenStemmer implements TermPreprocessing, StringPreprocessi
      * Returns the stemmed version of the given string.
      *
      * @param str String to stem
-     * @return If the word can not be stemmed or an error occurs the given string is returned unmodified.
+     * @return If the word cannot be stemmed or an error occurs the given string is returned unmodified.
      */
     private String stem(final String str) {
         try {

@@ -117,7 +117,7 @@ public final class DocumentBufferedFileStoreCell extends AbstractDocumentFileSto
      * @param bufferedFileStoreWriter The buffered file store writer to use for serialization of document data into
      * file store file.
      * @param document Document to encapsulate and store in file store.
-     * @throws IOException if document can not be serialized into file store file.
+     * @throws IOException if document cannot be serialized into file store file.
      */
     public DocumentBufferedFileStoreCell(final FileStore fileStore,
         final BufferedFileStoreWriter bufferedFileStoreWriter, final Document document) throws IOException {

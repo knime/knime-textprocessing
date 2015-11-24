@@ -78,7 +78,7 @@ public abstract class StreamableFunctionPreprocessingNodeModel extends Streamabl
     protected final void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws InvalidSettingsException {
         // empty implementation, must not be overwritten by NodeModels that extend from
-        // StreamableFunctionPreprocessingNodeModel, since it can not be called.
+        // StreamableFunctionPreprocessingNodeModel, since it cannot be called.
     }
 
     /**

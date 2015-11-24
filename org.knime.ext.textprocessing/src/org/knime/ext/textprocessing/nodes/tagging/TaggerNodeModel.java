@@ -121,7 +121,7 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
      * Creates column rearranger for creation of new data table.
      * @param in the input data table spec.
      * @return A new instance of column rearranger to create output data table
-     * @throws InvalidSettingsException If tagger instance can not be created.
+     * @throws InvalidSettingsException If tagger instance cannot be created.
      */
     private ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(in);
@@ -164,7 +164,7 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
      * tables for tagging.
      * @param inData Input data tables.
      * @param exec The execution context of the node.
-     * @throws Exception If tagger can not be prepared.
+     * @throws Exception If tagger cannot be prepared.
      */
     protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception { }
 

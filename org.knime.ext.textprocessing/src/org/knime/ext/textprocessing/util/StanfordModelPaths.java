@@ -58,7 +58,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * {@link org.knime.ext.textprocessing.TextprocessingCorePlugin}. Without the
  * activation of the plugin (which is usually done automatically by eclipse
  * by the creation of an instance of the activator class) the plugin root path
- * and the model paths can not be created / provided.
+ * and the model paths cannot be created / provided.
  *
  * @author Kilian Thiel, University of Konstanz
  */

@@ -164,7 +164,7 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
             ((SettingsModelString)m_replacementColumModel.createCloneWithValidatedValue(settings)).getStringValue();
         if (replaceColName.equals(replacementColName)) {
             throw new InvalidSettingsException(
-                "Lookup column can not be replecement column at the same time. Select different columns for lookup and replecement column.");
+                "Lookup column cannot be replecement column at the same time. Select different columns for lookup and replecement column.");
         }
     }
 }

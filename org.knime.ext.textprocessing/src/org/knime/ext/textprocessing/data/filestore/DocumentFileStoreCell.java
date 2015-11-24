@@ -115,7 +115,7 @@ public final class DocumentFileStoreCell extends AbstractDocumentFileStoreCell {
      * document at.
      * @param fileStore File store to store document at.
      * @param document Document to encapsulate and store in file store.
-     * @throws IOException if document can not be serialized into file store file.
+     * @throws IOException if document cannot be serialized into file store file.
      */
     public DocumentFileStoreCell(final FileStore fileStore, final Document document) throws IOException {
         super(fileStore, document);

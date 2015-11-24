@@ -53,7 +53,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.Term;
 
 /**
- * Bundles a document and a set of terms into a chunk. The data can not be
+ * Bundles a document and a set of terms into a chunk. The data cannot be
  * changed once the chunk has been created.
  *
  * @author Kilian Thiel, University of Konstanz

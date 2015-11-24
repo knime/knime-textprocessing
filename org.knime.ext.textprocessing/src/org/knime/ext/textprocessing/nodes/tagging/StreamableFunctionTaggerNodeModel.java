@@ -71,7 +71,7 @@ public abstract class StreamableFunctionTaggerNodeModel extends StreamableTagger
     @Override
     protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
         // empty implementation, must not be overwritten by NodeModels that extend from
-        // StreamableFunctionPreprocessingNodeModel, since it can not be called.
+        // StreamableFunctionPreprocessingNodeModel, since it cannot be called.
     }
 
     /**

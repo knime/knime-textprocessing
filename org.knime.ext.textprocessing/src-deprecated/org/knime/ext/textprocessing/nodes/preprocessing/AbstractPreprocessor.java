@@ -204,13 +204,13 @@ public abstract class AbstractPreprocessor {
      * given spec an InvalidSettingsException is thrown.
      *
      * @param spec The spec of the data table to check.
-     * @throws InvalidSettingsException If preprocessor can not work a data table with spec to check.
+     * @throws InvalidSettingsException If preprocessor cannot work a data table with spec to check.
      * @since 2.9
      */
     public abstract void validateDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException;
 
     /**
-     * Validates given preprocessor settings and throws InvalidSettingsException if settings are invalid or can not
+     * Validates given preprocessor settings and throws InvalidSettingsException if settings are invalid or cannot
      * be applied to concrete preprocessor.
      *
      * @param documentColIndex The index of the document column.
@@ -219,7 +219,7 @@ public abstract class AbstractPreprocessor {
      * @param deepPrepro If {@code true} deep preprocessing will be applied.
      * @param appendOrigDoc If {@code true} original document will be appended.
      * @param preproUnmodifiable If {@code true} unmodifiable terms will be preprocessed.
-     * @throws InvalidSettingsException if settings are invalid or can not be applied on concrete preprocessor.
+     * @throws InvalidSettingsException if settings are invalid or cannot be applied on concrete preprocessor.
      * @since 2.9
      */
     public abstract void validateSettings(final int documentColIndex, final int origDocumentColIndex,

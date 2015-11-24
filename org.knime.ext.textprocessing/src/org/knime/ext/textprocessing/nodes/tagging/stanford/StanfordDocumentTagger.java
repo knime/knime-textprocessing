@@ -131,8 +131,8 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      * @param setNeUnmodifiable If true all recognized terms are set
      * unmodifiable.
      * @param model The model to load and use.
-     * @throws ClassNotFoundException If model can not be found.
-     * @throws IOException If model can not be red.
+     * @throws ClassNotFoundException If model cannot be found.
+     * @throws IOException If model cannot be red.
      */
     public StanfordDocumentTagger(final boolean setNeUnmodifiable,
             final String model)

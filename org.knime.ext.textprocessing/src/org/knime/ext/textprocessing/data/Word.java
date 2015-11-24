@@ -224,7 +224,7 @@ public class Word implements TextContainer, Externalizable {
         // try to de-serialize the whitespace suffix
         try {
             m_whiteSpaceSuffix = in.readUTF();
-        // if suffix was not serialized and thus can not be de-serialized set default value
+        // if suffix was not serialized and thus cannot be de-serialized set default value
         } catch (EOFException e) {
             m_whiteSpaceSuffix = DEFAULT_WHITESPACE_SUFFIX;
         }

@@ -154,7 +154,7 @@ public final class StopWordFilterNodeModel2 extends StreamableFunctionPreprocess
         }
 
         if (!f.isFile() || !f.exists() || !f.canRead()) {
-            throw new InvalidSettingsException("Selected stop word file: " + file + " can not be accessed!");
+            throw new InvalidSettingsException("Selected stop word file: " + file + " cannot be accessed!");
         }
 
         return f;
@@ -178,11 +178,11 @@ public final class StopWordFilterNodeModel2 extends StreamableFunctionPreprocess
             } catch (FileNotFoundException e) {
                 LOGGER.warn("Not such stop word file.");
                 throw new InvalidSettingsException(
-                    "Selected stop word file: " + m_fileModel.getStringValue() + " can not be found!");
+                    "Selected stop word file: " + m_fileModel.getStringValue() + " cannot be found!");
             } catch (IOException e) {
                 LOGGER.warn("Cant read from stop word file.");
                 throw new InvalidSettingsException(
-                    "Selected stop word file: " + m_fileModel.getStringValue() + " can not be accessed!");
+                    "Selected stop word file: " + m_fileModel.getStringValue() + " cannot be accessed!");
             }
         }
     }

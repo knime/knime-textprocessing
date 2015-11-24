@@ -119,7 +119,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      *
      * @param fileStore File store to store document at.
      * @param document Document to encapsulate and store in file store.
-     * @throws IOException if document can not be serialized into file store file.
+     * @throws IOException if document cannot be serialized into file store file.
      */
     public AbstractDocumentFileStoreCell(final FileStore fileStore, final Document document) throws IOException {
         super(fileStore);
@@ -198,7 +198,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      * length and uuid into the given data output.
      *
      * @param output The data output to write the address information of the document to.
-     * @throws IOException If document data can not be written to file store file.
+     * @throws IOException If document data cannot be written to file store file.
      */
     protected synchronized void serializeCell(final DataCellDataOutput output) throws IOException {
         // write document to file store (if it has not been written bevore)
@@ -215,7 +215,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      * point, only its offset, length and uuid information.
      *
      * @param input The input to read the document address information from.
-     * @throws IOException If document address information can not be deserialized from given data input.
+     * @throws IOException If document address information cannot be deserialized from given data input.
      */
     protected synchronized void deserializeCell(final DataCellDataInput input) throws IOException {
         // read offset, length, and uuid, set serialized flag true (since cell has obviously been serialized before)
@@ -285,7 +285,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      *
      * @param doc The document to serialize.
      * @return The byte array containing the serialized document.
-     * @throws IOException If document data can not be serialized.
+     * @throws IOException If document data cannot be serialized.
      */
     static byte[] serializeDocument(final Document doc) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -303,7 +303,7 @@ abstract class AbstractDocumentFileStoreCell extends FileStoreCell implements Do
      *
      * @param bytes The byte array containing the serialized document data.
      * @return The new document instance.
-     * @throws IOException If document can not be deserialzed from byte array.
+     * @throws IOException If document cannot be deserialzed from byte array.
      */
     static Document deserializedDocument(final byte[] bytes) throws IOException {
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));

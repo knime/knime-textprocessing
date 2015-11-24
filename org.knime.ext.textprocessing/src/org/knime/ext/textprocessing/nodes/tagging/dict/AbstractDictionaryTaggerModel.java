@@ -154,7 +154,7 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
      * Reads strings of string column of second input data table to build dictionary.
      * @param inData Input data tables.
      * @param exec The execution context of the node.
-     * @throws Exception If tagger can not be prepared.
+     * @throws Exception If tagger cannot be prepared.
      * @since 2.9
      */
     @Override

@@ -181,7 +181,7 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * input documents. Extending classes need to create the corresponding preprocessing instance here.
      * @return A new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
      * documents.
-     * @throws Exception If preprocessing instance can not be created.
+     * @throws Exception If preprocessing instance cannot be created.
      */
     protected abstract TermPreprocessing createPreprocessing() throws Exception;
 

@@ -170,7 +170,7 @@ public abstract class TagFilterNodeModel extends PreprocessingNodeModel {
         super.validateSettings(settings);
         m_strictFilteringModel.validateSettings(settings);
         m_validTagsModel.validateSettings(settings);
-        //we can not valid date the new setting but we also don't need to
+        //we cannot valid date the new setting but we also don't need to
         //m_filterMatchingModel.validateSettings(settings);
     }
 

@@ -95,7 +95,7 @@ public final class DirectChunkPreprocessor extends AbstractPreprocessor {
     @Override
     public void checkPreprocessing() throws InvalidSettingsException {
         if (!ChunkPreprocessing.class.isInstance(m_preprocessing)) {
-            throw new InvalidSettingsException("This preprocessing can not be applied on this data table.");
+            throw new InvalidSettingsException("This preprocessing cannot be applied on this data table.");
         }
         m_chunkPreprocessing = (ChunkPreprocessing)m_preprocessing;
     }

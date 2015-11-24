@@ -169,7 +169,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         File dir = new File(m_directoryModel.getStringValue());
         if (!dir.exists() || !dir.isDirectory() || !dir.canWrite()) {
             throw new InvalidSettingsException("Directory " + m_directoryModel.getStringValue()
-                + " can not be accessed.");
+                + " cannot be accessed.");
         }
 
         ColumnRearranger cR = new ColumnRearranger(dataSpec);

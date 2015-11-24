@@ -147,7 +147,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * tables for tagging.
      * @param inData Input data tables.
      * @param exec The execution context of the node.
-     * @throws Exception If tagger can not be prepared.
+     * @throws Exception If tagger cannot be prepared.
      */
     protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception { }
 
@@ -155,7 +155,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * Creates column rearranger for creation of new data table.
      * @param in the input data table spec.
      * @return A new instance of column rearranger to create output data table
-     * @throws InvalidSettingsException If tagger instance can not be created.
+     * @throws InvalidSettingsException If tagger instance cannot be created.
      * @since 3.1
      */
     protected final ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
