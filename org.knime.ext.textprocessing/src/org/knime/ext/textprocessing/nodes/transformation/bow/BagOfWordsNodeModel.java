@@ -209,6 +209,10 @@ public class BagOfWordsNodeModel extends NodeModel {
                     addToBOW(terms, docCell, origDocCell, bdc);
                     processedDocUUIDs.add(doc.getUUID());
                 }
+            } else {
+                // set warning message
+                setWarningMessage(
+                    "Input table contains missing values in document column. Missing document values will be ignored.");
             }
 
             // report status
