@@ -145,8 +145,10 @@ final class TaggerCellFactory extends SingleCellFactory {
     public void afterProcessing() {
         // clean up thread local tagger models here!
         LOGGER.debug("Clearing tagger pool.");
-        for (int i = 0; i < m_taggerPool.length; i++) {
-            m_taggerPool[i] = null;
+        if (m_taggerPool != null) {
+            for (int i = 0; i < m_taggerPool.length; i++) {
+                m_taggerPool[i] = null;
+            }
         }
         m_taggerPool = null;
         m_taggerCount = new AtomicInteger(0);
