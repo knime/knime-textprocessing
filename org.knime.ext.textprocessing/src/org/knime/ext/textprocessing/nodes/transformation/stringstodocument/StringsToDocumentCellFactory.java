@@ -99,7 +99,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
      * @param numberOfThreads The number of parallel threads to use.
      * @throws IllegalArgumentException If given configuration is
      * <code>null</code>.
-     * @since 2.9
+     * @since 3.1
      */
     public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
         final int numberOfThreads) throws IllegalArgumentException {
