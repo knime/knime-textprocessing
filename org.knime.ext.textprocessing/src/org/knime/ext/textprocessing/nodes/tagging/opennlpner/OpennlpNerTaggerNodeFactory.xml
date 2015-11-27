@@ -31,6 +31,15 @@
             Firstname1 Lastname2<br />
             Firstname2 Lastname2
         </option>
+        
+        <tab name="Concurrency">
+        <option name="Number of maximal parallel tagging processes">
+            Defines the maximal number of parallel threads that are used for tagging. Please note, that for each thread
+            a tagging model will be loaded into memory. If this value is set to a number greater than 1, make sure that
+            enough heap space is available, in order to be able to load the models. If you are not sure how much heap is 
+            available for KNIME, leave the number to 1.
+        </option>
+        </tab>            
     </fullDescription>
         
     <ports>

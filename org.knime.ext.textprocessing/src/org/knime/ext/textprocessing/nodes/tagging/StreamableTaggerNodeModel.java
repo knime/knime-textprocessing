@@ -135,6 +135,14 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
     }
 
     /**
+     * @return the maximum number of parallel threads to use for tagging.
+     * @since 3.1
+     */
+    protected int getMaxNumberOfParallelThreads() {
+        return m_numberOfThreadsModel.getIntValue();
+    }
+
+    /**
      * Method to check specs of input data tables. This method can be overwritten to apply specific checks.
      *
      * @param inSpecs Specs of the input data tables.
@@ -166,8 +174,14 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         DataColumnSpec docCol = new DataColumnSpecCreator("Document", docFactory.getDataType()).createSpec();
 
-        final TaggerCellFactory cellFac =
-            new TaggerCellFactory(this, docColIndex, docCol, m_numberOfThreadsModel.getIntValue());
+        final int maxNumberOfParalleThreads;
+        if (getMaxNumberOfParallelThreads() <= 0) {
+            maxNumberOfParalleThreads = 1;
+        } else {
+            maxNumberOfParalleThreads = getMaxNumberOfParallelThreads();
+        }
+
+        final TaggerCellFactory cellFac = new TaggerCellFactory(this, docColIndex, docCol, maxNumberOfParalleThreads);
         final ColumnRearranger rearranger = new ColumnRearranger(in);
         rearranger.replace(cellFac, docColIndex);
         rearranger.keepOnly(docColIndex);

@@ -106,6 +106,15 @@ public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      * {@inheritDoc}
      */
     @Override
+    protected int getMaxNumberOfParallelThreads() {
+        // Abner model can not be parallelized. Maximal number of parallel threads is limited here to 1.
+        return 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);

@@ -49,11 +49,12 @@ package org.knime.ext.textprocessing.nodes.tagging.abner;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
  * Creates the dialog of the AbnerTaggerNode with a checkbox component,
@@ -62,7 +63,7 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class AbnerTaggerNodeDialog extends TaggerNodeSettingsPane {
+public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * Creates and returns a
@@ -100,8 +101,6 @@ public class AbnerTaggerNodeDialog extends TaggerNodeSettingsPane {
      */
     public AbnerTaggerNodeDialog() {
         super();
-        createNewTab("Tagger options");
-        setSelected("Tagger options");
 
         addDialogComponent(new DialogComponentBoolean(
                         createSetUnmodifiableModel(),
