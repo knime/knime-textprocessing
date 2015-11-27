@@ -52,9 +52,12 @@
             </ul>
             </p>
         </intro>
+        
+        <tab name="Tagger options">
         <option name="Tagger model">
             The tagger model to use.
         </option>
+        </tab>
         
         <tab name="Concurrency">
         <option name="Number of maximal parallel tagging processes">

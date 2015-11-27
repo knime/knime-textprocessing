@@ -14,9 +14,12 @@
             The OSCAR tag filter is afterwards able to filter the 
             assigned tags.
         </intro>
+        
+        <tab name="Tagger options">
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
         </option>
+        </tab>
         
         <tab name="Concurrency">
         <option name="Number of maximal parallel tagging processes">

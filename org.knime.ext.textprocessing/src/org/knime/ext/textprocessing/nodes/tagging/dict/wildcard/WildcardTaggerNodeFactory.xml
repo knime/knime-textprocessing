@@ -80,6 +80,8 @@
             tagged as one term.
             </p>
     </intro>
+    
+        <tab name="Tagger options">
         <option name="Expression column">
             Specifies the string column containing the wildcard or regular expressions to match. 
         </option>
@@ -111,6 +113,7 @@
         <option name="Tag value">
             Specifies the tag value to use for tagging recognized named entities.
         </option>
+        </tab>
         
         <tab name="Concurrency">
         <option name="Number of maximal parallel tagging processes">

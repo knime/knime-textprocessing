@@ -13,6 +13,8 @@
             processing toolkit, see 
             http://opennlp.apache.org/documentation.html.
         </intro>
+        
+        <tab name="Tagger options">
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
         </option>
@@ -31,6 +33,7 @@
             Firstname1 Lastname2<br />
             Firstname2 Lastname2
         </option>
+        </tab>
         
         <tab name="Concurrency">
         <option name="Number of maximal parallel tagging processes">
