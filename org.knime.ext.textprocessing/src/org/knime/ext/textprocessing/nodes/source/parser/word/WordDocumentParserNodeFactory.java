@@ -74,7 +74,7 @@ public class WordDocumentParserNodeFactory extends NodeFactory<DocumentParserNod
      */
     @Override
     public DocumentParserNodeModel createNodeModel() {
-        return new DocumentParserNodeModel(new WordDocumentParserFactory(), false, new String[]{"doc", "docx"});
+        return new DocumentParserNodeModel(new WordDocumentParserFactory(), false, new String[]{"doc", "docx", "docm"});
     }
 
     /**

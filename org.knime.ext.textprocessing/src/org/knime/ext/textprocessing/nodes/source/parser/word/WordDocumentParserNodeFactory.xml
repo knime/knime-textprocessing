@@ -6,15 +6,14 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            This node allows you to read Word (.doc) documents and create a 
+            This node allows you to read Word (.doc, .docx, .docm) documents and create a 
             document for each file. The text is extracted from the word file by 
-            usage of the Apache POI library 
-            (see http://poi.apache.org/ for details).
+            usage of the Apache POI library (see http://poi.apache.org/ for details).
             Paragraphs are taken into account. Meta information is not red. The
             first sentence is used as the document title.
         </intro>
         <option name="Document directory">
-            Set the directory containing the files to parse.
+            Set the directory containing the word files to parse.
         </option>
         <option name="Search recursively">
             If checked, the specified directory is searched for
