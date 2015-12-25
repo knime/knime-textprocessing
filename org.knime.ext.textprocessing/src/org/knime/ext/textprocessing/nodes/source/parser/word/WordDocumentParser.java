@@ -204,7 +204,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
                 setPublicationDate(si.getCreateDateTime());
 
                 // docx files
-            } else if (m_docPath.endsWith(".docx")) {
+            } else if (m_docPath.endsWith(".docx") || m_docPath.endsWith(".docm")) {
                 final XWPFDocument hdoc = new XWPFDocument(is);
                 final List<XWPFParagraph> paragraphs = hdoc.getParagraphs();
                 for (final XWPFParagraph paragraph : paragraphs) {
