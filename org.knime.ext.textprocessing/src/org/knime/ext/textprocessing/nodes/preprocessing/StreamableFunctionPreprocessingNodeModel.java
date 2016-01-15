@@ -77,8 +77,11 @@ public abstract class StreamableFunctionPreprocessingNodeModel extends Streamabl
     @Override
     protected final void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws InvalidSettingsException {
-        // empty implementation, must not be overwritten by NodeModels that extend from
-        // StreamableFunctionPreprocessingNodeModel, since it cannot be called.
+        PortObjectSpec[] inSpecs = new PortObjectSpec[inData.length];
+        for (int i = 0; i < inData.length; i++) {
+            inSpecs[i] = inData[i].getDataTableSpec();
+        }
+        preparePreprocessing(inSpecs);
     }
 
     /**
