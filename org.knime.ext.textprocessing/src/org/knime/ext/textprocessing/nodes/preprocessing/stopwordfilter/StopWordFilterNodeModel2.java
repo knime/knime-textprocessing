@@ -54,7 +54,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,6 +69,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
@@ -144,10 +144,7 @@ public final class StopWordFilterNodeModel2 extends StreamableFunctionPreprocess
         try {
             // first try if file string is an URL (files in drop dir come as URLs)
             final URL url = new URL(file);
-            f = new File(url.toURI());
-        } catch (URISyntaxException e) {
-            // if no URL try string as path to file
-            f = new File(file);
+            f = FileUtil.getFileFromURL(url);
         } catch (MalformedURLException e) {
             // if no URL try string as path to file
             f = new File(file);
