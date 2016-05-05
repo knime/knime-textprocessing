@@ -54,13 +54,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jempbox.xmp.XMPMetadata;
-import org.apache.jempbox.xmp.XMPSchemaDublinCore;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-import org.apache.pdfbox.pdmodel.common.PDMetadata;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
@@ -162,7 +158,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
             document = PDDocument.load(is);
 
             // extract text from pdf
-            PDFTextStripper stripper = new PDFTextStripper(m_charset.name());
+            PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(document);
             m_currentDoc.addSection(text, SectionAnnotation.UNKNOWN);
 
@@ -174,15 +170,6 @@ public class PDFDocumentParser extends AbstractDocumentParser {
                 title = m_docPath.toString().trim();
             }
 
-            PDDocumentCatalog catalog = document.getDocumentCatalog();
-            PDMetadata meta = catalog.getMetadata();
-            if (meta != null) {
-                XMPMetadata metadata = meta.exportXMPMetadata();
-                XMPSchemaDublinCore dc = metadata.getDublinCoreSchema();
-                if (dc != null && !checkTitle(title)) {
-                    title = dc.getTitle();
-                }
-            }
             PDDocumentInformation information = document.getDocumentInformation();
             if (information != null) {
                 if (!checkTitle(title)) {
