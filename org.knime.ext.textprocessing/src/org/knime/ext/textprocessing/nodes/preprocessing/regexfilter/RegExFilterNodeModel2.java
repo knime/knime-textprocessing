@@ -106,7 +106,7 @@ public final class RegExFilterNodeModel2 extends StreamableFunctionPreprocessing
         super.validateSettings(settings);
         m_regExModel.validateSettings(settings);
 
-        String inputPattern = m_regExModel.getStringValue();
+        String inputPattern = ((SettingsModelString)m_regExModel.createCloneWithValidatedValue(settings)).getStringValue();
         try {
             Pattern.compile(inputPattern);
         } catch (PatternSyntaxException exception) {
