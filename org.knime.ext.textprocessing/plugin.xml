@@ -221,6 +221,7 @@
       </node>
       <node
             category-path="/labs/textprocessing/misc"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory"
             id="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory">
       </node>
@@ -500,6 +501,12 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory2"
             id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/misc"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewer2NodeFactory"
+            id="org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewer2NodeFactory">
       </node>
    </extension>
    <extension

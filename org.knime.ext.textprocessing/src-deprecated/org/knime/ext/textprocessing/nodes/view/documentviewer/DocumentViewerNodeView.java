@@ -41,61 +41,56 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
- *   05.08.2008 (thiel): created
+ *   27.06.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
+
+import javax.swing.JPanel;
+
 import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewerNodeFactory extends 
-NodeFactory<DocumentViewerNodeModel> {
+@Deprecated
+public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
 
     /**
-     * {@inheritDoc}
+     * Creates a new instance of <code>DocumentViewerNodeView</code>.
+     *
+     * @param model The model holding the documents to dosplay.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentViewerNodeDialog();
+    public DocumentViewerNodeView(final DocumentViewerNodeModel model) {
+        super(model);
+        JPanel panel = new DocumentViewerTablePanel(model.getDocumentList());
+        setComponent(panel);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DocumentViewerNodeModel createNodeModel() {
-        return new DocumentViewerNodeModel();
+    protected void modelChanged() {
+        // Nothing to do ...
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentViewerNodeModel> createNodeView(final int index, 
-            final DocumentViewerNodeModel model) {
-        return new DocumentViewerNodeView(model);
+    protected void onClose() {
+        // Nothing to do ...
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected int getNrNodeViews() {
-        return 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
+    protected void onOpen() {
+        // Nothing to do ...
     }
 }

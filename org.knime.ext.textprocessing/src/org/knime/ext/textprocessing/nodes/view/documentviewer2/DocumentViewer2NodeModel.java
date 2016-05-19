@@ -41,11 +41,11 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   27.06.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.view.documentviewer;
+package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,61 +76,53 @@ import org.knime.ext.textprocessing.util.DataStructureUtil;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
- * 
- * @author Kilian Thiel, University of Konstanz
+ *
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
-public class DocumentViewerNodeModel extends NodeModel 
-implements BufferedDataTableHolder {
-    
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(DocumentViewerNodeModel.class);
-    
+public class DocumentViewer2NodeModel extends NodeModel implements BufferedDataTableHolder {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentViewer2NodeModel.class);
+
     private static final int INPUT_INDEX = 0;
-    
+
     private int m_documentCellindex = -1;
-    
+
     private List<Document> m_documents;
-    
+
     private BufferedDataTable m_data;
 
-    private static final String SETTINGS_FILE = 
-        "DocumentViewerNodeModelSettings.dat";    
-    
+    private static final String SETTINGS_FILE = "DocumentViewerNodeModelSettings.dat";
+
     private static final String INTERNAL_MODEL = "DocViewerModel";
-    
+
     private static final String DOCUMENT_INDEX = "DocIndex";
-    
-    private SettingsModelString m_documentColModel =
-        FrequenciesNodeSettingsPane.getDocumentColumnModel();    
-    
+
+    private SettingsModelString m_documentColModel = FrequenciesNodeSettingsPane.getDocumentColumnModel();
+
     private ExecutionContext m_exec;
-    
+
     /**
      * Creates new instance of <code>DocumentViewerNodeModel</code>.
      */
-    public DocumentViewerNodeModel() {
+    public DocumentViewer2NodeModel() {
         super(1, 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(
-                inSpecs[INPUT_INDEX]);
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[INPUT_INDEX]);
         verifier.verifyMinimumDocumentCells(1, true);
         m_documentCellindex = verifier.getDocumentCellIndex();
-        
-        int documentColIndex = inSpecs[0].findColumnIndex(
-                m_documentColModel.getStringValue());
+
+        int documentColIndex = inSpecs[0].findColumnIndex(m_documentColModel.getStringValue());
         if (documentColIndex < 0) {
             throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
-                    + "Check your settings!");
+                "Index of specified document column is not valid! " + "Check your settings!");
         }
-        
+
         return new DataTableSpec[]{};
     }
 
@@ -138,16 +130,14 @@ implements BufferedDataTableHolder {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         m_exec = exec;
-        m_documentCellindex = inData[0].getDataTableSpec().findColumnIndex(
-                m_documentColModel.getStringValue());
-        
+        m_documentCellindex = inData[0].getDataTableSpec().findColumnIndex(m_documentColModel.getStringValue());
+
         m_documents = new ArrayList<Document>();
         m_data = inData[INPUT_INDEX];
-        m_documents = DataStructureUtil.buildDocumentList(m_data, 
-                m_documentCellindex, m_exec);
+        m_documents = DataStructureUtil.buildDocumentList(m_data, m_documentCellindex, m_exec);
         Collections.sort(m_documents, new Comparator<Document>() {
             @Override
             public int compare(final Document o1, final Document o2) {
@@ -156,25 +146,25 @@ implements BufferedDataTableHolder {
                 return title1.compareTo(title2);
             }
         });
-        
+
         return new BufferedDataTable[]{};
     }
-    
+
     /**
      * @return the set of documents to display.
      */
-    List<Document> getDocumentList() {
+        List<Document> getDocumentList() {
         return m_documents;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public BufferedDataTable[] getInternalTables() {
-        return new BufferedDataTable[] {m_data};
+        return new BufferedDataTable[]{m_data};
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -185,25 +175,21 @@ implements BufferedDataTableHolder {
         }
         m_data = tables[0];
         try {
-            m_documents = DataStructureUtil.buildDocumentList(m_data, 
-                    m_documentCellindex, m_exec);
+            m_documents = DataStructureUtil.buildDocumentList(m_data, m_documentCellindex, m_exec);
         } catch (CanceledExecutionException e) {
-            LOGGER.warn(
-                    "Could not load internal table, execution was canceled!");
+            LOGGER.warn("Could not load internal table, execution was canceled!");
         }
-    }    
-    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         File file = new File(nodeInternDir, SETTINGS_FILE);
         FileInputStream fis = new FileInputStream(file);
-        ModelContentRO modelContent = ModelContent.loadFromXML(fis);        
+        ModelContentRO modelContent = ModelContent.loadFromXML(fis);
 
         // Load settings
         try {
@@ -220,8 +206,7 @@ implements BufferedDataTableHolder {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentColModel.loadSettingsFrom(settings);
     }
 
@@ -240,15 +225,14 @@ implements BufferedDataTableHolder {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Save tree
         ModelContent modelContent = new ModelContent(INTERNAL_MODEL);
 
         // Save settings
         modelContent.addInt(DOCUMENT_INDEX, m_documentCellindex);
-        
+
         File file = new File(nodeInternDir, SETTINGS_FILE);
         FileOutputStream fos = new FileOutputStream(file);
         modelContent.saveToXML(fos);
@@ -267,8 +251,7 @@ implements BufferedDataTableHolder {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentColModel.validateSettings(settings);
     }
 }

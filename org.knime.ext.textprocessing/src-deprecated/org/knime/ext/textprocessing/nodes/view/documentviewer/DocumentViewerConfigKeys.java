@@ -41,20 +41,21 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   08.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
+@Deprecated
 public final class DocumentViewerConfigKeys {
-    
+
     private DocumentViewerConfigKeys() { }
-    
+
     /**
      * The configuration key for the column containing he documents to process.
      */

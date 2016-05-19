@@ -41,55 +41,58 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
- *   27.06.2008 (thiel): created
+ *   27.08.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.view.documentviewer;
+package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
+import java.util.List;
 
-import javax.swing.JPanel;
+import javax.swing.JFrame;
 
-import org.knime.core.node.NodeView;
+import org.knime.core.node.KNIMEConstants;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerTablePanel;
 
 /**
- * 
- * @author Kilian Thiel, University of Konstanz
+ *
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
-public class DocumentViewerNodeView extends NodeView<DocumentViewerNodeModel> {
-    
+class DocumentViewerTablePanel2 extends AbstractDocumentTablePanel2 {
+
     /**
-     * Creates a new instance of <code>DocumentViewerNodeView</code>.
-     * 
-     * @param model The model holding the documents to dosplay.
+     * Automatically generated serial version id.
      */
-    public DocumentViewerNodeView(final DocumentViewerNodeModel model) {
-        super(model);
-        JPanel panel = new DocumentViewerTablePanel(model.getDocumentList());
-        setComponent(panel);
-    }
-    
+    private static final long serialVersionUID = 3735659735470727304L;
+
+    private static final String FRAME_TITLE = "Document Details";
+
+    private JFrame frame;
+
     /**
-     * {@inheritDoc}
+     * Creates a new instance of {@link DocumentViewerTablePanel} with the given set of documents to display.
+     *
+     * @param documents The set of documents to display.
      */
-    @Override
-    protected void modelChanged() {
-        // Nothing to do ...
+    public DocumentViewerTablePanel2(final List<Document> documents) {
+        super(documents);
+        frame = new JFrame();
+        if (KNIMEConstants.KNIME16X16 != null) {
+            frame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
+        }
+        frame.setVisible(false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void onClose() {
-        // Nothing to do ...
+    protected void onClick(final int rowIndex, final Document document) {
+        frame.setContentPane(new DocumentViewPanel2(document, this));
+        frame.pack();
+        frame.setTitle(FRAME_TITLE);
+        frame.setVisible(true);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onOpen() {
-        // Nothing to do ...
-    }
+
 }

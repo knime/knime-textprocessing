@@ -41,47 +41,62 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
- *   08.08.2008 (thiel): created
+ *   05.08.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer;
 
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentViewerNodeDialog extends DefaultNodeSettingsPane {
+@Deprecated
+public class DocumentViewerNodeFactory extends
+NodeFactory<DocumentViewerNodeModel> {
 
     /**
-     * @return Creates and returns the string settings model containing
-     * the name of the column with the documents to preprocess.
+     * {@inheritDoc}
      */
-    public static SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(
-                DocumentViewerConfigKeys.CFG_KEY_DOCUMENT_COL,
-                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new DocumentViewerNodeDialog();
     }
-    
+
     /**
-     * Creates new instance of <code>DocumentViewerNodeDialog</code>.
+     * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    public DocumentViewerNodeDialog() {
-        removeTab("Options");
-        createNewTabAt("Preprocessing", 1);
-        
-        DialogComponentColumnNameSelection comp1 = 
-            new DialogComponentColumnNameSelection(getDocumentColumnModel(), 
-                    "Document column", 0, DocumentValue.class);
-        comp1.setToolTipText(
-                "Column has to contain documents to preprocess!");
-        addDialogComponent(comp1);
+    @Override
+    public DocumentViewerNodeModel createNodeModel() {
+        return new DocumentViewerNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<DocumentViewerNodeModel> createNodeView(final int index,
+            final DocumentViewerNodeModel model) {
+        return new DocumentViewerNodeView(model);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
     }
 }
