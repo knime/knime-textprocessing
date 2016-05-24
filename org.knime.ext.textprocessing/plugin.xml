@@ -508,6 +508,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewer2NodeFactory"
             id="org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewer2NodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/preprocessing"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictionaryfilter.DictionaryFilterNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.dictionaryfilter.DictionaryFilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

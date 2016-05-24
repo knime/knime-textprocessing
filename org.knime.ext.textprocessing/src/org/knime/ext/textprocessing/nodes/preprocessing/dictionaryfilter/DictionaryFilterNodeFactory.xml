@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Dictionary Filter</name>
+    <shortDescription>Filters terms in documents that are contained in the dictionary column.</shortDescription>
+    
+    <fullDescription>
+        <intro>
+        	   Filters all terms of the input documents, which are contained in the dictionary provided 
+        	   by the second input port. As dictionary a string column of the second input port can be specified.
+        </intro>
+        <tab name="Filter options">
+        <option name="Case sensitive">
+              If checked the words are matched case sensitive otherwise not.
+        </option>
+        <option name="Column containing the strings to filter">
+              The column containing the strings (terms) to filter.
+        </option>
+        </tab>
+
+        <tab name="Preprocessing options">
+        <option name="Document column">
+            The column containing the documents to preprocess.
+        </option>
+        
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
+            documents will be appended as new column. 
+        </option>
+
+        <option name="Append column">
+            The name of the new appended column, containing the preprocessed documents.            
+        </option>
+        
+        <option name="Ignore unmodifiable tag">
+              If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+    </fullDescription>
+    
+    <ports>
+        <inPort name="Documents to preprocess" index="0">
+            The input table which contains the documents to preprocess.
+        </inPort>
+        <inPort name="Dictionary" index="1">
+            The input table containing at least one the string column (dictionary).
+        </inPort>        
+        <outPort name="Preprocessed documents." index="0">
+            The output table which contains the preprocessed documents.
+        </outPort>
+    </ports>    
+</knimeNode>
