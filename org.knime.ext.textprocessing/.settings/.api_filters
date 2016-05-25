@@ -22,6 +22,46 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys"/>
+                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeDialog">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeDialog"/>
+                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory"/>
+                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeModel">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeModel"/>
+                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeView">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeView"/>
+                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/preprocessing/AbstractPreprocessor.java" type="org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor">
         <filter id="305365105">
             <message_arguments>
@@ -265,46 +305,6 @@
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeModel"/>
                 <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/view/documentviewer/DocumentViewerConfigKeys.java" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys"/>
-                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/view/documentviewer/DocumentViewerNodeDialog.java" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeDialog">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeDialog"/>
-                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/view/documentviewer/DocumentViewerNodeFactory.java" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory"/>
-                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/view/documentviewer/DocumentViewerNodeModel.java" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeModel">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeModel"/>
-                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src-deprecated/org/knime/ext/textprocessing/nodes/view/documentviewer/DocumentViewerNodeView.java" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeView">
-        <filter id="305365105">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeView"/>
-                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
             </message_arguments>
         </filter>
     </resource>
