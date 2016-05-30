@@ -81,438 +81,438 @@
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParserNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserNodefactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter.NCharsFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter.NCharsFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopwordFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopwordFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.tf.TfNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.frequencies.tf.TfNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.idf.IdfNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.frequencies.idf.IdfNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos.PosTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pos.PosTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner.AbnerTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.abner.AbnerTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.NamedEntityFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.NamedEntityFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.ne.NamedEntityFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.ne.NamedEntityFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/misc"
             factory-class="org.knime.ext.textprocessing.nodes.misc.categorytoclass.CategoryToClassNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.misc.categorytoclass.CategoryToClassNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termtostring.TermToStringNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.termtostring.TermToStringNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/misc"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.termvector.TermVectorNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/mining"
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.chisquare.KeywordExtractorNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/mining"
             factory-class="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.misc.keywordextractor.keygraph.KeygraphNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabberNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.stringtoterm.StringToTermNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.stringtoterm.TermToStringNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.tagtoString.TagToStringNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractorNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.sentenceextraction.SentenceExtractionNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.sentenceextraction.SentenceStatisticsNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.termgrouper.TermGrouperNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/misc"
             factory-class="org.knime.ext.textprocessing.nodes.misc.stringmatcher.StringMatcherNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.misc.stringmatcher.StringMatcherNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.hyphenator.HyphenatorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.hyphenator.HyphenatorNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.icf.IcfNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.frequencies.icf.IcfNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.regexfilter.RegExFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.regexfilter.RegExFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.oscar.OscarTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.oscar.OscarTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termtostructure.TermToStructureNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.termtostructure.TermToStructureNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.stts.STTSTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.stts.STTSTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.pdf.PDFDocumentParserNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/misc"
             factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             factory-class="org.knime.ext.textprocessing.nodes.cooccurrencecounter.CooccurrenceCounterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.cooccurrencecounter.CooccurrenceCounterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.frenchtreebank.FrenchTreebankTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.frenchtreebank.FrenchTreebankTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.pharma.PharmaDefaultTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             factory-class="org.knime.ext.textprocessing.nodes.misc.ngram.NGramNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.misc.ngram.NGramNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.general.GeneralTagFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.general.GeneralTagFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/mining"
             factory-class="org.knime.ext.textprocessing.nodes.mining.topic.ParallelTopicExtractorNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.mining.topic.ParallelTopicExtractorNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverterNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmerNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.hyphenator.HyphenatorNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.hyphenator.HyphenatorNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter.NCharsFilterNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.ncharsfilter.NCharsFilterNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilterNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.ModifiableTermFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.nefilter.ModifiableTermFilterNodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmerNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.regexfilter.RegExFilterNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.regexfilter.RegExFilterNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacerNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilterNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilterNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter2.TagFilterNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter2.TagFilterNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacerNodeFactory2org.knime.ext.textprocessing.node1">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory2"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports.DictionaryReplacer2InPortsNodeFactory2">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/misc"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewer2NodeFactory"
-            id="org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewer2NodeFactory">
+            >
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictionaryfilter.DictionaryFilterNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.dictionaryfilter.DictionaryFilterNodeFactory">
+            >
       </node>
    </extension>
    <extension
