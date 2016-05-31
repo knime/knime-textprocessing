@@ -514,6 +514,11 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.dictionaryfilter.DictionaryFilterNodeFactory"
             >
       </node>
+      <node
+            category-path="/labs/textprocessing/misc"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.markuptagfilter.MarkupTagFilterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
