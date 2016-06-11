@@ -519,6 +519,12 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.misc.markuptagfilter.MarkupTagFilterNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/frequencies"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
