@@ -24,3 +24,7 @@ It is provided "as is," with no representations or warranties of any kind.
 ABNER is now "open source" and released under the terms of the 
 Common Public License. You are free to use the code under those terms.
 (http://www.opensource.org/licenses/cpl1.0.php)
+
+jsoup HTML parser:
+Copyright (c) 2009 - 2016 Jonathan Hedley
+jsoup is released under the MIT License (https://jsoup.org/license)
