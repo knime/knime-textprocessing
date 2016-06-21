@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory"
+            id="org.knime.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory"
+            id="org.knime.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory"
+            id="org.knime.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory">
+      </node>
+   </extension>
+   <extension
+         point="org.knime.core.PortType">
+      <portType
+            hidden="false"
+            name="org.knime.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject"
+            objectClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject"
+            objectSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject$Serializer"
+            specClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec"
+            specSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec$Serializer">
+      </portType>
+   </extension>
+   <extension
+         point="org.knime.workbench.repository.categories">
+      <category
+            icon="res/icons/missing.gif"
+            level-id="embeddings"
+            locked="true"
+            name="Word Embeddings"
+            path="/labs/deeplearning/">
+      </category>
+   </extension>
+
+</plugin>
