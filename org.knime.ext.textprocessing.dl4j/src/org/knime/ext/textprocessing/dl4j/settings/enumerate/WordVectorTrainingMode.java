@@ -40,53 +40,16 @@
  * may freely choose the license terms applicable to such Node, including
  * when such Node is propagated with or for interoperation with KNIME.
  *******************************************************************************/
-package org.knime.ext.textprocessing.dl4j.nodes.embeddings;
-
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObjectSpec;
-import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
+package org.knime.ext.textprocessing.dl4j.settings.enumerate;
 
 /**
- * Port Object Spec for Word Vector Models.
- * 
- * @author David Kolb
+ * Training modes of word vectors.
+ *
+ * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
-
-	public static final class Serializer extends
-		AbstractSimplePortObjectSpecSerializer<WordVectorPortObjectSpec> {
-	}
-	
-	private static final String CFGKEY_WORD_VECTOR_TRAINING_MODE = "WordVectorTrainingsMode";
-	
-	private WordVectorTrainingMode m_wordVectorTrainingsMode;
-	
-	/**
-     * Empty no-arg constructor as needed by {@link AbstractSimplePortObjectSpec}
-     */
-	public WordVectorPortObjectSpec() {
-		
-	}
-	
-	public WordVectorPortObjectSpec(final WordVectorTrainingMode mode) {
-		this.m_wordVectorTrainingsMode = mode;
-	}
-	
-	@Override
-	protected void save(ModelContentWO model) {
-		model.addString(CFGKEY_WORD_VECTOR_TRAINING_MODE, m_wordVectorTrainingsMode.toString());
-	}
-
-	@Override
-	protected void load(ModelContentRO model) throws InvalidSettingsException {
-		m_wordVectorTrainingsMode = WordVectorTrainingMode.valueOf(model.getString(CFGKEY_WORD_VECTOR_TRAINING_MODE));
-
-	}
-	
-	public WordVectorTrainingMode getWordVectorTrainingsMode(){
-		return m_wordVectorTrainingsMode;
-	}
-
+public enum WordVectorTrainingMode {
+	/** train word vectors */
+	WORD2VEC,
+	/** train document vectors */
+	DOC2VEC
 }

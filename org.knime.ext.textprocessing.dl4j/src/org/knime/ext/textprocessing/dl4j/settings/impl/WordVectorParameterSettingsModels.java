@@ -50,7 +50,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.dl4j.base.settings.IParameterSettingsModels;
-import org.knime.ext.dl4j.base.settings.enumerate.WordVectorLearnerParameter;
+import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 
 /**
  * Implementation of {@link IParameterSettingsModels} for Word Vector specific parameters.

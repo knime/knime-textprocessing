@@ -63,7 +63,7 @@ import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
 import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache;
-import org.knime.ext.dl4j.base.settings.enumerate.WordVectorTrainingMode;
+import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.nd4j.linalg.api.ndarray.INDArray;
