@@ -58,14 +58,6 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerPar
  * @author David Kolb, KNIME.com GmbH
  */
 public class WordVectorParameterSettingsModels implements IParameterSettingsModels<WordVectorLearnerParameter> {
-
-	//Parameter default values
-	static final int DEFAULT_INT = 1;
-	static final Double DEFAULT_MIN_LEARNING_RATE = 0.0001;
-	static final int DEFAULT_LAYER_SIZE = 100;
-	static final int DEFAULT_WINDOW_SIZE = 5;
-	static final int DEFAULT_MIN_WORD_FREQUENCY = 0;
-	static final String DEFAULT_WORD_VECTOR_TRAININGS_MODE = "WORD2VEC";
 	
 	private SettingsModelIntegerBounded m_minWordFrequency;
 	private SettingsModelIntegerBounded m_layerSize;
@@ -79,15 +71,20 @@ public class WordVectorParameterSettingsModels implements IParameterSettingsMode
 	public SettingsModel createParameter(WordVectorLearnerParameter enumerate) throws IllegalStateException {
 		switch (enumerate) {
 		case LAYER_SIZE:
-			return new SettingsModelIntegerBounded("layer_size", DEFAULT_LAYER_SIZE, 1, Integer.MAX_VALUE);
+			return new SettingsModelIntegerBounded("layer_size", 
+					WordVectorLearnerParameter.DEFAULT_LAYER_SIZE, 1, Integer.MAX_VALUE);
 		case MIN_WORD_FREQUENCY:
-			return new SettingsModelIntegerBounded("min_word_frequency", DEFAULT_MIN_WORD_FREQUENCY, 0, Integer.MAX_VALUE);
+			return new SettingsModelIntegerBounded("min_word_frequency",
+					WordVectorLearnerParameter.DEFAULT_MIN_WORD_FREQUENCY, 0, Integer.MAX_VALUE);
 		case WINDOW_SIZE:
-			return new SettingsModelIntegerBounded("window_size", DEFAULT_WINDOW_SIZE, 1, Integer.MAX_VALUE);
+			return new SettingsModelIntegerBounded("window_size", 
+					WordVectorLearnerParameter.DEFAULT_WINDOW_SIZE, 1, Integer.MAX_VALUE);
 		case WORD_VECTOR_TRAINING_MODE:
-			return new SettingsModelString("word_vector_trainings_mode", DEFAULT_WORD_VECTOR_TRAININGS_MODE);
+			return new SettingsModelString("word_vector_trainings_mode", 
+					WordVectorLearnerParameter.DEFAULT_WORD_VECTOR_TRAININGS_MODE);
 		case MIN_LEARNING_RATE:
-			return new SettingsModelDoubleBounded("minimum_learning_rate", DEFAULT_MIN_LEARNING_RATE, 0.0, Double.MAX_VALUE);		
+			return new SettingsModelDoubleBounded("minimum_learning_rate", 
+					WordVectorLearnerParameter.DEFAULT_MIN_LEARNING_RATE, 0.0, Double.MAX_VALUE);		
 		default:
 			throw new IllegalStateException(
                     "WordVectorParameter does not exist: "
