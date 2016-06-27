@@ -121,9 +121,12 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 		int epochs = m_dataParameterSettings.getEpochs().getIntValue();
 		int batchSize = m_dataParameterSettings.getBatchSize().getIntValue();
 		
-		//sentence tokenizer
+		//sentence tokenizer and preprocessing
+		boolean usePreproc = m_wordVecParameterSettings.getUseBasicPreprocessing().getBooleanValue();
 		TokenizerFactory t = new DefaultTokenizerFactory();
-        t.setTokenPreProcessor(new CommonPreprocessor());
+        if(usePreproc){
+        	t.setTokenPreProcessor(new CommonPreprocessor());
+        }
 
 		switch (mode) {
 		case DOC2VEC:
@@ -235,6 +238,7 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
 		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
 		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE);
+		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING);
 		
 		List<SettingsModel> settings = new ArrayList<>();		
 		settings.addAll(m_learnerParameterSettings.getAllInitializedSettings());

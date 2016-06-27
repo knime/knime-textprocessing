@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.knime.core.node.defaultnodesettings.SettingsModel;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -64,6 +65,7 @@ public class WordVectorParameterSettingsModels implements IParameterSettingsMode
 	private SettingsModelIntegerBounded m_windowSize;
 	private SettingsModelString m_wordVectorTrainingsMode;
 	private SettingsModelDoubleBounded m_minimumLearningRate;
+	private SettingsModelBoolean m_useBasicPreprocessing;
 	
 	private List<SettingsModel> m_allInitializedSettings = new ArrayList<>();
 	
@@ -84,7 +86,10 @@ public class WordVectorParameterSettingsModels implements IParameterSettingsMode
 					WordVectorLearnerParameter.DEFAULT_WORD_VECTOR_TRAININGS_MODE);
 		case MIN_LEARNING_RATE:
 			return new SettingsModelDoubleBounded("minimum_learning_rate", 
-					WordVectorLearnerParameter.DEFAULT_MIN_LEARNING_RATE, 0.0, Double.MAX_VALUE);		
+					WordVectorLearnerParameter.DEFAULT_MIN_LEARNING_RATE, 0.0, Double.MAX_VALUE);
+		case USE_BASIC_PREPROCESSING:
+			return new SettingsModelBoolean("use_basic_preprocessing", 
+					WordVectorLearnerParameter.DEFAULT_USE_BASIC_PREPROCESSING);
 		default:
 			throw new IllegalStateException(
                     "WordVectorParameter does not exist: "
@@ -114,6 +119,10 @@ public class WordVectorParameterSettingsModels implements IParameterSettingsMode
 		case MIN_LEARNING_RATE:
 			m_minimumLearningRate = (SettingsModelDoubleBounded)createParameter(enumerate);
 			addToSet(m_minimumLearningRate);
+			break;
+		case USE_BASIC_PREPROCESSING:
+			m_useBasicPreprocessing = (SettingsModelBoolean)createParameter(enumerate);
+			addToSet(m_useBasicPreprocessing);
 			break;
 		default:
 			throw new IllegalStateException(
@@ -153,6 +162,10 @@ public class WordVectorParameterSettingsModels implements IParameterSettingsMode
 	
 	public SettingsModelString getWordVectorTrainingsMode() {
 		return m_wordVectorTrainingsMode;
+	}
+	
+	public SettingsModelBoolean getUseBasicPreprocessing(){
+		return m_useBasicPreprocessing;
 	}
 
 }

@@ -21,6 +21,8 @@
       		<li>Doc2Vec: Training with labels. Learns word vectors based on labels associated with documents.</li>
       	</ul>
         </option>
+        <option name="Use Basic Token Preprocessing?">Whether to do basic preprocessing of the tokens, meaning to
+        convert them to lower case and remove punctuation.</option>
         <option name="Seed">A seed value to use for training.</option>
         <option name="Learning Rate">The learning rate that should be used for training.</option>
         <option name="Minimum Learning Rate">Minimum learning rate threshold which the learning rate should not fall below.</option>
