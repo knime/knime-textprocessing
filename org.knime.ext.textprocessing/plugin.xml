@@ -525,6 +525,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory"
             id="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/preprocessing"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
