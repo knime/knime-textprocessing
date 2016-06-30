@@ -51,12 +51,15 @@ import org.deeplearning4j.text.documentiterator.LabelledDocument;
 import org.deeplearning4j.text.documentiterator.LabelsSource;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.convert.java.DataCellToJavaConverterFactory;
 import org.knime.core.data.convert.java.DataCellToJavaConverterRegistry;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
+import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * {@link LabelAwareIterator} for a {@link BufferedDataTable}. Expects a column contained in the 
@@ -113,9 +116,20 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 		String documentContent = null;
 		String documentLabel = null;
 		try {
-			Optional<DataCellToJavaConverterFactory<DataCell, String>> docConverterFactory =
-					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(documentCell.getType(), String.class);		
-			documentContent = ConverterUtils.convertWithFactory(docConverterFactory, documentCell);
+			/* Can't use converter for documents because the getStringValue() method used for conversion to String returns
+			 * the document title and no the content
+			 */
+//			Optional<DataCellToJavaConverterFactory<DataCell, String>> docConverterFactory =
+//					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(documentCell.getType(), String.class);		
+//			documentContent = ConverterUtils.convertWithFactory(docConverterFactory, documentCell);
+			
+			if (documentCell.getType().isCompatible(DocumentValue.class)){
+				DocumentValue dCell = (DocumentValue)documentCell;
+				documentContent = dCell.getDocument().getDocumentBodyText();
+			} else if(documentCell.getType().isCompatible(StringValue.class)){
+				StringCell sCell = (StringCell)documentCell;
+				documentContent = sCell.getStringValue();
+			} 
 			
 			Optional<DataCellToJavaConverterFactory<DataCell, String>> labelConverterFactory =
 					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(labelCell.getType(), String.class);

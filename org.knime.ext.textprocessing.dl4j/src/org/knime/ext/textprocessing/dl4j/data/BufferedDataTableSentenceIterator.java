@@ -47,12 +47,15 @@ import java.util.Optional;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.SentencePreProcessor;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.convert.java.DataCellToJavaConverterFactory;
 import org.knime.core.data.convert.java.DataCellToJavaConverterRegistry;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
+import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * {@link SentenceIterator} for a {@link BufferedDataTable}. Expects a column contained in the 
@@ -88,15 +91,25 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
 	@Override
 	public String nextSentence() {
 		DataCell cell = m_tableIterator.next().getCell(m_documentColumnIndex);
-		
-		try {
-			Optional<DataCellToJavaConverterFactory<DataCell, String>> factory =
-					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(cell.getType(), String.class);
-			return ConverterUtils.convertWithFactory(factory, cell);			
-		} catch (Exception e) {
-			logger.coding("Problem with input conversion",e);
+		String documentContent = null;
+	
+	
+		/* Can't use converter for documents because the getStringValue() method used for conversion to String returns
+		 * the document title and no the content
+		 */
+//			Optional<DataCellToJavaConverterFactory<DataCell, String>> factory =
+//					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(cell.getType(), String.class);
+//			return ConverterUtils.convertWithFactory(factory, cell);	
+		if (cell.getType().isCompatible(DocumentValue.class)){
+			DocumentValue dCell = (DocumentValue)cell;
+			documentContent = dCell.getDocument().getDocumentBodyText();
+		} else if(cell.getType().isCompatible(StringValue.class)){
+			StringCell sCell = (StringCell)cell;
+			documentContent = sCell.getStringValue();
+		} else {
+			logger.coding("Problem with input conversion");
 		}
-		return null;
+		return documentContent;
 	}
 
 	/**
