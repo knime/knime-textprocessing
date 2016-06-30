@@ -531,12 +531,6 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory">
       </node>
-      <node
-            category-path="/labs/textprocessing/io"
-            deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserNodeFactory">
-      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
