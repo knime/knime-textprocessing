@@ -57,6 +57,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.DataValue;
 import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.container.CloseableRowIterator;
@@ -129,8 +130,8 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
     		List<DataCell> cells = TableUtils.toListOfCells(row);   		
     		DataCell cell = row.getCell(documentColumnIndex);
     		
-    		Optional<DataCellToJavaConverterFactory<DataCell, String>> factory =
-					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(cell.getType(), String.class);
+    		Optional<DataCellToJavaConverterFactory<DataValue, String>> factory =
+					DataCellToJavaConverterRegistry.getInstance().getPreferredConverterFactory(cell.getType(), String.class);
 			String document = ConverterUtils.convertWithFactory(factory, cell);
 			ListCell convertedDocument;
 			

@@ -51,6 +51,7 @@ import org.deeplearning4j.text.documentiterator.LabelledDocument;
 import org.deeplearning4j.text.documentiterator.LabelsSource;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.convert.java.DataCellToJavaConverterFactory;
@@ -131,8 +132,8 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 				documentContent = sCell.getStringValue();
 			} 
 			
-			Optional<DataCellToJavaConverterFactory<DataCell, String>> labelConverterFactory =
-					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(labelCell.getType(), String.class);
+			Optional<DataCellToJavaConverterFactory<DataValue, String>> labelConverterFactory =
+					DataCellToJavaConverterRegistry.getInstance().getPreferredConverterFactory(labelCell.getType(), String.class);
 			documentLabel = ConverterUtils.convertWithFactory(labelConverterFactory, labelCell);			
 		} catch (Exception e) {
 			logger.coding("Problem with input conversion",e);
@@ -167,8 +168,8 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 			DataCell labelCell = m_tableIterator.next().getCell(m_labelColumnIndex);
 			
 			try {
-				Optional<DataCellToJavaConverterFactory<DataCell, String>> labelConverterFactory =
-						DataCellToJavaConverterRegistry.getInstance().getConverterFactory(labelCell.getType(), String.class);
+				Optional<DataCellToJavaConverterFactory<DataValue, String>> labelConverterFactory =
+						DataCellToJavaConverterRegistry.getInstance().getPreferredConverterFactory(labelCell.getType(), String.class);
 				labels.add(ConverterUtils.convertWithFactory(labelConverterFactory, labelCell));							
 			} catch (Exception e) {
 				logger.coding("Problem with input conversion",e);
