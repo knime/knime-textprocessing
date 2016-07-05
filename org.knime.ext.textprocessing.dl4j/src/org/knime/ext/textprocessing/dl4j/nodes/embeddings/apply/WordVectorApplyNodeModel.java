@@ -130,9 +130,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
     		List<DataCell> cells = TableUtils.toListOfCells(row);   		
     		DataCell cell = row.getCell(documentColumnIndex);
     		
-    		Optional<DataCellToJavaConverterFactory<DataValue, String>> factory =
-					DataCellToJavaConverterRegistry.getInstance().getPreferredConverterFactory(cell.getType(), String.class);
-			String document = ConverterUtils.convertWithFactory(factory, cell);
+			String document = ConverterUtils.convertDataCellToJava(cell, String.class);
 			ListCell convertedDocument;
 			
 			if(m_calculateMean.getBooleanValue()){

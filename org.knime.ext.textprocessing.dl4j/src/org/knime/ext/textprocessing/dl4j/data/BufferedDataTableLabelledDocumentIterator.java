@@ -119,11 +119,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 		try {
 			/* Can't use converter for documents because the getStringValue() method used for conversion to String returns
 			 * the document title and no the content
-			 */
-//			Optional<DataCellToJavaConverterFactory<DataCell, String>> docConverterFactory =
-//					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(documentCell.getType(), String.class);		
-//			documentContent = ConverterUtils.convertWithFactory(docConverterFactory, documentCell);
-			
+			 */			
 			if (documentCell.getType().isCompatible(DocumentValue.class)){
 				DocumentValue dCell = (DocumentValue)documentCell;
 				documentContent = dCell.getDocument().getDocumentBodyText();
@@ -132,9 +128,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 				documentContent = sCell.getStringValue();
 			} 
 			
-			Optional<DataCellToJavaConverterFactory<DataValue, String>> labelConverterFactory =
-					DataCellToJavaConverterRegistry.getInstance().getPreferredConverterFactory(labelCell.getType(), String.class);
-			documentLabel = ConverterUtils.convertWithFactory(labelConverterFactory, labelCell);			
+			documentLabel = ConverterUtils.convertDataCellToJava(labelCell, String.class);
 		} catch (Exception e) {
 			logger.coding("Problem with input conversion",e);
 		}
@@ -168,9 +162,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 			DataCell labelCell = m_tableIterator.next().getCell(m_labelColumnIndex);
 			
 			try {
-				Optional<DataCellToJavaConverterFactory<DataValue, String>> labelConverterFactory =
-						DataCellToJavaConverterRegistry.getInstance().getPreferredConverterFactory(labelCell.getType(), String.class);
-				labels.add(ConverterUtils.convertWithFactory(labelConverterFactory, labelCell));							
+				labels.add(ConverterUtils.convertDataCellToJava(labelCell, String.class));
 			} catch (Exception e) {
 				logger.coding("Problem with input conversion",e);
 			}
