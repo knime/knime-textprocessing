@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcString2Term.png" type="Manipulator">
+	<name>Tika Language Detector</name>
+	<shortDescription>
+		This node detects the language of a given String/Document value.
+	</shortDescription>
+	<fullDescription>
+		<intro>
+			This node uses the Apache Tika library to detect the language of a
+			given String/Document value. The newly detected languages will be
+			appended to the input table.
+			The list of all supported languages can be seen
+			<a href="https://github.com/optimaize/language-detector">here</a>
+			. If the text contains mixed languages, the detector will, by default, return the
+			language with the most confidence value.
+		</intro>
+		<option name="String or Document column">
+			The column containing the strings or documents to parse.
+		</option>
+		<option name="New language column">
+			The name of the appended column for the languages.
+			Can be left empty.
+		</option>
+		<option name="Show Confidence value">
+			Specify whether the confidence value of each detected language should be appended in a new column.
+		</option>
+		<option name="New confidence value column">
+			The name of the appended column for the confidence value column.
+			Can be left empty.
+		</option>
+		<option name="Show all detected languages">
+			Specify whether all detected languages should be shown in the output table as a collection list. This is important for the case where
+			the text might contain mixed languages.
+		</option>
+	</fullDescription>
+
+	<ports>
+		<inPort name="Table containing the strings/documents" index="0">
+			The input table containing the strings/documents to convert. The
+			input table has to contain at least one String/Document column.
+		</inPort>
+		<outPort name="Table with appended language and confidence value column" index="0">
+			The output table containing the detected languages and if chosen, the confidence value of each detected language.
+		</outPort>
+	</ports>
+</knimeNode>
