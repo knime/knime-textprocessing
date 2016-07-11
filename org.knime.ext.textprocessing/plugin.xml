@@ -531,6 +531,12 @@
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory"
             id="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/frequencies"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
