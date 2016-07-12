@@ -41,11 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   18.04.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.frequencies.idf;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -58,26 +61,53 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequencyNodeModel;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * The model of the IDF-Node, specifying the proper cell factory
  * {@link org.knime.ext.textprocessing.nodes.frequencies.idf.IdfCellFactory}.
- * 
- * @author Kilian Thiel, University of Konstanz
+ *
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class IdfNodeModel extends FrequencyNodeModel {
 
+
     /**
-     * Creates a new instance of <code>IdfNodeModel</code>.
+     * idf smooth
+     * @since 3.2
+     */
+    public static final String IDF_SMOOTH = "smooth";
+
+
+    /**
+     * idf normalized
+     * @since 3.2
+     */
+    public static final String IDF_NORMALZED = "normalized";
+
+
+    /**
+     * idf probabilistic
+     * @since 3.2
+     */
+    public static final String IDF_PROBABILISTIC = "probabilistic";
+
+    /**
+     * @since 3.2
+     */
+    public final static String[] m_idfMethods = new String[]{IDF_SMOOTH, IDF_NORMALZED, IDF_PROBABILISTIC};
+
+
+    private SettingsModelString m_idfListModel = IdfNodeDialog.getIdfOptionsModel();
+
+    /**
+     * Creates a new instance of {@IdfNodeModel}.
      */
     public IdfNodeModel() {
         super();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -85,7 +115,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
     protected void initCellFactory(final BufferedDataTable inData,
             final ExecutionContext exec) throws CanceledExecutionException {
         m_cellFac = new IdfCellFactory(getDocumentColIndex(), getTermColIndex(),
-                inData, exec);
+              inData, exec, m_idfListModel.getStringValue());
     }
 
 
@@ -96,6 +126,9 @@ public class IdfNodeModel extends FrequencyNodeModel {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
+        try {
+            m_idfListModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
     }
 
     /**
@@ -105,13 +138,14 @@ public class IdfNodeModel extends FrequencyNodeModel {
     protected void reset() {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         super.saveSettingsTo(settings);
+        m_idfListModel.saveSettingsTo(settings);
     }
 
     /**
@@ -121,14 +155,17 @@ public class IdfNodeModel extends FrequencyNodeModel {
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         super.validateSettings(settings);
+        try {
+            m_idfListModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) { }
     }
 
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -138,7 +175,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
@@ -150,11 +187,19 @@ public class IdfNodeModel extends FrequencyNodeModel {
     @Override
     protected DataTableSpec createDataTableSpec(
             final DataTableSpec inDataSpec) {
-        DataColumnSpec freq = 
+        DataColumnSpec freq =
             new DataColumnSpecCreator(
                     DataTableSpec.getUniqueColumnName(
-                            inDataSpec, IdfCellFactory.COLNAME), 
+                            inDataSpec, IdfCellFactory.COLNAME),
                             DoubleCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(freq));
+    }
+
+    /**
+     * @return  smooth The default idf computation method
+     * @since 3.2
+     */
+    public static String getDefaultMethod() {
+        return IDF_SMOOTH;
     }
 }

@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   17.04.2008 (thiel): created
  */
@@ -56,40 +56,72 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 
 /**
- * Utility class providing various frequency computation methods, like
- * relative term frequency or inverse document frequency.
- * 
- * @author Kilian Thiel, University of Konstanz
+ * Utility class providing various frequency computation methods, like relative term frequency or inverse document
+ * frequency.
+ *
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public final class Frequencies {
 
-    private Frequencies() { }
-    
-    
+    private Frequencies() {
+    }
+
     /**
-     * Computes and returns the inverse document frequency (idf) out of the 
-     * given parameters.
-     * 
+     * Computes and returns the inverse document frequency (idf) out of the given parameters.
+     *
      * @param noAllDocs The number of all documents of the bag of words.
      * @param noTDocs The number of documents containing a certain term.
      * @return The inverse document frequency.
      */
-    public static double inverseDocumentFrequency(final int noAllDocs, 
-            final int noTDocs) {
+    public static double inverseDocumentFrequency(final int noAllDocs, final int noTDocs) {
         return Math.log10(1 + ((double)noAllDocs / (double)noTDocs));
     }
-    
+
     /**
-     * Computes and returns the absolute term frequency of the given term 
-     * and the document.
-     * 
+     * Computes and returns the normalized inverse document frequency out of the given parameters
+     *
+     * @param noAllDocs The number of all documents of the bag of words.
+     * @param noTDocs The number of documents containing a certain term.
+     * @return The normalized inverse document frequency
+     * @since 3.2
+     */
+    public static double normalizedInverseDocumentFrequency(final int noAllDocs, final int noTDocs) {
+        if (noTDocs == 0) {
+            return Double.NaN;
+        } else {
+            return Math.log10((double)noAllDocs / (double)noTDocs);
+        }
+    }
+
+    /**
+     * Computes and returns the normalized inverse document frequency out of the given parameters
+     *
+     * @param noAllDocs The number of all documents of the bag of words.
+     * @param noTDocs The number of documents containing a certain term.
+     * @return The probabilistic inverse document frequency
+     * @since 3.2
+     */
+
+    public static double probabilisticInverseDocumentFrequency(final int noAllDocs, final int noTDocs) {
+        double numerator = (double)noAllDocs - (double)noTDocs;
+        if (noTDocs == 0) {
+            return Double.NaN;
+        } else if (numerator == 0) {
+            return Double.NaN;
+        } else {
+            return Math.log10((numerator) / noTDocs);
+        }
+
+    }
+
+    /**
+     * Computes and returns the absolute term frequency of the given term and the document.
+     *
      * @param term The term to compute the tf value for.
      * @param doc The document to compute the tf value with.
-     * @return The absolute term frequency value of the given term according 
-     * to the given document.
+     * @return The absolute term frequency value of the given term according to the given document.
      */
-    public static int absoluteTermFrequency(final Term term, 
-            final Document doc) {
+    public static int absoluteTermFrequency(final Term term, final Document doc) {
         int termCount = 0;
         List<Section> sections = doc.getSections();
         for (Section s : sections) {
@@ -110,23 +142,20 @@ public final class Frequencies {
         }
         return termCount;
     }
-    
-    
+
     /**
-     * Computes and returns the relative term frequency (tf) of the given term 
-     * and the document. The tf value is computed by dividing the number of
-     * occurrences of the given term in the given document by the number of
-     * all words in the document.
-     * 
+     * Computes and returns the relative term frequency (tf) of the given term and the document. The tf value is
+     * computed by dividing the number of occurrences of the given term in the given document by the number of all words
+     * in the document.
+     *
      * @param term The term to compute the tf value for.
      * @param doc The document to compute the tf value with.
      * @return The tf value of the given term according to the given document.
      */
-    public static double relativeTermFrequency(final Term term, 
-            final Document doc) {
+    public static double relativeTermFrequency(final Term term, final Document doc) {
         int termCount = 0;
         int completeTermCount = 0;
-        
+
         List<Section> sections = doc.getSections();
         for (Section s : sections) {
             List<Paragraph> paragraphs = s.getParagraphs();
@@ -145,7 +174,7 @@ public final class Frequencies {
                 }
             }
         }
-        
+
         return (double)termCount / (double)completeTermCount;
     }
 }

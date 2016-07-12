@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,43 +44,22 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   21.04.2008 (thiel): created
+ *   Jun 30, 2016 (hermann): created
  */
 package org.knime.ext.textprocessing.nodes.frequencies.idf;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPane;
 
 /**
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @since 3.2
  */
-public class IdfNodeDialog extends FrequenciesNodeSettingsPane {
+public class IdfConfigKeys {
+
+    private IdfConfigKeys(){}
 
     /**
-     * @return settings options
-     * @since 3.2
+     * The configuration key for the settings of IDF
+     * computation.
      */
-    public static SettingsModelString getIdfOptionsModel() {
-        return new SettingsModelString(IdfConfigKeys.CFG_KEY_IDFOPTIONS, IdfNodeModel.getDefaultMethod());
-    }
-
-    private DialogComponentStringSelection m_idfListModel;
-
-
-    /**
-     * Creates new instance of {@IdfNodeDialog}.
-     */
-    public IdfNodeDialog() {
-        super();
-
-        createNewTab("IDF options");
-        setSelected("IDF options");
-        m_idfListModel = new DialogComponentStringSelection(getIdfOptionsModel(), "IDF variant:", new ArrayList<String>(Arrays.asList(IdfNodeModel.m_idfMethods)));
-        addDialogComponent(m_idfListModel);
-    }
+    public static final String CFG_KEY_IDFOPTIONS = "Idfoptions";
 }

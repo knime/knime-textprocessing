@@ -10,13 +10,21 @@
 
 	<fullDescription>
 	<intro>
-        Computes the inverse document frequency (idf) of each term according to
-        the given set of documents and adds a column containing the idf value.
-        The value for term t is computed as follows:
-        idf(t) = log(1 + (f(D) / f(d, t)), <br/>
-        where f(D) is the number of all documents and f(d, t) is the number of
-        documents containing term t.
+        Computes three variants of the inverse document frequency (idf) for each term according 
+        to the given set of documents and adds a column containing the idf value. Smooth, normalized, and
+        probabilistic idf.
+         
+        The default variant is smooth idf specified as follows: idf(t) = log(1 + (f(D) / f(d, t))).<br/> 
+        The normalized idf is defined by: idf(t) = log(f(D) / f(d,t)). <br/>
+        The probabilistic idf is defined by: idf(t) = log((f(D) - f(d,t)) / f(d,t)), where f(D) is the number of all 
+        documents and f(d,t) is the number of documents containing term t.
 	</intro>
+	
+	<tab name="Frequency options">
+    <option name="IDF variant">
+        Choose which variant of the inverse document frequency to compute. Default is smooth idf.
+    </option>
+    </tab>
 
 	<tab name="Document selection">
     <option name="Document Column">

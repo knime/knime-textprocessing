@@ -53,6 +53,7 @@ import java.util.Set;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.node.BufferedDataTable;
@@ -66,10 +67,10 @@ import org.knime.ext.textprocessing.nodes.frequencies.Frequencies;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequencyCellFactory;
 
 /**
- * The idf cell factory computes the inverse document frequency value of each
- * term and adds the value as a new double cell.
+ * The idf cell factory computes three variants of the inverse document frequency value for each term and adds the value
+ * as a new double cell.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class IdfCellFactory extends FrequencyCellFactory {
 
@@ -79,8 +80,7 @@ public class IdfCellFactory extends FrequencyCellFactory {
     public static final String COLNAME = "IDF";
 
     /**
-     * The flag specifying that the column containing the tf values is a double
-     * column.
+     * The flag specifying that the column containing the tf values is a double column.
      */
     public static final boolean INT_COL = false;
 
@@ -88,41 +88,62 @@ public class IdfCellFactory extends FrequencyCellFactory {
 
     private Set<Integer> m_docs;
 
+    private int documentCellIndex;
+
+    private String m_idfMethod;
 
     /**
-     * Creates new instance of <code>IdfCellFactory</code> which computes
-     * the idf value for each row and adds new column containing the values.
+     * Creates new instance of {@IdfCellFactory} which computes the idf value for each row and adds new column
+     * containing the values.
+     *
+     * @param documentCellIndex The column index containing the documents.
+     * @param termCellindex The column index containing the terms.
+     * @param docData The data table containing the complete bag of words.
+     * @param exec The execution context to monitor the progress and check it user canceled the process.
+     * @throws CanceledExecutionException If user canceled the process.
+     */
+    public IdfCellFactory(final int documentCellIndex, final int termCellindex, final BufferedDataTable docData,
+        final ExecutionContext exec) throws CanceledExecutionException {
+        this(documentCellIndex, termCellindex, docData, exec, IdfNodeModel.getDefaultMethod());
+    }
+
+    /**
+     * Creates new instance of {@IdfCellFactory} which computes the idf value for each row and adds new column
+     * containing the values.
      *
      * @param documentCellIndex The column index containing the documents.
      * @param termCellindex The column index containing the terms.
      * @param docData The data table containing the complete bag of words.
      * @param exec The execution context to monitor the progress and check it
-     * user canceled the process.
+     * @param method The method for the computation user canceled the process.
      * @throws CanceledExecutionException If user canceled the process.
+     * @since 3.2
      */
-    public IdfCellFactory(final int documentCellIndex,
-            final int termCellindex, final BufferedDataTable docData,
-            final ExecutionContext exec) throws CanceledExecutionException {
+    public IdfCellFactory(final int documentCellIndex, final int termCellindex, final BufferedDataTable docData,
+        final ExecutionContext exec, final String method) throws CanceledExecutionException {
         super(documentCellIndex, termCellindex, COLNAME, INT_COL);
 
+        m_idfMethod = method;
         m_termDocData = new Hashtable<Term, Set<Integer>>();
         m_docs = new HashSet<Integer>();
 
-        int maxRows = docData.getRowCount();
+        long maxRows = docData.size();
         int currRow = 1;
 
         RowIterator it = docData.iterator();
         while (it.hasNext()) {
             double prog = (double)currRow / (double)maxRows;
-            exec.setProgress(prog, "Computing idf value of term " + currRow
-                    + " of " + maxRows);
+            exec.setProgress(prog, "Computing idf value of term " + currRow + " of " + maxRows);
             exec.checkCanceled();
             currRow++;
 
             DataRow row = it.next();
+            // check for missing values in term or document column!
+            if (row.getCell(getTermColIndex()).isMissing() || row.getCell(getDocumentColIndex()).isMissing()) {
+                continue;
+            }
             Term t = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
-            Document d = ((DocumentValue)row.getCell(getDocumentColIndex()))
-                        .getDocument();
+            Document d = ((DocumentValue)row.getCell(getDocumentColIndex())).getDocument();
             int dHash = d.hashCode();
 
             // save doc
@@ -150,13 +171,27 @@ public class IdfCellFactory extends FrequencyCellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
+        // check for missing values in term column
+        if (row.getCell(getTermColIndex()).isMissing() || row.getCell(getDocumentColIndex()).isMissing()) {
+            return new DataCell[]{DataType.getMissingCell()};
+        }
         Term t = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
         double idf = 0;
+        // based on the selected method, compute the inverse document frequency value
         if (m_termDocData.containsKey(t)) {
-            idf = Frequencies.inverseDocumentFrequency(m_docs.size(),
-                    m_termDocData.get(t).size());
+            if (m_idfMethod.equalsIgnoreCase(IdfNodeModel.IDF_NORMALZED)) {
+                idf = Frequencies.normalizedInverseDocumentFrequency(m_docs.size(), m_termDocData.get(t).size());
+            } else if (m_idfMethod.equalsIgnoreCase(IdfNodeModel.IDF_PROBABILISTIC)) {
+                idf = Frequencies.probabilisticInverseDocumentFrequency(m_docs.size(), m_termDocData.get(t).size());
+            } else {
+                idf = Frequencies.inverseDocumentFrequency(m_docs.size(), m_termDocData.get(t).size());
+            }
         }
-        return new DoubleCell[]{new DoubleCell(idf)};
+        if (Double.isNaN(idf)) {
+            return new DataCell[]{DataType.getMissingCell()};
+        } else {
+            return new DoubleCell[]{new DoubleCell(idf)};
+        }
     }
 
 }
