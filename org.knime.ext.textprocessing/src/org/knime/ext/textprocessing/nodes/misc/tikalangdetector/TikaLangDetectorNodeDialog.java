@@ -112,10 +112,10 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * Creates a new instance of {@code TikaLangDetectorNodeDialog} which displays a column chooser component, to
-     * specify the column containing the text to parse. User can also choose to name the appended language column.
-     * There is also a tickbox component to specify whether to show the confidence value, and a string component to
-     * name the confidence value column if ticked. Another tickbox component specifies whether all detected languages
-     * should be shown in output table.
+     * specify the column containing the text to parse. User can also choose to name the appended language column. There
+     * is also a tickbox component to specify whether to show the confidence value, and a string component to name the
+     * confidence value column if ticked. Another tickbox component specifies whether all detected languages should be
+     * shown in output table.
      */
     @SuppressWarnings("unchecked")
     public TikaLangDetectorNodeDialog() {
@@ -126,6 +126,7 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
 
         m_confidenceColModel = createConfidenceColNameModel();
         m_confidenceBooleanModel = getConfidenceBooleanModel();
+        checkState();
         m_confidenceBooleanModel.addChangeListener(new InternalChangeListener());
 
         addDialogComponent(new DialogComponentBoolean(m_confidenceBooleanModel, "Show Confidence value"));
@@ -134,7 +135,7 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(getAllLangsBooleanModel(), "Show all detected languages"));
 
-        checkState();
+
 
     }
 

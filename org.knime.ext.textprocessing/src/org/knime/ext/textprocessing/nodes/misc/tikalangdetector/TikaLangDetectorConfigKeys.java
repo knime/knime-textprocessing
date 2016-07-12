@@ -52,7 +52,10 @@ package org.knime.ext.textprocessing.nodes.misc.tikalangdetector;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaLangDetectorConfigKeys {
+public final class TikaLangDetectorConfigKeys {
+    private TikaLangDetectorConfigKeys() {
+    }
+
     /**
      * The configuration key of the column containing the documents or strings.
      */

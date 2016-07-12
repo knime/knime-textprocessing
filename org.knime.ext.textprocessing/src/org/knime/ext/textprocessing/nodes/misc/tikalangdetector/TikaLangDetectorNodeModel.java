@@ -133,16 +133,17 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
         int valueIndex = -1;
         int colSpecLength = 1;
 
-        if(m_confidenceBooleanModel.getBooleanValue()){
+        if (m_confidenceBooleanModel.getBooleanValue()) {
             valueIndex = 1;
             colSpecLength++;
         }
 
-        if(in.findColumnIndex(m_langColNameModel.getStringValue()) >= 0){
+        if (in.findColumnIndex(m_langColNameModel.getStringValue()) >= 0) {
             throw new InvalidSettingsException("Language column name already exists.");
         }
 
-        if(m_confidenceBooleanModel.getBooleanValue() && in.findColumnIndex(m_ConfidenceColNameModel.getStringValue()) >= 0){
+        if (m_confidenceBooleanModel.getBooleanValue()
+            && in.findColumnIndex(m_ConfidenceColNameModel.getStringValue()) >= 0) {
             throw new InvalidSettingsException("Confidence value column name already exists.");
         }
 
@@ -170,17 +171,17 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
         ColumnRearranger c = new ColumnRearranger(in);
 
         DataColumnSpec[] newColSpecs = new DataColumnSpec[colSpecLength];
-        newColSpecs[langIndex] = this.createColumnSpec(m_allLangsBooleanModel.getBooleanValue(),
-            StringCell.TYPE, m_langColNameModel, DEFAULT_LANG_COLNAME);
-        if(m_confidenceBooleanModel.getBooleanValue()){
-            newColSpecs[valueIndex] = this.createColumnSpec(m_allLangsBooleanModel.getBooleanValue(),
-                DoubleCell.TYPE, m_ConfidenceColNameModel, DEFAULT_CONFIDENCE_COLNAME);
+        newColSpecs[langIndex] = this.createColumnSpec(m_allLangsBooleanModel.getBooleanValue(), StringCell.TYPE,
+            m_langColNameModel, DEFAULT_LANG_COLNAME);
+        if (m_confidenceBooleanModel.getBooleanValue()) {
+            newColSpecs[valueIndex] = this.createColumnSpec(m_allLangsBooleanModel.getBooleanValue(), DoubleCell.TYPE,
+                m_ConfidenceColNameModel, DEFAULT_CONFIDENCE_COLNAME);
         }
 
         TikaLangDetectorCellFactory factory;
         try {
-            factory = new TikaLangDetectorCellFactory(colIndex, newColSpecs, langIndex,
-                valueIndex, m_allLangsBooleanModel.getBooleanValue());
+            factory = new TikaLangDetectorCellFactory(colIndex, newColSpecs, langIndex, valueIndex,
+                m_allLangsBooleanModel.getBooleanValue());
             c.append(factory);
         } catch (IOException e) {
             LOGGER.error("Error while loading Tika language models");
@@ -189,10 +190,10 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
     }
 
     private DataColumnSpec createColumnSpec(final boolean collection, final DataType type,
-        final SettingsModelString model, final String colname){
+        final SettingsModelString model, final String colname) {
         DataColumnSpec newColSpec;
         DataType cellType = type;
-        if(collection){
+        if (collection) {
             cellType = ListCell.getCollectionType(type);
         }
         if (model.getStringValue().isEmpty()) {

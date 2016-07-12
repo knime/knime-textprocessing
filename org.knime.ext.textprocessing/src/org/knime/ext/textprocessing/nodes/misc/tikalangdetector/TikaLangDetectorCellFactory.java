@@ -118,7 +118,7 @@ public class TikaLangDetectorCellFactory extends AbstractCellFactory {
 
         if (cell.isMissing()) {
             newCells[m_langIndex] = DataType.getMissingCell();
-            if(m_cValueIndex > 0){
+            if (m_cValueIndex > 0) {
                 newCells[m_cValueIndex] = DataType.getMissingCell();
             }
             return newCells;
@@ -131,37 +131,46 @@ public class TikaLangDetectorCellFactory extends AbstractCellFactory {
             lang = m_langDetector.detectAll(((DocumentValue)cell).getDocument().getText());
         }
 
-        if(lang.isEmpty()){
-            newCells[m_langIndex] = new StringCell(UNDEFINED);
-            if(m_cValueIndex > 0){
-                newCells[m_cValueIndex] = new DoubleCell(0);
+        List<StringCell> langCells = new ArrayList<StringCell>();
+        List<DoubleCell> valueCells = new ArrayList<DoubleCell>();
+        for (LanguageResult res : lang) {
+            if (res != null && !res.isUnknown()) {
+                langCells.add(new StringCell(res.getLanguage()));
+                valueCells.add(
+                    new DoubleCell(new BigDecimal(res.getRawScore()).setScale(2, BigDecimal.ROUND_DOWN).doubleValue()));
+            }
+        }
+
+        if (lang.isEmpty() || (langCells.isEmpty() && valueCells.isEmpty())) {
+            if (m_isCollection) {
+                langCells.add(new StringCell(UNDEFINED));
+                valueCells.add(new DoubleCell(0));
+                newCells[m_langIndex] = CollectionCellFactory.createListCell(langCells);
+                if (m_cValueIndex > 0) {
+                    newCells[m_cValueIndex] = CollectionCellFactory.createListCell(valueCells);
+                }
+            } else {
+                newCells[m_langIndex] = new StringCell(UNDEFINED);
+                if (m_cValueIndex > 0) {
+                    newCells[m_cValueIndex] = new DoubleCell(0);
+                }
             }
             return newCells;
         }
 
-        List<StringCell> langCells = new ArrayList<StringCell>();
-        List<DoubleCell> valueCells = new ArrayList<DoubleCell>();
-        for(LanguageResult res : lang){
-            if (res != null && !res.isUnknown()) {
-                langCells.add(new StringCell(res.getLanguage()));
-                valueCells.add(new DoubleCell(new BigDecimal(res.getRawScore())
-                    .setScale(2, BigDecimal.ROUND_DOWN).doubleValue()));
-            }
-        }
-
-        if(m_specLength > 1){
-            if(m_isCollection){
+        if (m_specLength > 1) {
+            if (m_isCollection) {
                 newCells[m_langIndex] = CollectionCellFactory.createListCell(langCells);
                 newCells[m_cValueIndex] = CollectionCellFactory.createListCell(valueCells);
-            }else{
+            } else {
                 newCells[m_langIndex] = new StringCell(langCells.get(0).getStringValue());
                 newCells[m_cValueIndex] = new DoubleCell(valueCells.get(0).getDoubleValue());
             }
             return newCells;
-        }else{
-            if(m_isCollection){
+        } else {
+            if (m_isCollection) {
                 newCells[m_langIndex] = CollectionCellFactory.createListCell(langCells);
-            }else{
+            } else {
                 newCells[m_langIndex] = new StringCell(langCells.get(0).getStringValue());
             }
             return newCells;
