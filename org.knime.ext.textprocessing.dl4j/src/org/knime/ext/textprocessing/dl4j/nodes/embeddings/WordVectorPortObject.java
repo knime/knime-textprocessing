@@ -64,65 +64,63 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
  */
 public class WordVectorPortObject extends AbstractPortObject {
 
-	public static final class Serializer
-		extends AbstractPortObjectSerializer<WordVectorPortObject> {
-	}
-	
-	/**
+    public static final class Serializer extends AbstractPortObjectSerializer<WordVectorPortObject> {
+    }
+
+    /**
      * Define port type of objects of this class when used as PortObjects.
      */
-	public static final PortType TYPE =
-            PortTypeRegistry.getInstance().getPortType(WordVectorPortObject.class);
+    public static final PortType TYPE = PortTypeRegistry.getInstance().getPortType(WordVectorPortObject.class);
 
-    private static final String SUMMARY =
-            "Word Vector Model"; 
-	
+    private static final String SUMMARY = "Word Vector Model";
+
     private WordVectors m_wordVectors;
+
     private WordVectorPortObjectSpec m_spec;
-    
+
     /**
      * Empty no-arg constructor as needed by {@link AbstractPortObject}
      */
     public WordVectorPortObject() {
-    	
-	}
-    
+
+    }
+
     public WordVectorPortObject(final WordVectors wordVectors, final WordVectorPortObjectSpec spec) {
-		this.m_spec = spec;
-		this.m_wordVectors = wordVectors;
-	}
-    
-	@Override
-	public String getSummary() {
-		return SUMMARY;
-	}
+        this.m_spec = spec;
+        this.m_wordVectors = wordVectors;
+    }
 
-	@Override
-	public PortObjectSpec getSpec() {
-		return m_spec;
-	}
-	
-	public WordVectors getWordVectors(){
-		return m_wordVectors;
-	}
+    @Override
+    public String getSummary() {
+        return SUMMARY;
+    }
 
-	@Override
-	public JComponent[] getViews() {
-		return new JComponent[] {};
-	}
+    @Override
+    public PortObjectSpec getSpec() {
+        return m_spec;
+    }
 
-	@Override
-	protected void save(PortObjectZipOutputStream out, ExecutionMonitor exec)
-			throws IOException, CanceledExecutionException {
-		WordVectorPortObjectUtils.saveModelToZip(this, true, false, out);
-	}
+    public WordVectors getWordVectors() {
+        return m_wordVectors;
+    }
 
-	@Override
-	protected void load(PortObjectZipInputStream in, PortObjectSpec spec, ExecutionMonitor exec)
-			throws IOException, CanceledExecutionException {
-		WordVectorPortObject port = WordVectorPortObjectUtils.loadPortFromZip(in);
-		
-		this.m_spec = (WordVectorPortObjectSpec) spec;
-		this.m_wordVectors = port.getWordVectors();
-	}
+    @Override
+    public JComponent[] getViews() {
+        return new JComponent[]{};
+    }
+
+    @Override
+    protected void save(final PortObjectZipOutputStream out, final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        WordVectorPortObjectUtils.saveModelToZip(this, true, false, out);
+    }
+
+    @Override
+    protected void load(final PortObjectZipInputStream in, final PortObjectSpec spec, final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        final WordVectorPortObject port = WordVectorPortObjectUtils.loadPortFromZip(in);
+
+        this.m_spec = (WordVectorPortObjectSpec)spec;
+        this.m_wordVectors = port.getWordVectors();
+    }
 }

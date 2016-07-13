@@ -42,114 +42,112 @@
  *******************************************************************************/
 package org.knime.ext.textprocessing.dl4j.data;
 
-import java.util.Optional;
-
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.SentencePreProcessor;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CloseableRowIterator;
-import org.knime.core.data.convert.java.DataCellToJavaConverterFactory;
-import org.knime.core.data.convert.java.DataCellToJavaConverterRegistry;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
- * {@link SentenceIterator} for a {@link BufferedDataTable}. Expects a column contained in the 
- * data table holding one sentence per row.
- * 
+ * {@link SentenceIterator} for a {@link BufferedDataTable}. Expects a column contained in the data table holding one
+ * sentence per row.
+ *
  * @author David Kolb, KNIME.com GmbH
  */
 public class BufferedDataTableSentenceIterator implements SentenceIterator {
 
-	// the logger instance
-    private static final NodeLogger logger = NodeLogger
-            .getLogger(BufferedDataTableSentenceIterator.class);
-	
-	private final BufferedDataTable m_table;
-	private CloseableRowIterator m_tableIterator;
-	private final int m_documentColumnIndex;
-	
-	/**
-	 * Constructor for class BufferedDataTableSentenceIterator
-	 * 
-	 * @param table the table to iterate
-	 * @param documentColumnName the name of the document column
-	 */
-	public BufferedDataTableSentenceIterator(final BufferedDataTable table, final String documentColumnName) {
-		this.m_table = table;
-		this.m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
-		this.m_tableIterator = table.iterator();
-	}
-	
-	/**
-	 * Returns the next String contained in the document column of the table.
-	 */
-	@Override
-	public String nextSentence() {
-		DataCell cell = m_tableIterator.next().getCell(m_documentColumnIndex);
-		String documentContent = null;
-	
-	
-		/* Can't use converter for documents because the getStringValue() method used for conversion to String returns
-		 * the document title and no the content
-		 */
-//			Optional<DataCellToJavaConverterFactory<DataCell, String>> factory =
-//					DataCellToJavaConverterRegistry.getInstance().getConverterFactory(cell.getType(), String.class);
-//			return ConverterUtils.convertWithFactory(factory, cell);	
-		if (cell.getType().isCompatible(DocumentValue.class)){
-			DocumentValue dCell = (DocumentValue)cell;
-			documentContent = dCell.getDocument().getDocumentBodyText();
-		} else if(cell.getType().isCompatible(StringValue.class)){
-			StringCell sCell = (StringCell)cell;
-			documentContent = sCell.getStringValue();
-		} else {
-			logger.coding("Problem with input conversion");
-		}
-		return documentContent;
-	}
+    // the logger instance
+    private static final NodeLogger logger = NodeLogger.getLogger(BufferedDataTableSentenceIterator.class);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean hasNext() {
-		return m_tableIterator.hasNext();
-	}
+    private final BufferedDataTable m_table;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void reset() {
-		m_tableIterator.close();	
-		m_tableIterator = m_table.iterator();	
-	}
+    private CloseableRowIterator m_tableIterator;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void finish() {
-		// nothing to do
-	}
+    private final int m_documentColumnIndex;
 
-	/**
-	 * Method not supported. Will throw exception if called.
-	 */
-	@Override
-	public SentencePreProcessor getPreProcessor() {		
-		throw new UnsupportedOperationException("Method getPreProcessor not available in " + this.getClass().getName());
-	}
+    /**
+     * Constructor for class BufferedDataTableSentenceIterator
+     *
+     * @param table the table to iterate
+     * @param documentColumnName the name of the document column
+     */
+    public BufferedDataTableSentenceIterator(final BufferedDataTable table, final String documentColumnName) {
+        this.m_table = table;
+        this.m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
+        this.m_tableIterator = table.iterator();
+    }
 
-	/**
-	 * Method not supported. Will throw exception if called.
-	 */
-	@Override
-	public void setPreProcessor(SentencePreProcessor preProcessor) {
-		throw new UnsupportedOperationException("Method setPreProcessor not available in " + this.getClass().getName());
-	}
+    /**
+     * Returns the next String contained in the document column of the table.
+     */
+    @Override
+    public String nextSentence() {
+        final DataCell cell = m_tableIterator.next().getCell(m_documentColumnIndex);
+        String documentContent = null;
+
+        /*
+         * Can't use converter for documents because the getStringValue() method
+         * used for conversion to String returns the document title and no the
+         * content
+         */
+        // Optional<DataCellToJavaConverterFactory<DataCell, String>> factory =
+        // DataCellToJavaConverterRegistry.getInstance().getConverterFactory(cell.getType(),
+        // String.class);
+        // return ConverterUtils.convertWithFactory(factory, cell);
+        if (cell.getType().isCompatible(DocumentValue.class)) {
+            final DocumentValue dCell = (DocumentValue)cell;
+            documentContent = dCell.getDocument().getDocumentBodyText();
+        } else if (cell.getType().isCompatible(StringValue.class)) {
+            final StringCell sCell = (StringCell)cell;
+            documentContent = sCell.getStringValue();
+        } else {
+            logger.coding("Problem with input conversion");
+        }
+        return documentContent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNext() {
+        return m_tableIterator.hasNext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        m_tableIterator.close();
+        m_tableIterator = m_table.iterator();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void finish() {
+        // nothing to do
+    }
+
+    /**
+     * Method not supported. Will throw exception if called.
+     */
+    @Override
+    public SentencePreProcessor getPreProcessor() {
+        throw new UnsupportedOperationException("Method getPreProcessor not available in " + this.getClass().getName());
+    }
+
+    /**
+     * Method not supported. Will throw exception if called.
+     */
+    @Override
+    public void setPreProcessor(final SentencePreProcessor preProcessor) {
+        throw new UnsupportedOperationException("Method setPreProcessor not available in " + this.getClass().getName());
+    }
 }

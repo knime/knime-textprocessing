@@ -53,13 +53,11 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * <code>NodeDialog</code> for the "WordVectorApply" Node.
- * 
  *
- * This node dialog derives from {@link DefaultNodeSettingsPane} which allows
- * creation of a simple dialog with standard components. If you need a more 
- * complex dialog please derive directly from 
- * {@link org.knime.core.node.NodeDialogPane}.
- * 
+ *
+ * This node dialog derives from {@link DefaultNodeSettingsPane} which allows creation of a simple dialog with standard
+ * components. If you need a more complex dialog please derive directly from {@link org.knime.core.node.NodeDialogPane}.
+ *
  * @author David Kolb, KNIME.com GmbH
  */
 public class WordVectorApplyNodeDialog extends DefaultNodeSettingsPane {
@@ -68,21 +66,13 @@ public class WordVectorApplyNodeDialog extends DefaultNodeSettingsPane {
      * New pane for configuring the WordVectorApply node.
      */
     protected WordVectorApplyNodeDialog() {
-    	DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
-    	
-    	addDialogComponent(new DialogComponentColumnNameSelection(
-    			(SettingsModelString)dataSettingsModels.createParameter(
-    					DataParameter.DOCUMENT_COLUMN),
-    			"Document Column:",
-    			0,
-    			true,
-    			StringValue.class,
-    			DocumentValue.class
-                ));
-    	
-    	addDialogComponent(new DialogComponentBoolean(
-    			WordVectorApplyNodeModel.createCalculateMeanSettings(), 
-    			"Calculate Document Mean Vector?"));
+        final DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
+
+        addDialogComponent(new DialogComponentColumnNameSelection(
+            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN), "Document Column:",
+            0, true, StringValue.class, DocumentValue.class));
+
+        addDialogComponent(new DialogComponentBoolean(WordVectorApplyNodeModel.createCalculateMeanSettings(),
+                "Calculate Document Mean Vector?"));
     }
 }
-

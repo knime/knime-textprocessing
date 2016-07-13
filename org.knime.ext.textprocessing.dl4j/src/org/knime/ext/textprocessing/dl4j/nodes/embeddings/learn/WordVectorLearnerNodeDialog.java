@@ -58,23 +58,21 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
 import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
-import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
-import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
 import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels;
 import org.knime.ext.dl4j.base.util.EnumUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
+import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels;
 
 /**
  * <code>NodeDialog</code> for the "WordVectorLearner" Node.
- * 
  *
- * This node dialog derives from {@link DefaultNodeSettingsPane} which allows
- * creation of a simple dialog with standard components. If you need a more 
- * complex dialog please derive directly from 
- * {@link org.knime.core.node.NodeDialogPane}.
- * 
+ *
+ * This node dialog derives from {@link DefaultNodeSettingsPane} which allows creation of a simple dialog with standard
+ * components. If you need a more complex dialog please derive directly from {@link org.knime.core.node.NodeDialogPane}.
+ *
  * @author David Kolb, KNIME.com GmbH
  */
 public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
@@ -83,117 +81,69 @@ public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
      * New pane for configuring the WordVectorLearner node.
      */
     protected WordVectorLearnerNodeDialog() {
-    	LearnerParameterSettingsModels learnerSettingsModels = new LearnerParameterSettingsModels();
-    	DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
-    	WordVectorParameterSettingsModels wordVectorSettingsModels = new WordVectorParameterSettingsModels();
-    	
-    	SettingsModelString trainingModeSettings = (SettingsModelString)wordVectorSettingsModels.createParameter(
-				WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
-    	
-    	SettingsModelString labelColumnSettings = (SettingsModelString)dataSettingsModels.createParameter(
-				DataParameter.LABEL_COLUMN);
-    	SettingsModelString documentColumnSettings = (SettingsModelString)dataSettingsModels.createParameter(
-				DataParameter.DOCUMENT_COLUMN);
-    	
-    	trainingModeSettings.addChangeListener(new ChangeListener() {			
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				WordVectorTrainingMode mode = WordVectorTrainingMode.valueOf(trainingModeSettings.getStringValue());				
-				switch (mode) {			
-				case DOC2VEC:	
-					labelColumnSettings.setEnabled(true);
-					documentColumnSettings.setEnabled(true);
-					break;
-				case WORD2VEC:
-					labelColumnSettings.setEnabled(false);
-					documentColumnSettings.setEnabled(true);
-					break;
-				default:
-					break;
-				}				
-			}
-		});
-    	
-    	addDialogComponent(new DialogComponentStringSelection(
-				trainingModeSettings,
-				"WordVector Training Mode",
-				EnumUtils.getStringCollectionFromToString(WordVectorTrainingMode.values())
-				));
-    	addDialogComponent(new DialogComponentBoolean(
-    			(SettingsModelBoolean)wordVectorSettingsModels.createParameter(
-    					WordVectorLearnerParameter.USE_BASIC_PREPROCESSING),
-    			"Use Basic Token Preprocessing?"));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)learnerSettingsModels.createParameter(
-						LearnerParameter.SEED),
-				"Seed",
-				4
-				));   	
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelDoubleBounded)learnerSettingsModels.createParameter(
-						LearnerParameter.GLOBAL_LEARNING_RATE),
-				"Learning Rate",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelDoubleBounded)wordVectorSettingsModels.createParameter(
-						WordVectorLearnerParameter.MIN_LEARNING_RATE),
-				"Minimum Learning Rate",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)dataSettingsModels.createParameter(
-						DataParameter.BATCH_SIZE),
-				"Batch Size",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)dataSettingsModels.createParameter(
-						DataParameter.EPOCHS),
-				"Epochs",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)learnerSettingsModels.createParameter(
-						LearnerParameter.TRAINING_ITERATIONS),
-				"Number of Training Iterations",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)wordVectorSettingsModels.createParameter(
-						WordVectorLearnerParameter.LAYER_SIZE),
-				"Layer Size",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)wordVectorSettingsModels.createParameter(
-						WordVectorLearnerParameter.MIN_WORD_FREQUENCY),
-				"Minimum Word Frequency",
-				4
-				));
-    	addDialogComponent(new DialogComponentNumberEdit(
-				(SettingsModelIntegerBounded)wordVectorSettingsModels.createParameter(
-						WordVectorLearnerParameter.WINDOW_SIZE),
-				"Window Size",
-				4
-				));
-    	
-    	createNewTab("Column Selection");
-    	addDialogComponent(new DialogComponentColumnNameSelection(
-    			labelColumnSettings,
-    			"Label Column",
-    			0,
-    			false,
-    			NominalValue.class
-                ));
-    	addDialogComponent(new DialogComponentColumnNameSelection(
-    			documentColumnSettings,
-    			"Document Column",
-    			0,
-    			true,
-    			StringValue.class,
-    			DocumentValue.class
-                ));
+        final LearnerParameterSettingsModels learnerSettingsModels = new LearnerParameterSettingsModels();
+        final DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
+        final WordVectorParameterSettingsModels wordVectorSettingsModels = new WordVectorParameterSettingsModels();
+
+        final SettingsModelString trainingModeSettings = (SettingsModelString)wordVectorSettingsModels
+                .createParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
+
+        final SettingsModelString labelColumnSettings =
+                (SettingsModelString)dataSettingsModels.createParameter(DataParameter.LABEL_COLUMN);
+        final SettingsModelString documentColumnSettings =
+                (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN);
+
+        trainingModeSettings.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                final WordVectorTrainingMode mode = WordVectorTrainingMode.valueOf(trainingModeSettings.getStringValue());
+                switch (mode) {
+                    case DOC2VEC:
+                        labelColumnSettings.setEnabled(true);
+                        documentColumnSettings.setEnabled(true);
+                        break;
+                    case WORD2VEC:
+                        labelColumnSettings.setEnabled(false);
+                        documentColumnSettings.setEnabled(true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+        addDialogComponent(new DialogComponentStringSelection(trainingModeSettings, "WordVector Training Mode",
+            EnumUtils.getStringCollectionFromToString(WordVectorTrainingMode.values())));
+        addDialogComponent(new DialogComponentBoolean(
+            (SettingsModelBoolean)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING),
+            "Use Basic Token Preprocessing?"));
+        addDialogComponent(new DialogComponentNumberEdit(
+            (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.SEED), "Seed", 4));
+        addDialogComponent(new DialogComponentNumberEdit(
+            (SettingsModelDoubleBounded)learnerSettingsModels.createParameter(LearnerParameter.GLOBAL_LEARNING_RATE),
+            "Learning Rate", 4));
+        addDialogComponent(new DialogComponentNumberEdit((SettingsModelDoubleBounded)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE), "Minimum Learning Rate", 4));
+        addDialogComponent(new DialogComponentNumberEdit(
+            (SettingsModelIntegerBounded)dataSettingsModels.createParameter(DataParameter.BATCH_SIZE), "Batch Size",
+            4));
+        addDialogComponent(new DialogComponentNumberEdit(
+            (SettingsModelIntegerBounded)dataSettingsModels.createParameter(DataParameter.EPOCHS), "Epochs", 4));
+        addDialogComponent(new DialogComponentNumberEdit(
+            (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.TRAINING_ITERATIONS),
+            "Number of Training Iterations", 4));
+        addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.LAYER_SIZE), "Layer Size", 4));
+        addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY), "Minimum Word Frequency", 4));
+        addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.WINDOW_SIZE), "Window Size", 4));
+
+        createNewTab("Column Selection");
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(labelColumnSettings, "Label Column", 0, false, NominalValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(documentColumnSettings, "Document Column", 0, true,
+            StringValue.class, DocumentValue.class));
     }
 }
-

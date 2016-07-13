@@ -48,26 +48,32 @@ package org.knime.ext.textprocessing.dl4j.settings.enumerate;
  * @author David Kolb, KNIME.com GmbH
  */
 public enum WordVectorLearnerParameter {
-	/** minimum frequency threshold, words with less frequency will be discarded */
-	MIN_WORD_FREQUENCY,
-	/** number of epochs to train the model */
-	LAYER_SIZE,
-	/** size of the context window */
-	WINDOW_SIZE,
-	/** what word vectors to train */
-	WORD_VECTOR_TRAINING_MODE,
-	/** learning rate decays in word vector learning, minimum learning rate to use */
-	MIN_LEARNING_RATE,
-	/** whether to enable basic preprocessing (convert to lower case and strip punctuation) 
-	 * of tokens */
-	USE_BASIC_PREPROCESSING;
-	
-	//Parameter default values
-	public static final int DEFAULT_INT = 1;
-	public static final Double DEFAULT_MIN_LEARNING_RATE = 0.0001;
-	public static final int DEFAULT_LAYER_SIZE = 100;
-	public static final int DEFAULT_WINDOW_SIZE = 5;
-	public static final int DEFAULT_MIN_WORD_FREQUENCY = 0;
-	public static final String DEFAULT_WORD_VECTOR_TRAININGS_MODE = "WORD2VEC";
-	public static final boolean DEFAULT_USE_BASIC_PREPROCESSING = true;
+    /**
+     * minimum frequency threshold, words with less frequency will be discarded
+     */
+    MIN_WORD_FREQUENCY, /** number of epochs to train the model */
+    LAYER_SIZE, /** size of the context window */
+    WINDOW_SIZE, /** what word vectors to train */
+    WORD_VECTOR_TRAINING_MODE, /**
+     * learning rate decays in word vector learning, minimum learning rate to use
+     */
+    MIN_LEARNING_RATE, /**
+     * whether to enable basic preprocessing (convert to lower case and strip punctuation) of tokens
+     */
+    USE_BASIC_PREPROCESSING;
+
+    // Parameter default values
+    public static final int DEFAULT_INT = 1;
+
+    public static final Double DEFAULT_MIN_LEARNING_RATE = 0.0001;
+
+    public static final int DEFAULT_LAYER_SIZE = 100;
+
+    public static final int DEFAULT_WINDOW_SIZE = 5;
+
+    public static final int DEFAULT_MIN_WORD_FREQUENCY = 0;
+
+    public static final String DEFAULT_WORD_VECTOR_TRAININGS_MODE = "WORD2VEC";
+
+    public static final boolean DEFAULT_USE_BASIC_PREPROCESSING = true;
 }

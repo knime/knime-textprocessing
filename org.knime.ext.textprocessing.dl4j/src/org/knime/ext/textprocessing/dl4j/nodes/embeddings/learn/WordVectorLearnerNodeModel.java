@@ -65,8 +65,6 @@ import org.knime.core.node.port.PortType;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
 import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
 import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
-import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
-import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
 import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
@@ -74,180 +72,164 @@ import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentI
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableSentenceIterator;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
+import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
+import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels;
 
 /**
- * Node to learn a {@link WordVectors} model using either Wor2Vec or
- * Doc2Vec using DL4J implementation.
- * For details see: http://deeplearning4j.org/word2vec
+ * Node to learn a {@link WordVectors} model using either Wor2Vec or Doc2Vec using DL4J implementation. For details see:
+ * http://deeplearning4j.org/word2vec
  *
  * @author David Kolb, KNIME.com GmbH
  */
 public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 
-	// the logger instance
-    private static final NodeLogger logger = NodeLogger
-            .getLogger(WordVectorLearnerNodeModel.class);
-	
-    /* SettingsModels */    
-    private LearnerParameterSettingsModels m_learnerParameterSettings;
-    private DataParameterSettingsModels m_dataParameterSettings;
-    private WordVectorParameterSettingsModels m_wordVecParameterSettings;
-    
-    private WordVectorPortObjectSpec m_outputSpec;
-    
-	public WordVectorLearnerNodeModel() {
-		super(new PortType[] { BufferedDataTable.TYPE }, new PortType[] {WordVectorPortObject.TYPE });   	
-	}
+    // the logger instance
+    private static final NodeLogger logger = NodeLogger.getLogger(WordVectorLearnerNodeModel.class);
 
-	@Override
-	protected WordVectorPortObject[] execute(PortObject[] inObjects, ExecutionContext exec) throws Exception {
-		BufferedDataTable table = (BufferedDataTable)inObjects[0];
-		
-		WordVectorTrainingMode mode = WordVectorTrainingMode.valueOf(
-				m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());		
-		String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
-		String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
-		WordVectors wordVectors = null;
-		
-		//training parameters
-		int trainingIterations = m_learnerParameterSettings.getTrainingIterations().getIntValue();
-		int minWordFrequency = m_wordVecParameterSettings.getMinWordFrequency().getIntValue();
-		int layerSize = m_wordVecParameterSettings.getLayerSize().getIntValue();
-		int seed = m_learnerParameterSettings.getSeed().getIntValue();
-		double learningRate = m_learnerParameterSettings.getGlobalLearningRate().getDoubleValue();
-		double minLearningRate = m_wordVecParameterSettings.getMinimumLearningRate().getDoubleValue();
-		int windowSize = m_wordVecParameterSettings.getWindowSize().getIntValue();
-		int epochs = m_dataParameterSettings.getEpochs().getIntValue();
-		int batchSize = m_dataParameterSettings.getBatchSize().getIntValue();
-		
-		//sentence tokenizer and preprocessing
-		boolean usePreproc = m_wordVecParameterSettings.getUseBasicPreprocessing().getBooleanValue();
-		TokenizerFactory t = new DefaultTokenizerFactory();
-        if(usePreproc){
-        	t.setTokenPreProcessor(new CommonPreprocessor());
+    /* SettingsModels */
+    private LearnerParameterSettingsModels m_learnerParameterSettings;
+
+    private DataParameterSettingsModels m_dataParameterSettings;
+
+    private WordVectorParameterSettingsModels m_wordVecParameterSettings;
+
+    private WordVectorPortObjectSpec m_outputSpec;
+
+    public WordVectorLearnerNodeModel() {
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{WordVectorPortObject.TYPE});
+    }
+
+    @Override
+    protected WordVectorPortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        final BufferedDataTable table = (BufferedDataTable)inObjects[0];
+
+        final WordVectorTrainingMode mode =
+                WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
+        final String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
+        final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
+        WordVectors wordVectors = null;
+
+        // training parameters
+        final int trainingIterations = m_learnerParameterSettings.getTrainingIterations().getIntValue();
+        final int minWordFrequency = m_wordVecParameterSettings.getMinWordFrequency().getIntValue();
+        final int layerSize = m_wordVecParameterSettings.getLayerSize().getIntValue();
+        final int seed = m_learnerParameterSettings.getSeed().getIntValue();
+        final double learningRate = m_learnerParameterSettings.getGlobalLearningRate().getDoubleValue();
+        final double minLearningRate = m_wordVecParameterSettings.getMinimumLearningRate().getDoubleValue();
+        final int windowSize = m_wordVecParameterSettings.getWindowSize().getIntValue();
+        final int epochs = m_dataParameterSettings.getEpochs().getIntValue();
+        final int batchSize = m_dataParameterSettings.getBatchSize().getIntValue();
+
+        // sentence tokenizer and preprocessing
+        final boolean usePreproc = m_wordVecParameterSettings.getUseBasicPreprocessing().getBooleanValue();
+        final TokenizerFactory t = new DefaultTokenizerFactory();
+        if (usePreproc) {
+            t.setTokenPreProcessor(new CommonPreprocessor());
         }
 
-		switch (mode) {
-		case DOC2VEC:
-			LabelAwareIterator docIter = new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName);
-			
-			//build doc2vec model
-			ParagraphVectors d2v = new ParagraphVectors.Builder()
-	                .learningRate(learningRate)
-	                .minLearningRate(minLearningRate)
-	                .seed(seed)
-	                .layerSize(layerSize)
-	                .batchSize(batchSize)
-	                .windowSize(windowSize)
-	                .minWordFrequency(minWordFrequency)
-	                .iterations(trainingIterations)
-	                .epochs(epochs)
-	                .iterate(docIter)
-	                .trainWordVectors(true)
-	                .tokenizerFactory(t)
-	                .build();
-			
-			d2v.fit();			
-			wordVectors = d2v;	
-			
-			break;
-			
-		case WORD2VEC:			
-			SentenceIterator sentenceIter = new BufferedDataTableSentenceIterator(table, documentColumnName);
-			
-			//build word2vec model
-			Word2Vec w2v = new Word2Vec.Builder()
-					.learningRate(learningRate)
-					.learningRate(minLearningRate)
-	                .seed(seed)
-	                .layerSize(layerSize)
-	                .batchSize(batchSize)
-	                .windowSize(windowSize)
-	                .minWordFrequency(minWordFrequency)
-	                .iterations(trainingIterations)
-	                .epochs(epochs)
-	                .iterate(sentenceIter)
-	                .tokenizerFactory(t)
-	                .build();
-    
-			w2v.fit();			
-			wordVectors = w2v;
-			
-			break;
-			
-		default:
-			throw new InvalidSettingsException("No case defined for WordVectorTrainingMode: " + mode);
-		}
+        switch (mode) {
+            case DOC2VEC:
+                final LabelAwareIterator docIter =
+                new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName);
 
-		WordVectorPortObject outPortObject = new WordVectorPortObject(wordVectors, m_outputSpec);
-		return new WordVectorPortObject[]{outPortObject};
-	}			
-	
-	@Override
-	protected WordVectorPortObjectSpec[] configure(PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-		DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
-		
-		WordVectorTrainingMode mode = WordVectorTrainingMode.valueOf(
-				m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());		
-		String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
-		String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
-		
-		switch (mode) {
-		case DOC2VEC:		
-			try {
-				ConfigurationUtils.validateColumnSelection(tableSpec, new String[]{labelColumnName,documentColumnName});	
-			} catch (InvalidSettingsException e) {
-				throw new InvalidSettingsException("Need to specify document and label column for " + mode);
-			}		
-			break;
-		case WORD2VEC:
-			try {
-				ConfigurationUtils.validateColumnSelection(tableSpec, documentColumnName);
-			} catch (InvalidSettingsException e) {
-				throw new InvalidSettingsException("Need to specify document column for " + mode);
-			}
-			break;
-		default:
-			throw new InvalidSettingsException("No case defined for WordVectorTrainingsMode: " + mode);
-		}
+                // build doc2vec model
+                final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)
+                        .minLearningRate(minLearningRate).seed(seed).layerSize(layerSize).batchSize(batchSize)
+                        .windowSize(windowSize).minWordFrequency(minWordFrequency).iterations(trainingIterations)
+                        .epochs(epochs).iterate(docIter).trainWordVectors(true).tokenizerFactory(t).build();
 
-		m_outputSpec = new WordVectorPortObjectSpec(mode);
-		return new WordVectorPortObjectSpec[]{m_outputSpec};
-	}
-	
-	@Override
-	protected List<SettingsModel> initSettingsModels() {
-		m_learnerParameterSettings = new LearnerParameterSettingsModels();
-		m_learnerParameterSettings.setParameter(LearnerParameter.GLOBAL_LEARNING_RATE);		
-		m_learnerParameterSettings.setParameter(LearnerParameter.TRAINING_ITERATIONS);
-		m_learnerParameterSettings.setParameter(LearnerParameter.SEED);
-		
-		m_dataParameterSettings = new DataParameterSettingsModels();
-		m_dataParameterSettings.setParameter(DataParameter.BATCH_SIZE);
-		m_dataParameterSettings.setParameter(DataParameter.EPOCHS);
-		m_dataParameterSettings.setParameter(DataParameter.LABEL_COLUMN);
-    	//default training mode is Word2Vec so labels are not required by default
-		m_dataParameterSettings.getLabelColumn().setEnabled(false);
-		
-		m_dataParameterSettings.setParameter(DataParameter.DOCUMENT_COLUMN);
-		
-		m_wordVecParameterSettings = new WordVectorParameterSettingsModels();
-		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LAYER_SIZE);
-		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
-		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
-		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
-		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE);
-		m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING);
-		
-		List<SettingsModel> settings = new ArrayList<>();		
-		settings.addAll(m_learnerParameterSettings.getAllInitializedSettings());
-		settings.addAll(m_dataParameterSettings.getAllInitializedSettings());	
-		settings.addAll(m_wordVecParameterSettings.getAllInitializedSettings());
-		
-		return settings;
-	}
-    
-   
+                d2v.fit();
+                wordVectors = d2v;
+
+                break;
+
+            case WORD2VEC:
+                final SentenceIterator sentenceIter = new BufferedDataTableSentenceIterator(table, documentColumnName);
+
+                // build word2vec model
+                final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).learningRate(minLearningRate)
+                        .seed(seed).layerSize(layerSize).batchSize(batchSize).windowSize(windowSize)
+                        .minWordFrequency(minWordFrequency).iterations(trainingIterations).epochs(epochs)
+                        .iterate(sentenceIter).tokenizerFactory(t).build();
+
+                w2v.fit();
+                wordVectors = w2v;
+
+                break;
+
+            default:
+                throw new InvalidSettingsException("No case defined for WordVectorTrainingMode: " + mode);
+        }
+
+        final WordVectorPortObject outPortObject = new WordVectorPortObject(wordVectors, m_outputSpec);
+        return new WordVectorPortObject[]{outPortObject};
+    }
+
+    @Override
+    protected WordVectorPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
+
+        final WordVectorTrainingMode mode =
+                WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
+        final String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
+        final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
+
+        switch (mode) {
+            case DOC2VEC:
+                try {
+                    ConfigurationUtils.validateColumnSelection(tableSpec,
+                        new String[]{labelColumnName, documentColumnName});
+                } catch (final InvalidSettingsException e) {
+                    throw new InvalidSettingsException("Need to specify document and label column for " + mode);
+                }
+                break;
+            case WORD2VEC:
+                try {
+                    ConfigurationUtils.validateColumnSelection(tableSpec, documentColumnName);
+                } catch (final InvalidSettingsException e) {
+                    throw new InvalidSettingsException("Need to specify document column for " + mode);
+                }
+                break;
+            default:
+                throw new InvalidSettingsException("No case defined for WordVectorTrainingsMode: " + mode);
+        }
+
+        m_outputSpec = new WordVectorPortObjectSpec(mode);
+        return new WordVectorPortObjectSpec[]{m_outputSpec};
+    }
+
+    @Override
+    protected List<SettingsModel> initSettingsModels() {
+        m_learnerParameterSettings = new LearnerParameterSettingsModels();
+        m_learnerParameterSettings.setParameter(LearnerParameter.GLOBAL_LEARNING_RATE);
+        m_learnerParameterSettings.setParameter(LearnerParameter.TRAINING_ITERATIONS);
+        m_learnerParameterSettings.setParameter(LearnerParameter.SEED);
+
+        m_dataParameterSettings = new DataParameterSettingsModels();
+        m_dataParameterSettings.setParameter(DataParameter.BATCH_SIZE);
+        m_dataParameterSettings.setParameter(DataParameter.EPOCHS);
+        m_dataParameterSettings.setParameter(DataParameter.LABEL_COLUMN);
+        // default training mode is Word2Vec so labels are not required by
+        // default
+        m_dataParameterSettings.getLabelColumn().setEnabled(false);
+
+        m_dataParameterSettings.setParameter(DataParameter.DOCUMENT_COLUMN);
+
+        m_wordVecParameterSettings = new WordVectorParameterSettingsModels();
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LAYER_SIZE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING);
+
+        final List<SettingsModel> settings = new ArrayList<>();
+        settings.addAll(m_learnerParameterSettings.getAllInitializedSettings());
+        settings.addAll(m_dataParameterSettings.getAllInitializedSettings());
+        settings.addAll(m_wordVecParameterSettings.getAllInitializedSettings());
+
+        return settings;
+    }
+
 }
-

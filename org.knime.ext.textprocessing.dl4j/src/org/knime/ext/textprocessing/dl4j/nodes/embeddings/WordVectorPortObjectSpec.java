@@ -50,43 +50,42 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMo
 
 /**
  * Port Object Spec for Word Vector Models.
- * 
+ *
  * @author David Kolb
  */
 public class WordVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
 
-	public static final class Serializer extends
-		AbstractSimplePortObjectSpecSerializer<WordVectorPortObjectSpec> {
-	}
-	
-	private static final String CFGKEY_WORD_VECTOR_TRAINING_MODE = "WordVectorTrainingsMode";
-	
-	private WordVectorTrainingMode m_wordVectorTrainingsMode;
-	
-	/**
+    public static final class Serializer extends AbstractSimplePortObjectSpecSerializer<WordVectorPortObjectSpec> {
+    }
+
+    private static final String CFGKEY_WORD_VECTOR_TRAINING_MODE = "WordVectorTrainingsMode";
+
+    private WordVectorTrainingMode m_wordVectorTrainingsMode;
+
+    /**
      * Empty no-arg constructor as needed by {@link AbstractSimplePortObjectSpec}
      */
-	public WordVectorPortObjectSpec() {
-		
-	}
-	
-	public WordVectorPortObjectSpec(final WordVectorTrainingMode mode) {
-		this.m_wordVectorTrainingsMode = mode;
-	}
-	
-	@Override
-	protected void save(ModelContentWO model) {
-		model.addString(CFGKEY_WORD_VECTOR_TRAINING_MODE, m_wordVectorTrainingsMode.toString());
-	}
+    public WordVectorPortObjectSpec() {
 
-	@Override
-	protected void load(ModelContentRO model) throws InvalidSettingsException {
-		m_wordVectorTrainingsMode = WordVectorTrainingMode.valueOf(model.getString(CFGKEY_WORD_VECTOR_TRAINING_MODE));
+    }
 
-	}
-	
-	public WordVectorTrainingMode getWordVectorTrainingsMode(){
-		return m_wordVectorTrainingsMode;
-	}
+    public WordVectorPortObjectSpec(final WordVectorTrainingMode mode) {
+        this.m_wordVectorTrainingsMode = mode;
+    }
+
+    @Override
+    protected void save(final ModelContentWO model) {
+        model.addString(CFGKEY_WORD_VECTOR_TRAINING_MODE, m_wordVectorTrainingsMode.toString());
+    }
+
+    @Override
+    protected void load(final ModelContentRO model) throws InvalidSettingsException {
+        m_wordVectorTrainingsMode = WordVectorTrainingMode.valueOf(model.getString(CFGKEY_WORD_VECTOR_TRAINING_MODE));
+
+    }
+
+    public WordVectorTrainingMode getWordVectorTrainingsMode() {
+        return m_wordVectorTrainingsMode;
+    }
 
 }

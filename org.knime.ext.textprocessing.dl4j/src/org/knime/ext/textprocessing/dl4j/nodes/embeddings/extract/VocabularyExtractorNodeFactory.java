@@ -48,11 +48,10 @@ import org.knime.core.node.NodeView;
 
 /**
  * <code>NodeFactory</code> for the "VocabularyExtractor" Node.
- * 
+ *
  * @author David Kolb, KNIME.com GmbH
  */
-public class VocabularyExtractorNodeFactory 
-        extends NodeFactory<VocabularyExtractorNodeModel> {
+public class VocabularyExtractorNodeFactory extends NodeFactory<VocabularyExtractorNodeModel> {
 
     /**
      * {@inheritDoc}
@@ -75,7 +74,7 @@ public class VocabularyExtractorNodeFactory
      */
     @Override
     public NodeView<VocabularyExtractorNodeModel> createNodeView(final int viewIndex,
-            final VocabularyExtractorNodeModel nodeModel) {
+        final VocabularyExtractorNodeModel nodeModel) {
         return null;
     }
 
@@ -96,4 +95,3 @@ public class VocabularyExtractorNodeFactory
     }
 
 }
-

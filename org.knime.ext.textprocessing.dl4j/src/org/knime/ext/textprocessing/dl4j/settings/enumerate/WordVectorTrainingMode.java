@@ -48,8 +48,7 @@ package org.knime.ext.textprocessing.dl4j.settings.enumerate;
  * @author David Kolb, KNIME.com GmbH
  */
 public enum WordVectorTrainingMode {
-	/** train word vectors */
-	WORD2VEC,
-	/** train document vectors */
-	DOC2VEC
+    /** train word vectors */
+    WORD2VEC, /** train document vectors */
+    DOC2VEC
 }

@@ -74,79 +74,76 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
- * Node to extract a vocabulary with corresponding word vectors from a 
- * {@link WordVectors} model.
- * 
+ * Node to extract a vocabulary with corresponding word vectors from a {@link WordVectors} model.
+ *
  * @author David Kolb, KNIME.com GmbH
  */
 public class VocabularyExtractorNodeModel extends AbstractDLNodeModel {
 
-	// the logger instance
-    private static final NodeLogger logger = NodeLogger
-            .getLogger(VocabularyExtractorNodeModel.class);
-	
-	public VocabularyExtractorNodeModel() {
-		super(new PortType[] {WordVectorPortObject.TYPE}, new PortType[] {BufferedDataTable.TYPE});   	
-	}
-	
-	@Override
-	protected PortObject[] execute(PortObject[] inObjects, ExecutionContext exec) throws Exception {
-		WordVectorPortObject portObject = (WordVectorPortObject)inObjects[0];
-		Word2Vec wordVec = WordVectorPortObjectUtils.wordVectorsToWord2Vec(portObject.getWordVectors());
-		BufferedDataContainer container = exec.createDataContainer(createOutputSpec());
-		
-		List<String> voc = new ArrayList<>(wordVec.vocab().words());
-		
-		int i = 0;
-		for(String word : voc){
-			exec.setProgress( ((double)(i+1))/((double)voc.size()) );
-			
-			List<DataCell> cells = new ArrayList<>();
-			
-			cells.add(new StringCell(word));
-			
-			INDArray vector = wordVec.getWordVectorMatrix(word);
-			ListCell wordVectorollectionCell = CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(vector));
-			cells.add(wordVectorollectionCell);
-			
-			container.addRowToTable(new DefaultRow(new RowKey("Row" + i), cells));
-			i++;
-		}
-		
-		container.close();
-    	BufferedDataTable outputTable = container.getTable();
+    // the logger instance
+    private static final NodeLogger logger = NodeLogger.getLogger(VocabularyExtractorNodeModel.class);
 
-    	return new PortObject[]{outputTable};
-	}
-	
-	@Override
-	protected PortObjectSpec[] configure(PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-		return new PortObjectSpec[]{createOutputSpec()};
-	}
-	
-	@Override
-	protected List<SettingsModel> initSettingsModels() {
-		//no parameter for this node
-		return new ArrayList<SettingsModel>();
-	}
-	
-	/**
-	 * Create DataTableSpec containing two columns.
-	 * First column: StringCell
-	 * Second column: ListCell containing DoubleCell
-	 * 
-	 * @return the DataTableSpec containing both columns
-	 */
-	private DataTableSpec createOutputSpec(){
-		DataColumnSpec[] colSpecs = new DataColumnSpec[2];
-		
-		DataColumnSpecCreator specCreator = new DataColumnSpecCreator("word", DataType.getType(StringCell.class));
-		colSpecs[0] = specCreator.createSpec();
-		
-		specCreator = new DataColumnSpecCreator("output_vector", DataType.getType(ListCell.class, DoubleCell.TYPE));
-		colSpecs[1] = specCreator.createSpec();
-		
-		return new DataTableSpec(colSpecs);
-	}
+    public VocabularyExtractorNodeModel() {
+        super(new PortType[]{WordVectorPortObject.TYPE}, new PortType[]{BufferedDataTable.TYPE});
+    }
+
+    @Override
+    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        final WordVectorPortObject portObject = (WordVectorPortObject)inObjects[0];
+        final Word2Vec wordVec = WordVectorPortObjectUtils.wordVectorsToWord2Vec(portObject.getWordVectors());
+        final BufferedDataContainer container = exec.createDataContainer(createOutputSpec());
+
+        final List<String> voc = new ArrayList<>(wordVec.vocab().words());
+
+        int i = 0;
+        for (final String word : voc) {
+            exec.setProgress(((double)(i + 1)) / ((double)voc.size()));
+
+            final List<DataCell> cells = new ArrayList<>();
+
+            cells.add(new StringCell(word));
+
+            final INDArray vector = wordVec.getWordVectorMatrix(word);
+            final ListCell wordVectorollectionCell =
+                    CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(vector));
+            cells.add(wordVectorollectionCell);
+
+            container.addRowToTable(new DefaultRow(new RowKey("Row" + i), cells));
+            i++;
+        }
+
+        container.close();
+        final BufferedDataTable outputTable = container.getTable();
+
+        return new PortObject[]{outputTable};
+    }
+
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        return new PortObjectSpec[]{createOutputSpec()};
+    }
+
+    @Override
+    protected List<SettingsModel> initSettingsModels() {
+        // no parameter for this node
+        return new ArrayList<SettingsModel>();
+    }
+
+    /**
+     * Create DataTableSpec containing two columns. First column: StringCell Second column: ListCell containing
+     * DoubleCell
+     *
+     * @return the DataTableSpec containing both columns
+     */
+    private DataTableSpec createOutputSpec() {
+        final DataColumnSpec[] colSpecs = new DataColumnSpec[2];
+
+        DataColumnSpecCreator specCreator = new DataColumnSpecCreator("word", DataType.getType(StringCell.class));
+        colSpecs[0] = specCreator.createSpec();
+
+        specCreator = new DataColumnSpecCreator("output_vector", DataType.getType(ListCell.class, DoubleCell.TYPE));
+        colSpecs[1] = specCreator.createSpec();
+
+        return new DataTableSpec(colSpecs);
+    }
 }
-

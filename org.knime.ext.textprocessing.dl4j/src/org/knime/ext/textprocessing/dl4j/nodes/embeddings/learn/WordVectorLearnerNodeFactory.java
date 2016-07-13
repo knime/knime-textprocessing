@@ -48,12 +48,11 @@ import org.knime.core.node.NodeView;
 
 /**
  * <code>NodeFactory</code> for the "WordVectorLearner" Node.
- * 
+ *
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorLearnerNodeFactory 
-        extends NodeFactory<WordVectorLearnerNodeModel> {
+public class WordVectorLearnerNodeFactory extends NodeFactory<WordVectorLearnerNodeModel> {
 
     /**
      * {@inheritDoc}
@@ -76,7 +75,7 @@ public class WordVectorLearnerNodeFactory
      */
     @Override
     public NodeView<WordVectorLearnerNodeModel> createNodeView(final int viewIndex,
-            final WordVectorLearnerNodeModel nodeModel) {
+        final WordVectorLearnerNodeModel nodeModel) {
         return null;
     }
 
@@ -97,4 +96,3 @@ public class WordVectorLearnerNodeFactory
     }
 
 }
-

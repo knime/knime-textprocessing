@@ -59,113 +59,112 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerPar
  * @author David Kolb, KNIME.com GmbH
  */
 public class WordVectorParameterSettingsModels implements IParameterSettingsModels<WordVectorLearnerParameter> {
-	
-	private SettingsModelIntegerBounded m_minWordFrequency;
-	private SettingsModelIntegerBounded m_layerSize;
-	private SettingsModelIntegerBounded m_windowSize;
-	private SettingsModelString m_wordVectorTrainingsMode;
-	private SettingsModelDoubleBounded m_minimumLearningRate;
-	private SettingsModelBoolean m_useBasicPreprocessing;
-	
-	private List<SettingsModel> m_allInitializedSettings = new ArrayList<>();
-	
-	@Override
-	public SettingsModel createParameter(WordVectorLearnerParameter enumerate) throws IllegalStateException {
-		switch (enumerate) {
-		case LAYER_SIZE:
-			return new SettingsModelIntegerBounded("layer_size", 
-					WordVectorLearnerParameter.DEFAULT_LAYER_SIZE, 1, Integer.MAX_VALUE);
-		case MIN_WORD_FREQUENCY:
-			return new SettingsModelIntegerBounded("min_word_frequency",
-					WordVectorLearnerParameter.DEFAULT_MIN_WORD_FREQUENCY, 0, Integer.MAX_VALUE);
-		case WINDOW_SIZE:
-			return new SettingsModelIntegerBounded("window_size", 
-					WordVectorLearnerParameter.DEFAULT_WINDOW_SIZE, 1, Integer.MAX_VALUE);
-		case WORD_VECTOR_TRAINING_MODE:
-			return new SettingsModelString("word_vector_trainings_mode", 
-					WordVectorLearnerParameter.DEFAULT_WORD_VECTOR_TRAININGS_MODE);
-		case MIN_LEARNING_RATE:
-			return new SettingsModelDoubleBounded("minimum_learning_rate", 
-					WordVectorLearnerParameter.DEFAULT_MIN_LEARNING_RATE, 0.0, Double.MAX_VALUE);
-		case USE_BASIC_PREPROCESSING:
-			return new SettingsModelBoolean("use_basic_preprocessing", 
-					WordVectorLearnerParameter.DEFAULT_USE_BASIC_PREPROCESSING);
-		default:
-			throw new IllegalStateException(
-                    "WordVectorParameter does not exist: "
-                            + enumerate.toString());
-		}
-	}
 
-	@Override
-	public void setParameter(WordVectorLearnerParameter enumerate) throws IllegalStateException {
-		switch (enumerate) {
-		case LAYER_SIZE:
-			m_layerSize = (SettingsModelIntegerBounded)createParameter(enumerate);
-			addToSet(m_layerSize);
-			break;
-		case MIN_WORD_FREQUENCY:
-			m_minWordFrequency = (SettingsModelIntegerBounded)createParameter(enumerate);
-			addToSet(m_minWordFrequency);
-			break;
-		case WINDOW_SIZE:
-			m_windowSize = (SettingsModelIntegerBounded)createParameter(enumerate);
-			addToSet(m_windowSize);
-			break;
-		case WORD_VECTOR_TRAINING_MODE:
-			m_wordVectorTrainingsMode = (SettingsModelString)createParameter(enumerate);
-			addToSet(m_wordVectorTrainingsMode);
-			break;
-		case MIN_LEARNING_RATE:
-			m_minimumLearningRate = (SettingsModelDoubleBounded)createParameter(enumerate);
-			addToSet(m_minimumLearningRate);
-			break;
-		case USE_BASIC_PREPROCESSING:
-			m_useBasicPreprocessing = (SettingsModelBoolean)createParameter(enumerate);
-			addToSet(m_useBasicPreprocessing);
-			break;
-		default:
-			throw new IllegalStateException(
-                    "WordVectorParameter does not exist: "
-                            + enumerate.toString());
-		}
-	}
+    private SettingsModelIntegerBounded m_minWordFrequency;
 
-	
-	
-	@Override
-	public List<SettingsModel> getAllInitializedSettings() {
-		return m_allInitializedSettings;
-	}
-	
-	private void addToSet(SettingsModel model){
-		if(!m_allInitializedSettings.contains(model)){
-			m_allInitializedSettings.add(model);
-		}
-	}
+    private SettingsModelIntegerBounded m_layerSize;
 
-	public SettingsModelDoubleBounded getMinimumLearningRate(){
-		return m_minimumLearningRate;
-	}
-	
-	public SettingsModelIntegerBounded getMinWordFrequency() {
-		return m_minWordFrequency;
-	}
+    private SettingsModelIntegerBounded m_windowSize;
 
-	public SettingsModelIntegerBounded getLayerSize() {
-		return m_layerSize;
-	}
+    private SettingsModelString m_wordVectorTrainingsMode;
 
-	public SettingsModelIntegerBounded getWindowSize() {
-		return m_windowSize;
-	}
-	
-	public SettingsModelString getWordVectorTrainingsMode() {
-		return m_wordVectorTrainingsMode;
-	}
-	
-	public SettingsModelBoolean getUseBasicPreprocessing(){
-		return m_useBasicPreprocessing;
-	}
+    private SettingsModelDoubleBounded m_minimumLearningRate;
+
+    private SettingsModelBoolean m_useBasicPreprocessing;
+
+    private final List<SettingsModel> m_allInitializedSettings = new ArrayList<>();
+
+    @Override
+    public SettingsModel createParameter(final WordVectorLearnerParameter enumerate) throws IllegalStateException {
+        switch (enumerate) {
+            case LAYER_SIZE:
+                return new SettingsModelIntegerBounded("layer_size", WordVectorLearnerParameter.DEFAULT_LAYER_SIZE, 1,
+                    Integer.MAX_VALUE);
+            case MIN_WORD_FREQUENCY:
+                return new SettingsModelIntegerBounded("min_word_frequency",
+                    WordVectorLearnerParameter.DEFAULT_MIN_WORD_FREQUENCY, 0, Integer.MAX_VALUE);
+            case WINDOW_SIZE:
+                return new SettingsModelIntegerBounded("window_size", WordVectorLearnerParameter.DEFAULT_WINDOW_SIZE, 1,
+                    Integer.MAX_VALUE);
+            case WORD_VECTOR_TRAINING_MODE:
+                return new SettingsModelString("word_vector_trainings_mode",
+                    WordVectorLearnerParameter.DEFAULT_WORD_VECTOR_TRAININGS_MODE);
+            case MIN_LEARNING_RATE:
+                return new SettingsModelDoubleBounded("minimum_learning_rate",
+                    WordVectorLearnerParameter.DEFAULT_MIN_LEARNING_RATE, 0.0, Double.MAX_VALUE);
+            case USE_BASIC_PREPROCESSING:
+                return new SettingsModelBoolean("use_basic_preprocessing",
+                    WordVectorLearnerParameter.DEFAULT_USE_BASIC_PREPROCESSING);
+            default:
+                throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
+        }
+    }
+
+    @Override
+    public void setParameter(final WordVectorLearnerParameter enumerate) throws IllegalStateException {
+        switch (enumerate) {
+            case LAYER_SIZE:
+                m_layerSize = (SettingsModelIntegerBounded)createParameter(enumerate);
+                addToSet(m_layerSize);
+                break;
+            case MIN_WORD_FREQUENCY:
+                m_minWordFrequency = (SettingsModelIntegerBounded)createParameter(enumerate);
+                addToSet(m_minWordFrequency);
+                break;
+            case WINDOW_SIZE:
+                m_windowSize = (SettingsModelIntegerBounded)createParameter(enumerate);
+                addToSet(m_windowSize);
+                break;
+            case WORD_VECTOR_TRAINING_MODE:
+                m_wordVectorTrainingsMode = (SettingsModelString)createParameter(enumerate);
+                addToSet(m_wordVectorTrainingsMode);
+                break;
+            case MIN_LEARNING_RATE:
+                m_minimumLearningRate = (SettingsModelDoubleBounded)createParameter(enumerate);
+                addToSet(m_minimumLearningRate);
+                break;
+            case USE_BASIC_PREPROCESSING:
+                m_useBasicPreprocessing = (SettingsModelBoolean)createParameter(enumerate);
+                addToSet(m_useBasicPreprocessing);
+                break;
+            default:
+                throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
+        }
+    }
+
+    @Override
+    public List<SettingsModel> getAllInitializedSettings() {
+        return m_allInitializedSettings;
+    }
+
+    private void addToSet(final SettingsModel model) {
+        if (!m_allInitializedSettings.contains(model)) {
+            m_allInitializedSettings.add(model);
+        }
+    }
+
+    public SettingsModelDoubleBounded getMinimumLearningRate() {
+        return m_minimumLearningRate;
+    }
+
+    public SettingsModelIntegerBounded getMinWordFrequency() {
+        return m_minWordFrequency;
+    }
+
+    public SettingsModelIntegerBounded getLayerSize() {
+        return m_layerSize;
+    }
+
+    public SettingsModelIntegerBounded getWindowSize() {
+        return m_windowSize;
+    }
+
+    public SettingsModelString getWordVectorTrainingsMode() {
+        return m_wordVectorTrainingsMode;
+    }
+
+    public SettingsModelBoolean getUseBasicPreprocessing() {
+        return m_useBasicPreprocessing;
+    }
 
 }
