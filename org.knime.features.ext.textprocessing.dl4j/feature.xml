@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.knime.features.ext.textprocessing.dl4j"
-      label="KNIME Textprocessing extension for Deeplearning4J"
+      label="KNIME Textprocessing - Deeplearning4J Integration"
       version="3.2.0.qualifier"
       provider-name="KNIME GmbH, Konstanz, Germany">
 
