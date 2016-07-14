@@ -73,6 +73,6 @@ public class WordVectorApplyNodeDialog extends DefaultNodeSettingsPane {
             0, true, StringValue.class, DocumentValue.class));
 
         addDialogComponent(new DialogComponentBoolean(WordVectorApplyNodeModel.createCalculateMeanSettings(),
-                "Calculate Document Mean Vector?"));
+            "Calculate Document Mean Vector?"));
     }
 }

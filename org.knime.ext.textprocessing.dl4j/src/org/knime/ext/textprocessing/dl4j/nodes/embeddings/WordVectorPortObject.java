@@ -111,13 +111,13 @@ public class WordVectorPortObject extends AbstractPortObject {
 
     @Override
     protected void save(final PortObjectZipOutputStream out, final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+        throws IOException, CanceledExecutionException {
         WordVectorPortObjectUtils.saveModelToZip(this, true, false, out);
     }
 
     @Override
     protected void load(final PortObjectZipInputStream in, final PortObjectSpec spec, final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+        throws IOException, CanceledExecutionException {
         final WordVectorPortObject port = WordVectorPortObjectUtils.loadPortFromZip(in);
 
         this.m_spec = (WordVectorPortObjectSpec)spec;

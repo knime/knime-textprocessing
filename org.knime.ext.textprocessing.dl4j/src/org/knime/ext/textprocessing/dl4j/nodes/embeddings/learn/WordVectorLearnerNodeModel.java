@@ -101,11 +101,12 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
     }
 
     @Override
-    protected WordVectorPortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+    protected WordVectorPortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
+        throws Exception {
         final BufferedDataTable table = (BufferedDataTable)inObjects[0];
 
         final WordVectorTrainingMode mode =
-                WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
+            WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
         final String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
         final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
         WordVectors wordVectors = null;
@@ -131,13 +132,13 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
         switch (mode) {
             case DOC2VEC:
                 final LabelAwareIterator docIter =
-                new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName);
+                    new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName);
 
                 // build doc2vec model
                 final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)
-                        .minLearningRate(minLearningRate).seed(seed).layerSize(layerSize).batchSize(batchSize)
-                        .windowSize(windowSize).minWordFrequency(minWordFrequency).iterations(trainingIterations)
-                        .epochs(epochs).iterate(docIter).trainWordVectors(true).tokenizerFactory(t).build();
+                    .minLearningRate(minLearningRate).seed(seed).layerSize(layerSize).batchSize(batchSize)
+                    .windowSize(windowSize).minWordFrequency(minWordFrequency).iterations(trainingIterations)
+                    .epochs(epochs).iterate(docIter).trainWordVectors(true).tokenizerFactory(t).build();
 
                 d2v.fit();
                 wordVectors = d2v;
@@ -149,9 +150,9 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 
                 // build word2vec model
                 final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).learningRate(minLearningRate)
-                        .seed(seed).layerSize(layerSize).batchSize(batchSize).windowSize(windowSize)
-                        .minWordFrequency(minWordFrequency).iterations(trainingIterations).epochs(epochs)
-                        .iterate(sentenceIter).tokenizerFactory(t).build();
+                    .seed(seed).layerSize(layerSize).batchSize(batchSize).windowSize(windowSize)
+                    .minWordFrequency(minWordFrequency).iterations(trainingIterations).epochs(epochs)
+                    .iterate(sentenceIter).tokenizerFactory(t).build();
 
                 w2v.fit();
                 wordVectors = w2v;
@@ -171,7 +172,7 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
         final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
         final WordVectorTrainingMode mode =
-                WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
+            WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
         final String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
         final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
 

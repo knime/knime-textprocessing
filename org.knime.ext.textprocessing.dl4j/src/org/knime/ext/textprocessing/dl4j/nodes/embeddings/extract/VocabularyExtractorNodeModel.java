@@ -105,7 +105,7 @@ public class VocabularyExtractorNodeModel extends AbstractDLNodeModel {
 
             final INDArray vector = wordVec.getWordVectorMatrix(word);
             final ListCell wordVectorollectionCell =
-                    CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(vector));
+                CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(vector));
             cells.add(wordVectorollectionCell);
 
             container.addRowToTable(new DefaultRow(new RowKey("Row" + i), cells));

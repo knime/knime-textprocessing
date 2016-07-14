@@ -114,7 +114,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         final WordVectors wordVectors = portObject.getWordVectors();
 
         final int documentColumnIndex =
-                table.getDataTableSpec().findColumnIndex(m_dataParameterSettings.getDocumentColumn().getStringValue());
+            table.getDataTableSpec().findColumnIndex(m_dataParameterSettings.getDocumentColumn().getStringValue());
 
         final BufferedDataContainer container = exec.createDataContainer(m_outputSpec);
         final CloseableRowIterator tableIterator = table.iterator();
@@ -133,7 +133,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
             if (m_calculateMean.getBooleanValue()) {
                 final INDArray documentMeanVector = calculateDocumentMean(wordVectors, document);
                 convertedDocument =
-                        CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
+                    CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
 
             } else {
                 convertedDocument = replaceWordsByWordVector(wordVectors, document);
@@ -243,7 +243,8 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
             }
         }
 
-        final INDArray documentWordVectors = Nd4j.create(numberOfWordsMatchingWithVoc, wordVec.lookupTable().layerSize());
+        final INDArray documentWordVectors =
+            Nd4j.create(numberOfWordsMatchingWithVoc, wordVec.lookupTable().layerSize());
 
         int i = 0;
         for (final String token : tokens) {

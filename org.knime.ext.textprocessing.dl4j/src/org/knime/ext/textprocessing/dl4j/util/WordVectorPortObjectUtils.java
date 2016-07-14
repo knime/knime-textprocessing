@@ -91,8 +91,8 @@ public class WordVectorPortObjectUtils {
      * @param outStream stream to write to
      * @throws IOException
      */
-    public static void saveModelToZip(final WordVectorPortObject portObject, final boolean writePortObject, final boolean writeSpec,
-        final ZipOutputStream outStream) throws IOException {
+    public static void saveModelToZip(final WordVectorPortObject portObject, final boolean writePortObject,
+        final boolean writeSpec, final ZipOutputStream outStream) throws IOException {
         final WordVectorPortObjectSpec spec = (WordVectorPortObjectSpec)portObject.getSpec();
 
         if (outStream == null) {
@@ -181,7 +181,7 @@ public class WordVectorPortObjectUtils {
                 }
 
                 lookupTable = (InMemoryLookupTable<VocabWord>)new InMemoryLookupTable.Builder<VocabWord>()
-                        .vectorLength(arrays.get(0).columns()).cache(cache).build();
+                    .vectorLength(arrays.get(0).columns()).cache(cache).build();
 
                 final INDArray syn = Nd4j.create(new int[]{arrays.size(), arrays.get(0).columns()});
                 for (int i = 0; i < syn.rows(); i++) {
@@ -215,18 +215,20 @@ public class WordVectorPortObjectUtils {
         return mode;
     }
 
-    private static void savePortObjectOnly(final WordVectorPortObject portObject, final ZipOutputStream out) throws IOException {
+    private static void savePortObjectOnly(final WordVectorPortObject portObject, final ZipOutputStream out)
+        throws IOException {
         writeWordVectors(portObject.getWordVectors(), out);
     }
 
-    private static void saveSpecOnly(final WordVectorPortObjectSpec spec, final ZipOutputStream out) throws IOException {
+    private static void saveSpecOnly(final WordVectorPortObjectSpec spec, final ZipOutputStream out)
+        throws IOException {
         final WordVectorTrainingMode mode = spec.getWordVectorTrainingsMode();
 
         writeWordVectorTrainingsMode(mode, out);
     }
 
-    private static void savePortObjectAndSpec(final WordVectorPortObject portObject, final WordVectorPortObjectSpec spec,
-        final ZipOutputStream out) throws IOException {
+    private static void savePortObjectAndSpec(final WordVectorPortObject portObject,
+        final WordVectorPortObjectSpec spec, final ZipOutputStream out) throws IOException {
         savePortObjectOnly(portObject, out);
         saveSpecOnly(spec, out);
     }
@@ -239,7 +241,7 @@ public class WordVectorPortObjectUtils {
      * @throws IOException
      */
     public static void writeWordVectorTrainingsMode(final WordVectorTrainingMode mode, final ZipOutputStream out)
-            throws IOException {
+        throws IOException {
         final ZipEntry entry = new ZipEntry("word_vector_trainings_mode");
         out.putNextEntry(entry);
         // TODO may cause problems with encoding on different os

@@ -86,17 +86,18 @@ public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
         final WordVectorParameterSettingsModels wordVectorSettingsModels = new WordVectorParameterSettingsModels();
 
         final SettingsModelString trainingModeSettings = (SettingsModelString)wordVectorSettingsModels
-                .createParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
+            .createParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
 
         final SettingsModelString labelColumnSettings =
-                (SettingsModelString)dataSettingsModels.createParameter(DataParameter.LABEL_COLUMN);
+            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.LABEL_COLUMN);
         final SettingsModelString documentColumnSettings =
-                (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN);
+            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN);
 
         trainingModeSettings.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
-                final WordVectorTrainingMode mode = WordVectorTrainingMode.valueOf(trainingModeSettings.getStringValue());
+                final WordVectorTrainingMode mode =
+                    WordVectorTrainingMode.valueOf(trainingModeSettings.getStringValue());
                 switch (mode) {
                     case DOC2VEC:
                         labelColumnSettings.setEnabled(true);
@@ -116,7 +117,7 @@ public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
             EnumUtils.getStringCollectionFromToString(WordVectorTrainingMode.values())));
         addDialogComponent(new DialogComponentBoolean(
             (SettingsModelBoolean)wordVectorSettingsModels
-            .createParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING),
+                .createParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING),
             "Use Basic Token Preprocessing?"));
         addDialogComponent(new DialogComponentNumberEdit(
             (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.SEED), "Seed", 4));
