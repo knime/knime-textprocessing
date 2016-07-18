@@ -51,7 +51,7 @@ package org.knime.ext.textprocessing.nodes.frequencies.idf;
 /**
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
- * @since 3.2
+ * @since 3.3
  */
 public class IdfConfigKeys {
 

@@ -83,7 +83,7 @@ public final class Frequencies {
      * @param noAllDocs The number of all documents of the bag of words.
      * @param noTDocs The number of documents containing a certain term.
      * @return The normalized inverse document frequency
-     * @since 3.2
+     * @since 3.3
      */
     public static double normalizedInverseDocumentFrequency(final int noAllDocs, final int noTDocs) {
         if (noTDocs == 0) {
@@ -99,7 +99,7 @@ public final class Frequencies {
      * @param noAllDocs The number of all documents of the bag of words.
      * @param noTDocs The number of documents containing a certain term.
      * @return The probabilistic inverse document frequency
-     * @since 3.2
+     * @since 3.3
      */
 
     public static double probabilisticInverseDocumentFrequency(final int noAllDocs, final int noTDocs) {

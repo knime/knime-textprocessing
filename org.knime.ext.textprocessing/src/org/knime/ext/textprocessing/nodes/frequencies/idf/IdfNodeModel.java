@@ -75,26 +75,26 @@ public class IdfNodeModel extends FrequencyNodeModel {
 
     /**
      * idf smooth
-     * @since 3.2
+     * @since 3.3
      */
     public static final String IDF_SMOOTH = "smooth";
 
 
     /**
      * idf normalized
-     * @since 3.2
+     * @since 3.3
      */
     public static final String IDF_NORMALZED = "normalized";
 
 
     /**
      * idf probabilistic
-     * @since 3.2
+     * @since 3.3
      */
     public static final String IDF_PROBABILISTIC = "probabilistic";
 
     /**
-     * @since 3.2
+     * @since 3.3
      */
     public final static String[] m_idfMethods = new String[]{IDF_SMOOTH, IDF_NORMALZED, IDF_PROBABILISTIC};
 
@@ -197,7 +197,7 @@ public class IdfNodeModel extends FrequencyNodeModel {
 
     /**
      * @return  smooth The default idf computation method
-     * @since 3.2
+     * @since 3.3
      */
     public static String getDefaultMethod() {
         return IDF_SMOOTH;
