@@ -117,7 +117,7 @@ public class IdfCellFactory extends FrequencyCellFactory {
      * @param exec The execution context to monitor the progress and check it
      * @param method The method for the computation user canceled the process.
      * @throws CanceledExecutionException If user canceled the process.
-     * @since 3.2
+     * @since 3.3
      */
     public IdfCellFactory(final int documentCellIndex, final int termCellindex, final BufferedDataTable docData,
         final ExecutionContext exec, final String method) throws CanceledExecutionException {

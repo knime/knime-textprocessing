@@ -62,7 +62,7 @@ public class IdfNodeDialog extends FrequenciesNodeSettingsPane {
 
     /**
      * @return settings options
-     * @since 3.2
+     * @since 3.3
      */
     public static SettingsModelString getIdfOptionsModel() {
         return new SettingsModelString(IdfConfigKeys.CFG_KEY_IDFOPTIONS, IdfNodeModel.getDefaultMethod());
