@@ -42,56 +42,36 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   27.08.2008 (thiel): created
+ * Created on 20.12.2012 by kilian
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
-import java.util.List;
+import java.util.Iterator;
 
-import javax.swing.JFrame;
-
-import org.knime.core.node.KNIMEConstants;
 import org.knime.ext.textprocessing.data.Document;
 
 /**
+ * Interface to access of a list of documents and iterate over it.
  *
- * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.8
  */
-class DocumentViewerTablePanel2 extends AbstractDocumentTablePanel2 {
+public interface DocumentProvider extends Iterator<Document> {
 
     /**
-     * Automatically generated serial version id.
+     * @param index The index of the document to return.
+     * @return The document with the specified index of a document list.
+     * @since 2.7
      */
-    private static final long serialVersionUID = 3735659735470727304L;
-
-    private static final String FRAME_TITLE = "Document Details";
-
-    private JFrame frame;
+    public abstract Document getDocument(final int index);
 
     /**
-     * Creates a new instance of {@DocumentViewerTablePanel2} with the given set of documents to display.
-     *
-     * @param documents The set of documents to display.
+     * @return The previous document if it exists, otherwise {@code null}.
      */
-    public DocumentViewerTablePanel2(final List<Document> documents) {
-        super(documents);
-        frame = new JFrame();
-        if (KNIMEConstants.KNIME16X16 != null) {
-            frame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
-        }
-        frame.setVisible(false);
-    }
+    public Document previous();
 
     /**
-     * {@inheritDoc}
+     * @return {@code true} if a previous document exists, otherwise {@code false}.
      */
-    @Override
-    protected void onClick(final int rowIndex, final Document document) {
-        frame.setContentPane(new DocumentViewPanel2(document, this));
-        frame.pack();
-        frame.setTitle(FRAME_TITLE);
-        frame.setVisible(true);
-    }
-
+    public boolean hasPrevious();
 }

@@ -76,7 +76,6 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewModel;
 import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
 
 /**
@@ -190,7 +189,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
     }
 
     private String getParagraphText(final Paragraph p) {
-        if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch()) {
+        if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch() && !m_docViewModel.isDisplayTags()) {
             return replaceWhitespaces(p.getText());
         }
 
@@ -239,6 +238,24 @@ final class DocumentPanel2 extends JPanel implements Observer {
                         }
                     }
                 }
+
+                // when display tags button is selected, doSomeThing
+                if(m_docViewModel.isDisplayTags() && m_docViewModel.getTagType() != null){
+                    if(t.getTags().size() > 0){
+                        List<Tag> termTags = t.getTags();
+                        for(Tag tag : termTags){
+                            if(tag.getTagType().equals(m_docViewModel.getTagType())){
+                                if(!m_docViewModel.isHiliteTags()){
+                                    paramStr.append(replaceWhitespaces(t.getTextWithWsSuffix()));
+                                }
+                                paramStr.append("<font size=\"2.4\">"+"<b>"+"<i>"+"[" + tag.getTagType() + "( " + tag.getTagValue() + ")"+ "] "+"</i>"+"</b>"+"</font>");
+                                marked = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if (!marked) {
                     paramStr.append(replaceWhitespaces(t.getTextWithWsSuffix()));
                 }

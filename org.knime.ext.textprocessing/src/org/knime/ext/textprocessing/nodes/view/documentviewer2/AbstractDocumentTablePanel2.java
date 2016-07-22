@@ -81,7 +81,7 @@ import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentProvider;
+import org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentProvider;
 
 /**
  * A panel providing the functionality of displaying a specified set of documents in a table. A double click at a

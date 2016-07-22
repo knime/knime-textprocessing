@@ -59,7 +59,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewModel;
+import org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentViewModel;
 import org.knime.ext.textprocessing.nodes.view.documentviewer2.slider.ArrowPanel;
 
 /**

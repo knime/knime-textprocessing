@@ -72,7 +72,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.knime.ext.textprocessing.data.TagFactory;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewModel;
 import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
 import org.knime.ext.textprocessing.util.ImgLoaderUtil;
 
@@ -90,6 +89,8 @@ class DocumentControlPanel2 extends JPanel {
     private final DocumentViewModel m_docViewModel;
 
     private final JToggleButton m_hiliteTagsButton;
+
+    private final JToggleButton m_displayTagsButton;
 
     private final JComboBox<String> m_tagTypes;
 
@@ -186,6 +187,16 @@ class DocumentControlPanel2 extends JPanel {
         m_linkSourcesBox.addActionListener(new LinkSourceListener());
         innerHiliteToolbar.add(m_linkSourcesBox, hGBC);
 
+        // tag display button
+        hGBC.gridx = 0;
+        hGBC.gridy = 2;
+        m_displayTagsButton = new JToggleButton("OFF");
+        m_displayTagsButton.setSelected(DocumentViewPanel2.DISPLAY_TAGS);
+        m_displayTagsButton.addActionListener(new DisplayListener());
+        m_displayTagsButton.setToolTipText("click to display tagged terms");
+        innerHiliteToolbar.add(m_displayTagsButton, hGBC);
+
+
         JPanel innerSearchToolbar = new JPanel();
         innerSearchToolbar.setLayout(new GridBagLayout());
         GridBagConstraints sGBC = new GridBagConstraints();
@@ -242,6 +253,7 @@ class DocumentControlPanel2 extends JPanel {
 
     private void updateDocumentViewModel() {
         m_docViewModel.setHiliteTags(m_hiliteTagsButton.isSelected());
+        m_docViewModel.setDisplayTags(m_displayTagsButton.isSelected());
         m_docViewModel.setTagType(m_tagTypes.getSelectedItem().toString());
         m_docViewModel.setHiliteSearch(m_searchButton.isSelected());
         m_docViewModel.setSearchString(m_searchField.getText());
@@ -267,6 +279,31 @@ class DocumentControlPanel2 extends JPanel {
             updateDocumentViewModel();
             m_linkSourcesBox.setEnabled(m_hiliteTagsButton.isSelected());
         }
+    }
+
+    /**
+     *
+     *
+     * @author Hermann Azong, KNIME.com, Berlin, Germany
+     */
+    private class DisplayListener implements ActionListener{
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            updateDocumentViewModel();
+            if(m_displayTagsButton.isSelected()){
+                m_displayTagsButton.setText("ON");
+                m_displayTagsButton.setToolTipText("click to disable tagged terms");
+            } else {
+                m_displayTagsButton.setText("OFF");
+            }
+
+
+        }
+
     }
 
     /**
