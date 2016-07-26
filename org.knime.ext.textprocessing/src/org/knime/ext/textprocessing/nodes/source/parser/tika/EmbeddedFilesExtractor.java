@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.tika;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +64,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
+import org.apache.poi.poifs.filesystem.Entry;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
@@ -103,8 +105,10 @@ public class EmbeddedFilesExtractor {
 
     private List<String> outputFiles;
 
+    private boolean hasError;
+
     /**
-     *
+     * Constructor for EmbeddedFilesExtractor class
      */
     public EmbeddedFilesExtractor() {
         parser = new AutoDetectParser();
@@ -113,6 +117,7 @@ public class EmbeddedFilesExtractor {
         metadata = new Metadata();
         handler = new BodyContentHandler(-1);
         outputFiles = new ArrayList<String>();
+        hasError = false;
     }
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
@@ -125,48 +130,55 @@ public class EmbeddedFilesExtractor {
 
         parser.parse(is, handler, metadata, context);
         outputFiles = ex.getOutputFiles();
-
-        //        if (ex.hasError()) {
-        //            throw new TikaException("Some embedded files might not have been parsed properly.");
-        //        }
+        hasError = ex.hasError();
     }
 
     /**
-     * @param is
-     * @param outputDir
-     * @param fname
+     * Extract all embedded files within a file (if exists)
+     *
+     * @param is input stream
+     * @param outputDir directory to write the extracted files to
+     * @param fname the name of the file
      * @throws SAXException
      * @throws TikaException
      * @throws IOException
      */
-    public void extract(final InputStream is, final Path outputDir, final String fname)
-        throws SAXException, TikaException, IOException {
+    public void extract(final InputStream is, final Path outputDir, final String fname) throws SAXException, TikaException, IOException {
         filename = fname.split("\\.")[0];
         extract(is, outputDir);
     }
 
     /**
-     * @return metadata
+     * @return metadata of the container file
      */
     public Metadata getMetadata() {
         return metadata;
     }
 
     /**
-     * @return content handler
+     * @return content handler that contains the content of the container file
      */
     public ContentHandler getHandler() {
         return handler;
     }
 
     /**
-     * @return list
+     * @return list of extracted files
      */
     public List<String> getOutputFiles() {
         return outputFiles;
     }
 
+    /**
+     * @return boolean if the extract method throws an error
+     */
+    public boolean hasError() {
+        return hasError;
+    }
+
     private class CustomEmbeddedDocumentExtractor extends ParsingEmbeddedDocumentExtractor {
+        private static final String UNKNOWN_EXT = ".bin";
+
         private final Path outputDir;
 
         private int fileCount;
@@ -209,10 +221,9 @@ public class EmbeddedFilesExtractor {
             try {
                 autoParser.parse(tisParse, embedH, mdata, new ParseContext());
             } catch (TikaException e1) {
-                error = true;
+                // no problem if it can't be parsed
             }
 
-            // try to get the name of the embedded file from the metadata
             String name = mdata.get(TikaMetadataKeys.RESOURCE_NAME_KEY);
 
             if (name == null) {
@@ -233,13 +244,13 @@ public class EmbeddedFilesExtractor {
                 try {
                     name += config.getMimeRepository().forName(contentType.toString()).getExtension();
                     if (name.indexOf('.') == -1) {
-                        name += ".bina";
+                        name += UNKNOWN_EXT;
                     }
                 } catch (MimeTypeException e) {
-                    name += ".binb";
+                    name += UNKNOWN_EXT;
                 }
             } else if (name.indexOf('.') == -1 && contentType == null) {
-                name += ".binc";
+                name += UNKNOWN_EXT;
             }
 
             File outputFile = new File(outputDir.toFile(), name);
@@ -262,7 +273,7 @@ public class EmbeddedFilesExtractor {
                 } else {
                     IOUtils.copy(tisExtract, os);
                 }
-            } catch (Exception e) {
+            } catch (FileNotFoundException | SecurityException e) {
                 error = true;
             }
         }
@@ -271,14 +282,14 @@ public class EmbeddedFilesExtractor {
             int read = 0;
             byte[] bytes = new byte[size];
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ByteArrayOutputStream ostream = new ByteArrayOutputStream();
             if (size != 0) {
                 while ((read = input.read(bytes)) != -1) {
-                    bos.write(bytes, 0, read);
+                    ostream.write(bytes, 0, read);
                 }
             }
-            byte[] ba = bos.toByteArray();
-            return ba;
+            byte[] res = ostream.toByteArray();
+            return res;
         }
 
         public boolean hasError() {
@@ -289,14 +300,12 @@ public class EmbeddedFilesExtractor {
             return output;
         }
 
-        protected void copy(final DirectoryEntry sourceDir, final DirectoryEntry destDir) throws IOException {
-            for (org.apache.poi.poifs.filesystem.Entry entry : sourceDir) {
+        private void copy(final DirectoryEntry sourceDir, final DirectoryEntry destDir) throws IOException {
+            for (Entry entry : sourceDir) {
                 if (entry instanceof DirectoryEntry) {
-                    // Need to recurse
                     DirectoryEntry newDir = destDir.createDirectory(entry.getName());
                     copy((DirectoryEntry)entry, newDir);
                 } else {
-                    // Copy entry
                     try (InputStream contents = new DocumentInputStream((DocumentEntry)entry)) {
                         destDir.createDocument(entry.getName(), contents);
                     }

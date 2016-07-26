@@ -304,6 +304,9 @@ public class TikaParserNodeModel extends NodeModel {
                     if (m_extractBooleanModel.getBooleanValue()) {
                         EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                         ex.extract(stream, outputDir.toPath(), file.getName());
+                        if(ex.hasError()){
+                            LOGGER.error("Can't write extracted files to the output directory: " + file.getAbsolutePath());
+                        }
                         metadata = ex.getMetadata();
                         handler = ex.getHandler();
 
@@ -320,7 +323,7 @@ public class TikaParserNodeModel extends NodeModel {
                     } else {
                         parser.parse(stream, handler, metadata, new ParseContext());
                     }
-                } finally {
+                }finally {
                     stream.close();
                 }
 

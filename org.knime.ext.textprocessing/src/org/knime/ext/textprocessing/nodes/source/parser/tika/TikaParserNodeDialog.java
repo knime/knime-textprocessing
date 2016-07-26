@@ -109,6 +109,10 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             TikaParserNodeModel.DEFAULT_EXTRACT_PATH);
     }
 
+//    static SettingsModelAuthentication getCredentials() {
+//        return new SettingsModelAuthentication(TikaParserConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.CREDENTIALS);
+//    }
+
     private SettingsModelString m_typeModel;
 
     private DialogComponentStringListSelection m_typeListModel;
@@ -166,6 +170,8 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
         closeCurrentGroup();
+
+//        addDialogComponent(new DialogComponentAuthentication(getCredentials(), "put credentials", AuthenticationType.CREDENTIALS));
     }
 
     private void checkState() {
