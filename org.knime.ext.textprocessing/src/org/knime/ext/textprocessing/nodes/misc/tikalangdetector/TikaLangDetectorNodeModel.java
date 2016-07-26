@@ -104,13 +104,13 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaLangDetectorNodeModel.class);
 
-    private SettingsModelString m_colModel = TikaLangDetectorNodeDialog.createColModel();
+    private SettingsModelString m_colModel = TikaLangDetectorNodeDialog.getColModel();
 
-    private SettingsModelString m_langColNameModel = TikaLangDetectorNodeDialog.createLangColNameModel();
+    private SettingsModelString m_langColNameModel = TikaLangDetectorNodeDialog.getLangColNameModel();
 
     private SettingsModelBoolean m_confidenceBooleanModel = TikaLangDetectorNodeDialog.getConfidenceBooleanModel();
 
-    private SettingsModelString m_ConfidenceColNameModel = TikaLangDetectorNodeDialog.createConfidenceColNameModel();
+    private SettingsModelString m_ConfidenceColNameModel = TikaLangDetectorNodeDialog.getConfidenceColNameModel();
 
     private SettingsModelBoolean m_allLangsBooleanModel = TikaLangDetectorNodeDialog.getAllLangsBooleanModel();
 

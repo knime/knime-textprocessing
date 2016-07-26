@@ -37,7 +37,9 @@
     </fullDescription>
         
     <ports>
-        <outPort name="Documents output table" index="0">An output table
+        <outPort name="Metadata output table" index="0">An output table
+        containing the parsed document data. The columns are the same as what was selected in the Metadata list in the configure dialog.</outPort>
+        <outPort name="Attachment output table" index="1">An output table
         containing the parsed document data. The columns are the same as what was selected in the Metadata list in the configure dialog.</outPort>
     </ports>
 </knimeNode>

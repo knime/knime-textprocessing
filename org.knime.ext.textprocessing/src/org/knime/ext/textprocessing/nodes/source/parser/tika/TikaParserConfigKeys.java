@@ -86,4 +86,14 @@ public final class TikaParserConfigKeys {
      */
     public static final String CFGKEY_TYPE = "Type";
 
+    /**
+     * The configuration key of the "extract attachments" flag.
+     */
+    public static final String CFGKEY_EXTRACT_BOOLEAN = "ExtractAttachments";
+
+    /**
+     * The configuration key of the directory path where attachments will be extracted.
+     */
+    public static final String CFGKEY_EXTRACT_PATH = "ExtractAttachmentsPath";
+
 }

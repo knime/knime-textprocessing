@@ -69,7 +69,7 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return The settings model containing the default column.
      */
-    public static SettingsModelString createColModel() {
+    public static SettingsModelString getColModel() {
         return new SettingsModelString(TikaLangDetectorConfigKeys.CFGKEY_COL,
             TikaLangDetectorNodeModel.DEFAULT_COLNAME);
     }
@@ -77,7 +77,7 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return The settings model containing the name of the language column.
      */
-    public static SettingsModelString createLangColNameModel() {
+    public static SettingsModelString getLangColNameModel() {
         return new SettingsModelString(TikaLangDetectorConfigKeys.CFGKEY_LANG_COL_NAME,
             TikaLangDetectorNodeModel.DEFAULT_LANG_COLNAME);
     }
@@ -93,7 +93,7 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return The settings model containing the name of the confidence value column.
      */
-    public static SettingsModelString createConfidenceColNameModel() {
+    public static SettingsModelString getConfidenceColNameModel() {
         return new SettingsModelString(TikaLangDetectorConfigKeys.CFGKEY_CONFIDENCE_COL_NAME,
             TikaLangDetectorNodeModel.DEFAULT_CONFIDENCE_COLNAME);
     }
@@ -119,12 +119,12 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public TikaLangDetectorNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(createColModel(), "String or Document column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(getColModel(), "String or Document column", 0,
             DocumentValue.class, StringValue.class));
 
-        addDialogComponent(new DialogComponentString(createLangColNameModel(), "New language column"));
+        addDialogComponent(new DialogComponentString(getLangColNameModel(), "New language column"));
 
-        m_confidenceColModel = createConfidenceColNameModel();
+        m_confidenceColModel = getConfidenceColNameModel();
         m_confidenceBooleanModel = getConfidenceBooleanModel();
         checkState();
         m_confidenceBooleanModel.addChangeListener(new InternalChangeListener());

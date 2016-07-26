@@ -99,18 +99,34 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(TikaParserConfigKeys.CFGKEY_TYPE, TikaParserNodeModel.DEFAULT_TYPE);
     }
 
+    static SettingsModelBoolean getExtractBooleanModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_EXTRACT_BOOLEAN,
+            TikaParserNodeModel.DEFAULT_EXTRACT);
+    }
+
+    static SettingsModelString getExtractPathModel() {
+        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_EXTRACT_PATH,
+            TikaParserNodeModel.DEFAULT_EXTRACT_PATH);
+    }
+
     private SettingsModelString m_typeModel;
 
     private DialogComponentStringListSelection m_typeListModel;
 
+    private SettingsModelBoolean m_extractBooleanModel;
+
+    private SettingsModelString m_extractPathModel;
+
     /**
-     * Creates a new instance of {@code TikaParserNodeDialog} which displays a file chooser component, to
-     * specify the directory containing the files to parse, two checkbox components to specify if the directory is
-     * searched recursively for files to parse and whether to ignore hidden files, button and list components to specify which
-     * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify which meta data
-     * information are to be extracted.
+     * Creates a new instance of {@code TikaParserNodeDialog} which displays a file chooser component, to specify the
+     * directory containing the files to parse, two checkbox components to specify if the directory is searched
+     * recursively for files to parse and whether to ignore hidden files, button and list components to specify which
+     * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify
+     * which meta data information are to be extracted. Another boolean button is added to specify whether embedded
+     * files should be extracted as well to a specific directory using a file chooser component.
      */
     public TikaParserNodeDialog() {
+        createNewGroup("Directory settings");
         addDialogComponent(new DialogComponentFileChooser(getPathModel(), TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
 
@@ -119,6 +135,7 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(getIgnoreHiddenFilesModel(), "Ignore hidden files"));
         setHorizontalPlacement(false);
+        closeCurrentGroup();
 
         m_typeModel = getTypeModel();
 
@@ -138,6 +155,39 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
             new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
+
+        createNewGroup("Extract embedded files to a directory");
+        m_extractBooleanModel = getExtractBooleanModel();
+        m_extractPathModel = getExtractPathModel();
+        checkState();
+        m_extractBooleanModel.addChangeListener(new InternalChangeListener());
+
+        addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
+        addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserNodeDialog.class.toString(),
+            JFileChooser.OPEN_DIALOG, true));
+        closeCurrentGroup();
+    }
+
+    private void checkState() {
+        if (m_extractBooleanModel.getBooleanValue()) {
+            m_extractPathModel.setEnabled(true);
+        } else {
+            m_extractPathModel.setEnabled(false);
+        }
+    }
+
+    /**
+     * Listens to state change and enables / disables the model of the extracted path model
+     */
+    class InternalChangeListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            checkState();
+        }
     }
 
     class ButtonChangeListener implements ChangeListener {
