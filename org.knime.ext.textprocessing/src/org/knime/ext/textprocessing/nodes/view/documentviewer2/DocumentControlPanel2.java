@@ -204,7 +204,7 @@ class DocumentControlPanel2 extends JPanel {
         m_disableHtmlTags = new JToggleButton("html Off");
         m_disableHtmlTags.setSelected(DocumentViewPanel2.DISABLE_HTML_TAGS);
         m_disableHtmlTags.addActionListener(new DisableListener());
-        m_disableHtmlTags.setToolTipText("click to disable html tags in text");
+        m_disableHtmlTags.setToolTipText("click to show OFF html tags in text");
         innerHiliteToolbar.add(m_disableHtmlTags, hGBC);
 
 
@@ -312,6 +312,8 @@ class DocumentControlPanel2 extends JPanel {
                 m_displayTagsButton.setToolTipText("click to disable tagged terms");
             } else {
                 m_displayTagsButton.setText("OFF");
+                m_displayTagsButton.setToolTipText("click to display tagged terms");
+
             }
 
 
@@ -335,9 +337,10 @@ class DocumentControlPanel2 extends JPanel {
             updateDocumentViewModel();
             if(m_disableHtmlTags.isSelected()){
                 m_disableHtmlTags.setText("html On");
-                m_displayTagsButton.setToolTipText("click to enable html tags");
+                m_disableHtmlTags.setToolTipText("click to show ON html tags in text");
             } else {
                 m_disableHtmlTags.setText("html Off");
+                m_disableHtmlTags.setToolTipText("click to show OFF html tags in text");
             }
 
         }
