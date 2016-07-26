@@ -69,6 +69,8 @@ public class DocumentViewModel extends Observable {
 
     private boolean m_displayTags = DocumentViewPanel2.DISPLAY_TAGS;
 
+    private boolean m_disableHtmlTags = DocumentViewPanel2.DISABLE_HTML_TAGS;
+
     private String m_tagType = null;
 
     private Color m_taggedEntityColor = DocumentViewPanel2.DEFAULT_ENTITY_COLOR;
@@ -230,5 +232,19 @@ public class DocumentViewModel extends Observable {
      */
     public void setDisplayTags(final boolean displayTags) {
         this.m_displayTags = displayTags;
+    }
+
+    /**
+     * @return the m_disableHtmlTags
+     */
+    public boolean isDisableHtmlTags() {
+        return m_disableHtmlTags;
+    }
+
+    /**
+     * @param disableHtmlTags the m_disableHtmlTags to set
+     */
+    public void setDisableHtmlTags(final boolean disableHtmlTags) {
+        this.m_disableHtmlTags = disableHtmlTags;
     }
 }

@@ -84,6 +84,12 @@ class DocumentViewPanel2 extends JPanel {
     public static final boolean DISPLAY_TAGS = false;
 
     /**
+     * the default setting for disabling html tags
+     */
+    public static final boolean DISABLE_HTML_TAGS = false;
+
+
+    /**
      * The default entity hilite color.
      */
     public static final Color DEFAULT_ENTITY_COLOR = Color.BLUE;

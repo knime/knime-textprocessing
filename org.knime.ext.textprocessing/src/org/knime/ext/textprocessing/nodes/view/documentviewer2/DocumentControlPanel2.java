@@ -92,6 +92,8 @@ class DocumentControlPanel2 extends JPanel {
 
     private final JToggleButton m_displayTagsButton;
 
+    private final JToggleButton m_disableHtmlTags;
+
     private final JComboBox<String> m_tagTypes;
 
     private final JComboBox<String> m_linkSourcesBox;
@@ -196,6 +198,16 @@ class DocumentControlPanel2 extends JPanel {
         m_displayTagsButton.setToolTipText("click to display tagged terms");
         innerHiliteToolbar.add(m_displayTagsButton, hGBC);
 
+        // html disable button
+        hGBC.gridx = 0;
+        hGBC.gridy = 3;
+        m_disableHtmlTags = new JToggleButton("html Off");
+        m_disableHtmlTags.setSelected(DocumentViewPanel2.DISABLE_HTML_TAGS);
+        m_disableHtmlTags.addActionListener(new DisableListener());
+        m_disableHtmlTags.setToolTipText("click to disable html tags in text");
+        innerHiliteToolbar.add(m_disableHtmlTags, hGBC);
+
+
 
         JPanel innerSearchToolbar = new JPanel();
         innerSearchToolbar.setLayout(new GridBagLayout());
@@ -254,6 +266,7 @@ class DocumentControlPanel2 extends JPanel {
     private void updateDocumentViewModel() {
         m_docViewModel.setHiliteTags(m_hiliteTagsButton.isSelected());
         m_docViewModel.setDisplayTags(m_displayTagsButton.isSelected());
+        m_docViewModel.setDisableHtmlTags(m_disableHtmlTags.isSelected());
         m_docViewModel.setTagType(m_tagTypes.getSelectedItem().toString());
         m_docViewModel.setHiliteSearch(m_searchButton.isSelected());
         m_docViewModel.setSearchString(m_searchField.getText());
@@ -301,6 +314,31 @@ class DocumentControlPanel2 extends JPanel {
                 m_displayTagsButton.setText("OFF");
             }
 
+
+        }
+
+    }
+
+    /**
+     *
+     *
+     * @author Hermann Azong, KNIME.com, Berlin, Germany
+     */
+
+    private class DisableListener implements ActionListener{
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            updateDocumentViewModel();
+            if(m_disableHtmlTags.isSelected()){
+                m_disableHtmlTags.setText("html On");
+                m_displayTagsButton.setToolTipText("click to enable html tags");
+            } else {
+                m_disableHtmlTags.setText("html Off");
+            }
 
         }
 

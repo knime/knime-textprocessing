@@ -189,7 +189,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
     }
 
     private String getParagraphText(final Paragraph p) {
-        if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch() && !m_docViewModel.isDisplayTags()) {
+        if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch() && !m_docViewModel.isDisplayTags() && !m_docViewModel.isDisableHtmlTags()) {
             return replaceWhitespaces(p.getText());
         }
 
@@ -200,7 +200,6 @@ final class DocumentPanel2 extends JPanel implements Observer {
         for (Sentence sen : p.getSentences()) {
             for (Term t : sen.getTerms()) {
                 boolean marked = false;
-
                 // search hiliting
                 if (m_docViewModel.isHiliteSearch() && m_docViewModel.getSearchString() != null) {
                     if (searchMatch(t, m_docViewModel.getSearchString())) {
@@ -261,7 +260,12 @@ final class DocumentPanel2 extends JPanel implements Observer {
                 }
             }
         }
-        return paramStr.toString();
+
+        String paragraphString = paramStr.toString();
+        if(m_docViewModel.isDisableHtmlTags()){
+            paragraphString = paragraphString.replaceAll("\\<[^>]*>", "");
+        }
+        return paragraphString;
     }
 
     private static final boolean searchMatch(final Term term, final String search) {
