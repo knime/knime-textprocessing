@@ -112,7 +112,11 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelString m_extractPathModel;
 
     /**
-     *
+     * Creates a new instance of {@code TikaParserInputNodeDialog} which displays a column list component, to specify the
+     * column containing the paths to files that are to be parsed, button and list components to specify which
+     * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify
+     * which meta data information are to be extracted. Another boolean button is added to specify whether embedded
+     * files should be extracted as well to a specific directory using a file chooser component.
      */
     @SuppressWarnings("unchecked")
     public TikaParserInputNodeDialog() {
