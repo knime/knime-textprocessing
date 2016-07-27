@@ -51,7 +51,6 @@ package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
-import org.knime.ext.textprocessing.nodes.misc.tikalangdetector.TikaLangDetectorNodeDialog;
 
 /**
  *
@@ -97,7 +96,7 @@ public class TikaParserInputNodeFactory extends NodeFactory<TikaParserInputNodeM
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new TikaLangDetectorNodeDialog();
+        return new TikaParserInputNodeDialog();
     }
 
 }

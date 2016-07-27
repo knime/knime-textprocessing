@@ -95,6 +95,13 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.streamable.BufferedDataTableRowOutput;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.PortInput;
+import org.knime.core.node.streamable.PortOutput;
+import org.knime.core.node.streamable.RowOutput;
+import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 import org.xml.sax.ContentHandler;
@@ -215,6 +222,177 @@ public class TikaParserNodeModel extends NodeModel {
         return new DataTableSpec[]{null, null};
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BufferedDataTable[] execute(final BufferedDataTable[] data, final ExecutionContext exec)
+        throws Exception {
+        // create output spec and its container
+        BufferedDataContainer container1 =
+            exec.createDataContainer(createOutputTableSpec(Arrays.asList(m_columnModel.getStringArrayValue())));
+        BufferedDataContainer container2 =
+            exec.createDataContainer(createOutputTableSpec(Arrays.asList(OUTPUT_TWO_COL_NAMES)));
+
+        BufferedDataTableRowOutput output1 = new BufferedDataTableRowOutput(container1);
+        BufferedDataTableRowOutput output2 = new BufferedDataTableRowOutput(container2);
+
+        createStreamableOperator(null, null).runFinal(new PortInput[0], new PortOutput[]{output1, output2}, exec);
+        output1.close();
+        output2.close();
+        return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
+    }
+
+    @Override
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        return new StreamableOperator() {
+
+            @Override
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
+                assert inputs.length == 0;
+
+                RowOutput rowOutput1 = (RowOutput)outputs[0]; // data output port 1
+                RowOutput rowOutput2 = (RowOutput)outputs[1]; // data output port 2
+
+                boolean ext, error = false;
+                if (m_typesModel.getStringValue().equals(EXT_TYPE)) {
+                    ext = true;
+                } else {
+                    ext = false;
+                }
+
+                final File dir = getFile(m_pathModel.getStringValue());
+                final File outputDir = getFile(m_extractPathModel.getStringValue());
+                final boolean recursive = m_recursiveModel.getBooleanValue();
+                final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
+
+                final FileCollector fc;
+                if (ext) {
+                    fc = new FileCollector(dir, Arrays.asList(m_typeListModel.getStringArrayValue()), recursive,
+                        ignoreHiddenFiles);
+                } else {
+                    fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
+                }
+
+                final List<File> files = fc.getFiles();
+                final int numberOfFiles = files.size();
+
+                if (numberOfFiles == 0) {
+                    LOGGER.warn("Directory is empty: " + dir.getPath());
+                }
+
+                List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
+                int rowKeyOne = 0;
+                int rowKeyTwo = 0;
+                for (int i = 0; i < numberOfFiles; i++) {
+                    File file = files.get(i);
+                    if (!file.isFile()) {
+                        continue;
+                    }
+                    try {
+                        String mime_type = "-";
+                        ContentHandler handler = new BodyContentHandler(-1);
+                        AutoDetectParser parser = new AutoDetectParser();
+                        Metadata metadata = new Metadata();
+                        metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
+
+                        mime_type = parser.getDetector()
+                            .detect(new BufferedInputStream(new FileInputStream(file.getPath())), metadata).toString();
+
+                        if (mime_type.equals(MediaType.OCTET_STREAM.toString())) {
+                            LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath());
+                            error = true;
+                            continue;
+                        }
+                        if (!ext) {
+                            List<String> validTypes = Arrays.asList(m_typeListModel.getStringArrayValue());
+                            if (!validTypes.contains(mime_type)) {
+                                continue;
+                            }
+
+                        }
+                        LOGGER.info("Parsing file: " + file.getAbsolutePath());
+
+                        TikaInputStream stream = TikaInputStream.get(file.toPath());
+
+                        try {
+                            if (m_extractBooleanModel.getBooleanValue()) {
+                                EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
+                                ex.extract(stream, outputDir.toPath(), file.getName());
+                                if (ex.hasError()) {
+                                    LOGGER.error("Can't write extracted files to the output directory: "
+                                        + file.getAbsolutePath());
+                                }
+                                metadata = ex.getMetadata();
+                                handler = ex.getHandler();
+
+                                DataCell[] cellsTwo;
+                                DataRow rowTwo;
+                                for (String entry : ex.getOutputFiles()) {
+                                    cellsTwo = new DataCell[OUTPUT_TWO_COL_NAMES.length];
+                                    cellsTwo[0] = new StringCell(file.getName());
+                                    cellsTwo[1] = new StringCell(entry);
+                                    rowTwo = new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), cellsTwo);
+                                    rowOutput2.push(rowTwo);
+                                    rowKeyTwo++;
+                                }
+                            } else {
+                                parser.parse(stream, handler, metadata, new ParseContext());
+                            }
+                        } finally {
+                            stream.close();
+                        }
+
+                        DataCell[] cellsOne = new DataCell[outputColumnsOne.size()];
+                        for (int j = 0; j < outputColumnsOne.size(); j++) {
+                            String colName = outputColumnsOne.get(j);
+                            Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
+                            if (prop == null && colName.equals(TikaColumnKeys.COL_FILENAME)) {
+                                cellsOne[j] = new StringCell(file.getName());
+                            } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
+                                if (mime_type.equals("-")) {
+                                    cellsOne[j] = DataType.getMissingCell();
+                                } else {
+                                    cellsOne[j] = new StringCell(mime_type);
+                                }
+                            } else if (prop == null && colName.equals(TikaColumnKeys.COL_CONTENT)) {
+                                cellsOne[j] = new StringCell(handler.toString());
+                            } else {
+                                String val = metadata.get(prop);
+                                if (val == null) {
+                                    cellsOne[j] = DataType.getMissingCell();
+                                } else {
+                                    cellsOne[j] = new StringCell(val);
+                                }
+                            }
+                        }
+
+                        DataRow rowOne = new DefaultRow(RowKey.createRowKey((long)rowKeyOne), cellsOne);
+                        rowOutput1.push(rowOne);
+                        rowKeyOne++;
+
+                        exec.checkCanceled();
+                        exec.setProgress(i / (double)numberOfFiles, "Parsing file " + i + " of " + numberOfFiles);
+
+                    } catch (FileNotFoundException e) {
+                        LOGGER.warn("Could not find file: " + file.getAbsolutePath(), e);
+                        error = true;
+                    } catch (IOException | SAXException | TikaException e) {
+                        LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath(), e);
+                        error = true;
+                    }
+                } // end for loop
+
+                if (error) {
+                    setWarningMessage("Could not parse all files properly!");
+                }
+
+            }
+        };
+    }
+
     private DataTableSpec createOutputTableSpec(final List<String> selectedColumns) {
         DataColumnSpec[] cspecs = new DataColumnSpec[selectedColumns.size()];
         int i = 0;
@@ -224,158 +402,6 @@ public class TikaParserNodeModel extends NodeModel {
         }
 
         return new DataTableSpec(cspecs);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws InvalidSettingsException
-     */
-    @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-        throws CanceledExecutionException, InvalidSettingsException {
-        boolean ext, error = false;
-        if (m_typesModel.getStringValue().equals(EXT_TYPE)) {
-            ext = true;
-        } else {
-            ext = false;
-        }
-        List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
-        List<String> outputColumnsTwo = Arrays.asList(OUTPUT_TWO_COL_NAMES);
-
-        // create output spec and its container
-        BufferedDataContainer container1 = exec.createDataContainer(createOutputTableSpec(outputColumnsOne));
-        BufferedDataContainer container2 = exec.createDataContainer(createOutputTableSpec(outputColumnsTwo));
-
-        final File dir = getFile(m_pathModel.getStringValue());
-        final File outputDir = getFile(m_extractPathModel.getStringValue());
-        final boolean recursive = m_recursiveModel.getBooleanValue();
-        final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-
-        final FileCollector fc;
-        if (ext) {
-            fc = new FileCollector(dir, Arrays.asList(m_typeListModel.getStringArrayValue()), recursive,
-                ignoreHiddenFiles);
-        } else {
-            fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
-        }
-
-        final List<File> files = fc.getFiles();
-        final int numberOfFiles = files.size();
-
-        if (numberOfFiles == 0) {
-            LOGGER.warn("Directory is empty: " + dir.getPath());
-        }
-
-        int rowKeyOne = 0;
-        int rowKeyTwo = 0;
-        for (int i = 0; i < numberOfFiles; i++) {
-            File file = files.get(i);
-            if (!file.isFile()) {
-                continue;
-            }
-            try {
-                String mime_type = "-";
-                ContentHandler handler = new BodyContentHandler(-1);
-                AutoDetectParser parser = new AutoDetectParser();
-                Metadata metadata = new Metadata();
-                metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
-
-                mime_type = parser.getDetector()
-                    .detect(new BufferedInputStream(new FileInputStream(file.getPath())), metadata).toString();
-
-                if (mime_type.equals(MediaType.OCTET_STREAM.toString())) {
-                    LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath());
-                    error = true;
-                    continue;
-                }
-                if (!ext) {
-                    List<String> validTypes = Arrays.asList(m_typeListModel.getStringArrayValue());
-                    if (!validTypes.contains(mime_type)) {
-                        continue;
-                    }
-
-                }
-                LOGGER.info("Parsing file: " + file.getAbsolutePath());
-
-                TikaInputStream stream = TikaInputStream.get(file.toPath());
-
-                try {
-                    if (m_extractBooleanModel.getBooleanValue()) {
-                        EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
-                        ex.extract(stream, outputDir.toPath(), file.getName());
-                        if(ex.hasError()){
-                            LOGGER.error("Can't write extracted files to the output directory: " + file.getAbsolutePath());
-                        }
-                        metadata = ex.getMetadata();
-                        handler = ex.getHandler();
-
-                        DataCell[] cellsTwo;
-                        DataRow rowTwo;
-                        for (String entry : ex.getOutputFiles()) {
-                            cellsTwo = new DataCell[outputColumnsTwo.size()];
-                            cellsTwo[0] = new StringCell(file.getName());
-                            cellsTwo[1] = new StringCell(entry);
-                            rowTwo = new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), cellsTwo);
-                            container2.addRowToTable(rowTwo);
-                            rowKeyTwo++;
-                        }
-                    } else {
-                        parser.parse(stream, handler, metadata, new ParseContext());
-                    }
-                }finally {
-                    stream.close();
-                }
-
-                DataCell[] cellsOne = new DataCell[outputColumnsOne.size()];
-                for (int j = 0; j < outputColumnsOne.size(); j++) {
-                    String colName = outputColumnsOne.get(j);
-                    Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
-                    if (prop == null && colName.equals(TikaColumnKeys.COL_FILENAME)) {
-                        cellsOne[j] = new StringCell(file.getName());
-                    } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
-                        if (mime_type.equals("-")) {
-                            cellsOne[j] = DataType.getMissingCell();
-                        } else {
-                            cellsOne[j] = new StringCell(mime_type);
-                        }
-                    } else if (prop == null && colName.equals(TikaColumnKeys.COL_CONTENT)) {
-                        cellsOne[j] = new StringCell(handler.toString());
-                    } else {
-                        String val = metadata.get(prop);
-                        if (val == null) {
-                            cellsOne[j] = DataType.getMissingCell();
-                        } else {
-                            cellsOne[j] = new StringCell(val);
-                        }
-                    }
-                }
-
-                DataRow rowOne = new DefaultRow(RowKey.createRowKey((long)rowKeyOne), cellsOne);
-                container1.addRowToTable(rowOne);
-                rowKeyOne++;
-
-                exec.checkCanceled();
-                exec.setProgress(i / (double)numberOfFiles, "Parsing file " + i + " of " + numberOfFiles);
-
-            } catch (FileNotFoundException e) {
-                LOGGER.warn("Could not find file: " + file.getAbsolutePath(), e);
-                error = true;
-            } catch (IOException | SAXException | TikaException e) {
-                LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath(), e);
-                error = true;
-            }
-        } // end for loop
-
-        if (error) {
-            setWarningMessage("Could not parse all files properly!");
-        }
-
-        container1.close();
-        container2.close();
-
-        return new BufferedDataTable[]{container1.getTable(), container2.getTable()};
-
     }
 
     /**
