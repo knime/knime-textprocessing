@@ -62,16 +62,6 @@ public class TikaParserInputConfigKeys {
     public static final String CFGKEY_COL = "Column";
 
     /**
-     * The configuration key of the recursive flag (if set the specified directory is search recursively).
-     */
-    public static final String CFGKEY_RECURSIVE = "Rec";
-
-    /**
-     * The configuration key of the "ignore hidden files" flag.
-     */
-    public static final String CFGKEY_IGNORE_HIDDENFILES = "IgnoreHiddenFiles";
-
-    /**
      * The configuration key of the list of the file types (either file extensions or MIME-Types).
      */
     public static final String CFGKEY_TYPE_LIST = "TypeList";

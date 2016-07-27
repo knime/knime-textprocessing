@@ -243,6 +243,9 @@ public class TikaParserNodeModel extends NodeModel {
         return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
         final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
@@ -322,8 +325,9 @@ public class TikaParserNodeModel extends NodeModel {
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                                 ex.extract(stream, outputDir.toPath(), file.getName());
                                 if (ex.hasError()) {
-                                    LOGGER.error("Can't write extracted files to the output directory: "
+                                    LOGGER.error("Can't write embedded files to the output directory: "
                                         + file.getAbsolutePath());
+                                    error = true;
                                 }
                                 metadata = ex.getMetadata();
                                 handler = ex.getHandler();
@@ -341,6 +345,9 @@ public class TikaParserNodeModel extends NodeModel {
                             } else {
                                 parser.parse(stream, handler, metadata, new ParseContext());
                             }
+                        } catch (IOException | SAXException | TikaException e) {
+                            LOGGER.warn("Error parsing/writing embedded files of: " + file.getAbsolutePath());
+                            error = true;
                         } finally {
                             stream.close();
                         }
@@ -379,7 +386,7 @@ public class TikaParserNodeModel extends NodeModel {
                     } catch (FileNotFoundException e) {
                         LOGGER.warn("Could not find file: " + file.getAbsolutePath(), e);
                         error = true;
-                    } catch (IOException | SAXException | TikaException e) {
+                    } catch (IOException e) {
                         LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath(), e);
                         error = true;
                     }

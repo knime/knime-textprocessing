@@ -48,57 +48,79 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Property;
+import org.apache.tika.metadata.TikaMetadataKeys;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.BodyContentHandler;
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
+import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.node.BufferedDataContainer;
+import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.streamable.BufferedDataTableRowOutput;
+import org.knime.core.node.streamable.DataTableRowInput;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.PortInput;
+import org.knime.core.node.streamable.PortOutput;
+import org.knime.core.node.streamable.RowInput;
+import org.knime.core.node.streamable.RowOutput;
+import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.util.FileUtil;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.EmbeddedFilesExtractor;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaColumnKeys;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 /**
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
+public class TikaParserInputNodeModel extends NodeModel {
+
     /**
      * The name of the language column to parse.
      */
     static final String DEFAULT_COLNAME = "";
-
-    /**
-     * The default value of the recursive flag (if set <code>true</code> the specified directory is search recursively).
-     */
-    public static final boolean DEFAULT_RECURSIVE = false;
-
-    /**
-     * The default value of the ignore hidden files flag (if set <code>true</code> the hidden files will be not
-     * considered for parsing.
-     */
-    public static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
 
     /**
      * The action command value for choosing file extension in the dialog selection.
@@ -162,10 +184,6 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
 
     private SettingsModelString m_colModel = TikaParserInputNodeDialog.getColModel();
 
-    private SettingsModelBoolean m_recursiveModel = TikaParserInputNodeDialog.getRecursiveModel();
-
-    private SettingsModelBoolean m_ignoreHiddenFilesModel = TikaParserInputNodeDialog.getIgnoreHiddenFilesModel();
-
     private SettingsModelString m_typesModel = TikaParserInputNodeDialog.getTypeModel();
 
     private SettingsModelStringArray m_typeListModel = TikaParserInputNodeDialog.getTypeListModel();
@@ -175,6 +193,63 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
     private SettingsModelBoolean m_extractBooleanModel = TikaParserInputNodeDialog.getExtractBooleanModel();
 
     private SettingsModelString m_extractPathModel = TikaParserInputNodeDialog.getExtractPathModel();
+
+    /**
+     * Creates a new instance of {@code TikaParserInputNodeModel}
+     */
+    public TikaParserInputNodeModel() {
+
+        super(1, 2);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpec in = inSpecs[0];
+        int colIndex = -1;
+        colIndex = in.findColumnIndex(m_colModel.getStringValue());
+        if (colIndex < 0) {
+            for (int i = 0; i < in.getNumColumns(); i++) {
+                if (in.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
+                    colIndex = i;
+                    LOGGER.info("Guessing string column \"" + in.getColumnSpec(i).getName() + "\".");
+                    break;
+                }
+            }
+        }
+
+        if (colIndex < 0) {
+            throw new InvalidSettingsException("String column not set");
+        }
+        m_colModel.setStringValue(in.getColumnSpec(colIndex).getName());
+
+        return new DataTableSpec[]{null, null};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BufferedDataTable[] execute(final BufferedDataTable[] data, final ExecutionContext exec)
+        throws Exception {
+
+        // create output spec and its container
+        BufferedDataContainer container1 =
+            exec.createDataContainer(createOutputTableSpec(Arrays.asList(m_columnModel.getStringArrayValue())));
+        BufferedDataContainer container2 =
+            exec.createDataContainer(createOutputTableSpec(Arrays.asList(OUTPUT_TWO_COL_NAMES)));
+
+        BufferedDataTableRowOutput output1 = new BufferedDataTableRowOutput(container1);
+        BufferedDataTableRowOutput output2 = new BufferedDataTableRowOutput(container2);
+
+        createStreamableOperator(null, null).runFinal(new PortInput[]{new DataTableRowInput(data[0])},
+            new PortOutput[]{output1, output2}, exec);
+        output1.close();
+        output2.close();
+        return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
+    }
 
     private DataTableSpec createOutputTableSpec(final List<String> selectedColumns) {
         DataColumnSpec[] cspecs = new DataColumnSpec[selectedColumns.size()];
@@ -191,10 +266,150 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
      * {@inheritDoc}
      */
     @Override
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        return new StreamableOperator() {
+
+            @Override
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
+                RowInput rowInput = (RowInput)inputs[0];
+
+                RowOutput rowOutput1 = (RowOutput)outputs[0]; // data output port 1
+                RowOutput rowOutput2 = (RowOutput)outputs[1]; // data output port 2
+
+                boolean ext, error = false;
+                if (m_typesModel.getStringValue().equals(EXT_TYPE)) {
+                    ext = true;
+                } else {
+                    ext = false;
+                }
+                int colIndex = rowInput.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
+                final File outputDir = getFile(m_extractPathModel.getStringValue());
+                List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
+                int rowKeyOne = 0;
+                int rowKeyTwo = 0;
+
+                DataRow row;
+                while ((row = rowInput.poll()) != null) {
+                    String url = ((StringCell)row.getCell(colIndex)).getStringValue();
+                    File file = getFile(url);
+                    if (!file.isFile()) {
+                        continue;
+                    }
+                    try {
+                        String mime_type = "-";
+                        ContentHandler handler = new BodyContentHandler(-1);
+                        AutoDetectParser parser = new AutoDetectParser();
+                        Metadata metadata = new Metadata();
+                        metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
+
+                        mime_type = parser.getDetector()
+                            .detect(new BufferedInputStream(new FileInputStream(file.getPath())), metadata).toString();
+
+                        if (mime_type.equals(MediaType.OCTET_STREAM.toString())) {
+                            LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath());
+                            error = true;
+                            continue;
+                        }
+                        if (!ext) {
+                            List<String> validTypes = Arrays.asList(m_typeListModel.getStringArrayValue());
+                            if (!validTypes.contains(mime_type)) {
+                                continue;
+                            }
+
+                        }
+                        LOGGER.info("Parsing file: " + file.getAbsolutePath());
+
+                        TikaInputStream stream = TikaInputStream.get(file.toPath());
+
+                        try {
+                            if (m_extractBooleanModel.getBooleanValue()) {
+                                EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
+                                ex.extract(stream, outputDir.toPath(), file.getName());
+                                if (ex.hasError()) {
+                                    LOGGER.error("Can't write embedded files to the output directory: "
+                                        + file.getAbsolutePath());
+                                    error = true;
+                                }
+                                metadata = ex.getMetadata();
+                                handler = ex.getHandler();
+
+                                DataCell[] cellsTwo;
+                                DataRow rowTwo;
+                                for (String entry : ex.getOutputFiles()) {
+                                    cellsTwo = new DataCell[OUTPUT_TWO_COL_NAMES.length];
+                                    cellsTwo[0] = new StringCell(file.getName());
+                                    cellsTwo[1] = new StringCell(entry);
+                                    rowTwo = new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), cellsTwo);
+                                    rowOutput2.push(rowTwo);
+                                    rowKeyTwo++;
+                                }
+                            } else {
+                                parser.parse(stream, handler, metadata, new ParseContext());
+                            }
+                        } catch (IOException | SAXException | TikaException e) {
+                            LOGGER.warn("Error parsing/writing embedded files of: " + file.getAbsolutePath());
+                            error = true;
+                        } finally {
+                            stream.close();
+                        }
+
+                        DataCell[] cellsOne = new DataCell[outputColumnsOne.size()];
+                        for (int j = 0; j < outputColumnsOne.size(); j++) {
+                            String colName = outputColumnsOne.get(j);
+                            Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
+                            if (prop == null && colName.equals(TikaColumnKeys.COL_FILENAME)) {
+                                cellsOne[j] = new StringCell(file.getAbsolutePath());
+                            } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
+                                if (mime_type.equals("-")) {
+                                    cellsOne[j] = DataType.getMissingCell();
+                                } else {
+                                    cellsOne[j] = new StringCell(mime_type);
+                                }
+                            } else if (prop == null && colName.equals(TikaColumnKeys.COL_CONTENT)) {
+                                cellsOne[j] = new StringCell(handler.toString());
+                            } else {
+                                String val = metadata.get(prop);
+                                if (val == null) {
+                                    cellsOne[j] = DataType.getMissingCell();
+                                } else {
+                                    cellsOne[j] = new StringCell(val);
+                                }
+                            }
+                        }
+
+                        DataRow rowOne = new DefaultRow(RowKey.createRowKey((long)rowKeyOne), cellsOne);
+                        rowOutput1.push(rowOne);
+                        rowKeyOne++;
+
+                        exec.checkCanceled();
+
+                    } catch (FileNotFoundException e) {
+                        LOGGER.warn("Could not find file: " + file.getAbsolutePath(), e);
+                        error = true;
+                    } catch (IOException e) {
+                        LOGGER.warn("Could not detect/parse file: " + file.getAbsolutePath(), e);
+                        error = true;
+                    }
+                } // end for loop
+
+                if (error) {
+                    setWarningMessage("Could not parse all files properly!");
+                }
+
+                rowInput.close();
+            }
+
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_colModel.saveSettingsTo(settings);
-        m_recursiveModel.saveSettingsTo(settings);
-        m_ignoreHiddenFilesModel.saveSettingsTo(settings);
         m_typesModel.saveSettingsTo(settings);
         m_columnModel.saveSettingsTo(settings);
         m_typeListModel.saveSettingsTo(settings);
@@ -209,8 +424,6 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_colModel.validateSettings(settings);
-        m_recursiveModel.validateSettings(settings);
-        m_ignoreHiddenFilesModel.validateSettings(settings);
         m_typesModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
         m_typeListModel.validateSettings(settings);
@@ -225,13 +438,37 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_colModel.loadSettingsFrom(settings);
-        m_recursiveModel.loadSettingsFrom(settings);
-        m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
         m_typesModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
         m_typeListModel.loadSettingsFrom(settings);
         m_extractBooleanModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() {
 
     }
 
@@ -270,7 +507,7 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
         return result.toArray(new String[result.size()]);
     }
 
-    private static File getFile(final String file) throws InvalidSettingsException {
+    private static File getFile(final String file) {
         File f = null;
         try {
             // first try if file string is an URL (files in drop dir come as URLs)
@@ -281,35 +518,11 @@ public class TikaParserInputNodeModel extends SimpleStreamableFunctionNodeModel{
             f = new File(file);
         }
 
-        if (f.isDirectory() | !f.exists() || !f.canRead()) {
-            throw new InvalidSettingsException("Selected file: " + file + " cannot be accessed!");
+        if (!f.exists() || !f.canRead() || !f.isFile()){
+            LOGGER.warn("Selected file: " + file + " cannot be accessed!");
         }
 
         return f;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
-        int colIndex = -1;
-        colIndex = in.findColumnIndex(m_colModel.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < in.getNumColumns(); i++) {
-                if (in.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
-                    colIndex = i;
-                    LOGGER.info("Guessing string column \"" + in.getColumnSpec(i).getName() + "\".");
-                    break;
-                }
-            }
-        }
-
-        if (colIndex < 0) {
-            throw new InvalidSettingsException("String column not set");
-        }
-        m_colModel.setStringValue(in.getColumnSpec(colIndex).getName());
-        return null;
     }
 
 }

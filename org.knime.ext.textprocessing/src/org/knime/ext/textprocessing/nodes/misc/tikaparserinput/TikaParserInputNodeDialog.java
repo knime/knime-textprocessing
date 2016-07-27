@@ -79,15 +79,6 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
             TikaParserInputNodeModel.DEFAULT_COLNAME);
     }
 
-    static SettingsModelBoolean getRecursiveModel() {
-        return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_RECURSIVE, TikaParserInputNodeModel.DEFAULT_RECURSIVE);
-    }
-
-    static SettingsModelBoolean getIgnoreHiddenFilesModel() {
-        return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_IGNORE_HIDDENFILES,
-            TikaParserInputNodeModel.DEFAULT_IGNORE_HIDDENFILES);
-    }
-
     static SettingsModelStringArray getTypeListModel() {
         return new SettingsModelStringArray(TikaParserInputConfigKeys.CFGKEY_TYPE_LIST,
             TikaParserInputNodeModel.DEFAULT_TYPE_LIST);
@@ -125,7 +116,7 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public TikaParserInputNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(getColModel(), "String or URI column", 0, StringValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(getColModel(), "String column", 0, StringValue.class));
 
         m_typeModel = getTypeModel();
 
