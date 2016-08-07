@@ -135,8 +135,6 @@ public class TikaLangDetectorNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(getAllLangsBooleanModel(), "Show all detected languages"));
 
-
-
     }
 
     private void checkState() {

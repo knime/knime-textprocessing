@@ -58,6 +58,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -110,6 +111,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
+ * The node model of the Tika Parser node. This model extends {@link org.knime.core.node.NodeModel} and is streamable.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
@@ -214,6 +216,8 @@ public class TikaParserNodeModel extends NodeModel {
 
     private SettingsModelAuthentication m_authModel = TikaParserNodeDialog.getCredentials();
 
+    private SettingsModelBoolean m_authBooleanModel = TikaParserNodeDialog.getAuthBooleanModel();
+
     /**
      * Creates a new instance of {@code TikaParserNodeModel}
      */
@@ -298,6 +302,7 @@ public class TikaParserNodeModel extends NodeModel {
                     LOGGER.warn("Directory is empty: " + dir.getPath());
                 }
 
+                HashMap<String, Integer> duplicateFiles = new HashMap<String, Integer>();
                 List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
                 int rowKeyOne = 0;
                 int rowKeyTwo = 0;
@@ -313,12 +318,14 @@ public class TikaParserNodeModel extends NodeModel {
                         AutoDetectParser parser = new AutoDetectParser();
                         Metadata metadata = new Metadata();
                         ParseContext context = new ParseContext();
-                        context.set(PasswordProvider.class, new PasswordProvider() {
-                            @Override
-                            public String getPassword(final Metadata md) {
-                                return password;
-                            }
-                        });
+                        if (m_authBooleanModel.getBooleanValue()) {
+                            context.set(PasswordProvider.class, new PasswordProvider() {
+                                @Override
+                                public String getPassword(final Metadata md) {
+                                    return password;
+                                }
+                            });
+                        }
 
                         metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
 
@@ -344,7 +351,9 @@ public class TikaParserNodeModel extends NodeModel {
                         try {
                             if (m_extractBooleanModel.getBooleanValue()) {
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
-                                ex.extract(stream, outputDir.toPath(), file.getName(), context);
+                                ex.setContext(context);
+                                ex.setDuplicateFilesList(duplicateFiles);
+                                ex.extract(stream, outputDir.toPath(), file.getName());
                                 if (ex.hasError()) {
                                     LOGGER.error("Can't write embedded files to the output directory: "
                                         + file.getAbsolutePath());
@@ -357,7 +366,7 @@ public class TikaParserNodeModel extends NodeModel {
                                 DataRow rowTwo;
                                 for (String entry : ex.getOutputFiles()) {
                                     cellsTwo = new DataCell[OUTPUT_TWO_COL_NAMES.length];
-                                    cellsTwo[0] = new StringCell(file.getName());
+                                    cellsTwo[0] = new StringCell(file.getAbsolutePath());
                                     cellsTwo[1] = new StringCell(entry);
                                     rowTwo = new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), cellsTwo);
                                     rowOutput2.push(rowTwo);
@@ -379,7 +388,7 @@ public class TikaParserNodeModel extends NodeModel {
                         for (int j = 0; j < outputColumnsOne.size(); j++) {
                             String colName = outputColumnsOne.get(j);
                             Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
-                            if (prop == null && colName.equals(TikaColumnKeys.COL_FILENAME)) {
+                            if (prop == null && colName.equals(TikaColumnKeys.COL_FILEPATH)) {
                                 cellsOne[j] = new StringCell(file.getAbsolutePath());
                             } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
                                 if (mime_type.equals("-")) {
@@ -448,6 +457,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_extractBooleanModel.saveSettingsTo(settings);
         m_extractPathModel.saveSettingsTo(settings);
         m_authModel.saveSettingsTo(settings);
+        m_authBooleanModel.saveSettingsTo(settings);
 
     }
 
@@ -465,6 +475,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_extractBooleanModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
         m_authModel.validateSettings(settings);
+        m_authBooleanModel.validateSettings(settings);
     }
 
     /**
@@ -481,6 +492,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_extractBooleanModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
         m_authModel.loadSettingsFrom(settings);
+        m_authBooleanModel.loadSettingsFrom(settings);
     }
 
     /**

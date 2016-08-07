@@ -53,6 +53,8 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * The {@link org.knime.core.node.NodeFactory} of the Tika Parser node, provides methods to create the model and the
+ * dialog instance.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */

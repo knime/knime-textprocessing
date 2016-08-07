@@ -72,6 +72,8 @@ import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
+ * The node model of the Tika Language Detector node. This model extends
+ * {@link org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel} and is streamable.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
@@ -80,27 +82,27 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
     /**
      * The name of the language column to parse.
      */
-    static final String DEFAULT_COLNAME = "";
+    public static final String DEFAULT_COLNAME = "";
 
     /**
      * The name of the language column to append.
      */
-    static final String DEFAULT_LANG_COLNAME = "Language";
+    public static final String DEFAULT_LANG_COLNAME = "Language";
 
     /**
      * Flag to specify whether to show the confidence value.
      */
-    static final boolean DEFAULT_CONFIDENCE = false;
+    public static final boolean DEFAULT_CONFIDENCE = false;
 
     /**
      * The name of the confidence value column to append.
      */
-    static final String DEFAULT_CONFIDENCE_COLNAME = "Confidence Value";
+    public static final String DEFAULT_CONFIDENCE_COLNAME = "Confidence Value";
 
     /**
      * Flag to specify whether to show all detected languages.
      */
-    static final boolean DEFAULT_ALL_LANGS = false;
+    public static final boolean DEFAULT_ALL_LANGS = false;
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaLangDetectorNodeModel.class);
 

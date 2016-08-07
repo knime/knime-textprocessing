@@ -113,12 +113,12 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
     }
 
     static SettingsModelAuthentication getCredentials() {
-        return new SettingsModelAuthentication(TikaParserConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.USER_PWD, "<leave this empty>", null, null);
+        return new SettingsModelAuthentication(TikaParserConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.USER_PWD,
+            "<leave this empty>", null, null);
     }
 
     static SettingsModelBoolean getAuthBooleanModel() {
-        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ENCRYPTED,
-            TikaParserNodeModel.DEFAULT_ENCRYPTED);
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ENCRYPTED, TikaParserNodeModel.DEFAULT_ENCRYPTED);
     }
 
     private SettingsModelString m_typeModel;
@@ -139,7 +139,9 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
      * recursively for files to parse and whether to ignore hidden files, button and list components to specify which
      * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify
      * which meta data information are to be extracted. Another boolean button is added to specify whether embedded
-     * files should be extracted as well to a specific directory using a file chooser component.
+     * files should be extracted as well to a specific directory using a file chooser component. For encrypted files,
+     * there is a boolean button to specify whether any detected encrypted files should be parsed. If set to true, a
+     * password has to be given in the authentication component.
      */
     public TikaParserNodeDialog() {
         createNewGroup("Directory and files settings");
@@ -169,7 +171,6 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(m_typeListModel);
         closeCurrentGroup();
 
-
         createNewGroup("Output settings");
         addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
             new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
@@ -178,7 +179,7 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Extract embedded files to a directory");
         m_extractBooleanModel = getExtractBooleanModel();
         m_extractPathModel = getExtractPathModel();
-        checkState();
+
         m_extractBooleanModel.addChangeListener(new InternalChangeListener());
 
         addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
@@ -190,9 +191,12 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         m_authBooleanModel = getAuthBooleanModel();
         m_authBooleanModel.addChangeListener(new InternalChangeListener());
         m_authModel = getCredentials();
-        addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
-        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files", AuthenticationType.USER_PWD));
+        addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
+        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files",
+            AuthenticationType.USER_PWD));
         closeCurrentGroup();
+
+        checkState();
     }
 
     private void checkState() {

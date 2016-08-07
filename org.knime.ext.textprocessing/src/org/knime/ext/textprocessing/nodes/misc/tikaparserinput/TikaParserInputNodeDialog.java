@@ -78,8 +78,7 @@ import org.knime.core.node.util.ButtonGroupEnumInterface;
 public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
     static SettingsModelString getColModel() {
-        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_COL,
-            TikaParserInputNodeModel.DEFAULT_COLNAME);
+        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_COL, TikaParserInputNodeModel.DEFAULT_COLNAME);
     }
 
     static SettingsModelStringArray getTypeListModel() {
@@ -107,7 +106,8 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
     }
 
     static SettingsModelAuthentication getCredentials() {
-        return new SettingsModelAuthentication(TikaParserInputConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.USER_PWD, "<leave this empty>", null, null);
+        return new SettingsModelAuthentication(TikaParserInputConfigKeys.CFGKEY_CREDENTIALS,
+            AuthenticationType.USER_PWD, "<leave this empty>", null, null);
     }
 
     static SettingsModelBoolean getAuthBooleanModel() {
@@ -128,16 +128,19 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelAuthentication m_authModel;
 
     /**
-     * Creates a new instance of {@code TikaParserInputNodeDialog} which displays a column list component, to specify the
-     * column containing the paths to files that are to be parsed, button and list components to specify which
-     * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify
-     * which meta data information are to be extracted. Another boolean button is added to specify whether embedded
-     * files should be extracted as well to a specific directory using a file chooser component.
+     * Creates a new instance of {@code TikaParserInputNodeDialog} which displays a column list component, to specify
+     * the column containing the paths to files that are to be parsed, button and list components to specify which file
+     * types are to be parsed (through file extension or MIME-Type), and the last list component is to specify which
+     * meta data information are to be extracted. Another boolean button is added to specify whether embedded files
+     * should be extracted as well to a specific directory using a file chooser component. For encrypted files, there is
+     * a boolean button to specify whether any detected encrypted files should be parsed. If set to true, a password has
+     * to be given in the authentication component.
      */
     @SuppressWarnings("unchecked")
     public TikaParserInputNodeDialog() {
         createNewGroup("Input column and files settings");
-        addDialogComponent(new DialogComponentColumnNameSelection(getColModel(), "File path column", 0, StringValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getColModel(), "File path column", 0, StringValue.class));
 
         m_typeModel = getTypeModel();
 
@@ -164,9 +167,9 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         m_extractPathModel = getExtractPathModel();
         m_extractBooleanModel.addChangeListener(new InternalChangeListener());
 
-        addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
-        addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserInputNodeDialog.class.toString(),
-            JFileChooser.OPEN_DIALOG, true));
+        addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Parse attachments and embedded files"));
+        addDialogComponent(new DialogComponentFileChooser(m_extractPathModel,
+            TikaParserInputNodeDialog.class.toString(), JFileChooser.OPEN_DIALOG, true));
         closeCurrentGroup();
 
         createNewGroup("Encrypted files settings");
@@ -174,7 +177,8 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         m_authBooleanModel.addChangeListener(new InternalChangeListener());
         m_authModel = getCredentials();
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
-        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files", AuthenticationType.USER_PWD));
+        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files",
+            AuthenticationType.USER_PWD));
         closeCurrentGroup();
 
         checkState();

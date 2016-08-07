@@ -29,17 +29,22 @@
 			files, such as
 			attachments in E-mails, etc, and store them in a
 			specified directory.
+			Authentication setting is also provided to parse
+			any encrypted files.
 		</intro>
 		<option name="String column">
 			The column containing the paths to files to
 			parse.
 		</option>
 		<option name="Choose which type to parse">
-			Specify how to choose the file types that are to be parsed. There are two
-			options, either through the file extensions or the MIME-types.
+			Specify how to choose the file types that are to
+			be parsed. There are two
+			options, either through the file extensions
+			or the MIME-types.
 		</option>
 		<option name="File Extension">
-			If selected, the list of all file extensions that are supported by Tika
+			If selected, the list of all file extensions that
+			are supported by Tika
 			will be shown.
 		</option>
 		<option name="MIME-Type">
@@ -57,15 +62,34 @@
 			.
 		</option>
 		<option name="Extract attachments and embedded files">
-			If checked, any embedded files that are contained in the input files
-			would be extracted and stored in the output directory.
+			If checked, any embedded files that are contained
+			in the input files
+			would be extracted and stored in the output
+			directory.
 		</option>
 		<option name="Ouput directory">
-			Specify the directory where the extracted files should be stored.
+			Specify the directory where the extracted files
+			should be stored.
+		</option>
+		<option name="Parse encrypted files">
+			If checked, the node will try to open any detected
+			encrypted files using the given password. If the password is invalid,
+			a warning will be given.
+		</option>
+		<option name="Enter password for any encrypted files">
+			Specify the password for any encrypted files in
+			the directory. Note: this password will be used to open all encrypted
+			files in the directory.
 		</option>
 	</fullDescription>
 
 	<ports>
+		<inPort name="Table containing the filepaths" index="0">
+			The input
+			table containing the URLs or paths to files that are to be parsed.
+			The
+			input table has to contain at least one String column.
+		</inPort>
 		<outPort name="Metadata output table" index="0">An output table
 			containing the parsed document data. The columns are the same as what
 			was selected in the Metadata list in the configure dialog.

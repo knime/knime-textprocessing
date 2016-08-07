@@ -62,7 +62,7 @@ public class TikaColumnKeys {
     /**
      * The name of the file, including the extension.
      */
-    public static final String COL_FILENAME = "Filename";
+    public static final String COL_FILEPATH = "Filepath";
 
     /**
      * The MIME-type of the file.
@@ -190,7 +190,7 @@ public class TikaColumnKeys {
     public static final LinkedHashMap<String,Property> COLUMN_PROPERTY_MAP = new LinkedHashMap<String,Property>(){
         private static final long serialVersionUID = 1L;
     {
-        put(COL_FILENAME,null) ;
+        put(COL_FILEPATH,null) ;
         put(COL_MIME_TYPE,null) ;
         put(COL_TITLE,TikaCoreProperties.TITLE) ;
         put(COL_CREATOR,TikaCoreProperties.CREATOR) ;

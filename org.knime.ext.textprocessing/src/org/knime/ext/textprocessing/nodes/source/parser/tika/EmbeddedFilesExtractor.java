@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
@@ -109,6 +110,8 @@ public class EmbeddedFilesExtractor {
 
     private boolean hasError;
 
+    private HashMap<String, Integer> dupFiles;
+
     /**
      * Constructor for EmbeddedFilesExtractor class
      */
@@ -120,6 +123,7 @@ public class EmbeddedFilesExtractor {
         handler = new BodyContentHandler(-1);
         outputFiles = new ArrayList<String>();
         hasError = false;
+        context = new ParseContext();
     }
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
@@ -139,15 +143,33 @@ public class EmbeddedFilesExtractor {
      * @param is input stream
      * @param outputDir directory to write the extracted files to
      * @param fname the name of the file
-     * @param pcontext parse context
      * @throws SAXException
      * @throws TikaException
      * @throws IOException
      */
-    public void extract(final InputStream is, final Path outputDir, final String fname, final ParseContext pcontext) throws SAXException, TikaException, IOException {
+    public void extract(final InputStream is, final Path outputDir, final String fname)
+        throws SAXException, TikaException, IOException {
         filename = fname.split("\\.")[0];
-        context = pcontext;
         extract(is, outputDir);
+    }
+
+    /**
+     * Set parse context for the extractor
+     *
+     * @param pcontext the parse context to be used
+     */
+    public void setContext(final ParseContext pcontext) {
+        context = pcontext;
+    }
+
+    /**
+     * Set the list that keeps track of duplicate files. This is needed to prevent overwrite for files with the same
+     * name.
+     *
+     * @param duplicateFiles the hash map containing filenames and their corresponding file counter
+     */
+    public void setDuplicateFilesList(final HashMap<String, Integer> duplicateFiles) {
+        dupFiles = duplicateFiles;
     }
 
     /**
@@ -183,7 +205,7 @@ public class EmbeddedFilesExtractor {
 
         private final Path outputDir;
 
-        private int fileCount, i;
+        private int fileCount;
 
         private Parser autoParser;
 
@@ -197,7 +219,6 @@ public class EmbeddedFilesExtractor {
             super(parseContext);
             outputDir = outputDirectory;
             fileCount = 0;
-            i = 0;
             autoParser = new AutoDetectParser();
             skippedContainer = false;
             error = false;
@@ -225,7 +246,7 @@ public class EmbeddedFilesExtractor {
                 autoParser.parse(tisParse, embedH, mdata, new ParseContext());
             } catch (TikaException e1) {
                 // no problem if it can't be parsed
-            }finally{
+            } finally {
                 tisParse.close();
             }
 
@@ -242,7 +263,7 @@ public class EmbeddedFilesExtractor {
                 if (outputName == null) {
                     outputName = FilenameUtils.normalize(FilenameUtils.getName(name));
                 }
-                if(!outputName.contains(filename)){
+                if (!outputName.contains(filename)) {
                     name = filename + "_" + outputName;
                 }
             }
@@ -261,7 +282,14 @@ public class EmbeddedFilesExtractor {
             }
 
             File outputFile = new File(outputDir.toFile(), name);
+            if (!dupFiles.containsKey(name)) {
+                dupFiles.put(name, 0);
+            } else {
+                dupFiles.replace(name, dupFiles.get(name) + 1);
+                outputFile = new File(outputDir.toFile(), FilenameUtils.getBaseName(name) + "_"
+                    + String.valueOf(dupFiles.get(name)) + "." + FilenameUtils.getExtension(name));
 
+            }
             output.add(outputFile.getAbsolutePath());
             File parent = outputFile.getParentFile();
             if (!parent.exists()) {
@@ -283,7 +311,7 @@ public class EmbeddedFilesExtractor {
                 }
             } catch (FileNotFoundException | SecurityException e) {
                 error = true;
-            }finally{
+            } finally {
                 tisExtract.close();
             }
         }
