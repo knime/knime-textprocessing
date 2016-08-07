@@ -57,10 +57,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentAuthentication;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
+import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication.AuthenticationType;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
@@ -109,9 +112,14 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             TikaParserNodeModel.DEFAULT_EXTRACT_PATH);
     }
 
-//    static SettingsModelAuthentication getCredentials() {
-//        return new SettingsModelAuthentication(TikaParserConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.CREDENTIALS);
-//    }
+    static SettingsModelAuthentication getCredentials() {
+        return new SettingsModelAuthentication(TikaParserConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.USER_PWD, "<leave this empty>", null, null);
+    }
+
+    static SettingsModelBoolean getAuthBooleanModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ENCRYPTED,
+            TikaParserNodeModel.DEFAULT_ENCRYPTED);
+    }
 
     private SettingsModelString m_typeModel;
 
@@ -120,6 +128,10 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelBoolean m_extractBooleanModel;
 
     private SettingsModelString m_extractPathModel;
+
+    private SettingsModelBoolean m_authBooleanModel;
+
+    private SettingsModelAuthentication m_authModel;
 
     /**
      * Creates a new instance of {@code TikaParserNodeDialog} which displays a file chooser component, to specify the
@@ -130,7 +142,7 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
      * files should be extracted as well to a specific directory using a file chooser component.
      */
     public TikaParserNodeDialog() {
-        createNewGroup("Directory settings");
+        createNewGroup("Directory and files settings");
         addDialogComponent(new DialogComponentFileChooser(getPathModel(), TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
 
@@ -139,7 +151,6 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(getIgnoreHiddenFilesModel(), "Ignore hidden files"));
         setHorizontalPlacement(false);
-        closeCurrentGroup();
 
         m_typeModel = getTypeModel();
 
@@ -156,9 +167,13 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         m_typeListModel = new DialogComponentStringListSelection(getTypeListModel(), "Type",
             new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_TYPE_LIST)), true, 10);
         addDialogComponent(m_typeListModel);
+        closeCurrentGroup();
 
+
+        createNewGroup("Output settings");
         addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
             new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
+        closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
         m_extractBooleanModel = getExtractBooleanModel();
@@ -171,7 +186,13 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             JFileChooser.OPEN_DIALOG, true));
         closeCurrentGroup();
 
-//        addDialogComponent(new DialogComponentAuthentication(getCredentials(), "put credentials", AuthenticationType.CREDENTIALS));
+        createNewGroup("Encrypted files settings");
+        m_authBooleanModel = getAuthBooleanModel();
+        m_authBooleanModel.addChangeListener(new InternalChangeListener());
+        m_authModel = getCredentials();
+        addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
+        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files", AuthenticationType.USER_PWD));
+        closeCurrentGroup();
     }
 
     private void checkState() {
@@ -179,6 +200,11 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             m_extractPathModel.setEnabled(true);
         } else {
             m_extractPathModel.setEnabled(false);
+        }
+        if (m_authBooleanModel.getBooleanValue()) {
+            m_authModel.setEnabled(true);
+        } else {
+            m_authModel.setEnabled(false);
         }
     }
 

@@ -62,7 +62,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.tika.exception.TikaException;
+import org.apache.tika.exception.EncryptedDocumentException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Property;
@@ -72,6 +72,7 @@ import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.PasswordProvider;
 import org.apache.tika.sax.BodyContentHandler;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -92,6 +93,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
@@ -185,6 +187,11 @@ public class TikaParserNodeModel extends NodeModel {
      */
     public static final String DEFAULT_EXTRACT_PATH = System.getProperty("user.home");
 
+    /**
+     * The default value of the "extract encrypted" flag.
+     */
+    public static final boolean DEFAULT_ENCRYPTED = false;
+
     private static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments"};
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaParserNodeModel.class);
@@ -205,6 +212,8 @@ public class TikaParserNodeModel extends NodeModel {
 
     private SettingsModelString m_extractPathModel = TikaParserNodeDialog.getExtractPathModel();
 
+    private SettingsModelAuthentication m_authModel = TikaParserNodeDialog.getCredentials();
+
     /**
      * Creates a new instance of {@code TikaParserNodeModel}
      */
@@ -219,7 +228,9 @@ public class TikaParserNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
 
-        return new DataTableSpec[]{null, null};
+        DataTableSpec col1 = createOutputTableSpec(Arrays.asList(m_columnModel.getStringArrayValue()));
+        DataTableSpec col2 = createOutputTableSpec(Arrays.asList(OUTPUT_TWO_COL_NAMES));
+        return new DataTableSpec[]{col1, col2};
     }
 
     /**
@@ -270,6 +281,7 @@ public class TikaParserNodeModel extends NodeModel {
                 final File outputDir = getFile(m_extractPathModel.getStringValue());
                 final boolean recursive = m_recursiveModel.getBooleanValue();
                 final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
+                final String password = m_authModel.getPassword();
 
                 final FileCollector fc;
                 if (ext) {
@@ -292,6 +304,7 @@ public class TikaParserNodeModel extends NodeModel {
                 for (int i = 0; i < numberOfFiles; i++) {
                     File file = files.get(i);
                     if (!file.isFile()) {
+                        LOGGER.warn("File: " + file.getAbsolutePath() + " is not a valid file ");
                         continue;
                     }
                     try {
@@ -299,6 +312,14 @@ public class TikaParserNodeModel extends NodeModel {
                         ContentHandler handler = new BodyContentHandler(-1);
                         AutoDetectParser parser = new AutoDetectParser();
                         Metadata metadata = new Metadata();
+                        ParseContext context = new ParseContext();
+                        context.set(PasswordProvider.class, new PasswordProvider() {
+                            @Override
+                            public String getPassword(final Metadata md) {
+                                return password;
+                            }
+                        });
+
                         metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
 
                         mime_type = parser.getDetector()
@@ -323,7 +344,7 @@ public class TikaParserNodeModel extends NodeModel {
                         try {
                             if (m_extractBooleanModel.getBooleanValue()) {
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
-                                ex.extract(stream, outputDir.toPath(), file.getName());
+                                ex.extract(stream, outputDir.toPath(), file.getName(), context);
                                 if (ex.hasError()) {
                                     LOGGER.error("Can't write embedded files to the output directory: "
                                         + file.getAbsolutePath());
@@ -343,11 +364,13 @@ public class TikaParserNodeModel extends NodeModel {
                                     rowKeyTwo++;
                                 }
                             } else {
-                                parser.parse(stream, handler, metadata, new ParseContext());
+                                parser.parse(stream, handler, metadata, context);
                             }
-                        } catch (IOException | SAXException | TikaException e) {
+                        } catch (IOException | SAXException e) {
                             LOGGER.warn("Error parsing/writing embedded files of: " + file.getAbsolutePath());
                             error = true;
+                        } catch (EncryptedDocumentException e) {
+                            LOGGER.warn("Cannot parse encrypted files. Please give a valid password.");
                         } finally {
                             stream.close();
                         }
@@ -357,7 +380,7 @@ public class TikaParserNodeModel extends NodeModel {
                             String colName = outputColumnsOne.get(j);
                             Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
                             if (prop == null && colName.equals(TikaColumnKeys.COL_FILENAME)) {
-                                cellsOne[j] = new StringCell(file.getName());
+                                cellsOne[j] = new StringCell(file.getAbsolutePath());
                             } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
                                 if (mime_type.equals("-")) {
                                     cellsOne[j] = DataType.getMissingCell();
@@ -424,6 +447,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_typeListModel.saveSettingsTo(settings);
         m_extractBooleanModel.saveSettingsTo(settings);
         m_extractPathModel.saveSettingsTo(settings);
+        m_authModel.saveSettingsTo(settings);
 
     }
 
@@ -440,6 +464,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_typeListModel.validateSettings(settings);
         m_extractBooleanModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
+        m_authModel.validateSettings(settings);
     }
 
     /**
@@ -455,6 +480,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_typeListModel.loadSettingsFrom(settings);
         m_extractBooleanModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
+        m_authModel.loadSettingsFrom(settings);
     }
 
     /**

@@ -99,6 +99,11 @@ public final class TikaParserConfigKeys {
     /**
      *
      */
-//    public static final String CFGKEY_CREDENTIALS = "CredentialsKey";
+    public static final String CFGKEY_CREDENTIALS = "CredentialsKey";
+
+    /**
+    *
+    */
+   public static final String CFGKEY_ENCRYPTED = "ExtractEncrypted";
 
 }

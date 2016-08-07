@@ -86,4 +86,14 @@ public class TikaParserInputConfigKeys {
      */
     public static final String CFGKEY_EXTRACT_PATH = "ExtractAttachmentsPath";
 
+    /**
+    *
+    */
+   public static final String CFGKEY_CREDENTIALS = "CredentialsKey";
+
+   /**
+   *
+   */
+  public static final String CFGKEY_ENCRYPTED = "ExtractEncrypted";
+
 }

@@ -101,6 +101,8 @@ public class EmbeddedFilesExtractor {
 
     private Metadata metadata;
 
+    private ParseContext context;
+
     private ContentHandler handler;
 
     private List<String> outputFiles;
@@ -122,8 +124,6 @@ public class EmbeddedFilesExtractor {
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
 
-        ParseContext context = new ParseContext();
-
         metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, filename);
         CustomEmbeddedDocumentExtractor ex = new CustomEmbeddedDocumentExtractor(outputDir, context);
         context.set(EmbeddedDocumentExtractor.class, ex);
@@ -139,12 +139,14 @@ public class EmbeddedFilesExtractor {
      * @param is input stream
      * @param outputDir directory to write the extracted files to
      * @param fname the name of the file
+     * @param pcontext parse context
      * @throws SAXException
      * @throws TikaException
      * @throws IOException
      */
-    public void extract(final InputStream is, final Path outputDir, final String fname) throws SAXException, TikaException, IOException {
+    public void extract(final InputStream is, final Path outputDir, final String fname, final ParseContext pcontext) throws SAXException, TikaException, IOException {
         filename = fname.split("\\.")[0];
+        context = pcontext;
         extract(is, outputDir);
     }
 
@@ -181,7 +183,7 @@ public class EmbeddedFilesExtractor {
 
         private final Path outputDir;
 
-        private int fileCount;
+        private int fileCount, i;
 
         private Parser autoParser;
 
@@ -195,6 +197,7 @@ public class EmbeddedFilesExtractor {
             super(parseContext);
             outputDir = outputDirectory;
             fileCount = 0;
+            i = 0;
             autoParser = new AutoDetectParser();
             skippedContainer = false;
             error = false;
@@ -222,6 +225,8 @@ public class EmbeddedFilesExtractor {
                 autoParser.parse(tisParse, embedH, mdata, new ParseContext());
             } catch (TikaException e1) {
                 // no problem if it can't be parsed
+            }finally{
+                tisParse.close();
             }
 
             String name = mdata.get(TikaMetadataKeys.RESOURCE_NAME_KEY);
@@ -237,7 +242,9 @@ public class EmbeddedFilesExtractor {
                 if (outputName == null) {
                     outputName = FilenameUtils.normalize(FilenameUtils.getName(name));
                 }
-                name = filename + "_" + outputName;
+                if(!outputName.contains(filename)){
+                    name = filename + "_" + outputName;
+                }
             }
 
             if (name.indexOf('.') == -1 && contentType != null) {
@@ -254,6 +261,7 @@ public class EmbeddedFilesExtractor {
             }
 
             File outputFile = new File(outputDir.toFile(), name);
+
             output.add(outputFile.getAbsolutePath());
             File parent = outputFile.getParentFile();
             if (!parent.exists()) {
@@ -275,6 +283,8 @@ public class EmbeddedFilesExtractor {
                 }
             } catch (FileNotFoundException | SecurityException e) {
                 error = true;
+            }finally{
+                tisExtract.close();
             }
         }
 
@@ -289,6 +299,7 @@ public class EmbeddedFilesExtractor {
                 }
             }
             byte[] res = ostream.toByteArray();
+            ostream.close();
             return res;
         }
 
@@ -308,6 +319,7 @@ public class EmbeddedFilesExtractor {
                 } else {
                     try (InputStream contents = new DocumentInputStream((DocumentEntry)entry)) {
                         destDir.createDocument(entry.getName(), contents);
+                        contents.close();
                     }
                 }
             }
