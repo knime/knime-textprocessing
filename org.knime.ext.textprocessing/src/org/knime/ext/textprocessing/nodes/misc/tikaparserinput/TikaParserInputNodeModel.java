@@ -511,7 +511,7 @@ public class TikaParserInputNodeModel extends NodeModel {
         if(!file.exists()){
                 setWarningMessage("Output directory doesn't exist. Creating directory...");
                 if(!file.mkdir()){
-                    setWarningMessage("Diectory cannot be created. Please give a valid path.");
+                    setWarningMessage("Directory cannot be created. Please give a valid path.");
                 }
         }
     }
