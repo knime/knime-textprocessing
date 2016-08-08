@@ -253,8 +253,7 @@ public class TikaParserNodeModel extends NodeModel {
         BufferedDataTableRowOutput output2 = new BufferedDataTableRowOutput(container2);
 
         createStreamableOperator(null, null).runFinal(new PortInput[0], new PortOutput[]{output1, output2}, exec);
-        output1.close();
-        output2.close();
+
         return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
     }
 
@@ -309,7 +308,6 @@ public class TikaParserNodeModel extends NodeModel {
                 for (int i = 0; i < numberOfFiles; i++) {
                     File file = files.get(i);
                     if (!file.isFile()) {
-                        LOGGER.warn("File: " + file.getAbsolutePath() + " is not a valid file ");
                         continue;
                     }
                     try {
@@ -378,8 +376,10 @@ public class TikaParserNodeModel extends NodeModel {
                         } catch (IOException | SAXException e) {
                             LOGGER.warn("Error parsing/writing embedded files of: " + file.getAbsolutePath());
                             error = true;
+                            continue;
                         } catch (EncryptedDocumentException e) {
                             LOGGER.warn("Cannot parse encrypted files. Please give a valid password.");
+                            continue;
                         } finally {
                             stream.close();
                         }
@@ -426,6 +426,10 @@ public class TikaParserNodeModel extends NodeModel {
 
                 if (error) {
                     setWarningMessage("Could not parse all files properly!");
+                }
+
+                for(int i=0;i<outputs.length;i++){
+                    ((RowOutput)outputs[i]).close();
                 }
 
             }

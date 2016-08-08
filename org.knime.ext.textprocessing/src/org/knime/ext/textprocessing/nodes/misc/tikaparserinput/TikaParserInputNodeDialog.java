@@ -107,7 +107,7 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
     static SettingsModelAuthentication getCredentials() {
         return new SettingsModelAuthentication(TikaParserInputConfigKeys.CFGKEY_CREDENTIALS,
-            AuthenticationType.USER_PWD, "<leave this empty>", null, null);
+            AuthenticationType.USER_PWD, "username", null, null);
     }
 
     static SettingsModelBoolean getAuthBooleanModel() {
@@ -165,7 +165,7 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Extract embedded files to a directory");
         m_extractBooleanModel = getExtractBooleanModel();
         m_extractPathModel = getExtractPathModel();
-        m_extractBooleanModel.addChangeListener(new InternalChangeListener());
+        m_extractBooleanModel.addChangeListener(new InternalChangeListenerExt());
 
         addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Parse attachments and embedded files"));
         addDialogComponent(new DialogComponentFileChooser(m_extractPathModel,
@@ -174,40 +174,48 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
         createNewGroup("Encrypted files settings");
         m_authBooleanModel = getAuthBooleanModel();
-        m_authBooleanModel.addChangeListener(new InternalChangeListener());
+        m_authBooleanModel.addChangeListener(new InternalChangeListenerAuth());
         m_authModel = getCredentials();
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
         addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files",
             AuthenticationType.USER_PWD));
         closeCurrentGroup();
 
-        checkState();
-    }
-
-    private void checkState() {
-        if (m_extractBooleanModel.getBooleanValue()) {
-            m_extractPathModel.setEnabled(true);
-        } else {
-            m_extractPathModel.setEnabled(false);
-        }
-        if (m_authBooleanModel.getBooleanValue()) {
-            m_authModel.setEnabled(true);
-        } else {
-            m_authModel.setEnabled(false);
-        }
     }
 
     /**
      * Listens to state change and enables / disables the model of the extracted path model
      */
-    class InternalChangeListener implements ChangeListener {
+    class InternalChangeListenerExt implements ChangeListener {
 
         /**
          * {@inheritDoc}
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            checkState();
+            if (m_extractBooleanModel.getBooleanValue()) {
+                m_extractPathModel.setEnabled(true);
+            } else {
+                m_extractPathModel.setEnabled(false);
+            }
+        }
+    }
+
+    /**
+     * Listens to state change and enables / disables the model of the authentication model
+     */
+    class InternalChangeListenerAuth implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            if (m_authBooleanModel.getBooleanValue()) {
+                m_authModel.setEnabled(true);
+            } else {
+                m_authModel.setEnabled(false);
+            }
         }
     }
 

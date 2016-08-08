@@ -269,8 +269,7 @@ public class TikaParserInputNodeModel extends NodeModel {
 
         createStreamableOperator(null, null).runFinal(new PortInput[]{new DataTableRowInput(data[0])},
             new PortOutput[]{output1, output2}, exec);
-        output1.close();
-        output2.close();
+
         return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
     }
 
@@ -342,9 +341,12 @@ public class TikaParserInputNodeModel extends NodeModel {
                         continue;
                     }
 
-                    if (!validTypes.contains(FilenameUtils.getExtension(file.getName()))) {
-                        continue;
+                    if(ext){
+                        if (!validTypes.contains(FilenameUtils.getExtension(file.getName()))) {
+                            continue;
+                        }
                     }
+
                     try {
                         String mime_type = "-";
                         ContentHandler handler = new BodyContentHandler(-1);
@@ -373,7 +375,6 @@ public class TikaParserInputNodeModel extends NodeModel {
                             if (!validTypes.contains(mime_type)) {
                                 continue;
                             }
-
                         }
                         LOGGER.info("Parsing file: " + file.getAbsolutePath());
 
@@ -409,8 +410,10 @@ public class TikaParserInputNodeModel extends NodeModel {
                         } catch (IOException | SAXException e) {
                             LOGGER.warn("Error parsing/writing embedded files of: " + file.getAbsolutePath());
                             error = true;
+                            continue;
                         } catch (EncryptedDocumentException e) {
                             LOGGER.warn("Cannot parse encrypted files. Please give a valid password.");
+                            continue;
                         } finally {
                             stream.close();
                         }
@@ -465,6 +468,10 @@ public class TikaParserInputNodeModel extends NodeModel {
                 }
 
                 rowInput.close();
+                for(int i=0;i<outputs.length;i++){
+                    ((RowOutput)outputs[i]).close();
+                }
+
             }
 
         };

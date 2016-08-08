@@ -32,7 +32,7 @@
 			Authentication setting is also provided to parse
 			any encrypted files.
 		</intro>
-		<option name="String column">
+		<option name="File path column">
 			The column containing the paths to files to
 			parse.
 		</option>
