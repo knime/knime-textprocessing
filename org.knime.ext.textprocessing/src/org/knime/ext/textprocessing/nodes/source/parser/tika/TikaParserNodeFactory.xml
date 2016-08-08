@@ -3,7 +3,8 @@
 <knimeNode icon="../../../../icons/TextProcSource.png" type="Source">
 	<name>Tika Parser</name>
 	<shortDescription>
-		Tika Parser parses all kinds of file format supported by the Apache Tika
+		Tika Parser parses all kinds of file format supported
+		by the Apache Tika
 		library.
 	</shortDescription>
 	<fullDescription>
@@ -24,29 +25,39 @@
 			by Tika. The type of the files can be selected in the configuration
 			dialog. Users have the choice between selecting the file extensions,
 			or the
-			MIME-types. What kind of information that are to be extracted from the file
-			(metadata and content) can also be selected in the dialog.
-			If possible, user can also extract files that are embedded in the input
-			files, such as attachments in E-mails, etc, and store them in a
+			MIME-types. What kind of information that are to be extracted
+			from the file
+			(metadata and content) can also be selected in the
+			dialog.
+			If possible, user can also extract files that are embedded in
+			the input
+			files, such as attachments in E-mails, etc, and store them
+			in a
 			specified directory.
-			Authentication setting is also provided to parse any encrypted files.
+			Authentication setting is also provided to
+			parse any encrypted files.
 		</intro>
 		<option name="Document directory">
 			Specify the directory where the files are located.
 		</option>
 		<option name="Ignore hidden files">
-			If checked, hidden files will not be considered for parsing.
+			If checked, hidden files will not be considered
+			for parsing.
 		</option>
 		<option name="Recursive">
-			If checked, sub-directories inside the directory will be checked as
+			If checked, sub-directories inside the directory
+			will be checked as
 			well.
 		</option>
 		<option name="Choose which type to parse">
-			Specify how to choose the file types that are to be parsed. There are two
-			options, either through the file extensions or the MIME-types.
+			Specify how to choose the file types that are to
+			be parsed. There are two
+			options, either through the file extensions
+			or the MIME-types.
 		</option>
 		<option name="File Extension">
-			If selected, the list of all file extensions that are supported by Tika
+			If selected, the list of all file extensions that
+			are supported by Tika
 			will be shown.
 		</option>
 		<option name="MIME-Type">
@@ -64,11 +75,15 @@
 			.
 		</option>
 		<option name="Extract attachments and embedded files">
-			If checked, any embedded files that are contained in the input files
-			would be extracted and stored in the output directory.
+			If checked, any embedded files that are contained
+			in the input files
+			would be extracted and stored in the output
+			directory.
 		</option>
 		<option name="Ouput directory">
-			Specify the directory where the extracted files should be stored.
+			Specify the directory where the extracted files
+			should be stored. If the specified directory doesn't exist, the node
+			will try to create it.
 		</option>
 		<option name="Parse encrypted files">
 			If checked, the node will try to open any detected

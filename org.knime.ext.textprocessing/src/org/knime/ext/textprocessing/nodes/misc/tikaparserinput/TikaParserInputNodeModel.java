@@ -324,9 +324,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                 }
                 List<String> validTypes = Arrays.asList(m_typeListModel.getStringArrayValue());
                 int colIndex = rowInput.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
-                final File outputDir = getFile(m_extractPathModel.getStringValue());
                 List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
-                final String password = m_authModel.getPassword();
                 HashMap<String, Integer> duplicateFiles = new HashMap<String, Integer>();
                 int rowKeyOne = 0;
                 int rowKeyTwo = 0;
@@ -354,6 +352,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                         Metadata metadata = new Metadata();
                         ParseContext context = new ParseContext();
                         if (m_authBooleanModel.getBooleanValue()) {
+                            final String password = m_authModel.getPassword();
                             context.set(PasswordProvider.class, new PasswordProvider() {
                                 @Override
                                 public String getPassword(final Metadata md) {
@@ -382,6 +381,7 @@ public class TikaParserInputNodeModel extends NodeModel {
 
                         try {
                             if (m_extractBooleanModel.getBooleanValue()) {
+                                final File outputDir = getFile(m_extractPathModel.getStringValue());
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                                 ex.setContext(context);
                                 ex.setDuplicateFilesList(duplicateFiles);
@@ -506,21 +506,26 @@ public class TikaParserInputNodeModel extends NodeModel {
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
 
-        String outputDir =
-            ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
+        Boolean extract =
+            ((SettingsModelBoolean)m_extractBooleanModel.createCloneWithValidatedValue(settings)).getBooleanValue();
 
-        File file = null;
-        try {
-            URL url = new URL(outputDir);
-            file = FileUtil.getFileFromURL(url);
-        } catch (MalformedURLException e) {
-            file = new File(outputDir);
-        }
+        if (extract) {
+            String outputDir =
+                ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
 
-        if (!file.exists()) {
-            setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
-            if (!file.mkdir()) {
-                setWarningMessage("Directory " + outputDir + " cannot be created. Please give a valid path.");
+            File file = null;
+            try {
+                URL url = new URL(outputDir);
+                file = FileUtil.getFileFromURL(url);
+            } catch (MalformedURLException e) {
+                file = new File(outputDir);
+            }
+
+            if (!file.exists()) {
+                setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
+                if (!file.mkdir()) {
+                    setWarningMessage("Directory " + outputDir + " cannot be created. Please give a valid path.");
+                }
             }
         }
     }

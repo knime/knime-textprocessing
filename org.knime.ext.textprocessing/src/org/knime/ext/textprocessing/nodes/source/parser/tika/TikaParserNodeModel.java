@@ -281,10 +281,8 @@ public class TikaParserNodeModel extends NodeModel {
                 }
 
                 final File dir = getFile(m_pathModel.getStringValue());
-                final File outputDir = getFile(m_extractPathModel.getStringValue());
                 final boolean recursive = m_recursiveModel.getBooleanValue();
                 final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-                final String password = m_authModel.getPassword();
 
                 final FileCollector fc;
                 if (ext) {
@@ -317,6 +315,7 @@ public class TikaParserNodeModel extends NodeModel {
                         Metadata metadata = new Metadata();
                         ParseContext context = new ParseContext();
                         if (m_authBooleanModel.getBooleanValue()) {
+                            final String password = m_authModel.getPassword();
                             context.set(PasswordProvider.class, new PasswordProvider() {
                                 @Override
                                 public String getPassword(final Metadata md) {
@@ -348,6 +347,7 @@ public class TikaParserNodeModel extends NodeModel {
 
                         try {
                             if (m_extractBooleanModel.getBooleanValue()) {
+                                final File outputDir = getFile(m_extractPathModel.getStringValue());
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                                 ex.setContext(context);
                                 ex.setDuplicateFilesList(duplicateFiles);
@@ -481,19 +481,26 @@ public class TikaParserNodeModel extends NodeModel {
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
 
-        String outputDir =
-            ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
-        File file = null;
-        try {
-            URL url = new URL(outputDir);
-            file = FileUtil.getFileFromURL(url);
-        } catch (MalformedURLException e) {
-            file = new File(outputDir);
-        }
-        if (!file.exists()) {
-            setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
-            if (!file.mkdir()) {
-                setWarningMessage("Directory " + outputDir + " cannot be created. Please give a valid path.");
+        Boolean extract =
+            ((SettingsModelBoolean)m_extractBooleanModel.createCloneWithValidatedValue(settings)).getBooleanValue();
+
+        if (extract) {
+            String outputDir =
+                ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
+
+            File file = null;
+            try {
+                URL url = new URL(outputDir);
+                file = FileUtil.getFileFromURL(url);
+            } catch (MalformedURLException e) {
+                file = new File(outputDir);
+            }
+
+            if (!file.exists()) {
+                setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
+                if (!file.mkdir()) {
+                    setWarningMessage("Directory " + outputDir + " cannot be created. Please give a valid path.");
+                }
             }
         }
     }

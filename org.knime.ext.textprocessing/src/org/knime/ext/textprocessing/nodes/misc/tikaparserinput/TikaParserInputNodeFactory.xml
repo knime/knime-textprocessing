@@ -69,7 +69,7 @@
 		</option>
 		<option name="Ouput directory">
 			Specify the directory where the extracted files
-			should be stored.
+			should be stored. If the specified directory doesn't exist, the node will try to create it.
 		</option>
 		<option name="Parse encrypted files">
 			If checked, the node will try to open any detected
