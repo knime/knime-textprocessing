@@ -341,7 +341,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                         continue;
                     }
 
-                    if(ext){
+                    if (ext) {
                         if (!validTypes.contains(FilenameUtils.getExtension(file.getName()))) {
                             continue;
                         }
@@ -468,7 +468,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                 }
 
                 rowInput.close();
-                for(int i=0;i<outputs.length;i++){
+                for (int i = 0; i < outputs.length; i++) {
                     ((RowOutput)outputs[i]).close();
                 }
 
@@ -506,13 +506,14 @@ public class TikaParserInputNodeModel extends NodeModel {
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
 
-        String outputDir = ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
+        String outputDir =
+            ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
         File file = new File(outputDir);
-        if(!file.exists()){
-                setWarningMessage("Output directory doesn't exist. Creating directory...");
-                if(!file.mkdir()){
-                    setWarningMessage("Directory cannot be created. Please give a valid path.");
-                }
+        if (!file.exists()) {
+            setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
+            if (!file.mkdir()) {
+                setWarningMessage("Directory " + outputDir + " cannot be created. Please give a valid path.");
+            }
         }
     }
 
