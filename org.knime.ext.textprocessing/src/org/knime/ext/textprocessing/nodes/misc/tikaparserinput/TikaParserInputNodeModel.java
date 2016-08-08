@@ -505,6 +505,15 @@ public class TikaParserInputNodeModel extends NodeModel {
         m_extractPathModel.validateSettings(settings);
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
+
+        String outputDir = ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
+        File file = new File(outputDir);
+        if(!file.exists()){
+                setWarningMessage("Output directory doesn't exist. Creating directory...");
+                if(!file.mkdir()){
+                    setWarningMessage("Diectory cannot be created. Please give a valid path.");
+                }
+        }
     }
 
     /**
