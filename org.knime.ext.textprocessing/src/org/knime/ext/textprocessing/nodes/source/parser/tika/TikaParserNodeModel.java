@@ -483,7 +483,13 @@ public class TikaParserNodeModel extends NodeModel {
 
         String outputDir =
             ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
-        File file = new File(outputDir);
+        File file = null;
+        try {
+            URL url = new URL(outputDir);
+            file = FileUtil.getFileFromURL(url);
+        } catch (MalformedURLException e) {
+            file = new File(outputDir);
+        }
         if (!file.exists()) {
             setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
             if (!file.mkdir()) {
