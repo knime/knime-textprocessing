@@ -300,6 +300,16 @@
             >
       </node>
       <node
+            category-path="/labs/textprocessing/misc"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.tikalangdetector.TikaLangDetectorNodeFactory"
+            >
+      </node>
+      <node
+            category-path="/labs/textprocessing/misc"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.tikaparserinput.TikaParserInputNodeFactory"
+            >
+      </node>
+      <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.hyphenator.HyphenatorNodeFactory"

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcString2Term.png" type="Manipulator">
+	<name>Tika Parser URL Input</name>
+	<shortDescription>
+		Tika Parser URL Input parses all kinds of file format
+		supported by the Apache Tika library.
+	</shortDescription>
+	<fullDescription>
+		<intro>
+			This node has the same function as the Tika Parser node, which
+			is to parse any documents that are
+			supported by Tika. The difference
+			is that this node takes file paths from a string column as input. The
+			type of the
+			files can be selected in the
+			configuration dialog. Users
+			have the
+			choice between selecting the
+			file extensions, or the
+			MIME-types. What
+			kind of information that are to be extracted from the
+			file
+			(metadata
+			and content) can also be selected in the dialog.
+			If
+			possible, user can
+			also extract files that are embedded in the input
+			files, such as
+			attachments in E-mails, etc, and store them in a
+			specified directory.
+			Authentication setting is also provided to parse
+			any encrypted files.
+		</intro>
+		<option name="File path column">
+			The column containing the paths to files to
+			parse.
+		</option>
+		<option name="Choose which type to parse">
+			Specify how to choose the file types that are to
+			be parsed. There are two
+			options, either through the file extensions
+			or the MIME-types.
+		</option>
+		<option name="File Extension">
+			If selected, the list of all file extensions that
+			are supported by Tika
+			will be shown.
+		</option>
+		<option name="MIME-Type">
+			If selected, the list of all MIME-types that are supported by Tika
+			will be shown. For more information about MIME-types and their
+			extensions, check
+			<a href="http://www.freeformatter.com/mime-types-list.html">here</a>
+			.
+		</option>
+		<option name="Metadata">
+			The list of all available information that could be parsed from the
+			files by Tika. For more details about the metadata, check
+			<a
+				href="https://tika.apache.org/1.13/api/org/apache/tika/metadata/TikaCoreProperties.html">here</a>
+			.
+		</option>
+		<option name="Extract attachments and embedded files">
+			If checked, any embedded files that are contained
+			in the input files
+			would be extracted and stored in the output
+			directory.
+		</option>
+		<option name="Ouput directory">
+			Specify the directory where the extracted files
+			should be stored. If the specified directory doesn't exist, the node will try to create it.
+		</option>
+		<option name="Parse encrypted files">
+			If checked, the node will try to open any detected
+			encrypted files using the given password. If the password is invalid,
+			a warning will be given.
+		</option>
+		<option name="Enter password for any encrypted files">
+			Specify the password for any encrypted files in
+			the directory. Note: this password will be used to open all encrypted
+			files in the directory.
+		</option>
+	</fullDescription>
+
+	<ports>
+		<inPort name="Table containing the filepaths" index="0">
+			The input
+			table containing the URLs or paths to files that are to be parsed.
+			The
+			input table has to contain at least one String column.
+		</inPort>
+		<outPort name="Metadata output table" index="0">An output table
+			containing the parsed document data. The columns are the same as what
+			was selected in the Metadata list in the configure dialog.
+		</outPort>
+		<outPort name="Attachment output table" index="1">An output table
+			containing the names of input files that contain any embedded files
+			and also the paths to the extracted files in the output directory.
+		</outPort>
+	</ports>
+</knimeNode>
