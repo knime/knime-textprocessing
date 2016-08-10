@@ -12,10 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/stax-api-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-schemas-3.9-20121203.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-ooxml-3.9-20121203.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-3.9-20121203.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-scratchpad-3.9-20121203.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oscar4-all-4.1.2-with-dependencies.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Snowball.jar"/>
