@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.knime.features.ext.textprocessing.dl4j"
-      label="KNIME Textprocessing - Deeplearning4J Integration"
+      label="KNIME Textprocessing - Deeplearning4J Integration (64bit only)"
       version="3.3.0.qualifier"
       provider-name="KNIME GmbH, Konstanz, Germany">
 
@@ -729,6 +729,7 @@ propagated with or for interoperation with KNIME.
 
    <plugin
          id="org.knime.ext.textprocessing.dl4j"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
