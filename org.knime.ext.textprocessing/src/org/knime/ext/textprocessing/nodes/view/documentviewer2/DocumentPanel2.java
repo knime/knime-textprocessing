@@ -70,6 +70,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
@@ -263,7 +264,8 @@ final class DocumentPanel2 extends JPanel implements Observer {
 
         String paragraphString = paramStr.toString();
         if(m_docViewModel.isDisableHtmlTags()){
-            paragraphString = paragraphString.replaceAll("\\<[^>]*>", "");
+            String tmpResults = StringEscapeUtils.escapeHtml4(paragraphString);
+            paragraphString = tmpResults.replaceAll("&amp;ensp;", " ");
         }
         return paragraphString;
     }

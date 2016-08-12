@@ -192,7 +192,7 @@ class DocumentControlPanel2 extends JPanel {
         // tag display button
         hGBC.gridx = 0;
         hGBC.gridy = 2;
-        m_displayTagsButton = new JToggleButton("OFF");
+        m_displayTagsButton = new JToggleButton("tags OFF");
         m_displayTagsButton.setSelected(DocumentViewPanel2.DISPLAY_TAGS);
         m_displayTagsButton.addActionListener(new DisplayListener());
         m_displayTagsButton.setToolTipText("click to display tagged terms");
@@ -201,10 +201,10 @@ class DocumentControlPanel2 extends JPanel {
         // html disable button
         hGBC.gridx = 0;
         hGBC.gridy = 3;
-        m_disableHtmlTags = new JToggleButton("html Off");
+        m_disableHtmlTags = new JToggleButton("html OFF");
         m_disableHtmlTags.setSelected(DocumentViewPanel2.DISABLE_HTML_TAGS);
         m_disableHtmlTags.addActionListener(new DisableListener());
-        m_disableHtmlTags.setToolTipText("click to show OFF html tags in text");
+        m_disableHtmlTags.setToolTipText("click to shwitch html interpretation OFF");
         innerHiliteToolbar.add(m_disableHtmlTags, hGBC);
 
 
@@ -308,10 +308,10 @@ class DocumentControlPanel2 extends JPanel {
         public void actionPerformed(final ActionEvent e) {
             updateDocumentViewModel();
             if(m_displayTagsButton.isSelected()){
-                m_displayTagsButton.setText("ON");
+                m_displayTagsButton.setText("tags ON");
                 m_displayTagsButton.setToolTipText("click to disable tagged terms");
             } else {
-                m_displayTagsButton.setText("OFF");
+                m_displayTagsButton.setText("tags OFF");
                 m_displayTagsButton.setToolTipText("click to display tagged terms");
 
             }
@@ -336,11 +336,11 @@ class DocumentControlPanel2 extends JPanel {
         public void actionPerformed(final ActionEvent e) {
             updateDocumentViewModel();
             if(m_disableHtmlTags.isSelected()){
-                m_disableHtmlTags.setText("html On");
-                m_disableHtmlTags.setToolTipText("click to show ON html tags in text");
+                m_disableHtmlTags.setText("html ON");
+                m_disableHtmlTags.setToolTipText("click to switch html interpretation ON");
             } else {
-                m_disableHtmlTags.setText("html Off");
-                m_disableHtmlTags.setToolTipText("click to show OFF html tags in text");
+                m_disableHtmlTags.setText("html OFF");
+                m_disableHtmlTags.setToolTipText("click to switch html interpretation OFF");
             }
 
         }
