@@ -264,9 +264,9 @@ class DocumentControlPanel2 extends JPanel {
     }
 
     private void updateDocumentViewModel() {
+        m_docViewModel.setDisableHtmlTags(m_disableHtmlTags.isSelected());
         m_docViewModel.setHiliteTags(m_hiliteTagsButton.isSelected());
         m_docViewModel.setDisplayTags(m_displayTagsButton.isSelected());
-        m_docViewModel.setDisableHtmlTags(m_disableHtmlTags.isSelected());
         m_docViewModel.setTagType(m_tagTypes.getSelectedItem().toString());
         m_docViewModel.setHiliteSearch(m_searchButton.isSelected());
         m_docViewModel.setSearchString(m_searchField.getText());
