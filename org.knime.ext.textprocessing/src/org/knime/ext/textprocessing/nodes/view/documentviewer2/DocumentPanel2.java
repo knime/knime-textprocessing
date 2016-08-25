@@ -122,7 +122,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
 
         HTMLEditorKit editorKit = new HTMLEditorKit();
 
-        // Adding stylesheet for the document
+        // Adding stylesheet to the document
         StyleSheet sheet = editorKit.getStyleSheet();
         sheet.addRule(
             "html, body {margin: 0; padding: 4px; color: #000000; font-family: 'Roboto', sans-serif; background: #ffffff; font-size: 12px;}");
@@ -261,7 +261,6 @@ final class DocumentPanel2 extends JPanel implements Observer {
                                 if (!m_docViewModel.isHiliteTags()) {
                                     paramStr.append(escapeHTMLIfSelected(t.getTextWithWsSuffix()));
                                 }
-                                //System.out.println(cleanWhitespaces(StringEscapeUtils.escapeHtml4(paramStr.toString())));
                                 paramStr.append("<font size=\"2.4\">" + "<b>" + "<i>" + "[" + tag.getTagType() + "("
                                     + tag.getTagValue() + ")" + "] " + "</i>" + "</b>" + "</font>");
                                 marked = true;
@@ -278,7 +277,6 @@ final class DocumentPanel2 extends JPanel implements Observer {
                                 if (!m_docViewModel.isHiliteTags()) {
                                     paramStr.append(escapeHTMLIfSelected(t.getTextWithWsSuffix()));
                                 }
-                                // escape html on the original document here
                                 paramStr.append("<font size=\"2.4\">" + "<b>" + "<i>" + "[" + tag.getTagType() + "("
                                     + tag.getTagValue() + ")" + "] " + "</i>" + "</b>" + "</font>");
                                 marked = true;
@@ -299,14 +297,14 @@ final class DocumentPanel2 extends JPanel implements Observer {
         return paramStr.toString();
     }
 
-    // Html Escape little method
+    // Escape HTML Character when clicked
     private String escapeHTMLIfSelected(String str) {
+        str = replaceWhitespacesWithPlaceholder(str);
+        str = replaceWhitespacesWithHtml(str);
         if (m_docViewModel.isDisableHtmlTags()) {
-            str = replaceWhitespacesWithPlaceholder(str);
-            str = replaceWhitespacesWithHtml(str);
             str = StringEscapeUtils.escapeHtml4(str);
-            str = cleanWhitespaces(str);
             }
+        str = cleanWhitespaces(str);
         return str;
     }
 

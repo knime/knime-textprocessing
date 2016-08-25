@@ -7,14 +7,16 @@
 	</shortDescription>
 	<fullDescription>
 	<intro>
-		The first view shows a list of all document titles. A double click on a
-        title opens an additional window, showing the details of the
-        selected document. All the information of the document are shown, 
-        such as, title, text, journal title, author names, publication date,
-        file name, category, source and type.
+		The first view shows a list of all document titles. The quick search offers the possibility
+		to search documents distinctly by title, category, authors or source. 
+		A double click on a title opens the document detail view. 
+		All the information of the document is shown, such as, title, text, 
+		journal title, author names, publication date, file name, category, source and type.
         
-        Additionally words can ce searched in that view and matches will be hilited.
-        Tagged terms can be hilited as well.
+        In the detail view words can be searched and matches will be hilited.
+        Tagged terms can be hilited as well. The tags themselves can also be displayed. 
+        It is also possible to turn off html parsing so that html documents can be displayed 
+        nicely.
 	</intro>
 	<option name="Document Col">
 	   Specifies the document column containing the documents to show.

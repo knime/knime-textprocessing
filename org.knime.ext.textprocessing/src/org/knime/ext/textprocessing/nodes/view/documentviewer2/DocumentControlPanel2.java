@@ -193,9 +193,8 @@ class DocumentControlPanel2 extends JPanel {
         m_linkSourcesBox.addActionListener(new LinkSourceListener());
         innerHiliteToolbar.add(m_linkSourcesBox, hGBC);
 
-        // tag display button
+        // tags display button
         JLabel label2 = new JLabel("tags on/off: ");
-        //hGBC.gridwidth = 1;
         hGBC.gridx = 0;
         hGBC.gridy = 2;
         innerHiliteToolbar.add(label2, hGBC);
@@ -205,8 +204,7 @@ class DocumentControlPanel2 extends JPanel {
         ImageIcon icon_1 = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
         m_displayTagsButton.setIcon(icon_1);
         m_displayTagsButton.setPreferredSize(new Dimension(53, 26));
-        m_displayTagsButton.setToolTipText("click to display tagged terms");
-        //hGBC.gridwidth = 2;
+        m_displayTagsButton.setToolTipText("click here to display tags");
         hGBC.gridx = 1;
         hGBC.gridy = 2;
         hGBC.fill = GridBagConstraints.NONE;
@@ -214,9 +212,8 @@ class DocumentControlPanel2 extends JPanel {
         innerHiliteToolbar.add(m_displayTagsButton, hGBC);
         hGBC.fill = GridBagConstraints.HORIZONTAL;
 
-        // html disable button
+        // html display button
         JLabel label3 = new JLabel("html on/off: ");
-        //hGBC.gridwidth = 1;
         hGBC.gridx = 0;
         hGBC.gridy = 3;
         innerHiliteToolbar.add(label3, hGBC);
@@ -226,8 +223,7 @@ class DocumentControlPanel2 extends JPanel {
         ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
         m_disableHtmlTags.setIcon(icon_2);
         m_disableHtmlTags.setPreferredSize(new Dimension(53, 26));
-        m_disableHtmlTags.setToolTipText("click to display the original document without html interpretation");
-        //hGBC.gridwidth = 2;
+        m_disableHtmlTags.setToolTipText("click here to display the original document without html interpretation");
         hGBC.gridx = 1;
         hGBC.gridy = 3;
         hGBC.fill = GridBagConstraints.NONE;
@@ -340,11 +336,11 @@ class DocumentControlPanel2 extends JPanel {
             if(m_displayTagsButton.isSelected()){
                 ImageIcon icon_on = ImgLoaderUtil.loadImageIcon("on.png", "ON");
                 m_displayTagsButton.setIcon(icon_on);
-                m_displayTagsButton.setToolTipText("click to disable tagged terms");
+                m_displayTagsButton.setToolTipText("click here to disable tags");
             } else {
                 ImageIcon icon_on = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
                 m_displayTagsButton.setIcon(icon_on);
-                m_displayTagsButton.setToolTipText("click to display tagged terms");
+                m_displayTagsButton.setToolTipText("click here to display tags");
 
             }
 
@@ -370,11 +366,11 @@ class DocumentControlPanel2 extends JPanel {
             if(m_disableHtmlTags.isSelected()){
                 ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("on.png", "ON");
                 m_disableHtmlTags.setIcon(icon_2);
-                m_disableHtmlTags.setToolTipText("click to display the document with html interpretation");
+                m_disableHtmlTags.setToolTipText("click here to display the document with html interpretation");
             } else {
                 ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
                 m_disableHtmlTags.setIcon(icon_2);
-                m_disableHtmlTags.setToolTipText("click to display the original document without html interpretation");
+                m_disableHtmlTags.setToolTipText("click here to display the original document without html interpretation");
             }
 
         }
