@@ -63,16 +63,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.InputVerifier;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -81,7 +82,7 @@ import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.nodes.view.documentviewer2.DocumentProvider;
+import org.knime.ext.textprocessing.util.ImgLoaderUtil;
 
 /**
  * A panel providing the functionality of displaying a specified set of documents in a table. A double click at a
@@ -176,24 +177,47 @@ abstract class AbstractDocumentTablePanel2 extends JPanel implements DocumentPro
         JLabel label = new JLabel("Quick Search: ");
         m_searchField = new JTextField();
         m_searchField.setToolTipText("Enter the search item here...");
-        m_searchField.setInputVerifier(new InputVerifier() {
 
-            @Override
-            public boolean verify(final JComponent input) {
-                return isNotEmpty((JTextField)input);
-            }
-
-            private boolean isNotEmpty(final JTextField input) {
-                // TODO Auto-generated method stub
-                return false;
-            }
-        });
         // Combo box list
         m_selection = new JComboBox<String>(m_items);
         m_selection.setToolTipText("Specifiy what to search");
         m_selection.setSelectedIndex(0);
-        m_searchButton = new JButton("search");
+        m_searchButton = new JButton();
+        ImageIcon icon = ImgLoaderUtil.loadImageIcon("search.png", "Search");
+        m_searchButton.setIcon(icon);
         m_searchButton.setToolTipText("Apply search");
+        // The search button is by default disable until the text field is filled
+        m_searchButton.setEnabled(false);
+
+        // make sure user enter a search key into the text field, otherwise the search button remain disable
+        m_searchField.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void removeUpdate(final DocumentEvent e) {
+                changed();
+
+            }
+
+            @Override
+            public void insertUpdate(final DocumentEvent e) {
+                changed();
+
+            }
+
+            @Override
+            public void changedUpdate(final DocumentEvent e) {
+                changed();
+
+            }
+
+            public void changed(){
+                if(!m_searchField.getText().isEmpty()){
+                    m_searchButton.setEnabled(true);
+                }else {
+                    m_searchButton.setEnabled(false);
+                }
+            }
+        });
 
         m_searchButton.addActionListener(new ActionListener() {
             @Override
@@ -202,8 +226,10 @@ abstract class AbstractDocumentTablePanel2 extends JPanel implements DocumentPro
             }
         });
 
-        m_resetButton = new JButton("reset");
-        m_resetButton.setToolTipText("Reset");
+        m_resetButton = new JButton();
+        icon = ImgLoaderUtil.loadImageIcon("arrow_redo.png", "Search");
+        m_resetButton.setIcon(icon);
+        m_resetButton.setToolTipText("Reset search results");
         m_resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

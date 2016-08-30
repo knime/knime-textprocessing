@@ -201,7 +201,7 @@ class DocumentControlPanel2 extends JPanel {
         m_displayTagsButton = new JToggleButton();
         m_displayTagsButton.setSelected(DocumentViewPanel2.DISPLAY_TAGS);
         m_displayTagsButton.addActionListener(new DisplayListener());
-        ImageIcon icon_1 = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
+        ImageIcon icon_1 = ImgLoaderUtil.loadImageIcon("tag_blue.png", "OFF");
         m_displayTagsButton.setIcon(icon_1);
         m_displayTagsButton.setPreferredSize(new Dimension(53, 26));
         m_displayTagsButton.setToolTipText("click here to display tags");
@@ -220,7 +220,7 @@ class DocumentControlPanel2 extends JPanel {
         m_disableHtmlTags = new JToggleButton();
         m_disableHtmlTags.setSelected(DocumentViewPanel2.DISABLE_HTML_TAGS);
         m_disableHtmlTags.addActionListener(new DisableListener());
-        ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
+        ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("html.png", "OFF");
         m_disableHtmlTags.setIcon(icon_2);
         m_disableHtmlTags.setPreferredSize(new Dimension(53, 26));
         m_disableHtmlTags.setToolTipText("click here to display the original document without html interpretation");
@@ -334,12 +334,10 @@ class DocumentControlPanel2 extends JPanel {
         public void actionPerformed(final ActionEvent e) {
             updateDocumentViewModel();
             if(m_displayTagsButton.isSelected()){
-                ImageIcon icon_on = ImgLoaderUtil.loadImageIcon("on.png", "ON");
+                ImageIcon icon_on = ImgLoaderUtil.loadImageIcon("tag_blue.png", "ON");
                 m_displayTagsButton.setIcon(icon_on);
                 m_displayTagsButton.setToolTipText("click here to disable tags");
             } else {
-                ImageIcon icon_on = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
-                m_displayTagsButton.setIcon(icon_on);
                 m_displayTagsButton.setToolTipText("click here to display tags");
 
             }
@@ -364,12 +362,10 @@ class DocumentControlPanel2 extends JPanel {
         public void actionPerformed(final ActionEvent e) {
             updateDocumentViewModel();
             if(m_disableHtmlTags.isSelected()){
-                ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("on.png", "ON");
+                ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("html.png", "ON");
                 m_disableHtmlTags.setIcon(icon_2);
                 m_disableHtmlTags.setToolTipText("click here to display the document with html interpretation");
             } else {
-                ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("off.png", "OFF");
-                m_disableHtmlTags.setIcon(icon_2);
                 m_disableHtmlTags.setToolTipText("click here to display the original document without html interpretation");
             }
 
