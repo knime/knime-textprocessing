@@ -202,7 +202,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
     private String getParagraphText(final Paragraph p) {
         if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch() && !m_docViewModel.isDisplayTags()
             && !m_docViewModel.isDisableHtmlTags()) {
-            return replaceWhitespacesWithHtml(p.getText());
+            return escapeHTMLIfSelected(p.getText());
         }
 
         // selected color to hex str
@@ -301,7 +301,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
     private String escapeHTMLIfSelected(String str) {
         str = replaceWhitespacesWithPlaceholder(str);
         str = replaceWhitespacesWithHtml(str);
-        if (m_docViewModel.isDisableHtmlTags()) {
+        if (!m_docViewModel.isDisableHtmlTags()) {
             str = StringEscapeUtils.escapeHtml4(str);
             }
         str = cleanWhitespaces(str);

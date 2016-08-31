@@ -72,8 +72,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -186,38 +184,8 @@ abstract class AbstractDocumentTablePanel2 extends JPanel implements DocumentPro
         ImageIcon icon = ImgLoaderUtil.loadImageIcon("search.png", "Search");
         m_searchButton.setIcon(icon);
         m_searchButton.setToolTipText("Apply search");
-        // The search button is by default disable until the text field is filled
-        m_searchButton.setEnabled(false);
 
-        // make sure user enter a search key into the text field, otherwise the search button remain disable
-        m_searchField.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void removeUpdate(final DocumentEvent e) {
-                changed();
-
-            }
-
-            @Override
-            public void insertUpdate(final DocumentEvent e) {
-                changed();
-
-            }
-
-            @Override
-            public void changedUpdate(final DocumentEvent e) {
-                changed();
-
-            }
-
-            public void changed(){
-                if(!m_searchField.getText().isEmpty()){
-                    m_searchButton.setEnabled(true);
-                }else {
-                    m_searchButton.setEnabled(false);
-                }
-            }
-        });
+        // Need to find a better way to handle the input text field if no text is entered
 
         m_searchButton.addActionListener(new ActionListener() {
             @Override

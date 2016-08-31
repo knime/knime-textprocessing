@@ -223,7 +223,7 @@ class DocumentControlPanel2 extends JPanel {
         ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("html.png", "OFF");
         m_disableHtmlTags.setIcon(icon_2);
         m_disableHtmlTags.setPreferredSize(new Dimension(53, 26));
-        m_disableHtmlTags.setToolTipText("click here to display the original document without html interpretation");
+        m_disableHtmlTags.setToolTipText("display the original document with html interpretation");
         hGBC.gridx = 1;
         hGBC.gridy = 3;
         hGBC.fill = GridBagConstraints.NONE;
@@ -361,12 +361,12 @@ class DocumentControlPanel2 extends JPanel {
         @Override
         public void actionPerformed(final ActionEvent e) {
             updateDocumentViewModel();
-            if(m_disableHtmlTags.isSelected()){
-                ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("html.png", "ON");
-                m_disableHtmlTags.setIcon(icon_2);
-                m_disableHtmlTags.setToolTipText("click here to display the document with html interpretation");
+            if(!m_disableHtmlTags.isSelected()){
+                //ImageIcon icon_2 = ImgLoaderUtil.loadImageIcon("html.png", "ON");
+                //m_disableHtmlTags.setIcon(icon_2);
+                m_disableHtmlTags.setToolTipText("display the original document with html interpretation");
             } else {
-                m_disableHtmlTags.setToolTipText("click here to display the original document without html interpretation");
+                m_disableHtmlTags.setToolTipText("display the original document without html interpretation");
             }
 
         }
