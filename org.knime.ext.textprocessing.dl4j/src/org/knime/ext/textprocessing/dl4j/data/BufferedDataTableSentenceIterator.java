@@ -45,11 +45,14 @@ package org.knime.ext.textprocessing.dl4j.data;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.SentencePreProcessor;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.dl4j.base.exception.DataCellConversionException;
+import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
@@ -86,8 +89,15 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
      */
     @Override
     public String nextSentence() {
-        final DataCell cell = m_tableIterator.next().getCell(m_documentColumnIndex);
+        final DataRow row = m_tableIterator.next();
+        final DataCell cell = row.getCell(m_documentColumnIndex);
         String documentContent = null;
+
+        try {
+            ConverterUtils.checkMissing(cell);
+        } catch (DataCellConversionException e) {
+            throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
+        }
 
         /*
          * Can't use converter for documents because the getStringValue() method

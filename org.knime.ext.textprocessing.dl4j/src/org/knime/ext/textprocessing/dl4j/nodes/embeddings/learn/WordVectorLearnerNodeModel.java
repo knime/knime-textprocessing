@@ -68,6 +68,7 @@ import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
 import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
 import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
+import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentIterator;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableSentenceIterator;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
@@ -104,6 +105,8 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
     protected WordVectorPortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
         final BufferedDataTable table = (BufferedDataTable)inObjects[0];
+
+        TableUtils.checkForEmptyTable(table);
 
         final WordVectorTrainingMode mode =
             WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());

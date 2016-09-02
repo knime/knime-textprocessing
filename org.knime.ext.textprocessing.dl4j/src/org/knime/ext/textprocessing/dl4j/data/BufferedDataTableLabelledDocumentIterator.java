@@ -55,6 +55,7 @@ import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
@@ -113,6 +114,12 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         final DataCell documentCell = row.getCell(m_documentColumnIndex);
         final DataCell labelCell = row.getCell(m_labelColumnIndex);
 
+        try {
+            ConverterUtils.checkMissing(documentCell);
+        } catch (DataCellConversionException e) {
+            throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
+        }
+
         String documentContent = null;
         String documentLabel = null;
         try {
@@ -130,8 +137,8 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
             }
 
             documentLabel = ConverterUtils.convertDataCellToJava(labelCell, String.class);
-        } catch (final Exception e) {
-            logger.coding("Problem with input conversion", e);
+        } catch (DataCellConversionException e) {
+            throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
         }
 
         final LabelledDocument output = new LabelledDocument();
@@ -160,12 +167,13 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     private LabelsSource initLabelsSource() {
         final List<String> labels = new ArrayList<>();
         while (m_tableIterator.hasNext()) {
-            final DataCell labelCell = m_tableIterator.next().getCell(m_labelColumnIndex);
+            final DataRow row = m_tableIterator.next();
+            final DataCell labelCell = row.getCell(m_labelColumnIndex);
 
             try {
                 labels.add(ConverterUtils.convertDataCellToJava(labelCell, String.class));
-            } catch (final Exception e) {
-                logger.coding("Problem with input conversion", e);
+            } catch (DataCellConversionException e) {
+                throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
             }
         }
         return new LabelsSource(labels);
