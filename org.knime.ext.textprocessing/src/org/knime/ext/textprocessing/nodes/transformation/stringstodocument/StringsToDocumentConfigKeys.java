@@ -61,6 +61,12 @@ public final class StringsToDocumentConfigKeys {
     public static final String CFGKEY_TITLECOL = "TitleCol";
 
     /**
+     * The configuration key of the "use title column" setting.
+     * @since 3.3
+     */
+    public static final String CFGKEY_USE_TITLECOLUMN = "useTitleColumn";
+
+    /**
      * The configuration key of the text column.
      */
     public static final String CFGKEY_TEXTCOL = "TextCol";
@@ -69,6 +75,12 @@ public final class StringsToDocumentConfigKeys {
      * The configuration key of the authors column.
      */
     public static final String CFGKEY_AUTHORSCOL = "AuthorsCol";
+
+    /**
+     * The configuration key of the "use authors column" setting.
+     * @since 3.3
+     */
+    public static final String CFGKEY_USE_AUTHORSCOLUMN = "useAuthorsColumn";
 
     /**
      * The configuration key of the author name split string.

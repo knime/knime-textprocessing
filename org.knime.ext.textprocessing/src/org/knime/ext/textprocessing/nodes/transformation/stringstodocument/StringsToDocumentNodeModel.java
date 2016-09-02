@@ -107,6 +107,10 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
     private SettingsModelIntegerBounded m_maxThreads = StringsToDocumentNodeDialog.getNumberOfThreadsModel();
 
+    private SettingsModelBoolean m_useTitleColumnModel = StringsToDocumentNodeDialog.getUseTitleColumnModel();
+
+    private SettingsModelBoolean m_useAuthorsColumnModel = StringsToDocumentNodeDialog.getUseAuthorsColumnModel();
+
     /** The default number of threads value. */
     static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
         (int)Math.ceil(Runtime.getRuntime().availableProcessors()));
@@ -123,6 +127,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
     public StringsToDocumentNodeModel() {
         m_useCatColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
         m_useSourceColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
+        m_useTitleColumnModel.addChangeListener(new DocTitleChangeListener());
+        m_useAuthorsColumnModel.addChangeListener(new AuthorsChangeListener());
     }
 
     private static final DataColumnSpec[] createNewColSpecs() {
@@ -140,8 +146,14 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         StringsToDocumentConfig conf = new StringsToDocumentConfig();
 
         // Title
+        String docTitle = m_titleColModel.getStringValue();
+        if(!docTitle.isEmpty() && docTitle.length() > 0){
+            conf.setDocTitle(docTitle);
+        }
         int titleIndex = spec.findColumnIndex(m_titleColModel.getStringValue());
         conf.setTitleStringIndex(titleIndex);
+        boolean useTitleCol = m_useTitleColumnModel.getBooleanValue();
+        conf.setUseTitleColumn(useTitleCol);
 
         // Fulltext
         int fulltextIndex = spec.findColumnIndex(m_fulltextColModel.getStringValue());
@@ -212,6 +224,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_pubDateModel.loadSettingsFrom(settings);
 
         try {
+            m_useTitleColumnModel.loadSettingsFrom(settings);
             m_useCatColumnModel.loadSettingsFrom(settings);
             m_useSourceColumnModel.loadSettingsFrom(settings);
             m_catColumnModel.loadSettingsFrom(settings);
@@ -245,6 +258,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_pubDateModel.saveSettingsTo(settings);
         m_useCatColumnModel.saveSettingsTo(settings);
         m_useSourceColumnModel.saveSettingsTo(settings);
+        m_useTitleColumnModel.saveSettingsTo(settings);
         m_catColumnModel.saveSettingsTo(settings);
         m_sourceColumnModel.saveSettingsTo(settings);
         m_maxThreads.saveSettingsTo(settings);
@@ -266,6 +280,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_pubDateModel.validateSettings(settings);
 
         try {
+            m_useTitleColumnModel.validateSettings(settings);
             m_useCatColumnModel.validateSettings(settings);
             m_useSourceColumnModel.validateSettings(settings);
             m_catColumnModel.validateSettings(settings);
@@ -295,6 +310,12 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
                     + e.getMessage());
         }
     }
+
+    /**
+     * write a method that check if datatable contains 'title' and 'authors' cols
+     * the method should take a string as parameter.
+     * If no title and authors document are available, generate them
+     */
 
 
 
@@ -334,5 +355,39 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
                 m_docSourceModel.setEnabled(
                         !m_useSourceColumnModel.getBooleanValue());
         }
+    }
+    /**
+     * Enables and disables text fields of document title.
+     * @author Hermann Azong, KNIME.com, Berlin, Germany
+     */
+    class DocTitleChangeListener implements ChangeListener{
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            m_titleColModel.setEnabled(
+                !m_useTitleColumnModel.getBooleanValue());
+
+        }
+
+    }
+
+    /**
+     * Enables and disables text fields of document authors.
+     * @author Hermann Azong, KNIME.com, Berlin, Germany
+     */
+    class AuthorsChangeListener implements ChangeListener{
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 }

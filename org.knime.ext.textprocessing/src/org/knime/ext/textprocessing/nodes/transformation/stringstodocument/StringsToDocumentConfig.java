@@ -65,6 +65,11 @@ public class StringsToDocumentConfig {
     static final String DEF_DOCUMENT_PUBDATE = PublicationDate.getToday();
 
     /**
+     * The default document title
+     */
+    static final String DEF_DOCUMENT_TITLE = "";
+
+    /**
      * The default document source.
      */
     static final String DEF_DOCUMENT_SOURCE = "";
@@ -99,6 +104,16 @@ public class StringsToDocumentConfig {
      */
     static final boolean DEF_USE_SOURCECOLUMN = false;
 
+    /**
+     * The default "use title column" setting.
+     */
+    static final boolean DEF_USE_TITLECOLUMN = false;
+
+    /**
+     * The default "use authors column" setting.
+     */
+    static final boolean DEF_USE_AUTHORSCOLUMN = false;
+
     private int m_titleStringIndex = -1;
 
     private int m_fulltextStringIndex = -1;
@@ -109,9 +124,15 @@ public class StringsToDocumentConfig {
 
     private int m_sourceStringIndex = -1;
 
+    private boolean m_useTitleColumn = DEF_USE_TITLECOLUMN;
+
+    private boolean m_useAuthorsColumn = DEF_USE_AUTHORSCOLUMN;
+
     private boolean m_useCatColumn = DEF_USE_CATCOLUMN;
 
     private boolean m_useSourceColumn = DEF_USE_SOURCECOLUMN;
+
+    private String m_docTitle = DEF_DOCUMENT_TITLE;
 
     private String m_authorsSplitChar = DEF_AUTHORS_SPLITCHAR;
 
@@ -297,5 +318,53 @@ public class StringsToDocumentConfig {
      */
     public boolean getUseSourceColumn() {
         return m_useSourceColumn;
+    }
+
+    /**
+     * @return the m_useTitleColumn
+     * @since 3.3
+     */
+    public boolean getUseTitleColumn() {
+        return m_useTitleColumn;
+    }
+
+    /**
+     * @param useTitleColumn the m_useTitleColumn to set
+     * @since 3.3
+     */
+    public void setUseTitleColumn(final boolean useTitleColumn) {
+        this.m_useTitleColumn = useTitleColumn;
+    }
+
+    /**
+     * @return the m_useAuthorsColumn
+     * @since 3.3
+     */
+    public boolean getUseAuthorsColumn() {
+        return m_useAuthorsColumn;
+    }
+
+    /**
+     * @param useAuthorsColumn the m_useAuthorsColumn to set
+     * @since 3.3
+     */
+    public void setUseAuthorsColumn(final boolean useAuthorsColumn) {
+        this.m_useAuthorsColumn = useAuthorsColumn;
+    }
+
+    /**
+     * @return the m_docTitle
+     * @since 3.3
+     */
+    public String getDocTitle() {
+        return m_docTitle;
+    }
+
+    /**
+     * @param docTitle the m_docTitle to set
+     * @since 3.3
+     */
+    public void setDocTitle(final String docTitle) {
+        this.m_docTitle = docTitle;
     }
 }
