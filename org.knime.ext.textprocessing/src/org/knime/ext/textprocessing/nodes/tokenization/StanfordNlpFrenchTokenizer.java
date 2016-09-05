@@ -44,26 +44,53 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   02.09.2016 (Julian): created
+ *   30.08.2016 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.stanford.nlp.international.french.process.FrenchTokenizer;
+import edu.stanford.nlp.international.french.process.FrenchTokenizer.FrenchTokenizerFactory;
+import edu.stanford.nlp.ling.CoreLabel;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
+public class StanfordNlpFrenchTokenizer implements Tokenizer {
 
-    OpenNlpWhitespaceTokenizerFactory() {
+    private FrenchTokenizerFactory<CoreLabel> m_tokenizer;
+
+    /**
+     * Creates a new instance of {@code StanfordNlpFrenchTokenizer}
+     */
+    public StanfordNlpFrenchTokenizer() {
+        m_tokenizer = (FrenchTokenizerFactory<CoreLabel>)FrenchTokenizer.ftbFactory();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tokenizer getTokenizer() {
-        return new OpenNlpWhitespaceTokenizer();
+    public List<String> tokenize(final String sentence) {
+
+        if (m_tokenizer != null) {
+            StringReader readString = new StringReader(sentence);
+            edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
+            List<CoreLabel> coreLabelList = tokenizer.tokenize();
+            List<String> tokenList = new ArrayList<String>();
+            for (CoreLabel cl : coreLabelList) {
+                tokenList.add(cl.originalText());
+            }
+            return tokenList;
+        } else {
+            return null;
+        }
+
     }
 
 }

@@ -47,8 +47,8 @@
 
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.knime.core.node.NodeLogger;
 
@@ -75,15 +75,24 @@ public class TokenizerPool {
 
     private int m_sentenceIndex = 0;
 
-    public static final Map<String, TokenizerFactory> m_tokenizerMap = new HashMap<>();
+    /**
+     *
+     * @since 3.3
+     */
+    public static final Map<String, TokenizerFactory> m_tokenizerMap = new TreeMap<>();
 
     static {
         m_tokenizerMap.put("OpenNLP WordTokenizer", new OpenNlpWordTokenizerFactory());
         m_tokenizerMap.put("OpenNLP WhitespaceTokenizer", new OpenNlpWhitespaceTokenizerFactory());
+        m_tokenizerMap.put("OpenNLP SimpleTokenizer", new OpenNlpSimpleTokenizerFactory());
+        m_tokenizerMap.put("StanfordNLP PTBTokenizer", new StanfordNlpPTBTokenizerFactory());
+        m_tokenizerMap.put("StanfordNLP FrenchTokenizer", new StanfordNlpFrenchTokenizerFactory());
+        m_tokenizerMap.put("StanfordNLP SpanishTokenizer", new StanfordNlpSpanishTokenizerFactory());
     }
 
     /**
      * Constructor for class OpenNLPTokenizerPool.
+     *
      * @param poolSize The number of word and sentence tokenizers of the pool.
      */
     TokenizerPool(final int poolSize, final String tokenizer) {
@@ -98,7 +107,6 @@ public class TokenizerPool {
 
         LOGGER.debug("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
         for (int i = 0; i < m_poolSize; i++) {
-            //m_wordTokenizer[i] = DefaultTokenization.tokenizerMap.get(m_tokenizer).getTokenizer();
             m_wordTokenizer[i] = m_tokenizerMap.get(m_tokenizer).getTokenizer();
             m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
         }
@@ -129,6 +137,11 @@ public class TokenizerPool {
         return m_tokenizer;
     }
 
+    /**
+     * @return Returns m_tokenizerMap as a String array, so it can be used for
+     * the {@code ComboFieldEditor} in the {@code TextprocessingPreferenceInitializer} class.
+     * @since 3.3
+     */
     public static String[][] getMapAsStringArray() {
         String[][] array = new String[m_tokenizerMap.size()][2];
         int counter = 0;

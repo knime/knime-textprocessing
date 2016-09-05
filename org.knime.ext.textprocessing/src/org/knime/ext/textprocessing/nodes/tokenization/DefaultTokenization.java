@@ -49,8 +49,6 @@ package org.knime.ext.textprocessing.nodes.tokenization;
 
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
-
-
 /**
  * Is a utility class which provides methods for the default tokenization of
  * {@link org.knime.ext.textprocessing.data.Document}s.
@@ -59,14 +57,17 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  */
 public final class DefaultTokenization {
 
-    private static TokenizerPool tokenizerPool = new TokenizerPool(
-        TextprocessingPreferenceInitializer.tokenizerPoolSize(), TextprocessingPreferenceInitializer.getTokenizerName());
+    private static TokenizerPool tokenizerPool =
+        new TokenizerPool(TextprocessingPreferenceInitializer.tokenizerPoolSize(),
+            TextprocessingPreferenceInitializer.getTokenizerName());
 
-    private DefaultTokenization() { }
+    private DefaultTokenization() {
+    }
 
     /**
      * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
      * preference pool size.
+     *
      * @since 2.9
      */
     public static final void createNewTokenizerPool() {
@@ -90,4 +91,5 @@ public final class DefaultTokenization {
     public static final Tokenizer getWordTokenizer() {
         return tokenizerPool.nextWordTokenizer();
     }
+
 }

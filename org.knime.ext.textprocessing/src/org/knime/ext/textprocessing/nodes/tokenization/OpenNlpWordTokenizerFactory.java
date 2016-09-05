@@ -55,12 +55,10 @@ package org.knime.ext.textprocessing.nodes.tokenization;
  */
 public class OpenNlpWordTokenizerFactory implements TokenizerFactory {
 
-    private Tokenizer m_tokenizer;
-    private String m_tokenizerFactoryName;
-
-    OpenNlpWordTokenizerFactory() {
-        m_tokenizer = new OpenNlpWordTokenizer();
-        m_tokenizerFactoryName = "OpenNlpWordTokenizerFactory";
+    /**
+     *
+     */
+    public OpenNlpWordTokenizerFactory() {
     }
 
     /**
@@ -68,15 +66,7 @@ public class OpenNlpWordTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public Tokenizer getTokenizer() {
-        return m_tokenizer;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFactoryName() {
-        return m_tokenizerFactoryName;
+        return new OpenNlpWordTokenizer();
     }
 
 }

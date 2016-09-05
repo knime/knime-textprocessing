@@ -44,26 +44,49 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   02.09.2016 (Julian): created
+ *   29.08.2016 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.stanford.nlp.ling.Word;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
+public class StanfordNlpPTBTokenizer implements Tokenizer {
 
-    OpenNlpWhitespaceTokenizerFactory() {
-    }
+    private edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory<Word> m_tokenizer;
 
     /**
-     * {@inheritDoc}
+     * Creates a new instance of {@code StanfordNlpPTBTokenizer}
      */
-    @Override
-    public Tokenizer getTokenizer() {
-        return new OpenNlpWhitespaceTokenizer();
+    public StanfordNlpPTBTokenizer() {
+        m_tokenizer = (PTBTokenizerFactory<Word>)PTBTokenizer.factory();
     }
 
+    @Override
+    public synchronized List<String> tokenize(final String sentence) {
+
+        if (m_tokenizer != null) {
+            StringReader readString = new StringReader(sentence);
+            edu.stanford.nlp.process.Tokenizer<Word> tokenizer = m_tokenizer.getTokenizer(readString);
+            List<Word> wordList = tokenizer.tokenize();
+            List<String> tokenList = new ArrayList<String>();
+            for (Word word : wordList) {
+                tokenList.add(word.word());
+            }
+            return tokenList;
+        } else {
+            return null;
+        }
+
+    }
 }

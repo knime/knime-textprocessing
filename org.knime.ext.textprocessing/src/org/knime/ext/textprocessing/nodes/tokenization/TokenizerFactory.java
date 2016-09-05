@@ -59,9 +59,4 @@ public interface TokenizerFactory {
      * @return
      */
     public Tokenizer getTokenizer();
-
-    /**
-     * @return
-     */
-    public String getFactoryName();
 }

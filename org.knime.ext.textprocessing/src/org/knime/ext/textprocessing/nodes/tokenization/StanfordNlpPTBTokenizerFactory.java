@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   02.09.2016 (Julian): created
+ *   05.09.2016 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
@@ -53,9 +53,12 @@ package org.knime.ext.textprocessing.nodes.tokenization;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
+public class StanfordNlpPTBTokenizerFactory implements TokenizerFactory {
 
-    OpenNlpWhitespaceTokenizerFactory() {
+    /**
+     *
+     */
+    public StanfordNlpPTBTokenizerFactory() {
     }
 
     /**
@@ -63,7 +66,7 @@ public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public Tokenizer getTokenizer() {
-        return new OpenNlpWhitespaceTokenizer();
+        return new StanfordNlpPTBTokenizer();
     }
 
 }

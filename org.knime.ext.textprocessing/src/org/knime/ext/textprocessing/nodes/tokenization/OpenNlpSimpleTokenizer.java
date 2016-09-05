@@ -44,26 +44,39 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   02.09.2016 (Julian): created
+ *   27.07.2016 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
+
+import java.util.Arrays;
+import java.util.List;
+
+import opennlp.tools.tokenize.SimpleTokenizer;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
+public class OpenNlpSimpleTokenizer implements Tokenizer {
 
-    OpenNlpWhitespaceTokenizerFactory() {
+    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
+
+    /**
+     * Creates new instance of {@code OpenNlpSimpleTokenizer}
+     */
+    public OpenNlpSimpleTokenizer() {
+        m_tokenizer = SimpleTokenizer.INSTANCE;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tokenizer getTokenizer() {
-        return new OpenNlpWhitespaceTokenizer();
+    public synchronized List<String> tokenize(final String sentence) {
+        if (m_tokenizer != null) {
+            return Arrays.asList(m_tokenizer.tokenize(sentence));
+        }
+        return null;
     }
-
 }

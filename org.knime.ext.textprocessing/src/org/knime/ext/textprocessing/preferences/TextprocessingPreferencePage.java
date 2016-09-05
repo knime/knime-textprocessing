@@ -153,10 +153,6 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 
         // Tokenizer
         String [][] m_tokenizerNames = TokenizerPool.getMapAsStringArray();
-//        m_tokenizerNames[0][0] = "OpenNLP WordTokenizer";
-//        m_tokenizerNames[0][1] = "OpenNLP WordTokenizer";
-//        m_tokenizerNames[1][0] = "OpenNLP WhitespaceTokenizer";
-//        m_tokenizerNames[1][1] = "OpenNLP WhitespaceTokenizer";
         m_tokenizer = new ComboFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER, "Tokenizer", m_tokenizerNames,
             tokenizationGrp);
         m_tokenizer.setPage(this);
