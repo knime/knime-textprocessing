@@ -47,8 +47,8 @@
  */
 package org.knime.ext.textprocessing.preferences;
 
-
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -63,6 +63,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerPool;
 
 /**
  *
@@ -78,6 +79,8 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 
     private BooleanFieldEditor m_initTokenizerPoolOnStartup;
 
+    private ComboFieldEditor m_tokenizer;
+
     /**
      * Creates a new preference page.
      */
@@ -89,27 +92,29 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 
     private static final String DESC_SERIALIZATION =
         "Check to enable loading of workflows containing old textprocessing "
-      + "nodes (2.4.x and older).\nNote that backwards compatibility slows "
-      + "down deserialization and thus buffering and\nprocessing of nodes. "
-      + "Uncheck to speed up processing. If workflows containing older "
-      + " nodes\nare loaded once, option can be unchecked.";
+            + "nodes (2.4.x and older).\nNote that backwards compatibility slows "
+            + "down deserialization and thus buffering and\nprocessing of nodes. "
+            + "Uncheck to speed up processing. If workflows containing older "
+            + " nodes\nare loaded once, option can be unchecked.";
 
-//    private static final String DESC_PREPROCESSING =
-//        "If checked, nodes of the \"Preprocessing\" category process data "
-//      + "in memory. Large sets of\ndocuments may not fit into memory and "
-//      + "thus cannot be processed. Uncheck if documents\ndo not fit into "
-//      + "memory. Note that unchecking slows down processing significantly. "
-//      + "\nCheck to speed up processing.";
+    //    private static final String DESC_PREPROCESSING =
+    //        "If checked, nodes of the \"Preprocessing\" category process data "
+    //      + "in memory. Large sets of\ndocuments may not fit into memory and "
+    //      + "thus cannot be processed. Uncheck if documents\ndo not fit into "
+    //      + "memory. Note that unchecking slows down processing significantly. "
+    //      + "\nCheck to speed up processing.";
 
     private static final String DESC_TOKENIZER_POOLSIZE =
         "The maximal number of tokenizers which can be used concurrently. "
-      + "All tokenizer will be\ncreated on demand or startup and on change "
-      + "of the pool size. Be aware that tokenizers do\nrequire memory. As a "
-      + "rule of thump, use not more than #documents/100 tokenizers.";
+            + "All tokenizer will be\ncreated on demand or startup and on change "
+            + "of the pool size. Be aware that tokenizers do\nrequire memory. As a "
+            + "rule of thump, use not more than #documents/100 tokenizers.";
 
     private static final String DESC_INIT_POOL_ONSTARTUP =
-            "If checked tokenizers are initialized on startup, which slows down "
-          + "KNIME startup time.";
+        "If checked tokenizers are initialized on startup, which slows down KNIME startup time.";
+
+    private static final String DESC_INIT_TOKENIZER =
+        "The tokenizer which will be used to generate terms." + "Select the tokenizer for your purpose.";
 
     /**
      * {@inheritDoc}
@@ -127,7 +132,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         tokenizationGrp.setText("Tokenization:");
 
         m_tokenizerPoolSize = new IntegerFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER_POOLSIZE,
-                "Tokenizer pool size", tokenizationGrp);
+            "Tokenizer pool size", tokenizationGrp);
         m_tokenizerPoolSize.setPage(this);
         m_tokenizerPoolSize.setPreferenceStore(getPreferenceStore());
         m_tokenizerPoolSize.load();
@@ -136,15 +141,30 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         final Label lTokenization = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
         lTokenization.setText(DESC_TOKENIZER_POOLSIZE);
 
-        m_initTokenizerPoolOnStartup = new BooleanFieldEditor(
-            TextprocessingPreferenceInitializer.PREF_TOKENIZER_INIT_ONSTARTUP, "Initialize pool on startup",
-            tokenizationGrp);
+        m_initTokenizerPoolOnStartup =
+            new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER_INIT_ONSTARTUP,
+                "Initialize pool on startup", tokenizationGrp);
         m_initTokenizerPoolOnStartup.setPage(this);
         m_initTokenizerPoolOnStartup.setPreferenceStore(getPreferenceStore());
         m_initTokenizerPoolOnStartup.load();
 
         final Label lInitialization = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
         lInitialization.setText(DESC_INIT_POOL_ONSTARTUP);
+
+        // Tokenizer
+        String [][] m_tokenizerNames = TokenizerPool.getMapAsStringArray();
+//        m_tokenizerNames[0][0] = "OpenNLP WordTokenizer";
+//        m_tokenizerNames[0][1] = "OpenNLP WordTokenizer";
+//        m_tokenizerNames[1][0] = "OpenNLP WhitespaceTokenizer";
+//        m_tokenizerNames[1][1] = "OpenNLP WhitespaceTokenizer";
+        m_tokenizer = new ComboFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER, "Tokenizer", m_tokenizerNames,
+            tokenizationGrp);
+        m_tokenizer.setPage(this);
+        m_tokenizer.setPreferenceStore(getPreferenceStore());
+        m_tokenizer.load();
+
+        final Label lTokenizer = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
+        lTokenizer.setText(DESC_INIT_TOKENIZER);
 
         tokenizationGrp.setLayoutData(getGridData());
         tokenizationGrp.setLayout(getLayout());
@@ -153,9 +173,8 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         final Group serializationGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
         serializationGrp.setText("Serialization:");
 
-        m_useDmlDeserialization =
-            new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_DML_DESERIALIZATION,
-                "Backwards compatibility (to 2.4 and older)", serializationGrp);
+        m_useDmlDeserialization = new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_DML_DESERIALIZATION,
+            "Backwards compatibility (to 2.4 and older)", serializationGrp);
         m_useDmlDeserialization.setPage(this);
         m_useDmlDeserialization.setPreferenceStore(getPreferenceStore());
         m_useDmlDeserialization.load();
@@ -186,7 +205,8 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
      * {@inheritDoc}
      */
     @Override
-    public void init(final IWorkbench workbench) { }
+    public void init(final IWorkbench workbench) {
+    }
 
     /**
      * {@inheritDoc}
@@ -196,6 +216,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         m_useDmlDeserialization.loadDefault();
         m_tokenizerPoolSize.loadDefault();
         m_initTokenizerPoolOnStartup.loadDefault();
+        m_tokenizer.loadDefault();
         super.performDefaults();
     }
 
@@ -207,6 +228,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         m_useDmlDeserialization.store();
         m_tokenizerPoolSize.store();
         m_initTokenizerPoolOnStartup.store();
+        m_tokenizer.store();
 
         // initialize tokenizer pool with new pool size
         DefaultTokenization.createNewTokenizerPool();

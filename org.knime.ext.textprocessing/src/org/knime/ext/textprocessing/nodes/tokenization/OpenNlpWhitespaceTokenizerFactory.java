@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,51 +44,40 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   02.09.2016 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
-
-
-
 /**
- * Is a utility class which provides methods for the default tokenization of
- * {@link org.knime.ext.textprocessing.data.Document}s.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-public final class DefaultTokenization {
+public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
 
-    private static TokenizerPool tokenizerPool = new TokenizerPool(
-        TextprocessingPreferenceInitializer.tokenizerPoolSize(), TextprocessingPreferenceInitializer.getTokenizerName());
+    private Tokenizer m_tokenizer;
 
-    private DefaultTokenization() { }
+    private String m_tokenizerFactoryName;
 
-    /**
-     * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
-     * preference pool size.
-     * @since 2.9
-     */
-    public static final void createNewTokenizerPool() {
-        final int newPoolSize = TextprocessingPreferenceInitializer.tokenizerPoolSize();
-        final String newTokenizer = TextprocessingPreferenceInitializer.getTokenizerName();
-        if ((newPoolSize != tokenizerPool.getPoolSize()) || (!newTokenizer.equals(tokenizerPool.getTokenizerName()))) {
-            tokenizerPool = new TokenizerPool(newPoolSize, newTokenizer);
-        }
+    OpenNlpWhitespaceTokenizerFactory() {
+        m_tokenizer = new OpenNlpWhitespaceTokenizer();
+        m_tokenizerFactoryName = "OpenNlpWhitespaceTokenizerFactory";
     }
 
     /**
-     * @return The default sentence tokenizer.
+     * {@inheritDoc}
      */
-    public static final Tokenizer getSentenceTokenizer() {
-        return tokenizerPool.nextSentenceTokenizer();
+    @Override
+    public Tokenizer getTokenizer() {
+        return m_tokenizer;
     }
 
     /**
-     * @return The default word tokenizer.
+     * {@inheritDoc}
      */
-    public static final Tokenizer getWordTokenizer() {
-        return tokenizerPool.nextWordTokenizer();
+    @Override
+    public String getFactoryName() {
+        return m_tokenizerFactoryName;
     }
+
 }

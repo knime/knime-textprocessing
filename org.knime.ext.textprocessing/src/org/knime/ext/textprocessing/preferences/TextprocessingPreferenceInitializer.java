@@ -66,11 +66,14 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
     /*** The default size of the tokenizer pool. */
     public static final int DEFAULT_TOKENIZER_POOLSIZE = 10;
 
-    /*** The maximum size of the tokenizer pool. */
-    public static final int MAX_TOKENIZER_POOLSIZE = 1000;
+    /*** The default tokenizer. */
+    public static final String DEFAULT_TOKENIZER = "OpenNLP WordTokenizer";
 
     /** The default setting whether tokenizer pool is initialized on startup. */
     public static final boolean DEFAULT_TOKENIZER_INIT_ONSTARTUP = true;
+
+    /*** The maximum size of the tokenizer pool. */
+    public static final int MAX_TOKENIZER_POOLSIZE = 1000;
 
     /** Preference key for the usage of backwards compatibility. */
     public static final String PREF_DML_DESERIALIZATION = "knime.textprocessing.dmldeserialization";
@@ -88,6 +91,11 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
     public static final String PREF_TOKENIZER_INIT_ONSTARTUP = "knime.textprocessing.tokenizer.initonstartup";
 
     /**
+     * Preference key for the tokenizer.
+     */
+    public static final String PREF_TOKENIZER = "knime.textprocessing.tokenizer.tokenizer";
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -99,6 +107,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
         store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
         store.setDefault(PREF_TOKENIZER_POOLSIZE, DEFAULT_TOKENIZER_POOLSIZE);
         store.setDefault(PREF_TOKENIZER_INIT_ONSTARTUP, DEFAULT_TOKENIZER_INIT_ONSTARTUP);
+        store.setDefault(PREF_TOKENIZER, DEFAULT_TOKENIZER);
     }
 
     /**
@@ -153,5 +162,16 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
             return DEFAULT_TOKENIZER_INIT_ONSTARTUP;
         }
         return pStore.getBoolean(PREF_TOKENIZER_INIT_ONSTARTUP);
+    }
+
+    /**
+     * @return
+     */
+    public static final String getTokenizerName() {
+        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        if(!pStore.contains(PREF_TOKENIZER)) {
+            return DEFAULT_TOKENIZER;
+        }
+        return pStore.getString(PREF_TOKENIZER);
     }
 }

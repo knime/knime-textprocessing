@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,51 +44,40 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   27.06.2016 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import java.util.Arrays;
+import java.util.List;
 
-
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 /**
- * Is a utility class which provides methods for the default tokenization of
- * {@link org.knime.ext.textprocessing.data.Document}s.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-public final class DefaultTokenization {
+public class OpenNlpWhitespaceTokenizer implements Tokenizer {
 
-    private static TokenizerPool tokenizerPool = new TokenizerPool(
-        TextprocessingPreferenceInitializer.tokenizerPoolSize(), TextprocessingPreferenceInitializer.getTokenizerName());
-
-    private DefaultTokenization() { }
+    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
     /**
-     * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
-     * preference pool size.
-     * @since 2.9
+     * Creates new instance of <code>OpenNlpWhitespaceTokenizer</code>.
      */
-    public static final void createNewTokenizerPool() {
-        final int newPoolSize = TextprocessingPreferenceInitializer.tokenizerPoolSize();
-        final String newTokenizer = TextprocessingPreferenceInitializer.getTokenizerName();
-        if ((newPoolSize != tokenizerPool.getPoolSize()) || (!newTokenizer.equals(tokenizerPool.getTokenizerName()))) {
-            tokenizerPool = new TokenizerPool(newPoolSize, newTokenizer);
+    public OpenNlpWhitespaceTokenizer() {
+        m_tokenizer = WhitespaceTokenizer.INSTANCE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized List<String> tokenize(final String sentence) {
+        if (m_tokenizer != null) {
+            return Arrays.asList(m_tokenizer.tokenize(sentence));
         }
+        return null;
     }
 
-    /**
-     * @return The default sentence tokenizer.
-     */
-    public static final Tokenizer getSentenceTokenizer() {
-        return tokenizerPool.nextSentenceTokenizer();
-    }
-
-    /**
-     * @return The default word tokenizer.
-     */
-    public static final Tokenizer getWordTokenizer() {
-        return tokenizerPool.nextWordTokenizer();
-    }
 }

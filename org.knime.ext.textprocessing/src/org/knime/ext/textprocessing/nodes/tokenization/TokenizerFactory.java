@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,51 +44,24 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   02.09.2016 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
-
-
-
 /**
- * Is a utility class which provides methods for the default tokenization of
- * {@link org.knime.ext.textprocessing.data.Document}s.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-public final class DefaultTokenization {
-
-    private static TokenizerPool tokenizerPool = new TokenizerPool(
-        TextprocessingPreferenceInitializer.tokenizerPoolSize(), TextprocessingPreferenceInitializer.getTokenizerName());
-
-    private DefaultTokenization() { }
+public interface TokenizerFactory {
 
     /**
-     * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
-     * preference pool size.
-     * @since 2.9
+     * @return
      */
-    public static final void createNewTokenizerPool() {
-        final int newPoolSize = TextprocessingPreferenceInitializer.tokenizerPoolSize();
-        final String newTokenizer = TextprocessingPreferenceInitializer.getTokenizerName();
-        if ((newPoolSize != tokenizerPool.getPoolSize()) || (!newTokenizer.equals(tokenizerPool.getTokenizerName()))) {
-            tokenizerPool = new TokenizerPool(newPoolSize, newTokenizer);
-        }
-    }
+    public Tokenizer getTokenizer();
 
     /**
-     * @return The default sentence tokenizer.
+     * @return
      */
-    public static final Tokenizer getSentenceTokenizer() {
-        return tokenizerPool.nextSentenceTokenizer();
-    }
-
-    /**
-     * @return The default word tokenizer.
-     */
-    public static final Tokenizer getWordTokenizer() {
-        return tokenizerPool.nextWordTokenizer();
-    }
+    public String getFactoryName();
 }
