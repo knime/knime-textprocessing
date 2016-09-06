@@ -63,7 +63,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
-import org.knime.ext.textprocessing.nodes.tokenization.TokenizerPool;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 
 /**
  *
@@ -152,7 +152,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         lInitialization.setText(DESC_INIT_POOL_ONSTARTUP);
 
         // Tokenizer
-        String [][] m_tokenizerNames = TokenizerPool.getMapAsStringArray();
+        String [][] m_tokenizerNames = TokenizerFactoryRegistry.getMapAsStringArray();
         m_tokenizer = new ComboFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER, "Tokenizer", m_tokenizerNames,
             tokenizationGrp);
         m_tokenizer.setPage(this);
