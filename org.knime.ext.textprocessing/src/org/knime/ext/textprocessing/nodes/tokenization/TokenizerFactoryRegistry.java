@@ -66,13 +66,13 @@ public final class TokenizerFactoryRegistry {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TokenizerFactoryRegistry.class);
 
     /**
-    *
-    */
+     * The extension point id of the TokenizerFactory extension point.
+     */
     public static final String EXT_POINT_ID = "org.knime.ext.textprocessing.TokenizerFactory";
 
     /**
-    *
-    */
+     * The extension point attribute.
+     */
     public static final String EXT_POINT_ATTR_DF = "TokenizerFactory";
 
     private static TokenizerFactoryRegistry instance;
@@ -80,7 +80,8 @@ public final class TokenizerFactoryRegistry {
     private Map<String, TokenizerFactory> m_tokenizerMap = new TreeMap<>();
 
     private TokenizerFactoryRegistry() {
-        registerTokenizerFactory(new OpenNlpWordTokenizerFactory());
+        registerTokenizerFactory(new OpenNlpEnglishWordTokenizerFactory());
+        registerTokenizerFactory(new OpenNlpGermanWordTokenizerFactory());
         registerTokenizerFactory(new OpenNlpSimpleTokenizerFactory());
         registerTokenizerFactory(new OpenNlpWhitespaceTokenizerFactory());
         registerTokenizerFactory(new StanfordNlpPTBTokenizerFactory());
@@ -90,7 +91,7 @@ public final class TokenizerFactoryRegistry {
     }
 
     /**
-     * @return
+     * @return Returns a new instance of {@code TokenizerFactoryRegistry}
      */
     public static TokenizerFactoryRegistry getInstance() {
         if (instance == null) {
@@ -149,15 +150,15 @@ public final class TokenizerFactoryRegistry {
     }
 
     /**
-     * @return
+     * @return Returns the map containing the name of the tokenizer and the related TokenizerFactory.
      */
-    public static Map<String, TokenizerFactory> getTokenizerFactoryMap(){
+    public static Map<String, TokenizerFactory> getTokenizerFactoryMap() {
         return getInstance().m_tokenizerMap;
     }
 
     /**
-     * @return Returns m_tokenizerMap as a String array, so it can be used for
-     * the {@code ComboFieldEditor} in the {@code TextprocessingPreferenceInitializer} class.
+     * @return Returns m_tokenizerMap as a String array, so it can be used for the {@code ComboFieldEditor} in the
+     *         {@code TextprocessingPreferenceInitializer} class.
      * @since 3.3
      */
     public static String[][] getMapAsStringArray() {

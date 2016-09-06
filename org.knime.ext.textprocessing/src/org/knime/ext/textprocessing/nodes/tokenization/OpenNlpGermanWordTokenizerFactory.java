@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,60 +44,36 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   06.09.2016 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import opennlp.tools.tokenize.TokenizerModel;
-
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
-
 /**
- * A tokenizer which is able to detect words and and provides a tokenization
- * resulting each word as one token.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class OpenNlpWordTokenizer implements Tokenizer {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(
-            OpenNlpWordTokenizer.class);
-
-    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
+public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
 
     /**
-     * Creates new instance of <code>OpenNlpWordTokenizer</code>.
+     *
      */
-    public OpenNlpWordTokenizer() {
-        try {
-            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
-            .getTokenizerModelFile();
-            InputStream is = new FileInputStream(new File(modelPath));
-            TokenizerModel model = new TokenizerModel(is);
-            m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);
-        } catch (IOException e) {
-            LOGGER.error("Sentence tokenizer model could not be red!");
-            LOGGER.error(e.getStackTrace());
-        }
+    public OpenNlpGermanWordTokenizerFactory() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized List<String> tokenize(final String sentence) {
-        if (m_tokenizer != null) {
-            return Arrays.asList(m_tokenizer.tokenize(sentence));
-        }
-        return null;
+    public Tokenizer getTokenizer() {
+        return new OpenNlpGermanWordTokenizer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "OpenNLP German WordTokenizer";
     }
 
 }
