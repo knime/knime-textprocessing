@@ -69,4 +69,12 @@ public class OpenNlpSimpleTokenizerFactory implements TokenizerFactory {
         return new OpenNlpSimpleTokenizer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "OpenNLP SimpleTokenizer";
+    }
+
 }

@@ -69,4 +69,12 @@ public class StanfordNlpFrenchTokenizerFactory implements TokenizerFactory {
         return new StanfordNlpFrenchTokenizer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "StanfordNLP FrenchTokenizer";
+    }
+
 }

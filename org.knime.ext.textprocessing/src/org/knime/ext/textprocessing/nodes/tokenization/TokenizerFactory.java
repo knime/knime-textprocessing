@@ -56,7 +56,12 @@ package org.knime.ext.textprocessing.nodes.tokenization;
 public interface TokenizerFactory {
 
     /**
-     * @return
+     * @return Returns the Tokenizer.
      */
     public Tokenizer getTokenizer();
+
+    /**
+     * @return Returns the name of the Tokenizer.
+     */
+    public String getTokenizerName();
 }

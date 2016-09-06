@@ -69,4 +69,12 @@ public class StanfordNlpPTBTokenizerFactory implements TokenizerFactory {
         return new StanfordNlpPTBTokenizer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "StanfordNLP PTBTokenizer";
+    }
+
 }

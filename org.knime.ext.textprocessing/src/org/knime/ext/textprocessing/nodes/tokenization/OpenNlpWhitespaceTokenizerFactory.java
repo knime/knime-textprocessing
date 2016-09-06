@@ -66,4 +66,12 @@ public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
         return new OpenNlpWhitespaceTokenizer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "OpenNLP WhitespaceTokenizer";
+    }
+
 }

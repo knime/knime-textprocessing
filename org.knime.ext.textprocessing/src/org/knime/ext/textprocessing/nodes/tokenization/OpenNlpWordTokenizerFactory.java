@@ -69,4 +69,12 @@ public class OpenNlpWordTokenizerFactory implements TokenizerFactory {
         return new OpenNlpWordTokenizer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "OpenNLP WordTokenizer";
+    }
+
 }
