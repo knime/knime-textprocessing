@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="org.knime.ext.textprocessing.TagSet" name="TagSet" schema="schema/org.knime.ext.textprocessing.TagSet.exsd"/>
    <extension-point id="org.knime.ext.textprocessing.DocumentGrabber" name="DocumentGrabber" schema="schema/org.knime.ext.textprocessing.DocumentGrabber.exsd"/>
+   <extension-point id="org.knime.ext.textprocessing.TokenizerFactory" name="TokenizerFactory" schema="schema/org.knime.ext.textprocessing.TokenizerFactory.exsd"/>
    <extension
          point="org.knime.workbench.repository.categories">
       <category
@@ -678,6 +679,9 @@
                serializerClass="org.knime.ext.textprocessing.data.TermCell2$TermSerializer">
          </serializer>
       </DataType>
+   </extension>
+   <extension
+         point="org.knime.ext.textprocessing.TokenizerFactory">
    </extension>
    
 </plugin>

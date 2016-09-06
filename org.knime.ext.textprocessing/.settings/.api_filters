@@ -513,6 +513,13 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tokenization/OpenNlpSimpleTokenizerFactory.java" type="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSimpleTokenizerFactory">
+        <filter id="1110441988">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSimpleTokenizerFactory"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/transformation/stringstodocument/StringsToDocumentCellFactory.java" type="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory">
         <filter id="338722907">
             <message_arguments>
