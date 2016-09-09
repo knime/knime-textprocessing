@@ -60,6 +60,7 @@ import javax.swing.event.ChangeListener;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -71,6 +72,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
+import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -160,8 +162,14 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         conf.setFulltextStringIndex(fulltextIndex);
 
         // Author names
+        String authorNames = m_authorsColModel.getStringValue();
+        if(!authorNames.isEmpty() && authorNames.length() > 0){
+            conf.setAuthorNames(authorNames);
+        }
         int authorIndex = spec.findColumnIndex(m_authorsColModel.getStringValue());
         conf.setAuthorsStringIndex(authorIndex);
+        boolean useAuthorsCol = m_useAuthorsColumnModel.getBooleanValue();
+        conf.setUseAuthorsColumn(useAuthorsCol);
 
         // Author name separator
         String authorNameSeparator = m_authorNameSeparator.getStringValue();
@@ -225,6 +233,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
         try {
             m_useTitleColumnModel.loadSettingsFrom(settings);
+            m_useAuthorsColumnModel.loadSettingsFrom(settings);
             m_useCatColumnModel.loadSettingsFrom(settings);
             m_useSourceColumnModel.loadSettingsFrom(settings);
             m_catColumnModel.loadSettingsFrom(settings);
@@ -259,6 +268,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_useCatColumnModel.saveSettingsTo(settings);
         m_useSourceColumnModel.saveSettingsTo(settings);
         m_useTitleColumnModel.saveSettingsTo(settings);
+        m_useAuthorsColumnModel.saveSettingsTo(settings);
         m_catColumnModel.saveSettingsTo(settings);
         m_sourceColumnModel.saveSettingsTo(settings);
         m_maxThreads.saveSettingsTo(settings);
@@ -281,6 +291,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
         try {
             m_useTitleColumnModel.validateSettings(settings);
+            m_useAuthorsColumnModel.validateSettings(settings);
             m_useCatColumnModel.validateSettings(settings);
             m_useSourceColumnModel.validateSettings(settings);
             m_catColumnModel.validateSettings(settings);
@@ -367,8 +378,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            m_titleColModel.setEnabled(
-                !m_useTitleColumnModel.getBooleanValue());
+         // TODO Auto-generated method stub
 
         }
 
@@ -389,5 +399,49 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
         }
 
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        doSmartDialogSelection(inSpecs[0]);
+        return super.configure(inSpecs);
+    }
+    /**
+     * @param dataTableSpec
+     * @since 3.3
+     */
+    protected void doSmartDialogSelection(final DataTableSpec dataTableSpec){
+        String[] columns = dataTableSpec.getColumnNames();
+        if(settingsNotConfigured()){
+            for (int i = 0 ; i < columns.length; i++) {
+                String column = columns[i];
+                if(column.equalsIgnoreCase(DocumentDataExtractor.TITLE.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    m_titleColModel.setStringValue(column);
+                }
+                if(column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    m_sourceColumnModel.setStringValue(column);
+                }
+                if(column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    m_authorsColModel.setStringValue(column);
+                }
+                if(column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    m_catColumnModel.setStringValue(column);
+                }
+                if(column.equalsIgnoreCase(DocumentDataExtractor.TEXT.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    m_fulltextColModel.setStringValue(column);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return true if settings have not been configured before
+     * @since 3.3
+     */
+    protected boolean settingsNotConfigured(){
+        return(m_titleColModel.getStringValue().length() == 0 && m_authorsColModel.getStringValue().length() == 0
+                && m_fulltextColModel.getStringValue().length() == 0 && m_docSourceModel.getStringValue().length() == 0
+                && m_docCategoryModel.getStringValue().length() == 0);
     }
 }

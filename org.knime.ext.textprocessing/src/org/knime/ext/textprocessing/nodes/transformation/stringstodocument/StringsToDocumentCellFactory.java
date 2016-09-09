@@ -74,9 +74,8 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * A <code>CellFactory</code> to build a document for each data row. The
- * given <code>StringsToDocumentConfig</code> instance specifies which
- * columns of the row to use as title, text authors, etc.
+ * A <code>CellFactory</code> to build a document for each data row. The given <code>StringsToDocumentConfig</code>
+ * instance specifies which columns of the row to use as title, text authors, etc.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -91,14 +90,12 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
     /**
-     * Creates new instance of <code>StringsToDocumentCellFactory</code> with
-     * given configuration.
+     * Creates new instance of <code>StringsToDocumentCellFactory</code> with given configuration.
      *
      * @param config The configuration how to build a document.
      * @param newColSpecs The specs of the new columns that are created.
      * @param numberOfThreads The number of parallel threads to use.
-     * @throws IllegalArgumentException If given configuration is
-     * <code>null</code>.
+     * @throws IllegalArgumentException If given configuration is <code>null</code>.
      * @since 3.1
      */
     public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
@@ -147,13 +144,18 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         final DocumentBuilder docBuilder = new DocumentBuilder();
 
         // Set title
-        if (m_config.getTitleStringIndex() >= 0) {
-            DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
-            String title = "";
-            if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
-                title = ((StringValue)titleCell).getStringValue();
+        String title = m_config.getDocTitle();
+        if (m_config.getUseTitleColumn()) {
+            if (m_config.getTitleStringIndex() >= 0) {
+                // looping over the data cells will helps checking for each doc title for availability
+                final DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
+                if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
+                    title = ((StringValue)titleCell).getStringValue();
+                }
+                docBuilder.addTitle(title);
             }
-
+        } else {
+            title = row.getKey().toString();
             docBuilder.addTitle(title);
         }
 
@@ -168,31 +170,37 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         }
 
         // Set authors
-        if (m_config.getAuthorsStringIndex() >= 0) {
-            final DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
-            if (!auhorsCell.isMissing() && auhorsCell.getType().isCompatible(StringValue.class)) {
-                final String authors = ((StringValue)auhorsCell).getStringValue();
-                final String[]authorsArr = authors.split(m_config.getAuthorsSplitChar());
-                for (String author : authorsArr) {
-                    String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
-                    String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
+        if (m_config.getUseAuthorsColumn()) {
+            if (m_config.getAuthorsStringIndex() >= 0) {
+                final DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
+                if (!auhorsCell.isMissing() && auhorsCell.getType().isCompatible(StringValue.class)) {
+                    final String authors = ((StringValue)auhorsCell).getStringValue();
+                    final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
+                    for (String author : authorsArr) {
+                        String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
+                        String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
 
-                    final String[] names = author.split(" ");
-                    if (names.length > 1) {
-                        final StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < names.length - 1; i++) {
-                            sb.append(names[i]);
-                            sb.append(" ");
+                        final String[] names = author.split(" ");
+                        if (names.length > 1) {
+                            final StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < names.length - 1; i++) {
+                                sb.append(names[i]);
+                                sb.append(" ");
+                            }
+                            firstName = sb.toString();
+                            lastName = names[names.length - 1];
+                        } else if (names.length == 1) {
+                            lastName = names[0];
                         }
-                        firstName = sb.toString();
-                        lastName = names[names.length - 1];
-                    } else if (names.length == 1) {
-                        lastName = names[0];
-                    }
 
-                    docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+                        docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+                    }
                 }
+
             }
+        } else {
+
+            docBuilder.addAuthor(new Author("Author", "Author"));
         }
 
         // set document source
@@ -250,6 +258,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
     /**
      * Closes data cell cache.
+     *
      * @since 2.8
      */
     @Override

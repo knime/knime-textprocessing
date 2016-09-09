@@ -198,8 +198,6 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentNodeModel.MAX_THREADS);
     }
 
-    private SettingsModelString m_titleColModel;
-
     private SettingsModelString m_docCategoryModel;
 
     private SettingsModelString m_docSourceModel;
@@ -308,8 +306,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            m_titleColModel.setEnabled(
-                !m_useTitleColumnModel.getBooleanValue());
+         // TODO Auto-generated method stub
 
         }
 

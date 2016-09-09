@@ -134,6 +134,8 @@ public class StringsToDocumentConfig {
 
     private String m_docTitle = DEF_DOCUMENT_TITLE;
 
+    private String m_authorNames = DEF_AUTHOR_NAMES;
+
     private String m_authorsSplitChar = DEF_AUTHORS_SPLITCHAR;
 
     private String m_docSource = DEF_DOCUMENT_SOURCE;
@@ -366,5 +368,21 @@ public class StringsToDocumentConfig {
      */
     public void setDocTitle(final String docTitle) {
         this.m_docTitle = docTitle;
+    }
+
+    /**
+     * @return the m_authorNames
+     * @since 3.3
+     */
+    public String getAuthorNames() {
+        return m_authorNames;
+    }
+
+    /**
+     * @param authorNames the m_authorNames to set
+     * @since 3.3
+     */
+    public void setAuthorNames(final String authorNames) {
+        this.m_authorNames = authorNames;
     }
 }

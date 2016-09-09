@@ -12,7 +12,6 @@
             full text. Furthermore the defined category, source, type, and
             date will be set.
         </intro>
-        
         <option name="Title">
             The column containing the string which is used as title.
         </option>
