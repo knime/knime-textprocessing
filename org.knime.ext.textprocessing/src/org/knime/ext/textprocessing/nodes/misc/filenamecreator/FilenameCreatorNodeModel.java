@@ -54,12 +54,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -81,6 +83,8 @@ public class FilenameCreatorNodeModel extends NodeModel {
      * The default path to the base directory.
      */
     public static final String DEFAULT_PATH = System.getProperty("user.home");
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(FilenameCreatorNodeModel.class);
 
     private SettingsModelString m_pathModel = FilenameCreatorNodeDialog.getPathModel();
 
@@ -117,7 +121,8 @@ public class FilenameCreatorNodeModel extends NodeModel {
      */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        File dir = getDir(m_pathModel.getStringValue());
+        final File dir = getDir(m_pathModel.getStringValue());
+        String outputFlowVar = "filePath";
         String ext = m_extModel.getStringValue();
         String name = m_nameModel.getStringValue();
 
@@ -146,8 +151,14 @@ public class FilenameCreatorNodeModel extends NodeModel {
         if (filepath.isDirectory()) {
             throw new Exception("File path is a directory!");
         }
-
-        pushFlowVariableString("filePath", filepath.getCanonicalPath());
+        int i = 0;
+        Set<String> flowVars = getAvailableFlowVariables().keySet();
+        while(flowVars.contains(outputFlowVar)){
+            LOGGER.info("Flow variable " + outputFlowVar + " already exists. Using " + outputFlowVar + i + " as output variable.");
+            outputFlowVar += i;
+            i++;
+        }
+        pushFlowVariableString(outputFlowVar, filepath.getCanonicalPath());
 
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
