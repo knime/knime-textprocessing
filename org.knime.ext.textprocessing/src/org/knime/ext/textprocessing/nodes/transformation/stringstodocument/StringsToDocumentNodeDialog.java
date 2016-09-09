@@ -220,16 +220,17 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_useTitleColumnModel = getUseTitleColumnModel();
         m_useTitleColumnModel.addChangeListener(new DocTitleChangeListener());
-        addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from Column"));
+        addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(getTitleStringModel(), "Title", 0, StringValue.class));
+            new DialogComponentColumnNameSelection(getTitleStringModel(), "Title column", 0, StringValue.class));
 
+        setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         m_useAuthorsColumnModel = getUseAuthorsColumnModel();
         m_useAuthorsColumnModel.addChangeListener(new AuthorsChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(getAuthorsStringModel(), "Authors", 0, StringValue.class));
+            new DialogComponentColumnNameSelection(getAuthorsStringModel(), "Authors column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
         addDialogComponent(new DialogComponentString(getAuthorSplitStringModel(), "Author names separator"));
