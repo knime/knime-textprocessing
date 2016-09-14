@@ -49,6 +49,8 @@ package org.knime.ext.textprocessing.nodes.tagging;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -63,7 +65,9 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
 import org.knime.core.node.streamable.PartitionInfo;
@@ -92,11 +96,12 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * Default constructor, defining one data input and one data output port.
      */
     public StreamableTaggerNodeModel() {
-        this(1, new InputPortRole[] {});
+        this(1, new InputPortRole[]{});
     }
 
     /**
      * Constructor defining a specified number of data input and one data output port.
+     *
      * @param dataInPorts The number of data input ports.
      * @param roles The roles of the input ports after the first port.
      */
@@ -114,21 +119,74 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-        throws Exception {
-        prepareTagger(inData, exec);
-        final ColumnRearranger rearranger = createColumnRearranger(inData[0].getDataTableSpec());
-        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
+    /**
+     * @param portTypes
+     * @param roles
+     * @since 3.3
+     */
+    public StreamableTaggerNodeModel(final PortType[] portTypes, final InputPortRole[] roles) {
+        super(portTypes, new PortType[]{BufferedDataTable.TYPE});
+
+        if (roles.length != portTypes.length - 1) {
+            throw new IllegalArgumentException(
+                "Number of input port roles must be equal to number of data in ports -1!");
+        }
+        m_roles = new InputPortRole[portTypes.length];
+        m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
+        for (int i = 1; i < m_roles.length; i++) {
+            m_roles[i] = roles[i - 1];
+        }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        checkInputDataTableSpecs(inSpecs);
+    /**
+     * @param inPortTypes
+     * @param roles
+     * @param outPortTypes
+     * @since 3.3
+     */
+    public StreamableTaggerNodeModel(final PortType[] inPortTypes, final InputPortRole[] roles, final PortType[] outPortTypes) {
+        super(inPortTypes, outPortTypes);
 
-        DataTableSpec in = inSpecs[0];
+        if (roles.length != inPortTypes.length - 1) {
+            throw new IllegalArgumentException(
+                "Number of input port roles must be equal to number of data in ports -1!");
+        }
+        m_roles = new InputPortRole[inPortTypes.length];
+        m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
+        for (int i = 1; i < m_roles.length; i++) {
+            m_roles[i] = roles[i - 1];
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        prepareTagger(inObjects, exec);
+
+        BufferedDataTable inDataDocumentTable = (BufferedDataTable)inObjects[0];
+        final ColumnRearranger rearranger = createColumnRearranger(inDataDocumentTable.getDataTableSpec());
+        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataDocumentTable, rearranger, exec)};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        List<DataTableSpec> dataTableSpecs = new LinkedList<>();
+        for (PortObjectSpec pospec : inSpecs) {
+            if (pospec instanceof DataTableSpec) {
+                dataTableSpecs.add((DataTableSpec)pospec);
+            }
+        }
+        DataTableSpec[] inDataTableSpecs = dataTableSpecs.toArray(new DataTableSpec[]{});
+
+        checkInputDataTableSpecs(inDataTableSpecs);
+        checkInputPortSpecs(inSpecs);
+
+        DataTableSpec in = inDataTableSpecs[0];
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
         return new DataTableSpec[]{out};
@@ -148,19 +206,54 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * @param inSpecs Specs of the input data tables.
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      */
-    protected void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException { }
+    protected void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+    }
+
+    /**
+     * Method to check specs of input ports. This method can be overwritten to apply specific checks.
+     *
+     * @param inSpecs Specs of the input ports.
+     * @throws InvalidSettingsException If settings or specs of input ports are invalid.
+     * @since 3.3
+     */
+    protected void checkInputPortSpecs(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+    }
 
     /**
      * Method to prepare the tagger model. This method can be overwritten to apply loading of data from input data
      * tables for tagging.
+     *
      * @param inData Input data tables.
      * @param exec The execution context of the node.
      * @throws Exception If tagger cannot be prepared.
      */
-    protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception { }
+    protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
+    }
+
+    /**
+     * Method to prepare the tagger model. This method can be overwritten to apply loading of data from input data
+     * tables for tagging.
+     * @param inObjects Input port objects.
+     * @param exec The execution context of the node.
+     * @throws Exception If tagger cannot be prepared.
+     * @since 3.3
+     */
+    protected void prepareTagger(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        List<BufferedDataTable> bufferedDataTables = new LinkedList<>();
+        for (PortObject po : inObjects) {
+            if (po instanceof BufferedDataTable) {
+                bufferedDataTables.add((BufferedDataTable)po);
+            } else {
+                bufferedDataTables.add(null);
+            }
+        }
+        BufferedDataTable[] inData = bufferedDataTables.toArray(new BufferedDataTable[]{});
+        prepareTagger(inData, exec);
+    }
 
     /**
      * Creates column rearranger for creation of new data table.
+     *
      * @param in the input data table spec.
      * @return A new instance of column rearranger to create output data table
      * @throws InvalidSettingsException If tagger instance cannot be created.
@@ -206,21 +299,22 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * {@inheritDoc}
      */
     @Override
-    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
-        throws InvalidSettingsException {
-         return new StreamableOperator() {
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        return new StreamableOperator() {
 
             @Override
-            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec) throws Exception {
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
 
-                // covert non streamable in ports to BufferedDatatables
-                BufferedDataTable[] inData = new BufferedDataTable[inputs.length];
+                // covert non streamable in ports to PortObject
+                PortObject[] inData = new PortObject[inputs.length];
                 for (int i = 0; i < inputs.length; i++) {
                     if (m_roles[i].equals(InputPortRole.DISTRIBUTED_STREAMABLE)
                         || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
                         inData[i] = null;
                     } else {
-                        inData[i] = (BufferedDataTable) ((PortObjectInput) inputs[i]).getPortObject();
+                        inData[i] = ((PortObjectInput)inputs[i]).getPortObject();
                     }
                 }
 
@@ -239,15 +333,15 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
 
     /** {@inheritDoc} */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // possibly overwritten
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // possibly overwritten
     }
 
@@ -255,8 +349,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         try {
             m_numberOfThreadsModel.loadSettingsFrom(settings);
         } catch (InvalidSettingsException e) {
@@ -276,8 +369,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         try {
             m_numberOfThreadsModel.validateSettings(settings);
         } catch (InvalidSettingsException e) {

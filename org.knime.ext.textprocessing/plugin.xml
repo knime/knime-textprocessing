@@ -547,6 +547,24 @@
             factory-class="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory"
             id="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner.StanfordNlpNeLearnerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner.StanfordNlpNeLearnerNodeFactory">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnescorer.StanfordNlpNeScorerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnescorer.StanfordNlpNeScorerNodeFactory">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory"
+            id="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -678,6 +696,18 @@
                serializerClass="org.knime.ext.textprocessing.data.TermCell2$TermSerializer">
          </serializer>
       </DataType>
+   </extension>
+   <extension
+         point="org.knime.core.PortType">
+      <portType
+            color="#2E9AFE"
+            hidden="false"
+            name="StanfordNERModelPortObject"
+            objectClass="org.knime.ext.textprocessing.data.StanfordNERModelPortObject"
+            objectSerializer="org.knime.ext.textprocessing.data.StanfordNERModelPortObject$Serializer"
+            specClass="org.knime.ext.textprocessing.data.NERModelPortObjectSpec"
+            specSerializer="org.knime.ext.textprocessing.data.NERModelPortObjectSpec$Serializer">
+      </portType>
    </extension>
    
 </plugin>

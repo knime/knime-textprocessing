@@ -67,25 +67,25 @@ public final class StanfordModelPaths {
     private static StanfordModelPaths instance = null;
 
     private static final String GERMAN_FAST_POS =
-        "/resources/stanfordmodels/german-fast.tagger";
+        "/resources/stanfordmodels/pos/german-fast.tagger";
 
     private static final String GERMAN_DEWAC_POS =
-        "/resources/stanfordmodels/german-dewac.tagger";
+        "/resources/stanfordmodels/pos/german-dewac.tagger";
 
     private static final String GERMAN_HGC_POS =
-            "/resources/stanfordmodels/german-hgc.tagger";
+            "/resources/stanfordmodels/pos/german-hgc.tagger";
 
     private static final String FRENCH_POS =
-            "/resources/stanfordmodels/french.tagger";
+            "/resources/stanfordmodels/pos/french.tagger";
 
     private static final String ENGLISH_BIDIRECTIONAL_POS =
-            "/resources/stanfordmodels/english-bidirectional-distsim.tagger";
+            "/resources/stanfordmodels/pos/english-bidirectional-distsim.tagger";
 
     private static final String ENGLISH_CASELESS_LEFT3WORDS_POS =
-            "/resources/stanfordmodels/english-caseless-left3words-distsim.tagger";
+            "/resources/stanfordmodels/pos/english-caseless-left3words-distsim.tagger";
 
     private static final String ENGLISH_LEFT3WORDS_POS =
-            "/resources/stanfordmodels/english-left3words-distsim.tagger";
+            "/resources/stanfordmodels/pos/english-left3words-distsim.tagger";
 
 
     /**

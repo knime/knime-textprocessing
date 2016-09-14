@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Learner">
+    <name>StanfordNLP NE Learner</name>
+    <shortDescription>
+        Creates a StanfordNLP Named-Entity Model.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			<p>
+			The StanfordNLP NE Learner creates a conditional random field model based on documents and a dictionary
+			with entities that occur in the documents. The chosen tag and the used dictionary will be saved internally, 
+			so they can be used by the StanfordNLP NE tagger to tag new documents and validate the model.
+			If you want to use the model externally, the model file can be found at your workflow directory:
+			</p>
+			<p><i>/%KNIMEWORKSPACE%/%WORKFLOW%/StanfordNLP NE Learner(##)/port_1/object/portobject.zip</i></p>
+            <p>
+            You can select the document column and the dictionary column to train your model with. There is also a tab
+            in the dialog to specify the learner properties. Currently, there are only a few options, since the amount of
+            parameters is pretty huge. So please contact us, if there are important/highly used parameters,
+            we should integrate!
+			</p>
+			<p>
+			<b>NOTE</b>: If you are interested in the StanfordNLP toolkit, please visit 
+			<a href="http://nlp.stanford.edu/software/">http://nlp.stanford.edu/software/</a>.
+			Some of the following property descriptions are taken from the
+			<a href="http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/ie/NERFeatureFactory.html">NERFeatureFactory</a>
+			class from StanfordNLP. Please look into it for further information.
+			</p>
+        </intro> 
+        <tab name="Learner options">
+        <option name="Document column">
+        	The document column to train the model with.
+        </option>
+        <option name="String column">
+        	The string column containing the entities to train the model with.
+        </option>
+        <option name="Tag type">
+        The tag type to train the model with. This information will be used, if you forward the model to the Stanford NLP NE tagger.
+        </option>
+        <option name="Tag value">
+        	The tag value to train the model with. This information will be used, if you forward the model to the Stanford NLP NE tagger.
+        </option>
+        </tab>
+        <tab name="Learner Properties">
+        <option name="maxLeft">
+        	The maximum context of class features used.
+        </option>
+		<option name="Use Class Feature">
+				Include a feature for the class (as a class marginal). Puts a prior on the classes which is equivalent to how often the feature appeared in the training data.
+        </option>
+        <option name="Use Word">
+        		Gives you feature for word.
+        </option>
+        <option name="Use NGrams">
+        	Make features from letter n-grams, i.e., substrings of the word.
+        </option>
+        <option name="No Mid NGrams">
+        	Do not include character n-gram features for n-grams that contain neither the beginning or end of the word.
+        </option>
+        <option name="Max NGram Length">
+        	If this number is positive, n-grams above this size will not be used in the model.
+        </option>
+        <option name="Use Prev">
+        	Enables previous features.
+        </option>
+        <option name="Use Next">
+        	Enables next features.
+        </option>
+        <option name="Use Disjunctive">
+        	   Include in features giving disjunctions of words anywhere in the left or
+        	   right disjunctionWidth words (preserving direction but not position).
+        </option>
+        <option name="Use Sequences">
+        	Does not use any class combination features if this is false.
+        </option>
+		<option name="Use Prev Sequences">
+        	Does not use any class combination features using previous classes if this is false.
+        </option>
+        <option name="Use Type Seqs">
+        	Use basic zeroeth order word shape features.
+        </option>
+        <option name="Use Type Seqs2">
+        	Add additional first and second order word shape features
+        </option>
+        <option name="Use Type YSeqs">
+        	Some first order word shape patterns.
+        </option>
+        <option name="Word Shape">
+        	Either "none" for no wordShape use, or the name of a word shape function
+        </option>
+        </tab>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to train the model with.</inPort>
+        <inPort name="Dictionary input table" index="1">The input dictionary
+        containing the known-entities to train the model with.</inPort>
+        <outPort name="Model output" index="0">The StanfordNLP NE model.</outPort>
+    </ports>
+</knimeNode>
