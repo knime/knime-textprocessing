@@ -55,6 +55,7 @@ import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.knime.core.node.CanceledExecutionException;
@@ -130,11 +131,23 @@ public class FilenameCreatorNodeModel extends NodeModel {
             ext = "." + ext;
         }
         if (!Pattern.matches("^\\.[a-zA-Z0-9]+", ext)) {
-            throw new Exception("Invalid file extension!");
+            throw new Exception("Invalid file extension: Only alphanumeric characters are allowed.");
         }
-        if (!Pattern.matches("[^/:?<>*\"|\\\\]+", name)) {
-            throw new Exception("Invalid file name!");
+        Pattern pattern = Pattern.compile("[/:?<>*\"|\\\\]");
+        Matcher matcher = pattern.matcher(name);
+        if(matcher.find()){
+            throw new Exception("Invalid file name: " + name.charAt(matcher.start()) + " at position " + matcher.start() + ".");
         }
+
+        if(Pattern.matches("[.\\s]+", name)){
+            throw new Exception("Invalid file name: Filename cannot contain only dot(s) or space(s).");
+        }
+
+        if(Pattern.matches("^\\s+.*", name)){
+            name = name.replaceAll("^\\s+", "");
+            LOGGER.warn("Filename contains leading whitespace(s). It will be removed.");
+        }
+
         try{
             new File(name).getCanonicalPath();
         } catch (IOException | NullPointerException e) {
