@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates a new instance of the {@code StanfordNlpSpanishTokenizerFactory}.
      */
     public StanfordNlpSpanishTokenizerFactory() {
     }

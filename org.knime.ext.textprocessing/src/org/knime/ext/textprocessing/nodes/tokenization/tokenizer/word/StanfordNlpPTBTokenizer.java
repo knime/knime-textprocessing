@@ -55,7 +55,6 @@ import java.util.List;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
 import edu.stanford.nlp.ling.Word;
-import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 
 /**
@@ -71,7 +70,8 @@ public class StanfordNlpPTBTokenizer implements Tokenizer {
      * Creates a new instance of {@code StanfordNlpPTBTokenizer}
      */
     public StanfordNlpPTBTokenizer() {
-        m_tokenizer = (PTBTokenizerFactory<Word>)PTBTokenizer.factory();
+        m_tokenizer =
+            PTBTokenizerFactory.newWordTokenizerFactory("normalizeParentheses=false,normalizeOtherBrackets=false");
     }
 
     @Override

@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class OpenNlpEnglishWordTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates an instance of the {@code OpenNlpEnglishWordTokenizerFactory}.
      */
     public OpenNlpEnglishWordTokenizerFactory() {
     }
@@ -86,9 +86,9 @@ public class OpenNlpEnglishWordTokenizerFactory implements TokenizerFactory {
     @Override
     public String getTokenizerDescription() {
         return "\"A maximum entropy tokenizer, detects token boundaries based on probability model\". "
-                + "This tokenizer uses the probability model for English texts. "
-                + "The model is provided by the OpenNLP group. "
-                + "For more information about the OpenNLP tokenizer, visit their website.";
+            + "This tokenizer uses the probability model for English texts. "
+            + "The model is provided by the OpenNLP group. "
+            + "For more information about the OpenNLP tokenizer, visit their website.";
     }
 
 }

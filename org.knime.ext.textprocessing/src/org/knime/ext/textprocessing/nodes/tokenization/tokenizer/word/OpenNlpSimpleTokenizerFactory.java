@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class OpenNlpSimpleTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates a new instance of the {@code OpenNlpSimpleTokenizerFactory}.
      */
     public OpenNlpSimpleTokenizerFactory() {
     }

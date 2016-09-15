@@ -72,6 +72,8 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
      */
     public StanfordNlpSpanishTokenizer() {
         m_tokenizer = (SpanishTokenizerFactory<CoreLabel>)SpanishTokenizer.ancoraFactory();
+        m_tokenizer.setOptions(
+            "ptb3Ellipsis=true,normalizeParentheses=false,normalizeOtherBrackets=false,ptb3Dashes=false,splitAll=true");
     }
 
     /**
@@ -82,7 +84,7 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
 
         if (m_tokenizer != null) {
             StringReader readString = new StringReader(sentence);
-            edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
+            SpanishTokenizer<CoreLabel> tokenizer = (SpanishTokenizer<CoreLabel>)m_tokenizer.getTokenizer(readString);
             List<CoreLabel> coreLabelList = tokenizer.tokenize();
             List<String> tokenList = new ArrayList<String>();
             for (CoreLabel cl : coreLabelList) {

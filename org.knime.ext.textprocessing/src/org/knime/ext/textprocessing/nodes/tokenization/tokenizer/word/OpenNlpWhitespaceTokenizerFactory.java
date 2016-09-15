@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates a new instance of the {@code OpenNlpWhitespaceTokenizerFactory}.
      */
     public OpenNlpWhitespaceTokenizerFactory() {
     }
@@ -86,7 +86,7 @@ public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
     @Override
     public String getTokenizerDescription() {
         return "\"A whitespace tokenizer. Non-whitespace sequences are identified as tokens.\" "
-                + "For more information about the OpenNLP tokenizer, visit their website.";
+            + "For more information about the OpenNLP tokenizer, visit their website.";
     }
 
 }

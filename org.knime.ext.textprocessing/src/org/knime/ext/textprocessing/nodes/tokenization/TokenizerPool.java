@@ -51,8 +51,8 @@ import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.nodes.tokenization.tokenizer.sentence.OpenNlpSentenceTokenizer;
 
 /**
- * Provides a pool of tokenizer instances. The pool size is the number of available word and sentence
- * tokenizers. All tokenizer instances are created in the constructor of the pool.
+ * Provides a pool of tokenizer instances. The pool size is the number of available word and sentence tokenizers. All
+ * tokenizer instances are created in the constructor of the pool.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 3.3

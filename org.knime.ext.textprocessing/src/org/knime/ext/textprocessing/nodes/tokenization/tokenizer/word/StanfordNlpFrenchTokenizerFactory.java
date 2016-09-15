@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class StanfordNlpFrenchTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates a new instance of the {@code StanfordNlpFrenchTokenizerFactory}.
      */
     public StanfordNlpFrenchTokenizerFactory() {
     }

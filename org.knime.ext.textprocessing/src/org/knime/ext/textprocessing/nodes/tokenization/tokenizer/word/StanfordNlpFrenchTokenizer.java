@@ -72,6 +72,7 @@ public class StanfordNlpFrenchTokenizer implements Tokenizer {
      */
     public StanfordNlpFrenchTokenizer() {
         m_tokenizer = (FrenchTokenizerFactory<CoreLabel>)FrenchTokenizer.ftbFactory();
+        m_tokenizer.setOptions("normalizeParentheses=false,normalizeOtherBrackets=false");
     }
 
     /**

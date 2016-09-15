@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class StanfordNlpPTBTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates a new instance of the {@code StanfordNlpPTBTokenizerFactory}.
      */
     public StanfordNlpPTBTokenizerFactory() {
     }
@@ -86,9 +86,9 @@ public class StanfordNlpPTBTokenizerFactory implements TokenizerFactory {
     @Override
     public String getTokenizerDescription() {
         return "\"A fast, rule-based tokenizer implementation, which produces Penn Treebank style tokenization of English "
-                + "text. It was initially written to conform to Penn Treebank tokenization conventions over ASCII text, "
-                + "but now provides a range of tokenization options over a broader space of Unicode text.\" "
-                + "For more information about the StanfordNLP tokenizer, visit their website.";
+            + "text. It was initially written to conform to Penn Treebank tokenization conventions over ASCII text, "
+            + "but now provides a range of tokenization options over a broader space of Unicode text.\" "
+            + "For more information about the StanfordNLP tokenizer, visit their website.";
     }
 
 }

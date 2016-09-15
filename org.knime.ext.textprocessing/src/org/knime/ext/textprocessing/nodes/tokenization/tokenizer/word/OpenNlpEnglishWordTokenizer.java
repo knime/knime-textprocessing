@@ -61,15 +61,13 @@ import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 import opennlp.tools.tokenize.TokenizerModel;
 
 /**
- * A tokenizer which is able to detect words and and provides a tokenization
- * resulting each word as one token.
+ * A tokenizer which is able to detect words and and provides a tokenization resulting each word as one token.
  *
  * @author Kilian Thiel, University of Konstanz
  */
 public class OpenNlpEnglishWordTokenizer implements Tokenizer {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(
-            OpenNlpEnglishWordTokenizer.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(OpenNlpEnglishWordTokenizer.class);
 
     private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
@@ -78,8 +76,7 @@ public class OpenNlpEnglishWordTokenizer implements Tokenizer {
      */
     public OpenNlpEnglishWordTokenizer() {
         try {
-            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
-            .getEnTokenizerModelFile();
+            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths().getEnTokenizerModelFile();
             InputStream is = new FileInputStream(new File(modelPath));
             TokenizerModel model = new TokenizerModel(is);
             m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);

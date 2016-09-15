@@ -58,7 +58,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
 
     /**
-     *
+     * Creates a new instance of the {@code OpenNlpGermanWordTokenizerFactory}.
      */
     public OpenNlpGermanWordTokenizerFactory() {
     }
