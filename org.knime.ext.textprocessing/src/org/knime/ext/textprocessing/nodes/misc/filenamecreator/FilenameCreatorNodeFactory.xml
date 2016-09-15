@@ -13,7 +13,7 @@
 			Specify the base directory where the file will be located.
 		</option>
 		<option name="File name">
-			Specify the name of the file. Any invalid symbols, e.g /, \, ?, *, :, &lt;, &gt;, ", |
+			Specify the name of the file. Some special characters, such as /, \, ?, *, :, &lt;, &gt;, ", |
 			will be rejected.
 		</option>
 		<option name="File extension">
