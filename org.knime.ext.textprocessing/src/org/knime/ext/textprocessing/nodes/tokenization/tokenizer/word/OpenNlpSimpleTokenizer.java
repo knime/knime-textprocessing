@@ -44,52 +44,41 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.08.2016 (Julian): created
+ *   27.07.2016 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
 
-import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import edu.stanford.nlp.international.spanish.process.SpanishTokenizer;
-import edu.stanford.nlp.international.spanish.process.SpanishTokenizer.SpanishTokenizerFactory;
-import edu.stanford.nlp.ling.CoreLabel;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+
+import opennlp.tools.tokenize.SimpleTokenizer;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class StanfordNlpSpanishTokenizer implements Tokenizer {
+public class OpenNlpSimpleTokenizer implements Tokenizer {
 
-    private SpanishTokenizerFactory<CoreLabel> m_tokenizer;
+    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
     /**
-     * Creates a new instance of {@code StanfordNlpSpanishTokenizer}
+     * Creates new instance of {@code OpenNlpSimpleTokenizer}
      */
-    public StanfordNlpSpanishTokenizer() {
-        m_tokenizer = (SpanishTokenizerFactory<CoreLabel>)SpanishTokenizer.ancoraFactory();
+    public OpenNlpSimpleTokenizer() {
+        m_tokenizer = SimpleTokenizer.INSTANCE;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> tokenize(final String sentence) {
-
+    public synchronized List<String> tokenize(final String sentence) {
         if (m_tokenizer != null) {
-            StringReader readString = new StringReader(sentence);
-            edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
-            List<CoreLabel> coreLabelList = tokenizer.tokenize();
-            List<String> tokenList = new ArrayList<String>();
-            for (CoreLabel cl : coreLabelList) {
-                tokenList.add(cl.originalText());
-            }
-            return tokenList;
-        } else {
-            return null;
+            return Arrays.asList(m_tokenizer.tokenize(sentence));
         }
-
+        return null;
     }
 }

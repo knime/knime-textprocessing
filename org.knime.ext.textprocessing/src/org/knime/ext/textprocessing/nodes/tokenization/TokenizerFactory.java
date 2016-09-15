@@ -64,4 +64,10 @@ public interface TokenizerFactory {
      * @return Returns the name of the Tokenizer.
      */
     public String getTokenizerName();
+
+    /**
+     * @return Returns the description of the Tokenizer.
+     */
+    public String getTokenizerDescription();
+
 }

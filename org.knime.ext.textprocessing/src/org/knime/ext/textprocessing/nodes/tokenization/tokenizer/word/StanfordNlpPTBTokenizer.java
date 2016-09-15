@@ -44,37 +44,51 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   02.09.2016 (Julian): created
+ *   29.08.2016 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+
+import edu.stanford.nlp.ling.Word;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpEnglishWordTokenizerFactory implements TokenizerFactory {
+public class StanfordNlpPTBTokenizer implements Tokenizer {
+
+    private edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory<Word> m_tokenizer;
 
     /**
-     *
+     * Creates a new instance of {@code StanfordNlpPTBTokenizer}
      */
-    public OpenNlpEnglishWordTokenizerFactory() {
+    public StanfordNlpPTBTokenizer() {
+        m_tokenizer = (PTBTokenizerFactory<Word>)PTBTokenizer.factory();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Tokenizer getTokenizer() {
-        return new OpenNlpEnglishWordTokenizer();
-    }
+    public synchronized List<String> tokenize(final String sentence) {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenizerName() {
-        return "OpenNLP English WordTokenizer";
-    }
+        if (m_tokenizer != null) {
+            StringReader readString = new StringReader(sentence);
+            edu.stanford.nlp.process.Tokenizer<Word> tokenizer = m_tokenizer.getTokenizer(readString);
+            List<Word> wordList = tokenizer.tokenize();
+            List<String> tokenList = new ArrayList<String>();
+            for (Word word : wordList) {
+                tokenList.add(word.word());
+            }
+            return tokenList;
+        } else {
+            return null;
+        }
 
+    }
 }

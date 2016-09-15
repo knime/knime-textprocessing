@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,60 +44,51 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   02.09.2016 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
-
-import opennlp.tools.tokenize.TokenizerModel;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
- * A tokenizer which is able to detect words and and provides a tokenization
- * resulting each word as one token.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-public class OpenNlpEnglishWordTokenizer implements Tokenizer {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(
-            OpenNlpEnglishWordTokenizer.class);
-
-    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
+public class OpenNlpEnglishWordTokenizerFactory implements TokenizerFactory {
 
     /**
-     * Creates new instance of <code>OpenNlpWordTokenizer</code>.
+     *
      */
-    public OpenNlpEnglishWordTokenizer() {
-        try {
-            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
-            .getEnTokenizerModelFile();
-            InputStream is = new FileInputStream(new File(modelPath));
-            TokenizerModel model = new TokenizerModel(is);
-            m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);
-        } catch (IOException e) {
-            LOGGER.error("English word tokenizer model could not be red!");
-            LOGGER.error(e.getStackTrace());
-        }
+    public OpenNlpEnglishWordTokenizerFactory() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized List<String> tokenize(final String sentence) {
-        if (m_tokenizer != null) {
-            return Arrays.asList(m_tokenizer.tokenize(sentence));
-        }
-        return null;
+    public Tokenizer getTokenizer() {
+        return new OpenNlpEnglishWordTokenizer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "OpenNLP English WordTokenizer";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescription() {
+        return "\"A maximum entropy tokenizer, detects token boundaries based on probability model\". "
+                + "This tokenizer uses the probability model for English texts. "
+                + "The model is provided by the OpenNLP group. "
+                + "For more information about the OpenNLP tokenizer, visit their website.";
     }
 
 }

@@ -57,6 +57,8 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
@@ -80,20 +82,13 @@ public final class TokenizerFactoryRegistry {
     private Map<String, TokenizerFactory> m_tokenizerMap = new TreeMap<>();
 
     private TokenizerFactoryRegistry() {
-        registerTokenizerFactory(new OpenNlpEnglishWordTokenizerFactory());
-        registerTokenizerFactory(new OpenNlpGermanWordTokenizerFactory());
-        registerTokenizerFactory(new OpenNlpSimpleTokenizerFactory());
-        registerTokenizerFactory(new OpenNlpWhitespaceTokenizerFactory());
-        registerTokenizerFactory(new StanfordNlpPTBTokenizerFactory());
-        registerTokenizerFactory(new StanfordNlpFrenchTokenizerFactory());
-        registerTokenizerFactory(new StanfordNlpSpanishTokenizerFactory());
         registerExtensionPoints();
     }
 
     /**
      * @return Returns a new instance of {@code TokenizerFactoryRegistry}
      */
-    public static TokenizerFactoryRegistry getInstance() {
+    public static synchronized TokenizerFactoryRegistry getInstance() {
         if (instance == null) {
             instance = new TokenizerFactoryRegistry();
         }
@@ -152,8 +147,8 @@ public final class TokenizerFactoryRegistry {
     /**
      * @return Returns the map containing the name of the tokenizer and the related TokenizerFactory.
      */
-    public static Map<String, TokenizerFactory> getTokenizerFactoryMap() {
-        return getInstance().m_tokenizerMap;
+    public static ImmutableMap<String, TokenizerFactory> getTokenizerFactoryMap() {
+        return ImmutableMap.copyOf(getInstance().m_tokenizerMap);
     }
 
     /**
@@ -162,10 +157,10 @@ public final class TokenizerFactoryRegistry {
      * @since 3.3
      */
     public static String[][] getMapAsStringArray() {
-        Map<String, TokenizerFactory> map = getTokenizerFactoryMap();
+        ImmutableMap<String, TokenizerFactory> map = getTokenizerFactoryMap();
         String[][] array = new String[map.size()][2];
         int counter = 0;
-        for (Map.Entry<String, TokenizerFactory> entry : map.entrySet()) {
+        for (ImmutableMap.Entry<String, TokenizerFactory> entry : map.entrySet()) {
             array[counter][0] = entry.getKey();
             array[counter][1] = entry.getKey();
             counter++;

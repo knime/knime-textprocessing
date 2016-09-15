@@ -44,21 +44,24 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   05.09.2016 (Julian): created
+ *   05.09.2016 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
+
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
+public class OpenNlpSimpleTokenizerFactory implements TokenizerFactory {
 
     /**
      *
      */
-    public StanfordNlpSpanishTokenizerFactory() {
+    public OpenNlpSimpleTokenizerFactory() {
     }
 
     /**
@@ -66,7 +69,7 @@ public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public Tokenizer getTokenizer() {
-        return new StanfordNlpSpanishTokenizer();
+        return new OpenNlpSimpleTokenizer();
     }
 
     /**
@@ -74,7 +77,16 @@ public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public String getTokenizerName() {
-        return "StanfordNLP SpanishTokenizer";
+        return "OpenNLP SimpleTokenizer";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescription() {
+        return "\"A character class tokenizer. Sequences of the same character class are tokens.\" "
+            + "For more information about the OpenNLP tokenizer, visit their website.";
     }
 
 }

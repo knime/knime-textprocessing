@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,29 +43,50 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   27.06.2016 (Julian Bunzel): created
+ *   14.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import opennlp.tools.tokenize.WhitespaceTokenizer;
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
+
+import opennlp.tools.tokenize.TokenizerModel;
 
 /**
+ * A tokenizer which is able to detect words and and provides a tokenization
+ * resulting each word as one token.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @author Kilian Thiel, University of Konstanz
  */
-public class OpenNlpWhitespaceTokenizer implements Tokenizer {
+public class OpenNlpEnglishWordTokenizer implements Tokenizer {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(
+            OpenNlpEnglishWordTokenizer.class);
 
     private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
     /**
-     * Creates new instance of <code>OpenNlpWhitespaceTokenizer</code>.
+     * Creates new instance of <code>OpenNlpWordTokenizer</code>.
      */
-    public OpenNlpWhitespaceTokenizer() {
-        m_tokenizer = WhitespaceTokenizer.INSTANCE;
+    public OpenNlpEnglishWordTokenizer() {
+        try {
+            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
+            .getEnTokenizerModelFile();
+            InputStream is = new FileInputStream(new File(modelPath));
+            TokenizerModel model = new TokenizerModel(is);
+            m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);
+        } catch (IOException e) {
+            LOGGER.error("English word tokenizer model could not be red!");
+            LOGGER.error(e.getStackTrace());
+        }
     }
 
     /**

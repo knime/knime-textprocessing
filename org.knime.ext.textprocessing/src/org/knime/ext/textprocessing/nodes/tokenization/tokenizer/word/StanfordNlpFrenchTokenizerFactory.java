@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,63 +44,50 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   14.02.2008 (thiel): created
+ *   05.09.2016 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import opennlp.tools.sentdetect.SentenceDetector;
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
-
-import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
- * A tokenizer which is able to detect sentences and and provides a tokenization
- * resulting each sentence as one token.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-public class OpenNlpSentenceTokenizer implements Tokenizer {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(
-            OpenNlpSentenceTokenizer.class);
-
-    private SentenceDetector m_tokenizer;
+public class StanfordNlpFrenchTokenizerFactory implements TokenizerFactory {
 
     /**
-     * Creates a new instance of <code>OpenNlpSentenceTokenizer</code>.
+     *
      */
-    public OpenNlpSentenceTokenizer() {
-        try {
-            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
-            .getSentenceModelFile();
-            InputStream is = new FileInputStream(new File(modelPath));
-            SentenceModel model = new SentenceModel(is);
-            m_tokenizer = new SentenceDetectorME(model);
-        } catch (IOException e) {
-            LOGGER.error("Could not create OpenNlpSentenceTokenizer since"
-                    + "model could not be red!");
-            LOGGER.error(e.getStackTrace());
-        }
+    public StanfordNlpFrenchTokenizerFactory() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized List<String> tokenize(final String text) {
-        if (m_tokenizer != null) {
-            return Arrays.asList(m_tokenizer.sentDetect(text));
-        }
-        return null;
+    public Tokenizer getTokenizer() {
+        return new StanfordNlpFrenchTokenizer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "StanfordNLP FrenchTokenizer";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescription() {
+        return "\"Tokenizer for raw French text. This tokenization scheme is a derivative of PTB tokenization, "
+            + "but with extra rules for French elision and compounding.\" "
+            + "For more information about the StanfordNLP tokenizer, visit their website.";
     }
 
 }

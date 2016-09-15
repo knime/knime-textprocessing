@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,49 +43,64 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   29.08.2016 (Julian): created
+ *   14.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.sentence;
 
-import java.io.StringReader;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
-import edu.stanford.nlp.ling.Word;
-import edu.stanford.nlp.process.PTBTokenizer;
-import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
+import opennlp.tools.sentdetect.SentenceDetector;
+import opennlp.tools.sentdetect.SentenceDetectorME;
+import opennlp.tools.sentdetect.SentenceModel;
+
+import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
 /**
+ * A tokenizer which is able to detect sentences and and provides a tokenization
+ * resulting each sentence as one token.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @author Kilian Thiel, University of Konstanz
  */
-public class StanfordNlpPTBTokenizer implements Tokenizer {
+public class OpenNlpSentenceTokenizer implements Tokenizer {
 
-    private edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory<Word> m_tokenizer;
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(
+            OpenNlpSentenceTokenizer.class);
+
+    private SentenceDetector m_tokenizer;
 
     /**
-     * Creates a new instance of {@code StanfordNlpPTBTokenizer}
+     * Creates a new instance of <code>OpenNlpSentenceTokenizer</code>.
      */
-    public StanfordNlpPTBTokenizer() {
-        m_tokenizer = (PTBTokenizerFactory<Word>)PTBTokenizer.factory();
-    }
-
-    @Override
-    public synchronized List<String> tokenize(final String sentence) {
-
-        if (m_tokenizer != null) {
-            StringReader readString = new StringReader(sentence);
-            edu.stanford.nlp.process.Tokenizer<Word> tokenizer = m_tokenizer.getTokenizer(readString);
-            List<Word> wordList = tokenizer.tokenize();
-            List<String> tokenList = new ArrayList<String>();
-            for (Word word : wordList) {
-                tokenList.add(word.word());
-            }
-            return tokenList;
-        } else {
-            return null;
+    public OpenNlpSentenceTokenizer() {
+        try {
+            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
+            .getSentenceModelFile();
+            InputStream is = new FileInputStream(new File(modelPath));
+            SentenceModel model = new SentenceModel(is);
+            m_tokenizer = new SentenceDetectorME(model);
+        } catch (IOException e) {
+            LOGGER.error("Could not create OpenNlpSentenceTokenizer since"
+                    + "model could not be red!");
+            LOGGER.error(e.getStackTrace());
         }
-
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized List<String> tokenize(final String text) {
+        if (m_tokenizer != null) {
+            return Arrays.asList(m_tokenizer.sentDetect(text));
+        }
+        return null;
+    }
+
 }

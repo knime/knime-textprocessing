@@ -44,36 +44,42 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   06.09.2016 (Julian Bunzel): created
+ *   27.06.2016 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
+public class OpenNlpWhitespaceTokenizer implements Tokenizer {
+
+    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
     /**
-     *
+     * Creates new instance of <code>OpenNlpWhitespaceTokenizer</code>.
      */
-    public OpenNlpGermanWordTokenizerFactory() {
+    public OpenNlpWhitespaceTokenizer() {
+        m_tokenizer = WhitespaceTokenizer.INSTANCE;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tokenizer getTokenizer() {
-        return new OpenNlpGermanWordTokenizer();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenizerName() {
-        return "OpenNLP German WordTokenizer";
+    public synchronized List<String> tokenize(final String sentence) {
+        if (m_tokenizer != null) {
+            return Arrays.asList(m_tokenizer.tokenize(sentence));
+        }
+        return null;
     }
 
 }

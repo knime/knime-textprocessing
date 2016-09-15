@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.nodes.tokenization;
 
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.nodes.tokenization.tokenizer.sentence.OpenNlpSentenceTokenizer;
 
 /**
  * Provides a pool of tokenizer instances. The pool size is the number of available word and sentence

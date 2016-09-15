@@ -44,18 +44,24 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   02.09.2016 (Julian): created
+ *   05.09.2016 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
+
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
+public class StanfordNlpPTBTokenizerFactory implements TokenizerFactory {
 
-    OpenNlpWhitespaceTokenizerFactory() {
+    /**
+     *
+     */
+    public StanfordNlpPTBTokenizerFactory() {
     }
 
     /**
@@ -63,7 +69,7 @@ public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public Tokenizer getTokenizer() {
-        return new OpenNlpWhitespaceTokenizer();
+        return new StanfordNlpPTBTokenizer();
     }
 
     /**
@@ -71,7 +77,18 @@ public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public String getTokenizerName() {
-        return "OpenNLP WhitespaceTokenizer";
+        return "StanfordNLP PTBTokenizer";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescription() {
+        return "\"A fast, rule-based tokenizer implementation, which produces Penn Treebank style tokenization of English "
+                + "text. It was initially written to conform to Penn Treebank tokenization conventions over ASCII text, "
+                + "but now provides a range of tokenization options over a broader space of Unicode text.\" "
+                + "For more information about the StanfordNLP tokenizer, visit their website.";
     }
 
 }

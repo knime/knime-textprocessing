@@ -44,39 +44,53 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   27.07.2016 (Julian Bunzel): created
+ *   05.09.2016 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
 
-import java.util.Arrays;
-import java.util.List;
-
-import opennlp.tools.tokenize.SimpleTokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpSimpleTokenizer implements Tokenizer {
-
-    private opennlp.tools.tokenize.Tokenizer m_tokenizer;
+public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
 
     /**
-     * Creates new instance of {@code OpenNlpSimpleTokenizer}
+     *
      */
-    public OpenNlpSimpleTokenizer() {
-        m_tokenizer = SimpleTokenizer.INSTANCE;
+    public StanfordNlpSpanishTokenizerFactory() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized List<String> tokenize(final String sentence) {
-        if (m_tokenizer != null) {
-            return Arrays.asList(m_tokenizer.tokenize(sentence));
-        }
-        return null;
+    public Tokenizer getTokenizer() {
+        return new StanfordNlpSpanishTokenizer();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "StanfordNLP SpanishTokenizer";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescription() {
+        return "\"Tokenizer for raw Spanish text. This tokenization scheme is a derivative of PTB tokenization, "
+            + "but with extra rules for Spanish contractions and assimilations. "
+            + "It is based heavily on the FrenchTokenizer. "
+            + "The tokenizer tokenizes according to the modified AnCora corpus tokenization standards, "
+            + "so the rules are a little different from PTB.\" "
+            + "For more information about the StanfordNLP tokenizer, visit their website.";
+    }
+
 }

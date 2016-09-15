@@ -44,37 +44,54 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   05.09.2016 (Julian Bunzel): created
+ *   30.08.2016 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+
+import edu.stanford.nlp.international.spanish.process.SpanishTokenizer;
+import edu.stanford.nlp.international.spanish.process.SpanishTokenizer.SpanishTokenizerFactory;
+import edu.stanford.nlp.ling.CoreLabel;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class OpenNlpSimpleTokenizerFactory implements TokenizerFactory {
+public class StanfordNlpSpanishTokenizer implements Tokenizer {
+
+    private SpanishTokenizerFactory<CoreLabel> m_tokenizer;
 
     /**
-     *
+     * Creates a new instance of {@code StanfordNlpSpanishTokenizer}
      */
-    public OpenNlpSimpleTokenizerFactory() {
+    public StanfordNlpSpanishTokenizer() {
+        m_tokenizer = (SpanishTokenizerFactory<CoreLabel>)SpanishTokenizer.ancoraFactory();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tokenizer getTokenizer() {
-        return new OpenNlpSimpleTokenizer();
-    }
+    public List<String> tokenize(final String sentence) {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenizerName() {
-        return "OpenNLP SimpleTokenizer";
-    }
+        if (m_tokenizer != null) {
+            StringReader readString = new StringReader(sentence);
+            edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
+            List<CoreLabel> coreLabelList = tokenizer.tokenize();
+            List<String> tokenList = new ArrayList<String>();
+            for (CoreLabel cl : coreLabelList) {
+                tokenList.add(cl.originalText());
+            }
+            return tokenList;
+        } else {
+            return null;
+        }
 
+    }
 }

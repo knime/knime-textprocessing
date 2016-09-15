@@ -44,53 +44,50 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.08.2016 (Julian): created
+ *   06.09.2016 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tokenization;
+package org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.stanford.nlp.international.french.process.FrenchTokenizer;
-import edu.stanford.nlp.international.french.process.FrenchTokenizer.FrenchTokenizerFactory;
-import edu.stanford.nlp.ling.CoreLabel;
+import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
  */
-public class StanfordNlpFrenchTokenizer implements Tokenizer {
-
-    private FrenchTokenizerFactory<CoreLabel> m_tokenizer;
+public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
 
     /**
-     * Creates a new instance of {@code StanfordNlpFrenchTokenizer}
+     *
      */
-    public StanfordNlpFrenchTokenizer() {
-        m_tokenizer = (FrenchTokenizerFactory<CoreLabel>)FrenchTokenizer.ftbFactory();
+    public OpenNlpGermanWordTokenizerFactory() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> tokenize(final String sentence) {
+    public Tokenizer getTokenizer() {
+        return new OpenNlpGermanWordTokenizer();
+    }
 
-        if (m_tokenizer != null) {
-            StringReader readString = new StringReader(sentence);
-            edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
-            List<CoreLabel> coreLabelList = tokenizer.tokenize();
-            List<String> tokenList = new ArrayList<String>();
-            for (CoreLabel cl : coreLabelList) {
-                tokenList.add(cl.originalText());
-            }
-            return tokenList;
-        } else {
-            return null;
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return "OpenNLP German WordTokenizer";
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescription() {
+        return "\"A maximum entropy tokenizer, detects token boundaries based on probability model\". "
+                + "This tokenizer uses the probability model for German texts. "
+                + "The model is provided by the OpenNLP group. "
+                + "For more information about the OpenNLP tokenizer, visit their website.";
     }
 
 }
