@@ -205,6 +205,11 @@
             >
       </node>
       <node
+            category-path="/labs/textprocessing/transformation"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter.DocumentVectorAdapterNodeFactory"
+            >
+      </node>
+      <node
             category-path="/labs/textprocessing/misc"
             factory-class="org.knime.ext.textprocessing.nodes.misc.categorytoclass.CategoryToClassNodeFactory"
             >
