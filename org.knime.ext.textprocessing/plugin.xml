@@ -682,6 +682,24 @@
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TokenizerFactory">
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpEnglishWordTokenizerFactory">
+      </TokenizerFactory>
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizerFactory">
+      </TokenizerFactory>
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpSimpleTokenizerFactory">
+      </TokenizerFactory>
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpPTBTokenizerFactory">
+      </TokenizerFactory>
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizerFactory">
+      </TokenizerFactory>
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpWhitespaceTokenizerFactory">
+      </TokenizerFactory>
    </extension>
    
 </plugin>
