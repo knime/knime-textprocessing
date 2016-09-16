@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -85,6 +86,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.UniqueNameGenerator;
 import org.knime.ext.textprocessing.data.Document;
@@ -98,6 +100,10 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
+ * The model of the document vector adapter node. This node creates a document feature vector for each document exactly
+ * as the normal document vector node. It has two inputs, the first one is the input table, whose features are to be
+ * filtered based on the reference table in the second input. This node returns a document feature vector with the same
+ * features as the ones in the reference table.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
@@ -126,7 +132,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
     /**
      * The default value to the as collection flag.
      */
-    public static final boolean DEFAULT_ASCOLLECTION = true;
+    public static final boolean DEFAULT_ASCOLLECTION = false;
 
     private final TextContainerDataCellFactory m_documentCellFac;
 
@@ -144,8 +150,10 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_asCollectionModel = DocumentVectorAdapterNodeDialog.getAsCollectionModel();
 
+    private SettingsModelColumnFilter2 m_vectorColsModel = DocumentVectorAdapterNodeDialog.getVectorColumnsModel();
+
     /**
-     * Creates a new instance of <code>DocumentVectorNodeModel</code>.
+     * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
      */
     public DocumentVectorAdapterNodeModel() {
         super(2, 1);
@@ -179,13 +187,12 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         throws InvalidSettingsException {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
-        verifier.verifyMinimumNumberCells(1, false);
+        verifier.verifyMinimumNumberCells(1, true);
 
         if (verifyTermCell) {
             verifier.verifyTermCell(true);
             m_termColIndex = verifier.getTermCellIndex();
         }
-
     }
 
     /**
@@ -211,16 +218,22 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
             final String colName = m_colModel.getStringValue();
             colIndex = inData[0].getDataTableSpec().findColumnIndex(colName);
             if (colIndex < 0) {
-                throw new InvalidSettingsException("No valid column selected!");
+                throw new InvalidSettingsException("No valid value column selected!");
             }
         }
 
         // Get all terms from reference table
+        exec.setProgress("Collecting all terms from the reference table");
+        List<String> includedCols =
+            Arrays.asList(m_vectorColsModel.applyTo(inData[1].getDataTableSpec()).getIncludes());
+        if (includedCols.size() == 0) {
+            setWarningMessage("No feature columns selected: No document vector will be created.");
+        }
         List<String> refTerms = new ArrayList<String>();
         Iterator<DataColumnSpec> iterator = inData[1].getDataTableSpec().iterator();
         while (iterator.hasNext()) {
             DataColumnSpec col = iterator.next();
-            if (col.getType().isCompatible(DoubleValue.class)) {
+            if (includedCols.contains(col.getName())) {
                 refTerms.add(col.getName());
             }
         }
@@ -260,15 +273,15 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         }
 
         // Add terms that are in the reference table, but not in the main table
-        for(String term : refTerms){
-            if(!featureIndexTable.containsKey(term)){
+        for (String term : refTerms) {
+            if (!featureIndexTable.containsKey(term)) {
                 featureIndexTable.put(term, currIndex);
                 currIndex++;
             }
         }
 
         // second go through data table to create feature vectors
-        exec.setProgress("Create feature vectors");
+        exec.setProgress("Creating feature vectors");
         BufferedDataContainer dc;
         if (m_asCollectionModel.getBooleanValue()) {
             dc = exec.createDataContainer(createDataTableSpecAsCollection(featureIndexTable));
@@ -317,7 +330,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
                 key = currTerm.toString();
             }
             Integer index = featureIndexTable.get(key);
-            if(index != null){
+            if (index != null) {
                 featureVector.set(index, new DoubleCell(currValue));
             }
 
@@ -432,6 +445,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         m_documentColModel.loadSettingsFrom(settings);
         m_ignoreTags.loadSettingsFrom(settings);
         m_asCollectionModel.loadSettingsFrom(settings);
+        m_vectorColsModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -444,6 +458,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         m_documentColModel.saveSettingsTo(settings);
         m_ignoreTags.saveSettingsTo(settings);
         m_asCollectionModel.saveSettingsTo(settings);
+        m_vectorColsModel.saveSettingsTo(settings);
     }
 
     /**
@@ -456,6 +471,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         m_documentColModel.validateSettings(settings);
         m_ignoreTags.validateSettings(settings);
         m_asCollectionModel.validateSettings(settings);
+        m_vectorColsModel.validateSettings(settings);
     }
 
     /**

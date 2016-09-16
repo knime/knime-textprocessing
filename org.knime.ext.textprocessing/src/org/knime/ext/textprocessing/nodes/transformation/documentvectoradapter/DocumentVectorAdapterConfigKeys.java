@@ -81,4 +81,10 @@ public class DocumentVectorAdapterConfigKeys {
      * The configuration key of the as_collection flag.
      */
     public static final String CFGKEY_ASCOLLECTION = "asCollection";
+
+    /**
+     * The configuration key of the selected feature columns.
+     */
+    public static final String CFGKEY_VECTOR_COLUMNS = "featureColumns";
+
 }

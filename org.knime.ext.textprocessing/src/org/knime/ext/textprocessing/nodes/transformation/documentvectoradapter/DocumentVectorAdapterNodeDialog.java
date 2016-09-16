@@ -54,8 +54,10 @@ import javax.swing.event.ChangeListener;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter2;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
@@ -91,6 +93,11 @@ public class DocumentVectorAdapterNodeDialog extends DefaultNodeSettingsPane {
             DocumentVectorAdapterNodeModel.DEFAULT_IGNORE_TAGS);
     }
 
+    @SuppressWarnings("unchecked")
+    static SettingsModelColumnFilter2 getVectorColumnsModel() {
+        return new SettingsModelColumnFilter2(DocumentVectorAdapterConfigKeys.CFGKEY_VECTOR_COLUMNS, DoubleValue.class);
+    }
+
     private SettingsModelString m_columnModel;
 
     private SettingsModelBoolean m_booleanModel;
@@ -100,6 +107,8 @@ public class DocumentVectorAdapterNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public DocumentVectorAdapterNodeDialog() {
+
+        createNewGroup("Document vector settings");
         addDialogComponent(
             new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 0, DocumentValue.class));
 
@@ -114,8 +123,12 @@ public class DocumentVectorAdapterNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 0, DoubleValue.class));
 
         addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
+        closeCurrentGroup();
 
         checkUncheck();
+
+        createNewTab("Feature Column Selection");
+        addDialogComponent(new DialogComponentColumnFilter2(getVectorColumnsModel(), 1));
     }
 
     private void checkUncheck() {
