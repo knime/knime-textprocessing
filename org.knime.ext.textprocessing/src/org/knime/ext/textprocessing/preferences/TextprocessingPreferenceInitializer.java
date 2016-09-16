@@ -67,7 +67,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
     public static final int DEFAULT_TOKENIZER_POOLSIZE = 10;
 
     /*** The default tokenizer. */
-    public static final String DEFAULT_TOKENIZER = "OpenNLP WordTokenizer";
+    public static final String DEFAULT_TOKENIZER = "OpenNLP English WordTokenizer";
 
     /** The default setting whether tokenizer pool is initialized on startup. */
     public static final boolean DEFAULT_TOKENIZER_INIT_ONSTARTUP = true;
