@@ -71,7 +71,7 @@ public class StanfordNlpPTBTokenizer implements Tokenizer {
      */
     public StanfordNlpPTBTokenizer() {
         m_tokenizer =
-            PTBTokenizerFactory.newWordTokenizerFactory("normalizeParentheses=false,normalizeOtherBrackets=false");
+            PTBTokenizerFactory.newWordTokenizerFactory("ptb3Escaping=false");
     }
 
     @Override
