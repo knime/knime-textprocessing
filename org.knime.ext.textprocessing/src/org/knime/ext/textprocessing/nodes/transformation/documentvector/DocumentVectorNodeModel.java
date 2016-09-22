@@ -271,6 +271,7 @@ public class DocumentVectorNodeModel extends NodeModel {
             final DataCell docCell = row.getCell(m_documentColIndex);
             // if the term or document is missing, then skip the row
             if(termCell.isMissing() || docCell.isMissing()){
+                setWarningMessage(row.getKey().getString() + " has missing term/document. This row will be ignored...");
                 numberOfRows -= 1;
                 continue;
             }
@@ -282,6 +283,7 @@ public class DocumentVectorNodeModel extends NodeModel {
              // if the value is missing, set it to 0
                 if(cell.isMissing()){
                     currValue = 0;
+                    setWarningMessage(row.getKey().getString() + " has a missing TF value. The value will be set to 0...");
                 }else{
                     currValue = ((DoubleValue)cell).getDoubleValue();
                 }
