@@ -255,7 +255,13 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         while (it.hasNext()) {
             exec.checkCanceled();
             final DataRow row = it.next();
-            final Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+            final DataCell termCell = row.getCell(m_termColIndex);
+            final DataCell docCell = row.getCell(m_documentColIndex);
+            // if the term or document is missing, then skip the row
+            if(termCell.isMissing() || docCell.isMissing()){
+                continue;
+            }
+            final Term t = ((TermValue)termCell).getTermValue();
 
             String key = null;
             // if tags have o be ignored
@@ -292,17 +298,30 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
         Document lastDoc = null;
         List<DoubleCell> featureVector = initFeatureVector(featureIndexTable.size());
 
-        final long numberOfRows = sortedTable.size();
+        long numberOfRows = sortedTable.size();
         int currRow = 1;
         it = sortedTable.iterator();
         while (it.hasNext()) {
             exec.checkCanceled();
             final DataRow row = it.next();
-            final Document currDoc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
-            final Term currTerm = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+            final DataCell termCell = row.getCell(m_termColIndex);
+            final DataCell docCell = row.getCell(m_documentColIndex);
+            // if the term or document is missing, then skip the row
+            if(termCell.isMissing() || docCell.isMissing()){
+                numberOfRows -= 1;
+                continue;
+            }
+            final Document currDoc = ((DocumentValue)docCell).getDocument();
+            final Term currTerm = ((TermValue)termCell).getTermValue();
             double currValue = 1;
             if (colIndex > -1) {
-                currValue = ((DoubleValue)row.getCell(colIndex)).getDoubleValue();
+                DataCell cell = row.getCell(colIndex);
+                // if the value is missing, set it to 0
+                if(cell.isMissing()){
+                    currValue = 0;
+                }else{
+                    currValue = ((DoubleValue)cell).getDoubleValue();
+                }
             }
 
             // if current doc is not equals last doc, create new feature vector
