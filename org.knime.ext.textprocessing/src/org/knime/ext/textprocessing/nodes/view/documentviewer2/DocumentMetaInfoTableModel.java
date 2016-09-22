@@ -42,56 +42,111 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   27.08.2008 (thiel): created
+ * Created on 09.05.2013 by Kilian Thiel
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 
-import org.knime.core.node.KNIMEConstants;
-import org.knime.ext.textprocessing.data.Document;
 
 /**
+ * A table model containing the additional document meta information.
  *
- * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.8
  */
-class DocumentViewerTablePanel2 extends AbstractDocumentTablePanel2 {
+public class DocumentMetaInfoTableModel extends DefaultTableModel implements Observer {
 
     /**
      * Automatically generated serial version id.
      */
     private static final long serialVersionUID = 3735659735470727304L;
 
-    private static final String FRAME_TITLE = "Document Details";
+    private final DocumentViewModel m_docViewerModel;
 
-    private JFrame frame;
+    private final List<String> m_keys = new ArrayList<String>();
 
     /**
-     * Creates a new instance of {@DocumentViewerTablePanel2} with the given set of documents to display.
+     * Creates a new instance of {@code DocumentMetaInfoTableModel} with given document view model, containing the
+     * additional document meta information.
      *
-     * @param documents The set of documents to display.
+     * @param docViewerModel The document view model, containing the additional document meta information.
      */
-    public DocumentViewerTablePanel2(final List<Document> documents) {
-        super(documents);
-        frame = new JFrame();
-        if (KNIMEConstants.KNIME16X16 != null) {
-            frame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
+    public DocumentMetaInfoTableModel(final DocumentViewModel docViewerModel) {
+        super();
+
+        if (docViewerModel == null) {
+            throw new IllegalArgumentException("Document view model may not be null!");
         }
-        frame.setVisible(false);
+        m_docViewerModel = docViewerModel;
+        fillKeyList();
     }
 
-    /**
-     * {@inheritDoc}
+    private void fillKeyList() {
+        m_keys.clear();
+        m_keys.addAll(m_docViewerModel.getDocument().getMetaInformation().getMetaInfoKeys());
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getColumnCount()
      */
     @Override
-    protected void onClick(final int rowIndex, final Document document) {
-        frame.setContentPane(new DocumentViewPanel2(document, this));
-        frame.pack();
-        frame.setTitle(FRAME_TITLE);
-        frame.setVisible(true);
+    public int getColumnCount() {
+        return 2;
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getRowCount()
+     */
+    @Override
+    public int getRowCount() {
+        if (m_keys == null) {
+            return 0;
+        }
+
+        return m_keys.size();
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+     */
+    @Override
+    public String getColumnName(final int column) {
+        if (column == 0) {
+            return "Name";
+        } else if (column == 1) {
+            return "Value";
+        }
+        return "";
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getValueAt(int, int)
+     */
+    @Override
+    public Object getValueAt(final int rowIndex, final int columnIndex) {
+        String value = "";
+        if (rowIndex >= 0 && rowIndex < m_keys.size()) {
+            if (columnIndex == 0) {
+                value = m_keys.get(rowIndex);
+            } else if (columnIndex == 1) {
+                value = m_docViewerModel.getDocument().getMetaInformation().getMetaInfoValue(m_keys.get(rowIndex));
+            }
+        }
+        return value;
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable o, final Object arg) {
+        fillKeyList();
+        fireTableDataChanged();
+    }
 }

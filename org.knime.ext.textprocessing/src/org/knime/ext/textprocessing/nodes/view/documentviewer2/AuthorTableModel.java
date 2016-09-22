@@ -42,56 +42,116 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   27.08.2008 (thiel): created
+ * Created on 09.05.2013 by Kilian Thiel
  */
 package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 
-import org.knime.core.node.KNIMEConstants;
-import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.Author;
+
 
 /**
+ * A table model containing authors information.
  *
- * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.8
  */
-class DocumentViewerTablePanel2 extends AbstractDocumentTablePanel2 {
+public class AuthorTableModel extends DefaultTableModel implements Observer {
 
     /**
      * Automatically generated serial version id.
      */
     private static final long serialVersionUID = 3735659735470727304L;
 
-    private static final String FRAME_TITLE = "Document Details";
+    private final DocumentViewModel m_docViewerModel;
 
-    private JFrame frame;
+    private final List<Author> m_authorList = new ArrayList<Author>();
 
     /**
-     * Creates a new instance of {@DocumentViewerTablePanel2} with the given set of documents to display.
+     * Creates a new instance of {@code AuthorTableModel} with given document view model, containing the document
+     * authors.
      *
-     * @param documents The set of documents to display.
+     * @param docViewerModel The document view model, containing the document authors.
      */
-    public DocumentViewerTablePanel2(final List<Document> documents) {
-        super(documents);
-        frame = new JFrame();
-        if (KNIMEConstants.KNIME16X16 != null) {
-            frame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
+    public AuthorTableModel(final DocumentViewModel docViewerModel) {
+        super();
+
+        if (docViewerModel == null) {
+            throw new IllegalArgumentException("Document view model may not be null!");
         }
-        frame.setVisible(false);
+        m_docViewerModel = docViewerModel;
+        fillAuthorList();
     }
 
-    /**
-     * {@inheritDoc}
+    private void fillAuthorList() {
+        m_authorList.clear();
+        m_authorList.addAll(m_docViewerModel.getDocument().getAuthors());
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getRowCount()
      */
     @Override
-    protected void onClick(final int rowIndex, final Document document) {
-        frame.setContentPane(new DocumentViewPanel2(document, this));
-        frame.pack();
-        frame.setTitle(FRAME_TITLE);
-        frame.setVisible(true);
+    public int getRowCount() {
+        if (m_authorList == null) {
+            return 0;
+        }
+        int noAuthors = m_authorList.size();
+        if (noAuthors <= 0) {
+            noAuthors = 1;
+        }
+        return noAuthors;
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getColumnCount()
+     */
+    @Override
+    public int getColumnCount() {
+        return 2;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getValueAt(int, int)
+     */
+    @Override
+    public Object getValueAt(final int rowIndex, final int columnIndex) {
+        String value = "";
+        if (rowIndex >= 0 && rowIndex < m_authorList.size()) {
+            if (columnIndex == 0) {
+                value = m_authorList.get(rowIndex).getFirstName();
+            } else if (columnIndex == 1) {
+                value = m_authorList.get(rowIndex).getLastName();
+            }
+        }
+        return value;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+     */
+    @Override
+    public String getColumnName(final int column) {
+        if (column == 0) {
+            return "First name";
+        } else if (column == 1) {
+            return "Last name";
+        }
+        return "";
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable o, final Object arg) {
+        fillAuthorList();
+        fireTableDataChanged();
+    }
 }

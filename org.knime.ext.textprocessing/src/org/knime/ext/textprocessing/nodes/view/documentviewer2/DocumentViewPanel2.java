@@ -55,9 +55,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentProvider;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewModel;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewPanel;
 
 /**
  *
@@ -81,6 +78,18 @@ class DocumentViewPanel2 extends JPanel {
     public static final boolean HILITE_SEARCH = false;
 
     /**
+     * the default setting for displaying tags
+     */
+
+    public static final boolean DISPLAY_TAGS = false;
+
+    /**
+     * the default setting for disabling html tags
+     */
+    public static final boolean DISABLE_HTML_TAGS = false;
+
+
+    /**
      * The default entity hilite color.
      */
     public static final Color DEFAULT_ENTITY_COLOR = Color.BLUE;
@@ -92,7 +101,7 @@ class DocumentViewPanel2 extends JPanel {
     private final DocumentViewModel m_docViewModel;
 
     /**
-     * Creates new instance of {@link DocumentViewPanel} with given document to display.
+     * Creates new instance of {@DocumentViewPanel2} with given document to display.
      *
      * @param doc The document to display.
      * @param docProvider The provider for next or previous documents.
@@ -110,7 +119,7 @@ class DocumentViewPanel2 extends JPanel {
     }
 
     /**
-     * Creates new instance of {@link DocumentViewPanel} with given document to display.
+     * Creates new instance of {@DocumentViewPanel2} with given document to display.
      *
      * @param doc The document to display.
      * @throws IllegalArgumentException If given document is <code>null</code>.

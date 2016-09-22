@@ -70,13 +70,13 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewModel;
 import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
 
 /**
@@ -122,7 +122,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
 
         HTMLEditorKit editorKit = new HTMLEditorKit();
 
-        // Adding stylesheet for the document
+        // Adding stylesheet to the document
         StyleSheet sheet = editorKit.getStyleSheet();
         sheet.addRule(
             "html, body {margin: 0; padding: 4px; color: #000000; font-family: 'Roboto', sans-serif; background: #ffffff; font-size: 12px;}");
@@ -157,7 +157,17 @@ final class DocumentPanel2 extends JPanel implements Observer {
         add(jsp, BorderLayout.CENTER);
     }
 
-    private static final String replaceWhitespaces(final String str) {
+    private static final String whitespacePlaceHolder = "@#P@H#@";
+
+    private final String replaceWhitespacesWithPlaceholder(final String str) {
+        return str.replaceAll("\\s", whitespacePlaceHolder);
+    }
+
+    private final String cleanWhitespaces(final String str) {
+        return str.replaceAll(whitespacePlaceHolder, "&ensp;");
+    }
+
+    private final String replaceWhitespacesWithHtml(final String str) {
         return str.replaceAll("\\s", "&ensp;");
     }
 
@@ -190,8 +200,9 @@ final class DocumentPanel2 extends JPanel implements Observer {
     }
 
     private String getParagraphText(final Paragraph p) {
-        if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch()) {
-            return replaceWhitespaces(p.getText());
+        if (!m_docViewModel.isHiliteTags() && !m_docViewModel.isHiliteSearch() && !m_docViewModel.isDisplayTags()
+            && !m_docViewModel.isDisableHtmlTags()) {
+            return escapeHTMLIfSelected(p.getText());
         }
 
         // selected color to hex str
@@ -201,13 +212,13 @@ final class DocumentPanel2 extends JPanel implements Observer {
         for (Sentence sen : p.getSentences()) {
             for (Term t : sen.getTerms()) {
                 boolean marked = false;
-
                 // search hiliting
                 if (m_docViewModel.isHiliteSearch() && m_docViewModel.getSearchString() != null) {
                     if (searchMatch(t, m_docViewModel.getSearchString())) {
                         paramStr.append("<font style=\"BACKGROUND-COLOR: green; COLOR: white\">"
-                            + replaceWhitespaces(t.getText()) + "</font>");
-                        paramStr.append(replaceWhitespaces(t.getTextWithWsSuffix().substring(t.getText().length())));
+                            + escapeHTMLIfSelected(t.getText()) + "</font>");
+                        paramStr.append(
+                            escapeHTMLIfSelected(t.getTextWithWsSuffix().substring(t.getText().length())));
                         marked = true;
                         continue;
                     }
@@ -226,25 +237,75 @@ final class DocumentPanel2 extends JPanel implements Observer {
                                     paramStr.append("<a href=\"" + link + "\">");
                                 }
                                 paramStr.append("<font color=\"#" + hexColorStr + "\">"
-                                    + replaceWhitespaces(t.getText()) + "</font>");
+                                    + escapeHTMLIfSelected(t.getText()) + "</font>");
                                 if (SearchEngines.getInstance().getSearchEngineSetting().size() > 0) {
                                     paramStr.append("</a>");
                                 }
 
-                                paramStr.append(
-                                    replaceWhitespaces(t.getTextWithWsSuffix().substring(t.getText().length())));
+                                paramStr.append(escapeHTMLIfSelected(
+                                    t.getTextWithWsSuffix().substring(t.getText().length())));
                                 marked = true;
                                 break;
                             }
                         }
                     }
                 }
+
+                // when display tags button is selected, show tags
+                if (m_docViewModel.isDisplayTags() && m_docViewModel.getTagType() != null
+                    && !m_docViewModel.isDisableHtmlTags()) {
+                    if (t.getTags().size() > 0) {
+                        List<Tag> termTags = t.getTags();
+                        for (Tag tag : termTags) {
+                            if (tag.getTagType().equals(m_docViewModel.getTagType())) {
+                                if (!m_docViewModel.isHiliteTags()) {
+                                    paramStr.append(escapeHTMLIfSelected(t.getTextWithWsSuffix()));
+                                }
+                                paramStr.append("<font size=\"2.4\">" + "<b>" + "<i>" + "[" + tag.getTagType() + "("
+                                    + tag.getTagValue() + ")" + "] " + "</i>" + "</b>" + "</font>");
+                                marked = true;
+                                break;
+                            }
+                        }
+                    }
+                } else if (m_docViewModel.isDisplayTags() && m_docViewModel.getTagType() != null
+                    && m_docViewModel.isDisableHtmlTags()) {
+                    if (t.getTags().size() > 0) {
+                        List<Tag> termTags = t.getTags();
+                        for (Tag tag : termTags) {
+                            if (tag.getTagType().equals(m_docViewModel.getTagType())) {
+                                if (!m_docViewModel.isHiliteTags()) {
+                                    paramStr.append(escapeHTMLIfSelected(t.getTextWithWsSuffix()));
+                                }
+                                paramStr.append("<font size=\"2.4\">" + "<b>" + "<i>" + "[" + tag.getTagType() + "("
+                                    + tag.getTagValue() + ")" + "] " + "</i>" + "</b>" + "</font>");
+                                marked = true;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+
                 if (!marked) {
-                    paramStr.append(replaceWhitespaces(t.getTextWithWsSuffix()));
+                    paramStr.append(escapeHTMLIfSelected(t.getTextWithWsSuffix()));
                 }
             }
+
         }
+
         return paramStr.toString();
+    }
+
+    // Escape HTML Character when clicked
+    private String escapeHTMLIfSelected(String str) {
+        str = replaceWhitespacesWithPlaceholder(str);
+        str = replaceWhitespacesWithHtml(str);
+        if (!m_docViewModel.isDisableHtmlTags()) {
+            str = StringEscapeUtils.escapeHtml4(str);
+            }
+        str = cleanWhitespaces(str);
+        return str;
     }
 
     private static final boolean searchMatch(final Term term, final String search) {
@@ -341,4 +402,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
         m_fulltextPane.setText(getPreparedText());
         repaint();
     }
+
+
+
 }

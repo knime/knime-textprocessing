@@ -55,10 +55,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import org.knime.ext.textprocessing.nodes.view.documentviewer.AuthorTableModel;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentInfoTableModel;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentMetaInfoTableModel;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewModel;
 import org.knime.ext.textprocessing.nodes.view.documentviewer2.slider.SideBar;
 import org.knime.ext.textprocessing.nodes.view.documentviewer2.slider.SideBar.SideBarMode;
 import org.knime.ext.textprocessing.nodes.view.documentviewer2.slider.SidebarSection;
