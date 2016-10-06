@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-deprecated"/>
+	<classpathentry exported="true" kind="lib" path="lib/streaminer-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guava-19.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/stanford-ner-3.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/stanford-postagger-3.6.0.jar"/>

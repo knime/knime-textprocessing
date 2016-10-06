@@ -15,10 +15,11 @@ Bundle-ClassPath: knime-textprocessing.jar,
  lib/opennlp-tools-1.6.0.jar,
  lib/pdfbox-app-2.0.0.jar,
  lib/jsoup-1.9.2.jar,
- lib/oscar4-all-4.1.2-with-dependencies.jar,
  lib/guava-19.0.jar,
- lib/stanford-ner-3.6.0.jar,
- lib/stanford-postagger-3.6.0.jar
+ lib/oscar4-all-4.1.2-with-dependencies.jar,
+ lib/stanford-postagger-3.6.0.jar,
+ lib/streaminer-1.2.jar,
+ lib/stanford-ner-3.6.0.jar
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Export-Package: org.knime.ext.textprocessing,
@@ -66,6 +67,7 @@ Export-Package: org.knime.ext.textprocessing,
  org.knime.ext.textprocessing.nodes.transformation.bow,
  org.knime.ext.textprocessing.nodes.transformation.documenttostring,
  org.knime.ext.textprocessing.nodes.transformation.documentvector,
+ org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing,
  org.knime.ext.textprocessing.nodes.transformation.sentenceextraction,
  org.knime.ext.textprocessing.nodes.transformation.stringstodocument,
  org.knime.ext.textprocessing.nodes.transformation.stringtoterm,

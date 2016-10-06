@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="org.knime.ext.textprocessing.TagSet" name="TagSet" schema="schema/org.knime.ext.textprocessing.TagSet.exsd"/>
    <extension-point id="org.knime.ext.textprocessing.DocumentGrabber" name="DocumentGrabber" schema="schema/org.knime.ext.textprocessing.DocumentGrabber.exsd"/>
+   <extension-point id="org.knime.ext.textprocessing.HashingFunction" name="HashingFunction" schema="schema/org.knime.ext.textprocessing.HashingFunction.exsd"/>
    <extension
          point="org.knime.workbench.repository.categories">
       <category
@@ -202,6 +203,11 @@
       <node
             category-path="/labs/textprocessing/transformation"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory"
+            >
+      </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingNodeFactory"
             >
       </node>
       <node
@@ -698,6 +704,27 @@
       </DataType>
    </extension>
    <extension
+         point="org.knime.ext.textprocessing.HashingFunction">
+      <HashingFunction
+            HashingFunction="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.Adler32HashingFunction">
+      </HashingFunction>
+      <HashingFunction
+            HashingFunction="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.JavaHashingFunction">
+      </HashingFunction>
+      <HashingFunction
+            HashingFunction="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.Lookup3_32bitHashingFunction">
+      </HashingFunction>
+      <HashingFunction
+            HashingFunction="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.Murmur3_128bitHashingFunction">
+      </HashingFunction>
+      <HashingFunction
+            HashingFunction="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.Murmur3_32bitHashingFunction">
+      </HashingFunction>
+      <HashingFunction
+            HashingFunction="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.Siphash24HashingFunction">
+      </HashingFunction>
+   </extension>
+   <extension
          point="org.knime.core.PortType">
       <portType
             color="#2E9AFE"
@@ -709,5 +736,4 @@
             specSerializer="org.knime.ext.textprocessing.data.NERModelPortObjectSpec$Serializer">
       </portType>
    </extension>
-   
 </plugin>
