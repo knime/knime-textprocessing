@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcVectors.png" type="Manipulator">
+	<name>Document Vector Adapter</name>
+	<shortDescription>Creates a document vector for each document, whose
+		features are identical as the ones in the reference table.
+	</shortDescription>
+	<fullDescription>
+		<intro>
+			This node
+			creates a document vector for each document representing
+			it
+			in the
+			terms space, exactly as the normal document vector node. The
+			difference is that this node takes two data tables as input:
+			<br />
+			1. Table containing the bag-of-words terms
+			<br />
+			2. Table containing the
+			reference document vector
+			<br />
+			<br />
+			The terms from the first input will be converted into document
+			vectors using the vector from the second input as the reference.
+			Features that appear in first table, but not in the reference table
+			will be filtered out, and features that appear in the reference
+			table, but not
+			in the first table will be added to the output vector
+			and their values will be set to 0.
+			<br />
+			<br />
+			The values of the feature vectors can be
+			specified as boolean values
+			or as values of a specified column i.e. an tf*idf
+			column. The
+			dimension of the vectors will be the
+			number of distinct
+			terms in the
+			BoW.
+		</intro>
+		<tab name="Option">
+			<option name="Document column">
+				The column containing the documents to use.
+			</option>
+			<option name="Ignore tags">
+				If checked tags are ignored when comparing terms.
+			</option>
+			<option name="Bitvector">
+				If checked a bitvector will be created indicating
+				whether a
+				certain term is contained in a document or not.
+			</option>
+			<option name="Vector value">
+				If Bitvector setting is not checked it is
+				possible to specify the
+				column to use as feature vector values. The
+				column can i.e. contain
+				tf*idf values which are than used as values
+				of the feature vector.
+				Be aware that you have to compute these values
+				before using this
+				node. To do so i.e. the frequency calculation nodes
+				can be used.
+			</option>
+			<option name="As collection cell">
+				If checked all vector entries will be stored in a
+				collection cell
+				consisting of double cells. The cells are ordered,
+				the ordering
+				is specified in the data table spec. If not checked all
+				double
+				cells will be stored in corresponding columns. The advantage
+				of the column representation is that most of the regular algorithms
+				in KNIME can be applied. The disadvantage is (which is on the
+				other
+				hand the advantage of the collection representation) that
+				processing
+				of subsequent nodes will be slowed down, due to the many
+				columns that
+				will be created (dependent on the input data of
+				course).
+			</option>
+		</tab>
+		<tab name="Feature Column Selection">
+			<option name="Feature Column Selection">
+				Selects all columns from the reference table
+				containing features that should appear in the output document vector.
+			</option>
+		</tab>
+	</fullDescription>
+
+	<ports>
+		<inPort name="Documents input table" index="0">The input table
+			containing the bag of words.
+		</inPort>
+		<inPort name="Document vector input table" index="1">The input
+			reference table containing the reference document vector.
+		</inPort>
+		<outPort name="Documents output table" index="0">An output table
+			containing the documents with the corresponding document vectors,
+			whose terms are identical to the ones in the reference document vector.
+		</outPort>
+	</ports>
+</knimeNode>
