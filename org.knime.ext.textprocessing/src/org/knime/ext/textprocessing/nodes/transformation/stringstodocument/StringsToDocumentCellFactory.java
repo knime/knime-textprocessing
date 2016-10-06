@@ -74,8 +74,8 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * A {@CellFactory} to build a document for each data row. The given {@StringsToDocumentConfig}
- * instance specifies which columns of the row to use as title, text authors, etc.
+ * A {@CellFactory} to build a document for each data row. The given {@StringsToDocumentConfig} instance specifies which
+ * columns of the row to use as title, text authors, etc.
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
@@ -150,6 +150,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
                 final DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
                 if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
                     title = ((StringValue)titleCell).getStringValue();
+                } else {
+                    title = "";
                 }
                 docBuilder.addTitle(title);
             }

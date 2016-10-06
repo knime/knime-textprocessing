@@ -70,8 +70,8 @@ import org.knime.ext.textprocessing.data.DocumentType;
 public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be
-     *         used as authors column.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
+     *         authors column.
      */
     static final SettingsModelString getAuthorsStringModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHORSCOL, "");
@@ -86,16 +86,16 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be
-     *         used as title column.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
+     *         title column.
      */
     static final SettingsModelString getTitleStringModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TITLECOL, "");
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be
-     *         used as full text column.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
+     *         full text column.
      */
     static final SettingsModelString getTextStringModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TEXTCOL, "");
@@ -134,8 +134,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used
-     *         for category values or not.
+     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used for
+     *         category values or not.
      */
     static final SettingsModelBoolean getUseCategoryColumnModel() {
         return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_CATCOLUMN,
@@ -143,8 +143,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used
-     *         for source values or not.
+     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used for source
+     *         values or not.
      */
     static final SettingsModelBoolean getUseSourceColumnModel() {
         return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_SOURCECOLUMN,
@@ -172,16 +172,14 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the
-     *         category values.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the category values.
      */
     static final SettingsModelString getCategoryColumnModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_CATCOLUMN, "");
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the source
-     *         values.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the source values.
      */
     static final SettingsModelString getSourceColumnModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_SOURCECOLUMN, "");
@@ -198,7 +196,16 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentNodeModel.MAX_THREADS);
     }
 
+    //    static final SettingsModelString getDocTitleModel(){
+    //        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TITLECOL, StringsToDocumentConfig.DEF_DOCUMENT_TITLE);
+    //
+    //    }
+
     private SettingsModelString m_docCategoryModel;
+
+    //    private SettingsModelString m_docTitleModel;
+    //
+    //    private SettingsModelString m_authorModel;
 
     private SettingsModelString m_docSourceModel;
 
@@ -307,7 +314,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-         // TODO Auto-generated method stub
+            //m_docTitleModel.setEnabled(!m_useTitleColumnModel.getBooleanValue());
 
         }
 

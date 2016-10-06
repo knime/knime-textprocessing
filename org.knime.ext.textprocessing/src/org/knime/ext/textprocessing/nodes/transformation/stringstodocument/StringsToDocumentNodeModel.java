@@ -149,7 +149,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
         // Title
         String docTitle = m_titleColModel.getStringValue();
-        if(!docTitle.isEmpty() && docTitle.length() > 0){
+        if (!docTitle.isEmpty() && docTitle.length() > 0) {
             conf.setDocTitle(docTitle);
         }
         int titleIndex = spec.findColumnIndex(m_titleColModel.getStringValue());
@@ -163,7 +163,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
         // Author names
         String authorNames = m_authorsColModel.getStringValue();
-        if(!authorNames.isEmpty() && authorNames.length() > 0){
+        if (!authorNames.isEmpty() && authorNames.length() > 0) {
             conf.setAuthorNames(authorNames);
         }
         int authorIndex = spec.findColumnIndex(m_authorsColModel.getStringValue());
@@ -209,8 +209,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
             conf.setPublicationDate(pubDate);
         }
 
-        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(
-            conf, createNewColSpecs(), m_maxThreads.getIntValue());
+        StringsToDocumentCellFactory cellFac =
+            new StringsToDocumentCellFactory(conf, createNewColSpecs(), m_maxThreads.getIntValue());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         rearranger.append(cellFac);
         return rearranger;
@@ -220,8 +220,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_fulltextColModel.loadSettingsFrom(settings);
         m_authorsColModel.loadSettingsFrom(settings);
         m_titleColModel.loadSettingsFrom(settings);
@@ -278,8 +277,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_fulltextColModel.validateSettings(settings);
         m_authorsColModel.validateSettings(settings);
         m_titleColModel.validateSettings(settings);
@@ -301,14 +299,12 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
             // don't throw error msg
         }
 
-        String pubDate = ((SettingsModelString)m_pubDateModel.
-                createCloneWithValidatedValue(settings)).getStringValue();
+        String pubDate = ((SettingsModelString)m_pubDateModel.createCloneWithValidatedValue(settings)).getStringValue();
 
         Pattern p = Pattern.compile("(\\d){2}-(\\d){2}-(\\d){4}");
         Matcher m = p.matcher(pubDate);
         if (!m.matches()) {
-            throw new InvalidSettingsException(
-                    "Publicationdate is not formatted properly (dd-mm-yyyy)!");
+            throw new InvalidSettingsException("Publicationdate is not formatted properly (dd-mm-yyyy)!");
         }
 
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
@@ -316,27 +312,21 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         try {
             df.parse(pubDate);
         } catch (ParseException e) {
-            throw new InvalidSettingsException(
-                     "Specified date is not valid!\n"
-                    + e.getMessage());
+            throw new InvalidSettingsException("Specified date is not valid!\n" + e.getMessage());
         }
     }
 
     /**
-     * write a method that check if datatable contains 'title' and 'authors' cols
-     * the method should take a string as parameter.
-     * If no title and authors document are available, generate them
+     * write a method that check if datatable contains 'title' and 'authors' cols the method should take a string as
+     * parameter. If no title and authors document are available, generate them
      */
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -344,14 +334,14 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
     /**
      * Enables and disables text fields of document source and category.
+     *
      * @author Kilian Thiel, KNIME.com, Berlin, Germany
      */
     class CategorySourceUsageChanceListener implements ChangeListener {
@@ -361,24 +351,24 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-                m_docCategoryModel.setEnabled(
-                        !m_useCatColumnModel.getBooleanValue());
-                m_docSourceModel.setEnabled(
-                        !m_useSourceColumnModel.getBooleanValue());
+            m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
+            m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
         }
     }
+
     /**
      * Enables and disables text fields of document title.
+     *
      * @author Hermann Azong, KNIME.com, Berlin, Germany
      */
-    class DocTitleChangeListener implements ChangeListener{
+    class DocTitleChangeListener implements ChangeListener {
 
         /**
          * {@inheritDoc}
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-         // TODO Auto-generated method stub
+            // TODO Auto-generated method stub
 
         }
 
@@ -386,9 +376,10 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
     /**
      * Enables and disables text fields of document authors.
+     *
      * @author Hermann Azong, KNIME.com, Berlin, Germany
      */
-    class AuthorsChangeListener implements ChangeListener{
+    class AuthorsChangeListener implements ChangeListener {
 
         /**
          * {@inheritDoc}
@@ -407,28 +398,34 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         doSmartDialogSelection(inSpecs[0]);
         return super.configure(inSpecs);
     }
+
     /**
      * @param dataTableSpec
      * @since 3.3
      */
-    protected void doSmartDialogSelection(final DataTableSpec dataTableSpec){
+    protected void doSmartDialogSelection(final DataTableSpec dataTableSpec) {
         String[] columns = dataTableSpec.getColumnNames();
-        if(settingsNotConfigured()){
-            for (int i = 0 ; i < columns.length; i++) {
+        if (settingsNotConfigured()) {
+            for (int i = 0; i < columns.length; i++) {
                 String column = columns[i];
-                if(column.equalsIgnoreCase(DocumentDataExtractor.TITLE.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                if (column.equalsIgnoreCase(DocumentDataExtractor.TITLE.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
                     m_titleColModel.setStringValue(column);
                 }
-                if(column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                if (column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
                     m_sourceColumnModel.setStringValue(column);
                 }
-                if(column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                if (column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
                     m_authorsColModel.setStringValue(column);
                 }
-                if(column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                if (column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
                     m_catColumnModel.setStringValue(column);
                 }
-                if(column.equalsIgnoreCase(DocumentDataExtractor.TEXT.getName()) && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                if (column.equalsIgnoreCase(DocumentDataExtractor.TEXT.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
                     m_fulltextColModel.setStringValue(column);
                 }
             }
@@ -439,9 +436,9 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * @return true if settings have not been configured before
      * @since 3.3
      */
-    protected boolean settingsNotConfigured(){
-        return(m_titleColModel.getStringValue().length() == 0 && m_authorsColModel.getStringValue().length() == 0
-                && m_fulltextColModel.getStringValue().length() == 0 && m_docSourceModel.getStringValue().length() == 0
-                && m_docCategoryModel.getStringValue().length() == 0);
+    protected boolean settingsNotConfigured() {
+        return (m_titleColModel.getStringValue().length() == 0 && m_authorsColModel.getStringValue().length() == 0
+            && m_fulltextColModel.getStringValue().length() == 0 && m_docSourceModel.getStringValue().length() == 0
+            && m_docCategoryModel.getStringValue().length() == 0);
     }
 }

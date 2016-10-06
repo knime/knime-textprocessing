@@ -53,7 +53,8 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
  */
 public final class StringsToDocumentConfigKeys {
 
-    private StringsToDocumentConfigKeys() { /* empty */ }
+    private StringsToDocumentConfigKeys() {
+        /* empty */ }
 
     /**
      * The configuration key of the title column.
@@ -62,6 +63,7 @@ public final class StringsToDocumentConfigKeys {
 
     /**
      * The configuration key of the "use title column" setting.
+     *
      * @since 3.3
      */
     public static final String CFGKEY_USE_TITLECOLUMN = "useTitleColumn";
@@ -78,6 +80,7 @@ public final class StringsToDocumentConfigKeys {
 
     /**
      * The configuration key of the "use authors column" setting.
+     *
      * @since 3.3
      */
     public static final String CFGKEY_USE_AUTHORSCOLUMN = "useAuthorsColumn";
@@ -109,30 +112,35 @@ public final class StringsToDocumentConfigKeys {
 
     /**
      * The configuration key of the "use category column" setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_USE_CATCOLUMN = "UseCategoryColumn";
 
     /**
      * The configuration key of the category column setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_CATCOLUMN = "CategoryColumn";
 
     /**
      * The configuration key of the "use source column" setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_USE_SOURCECOLUMN = "UseSourceColumn";
 
     /**
      * The configuration key of the source column setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_SOURCECOLUMN = "SourceColumn";
 
     /**
      * The configuration key of the number of threads to use.
+     *
      * @since 2.9
      */
     public static final String CFGKEY_THREADS = "Number of threads";

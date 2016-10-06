@@ -51,9 +51,8 @@ import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 
 /**
- * Holds all necessary variables needed to build a document out of a data row,
- * like certain indices for title, author or full text column, publication
- * date, document source, category, and type.
+ * Holds all necessary variables needed to build a document out of a data row, like certain indices for title, author or
+ * full text column, publication date, document source, category, and type.
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
