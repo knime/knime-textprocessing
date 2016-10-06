@@ -69,8 +69,11 @@ public final class OpenNlpModelPaths {
     private static final String SENTENCE_MODEL_POSTFIX =
         "/resources/opennlpmodels/sentdetect/en-sent.bin";
 
-    private static final String TOKENIZATION_MODEL_POSTFIX =
+    private static final String TOKENIZATION_EN_MODEL_POSTFIX =
         "/resources/opennlpmodels/tokenize/en-token.bin";
+
+    private static final String TOKENIZATION_DE_MODEL_POSTFIX =
+        "/resources/opennlpmodels/tokenize/de-token.bin";
 
     private static final String POS_MODEL_POSTFIX =
         "/resources/opennlpmodels/pos/en-pos-maxent.bin";
@@ -133,8 +136,12 @@ public final class OpenNlpModelPaths {
     /**
      * @return the model file of the tokenization model.
      */
-    public String getTokenizerModelFile() {
-        return m_basePath + TOKENIZATION_MODEL_POSTFIX;
+    public String getEnTokenizerModelFile() {
+        return m_basePath + TOKENIZATION_EN_MODEL_POSTFIX;
+    }
+
+    public String getDeTokenizerModelFile() {
+        return m_basePath + TOKENIZATION_DE_MODEL_POSTFIX;
     }
 
     /**

@@ -47,10 +47,12 @@
  */
 package org.knime.ext.textprocessing.preferences;
 
-
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -63,6 +65,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 
 /**
  *
@@ -78,6 +81,14 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 
     private BooleanFieldEditor m_initTokenizerPoolOnStartup;
 
+    private ComboFieldEditor m_tokenizer;
+
+    private Group m_tokenizerDescGroup;
+
+    private Group m_tokenizationGrp;
+
+    private Label m_lTokenizerDesc;
+
     /**
      * Creates a new preference page.
      */
@@ -89,27 +100,29 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
 
     private static final String DESC_SERIALIZATION =
         "Check to enable loading of workflows containing old textprocessing "
-      + "nodes (2.4.x and older).\nNote that backwards compatibility slows "
-      + "down deserialization and thus buffering and\nprocessing of nodes. "
-      + "Uncheck to speed up processing. If workflows containing older "
-      + " nodes\nare loaded once, option can be unchecked.";
+            + "nodes (2.4.x and older).\nNote that backwards compatibility slows "
+            + "down deserialization and thus buffering and\nprocessing of nodes. "
+            + "Uncheck to speed up processing. If workflows containing older "
+            + " nodes\nare loaded once, option can be unchecked.";
 
-//    private static final String DESC_PREPROCESSING =
-//        "If checked, nodes of the \"Preprocessing\" category process data "
-//      + "in memory. Large sets of\ndocuments may not fit into memory and "
-//      + "thus cannot be processed. Uncheck if documents\ndo not fit into "
-//      + "memory. Note that unchecking slows down processing significantly. "
-//      + "\nCheck to speed up processing.";
+    //    private static final String DESC_PREPROCESSING =
+    //        "If checked, nodes of the \"Preprocessing\" category process data "
+    //      + "in memory. Large sets of\ndocuments may not fit into memory and "
+    //      + "thus cannot be processed. Uncheck if documents\ndo not fit into "
+    //      + "memory. Note that unchecking slows down processing significantly. "
+    //      + "\nCheck to speed up processing.";
 
     private static final String DESC_TOKENIZER_POOLSIZE =
         "The maximal number of tokenizers which can be used concurrently. "
-      + "All tokenizer will be\ncreated on demand or startup and on change "
-      + "of the pool size. Be aware that tokenizers do\nrequire memory. As a "
-      + "rule of thump, use not more than #documents/100 tokenizers.";
+            + "All tokenizer will be\ncreated on demand or startup and on change "
+            + "of the pool size. Be aware that tokenizers do\nrequire memory. As a "
+            + "rule of thump, use not more than #documents/100 tokenizers.";
 
     private static final String DESC_INIT_POOL_ONSTARTUP =
-            "If checked tokenizers are initialized on startup, which slows down "
-          + "KNIME startup time.";
+        "If checked tokenizers are initialized on startup, which slows down KNIME startup time.";
+
+    private static final String DESC_INIT_TOKENIZER =
+        "The tokenizer used to split sentences into terms. Select the tokenizer for your purpose.";
 
     /**
      * {@inheritDoc}
@@ -123,39 +136,62 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         m_mainComposite.setLayout(gl);
 
         // Tokenizer pool
-        final Group tokenizationGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
-        tokenizationGrp.setText("Tokenization:");
+        m_tokenizationGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
+        m_tokenizationGrp.setText("Tokenization:");
 
         m_tokenizerPoolSize = new IntegerFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER_POOLSIZE,
-                "Tokenizer pool size", tokenizationGrp);
+            "Tokenizer pool size", m_tokenizationGrp);
         m_tokenizerPoolSize.setPage(this);
         m_tokenizerPoolSize.setPreferenceStore(getPreferenceStore());
         m_tokenizerPoolSize.load();
         m_tokenizerPoolSize.setValidRange(1, TextprocessingPreferenceInitializer.MAX_TOKENIZER_POOLSIZE);
 
-        final Label lTokenization = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
+        final Label lTokenization = new Label(m_tokenizationGrp, SWT.LEFT | SWT.WRAP);
         lTokenization.setText(DESC_TOKENIZER_POOLSIZE);
 
-        m_initTokenizerPoolOnStartup = new BooleanFieldEditor(
-            TextprocessingPreferenceInitializer.PREF_TOKENIZER_INIT_ONSTARTUP, "Initialize pool on startup",
-            tokenizationGrp);
+        m_initTokenizerPoolOnStartup =
+            new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER_INIT_ONSTARTUP,
+                "Initialize pool on startup", m_tokenizationGrp);
         m_initTokenizerPoolOnStartup.setPage(this);
         m_initTokenizerPoolOnStartup.setPreferenceStore(getPreferenceStore());
         m_initTokenizerPoolOnStartup.load();
 
-        final Label lInitialization = new Label(tokenizationGrp, SWT.LEFT | SWT.WRAP);
+        final Label lInitialization = new Label(m_tokenizationGrp, SWT.LEFT | SWT.WRAP);
         lInitialization.setText(DESC_INIT_POOL_ONSTARTUP);
 
-        tokenizationGrp.setLayoutData(getGridData());
-        tokenizationGrp.setLayout(getLayout());
+        // Tokenizer
+        String [][] m_tokenizerNames = TokenizerFactoryRegistry.getMapAsStringArray();
+        m_tokenizer = new ComboFieldEditor(TextprocessingPreferenceInitializer.PREF_TOKENIZER, "Tokenizer", m_tokenizerNames,
+            m_tokenizationGrp);
+        m_tokenizer.setPage(this);
+        m_tokenizer.setPreferenceStore(getPreferenceStore());
+        m_tokenizer.load();
+        m_tokenizer.setPropertyChangeListener(new TokenizerPropertyChangeListener());
+
+        final Label lTokenizer = new Label(m_tokenizationGrp, SWT.LEFT | SWT.WRAP);
+        lTokenizer.setText(DESC_INIT_TOKENIZER);
+
+        m_tokenizerDescGroup = new Group(m_tokenizationGrp, SWT.SHADOW_ETCHED_IN);
+        m_tokenizerDescGroup.setText("Description: " + TextprocessingPreferenceInitializer.tokenizerName());
+        m_tokenizerDescGroup.setLayoutData(getGridData());
+        m_tokenizerDescGroup.setLayout(getLayout());
+
+        m_lTokenizerDesc = new Label(m_tokenizerDescGroup, SWT.LEFT | SWT.WRAP);
+        m_lTokenizerDesc.setLayoutData(getDescriptionGridData());
+        TokenizerFactoryRegistry.getInstance();
+        m_lTokenizerDesc.setText(TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizer.getPreferenceStore().
+          getString("knime.textprocessing.tokenizer.tokenizer")).getTokenizerDescription());
+
+
+        m_tokenizationGrp.setLayoutData(getGridData());
+        m_tokenizationGrp.setLayout(getLayout());
 
         // Dml deserialization setting
         final Group serializationGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
         serializationGrp.setText("Serialization:");
 
-        m_useDmlDeserialization =
-            new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_DML_DESERIALIZATION,
-                "Backwards compatibility (to 2.4 and older)", serializationGrp);
+        m_useDmlDeserialization = new BooleanFieldEditor(TextprocessingPreferenceInitializer.PREF_DML_DESERIALIZATION,
+            "Backwards compatibility (to 2.4 and older)", serializationGrp);
         m_useDmlDeserialization.setPage(this);
         m_useDmlDeserialization.setPreferenceStore(getPreferenceStore());
         m_useDmlDeserialization.load();
@@ -170,8 +206,13 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
     }
 
     private static final GridData getGridData() {
-        GridData layoutData = new GridData(GridData.FILL);
-        layoutData.widthHint = 500;
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+        return layoutData;
+    }
+
+    private static final GridData getDescriptionGridData() {
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+        layoutData.widthHint = 200;
         return layoutData;
     }
 
@@ -186,7 +227,8 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
      * {@inheritDoc}
      */
     @Override
-    public void init(final IWorkbench workbench) { }
+    public void init(final IWorkbench workbench) {
+    }
 
     /**
      * {@inheritDoc}
@@ -196,6 +238,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         m_useDmlDeserialization.loadDefault();
         m_tokenizerPoolSize.loadDefault();
         m_initTokenizerPoolOnStartup.loadDefault();
+        m_tokenizer.loadDefault();
         super.performDefaults();
     }
 
@@ -207,10 +250,32 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         m_useDmlDeserialization.store();
         m_tokenizerPoolSize.store();
         m_initTokenizerPoolOnStartup.store();
+        m_tokenizer.store();
 
         // initialize tokenizer pool with new pool size
         DefaultTokenization.createNewTokenizerPool();
 
         return super.performOk();
     }
+
+    private class TokenizerPropertyChangeListener implements IPropertyChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void propertyChange(final PropertyChangeEvent event) {
+            m_tokenizerDescGroup.setText("Description: " + event.getNewValue().toString());
+            TokenizerFactoryRegistry.getInstance();
+            m_lTokenizerDesc.setText(TokenizerFactoryRegistry.getTokenizerFactoryMap().get(event.getNewValue().toString()).
+                getTokenizerDescription());
+            m_tokenizerDescGroup.layout();
+            m_tokenizationGrp.layout();
+            m_mainComposite.layout();
+        }
+
+
+
+    }
+
 }

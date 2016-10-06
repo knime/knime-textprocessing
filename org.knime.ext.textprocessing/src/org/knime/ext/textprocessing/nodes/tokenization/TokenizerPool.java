@@ -48,22 +48,26 @@
 package org.knime.ext.textprocessing.nodes.tokenization;
 
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.textprocessing.nodes.tokenization.tokenizer.sentence.OpenNlpSentenceTokenizer;
 
 /**
- * Provides a pool of openNLP tokenizer instances. The pool size is the number of available word and sentence
- * tokenizers. All tokenizer instances are created in the constructor of the pool.
+ * Provides a pool of tokenizer instances. The pool size is the number of available word and sentence tokenizers. All
+ * tokenizer instances are created in the constructor of the pool.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 3.3
  */
-class OpenNLPTokenizerPool {
+public class TokenizerPool {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(OpenNLPTokenizerPool.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TokenizerPool.class);
 
-    private final OpenNlpWordTokenizer[] m_wordTokenizer;
+    private final Tokenizer[] m_wordTokenizer;
 
     private final OpenNlpSentenceTokenizer[] m_sentenceTokenizer;
 
     private final int m_poolSize;
+
+    private final String m_tokenizer;
 
     private int m_wordIndex = 0;
 
@@ -71,20 +75,22 @@ class OpenNLPTokenizerPool {
 
     /**
      * Constructor for class OpenNLPTokenizerPool.
+     *
      * @param poolSize The number of word and sentence tokenizers of the pool.
      */
-    OpenNLPTokenizerPool(final int poolSize) {
+    TokenizerPool(final int poolSize, final String tokenizer) {
         if (poolSize < 1) {
             throw new IllegalArgumentException("Tokenizer pool size must be larger than 0!");
         }
 
         m_poolSize = poolSize;
-        m_wordTokenizer = new OpenNlpWordTokenizer[m_poolSize];
+        m_tokenizer = tokenizer;
+        m_wordTokenizer = new Tokenizer[m_poolSize];
         m_sentenceTokenizer = new OpenNlpSentenceTokenizer[m_poolSize];
 
         LOGGER.debug("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
         for (int i = 0; i < m_poolSize; i++) {
-            m_wordTokenizer[i] = new OpenNlpWordTokenizer();
+            m_wordTokenizer[i] = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizer).getTokenizer();
             m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
         }
     }
@@ -92,7 +98,7 @@ class OpenNLPTokenizerPool {
     /**
      * @return The next available word tokenizer.
      */
-    synchronized OpenNlpWordTokenizer nextWordTokenizer() {
+    synchronized Tokenizer nextWordTokenizer() {
         return m_wordTokenizer[m_wordIndex++ % m_poolSize];
     }
 
@@ -109,4 +115,9 @@ class OpenNLPTokenizerPool {
     int getPoolSize() {
         return m_poolSize;
     }
+
+    String getTokenizerName() {
+        return m_tokenizer;
+    }
+
 }
