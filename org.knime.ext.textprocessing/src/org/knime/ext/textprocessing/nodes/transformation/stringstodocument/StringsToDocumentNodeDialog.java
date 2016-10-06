@@ -65,12 +65,12 @@ import org.knime.ext.textprocessing.data.DocumentType;
 /**
  * Provides the dialog for the String to Document node with all necessary dialog components.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the column which has to be
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be
      *         used as authors column.
      */
     static final SettingsModelString getAuthorsStringModel() {
@@ -78,7 +78,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the separator string.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the separator string.
      */
     static final SettingsModelString getAuthorSplitStringModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHORSPLIT_STR,
@@ -86,7 +86,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the column which has to be
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be
      *         used as title column.
      */
     static final SettingsModelString getTitleStringModel() {
@@ -94,7 +94,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the column which has to be
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be
      *         used as full text column.
      */
     static final SettingsModelString getTextStringModel() {
@@ -102,7 +102,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the document source.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the document source.
      */
     static final SettingsModelString getDocSourceModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_DOCSOURCE,
@@ -110,7 +110,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the document category.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the document category.
      */
     static final SettingsModelString getDocCategoryModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_DOCCAT,
@@ -118,7 +118,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the document type.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the document type.
      */
     static final SettingsModelString getTypeModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_DOCTYPE,
@@ -126,7 +126,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the document category.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the document category.
      */
     static final SettingsModelString getPubDatModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATE,
@@ -134,7 +134,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelBoolean</code> specifying whether a column is used
+     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used
      *         for category values or not.
      */
     static final SettingsModelBoolean getUseCategoryColumnModel() {
@@ -143,7 +143,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelBoolean</code> specifying whether a column is used
+     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used
      *         for source values or not.
      */
     static final SettingsModelBoolean getUseSourceColumnModel() {
@@ -172,7 +172,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the column with the
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the
      *         category values.
      */
     static final SettingsModelString getCategoryColumnModel() {
@@ -180,7 +180,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the column with the source
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the source
      *         values.
      */
     static final SettingsModelString getSourceColumnModel() {
@@ -211,7 +211,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelBoolean m_useAuthorsColumnModel;
 
     /**
-     * Creates a new instance of <code>StringsToDocumentNodeDialog</code>.
+     * Creates a new instance of {@StringsToDocumentNodeDialog}.
      */
     @SuppressWarnings("unchecked")
     public StringsToDocumentNodeDialog() {

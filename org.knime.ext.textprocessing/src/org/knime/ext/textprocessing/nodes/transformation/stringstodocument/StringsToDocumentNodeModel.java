@@ -79,7 +79,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeModel {
 
@@ -124,7 +124,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
     static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
 
     /**
-     * Creates new instance of <code>StringsToDocumentNodeModel</code>.
+     * Creates new instance of {@StringsToDocumentNodeModel}.
      */
     public StringsToDocumentNodeModel() {
         m_useCatColumnModel.addChangeListener(new CategorySourceUsageChanceListener());

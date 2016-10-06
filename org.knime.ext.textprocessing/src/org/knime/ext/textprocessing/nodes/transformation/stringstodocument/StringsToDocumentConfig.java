@@ -55,7 +55,7 @@ import org.knime.ext.textprocessing.data.PublicationDate;
  * like certain indices for title, author or full text column, publication
  * date, document source, category, and type.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentConfig {
 

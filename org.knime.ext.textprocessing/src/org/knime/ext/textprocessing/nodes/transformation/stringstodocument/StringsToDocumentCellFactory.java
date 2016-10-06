@@ -74,10 +74,10 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * A <code>CellFactory</code> to build a document for each data row. The given <code>StringsToDocumentConfig</code>
+ * A {@CellFactory} to build a document for each data row. The given {@StringsToDocumentConfig}
  * instance specifies which columns of the row to use as title, text authors, etc.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
@@ -90,12 +90,12 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
     /**
-     * Creates new instance of <code>StringsToDocumentCellFactory</code> with given configuration.
+     * Creates new instance of {@StringsToDocumentCellFactory} with given configuration.
      *
      * @param config The configuration how to build a document.
      * @param newColSpecs The specs of the new columns that are created.
      * @param numberOfThreads The number of parallel threads to use.
-     * @throws IllegalArgumentException If given configuration is <code>null</code>.
+     * @throws IllegalArgumentException If given configuration is {@null}.
      * @since 3.1
      */
     public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
@@ -147,7 +147,6 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         String title = m_config.getDocTitle();
         if (m_config.getUseTitleColumn()) {
             if (m_config.getTitleStringIndex() >= 0) {
-                // looping over the data cells will helps checking for each doc title for availability
                 final DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
                 if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
                     title = ((StringValue)titleCell).getStringValue();

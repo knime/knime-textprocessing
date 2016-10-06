@@ -49,7 +49,7 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public final class StringsToDocumentConfigKeys {
 
