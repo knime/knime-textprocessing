@@ -549,38 +549,32 @@
       <node
             category-path="/labs/textprocessing/frequencies"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.df.DfNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.tagstripper.TagStripperNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/frequencies"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.frequencies.entropy.EntropyNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner.StanfordNlpNeLearnerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner.StanfordNlpNeLearnerNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner.StanfordNlpNeLearnerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnescorer.StanfordNlpNeScorerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnescorer.StanfordNlpNeScorerNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnescorer.StanfordNlpNeScorerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory"
-            id="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory">
       </node>
    </extension>
    <extension
