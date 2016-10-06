@@ -135,6 +135,11 @@
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.diacriticremover.DiacriticRemoverNodeFactory"
+            >
+      </node>
+      <node
+            category-path="/labs/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.puncterasure.PunctuationErasureNodeFactory"
             >
