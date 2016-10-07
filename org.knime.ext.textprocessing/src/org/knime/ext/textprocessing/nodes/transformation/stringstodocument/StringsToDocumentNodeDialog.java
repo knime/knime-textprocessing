@@ -232,9 +232,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             new DialogComponentColumnNameSelection(getAuthorsStringModel(), "Authors column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentString(getAuthorSplitStringModel(), "Author names separator"));
-
-        setHorizontalPlacement(false);
         addDialogComponent(
             new DialogComponentColumnNameSelection(getTextStringModel(), "Full text", 0, StringValue.class));
 
@@ -242,6 +241,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Source and Category");
         m_docSourceModel = getDocSourceModel();
         addDialogComponent(new DialogComponentString(m_docSourceModel, "Document source"));
+        setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         m_useSourceColumnModel = getUseSourceColumnModel();
         m_useSourceColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
