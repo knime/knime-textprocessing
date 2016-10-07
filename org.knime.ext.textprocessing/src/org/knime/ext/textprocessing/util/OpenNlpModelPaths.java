@@ -135,11 +135,15 @@ public final class OpenNlpModelPaths {
 
     /**
      * @return the model file of the tokenization model.
+     * @since 3.3
      */
     public String getEnTokenizerModelFile() {
         return m_basePath + TOKENIZATION_EN_MODEL_POSTFIX;
     }
 
+    /**
+     * @since 3.3
+     */
     public String getDeTokenizerModelFile() {
         return m_basePath + TOKENIZATION_DE_MODEL_POSTFIX;
     }

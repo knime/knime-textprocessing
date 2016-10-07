@@ -52,7 +52,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
  *
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class DocumentHashingConfigKeys {
+class DocumentHashingConfigKeys {
 
     private DocumentHashingConfigKeys() {
     }

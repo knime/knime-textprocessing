@@ -57,6 +57,7 @@ import com.google.common.hash.Hashing;
  * An implementation of Adler 32 hash function {@link com.google.common.hash.Hashing}
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public class Adler32HashingFunction implements HashingFunction {
 

@@ -57,6 +57,7 @@ import com.google.common.hash.Hashing;
  * An implementation of murmur3 32 bits hash function {@link com.google.common.hash.Hashing}
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public class Murmur3_32bitHashingFunction implements HashingFunction {
 

@@ -61,7 +61,7 @@ public final class DefaultTokenization {
         new TokenizerPool(TextprocessingPreferenceInitializer.tokenizerPoolSize(),
             TextprocessingPreferenceInitializer.tokenizerName());
 
-    public DefaultTokenization() {
+    private DefaultTokenization() {
     }
 
     /**

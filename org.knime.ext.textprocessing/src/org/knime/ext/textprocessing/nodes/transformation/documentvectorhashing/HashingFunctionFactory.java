@@ -66,7 +66,7 @@ import org.knime.core.node.NodeLogger;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public final class HashingFunctionFactory {
+final class HashingFunctionFactory {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(HashingFunctionFactory.class);
 
     /**

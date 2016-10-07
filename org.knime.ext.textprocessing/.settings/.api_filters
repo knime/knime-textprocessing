@@ -28,6 +28,22 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSentenceTokenizer">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSentenceTokenizer"/>
+                <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpWordTokenizer">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpWordTokenizer"/>
+                <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys">
         <filter id="305324134">
             <message_arguments>
@@ -538,6 +554,14 @@
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.util.DocumentDataCellFactory"/>
                 <message_argument value="prepare(ExecutionContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/util/OpenNlpModelPaths.java" type="org.knime.ext.textprocessing.util.OpenNlpModelPaths">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.util.OpenNlpModelPaths"/>
+                <message_argument value="getTokenizerModelFile()"/>
             </message_arguments>
         </filter>
     </resource>

@@ -62,6 +62,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public final class TokenizerFactoryRegistry {
 

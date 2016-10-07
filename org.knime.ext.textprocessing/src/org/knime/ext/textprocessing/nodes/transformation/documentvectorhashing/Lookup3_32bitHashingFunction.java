@@ -54,6 +54,7 @@ import org.streaminer.util.hash.Lookup3Hash;
  * An implementation of lookup3 32 bits hash function {@link org.streaminer.util.hash.Lookup3Hash}
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public class Lookup3_32bitHashingFunction implements HashingFunction {
 

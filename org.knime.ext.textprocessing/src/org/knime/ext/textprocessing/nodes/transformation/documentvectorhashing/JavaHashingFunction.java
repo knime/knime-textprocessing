@@ -52,6 +52,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
  * An implementation of the normal java hash function from String class
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public class JavaHashingFunction implements HashingFunction {
 

@@ -52,12 +52,12 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
  * The interface class for hashing functions
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
-
 public interface HashingFunction {
 
     /**
-     * Returns a hash value of a given string
+     * Returns a hash value of a given string.
      *
      * @param term the string to be hashed
      * @param seed the initial value for hashing
@@ -69,5 +69,4 @@ public interface HashingFunction {
      * @return the unique name of the function used for registration and selection
      */
     public String getName();
-
 }
