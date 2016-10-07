@@ -106,12 +106,12 @@ public class StringsToDocumentConfig {
     /**
      * The default "use title column" setting.
      */
-    static final boolean DEF_USE_TITLECOLUMN = false;
+    static final boolean DEF_USE_TITLECOLUMN = true;
 
     /**
      * The default "use authors column" setting.
      */
-    static final boolean DEF_USE_AUTHORSCOLUMN = false;
+    static final boolean DEF_USE_AUTHORSCOLUMN = true;
 
     private int m_titleStringIndex = -1;
 

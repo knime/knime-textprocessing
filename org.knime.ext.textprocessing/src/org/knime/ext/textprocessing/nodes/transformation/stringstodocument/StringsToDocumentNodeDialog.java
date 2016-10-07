@@ -196,16 +196,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentNodeModel.MAX_THREADS);
     }
 
-    //    static final SettingsModelString getDocTitleModel(){
-    //        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TITLECOL, StringsToDocumentConfig.DEF_DOCUMENT_TITLE);
-    //
-    //    }
 
     private SettingsModelString m_docCategoryModel;
-
-    //    private SettingsModelString m_docTitleModel;
-    //
-    //    private SettingsModelString m_authorModel;
 
     private SettingsModelString m_docSourceModel;
 
@@ -314,7 +306,6 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            //m_docTitleModel.setEnabled(!m_useTitleColumnModel.getBooleanValue());
 
         }
 

@@ -201,7 +201,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
             }
         } else {
 
-            docBuilder.addAuthor(new Author("-", "-"));
+            docBuilder.addAuthor(new Author());
         }
 
         // set document source
