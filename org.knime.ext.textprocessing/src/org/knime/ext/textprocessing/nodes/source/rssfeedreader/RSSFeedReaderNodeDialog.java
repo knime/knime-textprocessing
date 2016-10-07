@@ -52,7 +52,9 @@ import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumberEdit;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
@@ -69,7 +71,8 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Returns the SettingsModelBoolean containing the boolean value for creating a document column for feed entries.
+     * @return Returns the SettingsModelBoolean containing the boolean value for creating a document column for feed
+     *         entries.
      */
     public static final SettingsModelBoolean createDocumentColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_DOC_COLUMN,
@@ -77,11 +80,29 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Returns the SettingsModelBoolean containing the boolean value for creating an XML column for feed entries.
+     * @return Returns the SettingsModelBoolean containing the boolean value for creating an XML column for feed
+     *         entries.
      */
     public static final SettingsModelBoolean createXMLColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_XML_COLUMN,
             RSSFeedReaderNodeModel.DEF_CREATE_XML_COLUMN);
+    }
+
+    /**
+     * @return
+     */
+    public static final SettingsModelIntegerBounded createNumberOfThreadsModel() {
+        return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_NUMBER_OF_THREADS,
+            RSSFeedReaderNodeModel.DEF_THREADS, RSSFeedReaderNodeModel.MIN_THREADS, RSSFeedReaderNodeModel.MAX_THREADS);
+    }
+
+    /**
+     * @return
+     */
+    public static SettingsModelIntegerBounded createTimeOutModel() {
+        return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_TIMEOUT,
+            RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT,
+            RSSFeedReaderNodeModel.MAX_TIMEOUT);
     }
 
     /**
@@ -97,8 +118,13 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
         feedUrlColComp.setToolTipText("The RSS feed urls.");
         addDialogComponent(feedUrlColComp);
         setHorizontalPlacement(true);
-
+        addDialogComponent(new DialogComponentNumberEdit(createNumberOfThreadsModel(), "Number of threads"));
+        addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "TimeOut"));
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(createDocumentColumnModel(), "Create a Document column"));
-        addDialogComponent(new DialogComponentBoolean(createXMLColumnModel(),"Create an XML column"));
+        addDialogComponent(new DialogComponentBoolean(createXMLColumnModel(), "Create an XML column"));
+
     }
+
 }

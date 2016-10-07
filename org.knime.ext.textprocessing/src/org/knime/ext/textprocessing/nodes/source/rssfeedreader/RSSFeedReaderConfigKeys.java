@@ -54,9 +54,13 @@ package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
  */
 public class RSSFeedReaderConfigKeys {
 
-    final static String CFGKEY_FEED_URL_COLUMN = "String URL Column";
+    static final String CFGKEY_FEED_URL_COLUMN = "String URL Column";
 
-    final static String CFGKEY_CREATE_DOC_COLUMN = "Create Document Column";
+    static final String CFGKEY_CREATE_DOC_COLUMN = "Create Document Column";
 
-    final static String CFGKEY_CREATE_XML_COLUMN = "Create XML Column";
+    static final String CFGKEY_CREATE_XML_COLUMN = "Create XML Column";
+
+    static final String CFGKEY_NUMBER_OF_THREADS = "MaximalParallelThreads";
+
+    static final String CFGKEY_TIMEOUT = "TimeOut";
 }

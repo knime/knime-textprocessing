@@ -50,59 +50,29 @@ package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-
-import org.apache.commons.lang.StringUtils;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataType;
-import org.knime.core.data.RowKey;
+import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.date.DateAndTimeCell;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.StringCell;
-import org.knime.core.data.xml.XMLCell;
-import org.knime.core.data.xml.XMLCellFactory;
-import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentBuilder;
-import org.knime.ext.textprocessing.data.DocumentCell;
-import org.knime.ext.textprocessing.data.DocumentSource;
-import org.knime.ext.textprocessing.data.PublicationDate;
-import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.xml.sax.SAXException;
-
-import com.beust.jcommander.internal.Lists;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.SyndFeedOutput;
-import com.sun.syndication.io.XmlReader;
+import org.knime.core.util.ThreadPool;
 
 /**
  *
@@ -110,11 +80,21 @@ import com.sun.syndication.io.XmlReader;
  */
 public class RSSFeedReaderNodeModel extends NodeModel {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(RSSFeedReaderNodeModel.class);
-
     static final Boolean DEF_CREATE_DOC_COLUMN = false;
 
     static final Boolean DEF_CREATE_XML_COLUMN = false;
+
+    static final int DEF_THREADS = 3;
+
+    static final int MIN_THREADS = 1;
+
+    static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
+
+    static final int DEF_TIMEOUT = 3000;
+
+    static final int MIN_TIMEOUT = 0;
+
+    static final int MAX_TIMEOUT = Integer.MAX_VALUE;
 
     private SettingsModelString m_feedUrlColumn = RSSFeedReaderNodeDialog.createFeedUrlColumnModel();
 
@@ -122,7 +102,13 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_createXMLColumn = RSSFeedReaderNodeDialog.createXMLColumnModel();
 
-    private String m_feedUrlColumnName;
+    private SettingsModelIntegerBounded m_numberOfThreadsModel = RSSFeedReaderNodeDialog.createNumberOfThreadsModel();
+
+    private SettingsModelIntegerBounded m_timeOutModel = RSSFeedReaderNodeDialog.createTimeOutModel();
+
+    private int m_urlColIndex = -1;
+
+    private RSSFeedReaderDataTableCreator m_rssFeedReaderDataTableCreator;
 
     /**
      * @param nrInDataPorts
@@ -137,146 +123,100 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         throws Exception {
 
         BufferedDataTable inputTable = inData[0];
-        DataTableSpec inputTableSpec = inputTable.getSpec();
+        final long rowCount = inputTable.size();
 
-        DataTableSpec outputSpec = createOutputSpec();
-        BufferedDataContainer buf = exec.createDataContainer(outputSpec);
+        m_rssFeedReaderDataTableCreator =
+            new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
 
-        long rowCount = inputTable.size();
-        long currentOutputRow = 0;
+        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
+        final Semaphore semaphore = new Semaphore(m_numberOfThreadsModel.getIntValue());
+        final int chunkSize = (int) rowCount / m_numberOfThreadsModel.getIntValue();
+        int count = 0;
 
-        // iterate through columns
-        for (int i = 0; i < inputTableSpec.getNumColumns(); i++) {
-            // iterate through rows if column with correct name has been found
-            if (inputTableSpec.getColumnSpec(i).getName().equals(m_feedUrlColumnName)) {
-                for (DataRow row : inputTable) {
-                    String urlAsString = row.getCell(i).toString();
-                    URL url = new URL(urlAsString);
-                    HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
-                    // Reading the feed
-                    SyndFeedInput feedInput = new SyndFeedInput();
-                    SyndFeed feed = feedInput.build(new XmlReader(httpCon));
-                    List<SyndEntry> entries = feed.getEntries();
-                    Iterator<SyndEntry> itEntries = entries.iterator();
+        RSSFeedReaderDataTableCreator joiner =
+            new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
+        List<String> urlChunk = null;
 
-                    while (itEntries.hasNext()) {
-                        SyndEntry entry = itEntries.next();
-                        RowKey key = RowKey.createRowKey(currentOutputRow++);
-                        DataCell[] cells = new DataCell[5];
-                        Arrays.fill(cells, DataType.getMissingCell());
+        AtomicInteger urlCount = new AtomicInteger(0);
+        RowIterator it = inputTable.iterator();
+        List<Future<?>> futures = new ArrayList<>();
+        while (it.hasNext()) {
+            exec.checkCanceled();
+            DataRow row = it.next();
+//            if (row.getCell(m_urlColIndex).isMissing()) {
+//                continue;
+//            }
+            count++;
 
-                        if (m_createDocColumn.getBooleanValue() && !m_createXMLColumn.getBooleanValue()) {
-                            cells = new DataCell[6];
-                            cells[5] = new DocumentCell(createDocumentFromEntry(entry));
-                        }
-                        if (!m_createDocColumn.getBooleanValue() && m_createXMLColumn.getBooleanValue()) {
-                            cells = new DataCell[6];
-                            cells[5] = createXMLContentFromEntry(entry, feed);
-                        }
-                        if (m_createDocColumn.getBooleanValue() && m_createXMLColumn.getBooleanValue()) {
-                            cells = new DataCell[7];
-                            cells[5] = new DocumentCell(createDocumentFromEntry(entry));
-                            cells[6] = createXMLContentFromEntry(entry, feed);
-                            //COMBINATION FROM ABOVE
-                        }
+            //create empty chunk based on chunkSize
+            if (urlChunk == null) {
+                urlChunk = new ArrayList<String>(chunkSize);
+            }
 
-                        cells[0] = new StringCell(urlAsString);
-
-                        if (entry.getTitle() != null) {
-                            cells[1] = new StringCell(entry.getTitle());
-
-                        }
-                        if (entry.getDescription() != null) {
-                            cells[2] = new StringCell(entry.getDescription().getValue());
-                        }
-                        if (entry.getPublishedDate() != null) {
-                            Calendar cal = Calendar.getInstance();
-                            cal.setTime(entry.getPublishedDate());
-                            cells[3] = new DateAndTimeCell(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
-                                cal.get(Calendar.SECOND));
-                        }
-                        if (entry.getLink() != null) {
-                            cells[4] = new StringCell(entry.getLink());
-                        }
-
-                        DataRow outputRow = new DefaultRow(key, cells);
-                        buf.addRowToTable(outputRow);
-                    }
-
-                    exec.checkCanceled();
-                    exec.setProgress((double)i / rowCount, "Processing URL: " + i);
+            //add to chunk
+            if (count < chunkSize) {
+                if (row.getCell(m_urlColIndex).isMissing()) {
+                    urlChunk.add("MISSING_VALUE");
+                } else {
+                    urlChunk.add(row.getCell(m_urlColIndex).toString());
                 }
+                //chunk is full, process and clear
+            } else {
+                if (row.getCell(m_urlColIndex).isMissing()) {
+                    urlChunk.add("MISSING_VALUE");
+                } else {
+                    urlChunk.add(row.getCell(m_urlColIndex).toString());
+                }
+                futures.add(pool.enqueue(processChunk(urlChunk, joiner, exec, semaphore, urlCount, rowCount)));
+                urlChunk = null;
+                count = 0;
             }
         }
 
-        buf.close();
-        return new BufferedDataTable[]{buf.getTable()};
+        // enqueue the last chunk and wait
+        if (urlChunk != null && urlChunk.size() > 0) {
+            futures.add(pool.enqueue(processChunk(urlChunk, joiner, exec, semaphore, urlCount, rowCount)));
+        }
+
+        for (Future<?> f : futures) {
+            f.get();
+        }
+
+        exec.setMessage("Creating output table.");
+        return new BufferedDataTable[]{joiner.createDataTable(exec)};
     }
 
-    private Document createDocumentFromEntry(final SyndEntry entry) throws ParseException {
-        DocumentBuilder docBuilder = new DocumentBuilder();
-
-        docBuilder.addTitle(entry.getTitle());
-        docBuilder.addSection(entry.getDescription().getValue(), SectionAnnotation.ABSTRACT);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(entry.getPublishedDate());
-        PublicationDate pubDate = PublicationDate.createPublicationDate(cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
-        docBuilder.setPublicationDate(pubDate);
-        docBuilder.addDocumentSource(new DocumentSource(entry.getLink()));
-
-        return docBuilder.createDocument();
-    }
-
-    private DataCell createXMLContentFromEntry(final SyndEntry entry, final SyndFeed feed)
-        throws IOException, ParserConfigurationException, SAXException, XMLStreamException, FeedException {
-
-        SyndFeedOutput feedoutput = new SyndFeedOutput();
-        List<SyndEntry> entries = Lists.newArrayList();
-        entries.add(entry);
-        feed.setEntries(entries);
-        StringWriter xmlWriter = new StringWriter();
-        feedoutput.output(feed, xmlWriter);
-        String xmlWithFeedInfo = xmlWriter.toString();
-        StringBuilder xmlWithoutFeedInfoBuilder = new StringBuilder();
-        if (feed.getFeedType().contains("atom")) {
-            xmlWithoutFeedInfoBuilder.append("<entry>");
-            xmlWithoutFeedInfoBuilder.append(StringUtils.substringBetween(xmlWithFeedInfo, "<entry>", "</entry>"));
-            xmlWithoutFeedInfoBuilder.append("</entry>");
-        } else if (feed.getFeedType().contains("rss")) {
-            xmlWithoutFeedInfoBuilder.append("<channel>");
-            xmlWithoutFeedInfoBuilder.append(StringUtils.substringBetween(xmlWithFeedInfo, "<channel>", "</channel>"));
-            xmlWithoutFeedInfoBuilder.append("</channel>");
-        }
-        return XMLCellFactory.create(xmlWithFeedInfo);
-    }
-
-    private DataTableSpec createOutputSpec() {
-
-        DataColumnSpec[] outputColSpecs = new DataColumnSpec[5];
-
-        if (!m_createDocColumn.getBooleanValue() && m_createXMLColumn.getBooleanValue()) {
-            outputColSpecs = new DataColumnSpec[6];
-            outputColSpecs[5] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
-        }
-        if (m_createDocColumn.getBooleanValue() && !m_createXMLColumn.getBooleanValue()) {
-            outputColSpecs = new DataColumnSpec[6];
-            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
-        }
-        if (m_createDocColumn.getBooleanValue() && m_createXMLColumn.getBooleanValue()) {
-            outputColSpecs = new DataColumnSpec[7];
-            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
-            outputColSpecs[6] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
-        }
-
-        outputColSpecs[0] = new DataColumnSpecCreator("feedUrl", StringCell.TYPE).createSpec();
-        outputColSpecs[1] = new DataColumnSpecCreator("title", StringCell.TYPE).createSpec();
-        outputColSpecs[2] = new DataColumnSpecCreator("description", StringCell.TYPE).createSpec();
-        outputColSpecs[3] = new DataColumnSpecCreator("published", DateAndTimeCell.TYPE).createSpec();
-        outputColSpecs[4] = new DataColumnSpecCreator("itemUrl", StringCell.TYPE).createSpec();
-
-        return new DataTableSpec(outputColSpecs);
+    private Runnable processChunk(final List<String> urls, final RSSFeedReaderDataTableCreator joiner,
+        final ExecutionContext exec, final Semaphore semaphore, final AtomicInteger urlCount, final long inputTableSize)
+            throws CanceledExecutionException {
+        exec.checkCanceled();
+        return new Runnable() {
+            @Override
+            public void run() {
+                RSSFeedReaderDataTableCreator rssFeedReaderTC = null;
+                try {
+                    semaphore.acquire();
+                    rssFeedReaderTC = new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(),
+                        m_createXMLColumn.getBooleanValue());
+                    for (String urlAsString : urls) {
+                        exec.checkCanceled();
+                        rssFeedReaderTC.createDataCellsFromUrl(urlAsString, m_timeOutModel.getIntValue());
+                        int processedUrls = urlCount.addAndGet(1);
+                        double progress = (double)processedUrls / (double)inputTableSize;
+                        exec.setProgress(progress,
+                            "Parsed feed entries from " + processedUrls + "/" + inputTableSize + " urls.");
+                    }
+                    exec.checkCanceled();
+                    joiner.joinResults(rssFeedReaderTC, exec);
+                } catch (final CanceledExecutionException e) {
+                    // handled in main executer thread
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(e);
+                } finally {
+                    semaphore.release();
+                }
+            }
+        };
     }
 
     /**
@@ -292,15 +232,21 @@ public class RSSFeedReaderNodeModel extends NodeModel {
             for (int i = 0; i < inSpec.getNumColumns(); i++) {
                 if (inSpec.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
                     colIndex = i;
-                    m_feedUrlColumnName = inSpec.getColumnSpec(i).getName();
+                    this.setWarningMessage("Guessing document column \"" + inSpec.getColumnSpec(i).getName() + "\".");
                     break;
                 }
             }
-        } else if (colIndex >= 0) {
-            m_feedUrlColumnName = m_feedUrlColumn.getStringValue();
         }
 
-        return new DataTableSpec[]{createOutputSpec()};
+        if (colIndex < 0) {
+            throw new InvalidSettingsException("Input table contains no string column!");
+        }
+
+        m_urlColIndex = colIndex;
+
+        m_rssFeedReaderDataTableCreator =
+            new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
+        return new DataTableSpec[]{m_rssFeedReaderDataTableCreator.createDataTableSpec()};
     }
 
     /**
@@ -331,6 +277,8 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         m_feedUrlColumn.saveSettingsTo(settings);
         m_createDocColumn.saveSettingsTo(settings);
         m_createXMLColumn.saveSettingsTo(settings);
+        m_numberOfThreadsModel.saveSettingsTo(settings);
+        m_timeOutModel.saveSettingsTo(settings);
     }
 
     /**
@@ -341,6 +289,8 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         m_feedUrlColumn.validateSettings(settings);
         m_createDocColumn.validateSettings(settings);
         m_createXMLColumn.validateSettings(settings);
+        m_numberOfThreadsModel.validateSettings(settings);
+        m_timeOutModel.validateSettings(settings);
     }
 
     /**
@@ -351,6 +301,8 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         m_feedUrlColumn.loadSettingsFrom(settings);
         m_createDocColumn.loadSettingsFrom(settings);
         m_createXMLColumn.loadSettingsFrom(settings);
+        m_numberOfThreadsModel.loadSettingsFrom(settings);
+        m_timeOutModel.loadSettingsFrom(settings);
     }
 
     /**
