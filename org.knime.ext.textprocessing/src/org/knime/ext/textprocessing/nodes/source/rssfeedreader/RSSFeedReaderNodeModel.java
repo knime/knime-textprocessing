@@ -111,13 +111,16 @@ public class RSSFeedReaderNodeModel extends NodeModel {
     private RSSFeedReaderDataTableCreator m_rssFeedReaderDataTableCreator;
 
     /**
-     * @param nrInDataPorts
-     * @param nrOutDataPorts
+     * Creates a new instance {@code RSSFeedReaderNodeModel} with one {@code BufferedDataTable} input and one
+     * {@code BufferedDataTable} output.
      */
     protected RSSFeedReaderNodeModel() {
         super(1, 1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
@@ -125,37 +128,40 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         BufferedDataTable inputTable = inData[0];
         final long rowCount = inputTable.size();
 
-        m_rssFeedReaderDataTableCreator =
-            new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
+        //TODO: really necessary?
+//        m_rssFeedReaderDataTableCreator =
+//            new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
 
+        // creating thread pool, semaphore and chunk size
         final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
         final Semaphore semaphore = new Semaphore(m_numberOfThreadsModel.getIntValue());
-        final int chunkSize = (int) rowCount / m_numberOfThreadsModel.getIntValue();
-        int count = 0;
+        final int chunkSize = (int)rowCount / m_numberOfThreadsModel.getIntValue();
 
         RSSFeedReaderDataTableCreator joiner =
             new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
         List<String> urlChunk = null;
 
         AtomicInteger urlCount = new AtomicInteger(0);
-        RowIterator it = inputTable.iterator();
+        int missingUrlCount = 0;
+        int itCount = 0;
+        RowIterator iterator = inputTable.iterator();
         List<Future<?>> futures = new ArrayList<>();
-        while (it.hasNext()) {
+
+        // iterating through urls
+        while (iterator.hasNext()) {
             exec.checkCanceled();
-            DataRow row = it.next();
-//            if (row.getCell(m_urlColIndex).isMissing()) {
-//                continue;
-//            }
-            count++;
+            DataRow row = iterator.next();
+            itCount++;
 
             //create empty chunk based on chunkSize
             if (urlChunk == null) {
                 urlChunk = new ArrayList<String>(chunkSize);
             }
 
-            //add to chunk
-            if (count < chunkSize) {
+            //add urls to chunk
+            if (itCount < chunkSize) {
                 if (row.getCell(m_urlColIndex).isMissing()) {
+                    missingUrlCount++;
                     urlChunk.add("MISSING_VALUE");
                 } else {
                     urlChunk.add(row.getCell(m_urlColIndex).toString());
@@ -164,12 +170,13 @@ public class RSSFeedReaderNodeModel extends NodeModel {
             } else {
                 if (row.getCell(m_urlColIndex).isMissing()) {
                     urlChunk.add("MISSING_VALUE");
+                    missingUrlCount++;
                 } else {
                     urlChunk.add(row.getCell(m_urlColIndex).toString());
                 }
                 futures.add(pool.enqueue(processChunk(urlChunk, joiner, exec, semaphore, urlCount, rowCount)));
                 urlChunk = null;
-                count = 0;
+                itCount = 0;
             }
         }
 
@@ -183,6 +190,9 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         }
 
         exec.setMessage("Creating output table.");
+        if (missingUrlCount > 0) {
+            //    exec.setWarning
+        }
         return new BufferedDataTable[]{joiner.createDataTable(exec)};
     }
 
@@ -232,7 +242,7 @@ public class RSSFeedReaderNodeModel extends NodeModel {
             for (int i = 0; i < inSpec.getNumColumns(); i++) {
                 if (inSpec.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
                     colIndex = i;
-                    this.setWarningMessage("Guessing document column \"" + inSpec.getColumnSpec(i).getName() + "\".");
+                    this.setWarningMessage("Guessing url string column \"" + inSpec.getColumnSpec(i).getName() + "\".");
                     break;
                 }
             }

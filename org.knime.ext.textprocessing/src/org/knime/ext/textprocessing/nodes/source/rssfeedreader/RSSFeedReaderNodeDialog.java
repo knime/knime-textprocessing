@@ -89,7 +89,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return
+     * @return Returns the SettingsModelIntegerBounded for the number of used threads.
      */
     public static final SettingsModelIntegerBounded createNumberOfThreadsModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_NUMBER_OF_THREADS,
@@ -97,12 +97,11 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return
+     * @return Returns the SettingsModelIntegerBounded for the time until the connection times out (in ms).
      */
     public static SettingsModelIntegerBounded createTimeOutModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_TIMEOUT,
-            RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT,
-            RSSFeedReaderNodeModel.MAX_TIMEOUT);
+            RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT, RSSFeedReaderNodeModel.MAX_TIMEOUT);
     }
 
     /**
@@ -112,15 +111,20 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     public RSSFeedReaderNodeDialog() {
         super();
 
+        // component for the url column selection
         SettingsModelString feedUrlColumn = createFeedUrlColumnModel();
         DialogComponentColumnNameSelection feedUrlColComp =
             new DialogComponentColumnNameSelection(feedUrlColumn, "URL column", 0, StringValue.class);
         feedUrlColComp.setToolTipText("The RSS feed urls.");
         addDialogComponent(feedUrlColComp);
+
+        // components for number of threads and timeout settings
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumberEdit(createNumberOfThreadsModel(), "Number of threads"));
         addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "TimeOut"));
         setHorizontalPlacement(false);
+
+        // components for additional Document and/or XML columns
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(createDocumentColumnModel(), "Create a Document column"));
         addDialogComponent(new DialogComponentBoolean(createXMLColumnModel(), "Create an XML column"));

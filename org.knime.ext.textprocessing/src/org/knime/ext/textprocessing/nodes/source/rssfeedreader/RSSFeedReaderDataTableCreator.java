@@ -48,8 +48,9 @@
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -77,7 +78,6 @@ import org.knime.core.data.RowKey;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.data.xml.XMLCell;
 import org.knime.core.data.xml.XMLCellFactory;
 import org.knime.core.node.BufferedDataContainer;
@@ -91,8 +91,6 @@ import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
-import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.xml.sax.SAXException;
 
 import com.beust.jcommander.internal.Lists;
@@ -119,26 +117,28 @@ public class RSSFeedReaderDataTableCreator {
 
     private boolean m_createXMLCol;
 
-    private final TextContainerDataCellFactory m_documentCellFac;
+    //    private final TextContainerDataCellFactory m_documentCellFac;
 
     private final Map<String, Map<Integer, DataCell[]>> m_dataCells = new HashMap<String, Map<Integer, DataCell[]>>();
 
     private AtomicInteger m_processedUrlsPerChunk = new AtomicInteger(0);
 
     /**
-     * @param createDocumentColumn
-     * @param createXMLColumn
+     * Creates a new instance of the RSSFeedReaderDataTableCreator.
+     *
+     * @param createDocumentColumn Set true, if an additional Document column should be created.
+     * @param createXMLColumn Set true, if an additional XML column should be created.
      */
     public RSSFeedReaderDataTableCreator(final boolean createDocumentColumn, final boolean createXMLColumn) {
 
         m_createDocCol = createDocumentColumn;
         m_createXMLCol = createXMLColumn;
-        m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        //        m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
     }
 
     /**
-     * @param urlAsString
-     * @throws IllegalArgumentException
+     * @param urlAsString The url.
+     * @param timeOut The time in ms until the connection times out.
      */
     public void createDataCellsFromUrl(final String urlAsString, final int timeOut) {
         String uniqueUrlIdentifier = urlAsString + "(" + Integer.toString(m_processedUrlsPerChunk.getAndAdd(1)) + ")";
@@ -149,13 +149,15 @@ public class RSSFeedReaderDataTableCreator {
             try {
                 Map<Integer, DataCell[]> map = new HashMap<Integer, DataCell[]>();
                 URL url = new URL(urlAsString);
-                LOGGER.debug("Trying to connect to " + urlAsString + ".");
+                LOGGER.debug("Trying to connect to " + urlAsString + " or load file.");
                 //Reading the feeds
                 SyndFeedInput feedInput = new SyndFeedInput();
                 SyndFeed feed;
                 try {
-                    File f = FileUtil.getFileFromURL(url);
-                    feed = feedInput.build(f);
+                    InputStreamReader isr =
+                        new InputStreamReader(new FileInputStream(FileUtil.getFileFromURL(url)), "UTF-8");
+                    feed = feedInput.build(isr);
+                    isr.close();
                 } catch (IllegalArgumentException e) {
                     HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
                     httpCon.setConnectTimeout(3000);
@@ -164,11 +166,14 @@ public class RSSFeedReaderDataTableCreator {
                 List<SyndEntry> entries = feed.getEntries();
                 Iterator<SyndEntry> itEntries = entries.iterator();
                 int entryCount = 0;
+
+                // read entries and fill cells with information
                 while (itEntries.hasNext()) {
                     SyndEntry entry = itEntries.next();
                     DataCell[] cells = new DataCell[5];
                     Arrays.fill(cells, DataType.getMissingCell());
 
+                    // check if xml or doc columns should be created and generate cell content if true
                     if (m_createDocCol && !m_createXMLCol) {
                         cells = new DataCell[6];
                         Arrays.fill(cells, DataType.getMissingCell());
@@ -196,6 +201,7 @@ public class RSSFeedReaderDataTableCreator {
                         cells[6] = createXMLContentFromEntry(entry, feed);
                     }
 
+                    // generate basic cell content
                     cells[0] = new StringCell(urlAsString);
 
                     if (entry.getTitle() != null) {
@@ -215,6 +221,8 @@ public class RSSFeedReaderDataTableCreator {
                     if (entry.getLink() != null) {
                         cells[4] = new StringCell(entry.getLink());
                     }
+
+                    // add entry specific datacells to map
                     map.put(entryCount++, cells);
                     m_dataCells.put(uniqueUrlIdentifier, map);
                 }
@@ -231,10 +239,11 @@ public class RSSFeedReaderDataTableCreator {
         }
     }
 
+    // builds a document based on the feed entry
     private Document createDocumentFromEntry(final SyndEntry entry) {
         DocumentBuilder docBuilder = new DocumentBuilder();
-        // initialize empty document
 
+        // initialize empty document
         docBuilder.addTitle(null);
         docBuilder.setPublicationDate(null);
         docBuilder.addDocumentSource(null);
@@ -265,6 +274,7 @@ public class RSSFeedReaderDataTableCreator {
 
     }
 
+    // build xmlcontent based on the feed and feed entry information
     private DataCell createXMLContentFromEntry(final SyndEntry entry, final SyndFeed feed) {
 
         SyndFeedOutput feedoutput = new SyndFeedOutput();
@@ -295,8 +305,28 @@ public class RSSFeedReaderDataTableCreator {
     }
 
     /**
-     * @param rssFeedReaderCreator
-     * @param exec
+     * @return Returns the map containing the urls and the DataCells belonging to the urls.
+     */
+    private Map<String, Map<Integer, DataCell[]>> getResults() {
+        return m_dataCells;
+    }
+
+    /**
+     * @param exec The {@code ExecutionContext}.
+     */
+    private synchronized void openDataContainer(final ExecutionContext exec) {
+        if (exec != null) {
+            if (m_dataContainer == null) {
+                m_dataContainer = exec.createDataContainer(createDataTableSpec());
+            }
+        }
+    }
+
+    /**
+     * This method is used to join the results which have been created while processing multiple chunks.
+     * @param rssFeedReaderCreator The {@code RSSFeedReaderDataTableCreator} that stores the results from processing one
+     *            chunk.
+     * @param exec The {@code ExecutionContext}.
      */
     public void joinResults(final RSSFeedReaderDataTableCreator rssFeedReaderCreator, final ExecutionContext exec) {
         if (rssFeedReaderCreator != null && exec != null) {
@@ -314,8 +344,9 @@ public class RSSFeedReaderDataTableCreator {
     }
 
     /**
-     * @param key
-     * @param value
+     * This method adds the results created in an instance of {@code RSSFeedReaderDataTableCreator} to the DataContainer.
+     * @param url The feed url.
+     * @param cells The array of DataCells belonging to the url.
      */
     private synchronized void addDataCellsToDataContainer(final String url, final DataCell[] cells) {
         if (url != null && cells != null && m_dataContainer != null && m_dataContainer.isOpen()) {
@@ -330,18 +361,10 @@ public class RSSFeedReaderDataTableCreator {
 
     /**
      * @param exec
-     * @return
+     * @return Returns the {@code BufferedDataTable} containing the results from the {@code DataContainer}.
      */
     public synchronized BufferedDataTable createDataTable(final ExecutionContext exec) {
         openDataContainer(exec);
-
-        for (Entry<String, Map<Integer, DataCell[]>> entry : m_dataCells.entrySet()) {
-            Map<Integer, DataCell[]> map = entry.getValue();
-            for (Entry<Integer, DataCell[]> entry2 : map.entrySet()) {
-                addDataCellsToDataContainer(entry.getKey(), entry2.getValue());
-            }
-
-        }
 
         if (m_dataContainer != null && m_dataContainer.isOpen()) {
             m_dataContainer.close();
@@ -351,57 +374,8 @@ public class RSSFeedReaderDataTableCreator {
     }
 
     /**
-     * @return
-     */
-    private Map<String, Map<Integer, DataCell[]>> getResults() {
-        return m_dataCells;
-    }
-
-    /**
-     * @param exec
-     */
-    private synchronized void openDataContainer(final ExecutionContext exec) {
-        if (exec != null) {
-            if (m_dataContainer == null) {
-                m_dataContainer = exec.createDataContainer(createDataTableSpec());
-            }
-        }
-        m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
-    }
-
-    /**
-     * @return
-     */
-    public DataTableSpec createDataTableSpec() {
-
-        DataColumnSpec[] outputColSpecs = new DataColumnSpec[5];
-
-        if (!m_createDocCol && m_createXMLCol) {
-            outputColSpecs = new DataColumnSpec[6];
-            outputColSpecs[5] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
-        }
-        if (m_createDocCol && !m_createXMLCol) {
-            outputColSpecs = new DataColumnSpec[6];
-            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
-        }
-        if (m_createDocCol && m_createXMLCol) {
-            outputColSpecs = new DataColumnSpec[7];
-            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
-            outputColSpecs[6] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
-        }
-
-        outputColSpecs[0] = new DataColumnSpecCreator("feedUrl", StringCell.TYPE).createSpec();
-        outputColSpecs[1] = new DataColumnSpecCreator("title", StringCell.TYPE).createSpec();
-        outputColSpecs[2] = new DataColumnSpecCreator("description", StringCell.TYPE).createSpec();
-        outputColSpecs[3] = new DataColumnSpecCreator("published", DateAndTimeCell.TYPE).createSpec();
-        outputColSpecs[4] = new DataColumnSpecCreator("itemUrl", StringCell.TYPE).createSpec();
-
-        return new DataTableSpec(outputColSpecs);
-    }
-
-    /**
-     * @param urlAsString
-     * @return
+     * @param urlAsString The feed url.
+     * @return Returns a map containing missing value cells.
      */
     public Map<Integer, DataCell[]> createMissingValueCells(final String urlAsString) {
         Map<Integer, DataCell[]> map = new HashMap<Integer, DataCell[]>();
@@ -428,5 +402,35 @@ public class RSSFeedReaderDataTableCreator {
             map.put(0, cells);
             return map;
         }
+    }
+
+    /**
+     * @return Returns the {@code DataTableSpec} for the output table.
+     */
+    public DataTableSpec createDataTableSpec() {
+
+        DataColumnSpec[] outputColSpecs = new DataColumnSpec[5];
+
+        if (!m_createDocCol && m_createXMLCol) {
+            outputColSpecs = new DataColumnSpec[6];
+            outputColSpecs[5] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
+        }
+        if (m_createDocCol && !m_createXMLCol) {
+            outputColSpecs = new DataColumnSpec[6];
+            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
+        }
+        if (m_createDocCol && m_createXMLCol) {
+            outputColSpecs = new DataColumnSpec[7];
+            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
+            outputColSpecs[6] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
+        }
+
+        outputColSpecs[0] = new DataColumnSpecCreator("feedUrl", StringCell.TYPE).createSpec();
+        outputColSpecs[1] = new DataColumnSpecCreator("title", StringCell.TYPE).createSpec();
+        outputColSpecs[2] = new DataColumnSpecCreator("description", StringCell.TYPE).createSpec();
+        outputColSpecs[3] = new DataColumnSpecCreator("published", DateAndTimeCell.TYPE).createSpec();
+        outputColSpecs[4] = new DataColumnSpecCreator("itemUrl", StringCell.TYPE).createSpec();
+
+        return new DataTableSpec(outputColSpecs);
     }
 }

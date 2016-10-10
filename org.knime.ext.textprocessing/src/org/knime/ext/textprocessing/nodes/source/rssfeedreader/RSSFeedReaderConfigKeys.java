@@ -62,5 +62,5 @@ public class RSSFeedReaderConfigKeys {
 
     static final String CFGKEY_NUMBER_OF_THREADS = "MaximalParallelThreads";
 
-    static final String CFGKEY_TIMEOUT = "TimeOut";
+    static final String CFGKEY_TIMEOUT = "Time Out";
 }
