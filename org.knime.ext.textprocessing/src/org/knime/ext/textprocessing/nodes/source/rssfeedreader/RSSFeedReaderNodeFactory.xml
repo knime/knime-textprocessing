@@ -2,25 +2,54 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcSource.png" type="Other">
     <name>RSS Feed Reader</name>
-    <shortDescription>Parses RSS/Atom feeds.
+    <shortDescription>The RSS Feed Reader Node parses RSS/Atom feeds.
     </shortDescription>
     <fullDescription>
         <intro>
-            The RSS Feed Reader node connects to the specified feed urls and parses information from the feed entries.
-            ROME is used to parse the feed entries. This node also creates a Document for every entry.
+            This node connects to the specified feed urls in the input data table and parses information like title,
+             description, publication date and article link from the feed entries. It is also possible to create a 
+             Document and/or an XML column. The Document will be created from the feed entry information and the XML column 
+             shows the XML snippet for the specific feed entry.
+             
+            The RSS Feed Parser uses the <a href="https://rometools.github.io/rome/ROMEReleases/index.html">ROME(1.0)</a> library. 
+            ROME supports following formats and versions:
+            <ul>
+                <li>RSS 2.0</li>
+                <li>RSS 1.0</li>
+                <li>RSS 0.94</li>
+                <li>RSS 0.93</li>
+                <li>RSS 0.92</li>
+                <li>RSS 0.91 Userland</li>
+                <li>RSS 0.91 Netscape</li>
+                <li>RSS 0.90</li>
+                <li>Atom 1.0</li>
+                <li>RSS 0.3</li>
+            </ul>
+            For more information about <a href="https://rometools.github.io/rome/index.html">ROME</a>, visit their website.
         </intro>
         <option name="URL column">
             The urls to get the feeds from.
         </option>
-     
-    </fullDescription>
-        
+        <option name="Number of threads">
+            Select the number of threads.
+        </option>
+        <option name="Time out">
+            Set the time (in ms) until the connection times out, when no connection could be established. It also sets the
+            time for timing out, when a connection could be established but the reading of the url takes too long.
+        </option>
+        <option name="Create Document column">
+            If checked, the node creates an additional Document column for each feed entry.
+        </option>
+        <option name="Create XML column">
+            If checked, the node creates an additional XML column, containing the XML snippet for each feed entry.
+        </option>
+    </fullDescription>      
     <ports>
         <inPort name="Input table" index="0">
-            An input table which contains a column with urls.
+            An input table which contains a string column with urls to RSS or Atom feeds.
         </inPort>
-        <outPort name="Documents output table" index="0">
-            An output table which contains the parsed document data.
+        <outPort name="Output table" index="0">
+            An output table which contains parsed feed information.
         </outPort>
     </ports>
 </knimeNode>

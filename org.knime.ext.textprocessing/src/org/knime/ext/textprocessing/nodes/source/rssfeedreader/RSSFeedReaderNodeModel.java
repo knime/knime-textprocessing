@@ -84,7 +84,7 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
     static final Boolean DEF_CREATE_XML_COLUMN = false;
 
-    static final int DEF_THREADS = 3;
+    static final int DEF_THREADS = 2;
 
     static final int MIN_THREADS = 1;
 
@@ -127,10 +127,6 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
         BufferedDataTable inputTable = inData[0];
         final long rowCount = inputTable.size();
-
-        //TODO: really necessary?
-//        m_rssFeedReaderDataTableCreator =
-//            new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue());
 
         // creating thread pool, semaphore and chunk size
         final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
@@ -191,7 +187,7 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
         exec.setMessage("Creating output table.");
         if (missingUrlCount > 0) {
-            //    exec.setWarning
+            this.setWarningMessage("Could not connect to " + missingUrlCount + " of " + rowCount + " URLs.");
         }
         return new BufferedDataTable[]{joiner.createDataTable(exec)};
     }

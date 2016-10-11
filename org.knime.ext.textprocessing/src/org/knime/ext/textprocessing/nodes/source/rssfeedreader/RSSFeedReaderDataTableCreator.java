@@ -160,7 +160,8 @@ public class RSSFeedReaderDataTableCreator {
                     isr.close();
                 } catch (IllegalArgumentException e) {
                     HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
-                    httpCon.setConnectTimeout(3000);
+                    httpCon.setConnectTimeout(timeOut);
+                    httpCon.setReadTimeout(timeOut);
                     feed = feedInput.build(new XmlReader(httpCon));
                 }
                 List<SyndEntry> entries = feed.getEntries();
