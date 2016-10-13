@@ -120,7 +120,7 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
      * Creates a new instance of {@code TikaLangDetectorNodeModel}
      */
     public TikaLangDetectorNodeModel() {
-
+        stateChange();
     }
 
     /**
@@ -204,6 +204,14 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
             newColSpec = new DataColumnSpecCreator(model.getStringValue(), cellType).createSpec();
         }
         return newColSpec;
+    }
+
+    private void stateChange() {
+        if (m_confidenceBooleanModel.getBooleanValue()) {
+            m_ConfidenceColNameModel.setEnabled(true);
+        } else {
+            m_ConfidenceColNameModel.setEnabled(false);
+        }
     }
 
     /**

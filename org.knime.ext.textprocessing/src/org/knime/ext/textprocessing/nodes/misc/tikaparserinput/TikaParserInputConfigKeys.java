@@ -77,6 +77,16 @@ public class TikaParserInputConfigKeys {
     public static final String CFGKEY_TYPE = "Type";
 
     /**
+     * The configuration key of the "create error column" flag.
+     */
+    public static final String CFGKEY_ERROR_COLUMN = "ErrorColumn";
+
+    /**
+     * The configuration key of the name of the error column.
+     */
+    public static final String CFGKEY_ERROR_COLUMN_NAME = "ErrorColumnName";
+
+    /**
      * The configuration key of the "extract attachments" flag.
      */
     public static final String CFGKEY_EXTRACT_BOOLEAN = "ExtractAttachments";

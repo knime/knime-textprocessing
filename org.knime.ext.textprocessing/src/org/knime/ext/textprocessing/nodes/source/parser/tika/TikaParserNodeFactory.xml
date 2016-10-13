@@ -74,6 +74,12 @@
 				href="https://tika.apache.org/1.13/api/org/apache/tika/metadata/TikaCoreProperties.html">here</a>
 			.
 		</option>
+		<option name="Create error column">
+			If checked, an additional error column will be created. This string column will contain any error messages that appear while parsing the files.
+		</option>
+		<option name="New error output column">
+			The name of the new error column. 
+		</option>
 		<option name="Extract attachments and embedded files">
 			If checked, any embedded files that are contained
 			in the input files

@@ -142,18 +142,10 @@ public class TikaLangDetectorCellFactory extends AbstractCellFactory {
         }
 
         if (lang.isEmpty() || (langCells.isEmpty() && valueCells.isEmpty())) {
-            if (m_isCollection) {
-                langCells.add(new StringCell(UNDEFINED));
-                valueCells.add(new DoubleCell(0));
-                newCells[m_langIndex] = CollectionCellFactory.createListCell(langCells);
-                if (m_cValueIndex > 0) {
-                    newCells[m_cValueIndex] = CollectionCellFactory.createListCell(valueCells);
-                }
-            } else {
-                newCells[m_langIndex] = new StringCell(UNDEFINED);
-                if (m_cValueIndex > 0) {
-                    newCells[m_cValueIndex] = new DoubleCell(0);
-                }
+
+            newCells[m_langIndex] = DataType.getMissingCell();
+            if (m_cValueIndex > 0) {
+                newCells[m_cValueIndex] = DataType.getMissingCell();
             }
             return newCells;
         }

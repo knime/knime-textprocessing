@@ -82,6 +82,16 @@ public final class TikaParserConfigKeys {
     public static final String CFGKEY_COLUMNS_LIST = "ColumnsList";
 
     /**
+     * The configuration key of the "create error column" flag.
+     */
+    public static final String CFGKEY_ERROR_COLUMN = "ErrorColumn";
+
+    /**
+     * The configuration key of the name of the error column.
+     */
+    public static final String CFGKEY_ERROR_COLUMN_NAME = "ErrorColumnName";
+
+    /**
      * The configuration key of the type button to choose between file extension or MIME-Type.
      */
     public static final String CFGKEY_TYPE = "Type";

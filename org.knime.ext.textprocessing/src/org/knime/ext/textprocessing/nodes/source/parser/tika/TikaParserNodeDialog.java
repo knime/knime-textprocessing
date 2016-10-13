@@ -61,6 +61,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentAuthentication;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
 import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication.AuthenticationType;
@@ -98,6 +99,16 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             TikaParserNodeModel.DEFAULT_COLUMNS_LIST);
     }
 
+    static SettingsModelBoolean getErrorColumnModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ERROR_COLUMN,
+            TikaParserNodeModel.DEFAULT_ERROR_COLUMN);
+    }
+
+    static SettingsModelString getErrorColumnNameModel() {
+        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_ERROR_COLUMN_NAME,
+            TikaParserNodeModel.DEFAULT_ERROR_COLUMN_NAME);
+    }
+
     static SettingsModelString getTypeModel() {
         return new SettingsModelString(TikaParserConfigKeys.CFGKEY_TYPE, TikaParserNodeModel.DEFAULT_TYPE);
     }
@@ -125,6 +136,10 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
     private DialogComponentStringListSelection m_typeListModel;
 
+    private SettingsModelString m_errorColNameModel;
+
+    private SettingsModelBoolean m_errorColModel;
+
     private SettingsModelBoolean m_extractBooleanModel;
 
     private SettingsModelString m_extractPathModel;
@@ -138,10 +153,11 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
      * directory containing the files to parse, two checkbox components to specify if the directory is searched
      * recursively for files to parse and whether to ignore hidden files, button and list components to specify which
      * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify
-     * which meta data information are to be extracted. Another boolean button is added to specify whether embedded
-     * files should be extracted as well to a specific directory using a file chooser component. For encrypted files,
-     * there is a boolean button to specify whether any detected encrypted files should be parsed. If set to true, a
-     * password has to be given in the authentication component.
+     * which meta data information are to be extracted. A tick box for creating an additional error column is provided.
+     * Another boolean button is added to specify whether embedded files should be extracted as well to a specific
+     * directory using a file chooser component. For encrypted files, there is a boolean button to specify whether any
+     * detected encrypted files should be parsed. If set to true, a password has to be given in the authentication
+     * component.
      */
     public TikaParserNodeDialog() {
         createNewGroup("Directory and files settings");
@@ -174,6 +190,18 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Output settings");
         addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
             new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
+        setHorizontalPlacement(true);
+        m_errorColModel = getErrorColumnModel();
+        m_errorColModel.addChangeListener(new InternalChangeListenerErr());
+        DialogComponentBoolean errorColBooleanModel =
+            new DialogComponentBoolean(m_errorColModel, "Create error column");
+        errorColBooleanModel.setToolTipText(
+            "Create an additional String column to show any error messages if they appear while parsing the files.");
+        addDialogComponent(errorColBooleanModel);
+
+        m_errorColNameModel = getErrorColumnNameModel();
+        addDialogComponent(new DialogComponentString(m_errorColNameModel, "New error output column"));
+        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
@@ -234,6 +262,24 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         }
     }
 
+    /**
+     * Listens to state change and enables / disables the model of the authentication model
+     */
+    class InternalChangeListenerErr implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            if (m_errorColModel.getBooleanValue()) {
+                m_errorColNameModel.setEnabled(true);
+            } else {
+                m_errorColNameModel.setEnabled(false);
+            }
+        }
+    }
+
     class ButtonChangeListener implements ChangeListener {
 
         /**
@@ -246,6 +292,7 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             if (selectedButton.equals(TikaParserNodeModel.EXT_TYPE)) {
                 newList = new ArrayList<String>(Arrays.asList(TikaParserNodeModel.EXTENSION_LIST));
                 m_typeListModel.replaceListItems(newList, TikaParserNodeModel.EXTENSION_LIST);
+
             } else if (selectedButton.equals(TikaParserNodeModel.MIME_TYPE)) {
                 newList = new ArrayList<String>(Arrays.asList(TikaParserNodeModel.MIMETYPE_LIST));
                 m_typeListModel.replaceListItems(newList, TikaParserNodeModel.MIMETYPE_LIST);
