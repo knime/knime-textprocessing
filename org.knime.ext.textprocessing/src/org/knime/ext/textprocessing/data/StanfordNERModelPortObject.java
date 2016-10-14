@@ -106,6 +106,7 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             ModelContent config = new ModelContent(XML_CONFIG_NAME);
             config.addString("tagValue", portObject.getTagValue());
             config.addString("tagType", portObject.getTagType());
+            config.addString("tokenizerName", portObject.getTokenizerName());
             config.saveToXML(new NonClosableOutputStream.Zip(out));
             out.putNextEntry(new ZipEntry(MODEL_FILE_NAME));
             out.write(portObject.getByteArray());
@@ -129,9 +130,16 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             Tag usedTag;
             String usedTagValue;
             String usedTagType;
+            String nameOfUsedTokenizer;
             try {
                 usedTagValue = config.getString("tagValue");
                 usedTagType = config.getString("tagType");
+                try {
+                    nameOfUsedTokenizer = config.getString("tokenizerName");
+                } catch (InvalidSettingsException e) {
+                    // use old standard tokenizer for backwards compatibility
+                    nameOfUsedTokenizer = "OpenNLP English WordTokenizer";
+                }
                 usedTag = new Tag(usedTagValue, usedTagType);
             } catch (InvalidSettingsException e) {
                 throw new IOException("Failed to deserialize port object", e);
@@ -145,14 +153,13 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             byte[] dictByteArray = IOUtils.toByteArray(in);
             String dict = new String(dictByteArray);
             BufferedReader stringReader = new BufferedReader(new StringReader(dict));
-            String line= null;
+            String line = null;
             Set<String> dictSet = new LinkedHashSet<String>();
-            while((line=stringReader.readLine()) != null )
-            {
+            while ((line = stringReader.readLine()) != null) {
                 dictSet.add(line);
             }
             try {
-                return new StanfordNERModelPortObject(outputModelByteArray, usedTag, dictSet);
+                return new StanfordNERModelPortObject(outputModelByteArray, usedTag, dictSet, nameOfUsedTokenizer);
             } catch (Exception e) {
                 throw new IOException("Could not create NLPModelPortObject");
             }
@@ -165,13 +172,29 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
      * @param tag
      * @param dict
      * @throws Exception
+     * @deprecated
      */
-    public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict) throws Exception {
+    @Deprecated
+    public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict)
+        throws Exception {
         super(outputBuffer, tag, dict);
     }
 
     /**
+     * @param outputBuffer
+     * @param tag
+     * @param dict
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @throws Exception
+     */
+    public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict,
+        final String tokenizerName) throws Exception {
+        super(outputBuffer, tag, dict, tokenizerName);
+    }
+
+    /**
      * {@inheritDoc}
+     *
      * @throws IOException
      * @throws ClassNotFoundException
      * @throws ClassCastException

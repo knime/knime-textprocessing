@@ -85,11 +85,14 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
 
     private final Set<String> m_dict;
 
+    private final String m_tokenizerName;
 
     /**
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
      * @param tag The tag that has been used to build the model.
+     * @deprecated
      */
+    @Deprecated
     public NERModelPortObject(final byte[] outputBuffer, final Tag tag) {
         m_outputByteArray = outputBuffer;
         m_tag = tag;
@@ -97,6 +100,41 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
         m_tagValue = tag.getTagValue() ;
         m_dict = null;
         m_spec = new NERModelPortObjectSpec();
+        m_tokenizerName = "OpenNLP English WordTokenizer";
+    }
+
+    /**
+     * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
+     * @param tag The tag that has been used to build the model.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final String tokenizerName) {
+        m_outputByteArray = outputBuffer;
+        m_tag = tag;
+        m_tagType = tag.getTagType() ;
+        m_tagValue = tag.getTagValue() ;
+        m_dict = null;
+        m_spec = new NERModelPortObjectSpec();
+        m_tokenizerName = tokenizerName;
+    }
+
+    /**
+     * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
+     * @param tag The tag that has been used to build the model.
+     * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
+     * @throws Exception
+     * @deprecated
+     */
+    @Deprecated
+    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict) throws Exception {
+        m_outputByteArray = outputBuffer;
+        m_tag = tag;
+        m_tagType = tag.getTagType() ;
+        m_tagValue = tag.getTagValue() ;
+        m_dict = dict;
+        m_spec = new NERModelPortObjectSpec();
+        m_tokenizerName = "OpenNLP English WordTokenizer";
     }
 
     /**
@@ -105,13 +143,14 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
      * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
      * @throws Exception
      */
-    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict) throws Exception {
+    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict, final String tokenizerName) throws Exception {
         m_outputByteArray = outputBuffer;
         m_tag = tag;
         m_tagType = tag.getTagType() ;
         m_tagValue = tag.getTagValue() ;
         m_dict = dict;
         m_spec = new NERModelPortObjectSpec();
+        m_tokenizerName = tokenizerName;
     }
 
     /**
@@ -207,6 +246,13 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
     @Override
     public PortObjectSpec getSpec() {
         return m_spec;
+    }
+
+    /**
+     * @return Returns the name of the tokenizer used for word tokenization.
+     */
+    public String getTokenizerName() {
+        return m_tokenizerName;
     }
 
     @Override

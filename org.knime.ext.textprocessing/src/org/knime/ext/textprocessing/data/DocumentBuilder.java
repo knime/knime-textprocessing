@@ -58,6 +58,7 @@ import java.util.Set;
 
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * A utility class which helps building up a
@@ -112,26 +113,88 @@ public class DocumentBuilder {
 
     private HashMap<String, String> m_metaInfo = new LinkedHashMap<String, String>();
 
-    private Tokenizer m_sentenceTokenizer = DefaultTokenization
-            .getSentenceTokenizer();
+    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER;
 
-    private Tokenizer m_wordTokenizer = DefaultTokenization.getWordTokenizer();
+    private Tokenizer m_sentenceTokenizer = DefaultTokenization
+            .getSentenceTokenizer(m_tokenizerName);
+
+    private Tokenizer m_wordTokenizer = DefaultTokenization.getWordTokenizer(m_tokenizerName);
 
     /**
-     * Creates new empty instance of <code>DocumentBuilder</code>.
+     * Creates new empty instance of {@code DocumentBuilder}.
+     * @deprecated Use {@link #DocumentBuilder(String)} instead for tokenizer selection support.
      */
+    @Deprecated
     public DocumentBuilder() { /* empty */ }
 
     /**
-     * Creates new instance of <code>DocumentBuilder</code> and sets the meta
-     * information of the given <code>Document</code>.<br/>
+     * Creates new instance of {@code DocumentBuilder} with specified word tokenizer.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public DocumentBuilder(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+        m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
+        m_sentenceTokenizer = DefaultTokenization.getSentenceTokenizer(tokenizerName);
+    }
+
+    /**
+     * Creates new instance of {@code DocumentBuilder} and sets the meta
+     * information of the given {@code Document}.<br/>
      * The meta information to copy is: the documents authors, the source, the
      * category, the type, the file and the publication date.<br/>
      * The text data like title or sections are not copied.
-     *
+     * Only use this constructor if you want to create a document based on another document.
+     * If you want to add new content based on Strings (e.g. with {@link #addSentence(String sentence)})
+     * use {@link #DocumentBuilder(Document doc, String tokenizerName)}
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
+        // Add authors
+        for (Author a : doc.getAuthors()) {
+            addAuthor(a);
+        }
+
+        // Add source
+        for (DocumentSource s : doc.getSources()) {
+            addDocumentSource(s);
+        }
+
+        // Add categories
+        for (DocumentCategory c : doc.getCategories()) {
+            addDocumentCategory(c);
+        }
+
+        // Add type
+        setDocumentType(doc.getType());
+
+        // Add file
+        setDocumentFile(doc.getDocFile());
+
+        // Add publication date
+        setPublicationDate(doc.getPubDate());
+
+        // Add meta info
+        addMetaInformation(doc.getMetaInformation());
+    }
+
+    /**
+     * Creates new instance of {@code DocumentBuilder} and sets the meta
+     * information of the given {@code Document}.<br/>
+     * The meta information to copy is: the documents authors, the source, the
+     * category, the type, the file and the publication date.<br/>
+     * The text data like title or sections are not copied.
+     * Use this constructor if you are willing to add new information based on strings
+     * (e.g. with {@link #addSentence(String sentence)}).
+     * @param doc The document containing the meta information to copy.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public DocumentBuilder(final Document doc, final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+        m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
+        m_sentenceTokenizer = DefaultTokenization.getSentenceTokenizer(tokenizerName);
         // Add authors
         for (Author a : doc.getAuthors()) {
             addAuthor(a);
