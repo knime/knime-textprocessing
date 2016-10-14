@@ -53,6 +53,7 @@ import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreproc
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
@@ -175,7 +176,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         } else if (cell.getType().isCompatible(StringValue.class)) {
             return ((StringCell)cell).getStringValue();
         } else {
-            return null;
+            throw new IllegalArgumentException("Data Type " + cell.getType().getName() + " is not supported.");
         }
     }
 
@@ -232,6 +233,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
         final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
         ConfigurationUtils.validateColumnSelection(tableSpec, documentColumnName);
+        checkDocumentColumnType(tableSpec);
 
         if (m_calculateMean.getBooleanValue()) {
             m_outputSpec = TableUtils.appendColumnSpec(tableSpec, "converted_document",
@@ -241,6 +243,17 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
                 DataType.getType(ListCell.class, DataType.getType(ListCell.class, DoubleCell.TYPE)));
         }
         return new DataTableSpec[]{m_outputSpec};
+    }
+
+    private void checkDocumentColumnType(final DataTableSpec spec) throws InvalidSettingsException {
+        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
+        DataColumnSpec documentColumnSpec = spec.getColumnSpec(documentColumnName);
+        DataType type = documentColumnSpec.getType();
+
+        if (!(type.isCompatible(DocumentValue.class) || type.isCompatible(StringValue.class))) {
+            throw new InvalidSettingsException(
+                "Data Type " + documentColumnSpec.getType().getName() + " is not supported.");
+        }
     }
 
     @Override
