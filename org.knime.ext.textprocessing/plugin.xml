@@ -381,6 +381,11 @@
             >
       </node>
       <node
+            category-path="/labs/textprocessing/io"
+            factory-class="org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserNodeFactory"
+            >
+      </node>
+      <node
             category-path="/labs/textprocessing/misc"
             factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
             >
