@@ -8,7 +8,7 @@
         <intro>
             This node connects to the specified feed urls in the input data table and parses information like title,
              description, publication date and article link from the feed entries. It is also possible to create a 
-             Document and/or an XML column. The Document will be created from the feed entry information and the XML column 
+             document and/or an XML column. The document will be created from the feed entry information and the XML column 
              shows the XML snippet for the specific feed entry.
              
             The RSS Feed Parser uses the <a href="https://rometools.github.io/rome/ROMEReleases/index.html">ROME(1.0)</a> library. 
@@ -23,7 +23,7 @@
                 <li>RSS 0.91 Netscape</li>
                 <li>RSS 0.90</li>
                 <li>Atom 1.0</li>
-                <li>RSS 0.3</li>
+                <li>Atom 0.3</li>
             </ul>
             For more information about <a href="https://rometools.github.io/rome/index.html">ROME</a>, visit their website.
         </intro>
@@ -35,10 +35,10 @@
         </option>
         <option name="Time out">
             Set the time (in ms) until the connection times out, when no connection could be established. It also sets the
-            time for timing out, when a connection could be established but the reading of the url takes too long.
+            time for timing out, when a connection could be established but reading the feed takes too long.
         </option>
         <option name="Create Document column">
-            If checked, the node creates an additional Document column for each feed entry.
+            If checked, the node creates an additional document column for each feed entry.
         </option>
         <option name="Create XML column">
             If checked, the node creates an additional XML column, containing the XML snippet for each feed entry.
