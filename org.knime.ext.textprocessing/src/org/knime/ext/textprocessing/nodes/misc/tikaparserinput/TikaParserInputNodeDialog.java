@@ -50,7 +50,6 @@ package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
@@ -59,19 +58,19 @@ import javax.swing.event.ChangeListener;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.uri.URIDataValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentAuthentication;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
-import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication.AuthenticationType;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaDialogComponentStringFilter;
 
 /**
  *
@@ -81,11 +80,6 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
     static SettingsModelString getColModel() {
         return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_COL, TikaParserInputNodeModel.DEFAULT_COLNAME);
-    }
-
-    static SettingsModelStringArray getTypeListModel() {
-        return new SettingsModelStringArray(TikaParserInputConfigKeys.CFGKEY_TYPE_LIST,
-            TikaParserInputNodeModel.DEFAULT_TYPE_LIST);
     }
 
     static SettingsModelStringArray getColumnModel() {
@@ -117,14 +111,18 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
             TikaParserInputNodeModel.DEFAULT_EXTRACT_PATH);
     }
 
-    static SettingsModelAuthentication getCredentials() {
-        return new SettingsModelAuthentication(TikaParserInputConfigKeys.CFGKEY_CREDENTIALS,
-            AuthenticationType.USER_PWD, "username", null, null);
+    static SettingsModelString getCredentials() {
+        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_CREDENTIALS, "");
     }
 
     static SettingsModelBoolean getAuthBooleanModel() {
         return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_ENCRYPTED,
             TikaParserInputNodeModel.DEFAULT_ENCRYPTED);
+    }
+
+    static SettingsModelFilterString getFilterModel() {
+        return new SettingsModelFilterString(TikaParserInputConfigKeys.CFGKEY_FILTER_LIST,
+            TikaParserInputNodeModel.DEFAULT_TYPE_LIST, new String[0]);
     }
 
     private SettingsModelString m_typeModel;
@@ -137,11 +135,13 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_authBooleanModel;
 
-    private SettingsModelAuthentication m_authModel;
+    private SettingsModelString m_authModel;
 
     private SettingsModelString m_errorColNameModel;
 
     private SettingsModelBoolean m_errorColModel;
+
+    private TikaDialogComponentStringFilter m_filterModel;
 
     /**
      * Creates a new instance of {@code TikaParserInputNodeDialog} which displays a column list component, to specify
@@ -171,15 +171,14 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
         m_typeModel.addChangeListener(new ButtonChangeListener());
 
-        m_typeListModel = new DialogComponentStringListSelection(getTypeListModel(), "Type",
-            new ArrayList<String>(Arrays.asList(TikaParserInputNodeModel.DEFAULT_TYPE_LIST)), true, 10);
-        addDialogComponent(m_typeListModel);
+        m_filterModel = new TikaDialogComponentStringFilter(getFilterModel(), "EXT", TikaParserInputNodeModel.DEFAULT_TYPE_LIST);
+        addDialogComponent(m_filterModel);
 
-        addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
-            new ArrayList<String>(Arrays.asList(TikaParserInputNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
         closeCurrentGroup();
 
         createNewGroup("Output settings");
+        addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
+            new ArrayList<String>(Arrays.asList(TikaParserInputNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
         setHorizontalPlacement(true);
         m_errorColModel = getErrorColumnModel();
         m_errorColModel.addChangeListener(new InternalChangeListenerErr());
@@ -209,8 +208,7 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         m_authBooleanModel.addChangeListener(new InternalChangeListenerAuth());
         m_authModel = getCredentials();
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
-        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files",
-            AuthenticationType.USER_PWD));
+        addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
         closeCurrentGroup();
 
     }
@@ -276,14 +274,16 @@ public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            List<String> newList;
             String selectedButton = m_typeModel.getStringValue();
             if (selectedButton.equals(TikaParserInputNodeModel.EXT_TYPE)) {
-                newList = new ArrayList<String>(Arrays.asList(TikaParserInputNodeModel.EXTENSION_LIST));
-                m_typeListModel.replaceListItems(newList, TikaParserInputNodeModel.EXTENSION_LIST);
+                m_filterModel.setAllTypes(TikaParserInputNodeModel.EXTENSION_LIST);
+                m_filterModel.setType("EXT");
+                m_filterModel.updateLists();
+
             } else if (selectedButton.equals(TikaParserInputNodeModel.MIME_TYPE)) {
-                newList = new ArrayList<String>(Arrays.asList(TikaParserInputNodeModel.MIMETYPE_LIST));
-                m_typeListModel.replaceListItems(newList, TikaParserInputNodeModel.MIMETYPE_LIST);
+                m_filterModel.setAllTypes(TikaParserInputNodeModel.MIMETYPE_LIST);
+                m_filterModel.setType("MIME");
+                m_filterModel.updateLists();
             }
 
         }

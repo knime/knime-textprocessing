@@ -99,8 +99,8 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.port.PortObjectSpec;
@@ -212,7 +212,7 @@ public class TikaParserInputNodeModel extends NodeModel {
 
     private SettingsModelString m_typesModel = TikaParserInputNodeDialog.getTypeModel();
 
-    private SettingsModelStringArray m_typeListModel = TikaParserInputNodeDialog.getTypeListModel();
+    private SettingsModelFilterString m_filterModel = TikaParserInputNodeDialog.getFilterModel();
 
     private SettingsModelStringArray m_columnModel = TikaParserInputNodeDialog.getColumnModel();
 
@@ -220,7 +220,7 @@ public class TikaParserInputNodeModel extends NodeModel {
 
     private SettingsModelString m_extractPathModel = TikaParserInputNodeDialog.getExtractPathModel();
 
-    private SettingsModelAuthentication m_authModel = TikaParserInputNodeDialog.getCredentials();
+    private SettingsModelString m_authModel = TikaParserInputNodeDialog.getCredentials();
 
     private SettingsModelBoolean m_authBooleanModel = TikaParserInputNodeDialog.getAuthBooleanModel();
 
@@ -349,7 +349,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                 } else {
                     ext = false;
                 }
-                List<String> validTypes = Arrays.asList(m_typeListModel.getStringArrayValue());
+                List<String> validTypes = m_filterModel.getIncludeList();
                 int colIndex = rowInput.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
                 List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
                 if (m_errorColumnModel.getBooleanValue()) {
@@ -394,7 +394,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                     Metadata metadata = new Metadata();
                     ParseContext context = new ParseContext();
                     if (m_authBooleanModel.getBooleanValue()) {
-                        final String password = m_authModel.getPassword();
+                        final String password = m_authModel.getStringValue();
                         context.set(PasswordProvider.class, new PasswordProvider() {
                             @Override
                             public String getPassword(final Metadata md) {
@@ -441,7 +441,7 @@ public class TikaParserInputNodeModel extends NodeModel {
                             continue; // skip files whose MIME-type doesn't match the list of input MIME-types
                         }
                     }
-                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
+//                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
 
                     try {
                         if (m_extractBooleanModel.getBooleanValue()) {
@@ -550,7 +550,7 @@ public class TikaParserInputNodeModel extends NodeModel {
         m_colModel.saveSettingsTo(settings);
         m_typesModel.saveSettingsTo(settings);
         m_columnModel.saveSettingsTo(settings);
-        m_typeListModel.saveSettingsTo(settings);
+        m_filterModel.saveSettingsTo(settings);
         m_extractBooleanModel.saveSettingsTo(settings);
         m_extractPathModel.saveSettingsTo(settings);
         m_authModel.saveSettingsTo(settings);
@@ -567,7 +567,7 @@ public class TikaParserInputNodeModel extends NodeModel {
         m_colModel.validateSettings(settings);
         m_typesModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
-        m_typeListModel.validateSettings(settings);
+        m_filterModel.validateSettings(settings);
         m_extractBooleanModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
         m_authModel.validateSettings(settings);
@@ -608,7 +608,7 @@ public class TikaParserInputNodeModel extends NodeModel {
         m_colModel.loadSettingsFrom(settings);
         m_typesModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
-        m_typeListModel.loadSettingsFrom(settings);
+        m_filterModel.loadSettingsFrom(settings);
         m_extractBooleanModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
         m_authModel.loadSettingsFrom(settings);

@@ -393,7 +393,7 @@ public class TikaParserNodeModel extends NodeModel {
                             continue; // skip if mime type is not in the list of input mime types
                         }
                     }
-                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
+//                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
 
                     try {
                         if (m_extractBooleanModel.getBooleanValue()) {
