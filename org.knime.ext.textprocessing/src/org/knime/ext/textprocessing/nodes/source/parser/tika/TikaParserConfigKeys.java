@@ -74,7 +74,7 @@ public final class TikaParserConfigKeys {
     /**
      * The configuration key of the list of the file types (either file extensions or MIME-Types).
      */
-    public static final String CFGKEY_TYPE_LIST = "TypeList";
+    public static final String CFGKEY_FILTER_LIST = "TypeFilterList";
 
     /**
      * The configuration key of the list of the metadata information that are to be extracted.

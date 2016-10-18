@@ -95,8 +95,8 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.port.PortObjectSpec;
@@ -217,8 +217,6 @@ public class TikaParserNodeModel extends NodeModel {
 
     private SettingsModelString m_typesModel = TikaParserNodeDialog.getTypeModel();
 
-    private SettingsModelStringArray m_typeListModel = TikaParserNodeDialog.getTypeListModel();
-
     private SettingsModelStringArray m_columnModel = TikaParserNodeDialog.getColumnModel();
 
     private SettingsModelBoolean m_errorColumnModel = TikaParserNodeDialog.getErrorColumnModel();
@@ -227,11 +225,13 @@ public class TikaParserNodeModel extends NodeModel {
 
     private SettingsModelString m_extractPathModel = TikaParserNodeDialog.getExtractPathModel();
 
-    private SettingsModelAuthentication m_authModel = TikaParserNodeDialog.getCredentials();
+    private SettingsModelString m_authModel = TikaParserNodeDialog.getCredentials();
 
     private SettingsModelBoolean m_authBooleanModel = TikaParserNodeDialog.getAuthBooleanModel();
 
     private SettingsModelString m_errorColNameModel = TikaParserNodeDialog.getErrorColumnNameModel();
+
+    private SettingsModelFilterString m_filterModel = TikaParserNodeDialog.getFilterModel();
 
     /**
      * Creates a new instance of {@code TikaParserNodeModel}
@@ -310,8 +310,7 @@ public class TikaParserNodeModel extends NodeModel {
 
                 final FileCollector fc;
                 if (ext) {
-                    fc = new FileCollector(dir, Arrays.asList(m_typeListModel.getStringArrayValue()), recursive,
-                        ignoreHiddenFiles);
+                    fc = new FileCollector(dir, m_filterModel.getIncludeList(), recursive, ignoreHiddenFiles);
                 } else {
                     fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
                 }
@@ -345,7 +344,7 @@ public class TikaParserNodeModel extends NodeModel {
                     Metadata metadata = new Metadata();
                     ParseContext context = new ParseContext();
                     if (m_authBooleanModel.getBooleanValue()) {
-                        final String password = m_authModel.getPassword();
+                        final String password = m_authModel.getStringValue();
                         context.set(PasswordProvider.class, new PasswordProvider() {
                             @Override
                             public String getPassword(final Metadata md) {
@@ -389,7 +388,7 @@ public class TikaParserNodeModel extends NodeModel {
                         }
                     }
                     if (!ext) {
-                        List<String> validTypes = Arrays.asList(m_typeListModel.getStringArrayValue());
+                        List<String> validTypes = m_filterModel.getIncludeList();
                         if (!validTypes.contains(mime_type)) {
                             continue; // skip if mime type is not in the list of input mime types
                         }
@@ -528,13 +527,13 @@ public class TikaParserNodeModel extends NodeModel {
         m_ignoreHiddenFilesModel.saveSettingsTo(settings);
         m_typesModel.saveSettingsTo(settings);
         m_columnModel.saveSettingsTo(settings);
-        m_typeListModel.saveSettingsTo(settings);
         m_extractBooleanModel.saveSettingsTo(settings);
         m_extractPathModel.saveSettingsTo(settings);
         m_authModel.saveSettingsTo(settings);
         m_authBooleanModel.saveSettingsTo(settings);
         m_errorColumnModel.saveSettingsTo(settings);
         m_errorColNameModel.saveSettingsTo(settings);
+        m_filterModel.saveSettingsTo(settings);
     }
 
     /**
@@ -547,13 +546,13 @@ public class TikaParserNodeModel extends NodeModel {
         m_ignoreHiddenFilesModel.validateSettings(settings);
         m_typesModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
-        m_typeListModel.validateSettings(settings);
         m_extractBooleanModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
         m_errorColumnModel.validateSettings(settings);
         m_errorColNameModel.validateSettings(settings);
+        m_filterModel.validateSettings(settings);
 
         Boolean extract =
             ((SettingsModelBoolean)m_extractBooleanModel.createCloneWithValidatedValue(settings)).getBooleanValue();
@@ -590,13 +589,13 @@ public class TikaParserNodeModel extends NodeModel {
         m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
         m_typesModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
-        m_typeListModel.loadSettingsFrom(settings);
         m_extractBooleanModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
         m_authModel.loadSettingsFrom(settings);
         m_authBooleanModel.loadSettingsFrom(settings);
         m_errorColumnModel.loadSettingsFrom(settings);
         m_errorColNameModel.loadSettingsFrom(settings);
+        m_filterModel.loadSettingsFrom(settings);
     }
 
     /**

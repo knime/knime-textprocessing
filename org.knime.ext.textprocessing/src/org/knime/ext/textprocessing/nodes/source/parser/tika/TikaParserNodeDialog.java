@@ -50,22 +50,20 @@ package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentAuthentication;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication;
-import org.knime.core.node.defaultnodesettings.SettingsModelAuthentication.AuthenticationType;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
@@ -87,11 +85,6 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
     static SettingsModelBoolean getIgnoreHiddenFilesModel() {
         return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_IGNORE_HIDDENFILES,
             TikaParserNodeModel.DEFAULT_IGNORE_HIDDENFILES);
-    }
-
-    static SettingsModelStringArray getTypeListModel() {
-        return new SettingsModelStringArray(TikaParserConfigKeys.CFGKEY_TYPE_LIST,
-            TikaParserNodeModel.DEFAULT_TYPE_LIST);
     }
 
     static SettingsModelStringArray getColumnModel() {
@@ -123,18 +116,20 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
             TikaParserNodeModel.DEFAULT_EXTRACT_PATH);
     }
 
-    static SettingsModelAuthentication getCredentials() {
-        return new SettingsModelAuthentication(TikaParserConfigKeys.CFGKEY_CREDENTIALS, AuthenticationType.USER_PWD,
-            "username", null, null);
+    static SettingsModelString getCredentials() {
+        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_CREDENTIALS, "");
     }
 
     static SettingsModelBoolean getAuthBooleanModel() {
         return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ENCRYPTED, TikaParserNodeModel.DEFAULT_ENCRYPTED);
     }
 
-    private SettingsModelString m_typeModel;
+    static SettingsModelFilterString getFilterModel() {
+        return new SettingsModelFilterString(TikaParserConfigKeys.CFGKEY_FILTER_LIST,
+            TikaParserNodeModel.DEFAULT_TYPE_LIST, new String[0]);
+    }
 
-    private DialogComponentStringListSelection m_typeListModel;
+    private SettingsModelString m_typeModel;
 
     private SettingsModelString m_errorColNameModel;
 
@@ -146,7 +141,9 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_authBooleanModel;
 
-    private SettingsModelAuthentication m_authModel;
+    private SettingsModelString m_authModel;
+
+    private TikaDialogComponentStringFilter m_filterModel;
 
     /**
      * Creates a new instance of {@code TikaParserNodeDialog} which displays a file chooser component, to specify the
@@ -182,9 +179,9 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         m_typeModel.addChangeListener(new ButtonChangeListener());
 
-        m_typeListModel = new DialogComponentStringListSelection(getTypeListModel(), "Type",
-            new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_TYPE_LIST)), true, 10);
-        addDialogComponent(m_typeListModel);
+        m_filterModel = new TikaDialogComponentStringFilter(getFilterModel(), "EXT", TikaParserNodeModel.DEFAULT_TYPE_LIST);
+        addDialogComponent(m_filterModel);
+
         closeCurrentGroup();
 
         createNewGroup("Output settings");
@@ -220,8 +217,7 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         m_authBooleanModel.addChangeListener(new InternalChangeListenerAuth());
         m_authModel = getCredentials();
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
-        addDialogComponent(new DialogComponentAuthentication(m_authModel, "Enter password for any encrypted files",
-            AuthenticationType.USER_PWD));
+        addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
 
         closeCurrentGroup();
     }
@@ -287,15 +283,16 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            List<String> newList;
             String selectedButton = m_typeModel.getStringValue();
             if (selectedButton.equals(TikaParserNodeModel.EXT_TYPE)) {
-                newList = new ArrayList<String>(Arrays.asList(TikaParserNodeModel.EXTENSION_LIST));
-                m_typeListModel.replaceListItems(newList, TikaParserNodeModel.EXTENSION_LIST);
+                m_filterModel.setAllTypes(TikaParserNodeModel.EXTENSION_LIST);
+                m_filterModel.setType("EXT");
+                m_filterModel.updateLists();
 
             } else if (selectedButton.equals(TikaParserNodeModel.MIME_TYPE)) {
-                newList = new ArrayList<String>(Arrays.asList(TikaParserNodeModel.MIMETYPE_LIST));
-                m_typeListModel.replaceListItems(newList, TikaParserNodeModel.MIMETYPE_LIST);
+                m_filterModel.setAllTypes(TikaParserNodeModel.MIMETYPE_LIST);
+                m_filterModel.setType("MIME");
+                m_filterModel.updateLists();
             }
 
         }
