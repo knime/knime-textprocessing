@@ -58,7 +58,7 @@ import org.knime.core.data.def.StringCell;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class FeedReaderResult {
+class FeedReaderResult {
 
     private List<DataCell[]> m_dataCells = new LinkedList<DataCell[]>();
 
@@ -67,7 +67,7 @@ public class FeedReaderResult {
     /**
      * Creates a new instance of {@code FeedReaderResult}.
      */
-    public FeedReaderResult() {
+    FeedReaderResult() {
         // empty constructor
     }
 

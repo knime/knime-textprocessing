@@ -450,7 +450,7 @@ class RSSFeedReaderDataTableCreator {
      * @param urlAsString The feed url.
      * @return Returns a map containing missing value cells.
      */
-    DataCell[] createMissingValueCells() {
+    private DataCell[] createMissingValueCells() {
         DataCell[] cells;
         if (!m_createDocCol && !m_createXMLCol && !m_createHttpColumn) {
             cells = new DataCell[5];
