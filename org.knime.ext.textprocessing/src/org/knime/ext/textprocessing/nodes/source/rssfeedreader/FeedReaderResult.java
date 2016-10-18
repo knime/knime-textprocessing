@@ -71,14 +71,28 @@ public class FeedReaderResult {
         // empty constructor
     }
 
+    /**
+     * Sets the URL for the current instance of FeedReaderResult.
+     * @param urlAsString The url to set.
+     */
     void setURL(final String urlAsString) {
         m_url = urlAsString;
     }
 
+    /**
+     * @return URL from the current instance of FeedReaderResult.
+     */
     String getURL() {
         return m_url;
     }
 
+    /**
+     * Adds a DataCell array to the current instance of FeedReaderResult.
+     * Since this method changes the first entry of the incoming DataCell array to
+     * a StringCell containing the URL that has been set to this instance of FeedReaderResult. So, the URL should be
+     * set before using this method (unless you want to provide a row with missing cells even in the URL column).
+     * @param dataCells The DataCells containing the information generated from feed entries.
+     */
     void addDataCells(final DataCell[] dataCells) {
         if (m_url != null) {
             dataCells[0] = new StringCell(m_url);
@@ -86,6 +100,10 @@ public class FeedReaderResult {
         m_dataCells.add(dataCells);
     }
 
+    /**
+     * @return Returns the list of DataCell arrays containing the row information for feed entries of the current
+     * instance of FeedReaderResult.
+     */
     List<DataCell[]> getDataCells() {
         return m_dataCells;
     }
