@@ -58,11 +58,9 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -75,8 +73,10 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.xml.XMLCell;
 import org.knime.core.data.xml.XMLCellFactory;
@@ -105,23 +105,27 @@ import com.sun.syndication.io.XmlReader;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class RSSFeedReaderDataTableCreator {
+class RSSFeedReaderDataTableCreator {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(RSSFeedReaderDataTableCreator.class);
 
     private BufferedDataContainer m_dataContainer;
 
-    private int m_rowCount;
+    private int m_timeOut;
+
+    private long m_rowCount;
 
     private boolean m_createDocCol;
 
     private boolean m_createXMLCol;
 
-    //    private final TextContainerDataCellFactory m_documentCellFac;
+    private boolean m_createHttpColumn;
 
-    private final Map<String, Map<Integer, DataCell[]>> m_dataCells = new HashMap<String, Map<Integer, DataCell[]>>();
+    private final List<FeedReaderResult> m_feedReaderResults = new LinkedList<FeedReaderResult>();
 
-    private AtomicInteger m_processedUrlsPerChunk = new AtomicInteger(0);
+    private AtomicInteger m_missingRowCount = new AtomicInteger(0);
+
+    private int m_httpCode = -2;
 
     /**
      * Creates a new instance of the RSSFeedReaderDataTableCreator.
@@ -129,53 +133,86 @@ public class RSSFeedReaderDataTableCreator {
      * @param createDocumentColumn Set true, if an additional Document column should be created.
      * @param createXMLColumn Set true, if an additional XML column should be created.
      */
-    public RSSFeedReaderDataTableCreator(final boolean createDocumentColumn, final boolean createXMLColumn) {
-
+    RSSFeedReaderDataTableCreator(final boolean createDocumentColumn, final boolean createXMLColumn,
+        final boolean createHttpColumn, final int timeOut) {
         m_createDocCol = createDocumentColumn;
         m_createXMLCol = createXMLColumn;
-        //        m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        m_timeOut = timeOut;
+        m_createHttpColumn = createHttpColumn;
     }
 
     /**
      * @param urlAsString The url.
      * @param timeOut The time in ms until the connection times out.
      */
-    public void createDataCellsFromUrl(final String urlAsString, final int timeOut) {
-        String uniqueUrlIdentifier = urlAsString + "(" + Integer.toString(m_processedUrlsPerChunk.getAndAdd(1)) + ")";
-        if (urlAsString.equals("MISSING_VALUE")) {
-            Map<Integer, DataCell[]> map = createMissingValueCells(urlAsString);
-            m_dataCells.put(uniqueUrlIdentifier, map);
-        } else {
+    void createDataCellsFromUrl(final DataCell inputCell) {
+        FeedReaderResult result = new FeedReaderResult();
+        if (!inputCell.isMissing()) {
+            String urlAsString = ((StringValue)inputCell).getStringValue();
+            result.setURL(urlAsString);
+            URL url = null;
             try {
-                Map<Integer, DataCell[]> map = new HashMap<Integer, DataCell[]>();
-                URL url = new URL(urlAsString);
-                LOGGER.debug("Trying to connect to " + urlAsString + " or load file.");
-                //Reading the feeds
-                SyndFeedInput feedInput = new SyndFeedInput();
-                SyndFeed feed;
+                url = new URL(urlAsString);
+            } catch (MalformedURLException e) {
+                LOGGER.warn("MalformedURLException: Could not create URL from given string: " + urlAsString);
+                result.addDataCells(createMissingValueCells());
+                m_feedReaderResults.add(result);
+            }
+            LOGGER.debug("Connect to " + urlAsString + " or load file.");
+            //Reading the feeds
+            SyndFeedInput feedInput = new SyndFeedInput();
+            SyndFeed feed = null;
+            boolean isLocal = true;
+            try {
+                // try to read local URL which could also include knime:// protocol. This will fail for remote
+                // http:// URLs.
+                InputStreamReader isr =
+                    new InputStreamReader(new FileInputStream(FileUtil.getFileFromURL(url)), "UTF-8");
+                feed = feedInput.build(isr);
+                isr.close();
+            } catch (IllegalArgumentException e) {
+                isLocal = false;
+            } catch (IOException e) {
+                LOGGER.warn("IOException: Could not connect to URL / Could not find file: " + urlAsString);
+                result.addDataCells(createMissingValueCells());
+                m_feedReaderResults.add(result);
+            } catch (FeedException e) {
+                LOGGER.warn("FeedException: Unknown feed type for URL: " + urlAsString);
+                result.addDataCells(createMissingValueCells());
+                m_feedReaderResults.add(result);
+            }
+            if (!isLocal && url != null) {
                 try {
-                    InputStreamReader isr =
-                        new InputStreamReader(new FileInputStream(FileUtil.getFileFromURL(url)), "UTF-8");
-                    feed = feedInput.build(isr);
-                    isr.close();
-                } catch (IllegalArgumentException e) {
+                    // try to read remote URL
                     HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
-                    httpCon.setConnectTimeout(timeOut);
-                    httpCon.setReadTimeout(timeOut);
+                    httpCon.setConnectTimeout(m_timeOut);
+                    httpCon.setReadTimeout(m_timeOut);
+                    m_httpCode = httpCon.getResponseCode();
                     feed = feedInput.build(new XmlReader(httpCon));
+                } catch (IOException e) {
+                    LOGGER.warn("IOException: Could not open connection to " + urlAsString);
+                    result.addDataCells(createMissingValueCells());
+                    m_feedReaderResults.add(result);
+                } catch (IllegalArgumentException | FeedException e) {
+                    LOGGER.warn("IllegalArgumentException/FeedException: Unknown feed type for URL: " + urlAsString);
+                    result.addDataCells(createMissingValueCells());
+                    m_feedReaderResults.add(result);
                 }
+            }
+            if (feed != null) {
+                @SuppressWarnings("unchecked")
                 List<SyndEntry> entries = feed.getEntries();
                 Iterator<SyndEntry> itEntries = entries.iterator();
-                int entryCount = 0;
 
                 // read entries and fill cells with information
                 while (itEntries.hasNext()) {
                     SyndEntry entry = itEntries.next();
-                    DataCell[] cells = new DataCell[5];
-                    Arrays.fill(cells, DataType.getMissingCell());
-
+                    DataCell[] cells;
                     // check if xml or doc columns should be created and generate cell content if true
-                    if (m_createDocCol && !m_createXMLCol) {
+                    if (!m_createDocCol && !m_createXMLCol && !m_createHttpColumn) {
+                        cells = new DataCell[5];
+                        Arrays.fill(cells, DataType.getMissingCell());
+                    } else if (m_createDocCol && !m_createXMLCol && !m_createHttpColumn) {
                         cells = new DataCell[6];
                         Arrays.fill(cells, DataType.getMissingCell());
                         Document doc = createDocumentFromEntry(entry);
@@ -184,13 +221,17 @@ public class RSSFeedReaderDataTableCreator {
                         } else {
                             cells[5] = DataType.getMissingCell();
                         }
-                    }
-                    if (!m_createDocCol && m_createXMLCol) {
+                    } else if (!m_createDocCol && m_createXMLCol && !m_createHttpColumn) {
                         cells = new DataCell[6];
                         Arrays.fill(cells, DataType.getMissingCell());
                         cells[5] = createXMLContentFromEntry(entry, feed);
-                    }
-                    if (m_createDocCol && m_createXMLCol) {
+                    } else if (!m_createDocCol && !m_createXMLCol && m_createHttpColumn) {
+                        cells = new DataCell[6];
+                        Arrays.fill(cells, DataType.getMissingCell());
+                        if (m_httpCode != -2) {
+                            cells[5] = new IntCell(m_httpCode);
+                        }
+                    } else if (m_createDocCol && m_createXMLCol && !m_createHttpColumn) {
                         cells = new DataCell[7];
                         Arrays.fill(cells, DataType.getMissingCell());
                         Document doc = createDocumentFromEntry(entry);
@@ -200,6 +241,38 @@ public class RSSFeedReaderDataTableCreator {
                             cells[5] = DataType.getMissingCell();
                         }
                         cells[6] = createXMLContentFromEntry(entry, feed);
+                    } else if (m_createDocCol && !m_createXMLCol && m_createHttpColumn) {
+                        cells = new DataCell[7];
+                        Arrays.fill(cells, DataType.getMissingCell());
+                        Document doc = createDocumentFromEntry(entry);
+                        if (doc != null) {
+                            cells[5] = new DocumentCell(doc);
+                        } else {
+                            cells[5] = DataType.getMissingCell();
+                        }
+                        if (m_httpCode != -2) {
+                            cells[6] = new IntCell(m_httpCode);
+                        }
+                    } else if (!m_createDocCol && m_createXMLCol && m_createHttpColumn) {
+                        cells = new DataCell[7];
+                        Arrays.fill(cells, DataType.getMissingCell());
+                        cells[5] = createXMLContentFromEntry(entry, feed);
+                        if (m_httpCode != -2) {
+                            cells[6] = new IntCell(m_httpCode);
+                        }
+                    } else {
+                        cells = new DataCell[8];
+                        Arrays.fill(cells, DataType.getMissingCell());
+                        Document doc = createDocumentFromEntry(entry);
+                        if (doc != null) {
+                            cells[5] = new DocumentCell(doc);
+                        } else {
+                            cells[5] = DataType.getMissingCell();
+                        }
+                        cells[6] = createXMLContentFromEntry(entry, feed);
+                        if (m_httpCode != -2) {
+                            cells[7] = new IntCell(m_httpCode);
+                        }
                     }
 
                     // generate basic cell content
@@ -222,22 +295,16 @@ public class RSSFeedReaderDataTableCreator {
                     if (entry.getLink() != null) {
                         cells[4] = new StringCell(entry.getLink());
                     }
-
-                    // add entry specific datacells to map
-                    map.put(entryCount++, cells);
-                    m_dataCells.put(uniqueUrlIdentifier, map);
+                    result.addDataCells(cells);
                 }
-            } catch (MalformedURLException e) {
-                LOGGER.warn("MalformedURLException: Could not create URL from given string: " + urlAsString);
-                m_dataCells.put(uniqueUrlIdentifier, createMissingValueCells(urlAsString));
-            } catch (IOException e) {
-                LOGGER.warn("IOException: Could not connect to URL: " + urlAsString);
-                m_dataCells.put(uniqueUrlIdentifier, createMissingValueCells(urlAsString));
-            } catch (IllegalArgumentException | FeedException e) {
-                LOGGER.warn("IllegalArgumentException/FeedException: Unknown feed type for URL: " + urlAsString);
-                m_dataCells.put(uniqueUrlIdentifier, createMissingValueCells(urlAsString));
+                m_feedReaderResults.add(result);
             }
+        } else {
+            m_missingRowCount.addAndGet(1);
+            result.addDataCells(createMissingValueCells());
+            m_feedReaderResults.add(result);
         }
+
     }
 
     // builds a document based on the feed entry
@@ -275,7 +342,7 @@ public class RSSFeedReaderDataTableCreator {
 
     }
 
-    // build xmlcontent based on the feed and feed entry information
+    // builds xmlcontent based on the feed and feed entry information
     private DataCell createXMLContentFromEntry(final SyndEntry entry, final SyndFeed feed) {
 
         SyndFeedOutput feedoutput = new SyndFeedOutput();
@@ -308,8 +375,12 @@ public class RSSFeedReaderDataTableCreator {
     /**
      * @return Returns the map containing the urls and the DataCells belonging to the urls.
      */
-    private Map<String, Map<Integer, DataCell[]>> getResults() {
-        return m_dataCells;
+    private List<FeedReaderResult> getResults() {
+        return m_feedReaderResults;
+    }
+
+    int getMissingRowCount() {
+        return m_missingRowCount.intValue();
     }
 
     /**
@@ -325,38 +396,39 @@ public class RSSFeedReaderDataTableCreator {
 
     /**
      * This method is used to join the results which have been created while processing multiple chunks.
+     *
      * @param rssFeedReaderCreator The {@code RSSFeedReaderDataTableCreator} that stores the results from processing one
      *            chunk.
      * @param exec The {@code ExecutionContext}.
      */
-    public void joinResults(final RSSFeedReaderDataTableCreator rssFeedReaderCreator, final ExecutionContext exec) {
+    synchronized void joinResults(final RSSFeedReaderDataTableCreator rssFeedReaderCreator,
+        final ExecutionContext exec) {
         if (rssFeedReaderCreator != null && exec != null) {
             openDataContainer(exec);
-
-            final Map<String, Map<Integer, DataCell[]>> feedCells = rssFeedReaderCreator.getResults();
-
-            for (Entry<String, Map<Integer, DataCell[]>> entry : feedCells.entrySet()) {
-                Map<Integer, DataCell[]> map = entry.getValue();
-                for (Entry<Integer, DataCell[]> entry2 : map.entrySet()) {
-                    addDataCellsToDataContainer(entry.getKey(), entry2.getValue());
-                }
-            }
+            addResultsToDataContainer(rssFeedReaderCreator.getResults());
+            m_missingRowCount.addAndGet(rssFeedReaderCreator.getMissingRowCount());
         }
     }
 
     /**
-     * This method adds the results created in an instance of {@code RSSFeedReaderDataTableCreator} to the DataContainer.
+     * This method adds the results created in an instance of {@code RSSFeedReaderDataTableCreator} to the
+     * DataContainer.
+     *
      * @param url The feed url.
      * @param cells The array of DataCells belonging to the url.
      */
-    private synchronized void addDataCellsToDataContainer(final String url, final DataCell[] cells) {
-        if (url != null && cells != null && m_dataContainer != null && m_dataContainer.isOpen()) {
+    private synchronized void addResultsToDataContainer(final List<FeedReaderResult> results) {
+        if (m_dataContainer != null && m_dataContainer.isOpen()) {
+            for (FeedReaderResult result : results) {
+                List<DataCell[]> resultCells = result.getDataCells();
+                for (DataCell[] dataCells : resultCells) {
+                    final RowKey key = RowKey.createRowKey(m_rowCount);
+                    final DataRow newRow = new DefaultRow(key, dataCells);
+                    m_dataContainer.addRowToTable(newRow);
+                    m_rowCount++;
+                }
+            }
 
-            final RowKey key = new RowKey(Integer.valueOf(m_rowCount).toString());
-            final DataRow newRow = new DefaultRow(key, cells);
-            m_dataContainer.addRowToTable(newRow);
-
-            m_rowCount++;
         }
     }
 
@@ -364,7 +436,7 @@ public class RSSFeedReaderDataTableCreator {
      * @param exec
      * @return Returns the {@code BufferedDataTable} containing the results from the {@code DataContainer}.
      */
-    public synchronized BufferedDataTable createDataTable(final ExecutionContext exec) {
+    synchronized BufferedDataTable createDataTable(final ExecutionContext exec) {
         openDataContainer(exec);
 
         if (m_dataContainer != null && m_dataContainer.isOpen()) {
@@ -378,59 +450,83 @@ public class RSSFeedReaderDataTableCreator {
      * @param urlAsString The feed url.
      * @return Returns a map containing missing value cells.
      */
-    public Map<Integer, DataCell[]> createMissingValueCells(final String urlAsString) {
-        Map<Integer, DataCell[]> map = new HashMap<Integer, DataCell[]>();
-        DataCell[] cells = new DataCell[5];
-        Arrays.fill(cells, DataType.getMissingCell());
-        if (m_createDocCol && !m_createXMLCol) {
+    DataCell[] createMissingValueCells() {
+        DataCell[] cells;
+        if (!m_createDocCol && !m_createXMLCol && !m_createHttpColumn) {
+            cells = new DataCell[5];
+            Arrays.fill(cells, DataType.getMissingCell());
+        } else if ((m_createDocCol && !m_createXMLCol && !m_createHttpColumn)
+            || (!m_createDocCol && m_createXMLCol && !m_createHttpColumn)) {
             cells = new DataCell[6];
             Arrays.fill(cells, DataType.getMissingCell());
-        }
-        if (!m_createDocCol && m_createXMLCol) {
+        } else if (!m_createDocCol && !m_createXMLCol && m_createHttpColumn) {
             cells = new DataCell[6];
             Arrays.fill(cells, DataType.getMissingCell());
-        }
-        if (m_createDocCol && m_createXMLCol) {
+            if (m_httpCode != -2) {
+                cells[5] = new IntCell(m_httpCode);
+            }
+        } else if (m_createDocCol && m_createXMLCol && !m_createHttpColumn) {
             cells = new DataCell[7];
             Arrays.fill(cells, DataType.getMissingCell());
-        }
-        if (urlAsString.equals("MISSING_VALUE")) {
-            cells[0] = DataType.getMissingCell();
-            map.put(0, cells);
-            return map;
+        } else if ((m_createDocCol && !m_createXMLCol && m_createHttpColumn)
+            || (!m_createDocCol && m_createXMLCol && m_createHttpColumn)) {
+            cells = new DataCell[7];
+            Arrays.fill(cells, DataType.getMissingCell());
+            if (m_httpCode != -2) {
+                cells[6] = new IntCell(m_httpCode);
+            }
         } else {
-            cells[0] = new StringCell(urlAsString);
-            map.put(0, cells);
-            return map;
+            cells = new DataCell[8];
+            Arrays.fill(cells, DataType.getMissingCell());
+            if (m_httpCode != -2) {
+                cells[7] = new IntCell(m_httpCode);
+            }
         }
+        return cells;
     }
 
     /**
      * @return Returns the {@code DataTableSpec} for the output table.
      */
-    public DataTableSpec createDataTableSpec() {
+    DataTableSpec createDataTableSpec() {
 
-        DataColumnSpec[] outputColSpecs = new DataColumnSpec[5];
+        DataColumnSpec[] outputColSpecs;
 
-        if (!m_createDocCol && m_createXMLCol) {
-            outputColSpecs = new DataColumnSpec[6];
-            outputColSpecs[5] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
-        }
-        if (m_createDocCol && !m_createXMLCol) {
+        if (!m_createDocCol && !m_createXMLCol && !m_createHttpColumn) {
+            outputColSpecs = new DataColumnSpec[5];
+        } else if (m_createDocCol && !m_createXMLCol && !m_createHttpColumn) {
             outputColSpecs = new DataColumnSpec[6];
             outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
-        }
-        if (m_createDocCol && m_createXMLCol) {
+        } else if (!m_createDocCol && m_createXMLCol && !m_createHttpColumn) {
+            outputColSpecs = new DataColumnSpec[6];
+            outputColSpecs[5] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
+        } else if (!m_createDocCol && !m_createXMLCol && m_createHttpColumn) {
+            outputColSpecs = new DataColumnSpec[6];
+            outputColSpecs[5] = new DataColumnSpecCreator("HTTP Response Code", IntCell.TYPE).createSpec();
+        } else if ((m_createDocCol && m_createXMLCol && !m_createHttpColumn)) {
             outputColSpecs = new DataColumnSpec[7];
             outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
             outputColSpecs[6] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
+        } else if ((m_createDocCol && !m_createXMLCol && m_createHttpColumn)) {
+            outputColSpecs = new DataColumnSpec[7];
+            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
+            outputColSpecs[6] = new DataColumnSpecCreator("HTTP Response Code", IntCell.TYPE).createSpec();
+        } else if ((!m_createDocCol && m_createXMLCol && m_createHttpColumn)) {
+            outputColSpecs = new DataColumnSpec[7];
+            outputColSpecs[5] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
+            outputColSpecs[6] = new DataColumnSpecCreator("HTTP Response Code", IntCell.TYPE).createSpec();
+        } else {
+            outputColSpecs = new DataColumnSpec[8];
+            outputColSpecs[5] = new DataColumnSpecCreator("Document", DocumentCell.TYPE).createSpec();
+            outputColSpecs[6] = new DataColumnSpecCreator("XML", XMLCell.TYPE).createSpec();
+            outputColSpecs[7] = new DataColumnSpecCreator("HTTP Response Code", IntCell.TYPE).createSpec();
         }
 
-        outputColSpecs[0] = new DataColumnSpecCreator("feedUrl", StringCell.TYPE).createSpec();
-        outputColSpecs[1] = new DataColumnSpecCreator("title", StringCell.TYPE).createSpec();
-        outputColSpecs[2] = new DataColumnSpecCreator("description", StringCell.TYPE).createSpec();
-        outputColSpecs[3] = new DataColumnSpecCreator("published", DateAndTimeCell.TYPE).createSpec();
-        outputColSpecs[4] = new DataColumnSpecCreator("itemUrl", StringCell.TYPE).createSpec();
+        outputColSpecs[0] = new DataColumnSpecCreator("Feed Url", StringCell.TYPE).createSpec();
+        outputColSpecs[1] = new DataColumnSpecCreator("Title", StringCell.TYPE).createSpec();
+        outputColSpecs[2] = new DataColumnSpecCreator("Description", StringCell.TYPE).createSpec();
+        outputColSpecs[3] = new DataColumnSpecCreator("Published", DateAndTimeCell.TYPE).createSpec();
+        outputColSpecs[4] = new DataColumnSpecCreator("Item Url", StringCell.TYPE).createSpec();
 
         return new DataTableSpec(outputColSpecs);
     }

@@ -66,7 +66,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Returns the SettingsModelString containing the name of the url column.
      */
-    public static final SettingsModelString createFeedUrlColumnModel() {
+    static final SettingsModelString createFeedUrlColumnModel() {
         return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_FEED_URL_COLUMN, "");
     }
 
@@ -74,7 +74,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      * @return Returns the SettingsModelBoolean containing the boolean value for creating a document column for feed
      *         entries.
      */
-    public static final SettingsModelBoolean createDocumentColumnModel() {
+    static final SettingsModelBoolean createDocumentColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_DOC_COLUMN,
             RSSFeedReaderNodeModel.DEF_CREATE_DOC_COLUMN);
     }
@@ -83,7 +83,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      * @return Returns the SettingsModelBoolean containing the boolean value for creating an XML column for feed
      *         entries.
      */
-    public static final SettingsModelBoolean createXMLColumnModel() {
+    static final SettingsModelBoolean createXMLColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_XML_COLUMN,
             RSSFeedReaderNodeModel.DEF_CREATE_XML_COLUMN);
     }
@@ -91,7 +91,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Returns the SettingsModelIntegerBounded for the number of used threads.
      */
-    public static final SettingsModelIntegerBounded createNumberOfThreadsModel() {
+    static final SettingsModelIntegerBounded createNumberOfThreadsModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_NUMBER_OF_THREADS,
             RSSFeedReaderNodeModel.DEF_THREADS, RSSFeedReaderNodeModel.MIN_THREADS, RSSFeedReaderNodeModel.MAX_THREADS);
     }
@@ -99,9 +99,14 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Returns the SettingsModelIntegerBounded for the time until the connection times out (in ms).
      */
-    public static SettingsModelIntegerBounded createTimeOutModel() {
+    static SettingsModelIntegerBounded createTimeOutModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_TIMEOUT,
             RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT, RSSFeedReaderNodeModel.MAX_TIMEOUT);
+    }
+
+    static SettingsModelBoolean getHttpResponseCodeModel() {
+        return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_GET_HTTP_RESPONSE_CODE_COLUMN,
+            RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN);
     }
 
     /**
@@ -121,13 +126,15 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
         // components for number of threads and timeout settings
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumberEdit(createNumberOfThreadsModel(), "Number of threads"));
-        addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "TimeOut"));
+        addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "Time out"));
         setHorizontalPlacement(false);
 
         // components for additional Document and/or XML columns
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(createDocumentColumnModel(), "Create a Document column"));
-        addDialogComponent(new DialogComponentBoolean(createXMLColumnModel(), "Create an XML column"));
+        addDialogComponent(new DialogComponentBoolean(createDocumentColumnModel(), "Create Document column"));
+        addDialogComponent(new DialogComponentBoolean(createXMLColumnModel(), "Create XML column"));
+        setHorizontalPlacement(false);
+        addDialogComponent(new DialogComponentBoolean(getHttpResponseCodeModel(), "Create HTTP status code column"));
 
     }
 

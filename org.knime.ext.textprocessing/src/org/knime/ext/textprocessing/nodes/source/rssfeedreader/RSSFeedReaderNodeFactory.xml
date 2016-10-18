@@ -43,6 +43,9 @@
         <option name="Create XML column">
             If checked, the node creates an additional XML column, containing the XML snippet for each feed entry.
         </option>
+        <option name="Create HTTP Response Code column">
+            If checked, the node create an additional integer column, containing the HTTP Status Code for each URL.
+        </option>
     </fullDescription>      
     <ports>
         <inPort name="Input table" index="0">

@@ -44,25 +44,49 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   04.10.2016 (Julian): created
+ *   18.10.2016 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.knime.core.data.DataCell;
+import org.knime.core.data.def.StringCell;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class RSSFeedReaderConfigKeys {
+public class FeedReaderResult {
 
-    static final String CFGKEY_FEED_URL_COLUMN = "String URL Column";
+    private List<DataCell[]> m_dataCells = new LinkedList<DataCell[]>();
 
-    static final String CFGKEY_CREATE_DOC_COLUMN = "Create Document Column";
+    private String m_url;
 
-    static final String CFGKEY_CREATE_XML_COLUMN = "Create XML Column";
+    /**
+     * Creates a new instance of {@code FeedReaderResult}.
+     */
+    public FeedReaderResult() {
+        // empty constructor
+    }
 
-    static final String CFGKEY_NUMBER_OF_THREADS = "MaximalParallelThreads";
+    void setURL(final String urlAsString) {
+        m_url = urlAsString;
+    }
 
-    static final String CFGKEY_TIMEOUT = "Time Out";
+    String getURL() {
+        return m_url;
+    }
 
-    static final String CFGKEY_GET_HTTP_RESPONSE_CODE_COLUMN = "Create HTTP Response Code Column";
+    void addDataCells(final DataCell[] dataCells) {
+        if (m_url != null) {
+            dataCells[0] = new StringCell(m_url);
+        }
+        m_dataCells.add(dataCells);
+    }
+
+    List<DataCell[]> getDataCells() {
+        return m_dataCells;
+    }
 }
