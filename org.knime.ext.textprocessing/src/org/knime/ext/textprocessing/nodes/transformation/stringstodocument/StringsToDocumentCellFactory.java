@@ -201,7 +201,9 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
             }
         } else {
 
+            // Add "-" to the author names if no first and last name is specified
             docBuilder.addAuthor(new Author());
+            // Check if Author first or last name is specified, if not set the first or last name as "-"
         }
 
         // set document source

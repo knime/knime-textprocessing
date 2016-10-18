@@ -91,6 +91,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
     private SettingsModelString m_authorNameSeparator = StringsToDocumentNodeDialog.getAuthorSplitStringModel();
 
+    private SettingsModelString m_authorNamePlaceHolder = StringsToDocumentNodeDialog.getAuthorNamePlaceHolderModel();
+
     private SettingsModelString m_docSourceModel = StringsToDocumentNodeDialog.getDocSourceModel();
 
     private SettingsModelString m_docCategoryModel = StringsToDocumentNodeDialog.getDocCategoryModel();
@@ -127,10 +129,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * Creates new instance of {@StringsToDocumentNodeModel}.
      */
     public StringsToDocumentNodeModel() {
-        m_useCatColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
-        m_useSourceColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
-        m_useTitleColumnModel.addChangeListener(new DocTitleChangeListener());
-        m_useAuthorsColumnModel.addChangeListener(new AuthorsChangeListener());
+        modelStateChanged();
     }
 
     private static final DataColumnSpec[] createNewColSpecs() {
@@ -344,7 +343,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      *
      * @author Kilian Thiel, KNIME.com, Berlin, Germany
      */
-    class CategorySourceUsageChanceListener implements ChangeListener {
+    class UsageChanceListener implements ChangeListener {
 
         /**
          * {@inheritDoc}
@@ -353,44 +352,27 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         public void stateChanged(final ChangeEvent e) {
             m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
             m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
+            m_sourceColumnModel.setEnabled(m_useSourceColumnModel.getBooleanValue());
+            m_catColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
+            m_titleColModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
+            m_authorsColModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         }
     }
+
 
     /**
-     * Enables and disables text fields of document title.
-     *
-     * @author Hermann Azong, KNIME.com, Berlin, Germany
+     * @since 3.3
      */
-    class DocTitleChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            // TODO Auto-generated method stub
-
-        }
-
+    public void modelStateChanged() {
+        m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
+        m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
+        m_sourceColumnModel.setEnabled(m_useSourceColumnModel.getBooleanValue());
+        m_catColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
+        m_titleColModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
+        m_authorsColModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
     }
 
-    /**
-     * Enables and disables text fields of document authors.
-     *
-     * @author Hermann Azong, KNIME.com, Berlin, Germany
-     */
-    class AuthorsChangeListener implements ChangeListener {
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
 
     /** {@inheritDoc} */
     @Override

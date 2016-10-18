@@ -85,6 +85,12 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentConfig.DEF_AUTHORS_SPLITCHAR);
     }
 
+    static final SettingsModelString getAuthorNamePlaceHolderModel(){
+        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHORNAME_PLACEHOLDER_STR,
+            StringsToDocumentConfig.DEF_AUTHOR_NAMES);
+
+    }
+
     /**
      * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
      *         title column.
@@ -196,8 +202,11 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentNodeModel.MAX_THREADS);
     }
 
-
     private SettingsModelString m_docCategoryModel;
+
+    private SettingsModelString m_docTitleModelCombo;
+
+    private SettingsModelString m_docAuthorModelCombo;
 
     private SettingsModelString m_docSourceModel;
 
@@ -206,6 +215,10 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelBoolean m_useSourceColumnModel;
 
     private SettingsModelBoolean m_useTitleColumnModel;
+
+    private SettingsModelString m_docSourceModelCombo;
+
+    private SettingsModelString m_docCatModelCombo;
 
     private SettingsModelBoolean m_useAuthorsColumnModel;
 
@@ -218,22 +231,29 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Text");
         setHorizontalPlacement(true);
         m_useTitleColumnModel = getUseTitleColumnModel();
-        m_useTitleColumnModel.addChangeListener(new DocTitleChangeListener());
+        m_docTitleModelCombo = getTitleStringModel();
+        m_useTitleColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(getTitleStringModel(), "Title column", 0, StringValue.class));
+            new DialogComponentColumnNameSelection(m_docTitleModelCombo, "Title column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         m_useAuthorsColumnModel = getUseAuthorsColumnModel();
-        m_useAuthorsColumnModel.addChangeListener(new AuthorsChangeListener());
+        m_docAuthorModelCombo = getAuthorsStringModel();
+        m_useAuthorsColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(getAuthorsStringModel(), "Authors column", 0, StringValue.class));
+            new DialogComponentColumnNameSelection(m_docAuthorModelCombo, "Authors column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentString(getAuthorSplitStringModel(), "Author names separator"));
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentString(getAuthorNamePlaceHolderModel(), "Author first name"));
+        addDialogComponent(new DialogComponentString(getAuthorNamePlaceHolderModel(), "Author last name"));
+        setHorizontalPlacement(false);
         addDialogComponent(
             new DialogComponentColumnNameSelection(getTextStringModel(), "Full text", 0, StringValue.class));
 
@@ -244,9 +264,10 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         m_useSourceColumnModel = getUseSourceColumnModel();
-        m_useSourceColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
+        m_docSourceModelCombo = getSourceColumnModel();
+        m_useSourceColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_useSourceColumnModel, "Use sources from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(getSourceColumnModel(), "Document source column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(m_docSourceModelCombo, "Document source column", 0,
             StringValue.class));
         setHorizontalPlacement(false);
 
@@ -254,9 +275,10 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentString(m_docCategoryModel, "Document category"));
         setHorizontalPlacement(true);
         m_useCatColumnModel = getUseCategoryColumnModel();
-        m_useCatColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
+        m_docCatModelCombo = getCategoryColumnModel();
+        m_useCatColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_useCatColumnModel, "Use categories from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(getCategoryColumnModel(), "Document category column",
+        addDialogComponent(new DialogComponentColumnNameSelection(m_docCatModelCombo, "Document category column",
             0, StringValue.class));
         setHorizontalPlacement(false);
         closeCurrentGroup();
@@ -281,7 +303,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
      *
      * @author Kilian Thiel, KNIME.com, Berlin, Germany
      */
-    class CategorySourceUsageChanceListener implements ChangeListener {
+    class UsageChangeListener implements ChangeListener {
 
         /**
          * {@inheritDoc}
@@ -290,43 +312,12 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         public void stateChanged(final ChangeEvent e) {
             m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
             m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
+            m_docSourceModelCombo.setEnabled(m_useSourceColumnModel.getBooleanValue());
+            m_docCatModelCombo.setEnabled(m_useCatColumnModel.getBooleanValue());
+            m_docTitleModelCombo.setEnabled(m_useTitleColumnModel.getBooleanValue());
+            m_docAuthorModelCombo.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         }
     }
 
-    /**
-     *
-     * Enables and disables field of document title
-     *
-     * @author Hermann Azong, KNIME.com, Berlin, Germany
-     */
-    class DocTitleChangeListener implements ChangeListener {
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-
-        }
-
-    }
-
-    /**
-     *
-     * Enables and disables field of document authors
-     *
-     * @author Hermann Azong, KNIME.com, Berlin, Germany
-     */
-    class AuthorsChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
 }
