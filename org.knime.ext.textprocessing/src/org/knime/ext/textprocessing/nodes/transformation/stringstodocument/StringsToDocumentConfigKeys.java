@@ -91,10 +91,16 @@ public final class StringsToDocumentConfigKeys {
     public static final String CFGKEY_AUTHORSPLIT_STR = "AuthorSplitChar";
 
     /**
-     * The configuration key of the author name placeholder for first or last names
+     * The configuration key of the author name placeholder for first name
      * @since 3.3
      */
-    public static final String CFGKEY_AUTHORNAME_PLACEHOLDER_STR = "AuthorPlaceHolderChar";
+    public static final String CFGKEY_AUTHOR_FIRST_NAME = "AuthorFirstName";
+
+    /**
+     * The configuration key of the author name placeholder for last name
+     * @since 3.3
+     */
+    public static final String CFGKEY_AUTHOR_LAST_NAME = "AuthorLastName";
 
     /**
      * The configuration key of the document source.

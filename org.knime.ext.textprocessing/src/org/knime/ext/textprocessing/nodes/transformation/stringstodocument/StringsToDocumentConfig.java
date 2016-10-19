@@ -94,6 +94,16 @@ public class StringsToDocumentConfig {
     static final String DEF_AUTHOR_NAMES = "-";
 
     /**
+     * The default author first name
+     */
+    static final String DEF_AUTHOR_FIRST_NAME = "-";
+
+    /**
+     * The default author last name
+     */
+    static final String DEF_AUTHOR_LAST_NAME = "-";
+
+    /**
      * The default "use category column" setting.
      */
     static final boolean DEF_USE_CATCOLUMN = false;
@@ -134,6 +144,10 @@ public class StringsToDocumentConfig {
     private String m_docTitle = DEF_DOCUMENT_TITLE;
 
     private String m_authorNames = DEF_AUTHOR_NAMES;
+
+    private String m_authorFirstName = DEF_AUTHOR_FIRST_NAME;
+
+    private String m_authorLastName = DEF_AUTHOR_LAST_NAME;
 
     private String m_authorsSplitChar = DEF_AUTHORS_SPLITCHAR;
 
@@ -383,5 +397,38 @@ public class StringsToDocumentConfig {
      */
     public void setAuthorNames(final String authorNames) {
         this.m_authorNames = authorNames;
+    }
+
+    /**
+     * @return the m_authorFirstName
+     * @since 3.3
+     */
+    public String getAuthorFirstName() {
+        return m_authorFirstName;
+    }
+
+    /**
+     *
+     * @param authorFirstName the m_authorFirstName to set
+     * @since 3.3
+     */
+    public void setAuthorFirstName(final String authorFirstName) {
+        this.m_authorFirstName = authorFirstName;
+    }
+
+    /**
+     * @return the m_authorLastName
+     * @since 3.3
+     */
+    public String getAuthorLastName() {
+        return m_authorLastName;
+    }
+
+    /**
+     * @param authorLastName the m_authorLastName to set
+     * @since 3.3
+     */
+    public void setAuthorLastName(final String authorLastName) {
+        this.m_authorLastName = authorLastName;
     }
 }

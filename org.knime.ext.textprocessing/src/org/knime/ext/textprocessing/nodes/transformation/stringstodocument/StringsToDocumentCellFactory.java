@@ -178,8 +178,10 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
                     final String authors = ((StringValue)auhorsCell).getStringValue();
                     final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
                     for (String author : authorsArr) {
-                        String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
-                        String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
+//                        String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
+//                        String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
+                        String firstName = m_config.getAuthorFirstName();
+                        String lastName = m_config.getAuthorLastName();
 
                         final String[] names = author.split(" ");
                         if (names.length > 1) {
@@ -196,13 +198,16 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
                         docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
                     }
+                } else if (auhorsCell.isMissing()){
+                    docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
                 }
 
             }
         } else {
 
             // Add "-" to the author names if no first and last name is specified
-            docBuilder.addAuthor(new Author());
+
+            docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
             // Check if Author first or last name is specified, if not set the first or last name as "-"
         }
 

@@ -85,8 +85,14 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentConfig.DEF_AUTHORS_SPLITCHAR);
     }
 
-    static final SettingsModelString getAuthorNamePlaceHolderModel(){
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHORNAME_PLACEHOLDER_STR,
+    static final SettingsModelString getAuthorFirstNameModel(){
+        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
+            StringsToDocumentConfig.DEF_AUTHOR_NAMES);
+
+    }
+
+    static final SettingsModelString getAuthorLastNameModel(){
+        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
             StringsToDocumentConfig.DEF_AUTHOR_NAMES);
 
     }
@@ -251,8 +257,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentString(getAuthorSplitStringModel(), "Author names separator"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getAuthorNamePlaceHolderModel(), "Author first name"));
-        addDialogComponent(new DialogComponentString(getAuthorNamePlaceHolderModel(), "Author last name"));
+        addDialogComponent(new DialogComponentString(getAuthorFirstNameModel(), "Author first name"));
+        addDialogComponent(new DialogComponentString(getAuthorLastNameModel(), "Author last name"));
         setHorizontalPlacement(false);
         addDialogComponent(
             new DialogComponentColumnNameSelection(getTextStringModel(), "Full text", 0, StringValue.class));

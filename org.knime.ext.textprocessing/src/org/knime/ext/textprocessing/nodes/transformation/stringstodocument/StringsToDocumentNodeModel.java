@@ -91,7 +91,9 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
     private SettingsModelString m_authorNameSeparator = StringsToDocumentNodeDialog.getAuthorSplitStringModel();
 
-    private SettingsModelString m_authorNamePlaceHolder = StringsToDocumentNodeDialog.getAuthorNamePlaceHolderModel();
+    private SettingsModelString m_authorFirstNameModel = StringsToDocumentNodeDialog.getAuthorFirstNameModel();
+
+    private SettingsModelString m_authorLastNameModel = StringsToDocumentNodeDialog.getAuthorLastNameModel();
 
     private SettingsModelString m_docSourceModel = StringsToDocumentNodeDialog.getDocSourceModel();
 
@@ -169,6 +171,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         conf.setAuthorsStringIndex(authorIndex);
         boolean useAuthorsCol = m_useAuthorsColumnModel.getBooleanValue();
         conf.setUseAuthorsColumn(useAuthorsCol);
+        conf.setAuthorFirstName(m_authorFirstNameModel.getStringValue());
+        conf.setAuthorLastName(m_authorLastNameModel.getStringValue());
 
         // Author name separator
         String authorNameSeparator = m_authorNameSeparator.getStringValue();
@@ -228,6 +232,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_docCategoryModel.loadSettingsFrom(settings);
         m_docTypeModel.loadSettingsFrom(settings);
         m_pubDateModel.loadSettingsFrom(settings);
+        m_authorFirstNameModel.loadSettingsFrom(settings);
+        m_authorLastNameModel.loadSettingsFrom(settings);
 
         try {
             m_useTitleColumnModel.loadSettingsFrom(settings);
@@ -270,6 +276,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_catColumnModel.saveSettingsTo(settings);
         m_sourceColumnModel.saveSettingsTo(settings);
         m_maxThreads.saveSettingsTo(settings);
+        m_authorFirstNameModel.saveSettingsTo(settings);
+        m_authorLastNameModel.saveSettingsTo(settings);
     }
 
     /**
@@ -285,6 +293,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_docCategoryModel.validateSettings(settings);
         m_docTypeModel.validateSettings(settings);
         m_pubDateModel.validateSettings(settings);
+        m_authorFirstNameModel.validateSettings(settings);
+        m_authorLastNameModel.validateSettings(settings);
 
         try {
             m_useTitleColumnModel.validateSettings(settings);
