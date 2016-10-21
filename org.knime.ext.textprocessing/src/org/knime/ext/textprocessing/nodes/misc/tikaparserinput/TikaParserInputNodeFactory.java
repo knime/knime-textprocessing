@@ -58,7 +58,7 @@ import org.knime.core.node.NodeView;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaParserInputNodeFactory extends NodeFactory<TikaParserInputNodeModel> {
+public final class TikaParserInputNodeFactory extends NodeFactory<TikaParserInputNodeModel> {
 
     /**
      * {@inheritDoc}

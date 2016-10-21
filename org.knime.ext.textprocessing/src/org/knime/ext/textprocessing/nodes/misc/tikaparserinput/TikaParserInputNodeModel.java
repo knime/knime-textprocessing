@@ -114,6 +114,7 @@ import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.RowInput;
 import org.knime.core.node.streamable.RowOutput;
 import org.knime.core.node.streamable.StreamableOperator;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.EmbeddedFilesExtractor;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaColumnKeys;
@@ -126,115 +127,106 @@ import org.xml.sax.SAXException;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaParserInputNodeModel extends NodeModel {
+final class TikaParserInputNodeModel extends NodeModel {
 
     /**
      * The name of the language column to parse.
      */
-    public static final String DEFAULT_COLNAME = "";
+    static final String DEFAULT_COLNAME = "";
 
     /**
      * The action command value for choosing file extension in the dialog selection.
      */
-    public static final String EXT_TYPE = "Extension";
+    static final String EXT_TYPE = "Extension";
 
     /**
      * The action command value for choosing MIME-Type in the dialog selection.
      */
-    public static final String MIME_TYPE = "MIME";
+    static final String MIME_TYPE = "MIME";
 
     /**
      * The default value of the action command for choosing file extension in the dialog selection.
      */
-    public static final String DEFAULT_TYPE = EXT_TYPE;
+    static final String DEFAULT_TYPE = EXT_TYPE;
 
     private static final Set<MediaType> VALID_TYPES = new AutoDetectParser().getSupportedTypes(new ParseContext());
 
     /**
      * The list of all MIME-Types that will be shown in the dialog.
      */
-    public static final String[] MIMETYPE_LIST;
-
-    static {
-        MIMETYPE_LIST = getMimeTypes();
-    }
+    static final String[] MIMETYPE_LIST = getMimeTypes();
 
     /**
      * The list of all file extensions that will be shown in the dialog.
      */
-    public static final String[] EXTENSION_LIST;
-
-    static {
-        EXTENSION_LIST = getExtensions();
-    }
+    static final String[] EXTENSION_LIST = getExtensions();
 
     /**
      * The default list that will be shown in the dialog. The default is the list of file extensions.
      */
-    public static final String[] DEFAULT_TYPE_LIST = EXTENSION_LIST;
+    static final String[] DEFAULT_TYPE_LIST = EXTENSION_LIST;
 
     /**
      * The default value of the "create error column" flag.
      */
-    public static final boolean DEFAULT_ERROR_COLUMN = false;
+    static final boolean DEFAULT_ERROR_COLUMN = false;
 
     /**
      * The default value of the name of the error column.
      */
-    public static final String DEFAULT_ERROR_COLUMN_NAME = "Error Output";
+    static final String DEFAULT_ERROR_COLUMN_NAME = "Error Output";
 
     /**
      * The default list of meta data information to be parsed.
      */
-    public static final String[] DEFAULT_COLUMNS_LIST =
+    static final String[] DEFAULT_COLUMNS_LIST =
         TikaColumnKeys.COLUMN_PROPERTY_MAP.keySet().toArray(new String[TikaColumnKeys.COLUMN_PROPERTY_MAP.size()]);
 
     /**
      * The default value of the "extract attachments" flag.
      */
-    public static final boolean DEFAULT_EXTRACT = false;
+    static final boolean DEFAULT_EXTRACT = false;
 
     /**
      * The default path of the directory containing the extracted attachment files.
      */
-    public static final String DEFAULT_EXTRACT_PATH = System.getProperty("user.home");
+    static final String DEFAULT_EXTRACT_PATH = System.getProperty("user.home");
 
     /**
      * The default value of the "extract encrypted" flag.
      */
-    public static final boolean DEFAULT_ENCRYPTED = false;
+    static final boolean DEFAULT_ENCRYPTED = false;
 
     private static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments"};
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaParserInputNodeModel.class);
 
-    private SettingsModelString m_colModel = TikaParserInputNodeDialog.getColModel();
+    private final SettingsModelString m_colModel = TikaParserInputNodeDialog.getColModel();
 
-    private SettingsModelString m_typesModel = TikaParserInputNodeDialog.getTypeModel();
+    private final SettingsModelString m_typesModel = TikaParserInputNodeDialog.getTypeModel();
 
-    private SettingsModelFilterString m_filterModel = TikaParserInputNodeDialog.getFilterModel();
+    private final SettingsModelFilterString m_filterModel = TikaParserInputNodeDialog.getFilterModel();
 
-    private SettingsModelStringArray m_columnModel = TikaParserInputNodeDialog.getColumnModel();
+    private final SettingsModelStringArray m_columnModel = TikaParserInputNodeDialog.getColumnModel();
 
-    private SettingsModelBoolean m_extractBooleanModel = TikaParserInputNodeDialog.getExtractBooleanModel();
+    private final SettingsModelBoolean m_extractBooleanModel = TikaParserInputNodeDialog.getExtractBooleanModel();
 
-    private SettingsModelString m_extractPathModel = TikaParserInputNodeDialog.getExtractPathModel();
+    private final SettingsModelString m_extractPathModel = TikaParserInputNodeDialog.getExtractPathModel();
 
-    private SettingsModelString m_authModel = TikaParserInputNodeDialog.getCredentials();
+    private final SettingsModelString m_authModel = TikaParserInputNodeDialog.getCredentials();
 
-    private SettingsModelBoolean m_authBooleanModel = TikaParserInputNodeDialog.getAuthBooleanModel();
+    private final SettingsModelBoolean m_authBooleanModel = TikaParserInputNodeDialog.getAuthBooleanModel();
 
-    private SettingsModelString m_errorColNameModel = TikaParserInputNodeDialog.getErrorColumnNameModel();
+    private final SettingsModelString m_errorColNameModel = TikaParserInputNodeDialog.getErrorColumnNameModel();
 
-    private SettingsModelBoolean m_errorColumnModel = TikaParserInputNodeDialog.getErrorColumnModel();
+    private final SettingsModelBoolean m_errorColumnModel = TikaParserInputNodeDialog.getErrorColumnModel();
 
     private long m_noRows = 0;
 
     /**
      * Creates a new instance of {@code TikaParserInputNodeModel}
      */
-    public TikaParserInputNodeModel() {
-
+    TikaParserInputNodeModel() {
         super(1, 2);
         stateChange();
     }
@@ -246,8 +238,9 @@ public class TikaParserInputNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = inSpecs[0];
         int colIndex = -1;
-        colIndex = in.findColumnIndex(m_colModel.getStringValue());
-        if (colIndex < 0) {
+        final String colName = m_colModel.getStringValue();
+        if (colName == null) {
+            // auto-guessing parameters
             for (int i = 0; i < in.getNumColumns(); i++) {
                 DataType dtype = in.getColumnSpec(i).getType();
                 if (dtype.isCompatible(StringValue.class) || dtype.isCompatible(URIDataValue.class)) {
@@ -256,12 +249,21 @@ public class TikaParserInputNodeModel extends NodeModel {
                     break;
                 }
             }
+            CheckUtils.checkSetting(colIndex >= 0, "No string/URI compatible column in input");
+            m_colModel.setStringValue(in.getColumnSpec(colIndex).getName());
+        } else {
+            // we have user setting -- expect the column to be present and of appropriate type
+            colIndex = in.findColumnIndex(colName);
+            // column must be present, otherwise fail
+            CheckUtils.checkSetting(colIndex >= 0, "No such URI/String column in input: \"%s\"", colName);
+            DataType type = in.getColumnSpec(colIndex).getType();
+            // column must be URI or string compatible, otherwise fails
+            CheckUtils.checkSetting(type.isCompatible(StringValue.class) || type.isCompatible(URIDataCell.class),
+                "Column \"%s\" is present in the input table but not String/URI compatible, its type is \"%s\"",
+                colName, type.toPrettyString());
         }
 
-        if (colIndex < 0) {
-            throw new InvalidSettingsException("String/URI column not set.");
-        }
-        m_colModel.setStringValue(in.getColumnSpec(colIndex).getName());
+        assert colIndex >= 0 : "colindex expected to be non-negative at this point";
 
         List<String> listOutputCols = Arrays.asList(m_columnModel.getStringArrayValue());
         if (m_errorColumnModel.getBooleanValue()) {
@@ -369,16 +371,19 @@ public class TikaParserInputNodeModel extends NodeModel {
                     if (cell.isMissing()) {
                         continue;
                     }
-                    if (cell.getType().equals(StringCell.TYPE)) {
-                        url = ((StringCell)cell).getStringValue();
-                    } else if (cell.getType().equals(URIDataCell.TYPE)) {
+                    // we can safely assume the type of the cell is either String or URI compatible as this was
+                    // asserted during #configure
+                    if (cell instanceof URIDataValue) {
                         url = ((URIDataValue)cell).getURIContent().getURI().toString();
+                    } else if (cell instanceof StringValue) {
+                        url = ((StringCell)cell).getStringValue();
                     } else {
-                        throw new InvalidSettingsException("No String/URI column found.");
+                        throw new IllegalStateException("Content in column is not String/URI"); // would be a KNIME bug
                     }
 
                     File file = getFile(url);
-                    if (!file.exists() || !file.canRead() || !file.isFile()) {
+                    if (!file.canRead() || !file.isFile()) {
+                        // TODO Andisa -- no error message? This should go to the output?
                         continue; // skip unreadable files
                     }
 
@@ -441,7 +446,6 @@ public class TikaParserInputNodeModel extends NodeModel {
                             continue; // skip files whose MIME-type doesn't match the list of input MIME-types
                         }
                     }
-//                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
 
                     try {
                         if (m_extractBooleanModel.getBooleanValue()) {

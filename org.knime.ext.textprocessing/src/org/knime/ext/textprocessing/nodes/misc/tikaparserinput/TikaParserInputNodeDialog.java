@@ -76,7 +76,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaDialogComponent
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
+final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
     static SettingsModelString getColModel() {
         return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_COL, TikaParserInputNodeModel.DEFAULT_COLNAME);
