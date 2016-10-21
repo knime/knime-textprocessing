@@ -56,11 +56,13 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -71,13 +73,23 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.streamable.InputPortRole;
+import org.knime.core.node.streamable.OutputPortRole;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.PortInput;
+import org.knime.core.node.streamable.PortObjectInput;
+import org.knime.core.node.streamable.PortOutput;
+import org.knime.core.node.streamable.RowInput;
+import org.knime.core.node.streamable.RowOutput;
+import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
+import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
+import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
-import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.dl4j.base.util.NDArrayUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -93,9 +105,9 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
     // the logger instance
     private static final NodeLogger logger = NodeLogger.getLogger(WordVectorApplyNodeModel.class);
 
-    private DataParameterSettingsModels m_dataParameterSettings;
+    private DataParameterSettingsModels2 m_dataParameterSettings;
 
-    private final SettingsModelBoolean m_calculateMean = createCalculateMeanSettings();;
+    private final SettingsModelBoolean m_calculateMean = createCalculateMeanSettings();
 
     private DataTableSpec m_outputSpec;
 
@@ -114,7 +126,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         final WordVectors wordVectors = portObject.getWordVectors();
 
         final int documentColumnIndex =
-            table.getDataTableSpec().findColumnIndex(m_dataParameterSettings.getDocumentColumn().getStringValue());
+            table.getDataTableSpec().findColumnIndex(m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN));
 
         final BufferedDataContainer container = exec.createDataContainer(m_outputSpec);
         final CloseableRowIterator tableIterator = table.iterator();
@@ -123,25 +135,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         while (tableIterator.hasNext()) {
             exec.setProgress(((double)(i + 1)) / ((double)table.size()));
 
-            final DataRow row = tableIterator.next();
-            final List<DataCell> cells = TableUtils.toListOfCells(row);
-            final DataCell cell = row.getCell(documentColumnIndex);
-
-            final String document = ConverterUtils.convertDataCellToJava(cell, String.class);
-            ListCell convertedDocument;
-
-            if (m_calculateMean.getBooleanValue()) {
-                final INDArray documentMeanVector = calculateDocumentMean(wordVectors, document);
-                convertedDocument =
-                    CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
-
-            } else {
-                convertedDocument = replaceWordsByWordVector(wordVectors, document);
-            }
-
-            cells.add(convertedDocument);
-
-            container.addRowToTable(new DefaultRow(row.getKey(), cells));
+            container.addRowToTable(processRow(tableIterator.next(), documentColumnIndex, wordVectors));
             i++;
         }
 
@@ -153,10 +147,90 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         return new PortObject[]{outputTable};
     }
 
+    private DataRow processRow(final DataRow row, final int documentColumnIndex, final WordVectors wordVectors)
+        throws DataCellConversionException {
+
+        final List<DataCell> cells = TableUtils.toListOfCells(row);
+        final DataCell cell = row.getCell(documentColumnIndex);
+
+        final String document = getString(cell);
+        ListCell convertedDocument;
+
+        if (m_calculateMean.getBooleanValue()) {
+            final INDArray documentMeanVector = calculateDocumentMean(wordVectors, document);
+            convertedDocument =
+                CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
+        } else {
+            convertedDocument = replaceWordsByWordVector(wordVectors, document);
+        }
+
+        cells.add(convertedDocument);
+
+        return new DefaultRow(row.getKey(), cells);
+    }
+
+    private String getString(final DataCell cell) {
+        if (cell.getType().isCompatible(DocumentValue.class)) {
+            return ((DocumentValue)cell).getDocument().getDocumentBodyText();
+        } else if (cell.getType().isCompatible(StringValue.class)) {
+            return ((StringCell)cell).getStringValue();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+
+        return new StreamableOperator() {
+            @Override
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
+                DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
+                WordVectorPortObject wordVectorModel =
+                    (WordVectorPortObject)((PortObjectInput)inputs[1]).getPortObject();
+                WordVectors wordVectors = wordVectorModel.getWordVectors();
+                RowInput rowInput = (RowInput)inputs[0];
+                RowOutput rowOutput = (RowOutput)outputs[0];
+
+                final int documentColumnIndex =
+                    tableSpec.findColumnIndex(m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN));
+
+                DataRow row;
+                while ((row = rowInput.poll()) != null) {
+                    rowOutput.push(processRow(row, documentColumnIndex, wordVectors));
+                }
+
+                rowOutput.close();
+                rowInput.close();
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputPortRole[] getInputPortRoles() {
+        return new InputPortRole[]{InputPortRole.DISTRIBUTED_STREAMABLE, InputPortRole.NONDISTRIBUTED_NONSTREAMABLE};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutputPortRole[] getOutputPortRoles() {
+        return new OutputPortRole[]{OutputPortRole.DISTRIBUTED};
+    }
+
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
-        final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
+        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
         ConfigurationUtils.validateColumnSelection(tableSpec, documentColumnName);
 
         if (m_calculateMean.getBooleanValue()) {
@@ -171,7 +245,7 @@ public class WordVectorApplyNodeModel extends AbstractDLNodeModel {
 
     @Override
     protected List<SettingsModel> initSettingsModels() {
-        m_dataParameterSettings = new DataParameterSettingsModels();
+        m_dataParameterSettings = new DataParameterSettingsModels2();
         m_dataParameterSettings.setParameter(DataParameter.DOCUMENT_COLUMN);
 
         final List<SettingsModel> settings = new ArrayList<SettingsModel>();
