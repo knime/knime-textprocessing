@@ -307,6 +307,11 @@
             >
       </node>
       <node
+            category-path="/labs/textprocessing/preprocessing"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stanfordlemmatizer.StanfordLemmatizerNodeFactory"
+            >
+      </node>
+      <node
             category-path="/labs/textprocessing/tagging"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory"
             >

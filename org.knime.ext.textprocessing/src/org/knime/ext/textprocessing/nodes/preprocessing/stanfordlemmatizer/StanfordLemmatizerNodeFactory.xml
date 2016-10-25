@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+	<name>Stanford Lemmatizer</name>
+	<shortDescription>Returns the lemma of document terms using the
+		Stanford Core NLP library.</shortDescription>
+	<fullDescription>
+		<intro>
+			Lemmatizes terms contained in the input documents with the Stanford
+			Core NLP library. For details about the
+			Stanford Core NLP library,
+			please check
+			<a href="http://stanfordnlp.github.io/CoreNLP/index.html">here</a>
+			.
+			<br />
+			<br />
+			This node returns the lemma of a term by removing inflections, e.g
+			in
+			case of plurals, pronoun case, and verb endings. The lemma is based
+			heavily on the Part-Of-Speech (POS) tag of a term, so either the
+			Stanford
+			Node or the POS Node has to be applied before using the
+			Lemmatizer. This node will fail by default when at least one term
+			with no POS tag is found.
+			<br />
+			<br />
+			Currently only the english language is supported by
+			this node.
+		</intro>
+
+		<tab name="Lemmatizer options">
+			<option name="Skip terms with no POS tag">
+				If checked, all terms that have no POS tag will
+				simply be skipped. Otherwise, the node will fail when at least one
+				term has no POS tag.
+			</option>
+		</tab>
+		<tab name="Preprocessing options">
+			<option name="Document column">
+				The column containing the documents to
+				preprocess.
+			</option>
+
+			<option name="Replace documents">
+				If checked, the documents will be replaced by the
+				new preprocessed
+				documents. Otherwise the preprocessed
+				documents will
+				be appended as new column.
+			</option>
+
+			<option name="Append column">
+				The name of the new appended column, containing
+				the preprocessed
+				documents.
+			</option>
+
+			<option name="Ignore unmodifiable tag">
+				If checked, unmodifiable terms will be
+				preprocessed too.
+			</option>
+		</tab>
+	</fullDescription>
+
+	<ports>
+		<inPort name="Documents to preprocess" index="0">
+			The input table
+			which contains the documents to preprocess.
+		</inPort>
+		<outPort name="Preprocessed documents." index="0">
+			The output table
+			which contains the preprocessed documents.
+		</outPort>
+	</ports>
+</knimeNode>
