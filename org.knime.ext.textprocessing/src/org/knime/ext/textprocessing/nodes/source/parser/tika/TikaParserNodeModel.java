@@ -334,8 +334,11 @@ public class TikaParserNodeModel extends NodeModel {
                 for (int i = 0; i < numberOfFiles; i++) {
                     String errorMsg = "";
                     File file = files.get(i);
-                    // unreadable file with extension filter will be put in output. If mime filter is on, file will be skipped with a warning msg
-                    if (!file.isFile() || !file.canRead()) {
+
+                    if(!ext && !file.isFile()){
+                        continue;   // skip all directories
+                    }
+                    if (!file.canRead()) {
                         errorMsg = "Unreadable file";
                         if (ext) {
                             rowOutput1

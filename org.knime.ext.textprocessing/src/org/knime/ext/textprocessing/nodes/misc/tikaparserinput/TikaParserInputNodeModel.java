@@ -318,7 +318,7 @@ final class TikaParserInputNodeModel extends NodeModel {
     @Override
     public InputPortRole[] getInputPortRoles() {
         InputPortRole[] in = new InputPortRole[getNrInPorts()];
-        Arrays.fill(in, InputPortRole.DISTRIBUTED_STREAMABLE);
+        Arrays.fill(in, InputPortRole.NONDISTRIBUTED_STREAMABLE);
         return in;
     }
 
@@ -369,33 +369,41 @@ final class TikaParserInputNodeModel extends NodeModel {
                     String url;
                     DataCell cell = row.getCell(colIndex);
                     if (cell.isMissing()) {
+                        errorMsg = "Missing cell. Cannot locate file path";
+                        rowOutput1
+                            .push(setMissingRow(outputColumnsOne, "", rowKeyOne++, errorMsg));
                         continue;
                     }
                     // we can safely assume the type of the cell is either String or URI compatible as this was
                     // asserted during #configure
                     if (cell instanceof URIDataValue) {
                         url = ((URIDataValue)cell).getURIContent().getURI().toString();
-                    } else if (cell instanceof StringValue) {
-                        url = ((StringCell)cell).getStringValue();
                     } else {
-                        throw new IllegalStateException("Content in column is not String/URI"); // would be a KNIME bug
+                        url = ((StringCell)cell).getStringValue();
                     }
 
                     File file = getFile(url);
 
+                    if (!file.isFile() && file.canRead()) {
+                        errorMsg = "File might be a directory";
+                        rowOutput1.push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
+                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
+                        error = true;
+                        continue;
+                    }
+
                     if (ext) {
                         if (!validTypes.contains(FilenameUtils.getExtension(file.getName()).toLowerCase())) {
-                            continue; // skip files whose extension doesn't match the list of input extensions
+                            errorMsg = "File doesn't match any selected extension(s)";
+                            rowOutput1
+                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
+                            continue;
                         }
                     }
 
-                    if (!file.canRead() || !file.isFile()) {
-                        // unreadable file with extension filter will be put in output. If mime filter is on, file will be skipped with a warning msg
+                    if (!file.canRead()) {
                         errorMsg = "Unreadable file";
-                        if (ext) {
-                            rowOutput1
-                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        }
+                        rowOutput1.push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
                         LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
                         error = true;
                         continue;
@@ -429,7 +437,7 @@ final class TikaParserInputNodeModel extends NodeModel {
                         error = true;
                         continue;
                     } catch (IOException e) {
-                        errorMsg = "Error while detecting MIME-type of file";
+                        errorMsg = "Unable to determine the MIME-type";
                         if (ext) {
                             rowOutput1
                                 .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
@@ -451,7 +459,10 @@ final class TikaParserInputNodeModel extends NodeModel {
                     }
                     if (!ext) {
                         if (!validTypes.contains(mime_type)) {
-                            continue; // skip files whose MIME-type doesn't match the list of input MIME-types
+                            errorMsg = "File doesn't match any selected MIME-type(s)";
+                            rowOutput1
+                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
+                            continue;
                         }
                     }
 
@@ -662,7 +673,11 @@ final class TikaParserInputNodeModel extends NodeModel {
         for (int j = 0; j < outputSize; j++) {
             String colName = outputCols.get(j);
             if (colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                cellsOne[j] = new StringCell(file);
+                if(file.isEmpty()){
+                    cellsOne[j] = DataType.getMissingCell();
+                }else{
+                    cellsOne[j] = new StringCell(file);
+                }
             } else if (colName.equals(m_errorColNameModel.getStringValue())) {
                 cellsOne[j] = new StringCell(errorMsg);
             } else {
