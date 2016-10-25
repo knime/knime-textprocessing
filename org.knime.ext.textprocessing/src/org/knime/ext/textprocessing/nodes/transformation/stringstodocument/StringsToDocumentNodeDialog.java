@@ -138,7 +138,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the document category.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the document
+     *         publication date.
      */
     static final SettingsModelString getPubDatModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATE,
@@ -184,6 +185,16 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
+     *
+     * @return Creates and return an instance of{@SettingModelBoolean} specifying whether a column is used for
+     *         publication dates or not
+     */
+    static final SettingsModelBoolean getUsePubDateColumnModel(){
+        return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_PUBDATECOLUMN,
+            StringsToDocumentConfig.DEF_USE_PUBDATECOLUMN);
+    }
+
+    /**
      * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the category values.
      */
     static final SettingsModelString getCategoryColumnModel() {
@@ -195,6 +206,16 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString getSourceColumnModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_SOURCECOLUMN, "");
+    }
+
+    /**
+     *
+     * @return Creates and returns an instance of{@SettingsModellString} specifying the column which has to be used as
+     *         publication date
+     */
+    static final SettingsModelString getPubDateColumnModel(){
+        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATECOL, "");
+
     }
 
     /**
@@ -210,11 +231,19 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_docCategoryModel;
 
+    private SettingsModelString m_pubDateModel;
+
     private SettingsModelString m_docTitleModelCombo;
 
     private SettingsModelString m_docAuthorModelCombo;
 
     private SettingsModelString m_docSourceModel;
+
+    private SettingsModelString m_docSourceModelCombo;
+
+    private SettingsModelString m_docCatModelCombo;
+
+    private SettingsModelString m_pubDateModelCombo;
 
     private SettingsModelBoolean m_useCatColumnModel;
 
@@ -222,9 +251,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_useTitleColumnModel;
 
-    private SettingsModelString m_docSourceModelCombo;
-
-    private SettingsModelString m_docCatModelCombo;
+    private SettingsModelBoolean m_usePubDateColumnModel;
 
     private SettingsModelBoolean m_useAuthorsColumnModel;
 
@@ -292,10 +319,17 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document type", types));
-
-        DialogComponentString dcs = new DialogComponentString(getPubDatModel(), "Publication date (dd-mm-yyyy)");
+        m_pubDateModel = getPubDatModel();
+        DialogComponentString dcs = new DialogComponentString(m_pubDateModel, "Publication date (dd-mm-yyyy)");
         dcs.setToolTipText("Date has to be specified like \"dd-mm-yyyy!\"");
         addDialogComponent(dcs);
+        // Pub Date
+        setHorizontalPlacement(true);
+        m_usePubDateColumnModel = getUsePubDateColumnModel();
+        m_pubDateModelCombo = getPubDateColumnModel();
+        m_usePubDateColumnModel.addChangeListener(new UsageChangeListener());
+        addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Pub date Column", 0, StringValue.class));
         closeCurrentGroup();
 
         createNewGroup("Processes");
@@ -322,6 +356,9 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             m_docCatModelCombo.setEnabled(m_useCatColumnModel.getBooleanValue());
             m_docTitleModelCombo.setEnabled(m_useTitleColumnModel.getBooleanValue());
             m_docAuthorModelCombo.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+            m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
+            m_pubDateModelCombo.setEnabled(m_usePubDateColumnModel.getBooleanValue());
+
         }
     }
 

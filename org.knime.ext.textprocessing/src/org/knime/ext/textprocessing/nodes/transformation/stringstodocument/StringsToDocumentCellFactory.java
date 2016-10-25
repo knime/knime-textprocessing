@@ -178,8 +178,6 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
                     final String authors = ((StringValue)auhorsCell).getStringValue();
                     final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
                     for (String author : authorsArr) {
-//                        String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
-//                        String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
                         String firstName = m_config.getAuthorFirstName();
                         String lastName = m_config.getAuthorLastName();
 
@@ -198,17 +196,15 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
                         docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
                     }
-                } else if (auhorsCell.isMissing()){
+                } else if (auhorsCell.isMissing()) {
                     docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
                 }
 
             }
         } else {
 
-            // Add "-" to the author names if no first and last name is specified
-
+            //Check if Author first or last name is specified, if not set the first or last name as "-"
             docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
-            // Check if Author first or last name is specified, if not set the first or last name as "-"
         }
 
         // set document source
@@ -246,19 +242,32 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         // set document type
         docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_config.getDocType()));
 
-        // set publication date
-        final Matcher m = DATE_PATTERN.matcher(m_config.getPublicationDate());
-        if (m.matches()) {
-            final int day = Integer.parseInt(m.group(1));
-            final int month = Integer.parseInt(m.group(2));
-            final int year = Integer.parseInt(m.group(3));
-
-            try {
-                docBuilder.setPublicationDate(new PublicationDate(year, month, day));
-            } catch (ParseException e) {
-                LOGGER.info("Publication date could not be set!");
+        String dateStr = m_config.getPublicationDate();
+        if (m_config.getUsePubDateColumn()) {
+            if (m_config.getPubDateStringIndex() >= 0) {
+                final DataCell pubDateCell = row.getCell(m_config.getPubDateStringIndex());
+                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(StringValue.class)) {
+                    dateStr = ((StringValue)pubDateCell).getStringValue();
+                } else {
+                    dateStr = m_config.getPublicationDate();
+                }
             }
         }
+        if(!dateStr.isEmpty()){
+            final Matcher m = DATE_PATTERN.matcher(dateStr);
+            if (m.matches()) {
+                final int day = Integer.parseInt(m.group(1));
+                final int month = Integer.parseInt(m.group(2));
+                final int year = Integer.parseInt(m.group(3));
+
+                try {
+                    docBuilder.setPublicationDate(new PublicationDate(year, month, day));
+                } catch (ParseException e) {
+                    LOGGER.info("Publication date could not be set!");
+                }
+            }
+        }
+
 
         DataCellCache dataCellCache = getDataCellCache();
         return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};

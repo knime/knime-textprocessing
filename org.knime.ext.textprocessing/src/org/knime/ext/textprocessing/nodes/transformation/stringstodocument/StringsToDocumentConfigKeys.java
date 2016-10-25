@@ -78,6 +78,13 @@ public final class StringsToDocumentConfigKeys {
      */
     public static final String CFGKEY_AUTHORSCOL = "AuthorsCol";
 
+
+    /**
+     * configuration key for the publication date column
+     * @since 3.3
+     */
+    public static final String CFGKEY_PUBDATECOL = "PubdateCol";
+
     /**
      * The configuration key of the "use authors column" setting.
      *
@@ -121,6 +128,12 @@ public final class StringsToDocumentConfigKeys {
      * The configuration key of the publication date.
      */
     public static final String CFGKEY_PUBDATE = "PublicationDate";
+
+    /**
+     * The configuration key of the "use publication date column"
+     * @since 3.3
+     */
+    public static final String CFGKEY_USE_PUBDATECOLUMN = "UsePubDateColumn";
 
     /**
      * The configuration key of the "use category column" setting.

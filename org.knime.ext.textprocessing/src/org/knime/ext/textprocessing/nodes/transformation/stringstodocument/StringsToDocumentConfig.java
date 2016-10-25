@@ -114,6 +114,11 @@ public class StringsToDocumentConfig {
     static final boolean DEF_USE_SOURCECOLUMN = false;
 
     /**
+     * The default "use publication date column" setting.
+     */
+    static final boolean DEF_USE_PUBDATECOLUMN = false;
+
+    /**
      * The default "use title column" setting.
      */
     static final boolean DEF_USE_TITLECOLUMN = true;
@@ -133,6 +138,8 @@ public class StringsToDocumentConfig {
 
     private int m_sourceStringIndex = -1;
 
+    private int m_pubDateStingIndex = -1;
+
     private boolean m_useTitleColumn = DEF_USE_TITLECOLUMN;
 
     private boolean m_useAuthorsColumn = DEF_USE_AUTHORSCOLUMN;
@@ -140,6 +147,8 @@ public class StringsToDocumentConfig {
     private boolean m_useCatColumn = DEF_USE_CATCOLUMN;
 
     private boolean m_useSourceColumn = DEF_USE_SOURCECOLUMN;
+
+    private boolean m_usePubDateColumn = DEF_USE_PUBDATECOLUMN;
 
     private String m_docTitle = DEF_DOCUMENT_TITLE;
 
@@ -213,6 +222,24 @@ public class StringsToDocumentConfig {
      */
     public void setFulltextStringIndex(final int fulltextStringIndex) {
         m_fulltextStringIndex = fulltextStringIndex;
+    }
+
+    /**
+     *
+     * @return m_pubDateStingIndex
+     * @since 3.3
+     */
+    public int getPubDateStringIndex(){
+        return m_pubDateStingIndex;
+
+    }
+
+    /**
+     * @param pubDateStringIndex the pubDateStringIndex to set
+     * @since 3.3
+     */
+    public void setPubDateStringIndedx(final int pubDateStringIndex){
+        m_pubDateStingIndex = pubDateStringIndex;
     }
 
     /**
@@ -430,5 +457,21 @@ public class StringsToDocumentConfig {
      */
     public void setAuthorLastName(final String authorLastName) {
         this.m_authorLastName = authorLastName;
+    }
+
+    /**
+     * @return the m_usePubDateColumn
+     * @since 3.3
+     */
+    public boolean getUsePubDateColumn() {
+        return m_usePubDateColumn;
+    }
+
+    /**
+     * @param usePubDateColumn the m_usePubDateColumn to set
+     * @since 3.3
+     */
+    public void setUsePubDateColumn(final boolean usePubDateColumn) {
+        this.m_usePubDateColumn = usePubDateColumn;
     }
 }
