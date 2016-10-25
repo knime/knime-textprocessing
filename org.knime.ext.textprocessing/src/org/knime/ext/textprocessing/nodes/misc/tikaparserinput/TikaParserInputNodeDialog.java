@@ -101,7 +101,7 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
             TikaParserInputNodeModel.DEFAULT_ERROR_COLUMN_NAME);
     }
 
-    static SettingsModelBoolean getExtractBooleanModel() {
+    static SettingsModelBoolean getExtractAttachmentModel() {
         return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_EXTRACT_BOOLEAN,
             TikaParserInputNodeModel.DEFAULT_EXTRACT);
     }
@@ -194,7 +194,7 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
-        m_extractBooleanModel = getExtractBooleanModel();
+        m_extractBooleanModel = getExtractAttachmentModel();
         m_extractPathModel = getExtractPathModel();
         m_extractBooleanModel.addChangeListener(new InternalChangeListenerExt());
 

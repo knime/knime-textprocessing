@@ -209,7 +209,7 @@ final class TikaParserInputNodeModel extends NodeModel {
 
     private final SettingsModelStringArray m_columnModel = TikaParserInputNodeDialog.getColumnModel();
 
-    private final SettingsModelBoolean m_extractBooleanModel = TikaParserInputNodeDialog.getExtractBooleanModel();
+    private final SettingsModelBoolean m_extractAttachmentModel = TikaParserInputNodeDialog.getExtractAttachmentModel();
 
     private final SettingsModelString m_extractPathModel = TikaParserInputNodeDialog.getExtractPathModel();
 
@@ -382,15 +382,23 @@ final class TikaParserInputNodeModel extends NodeModel {
                     }
 
                     File file = getFile(url);
-                    if (!file.canRead() || !file.isFile()) {
-                        // TODO Andisa -- no error message? This should go to the output?
-                        continue; // skip unreadable files
-                    }
 
                     if (ext) {
                         if (!validTypes.contains(FilenameUtils.getExtension(file.getName()).toLowerCase())) {
                             continue; // skip files whose extension doesn't match the list of input extensions
                         }
+                    }
+
+                    if (!file.canRead() || !file.isFile()) {
+                        // unreadable file with extension filter will be put in output. If mime filter is on, file will be skipped with a warning msg
+                        errorMsg = "Unreadable file";
+                        if (ext) {
+                            rowOutput1
+                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
+                        }
+                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
+                        error = true;
+                        continue;
                     }
 
                     String mime_type = "-";
@@ -448,7 +456,7 @@ final class TikaParserInputNodeModel extends NodeModel {
                     }
 
                     try {
-                        if (m_extractBooleanModel.getBooleanValue()) {
+                        if (m_extractAttachmentModel.getBooleanValue()) {
                             try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
                                 final File outputDir = getFile(m_extractPathModel.getStringValue());
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
@@ -555,7 +563,7 @@ final class TikaParserInputNodeModel extends NodeModel {
         m_typesModel.saveSettingsTo(settings);
         m_columnModel.saveSettingsTo(settings);
         m_filterModel.saveSettingsTo(settings);
-        m_extractBooleanModel.saveSettingsTo(settings);
+        m_extractAttachmentModel.saveSettingsTo(settings);
         m_extractPathModel.saveSettingsTo(settings);
         m_authModel.saveSettingsTo(settings);
         m_authBooleanModel.saveSettingsTo(settings);
@@ -572,7 +580,7 @@ final class TikaParserInputNodeModel extends NodeModel {
         m_typesModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
         m_filterModel.validateSettings(settings);
-        m_extractBooleanModel.validateSettings(settings);
+        m_extractAttachmentModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
@@ -580,7 +588,7 @@ final class TikaParserInputNodeModel extends NodeModel {
         m_errorColumnModel.validateSettings(settings);
 
         Boolean extract =
-            ((SettingsModelBoolean)m_extractBooleanModel.createCloneWithValidatedValue(settings)).getBooleanValue();
+            ((SettingsModelBoolean)m_extractAttachmentModel.createCloneWithValidatedValue(settings)).getBooleanValue();
 
         if (extract) {
             String outputDir =
@@ -613,7 +621,7 @@ final class TikaParserInputNodeModel extends NodeModel {
         m_typesModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
         m_filterModel.loadSettingsFrom(settings);
-        m_extractBooleanModel.loadSettingsFrom(settings);
+        m_extractAttachmentModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
         m_authModel.loadSettingsFrom(settings);
         m_authBooleanModel.loadSettingsFrom(settings);
@@ -714,7 +722,7 @@ final class TikaParserInputNodeModel extends NodeModel {
     }
 
     private void stateChange() {
-        if (m_extractBooleanModel.getBooleanValue()) {
+        if (m_extractAttachmentModel.getBooleanValue()) {
             m_extractPathModel.setEnabled(true);
         } else {
             m_extractPathModel.setEnabled(false);

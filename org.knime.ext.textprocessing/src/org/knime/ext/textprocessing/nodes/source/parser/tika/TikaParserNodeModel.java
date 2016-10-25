@@ -221,7 +221,7 @@ public class TikaParserNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_errorColumnModel = TikaParserNodeDialog.getErrorColumnModel();
 
-    private SettingsModelBoolean m_extractBooleanModel = TikaParserNodeDialog.getExtractBooleanModel();
+    private SettingsModelBoolean m_extractAttachmentModel = TikaParserNodeDialog.getExtractAttachmentModel();
 
     private SettingsModelString m_extractPathModel = TikaParserNodeDialog.getExtractPathModel();
 
@@ -334,8 +334,16 @@ public class TikaParserNodeModel extends NodeModel {
                 for (int i = 0; i < numberOfFiles; i++) {
                     String errorMsg = "";
                     File file = files.get(i);
-                    if (!file.isFile()) {
-                        continue; // skip if file is unreadable
+                    // unreadable file with extension filter will be put in output. If mime filter is on, file will be skipped with a warning msg
+                    if (!file.isFile() || !file.canRead()) {
+                        errorMsg = "Unreadable file";
+                        if (ext) {
+                            rowOutput1
+                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
+                        }
+                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
+                        error = true;
+                        continue;
                     }
 
                     String mime_type = "-";
@@ -396,7 +404,7 @@ public class TikaParserNodeModel extends NodeModel {
 //                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
 
                     try {
-                        if (m_extractBooleanModel.getBooleanValue()) {
+                        if (m_extractAttachmentModel.getBooleanValue()) {
                             try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
                                 final File outputDir = getFile(m_extractPathModel.getStringValue());
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
@@ -527,7 +535,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_ignoreHiddenFilesModel.saveSettingsTo(settings);
         m_typesModel.saveSettingsTo(settings);
         m_columnModel.saveSettingsTo(settings);
-        m_extractBooleanModel.saveSettingsTo(settings);
+        m_extractAttachmentModel.saveSettingsTo(settings);
         m_extractPathModel.saveSettingsTo(settings);
         m_authModel.saveSettingsTo(settings);
         m_authBooleanModel.saveSettingsTo(settings);
@@ -546,7 +554,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_ignoreHiddenFilesModel.validateSettings(settings);
         m_typesModel.validateSettings(settings);
         m_columnModel.validateSettings(settings);
-        m_extractBooleanModel.validateSettings(settings);
+        m_extractAttachmentModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
         m_authModel.validateSettings(settings);
         m_authBooleanModel.validateSettings(settings);
@@ -555,7 +563,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_filterModel.validateSettings(settings);
 
         Boolean extract =
-            ((SettingsModelBoolean)m_extractBooleanModel.createCloneWithValidatedValue(settings)).getBooleanValue();
+            ((SettingsModelBoolean)m_extractAttachmentModel.createCloneWithValidatedValue(settings)).getBooleanValue();
 
         if (extract) {
             String outputDir =
@@ -589,7 +597,7 @@ public class TikaParserNodeModel extends NodeModel {
         m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
         m_typesModel.loadSettingsFrom(settings);
         m_columnModel.loadSettingsFrom(settings);
-        m_extractBooleanModel.loadSettingsFrom(settings);
+        m_extractAttachmentModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
         m_authModel.loadSettingsFrom(settings);
         m_authBooleanModel.loadSettingsFrom(settings);
@@ -678,7 +686,7 @@ public class TikaParserNodeModel extends NodeModel {
     }
 
     private void stateChange() {
-        if (m_extractBooleanModel.getBooleanValue()) {
+        if (m_extractAttachmentModel.getBooleanValue()) {
             m_extractPathModel.setEnabled(true);
         } else {
             m_extractPathModel.setEnabled(false);
