@@ -235,22 +235,36 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_docCategoryModel.loadSettingsFrom(settings);
         m_docTypeModel.loadSettingsFrom(settings);
         m_pubDateModel.loadSettingsFrom(settings);
-        m_pubDateColModel.loadSettingsFrom(settings);
-        m_authorFirstNameModel.loadSettingsFrom(settings);
-        m_authorLastNameModel.loadSettingsFrom(settings);
 
         try {
-            m_useTitleColumnModel.loadSettingsFrom(settings);
-            m_useAuthorsColumnModel.loadSettingsFrom(settings);
-            m_useCatColumnModel.loadSettingsFrom(settings);
             m_useSourceColumnModel.loadSettingsFrom(settings);
-            m_usePubDateColumnModel.loadSettingsFrom(settings);
+            m_useCatColumnModel.loadSettingsFrom(settings);
             m_catColumnModel.loadSettingsFrom(settings);
             m_sourceColumnModel.loadSettingsFrom(settings);
             m_maxThreads.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // don't throw error msg
-        }
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorFirstNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorLastNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_pubDateColModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_useTitleColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try {
+            m_useAuthorsColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_usePubDateColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+
+
+
+
     }
 
     /**
@@ -300,22 +314,32 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_docCategoryModel.validateSettings(settings);
         m_docTypeModel.validateSettings(settings);
         m_pubDateModel.validateSettings(settings);
-        m_authorFirstNameModel.validateSettings(settings);
-        m_pubDateColModel.validateSettings(settings);
-        m_authorLastNameModel.validateSettings(settings);
 
         try {
-            m_useTitleColumnModel.validateSettings(settings);
-            m_useAuthorsColumnModel.validateSettings(settings);
-            m_useCatColumnModel.validateSettings(settings);
-            m_useSourceColumnModel.validateSettings(settings);
-            m_usePubDateColumnModel.validateSettings(settings);
-            m_catColumnModel.validateSettings(settings);
-            m_sourceColumnModel.validateSettings(settings);
-            m_maxThreads.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // don't throw error msg
-        }
+            m_useSourceColumnModel.loadSettingsFrom(settings);
+            m_useCatColumnModel.loadSettingsFrom(settings);
+            m_catColumnModel.loadSettingsFrom(settings);
+            m_sourceColumnModel.loadSettingsFrom(settings);
+            m_maxThreads.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorFirstNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorLastNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_pubDateColModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_useTitleColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try {
+            m_useAuthorsColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_usePubDateColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
 
 
         String pubDate = ((SettingsModelString)m_pubDateModel.createCloneWithValidatedValue(settings)).getStringValue();

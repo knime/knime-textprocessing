@@ -284,8 +284,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentString(getAuthorSplitStringModel(), "Author names separator"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getAuthorFirstNameModel(), "Author first name"));
-        addDialogComponent(new DialogComponentString(getAuthorLastNameModel(), "Author last name"));
+        addDialogComponent(new DialogComponentString(getAuthorFirstNameModel(), "Default author first name"));
+        addDialogComponent(new DialogComponentString(getAuthorLastNameModel(), "Default author last name"));
         setHorizontalPlacement(false);
         addDialogComponent(
             new DialogComponentColumnNameSelection(getTextStringModel(), "Full text", 0, StringValue.class));
@@ -329,7 +329,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         m_pubDateModelCombo = getPubDateColumnModel();
         m_usePubDateColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Pub date Column", 0, StringValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0, StringValue.class));
         closeCurrentGroup();
 
         createNewGroup("Processes");
