@@ -54,12 +54,10 @@ import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -71,13 +69,14 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
+import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeModel {
 
@@ -89,6 +88,10 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
     private SettingsModelString m_authorNameSeparator = StringsToDocumentNodeDialog.getAuthorSplitStringModel();
 
+    private SettingsModelString m_authorFirstNameModel = StringsToDocumentNodeDialog.getAuthorFirstNameModel();
+
+    private SettingsModelString m_authorLastNameModel = StringsToDocumentNodeDialog.getAuthorLastNameModel();
+
     private SettingsModelString m_docSourceModel = StringsToDocumentNodeDialog.getDocSourceModel();
 
     private SettingsModelString m_docCategoryModel = StringsToDocumentNodeDialog.getDocCategoryModel();
@@ -96,6 +99,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
     private SettingsModelString m_docTypeModel = StringsToDocumentNodeDialog.getTypeModel();
 
     private SettingsModelString m_pubDateModel = StringsToDocumentNodeDialog.getPubDatModel();
+
+    private SettingsModelString m_pubDateColModel = StringsToDocumentNodeDialog.getPubDateColumnModel();
 
     private SettingsModelBoolean m_useCatColumnModel = StringsToDocumentNodeDialog.getUseCategoryColumnModel();
 
@@ -106,6 +111,12 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
     private SettingsModelString m_sourceColumnModel = StringsToDocumentNodeDialog.getSourceColumnModel();
 
     private SettingsModelIntegerBounded m_maxThreads = StringsToDocumentNodeDialog.getNumberOfThreadsModel();
+
+    private SettingsModelBoolean m_useTitleColumnModel = StringsToDocumentNodeDialog.getUseTitleColumnModel();
+
+    private SettingsModelBoolean m_useAuthorsColumnModel = StringsToDocumentNodeDialog.getUseAuthorsColumnModel();
+
+    private SettingsModelBoolean m_usePubDateColumnModel = StringsToDocumentNodeDialog.getUsePubDateColumnModel();
 
     /** The default number of threads value. */
     static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
@@ -118,11 +129,10 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
     static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
 
     /**
-     * Creates new instance of <code>StringsToDocumentNodeModel</code>.
+     * Creates new instance of {@StringsToDocumentNodeModel}.
      */
     public StringsToDocumentNodeModel() {
-        m_useCatColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
-        m_useSourceColumnModel.addChangeListener(new CategorySourceUsageChanceListener());
+        modelStateChanged();
     }
 
     private static final DataColumnSpec[] createNewColSpecs() {
@@ -140,16 +150,30 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         StringsToDocumentConfig conf = new StringsToDocumentConfig();
 
         // Title
+        String docTitle = m_titleColModel.getStringValue();
+        if (!docTitle.isEmpty() && docTitle.length() > 0) {
+            conf.setDocTitle(docTitle);
+        }
         int titleIndex = spec.findColumnIndex(m_titleColModel.getStringValue());
         conf.setTitleStringIndex(titleIndex);
+        boolean useTitleCol = m_useTitleColumnModel.getBooleanValue();
+        conf.setUseTitleColumn(useTitleCol);
 
         // Fulltext
         int fulltextIndex = spec.findColumnIndex(m_fulltextColModel.getStringValue());
         conf.setFulltextStringIndex(fulltextIndex);
 
         // Author names
+        String authorNames = m_authorsColModel.getStringValue();
+        if (!authorNames.isEmpty() && authorNames.length() > 0) {
+            conf.setAuthorNames(authorNames);
+        }
         int authorIndex = spec.findColumnIndex(m_authorsColModel.getStringValue());
         conf.setAuthorsStringIndex(authorIndex);
+        boolean useAuthorsCol = m_useAuthorsColumnModel.getBooleanValue();
+        conf.setUseAuthorsColumn(useAuthorsCol);
+        conf.setAuthorFirstName(m_authorFirstNameModel.getStringValue());
+        conf.setAuthorLastName(m_authorLastNameModel.getStringValue());
 
         // Author name separator
         String authorNameSeparator = m_authorNameSeparator.getStringValue();
@@ -185,12 +209,14 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
         // Publication Date
         String pubDate = m_pubDateModel.getStringValue();
-        if (!pubDate.isEmpty() && pubDate.length() > 0) {
-            conf.setPublicationDate(pubDate);
-        }
+        conf.setPublicationDate(pubDate);
+        int pubDateIndex = spec.findColumnIndex(m_pubDateColModel.getStringValue());
+        conf.setPubDateStringIndedx(pubDateIndex);
+        boolean usePubDateColumn = m_usePubDateColumnModel.getBooleanValue();
+        conf.setUsePubDateColumn(usePubDateColumn);
 
-        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(
-            conf, createNewColSpecs(), m_maxThreads.getIntValue());
+        StringsToDocumentCellFactory cellFac =
+            new StringsToDocumentCellFactory(conf, createNewColSpecs(), m_maxThreads.getIntValue());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         rearranger.append(cellFac);
         return rearranger;
@@ -200,8 +226,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_fulltextColModel.loadSettingsFrom(settings);
         m_authorsColModel.loadSettingsFrom(settings);
         m_titleColModel.loadSettingsFrom(settings);
@@ -212,14 +237,34 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_pubDateModel.loadSettingsFrom(settings);
 
         try {
-            m_useCatColumnModel.loadSettingsFrom(settings);
             m_useSourceColumnModel.loadSettingsFrom(settings);
+            m_useCatColumnModel.loadSettingsFrom(settings);
             m_catColumnModel.loadSettingsFrom(settings);
             m_sourceColumnModel.loadSettingsFrom(settings);
             m_maxThreads.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // don't throw error msg
-        }
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorFirstNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorLastNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_pubDateColModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_useTitleColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try {
+            m_useAuthorsColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_usePubDateColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+
+
+
+
     }
 
     /**
@@ -243,19 +288,24 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_docCategoryModel.saveSettingsTo(settings);
         m_docTypeModel.saveSettingsTo(settings);
         m_pubDateModel.saveSettingsTo(settings);
+        m_pubDateColModel.saveSettingsTo(settings);
         m_useCatColumnModel.saveSettingsTo(settings);
         m_useSourceColumnModel.saveSettingsTo(settings);
+        m_useTitleColumnModel.saveSettingsTo(settings);
+        m_useAuthorsColumnModel.saveSettingsTo(settings);
+        m_usePubDateColumnModel.saveSettingsTo(settings);
         m_catColumnModel.saveSettingsTo(settings);
         m_sourceColumnModel.saveSettingsTo(settings);
         m_maxThreads.saveSettingsTo(settings);
+        m_authorFirstNameModel.saveSettingsTo(settings);
+        m_authorLastNameModel.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_fulltextColModel.validateSettings(settings);
         m_authorsColModel.validateSettings(settings);
         m_titleColModel.validateSettings(settings);
@@ -266,45 +316,64 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_pubDateModel.validateSettings(settings);
 
         try {
-            m_useCatColumnModel.validateSettings(settings);
-            m_useSourceColumnModel.validateSettings(settings);
-            m_catColumnModel.validateSettings(settings);
-            m_sourceColumnModel.validateSettings(settings);
-            m_maxThreads.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // don't throw error msg
-        }
-
-        String pubDate = ((SettingsModelString)m_pubDateModel.
-                createCloneWithValidatedValue(settings)).getStringValue();
-
-        Pattern p = Pattern.compile("(\\d){2}-(\\d){2}-(\\d){4}");
-        Matcher m = p.matcher(pubDate);
-        if (!m.matches()) {
-            throw new InvalidSettingsException(
-                    "Publicationdate is not formatted properly (dd-mm-yyyy)!");
-        }
-
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-        df.setLenient(false);
+            m_useSourceColumnModel.loadSettingsFrom(settings);
+            m_useCatColumnModel.loadSettingsFrom(settings);
+            m_catColumnModel.loadSettingsFrom(settings);
+            m_sourceColumnModel.loadSettingsFrom(settings);
+            m_maxThreads.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
         try {
-            df.parse(pubDate);
-        } catch (ParseException e) {
-            throw new InvalidSettingsException(
-                     "Specified date is not valid!\n"
-                    + e.getMessage());
+            m_authorFirstNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_authorLastNameModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) { }
+        try {
+            m_pubDateColModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_useTitleColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try {
+            m_useAuthorsColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+        try{
+            m_usePubDateColumnModel.loadSettingsFrom(settings);
+        } catch(InvalidSettingsException e){ }
+
+
+        String pubDate = ((SettingsModelString)m_pubDateModel.createCloneWithValidatedValue(settings)).getStringValue();
+
+        if(!pubDate.isEmpty()){
+            Pattern p = Pattern.compile("(\\d){2}-(\\d){2}-(\\d){4}");
+            Matcher m = p.matcher(pubDate);
+            if (!m.matches()) {
+                throw new InvalidSettingsException("Publicationdate is not formatted properly (dd-mm-yyyy)!");
+            }
+
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+            df.setLenient(false);
+            try {
+                df.parse(pubDate);
+            } catch (ParseException e) {
+                throw new InvalidSettingsException("Specified date is not valid!\n" + e.getMessage());
+            }
+
         }
+
     }
 
-
+    /**
+     * write a method that check if datatable contains 'title' and 'authors' cols the method should take a string as
+     * parameter. If no title and authors document are available, generate them
+     */
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -312,27 +381,81 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
-    /**
-     * Enables and disables text fields of document source and category.
-     * @author Kilian Thiel, KNIME.com, Berlin, Germany
-     */
-    class CategorySourceUsageChanceListener implements ChangeListener {
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-                m_docCategoryModel.setEnabled(
-                        !m_useCatColumnModel.getBooleanValue());
-                m_docSourceModel.setEnabled(
-                        !m_useSourceColumnModel.getBooleanValue());
+    /**
+     * @since 3.3
+     */
+    public void modelStateChanged() {
+        m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
+        m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
+        m_sourceColumnModel.setEnabled(m_useSourceColumnModel.getBooleanValue());
+        m_catColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
+        m_titleColModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
+        m_authorsColModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+        m_pubDateColModel.setEnabled(m_usePubDateColumnModel.getBooleanValue());
+        m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
+    }
+
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        doSmartDialogSelection(inSpecs[0]);
+        return super.configure(inSpecs);
+    }
+
+    /**
+     * @param dataTableSpec
+     * @since 3.3
+     */
+    protected void doSmartDialogSelection(final DataTableSpec dataTableSpec) {
+        String[] columns = dataTableSpec.getColumnNames();
+        if (settingsNotConfigured()) {
+            for (int i = 0; i < columns.length; i++) {
+                String column = columns[i];
+                if (column.equalsIgnoreCase(DocumentDataExtractor.TITLE.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    m_titleColModel.setStringValue(column);
+                }
+                if (column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    m_sourceColumnModel.setStringValue(column);
+                }
+                if (column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    m_authorsColModel.setStringValue(column);
+                }
+                if (column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    m_catColumnModel.setStringValue(column);
+                }
+                if (column.equalsIgnoreCase(DocumentDataExtractor.TEXT.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    m_fulltextColModel.setStringValue(column);
+                }
+                if(column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    m_pubDateColModel.setStringValue(column);
+
+
+                }
+            }
         }
+    }
+
+    /**
+     * @return true if settings have not been configured before
+     * @since 3.3
+     */
+    protected boolean settingsNotConfigured() {
+        return (m_titleColModel.getStringValue().length() == 0 && m_authorsColModel.getStringValue().length() == 0
+            && m_fulltextColModel.getStringValue().length() == 0 && m_docSourceModel.getStringValue().length() == 0
+            && m_docCategoryModel.getStringValue().length() == 0 && m_pubDateColModel.getStringValue().length() == 0);
     }
 }

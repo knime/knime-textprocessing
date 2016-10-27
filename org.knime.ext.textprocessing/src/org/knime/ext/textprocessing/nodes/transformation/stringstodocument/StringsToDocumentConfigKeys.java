@@ -49,16 +49,24 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public final class StringsToDocumentConfigKeys {
 
-    private StringsToDocumentConfigKeys() { /* empty */ }
+    private StringsToDocumentConfigKeys() {
+        /* empty */ }
 
     /**
      * The configuration key of the title column.
      */
     public static final String CFGKEY_TITLECOL = "TitleCol";
+
+    /**
+     * The configuration key of the "use title column" setting.
+     *
+     * @since 3.3
+     */
+    public static final String CFGKEY_USE_TITLECOLUMN = "useTitleColumn";
 
     /**
      * The configuration key of the text column.
@@ -70,10 +78,36 @@ public final class StringsToDocumentConfigKeys {
      */
     public static final String CFGKEY_AUTHORSCOL = "AuthorsCol";
 
+
+    /**
+     * configuration key for the publication date column
+     * @since 3.3
+     */
+    public static final String CFGKEY_PUBDATECOL = "PubdateCol";
+
+    /**
+     * The configuration key of the "use authors column" setting.
+     *
+     * @since 3.3
+     */
+    public static final String CFGKEY_USE_AUTHORSCOLUMN = "useAuthorsColumn";
+
     /**
      * The configuration key of the author name split string.
      */
     public static final String CFGKEY_AUTHORSPLIT_STR = "AuthorSplitChar";
+
+    /**
+     * The configuration key of the author name placeholder for first name
+     * @since 3.3
+     */
+    public static final String CFGKEY_AUTHOR_FIRST_NAME = "AuthorFirstName";
+
+    /**
+     * The configuration key of the author name placeholder for last name
+     * @since 3.3
+     */
+    public static final String CFGKEY_AUTHOR_LAST_NAME = "AuthorLastName";
 
     /**
      * The configuration key of the document source.
@@ -96,31 +130,42 @@ public final class StringsToDocumentConfigKeys {
     public static final String CFGKEY_PUBDATE = "PublicationDate";
 
     /**
+     * The configuration key of the "use publication date column"
+     * @since 3.3
+     */
+    public static final String CFGKEY_USE_PUBDATECOLUMN = "UsePubDateColumn";
+
+    /**
      * The configuration key of the "use category column" setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_USE_CATCOLUMN = "UseCategoryColumn";
 
     /**
      * The configuration key of the category column setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_CATCOLUMN = "CategoryColumn";
 
     /**
      * The configuration key of the "use source column" setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_USE_SOURCECOLUMN = "UseSourceColumn";
 
     /**
      * The configuration key of the source column setting.
+     *
      * @since 2.6
      */
     public static final String CFGKEY_SOURCECOLUMN = "SourceColumn";
 
     /**
      * The configuration key of the number of threads to use.
+     *
      * @since 2.9
      */
     public static final String CFGKEY_THREADS = "Number of threads";

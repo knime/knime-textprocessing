@@ -74,11 +74,10 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * A <code>CellFactory</code> to build a document for each data row. The
- * given <code>StringsToDocumentConfig</code> instance specifies which
+ * A {@CellFactory} to build a document for each data row. The given {@StringsToDocumentConfig} instance specifies which
  * columns of the row to use as title, text authors, etc.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
@@ -91,14 +90,12 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
     /**
-     * Creates new instance of <code>StringsToDocumentCellFactory</code> with
-     * given configuration.
+     * Creates new instance of {@StringsToDocumentCellFactory} with given configuration.
      *
      * @param config The configuration how to build a document.
      * @param newColSpecs The specs of the new columns that are created.
      * @param numberOfThreads The number of parallel threads to use.
-     * @throws IllegalArgumentException If given configuration is
-     * <code>null</code>.
+     * @throws IllegalArgumentException If given configuration is {@null}.
      * @since 3.1
      */
     public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
@@ -147,13 +144,19 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         final DocumentBuilder docBuilder = new DocumentBuilder();
 
         // Set title
-        if (m_config.getTitleStringIndex() >= 0) {
-            DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
-            String title = "";
-            if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
-                title = ((StringValue)titleCell).getStringValue();
+        String title = m_config.getDocTitle();
+        if (m_config.getUseTitleColumn()) {
+            if (m_config.getTitleStringIndex() >= 0) {
+                final DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
+                if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
+                    title = ((StringValue)titleCell).getStringValue();
+                } else {
+                    title = "";
+                }
+                docBuilder.addTitle(title);
             }
-
+        } else {
+            title = row.getKey().toString();
             docBuilder.addTitle(title);
         }
 
@@ -168,31 +171,40 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         }
 
         // Set authors
-        if (m_config.getAuthorsStringIndex() >= 0) {
-            final DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
-            if (!auhorsCell.isMissing() && auhorsCell.getType().isCompatible(StringValue.class)) {
-                final String authors = ((StringValue)auhorsCell).getStringValue();
-                final String[]authorsArr = authors.split(m_config.getAuthorsSplitChar());
-                for (String author : authorsArr) {
-                    String firstName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
-                    String lastName = StringsToDocumentConfig.DEF_AUTHOR_NAMES;
+        if (m_config.getUseAuthorsColumn()) {
+            if (m_config.getAuthorsStringIndex() >= 0) {
+                final DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
+                if (!auhorsCell.isMissing() && auhorsCell.getType().isCompatible(StringValue.class)) {
+                    final String authors = ((StringValue)auhorsCell).getStringValue();
+                    final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
+                    for (String author : authorsArr) {
+                        String firstName = m_config.getAuthorFirstName();
+                        String lastName = m_config.getAuthorLastName();
 
-                    final String[] names = author.split(" ");
-                    if (names.length > 1) {
-                        final StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < names.length - 1; i++) {
-                            sb.append(names[i]);
-                            sb.append(" ");
+                        final String[] names = author.split(" ");
+                        if (names.length > 1) {
+                            final StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < names.length - 1; i++) {
+                                sb.append(names[i]);
+                                sb.append(" ");
+                            }
+                            firstName = sb.toString();
+                            lastName = names[names.length - 1];
+                        } else if (names.length == 1) {
+                            lastName = names[0];
                         }
-                        firstName = sb.toString();
-                        lastName = names[names.length - 1];
-                    } else if (names.length == 1) {
-                        lastName = names[0];
-                    }
 
-                    docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+                        docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+                    }
+                } else if (auhorsCell.isMissing()) {
+                    docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
                 }
+
             }
+        } else {
+
+            //Check if Author first or last name is specified, if not set the first or last name as "-"
+            docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
         }
 
         // set document source
@@ -230,19 +242,32 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         // set document type
         docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_config.getDocType()));
 
-        // set publication date
-        final Matcher m = DATE_PATTERN.matcher(m_config.getPublicationDate());
-        if (m.matches()) {
-            final int day = Integer.parseInt(m.group(1));
-            final int month = Integer.parseInt(m.group(2));
-            final int year = Integer.parseInt(m.group(3));
-
-            try {
-                docBuilder.setPublicationDate(new PublicationDate(year, month, day));
-            } catch (ParseException e) {
-                LOGGER.info("Publication date could not be set!");
+        String dateStr = m_config.getPublicationDate();
+        if (m_config.getUsePubDateColumn()) {
+            if (m_config.getPubDateStringIndex() >= 0) {
+                final DataCell pubDateCell = row.getCell(m_config.getPubDateStringIndex());
+                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(StringValue.class)) {
+                    dateStr = ((StringValue)pubDateCell).getStringValue();
+                } else {
+                    dateStr = m_config.getPublicationDate();
+                }
             }
         }
+        if(!dateStr.isEmpty()){
+            final Matcher m = DATE_PATTERN.matcher(dateStr);
+            if (m.matches()) {
+                final int day = Integer.parseInt(m.group(1));
+                final int month = Integer.parseInt(m.group(2));
+                final int year = Integer.parseInt(m.group(3));
+
+                try {
+                    docBuilder.setPublicationDate(new PublicationDate(year, month, day));
+                } catch (ParseException e) {
+                    LOGGER.info("Publication date could not be set!");
+                }
+            }
+        }
+
 
         DataCellCache dataCellCache = getDataCellCache();
         return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
@@ -250,6 +275,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
     /**
      * Closes data cell cache.
+     *
      * @since 2.8
      */
     @Override

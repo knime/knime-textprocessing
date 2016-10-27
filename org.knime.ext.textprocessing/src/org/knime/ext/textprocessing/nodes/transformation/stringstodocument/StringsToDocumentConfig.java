@@ -51,11 +51,10 @@ import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 
 /**
- * Holds all necessary variables needed to build a document out of a data row,
- * like certain indices for title, author or full text column, publication
- * date, document source, category, and type.
+ * Holds all necessary variables needed to build a document out of a data row, like certain indices for title, author or
+ * full text column, publication date, document source, category, and type.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
 public class StringsToDocumentConfig {
 
@@ -63,6 +62,11 @@ public class StringsToDocumentConfig {
      * The default document publication date.
      */
     static final String DEF_DOCUMENT_PUBDATE = PublicationDate.getToday();
+
+    /**
+     * The default document title
+     */
+    static final String DEF_DOCUMENT_TITLE = "";
 
     /**
      * The default document source.
@@ -90,6 +94,16 @@ public class StringsToDocumentConfig {
     static final String DEF_AUTHOR_NAMES = "-";
 
     /**
+     * The default author first name
+     */
+    static final String DEF_AUTHOR_FIRST_NAME = "-";
+
+    /**
+     * The default author last name
+     */
+    static final String DEF_AUTHOR_LAST_NAME = "-";
+
+    /**
      * The default "use category column" setting.
      */
     static final boolean DEF_USE_CATCOLUMN = false;
@@ -98,6 +112,21 @@ public class StringsToDocumentConfig {
      * The default "use source column" setting.
      */
     static final boolean DEF_USE_SOURCECOLUMN = false;
+
+    /**
+     * The default "use publication date column" setting.
+     */
+    static final boolean DEF_USE_PUBDATECOLUMN = false;
+
+    /**
+     * The default "use title column" setting.
+     */
+    static final boolean DEF_USE_TITLECOLUMN = true;
+
+    /**
+     * The default "use authors column" setting.
+     */
+    static final boolean DEF_USE_AUTHORSCOLUMN = true;
 
     private int m_titleStringIndex = -1;
 
@@ -109,9 +138,25 @@ public class StringsToDocumentConfig {
 
     private int m_sourceStringIndex = -1;
 
+    private int m_pubDateStingIndex = -1;
+
+    private boolean m_useTitleColumn = DEF_USE_TITLECOLUMN;
+
+    private boolean m_useAuthorsColumn = DEF_USE_AUTHORSCOLUMN;
+
     private boolean m_useCatColumn = DEF_USE_CATCOLUMN;
 
     private boolean m_useSourceColumn = DEF_USE_SOURCECOLUMN;
+
+    private boolean m_usePubDateColumn = DEF_USE_PUBDATECOLUMN;
+
+    private String m_docTitle = DEF_DOCUMENT_TITLE;
+
+    private String m_authorNames = DEF_AUTHOR_NAMES;
+
+    private String m_authorFirstName = DEF_AUTHOR_FIRST_NAME;
+
+    private String m_authorLastName = DEF_AUTHOR_LAST_NAME;
 
     private String m_authorsSplitChar = DEF_AUTHORS_SPLITCHAR;
 
@@ -177,6 +222,24 @@ public class StringsToDocumentConfig {
      */
     public void setFulltextStringIndex(final int fulltextStringIndex) {
         m_fulltextStringIndex = fulltextStringIndex;
+    }
+
+    /**
+     *
+     * @return m_pubDateStingIndex
+     * @since 3.3
+     */
+    public int getPubDateStringIndex(){
+        return m_pubDateStingIndex;
+
+    }
+
+    /**
+     * @param pubDateStringIndex the pubDateStringIndex to set
+     * @since 3.3
+     */
+    public void setPubDateStringIndedx(final int pubDateStringIndex){
+        m_pubDateStingIndex = pubDateStringIndex;
     }
 
     /**
@@ -297,5 +360,118 @@ public class StringsToDocumentConfig {
      */
     public boolean getUseSourceColumn() {
         return m_useSourceColumn;
+    }
+
+    /**
+     * @return the m_useTitleColumn
+     * @since 3.3
+     */
+    public boolean getUseTitleColumn() {
+        return m_useTitleColumn;
+    }
+
+    /**
+     * @param useTitleColumn the m_useTitleColumn to set
+     * @since 3.3
+     */
+    public void setUseTitleColumn(final boolean useTitleColumn) {
+        this.m_useTitleColumn = useTitleColumn;
+    }
+
+    /**
+     * @return the m_useAuthorsColumn
+     * @since 3.3
+     */
+    public boolean getUseAuthorsColumn() {
+        return m_useAuthorsColumn;
+    }
+
+    /**
+     * @param useAuthorsColumn the m_useAuthorsColumn to set
+     * @since 3.3
+     */
+    public void setUseAuthorsColumn(final boolean useAuthorsColumn) {
+        this.m_useAuthorsColumn = useAuthorsColumn;
+    }
+
+    /**
+     * @return the m_docTitle
+     * @since 3.3
+     */
+    public String getDocTitle() {
+        return m_docTitle;
+    }
+
+    /**
+     * @param docTitle the m_docTitle to set
+     * @since 3.3
+     */
+    public void setDocTitle(final String docTitle) {
+        this.m_docTitle = docTitle;
+    }
+
+    /**
+     * @return the m_authorNames
+     * @since 3.3
+     */
+    public String getAuthorNames() {
+        return m_authorNames;
+    }
+
+    /**
+     * @param authorNames the m_authorNames to set
+     * @since 3.3
+     */
+    public void setAuthorNames(final String authorNames) {
+        this.m_authorNames = authorNames;
+    }
+
+    /**
+     * @return the m_authorFirstName
+     * @since 3.3
+     */
+    public String getAuthorFirstName() {
+        return m_authorFirstName;
+    }
+
+    /**
+     *
+     * @param authorFirstName the m_authorFirstName to set
+     * @since 3.3
+     */
+    public void setAuthorFirstName(final String authorFirstName) {
+        this.m_authorFirstName = authorFirstName;
+    }
+
+    /**
+     * @return the m_authorLastName
+     * @since 3.3
+     */
+    public String getAuthorLastName() {
+        return m_authorLastName;
+    }
+
+    /**
+     * @param authorLastName the m_authorLastName to set
+     * @since 3.3
+     */
+    public void setAuthorLastName(final String authorLastName) {
+        this.m_authorLastName = authorLastName;
+    }
+
+    /**
+     * @return the m_usePubDateColumn
+     * @since 3.3
+     */
+    public boolean getUsePubDateColumn() {
+        return m_usePubDateColumn;
+    }
+
+    /**
+     * @param usePubDateColumn the m_usePubDateColumn to set
+     * @since 3.3
+     */
+    public void setUsePubDateColumn(final boolean usePubDateColumn) {
+        this.m_usePubDateColumn = usePubDateColumn;
     }
 }
