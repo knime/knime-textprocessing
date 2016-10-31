@@ -48,11 +48,14 @@
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.knime.core.data.DataCell;
-import org.knime.core.data.def.StringCell;
+
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  *
@@ -60,51 +63,79 @@ import org.knime.core.data.def.StringCell;
  */
 class FeedReaderResult {
 
-    private List<DataCell[]> m_dataCells = new LinkedList<DataCell[]>();
+    private List<FeedEntryResult> m_entryResults = new LinkedList<>();
 
     private String m_url;
+
+    private boolean m_createDocCol = RSSFeedReaderNodeModel.DEF_CREATE_DOC_COLUMN;
+
+    private boolean m_createXMLCol = RSSFeedReaderNodeModel.DEF_CREATE_XML_COLUMN;
+
+    private boolean m_createHttpColumn = RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN;
+
+    private int m_responseCode = -2;
 
     /**
      * Creates a new instance of {@code FeedReaderResult}.
      */
-    FeedReaderResult() {
-        // empty constructor
+    FeedReaderResult(final String url, final boolean docCol, final boolean xmlCol, final boolean HttpResponseCol) {
+        m_url = url;
+        m_createDocCol = docCol;
+        m_createXMLCol = xmlCol;
+        m_createHttpColumn = HttpResponseCol;
     }
 
     /**
-     * Sets the URL for the current instance of FeedReaderResult.
-     * @param urlAsString The url to set.
+     * Set the Result based on SyndFeed.
+     * @param feedResults The feed containing the entries.
      */
-    void setURL(final String urlAsString) {
-        m_url = urlAsString;
-    }
-
-    /**
-     * @return URL from the current instance of FeedReaderResult.
-     */
-    String getURL() {
-        return m_url;
-    }
-
-    /**
-     * Adds a DataCell array to the current instance of FeedReaderResult.
-     * Since this method changes the first entry of the incoming DataCell array to
-     * a StringCell containing the URL that has been set to this instance of FeedReaderResult. So, the URL should be
-     * set before using this method (unless you want to provide a row with missing cells even in the URL column).
-     * @param dataCells The DataCells containing the information generated from feed entries.
-     */
-    void addDataCells(final DataCell[] dataCells) {
-        if (m_url != null) {
-            dataCells[0] = new StringCell(m_url);
+    void setResults(final SyndFeed feedResults) {
+        // get entries
+        SyndFeed feed = feedResults;
+        if (feed != null) {
+            @SuppressWarnings("unchecked")
+            List<SyndEntry> entries = feed.getEntries();
+            Iterator<SyndEntry> itEntries = entries.iterator();
+            // read entries and fill cells with information
+            if (entries.size() == 0) {
+                FeedEntryResult entryResult =
+                        new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+                entryResult.createEntryResultasDataCell();
+                m_entryResults.add(entryResult);
+            } else {
+                while (itEntries.hasNext()) {
+                    FeedEntryResult entryResult =
+                            new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+                    SyndEntry entry = itEntries.next();
+                    entryResult.setEntry(entry, feed);
+                    entryResult.createEntryResultasDataCell();
+                    m_entryResults.add(entryResult);
+                }
+            }
+        } else {
+            FeedEntryResult entryResult =
+                    new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+            entryResult.createEntryResultasDataCell();
+            m_entryResults.add(entryResult);
         }
-        m_dataCells.add(dataCells);
     }
 
     /**
-     * @return Returns the list of DataCell arrays containing the row information for feed entries of the current
-     * instance of FeedReaderResult.
+     * @return Returns a list of DataCell arrays containing the information for every feed entry.
      */
-    List<DataCell[]> getDataCells() {
-        return m_dataCells;
+    List<DataCell[]> createListOfDataCellsFromResults() {
+        List<DataCell[]> feedResultAsCells = new LinkedList<>();
+        for (FeedEntryResult fer : m_entryResults) {
+            feedResultAsCells.add(fer.createEntryResultasDataCell());
+        }
+        return feedResultAsCells;
+    }
+
+    /**
+     * Set the HTTP response code for the FeedReaderResult.
+     * @param responseCode The HTTP response code.
+     */
+    void setHttpCode(final int responseCode) {
+        m_responseCode = responseCode;
     }
 }

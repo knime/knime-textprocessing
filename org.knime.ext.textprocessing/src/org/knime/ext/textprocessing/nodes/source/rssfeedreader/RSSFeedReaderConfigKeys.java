@@ -52,7 +52,7 @@ package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class RSSFeedReaderConfigKeys {
+class RSSFeedReaderConfigKeys {
 
     static final String CFGKEY_FEED_URL_COLUMN = "String URL Column";
 
