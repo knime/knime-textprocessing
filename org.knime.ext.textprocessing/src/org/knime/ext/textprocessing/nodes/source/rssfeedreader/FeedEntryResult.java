@@ -258,9 +258,9 @@ class FeedEntryResult {
         try {
             feedoutput.output(feed, xmlWriter);
         } catch (IOException e) {
-            LOGGER.warn("IOException: Could not write feed entry (" + entry.getLink() + ") to StringWriter");
+            LOGGER.warn("Could not write feed entry (" + entry.getLink() + ") to StringWriter");
         } catch (FeedException e) {
-            LOGGER.warn("FeedException: Could not create XML representation for feed entry: " + entry.getLink(), e);
+            LOGGER.warn("Could not create XML representation for feed entry: " + entry.getLink(), e);
         }
         return xmlWriter.toString();
     }
@@ -290,7 +290,7 @@ class FeedEntryResult {
                     cal.get(Calendar.DAY_OF_MONTH));
                 docBuilder.setPublicationDate(pubDate);
             } catch (ParseException e) {
-                LOGGER.warn("Parse Exception: Could not parse date from feed entry " + entry.getLink());
+                LOGGER.warn("Could not parse date from feed entry " + entry.getLink());
             }
         }
         if (entry.getLink() != null) {
