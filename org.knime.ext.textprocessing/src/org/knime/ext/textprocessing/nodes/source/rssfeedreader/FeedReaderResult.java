@@ -87,6 +87,7 @@ class FeedReaderResult {
 
     /**
      * Set the Result based on SyndFeed.
+     *
      * @param feedResults The feed containing the entries.
      */
     void setResults(final SyndFeed feedResults) {
@@ -99,13 +100,13 @@ class FeedReaderResult {
             // read entries and fill cells with information
             if (entries.size() == 0) {
                 FeedEntryResult entryResult =
-                        new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+                    new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
                 entryResult.createEntryResultasDataCell();
                 m_entryResults.add(entryResult);
             } else {
                 while (itEntries.hasNext()) {
                     FeedEntryResult entryResult =
-                            new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+                        new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
                     SyndEntry entry = itEntries.next();
                     entryResult.setEntry(entry, feed);
                     entryResult.createEntryResultasDataCell();
@@ -114,7 +115,7 @@ class FeedReaderResult {
             }
         } else {
             FeedEntryResult entryResult =
-                    new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+                new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
             entryResult.createEntryResultasDataCell();
             m_entryResults.add(entryResult);
         }
@@ -133,6 +134,7 @@ class FeedReaderResult {
 
     /**
      * Set the HTTP response code for the FeedReaderResult.
+     *
      * @param responseCode The HTTP response code.
      */
     void setHttpCode(final int responseCode) {

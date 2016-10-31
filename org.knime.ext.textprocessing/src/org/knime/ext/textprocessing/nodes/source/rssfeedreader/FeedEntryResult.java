@@ -53,6 +53,7 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -73,7 +74,6 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.xml.sax.SAXException;
 
-import com.beust.jcommander.internal.Lists;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
@@ -112,7 +112,8 @@ class FeedEntryResult {
     /**
      * Creates a new instance of {@code FeedEntryResult}.
      */
-    FeedEntryResult(final String feedUrl, final int responseCode, final boolean docCol, final boolean xmlCol, final boolean httpResponseCol) {
+    FeedEntryResult(final String feedUrl, final int responseCode, final boolean docCol, final boolean xmlCol,
+        final boolean httpResponseCol) {
         m_feedURL = feedUrl;
         m_responseCode = responseCode;
         m_createDocCol = docCol;
@@ -214,7 +215,7 @@ class FeedEntryResult {
         DataCell cell = DataType.getMissingCell();
 
         try {
-            if(m_xml != null) {
+            if (m_xml != null) {
                 cell = XMLCellFactory.create(m_xml);
             }
         } catch (IOException e) {
@@ -241,9 +242,8 @@ class FeedEntryResult {
         if (m_publicationDate != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(m_publicationDate);
-            cell = new DateAndTimeCell(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
-                cal.get(Calendar.SECOND));
+            cell = new DateAndTimeCell(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
         }
         return cell;
     }
@@ -251,7 +251,7 @@ class FeedEntryResult {
     // builds xmlcontent based on the feed and feed entry information
     private String createXMLContentFromEntry(final SyndEntry entry, final SyndFeed feed) {
         SyndFeedOutput feedoutput = new SyndFeedOutput();
-        List<SyndEntry> entries = Lists.newArrayList();
+        List<SyndEntry> entries = new LinkedList<>();
         entries.add(entry);
         feed.setEntries(entries);
         StringWriter xmlWriter = new StringWriter();
@@ -297,6 +297,5 @@ class FeedEntryResult {
             docBuilder.addDocumentSource(new DocumentSource(entry.getLink()));
         }
         return docBuilder.createDocument();
-
     }
 }
