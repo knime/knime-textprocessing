@@ -44,59 +44,63 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   06.10.2016 (andisadewi): created
+ *   01.11.2016 (andisadewi): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stanfordlemmatizer;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.streamable.simple.SimpleStreamableOperatorInternals;
 
 /**
+ * Helper class to represent a warning message that is stored in SimpleStreamableOperatorInternals-object.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class StanfordLemmatizerNodeFactory extends NodeFactory<StanfordLemmatizerNodeModel> {
+public final class WarningMessage extends SimpleStreamableOperatorInternals {
+
+    private static final String CONFIG_KEY = "warningmessage";
 
     /**
-     * {@inheritDoc}
+     * Creates an empty constructor
      */
-    @Override
-    public StanfordLemmatizerNodeModel createNodeModel() {
-        return new StanfordLemmatizerNodeModel(WarningMessage.class);
+    public WarningMessage() {
+        //empty constructor for serialization
     }
 
     /**
-     * {@inheritDoc}
+     * @return the warning message, can be <code>null</code>
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
+    String get() {
+        try {
+            return this.getConfig().getString(CONFIG_KEY).trim();
+        } catch (InvalidSettingsException e) {
+            return null;
+        }
+    }
+
+    void set(final String message) {
+        this.getConfig().addString(CONFIG_KEY, message);
     }
 
     /**
-     * {@inheritDoc}
+     * Appends the given warning message to existing ones and puts a '\n' in between. Or sets the given message if no
+     * message was set so far.
      */
-    @Override
-    public NodeView<StanfordLemmatizerNodeModel> createNodeView(final int viewIndex,
-        final StanfordLemmatizerNodeModel nodeModel) {
-        return null;
-    }
+    void append(final String message) {
+        try {
+            if (this.getConfig().getString(CONFIG_KEY) == null) {
+                set("");
+            }
+        } catch (InvalidSettingsException e) {
+            set("");
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new StanfordLemmatizerNodeDialog();
+        try {
+            this.getConfig().addString(CONFIG_KEY, this.getConfig().getString(CONFIG_KEY) + message + "\n");
+        } catch (InvalidSettingsException e) {
+            // should not happen
+            throw new RuntimeException(e);
+        }
     }
 
 }

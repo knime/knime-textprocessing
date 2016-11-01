@@ -51,7 +51,6 @@ package org.knime.ext.textprocessing.nodes.preprocessing.stanfordlemmatizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -65,14 +64,12 @@ import edu.stanford.nlp.process.Morphology;
  */
 public class StanfordLemmatizer implements TermPreprocessing {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(StanfordLemmatizer.class);
-
     /** Constant for the boolean flag to determine whether the node should fail. */
-    public static final boolean DEF_FAIL = true;
+    public static final boolean DEF_FAIL = false;
 
     private boolean m_skipTerms;
 
-    private String m_error;
+    private WarningMessage m_warnMessage;
 
     /**
      * Creates new instance of StanfordLemmatizer where the terms with no POS tags will be skipped by default.
@@ -88,7 +85,17 @@ public class StanfordLemmatizer implements TermPreprocessing {
      */
     public StanfordLemmatizer(final boolean skip) {
         m_skipTerms = skip;
-        setError("");
+    }
+
+    /**
+     * Creates new instance of StanfordLemmatizer.
+     *
+     * @param msg a WarningMessage object to store any warning message that may appear after processing
+     * @param skip boolean whether terms with no POS tags should be skipped or not
+     */
+    public StanfordLemmatizer(final WarningMessage msg, final boolean skip) {
+        m_skipTerms = skip;
+        m_warnMessage = msg;
     }
 
     /**
@@ -103,8 +110,8 @@ public class StanfordLemmatizer implements TermPreprocessing {
         // if term doesn't have any tags
         if (tags.isEmpty()) {
             // either skip or throw an exception
-            if (m_skipTerms) {
-                setError("Fail: Some terms have no POS tags.");
+            if (!m_skipTerms) {
+                m_warnMessage.set("Warning: Some terms have no POS tags.");
                 return term;
             } else {
                 throw new RuntimeException("Some terms have no POS tags.");
@@ -146,17 +153,9 @@ public class StanfordLemmatizer implements TermPreprocessing {
     }
 
     /**
-     * @return the m_error
+     * @return the WarningMessage object that contains the warning message
      */
-    public String getError() {
-        return m_error;
+    public WarningMessage getWarnMessage() {
+        return m_warnMessage;
     }
-
-    /**
-     * @param error the m_error to set
-     */
-    public void setError(final String error) {
-        this.m_error = error;
-    }
-
 }

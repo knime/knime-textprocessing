@@ -20,8 +20,7 @@
 			heavily on the Part-Of-Speech (POS) tag of a term, so either the
 			Stanford
 			Node or the POS Node has to be applied before using the
-			Lemmatizer. This node will fail by default when at least one term
-			with no POS tag is found.
+			Lemmatizer. Terms with no POS tag will be skipped by default.
 			<br />
 			<br />
 			Currently only the english language is supported by
@@ -30,9 +29,9 @@
 
 		<tab name="Lemmatizer options">
 			<option name="Skip terms with no POS tag">
-				If checked, all terms that have no POS tag will
-				simply be skipped. Otherwise, the node will fail when at least one
-				term has no POS tag.
+				If checked, the node will fail when at least one
+				term has no POS tag. Otherwise, all terms that have no POS tag will
+				simply be skipped. 
 			</option>
 		</tab>
 		<tab name="Preprocessing options">

@@ -75,8 +75,8 @@ public class StanfordLemmatizerNodeDialog extends PreprocessingNodeSettingsPane2
         createNewTab("Lemmatizer options");
         setSelected("Lemmatizer options");
 
-        DialogComponentBoolean skipTerms = new DialogComponentBoolean(getFailModel(), "Skip terms with no POS tag");
-        skipTerms.setToolTipText("If checked, terms with no POS tags will simply be skipped and node won't fail.");
+        DialogComponentBoolean skipTerms = new DialogComponentBoolean(getFailModel(), "Node should fail when terms with no POS tag are found");
+        skipTerms.setToolTipText("If checked, node will fail when any terms with no POS tag are found, else they will be skipped.");
         addDialogComponent(skipTerms);
     }
 }

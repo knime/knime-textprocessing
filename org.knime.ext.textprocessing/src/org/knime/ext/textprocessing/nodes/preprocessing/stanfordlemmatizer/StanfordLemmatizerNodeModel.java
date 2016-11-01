@@ -44,18 +44,16 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   06.10.2016 (andisadewi): created
+ *   31.10.2016 (andisadewi): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stanfordlemmatizer;
 
-import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.StreamableOperatorInternals;
-import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
+import org.knime.ext.textprocessing.nodes.preprocessing.StreamableProcessingWithInternalsNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
@@ -63,17 +61,24 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class StanfordLemmatizerNodeModel extends StreamableFunctionPreprocessingNodeModel {
+public class StanfordLemmatizerNodeModel extends StreamableProcessingWithInternalsNodeModel<WarningMessage> {
 
     private SettingsModelBoolean m_failModel = StanfordLemmatizerNodeDialog.getFailModel();
     private StanfordLemmatizer m_lemma;
 
     /**
+     * @param cl The class of the {@link StreamableOperatorInternals}.
+     */
+    public StanfordLemmatizerNodeModel(final Class<WarningMessage> cl) {
+        super(cl);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    protected TermPreprocessing createPreprocessing() throws Exception {
-        m_lemma = new StanfordLemmatizer(m_failModel.getBooleanValue());
+    protected TermPreprocessing createPreprocessing(final WarningMessage internals) throws Exception {
+        m_lemma = new StanfordLemmatizer(internals, m_failModel.getBooleanValue());
         return m_lemma;
     }
 
@@ -81,11 +86,47 @@ public class StanfordLemmatizerNodeModel extends StreamableFunctionPreprocessing
      * {@inheritDoc}
      */
     @Override
-    public void finishStreamableExecution(final StreamableOperatorInternals internals, final ExecutionContext exec,
-        final PortOutput[] output) throws Exception {
-        // TODO Auto-generated method stub
-        super.finishStreamableExecution(internals, exec, output);
-        setWarningMessage(m_lemma.getError());
+    protected void afterProcessing() {
+        WarningMessage warningMessage = m_lemma.getWarnMessage();
+        if (warningMessage.get() != null && warningMessage.get().length() > 0) {
+            setWarningMessage(warningMessage.get());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected WarningMessage createStreamingOperatorInternals() {
+        return new WarningMessage();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected WarningMessage mergeStreamingOperatorInternals(final WarningMessage[] operatorInternals) {
+        StringBuilder sb = new StringBuilder();
+        for (WarningMessage oi : operatorInternals) {
+            if (oi.get() != null) {
+                sb.append(oi.get());
+                sb.append("\n");
+            }
+        }
+        WarningMessage res = new WarningMessage();
+        res.set(sb.toString());
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void finishStreamableExecution(final WarningMessage operatorInternals) {
+        WarningMessage warningMessage = operatorInternals;
+        if (warningMessage.get() != null && warningMessage.get().length() > 0) {
+            setWarningMessage(warningMessage.get());
+        }
     }
 
     /**
@@ -115,5 +156,5 @@ public class StanfordLemmatizerNodeModel extends StreamableFunctionPreprocessing
         m_failModel.validateSettings(settings);
     }
 
-
 }
+

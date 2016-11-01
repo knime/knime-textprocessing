@@ -77,6 +77,7 @@ import org.knime.core.node.streamable.PortInput;
 import org.knime.core.node.streamable.PortObjectInput;
 import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.StreamableOperator;
+import org.knime.core.node.streamable.StreamableOperatorInternals;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -114,11 +115,12 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * Default constructor, defining one data input and one data output port.
      */
     public StreamablePreprocessingNodeModel() {
-        this(1, new InputPortRole[] {});
+        this(1, new InputPortRole[]{});
     }
 
     /**
      * Constructor defining a specified number of data input and one data output port.
+     *
      * @param dataInPorts The number of data input ports.
      * @param roles The roles of the input ports after the first port.
      */
@@ -144,7 +146,11 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
         throws Exception {
         preparePreprocessing(inData, exec);
         final ColumnRearranger rearranger = createColumnRearranger(inData[0].getDataTableSpec());
-        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
+
+        BufferedDataTable[] output =
+            new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
+        afterProcessing();
+        return output;
     }
 
     /** {@inheritDoc} */
@@ -162,7 +168,8 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * @param inSpecs Specs of the input data tables.
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      */
-    protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException { }
+    protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+    }
 
     /**
      * Method to prepare preprocessing instance before it can be applied. This method can be overwritten to apply
@@ -177,22 +184,56 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
     }
 
     /**
-     * Creates a new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the
-     * input documents. Extending classes need to create the corresponding preprocessing instance here.
+     * Creates a new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
+     * documents. Extending classes need to create the corresponding preprocessing instance here.
+     *
      * @return A new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
-     * documents.
+     *         documents.
      * @throws Exception If preprocessing instance cannot be created.
      */
     protected abstract TermPreprocessing createPreprocessing() throws Exception;
 
     /**
+     * Creates a new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
+     * documents. Extending classes need to create the corresponding preprocessing instance here. Extends the behavior
+     * of {@link StreamablePreprocessingNodeModel#createPreprocessing()} by an empty internals object that is filled
+     * while processing the data.
+     *
+     * @param internals the empty internals.
+     * @return A new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
+     *         documents.
+     * @throws Exception
+     * @since 3.3
+     */
+    protected TermPreprocessing createPreprocessingWithInternals(final StreamableOperatorInternals internals)
+        throws Exception {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
      * Creates column rearranger for creation of new data table.
+     *
      * @param in the input data table spec.
      * @return A new instance of column rearranger to create output data table
      * @throws InvalidSettingsException
-     * @throws Exception If preprocessing instance could not be created
      */
     protected final ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
+        return createColumnRearranger(in, createStreamingOperatorInternals());
+    }
+
+    /**
+     * Creates column rearranger for creation of new data table. Extends the behavior of
+     * {@link StreamablePreprocessingNodeModel#createColumnRearranger(DataTableSpec)} by an empty internals object that
+     * is filled while processing the data.
+     *
+     * @param in the input data table spec.
+     * @param internals the empty internals. Should be passed on to the cell factory
+     * @return A new instance of column rearranger to create output data table
+     * @throws InvalidSettingsException
+     * @since 3.3
+     */
+    protected final ColumnRearranger createColumnRearranger(final DataTableSpec in,
+        final StreamableOperatorInternals internals) throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(in);
         verfier.verifyMinimumDocumentCells(1, true);
         String docColName = m_documentColModel.getStringValue();
@@ -226,8 +267,8 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
             newColName = docColName;
         } else {
             if (in.containsName(newColName)) {
-                throw new InvalidSettingsException("Can't create new column \"" + newColName
-                    + "\" as input spec already contains such column!");
+                throw new InvalidSettingsException(
+                    "Can't create new column \"" + newColName + "\" as input spec already contains such column!");
             }
         }
 
@@ -237,10 +278,13 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
 
         // create cell factory and column rearranger
         try {
-            TermPreprocessing preprocessing = createPreprocessing();
 
-            final PreprocessingCellFactory cellFac = new PreprocessingCellFactory(preprocessing, docColIndex,
-                docCol, m_preproUnModifiableModel.getBooleanValue());
+            TermPreprocessing preprocessing = createPreprocessing();
+            if (preprocessing == null) {
+                preprocessing = createPreprocessingWithInternals(internals);
+            }
+            final PreprocessingCellFactory cellFac = new PreprocessingCellFactory(preprocessing, docColIndex, docCol,
+                m_preproUnModifiableModel.getBooleanValue());
             final ColumnRearranger rearranger = new ColumnRearranger(in);
 
             // replace or append
@@ -274,12 +318,13 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
-        throws InvalidSettingsException {
-         return new StreamableOperator() {
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        return new StreamableOperator() {
 
             @Override
-            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec) throws Exception {
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
 
                 // covert non streamable in ports to BufferedDatatables
                 BufferedDataTable[] inData = new BufferedDataTable[inputs.length];
@@ -288,7 +333,7 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
                         || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
                         inData[i] = null;
                     } else {
-                        inData[i] = (BufferedDataTable) ((PortObjectInput) inputs[i]).getPortObject();
+                        inData[i] = (BufferedDataTable)((PortObjectInput)inputs[i]).getPortObject();
                     }
                 }
 
@@ -303,21 +348,24 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void reset() { }
+    protected void reset() {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException { }
+        throws IOException, CanceledExecutionException {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException { }
+        throws IOException, CanceledExecutionException {
+    }
 
     /**
      * {@inheritDoc}
@@ -364,5 +412,26 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
                 m_newDocumentColModel.setEnabled(true);
             }
         }
+    }
+
+    /**
+     * Called after all rows have been processed in the
+     * {@link StreamablePreprocessingNodeModel#execute(BufferedDataTable[],ExecutionContext)} method. Can be overridden
+     * to set, e.g Warning messages, etc
+     *
+     * @since 3.3
+     */
+    protected void afterProcessing() {
+        // nothing to do by default
+    }
+
+    /**
+     * Creates new empty instance of the internals. Should be overridden in extending classes.
+     *
+     * @return A new instance of the internals (should not be null)
+     * @since 3.3
+     */
+    protected StreamableOperatorInternals createStreamingOperatorInternals() {
+        return null;
     }
 }
