@@ -90,7 +90,7 @@ import org.xml.sax.SAXException;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class EmbeddedFilesExtractor {
+public final class EmbeddedFilesExtractor {
 
     private Parser parser;
 

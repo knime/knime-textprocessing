@@ -63,6 +63,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.exception.EncryptedDocumentException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
@@ -106,6 +107,7 @@ import org.knime.core.node.streamable.PortInput;
 import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.RowOutput;
 import org.knime.core.node.streamable.StreamableOperator;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 import org.xml.sax.ContentHandler;
@@ -116,128 +118,119 @@ import org.xml.sax.SAXException;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaParserNodeModel extends NodeModel {
+final class TikaParserNodeModel extends NodeModel {
 
     /**
      * The default path of the directory containing the files to parse.
      */
-    public static final String DEFAULT_PATH = System.getProperty("user.home");
+    static final String DEFAULT_PATH = System.getProperty("user.home");
 
     /**
      * The default value of the recursive flag (if set <code>true</code> the specified directory is search recursively).
      */
-    public static final boolean DEFAULT_RECURSIVE = false;
+    static final boolean DEFAULT_RECURSIVE = false;
 
     /**
      * The default value of the ignore hidden files flag (if set <code>true</code> the hidden files will be not
      * considered for parsing.
      */
-    public static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
+    static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
 
     /**
      * The action command value for choosing file extension in the dialog selection.
      */
-    public static final String EXT_TYPE = "Extension";
+    static final String EXT_TYPE = "Extension";
 
     /**
      * The action command value for choosing MIME-Type in the dialog selection.
      */
-    public static final String MIME_TYPE = "MIME";
+    static final String MIME_TYPE = "MIME";
 
     /**
      * The default value of the action command for choosing file extension in the dialog selection.
      */
-    public static final String DEFAULT_TYPE = EXT_TYPE;
+    static final String DEFAULT_TYPE = EXT_TYPE;
 
     private static final Set<MediaType> VALID_TYPES = new AutoDetectParser().getSupportedTypes(new ParseContext());
 
     /**
      * The list of all MIME-Types that will be shown in the dialog.
      */
-    public static final String[] MIMETYPE_LIST;
-
-    static {
-        MIMETYPE_LIST = getMimeTypes();
-    }
+    static final String[] MIMETYPE_LIST = getMimeTypes();
 
     /**
      * The list of all file extensions that will be shown in the dialog.
      */
-    public static final String[] EXTENSION_LIST;
-
-    static {
-        EXTENSION_LIST = getExtensions();
-    }
+    static final String[] EXTENSION_LIST = getExtensions();
 
     /**
      * The default list that will be shown in the dialog. The default is the list of file extensions.
      */
-    public static final String[] DEFAULT_TYPE_LIST = EXTENSION_LIST;
+    static final String[] DEFAULT_TYPE_LIST = EXTENSION_LIST;
 
     /**
      * The default list of meta data information to be parsed.
      */
-    public static final String[] DEFAULT_COLUMNS_LIST =
+    static final String[] DEFAULT_COLUMNS_LIST =
         TikaColumnKeys.COLUMN_PROPERTY_MAP.keySet().toArray(new String[TikaColumnKeys.COLUMN_PROPERTY_MAP.size()]);
 
     /**
      * The default value of the "create error column" flag.
      */
-    public static final boolean DEFAULT_ERROR_COLUMN = false;
+    static final boolean DEFAULT_ERROR_COLUMN = false;
 
     /**
      * The default value of the name of the error column.
      */
-    public static final String DEFAULT_ERROR_COLUMN_NAME = "Error Output";
+    static final String DEFAULT_ERROR_COLUMN_NAME = "Error Output";
 
     /**
      * The default value of the "extract attachments" flag.
      */
-    public static final boolean DEFAULT_EXTRACT = false;
+    static final boolean DEFAULT_EXTRACT = false;
 
     /**
      * The default path of the directory containing the extracted attachment files.
      */
-    public static final String DEFAULT_EXTRACT_PATH = System.getProperty("user.home");
+    static final String DEFAULT_EXTRACT_PATH = System.getProperty("user.home");
 
     /**
      * The default value of the "extract encrypted" flag.
      */
-    public static final boolean DEFAULT_ENCRYPTED = false;
+    static final boolean DEFAULT_ENCRYPTED = false;
 
     private static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments"};
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaParserNodeModel.class);
 
-    private SettingsModelString m_pathModel = TikaParserNodeDialog.getPathModel();
+    private SettingsModelString m_pathModel = getPathModel();
 
-    private SettingsModelBoolean m_recursiveModel = TikaParserNodeDialog.getRecursiveModel();
+    private SettingsModelBoolean m_recursiveModel = getRecursiveModel();
 
-    private SettingsModelBoolean m_ignoreHiddenFilesModel = TikaParserNodeDialog.getIgnoreHiddenFilesModel();
+    private SettingsModelBoolean m_ignoreHiddenFilesModel = getIgnoreHiddenFilesModel();
 
-    private SettingsModelString m_typesModel = TikaParserNodeDialog.getTypeModel();
+    private SettingsModelString m_typesModel = getTypeModel();
 
-    private SettingsModelStringArray m_columnModel = TikaParserNodeDialog.getColumnModel();
+    private SettingsModelStringArray m_columnModel = getColumnModel();
 
-    private SettingsModelBoolean m_errorColumnModel = TikaParserNodeDialog.getErrorColumnModel();
+    private SettingsModelBoolean m_extractAttachmentModel = getExtractAttachmentModel();
 
-    private SettingsModelBoolean m_extractAttachmentModel = TikaParserNodeDialog.getExtractAttachmentModel();
+    private SettingsModelString m_extractPathModel = getExtractPathModel(m_extractAttachmentModel);
 
-    private SettingsModelString m_extractPathModel = TikaParserNodeDialog.getExtractPathModel();
+    private SettingsModelBoolean m_authBooleanModel = getAuthBooleanModel();
 
-    private SettingsModelString m_authModel = TikaParserNodeDialog.getCredentials();
+    private SettingsModelString m_authModel = getCredentials(m_authBooleanModel);
 
-    private SettingsModelBoolean m_authBooleanModel = TikaParserNodeDialog.getAuthBooleanModel();
+    private SettingsModelBoolean m_errorColumnModel = getErrorColumnModel();
 
-    private SettingsModelString m_errorColNameModel = TikaParserNodeDialog.getErrorColumnNameModel();
+    private SettingsModelString m_errorColNameModel = getErrorColumnNameModel(m_errorColumnModel);
 
-    private SettingsModelFilterString m_filterModel = TikaParserNodeDialog.getFilterModel();
+    private SettingsModelFilterString m_filterModel = getFilterModel();
 
     /**
      * Creates a new instance of {@code TikaParserNodeModel}
      */
-    public TikaParserNodeModel() {
-
+    TikaParserNodeModel() {
         super(0, 2);
         stateChange();
     }
@@ -331,6 +324,30 @@ public class TikaParserNodeModel extends NodeModel {
 
                 int rowKeyOne = 0;
                 int rowKeyTwo = 0;
+
+                final File attachmentDir;
+                if (m_extractAttachmentModel.getBooleanValue()) {
+                    String outputDir = m_extractPathModel.getStringValue();
+
+                    File file = null;
+                    try {
+                        URL url = new URL(outputDir);
+                        file = FileUtil.getFileFromURL(url);
+                    } catch (MalformedURLException e) {
+                        file = new File(outputDir);
+                    }
+
+                    if (!file.exists()) {
+                        CheckUtils.checkSetting(
+                            file.mkdirs(), "Directory \"%s\" cannot be created. Please give a valid path.", outputDir);
+                        setWarningMessage("Attachment directory didn't exist and was created: " + outputDir);
+                    }
+                    attachmentDir = file;
+                } else {
+                    attachmentDir = null;
+                }
+
+
                 for (int i = 0; i < numberOfFiles; i++) {
                     String errorMsg = "";
                     File file = files.get(i);
@@ -404,16 +421,14 @@ public class TikaParserNodeModel extends NodeModel {
                             continue; // skip if mime type is not in the list of input mime types
                         }
                     }
-//                    LOGGER.info("Parsing file: " + file.getAbsolutePath());
 
                     try {
-                        if (m_extractAttachmentModel.getBooleanValue()) {
+                        if (attachmentDir != null) {
                             try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
-                                final File outputDir = getFile(m_extractPathModel.getStringValue());
                                 EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                                 ex.setContext(context);
                                 ex.setDuplicateFilesList(duplicateFiles);
-                                ex.extract(stream, outputDir.toPath(), file.getName());
+                                ex.extract(stream, attachmentDir.toPath(), file.getName());
                                 metadata = ex.getMetadata();
                                 handler = ex.getHandler();
 
@@ -571,22 +586,7 @@ public class TikaParserNodeModel extends NodeModel {
         if (extract) {
             String outputDir =
                 ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
-
-            File file = null;
-            try {
-                URL url = new URL(outputDir);
-                file = FileUtil.getFileFromURL(url);
-            } catch (MalformedURLException e) {
-                file = new File(outputDir);
-            }
-
-            if (!file.exists()) {
-                setWarningMessage("Output directory doesn't exist. Creating directory " + outputDir);
-                if (!file.mkdir()) {
-                    throw new InvalidSettingsException(
-                        "Directory " + outputDir + " cannot be created. Please give a valid path.");
-                }
-            }
+            CheckUtils.checkSetting(StringUtils.isNotBlank(outputDir), "Path to attachment directory must not be blank");
         }
     }
 
@@ -705,6 +705,70 @@ public class TikaParserNodeModel extends NodeModel {
         } else {
             m_errorColNameModel.setEnabled(false);
         }
+    }
+
+    static SettingsModelString getPathModel() {
+        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_PATH, TikaParserNodeModel.DEFAULT_PATH);
+    }
+
+    static SettingsModelBoolean getRecursiveModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_RECURSIVE, TikaParserNodeModel.DEFAULT_RECURSIVE);
+    }
+
+    static SettingsModelBoolean getIgnoreHiddenFilesModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_IGNORE_HIDDENFILES,
+            TikaParserNodeModel.DEFAULT_IGNORE_HIDDENFILES);
+    }
+
+    static SettingsModelStringArray getColumnModel() {
+        return new SettingsModelStringArray(TikaParserConfigKeys.CFGKEY_COLUMNS_LIST,
+            TikaParserNodeModel.DEFAULT_COLUMNS_LIST);
+    }
+
+    static SettingsModelBoolean getErrorColumnModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ERROR_COLUMN,
+            TikaParserNodeModel.DEFAULT_ERROR_COLUMN);
+    }
+
+    static SettingsModelString getErrorColumnNameModel(final SettingsModelBoolean errorColModel) {
+        SettingsModelString s = new SettingsModelString(TikaParserConfigKeys.CFGKEY_ERROR_COLUMN_NAME,
+            TikaParserNodeModel.DEFAULT_ERROR_COLUMN_NAME);
+        errorColModel.addChangeListener(e -> s.setEnabled(errorColModel.getBooleanValue()));
+        s.setEnabled(errorColModel.getBooleanValue());
+        return s;
+    }
+
+    static SettingsModelString getTypeModel() {
+        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_TYPE, TikaParserNodeModel.DEFAULT_TYPE);
+    }
+
+    static SettingsModelBoolean getExtractAttachmentModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_EXTRACT_BOOLEAN,
+            TikaParserNodeModel.DEFAULT_EXTRACT);
+    }
+
+    static SettingsModelString getExtractPathModel(final SettingsModelBoolean enableModel) {
+        SettingsModelString s = new SettingsModelString(TikaParserConfigKeys.CFGKEY_EXTRACT_PATH,
+            TikaParserNodeModel.DEFAULT_EXTRACT_PATH);
+        enableModel.addChangeListener(e -> s.setEnabled(enableModel.getBooleanValue()));
+        s.setEnabled(enableModel.getBooleanValue());
+        return s;
+    }
+
+    static SettingsModelString getCredentials(final SettingsModelBoolean authBooleanModel) {
+        final SettingsModelString s = new SettingsModelString(TikaParserConfigKeys.CFGKEY_CREDENTIALS, "");
+        authBooleanModel.addChangeListener(e -> s.setEnabled(authBooleanModel.getBooleanValue()));
+        s.setEnabled(authBooleanModel.getBooleanValue());
+        return s;
+    }
+
+    static SettingsModelBoolean getAuthBooleanModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ENCRYPTED, TikaParserNodeModel.DEFAULT_ENCRYPTED);
+    }
+
+    static SettingsModelFilterString getFilterModel() {
+        return new SettingsModelFilterString(TikaParserConfigKeys.CFGKEY_FILTER_LIST,
+            TikaParserNodeModel.DEFAULT_TYPE_LIST, new String[0]);
     }
 
 }

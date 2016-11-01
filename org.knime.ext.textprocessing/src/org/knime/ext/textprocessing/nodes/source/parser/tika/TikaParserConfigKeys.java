@@ -52,68 +52,68 @@ package org.knime.ext.textprocessing.nodes.source.parser.tika;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public final class TikaParserConfigKeys {
+final class TikaParserConfigKeys {
     private TikaParserConfigKeys() {
     }
 
     /**
      * The configuration key of the path of the directory containing the files to parse.
      */
-    public static final String CFGKEY_PATH = "Path";
+    static final String CFGKEY_PATH = "Path";
 
     /**
      * The configuration key of the recursive flag (if set the specified directory is search recursively).
      */
-    public static final String CFGKEY_RECURSIVE = "Rec";
+    static final String CFGKEY_RECURSIVE = "Rec";
 
     /**
      * The configuration key of the "ignore hidden files" flag.
      */
-    public static final String CFGKEY_IGNORE_HIDDENFILES = "IgnoreHiddenFiles";
+    static final String CFGKEY_IGNORE_HIDDENFILES = "IgnoreHiddenFiles";
 
     /**
      * The configuration key of the list of the file types (either file extensions or MIME-Types).
      */
-    public static final String CFGKEY_FILTER_LIST = "TypeFilterList";
+    static final String CFGKEY_FILTER_LIST = "TypeFilterList";
 
     /**
      * The configuration key of the list of the metadata information that are to be extracted.
      */
-    public static final String CFGKEY_COLUMNS_LIST = "ColumnsList";
+    static final String CFGKEY_COLUMNS_LIST = "ColumnsList";
 
     /**
      * The configuration key of the "create error column" flag.
      */
-    public static final String CFGKEY_ERROR_COLUMN = "ErrorColumn";
+    static final String CFGKEY_ERROR_COLUMN = "ErrorColumn";
 
     /**
      * The configuration key of the name of the error column.
      */
-    public static final String CFGKEY_ERROR_COLUMN_NAME = "ErrorColumnName";
+    static final String CFGKEY_ERROR_COLUMN_NAME = "ErrorColumnName";
 
     /**
      * The configuration key of the type button to choose between file extension or MIME-Type.
      */
-    public static final String CFGKEY_TYPE = "Type";
+    static final String CFGKEY_TYPE = "Type";
 
     /**
      * The configuration key of the "extract attachments" flag.
      */
-    public static final String CFGKEY_EXTRACT_BOOLEAN = "ExtractAttachments";
+    static final String CFGKEY_EXTRACT_BOOLEAN = "ExtractAttachments";
 
     /**
      * The configuration key of the directory path where attachments will be extracted.
      */
-    public static final String CFGKEY_EXTRACT_PATH = "ExtractAttachmentsPath";
+    static final String CFGKEY_EXTRACT_PATH = "ExtractAttachmentsPath";
 
     /**
      * The configuration key of the input password for encrypted files.
      */
-    public static final String CFGKEY_CREDENTIALS = "CredentialsKey";
+    static final String CFGKEY_CREDENTIALS = "CredentialsKey";
 
     /**
      * he configuration key of the "parse encrypted files" flag.
      */
-    public static final String CFGKEY_ENCRYPTED = "ExtractEncrypted";
+    static final String CFGKEY_ENCRYPTED = "ExtractEncrypted";
 
 }

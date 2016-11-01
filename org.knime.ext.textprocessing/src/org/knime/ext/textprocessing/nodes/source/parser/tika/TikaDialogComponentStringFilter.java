@@ -52,6 +52,7 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.event.ChangeEvent;
@@ -69,7 +70,7 @@ import org.knime.core.node.util.filter.StringFilterPanel;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaDialogComponentStringFilter extends DialogComponent {
+public final class TikaDialogComponentStringFilter extends DialogComponent {
 
     private final StringFilterPanel m_stringPanel;
 
@@ -151,18 +152,18 @@ public class TikaDialogComponentStringFilter extends DialogComponent {
 
     /**
      * Update the include and exclude lists. This method should be called by a change listener Exclude list will be set
-     * to empty if both include/exclude lists are empty to each resprective type.
+     * to empty if both include/exclude lists are empty to each corresponding type.
      *
      */
     public void updateLists() {
-        if (m_type == "EXT") {
+        if (Objects.equals(m_type, "EXT")) {
             if (m_ext_incList.isEmpty() && m_ext_excList.isEmpty()) {
                 m_stringPanel.update(new ArrayList<String>(Arrays.asList(m_allTypes)), new ArrayList<String>(),
                     m_allTypes);
             } else {
                 m_stringPanel.update(m_ext_incList, m_ext_excList, m_allTypes);
             }
-        } else if (m_type == "MIME") {
+        } else if (Objects.equals(m_type, "MIME")) {
             if (m_mime_incList.isEmpty() && m_mime_excList.isEmpty()) {
                 m_stringPanel.update(new ArrayList<String>(Arrays.asList(m_allTypes)), new ArrayList<String>(),
                     m_allTypes);
@@ -173,10 +174,10 @@ public class TikaDialogComponentStringFilter extends DialogComponent {
     }
 
     private void setListBasedOnType(final List<String> incList, final List<String> excList) {
-        if (m_type == "EXT") {
+        if (Objects.equals(m_type, "EXT")) {
             m_ext_incList = incList;
             m_ext_excList = excList;
-        } else if (m_type == "MIME") {
+        } else if (Objects.equals(m_type, "MIME")) {
             m_mime_incList = incList;
             m_mime_excList = excList;
         }

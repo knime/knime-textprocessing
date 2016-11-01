@@ -57,7 +57,7 @@ import org.apache.tika.metadata.TikaCoreProperties;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaColumnKeys {
+public final class TikaColumnKeys {
 
     /**
      * The name of the file, including the extension.

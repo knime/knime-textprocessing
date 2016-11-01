@@ -63,71 +63,14 @@ import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
 
 /**
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
-
-    static SettingsModelString getPathModel() {
-        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_PATH, TikaParserNodeModel.DEFAULT_PATH);
-    }
-
-    static SettingsModelBoolean getRecursiveModel() {
-        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_RECURSIVE, TikaParserNodeModel.DEFAULT_RECURSIVE);
-    }
-
-    static SettingsModelBoolean getIgnoreHiddenFilesModel() {
-        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_IGNORE_HIDDENFILES,
-            TikaParserNodeModel.DEFAULT_IGNORE_HIDDENFILES);
-    }
-
-    static SettingsModelStringArray getColumnModel() {
-        return new SettingsModelStringArray(TikaParserConfigKeys.CFGKEY_COLUMNS_LIST,
-            TikaParserNodeModel.DEFAULT_COLUMNS_LIST);
-    }
-
-    static SettingsModelBoolean getErrorColumnModel() {
-        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ERROR_COLUMN,
-            TikaParserNodeModel.DEFAULT_ERROR_COLUMN);
-    }
-
-    static SettingsModelString getErrorColumnNameModel() {
-        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_ERROR_COLUMN_NAME,
-            TikaParserNodeModel.DEFAULT_ERROR_COLUMN_NAME);
-    }
-
-    static SettingsModelString getTypeModel() {
-        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_TYPE, TikaParserNodeModel.DEFAULT_TYPE);
-    }
-
-    static SettingsModelBoolean getExtractAttachmentModel() {
-        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_EXTRACT_BOOLEAN,
-            TikaParserNodeModel.DEFAULT_EXTRACT);
-    }
-
-    static SettingsModelString getExtractPathModel() {
-        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_EXTRACT_PATH,
-            TikaParserNodeModel.DEFAULT_EXTRACT_PATH);
-    }
-
-    static SettingsModelString getCredentials() {
-        return new SettingsModelString(TikaParserConfigKeys.CFGKEY_CREDENTIALS, "");
-    }
-
-    static SettingsModelBoolean getAuthBooleanModel() {
-        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_ENCRYPTED, TikaParserNodeModel.DEFAULT_ENCRYPTED);
-    }
-
-    static SettingsModelFilterString getFilterModel() {
-        return new SettingsModelFilterString(TikaParserConfigKeys.CFGKEY_FILTER_LIST,
-            TikaParserNodeModel.DEFAULT_TYPE_LIST, new String[0]);
-    }
+class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_typeModel;
 
@@ -156,18 +99,18 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
      * detected encrypted files should be parsed. If set to true, a password has to be given in the authentication
      * component.
      */
-    public TikaParserNodeDialog() {
+    TikaParserNodeDialog() {
         createNewGroup("Directory and files settings");
-        addDialogComponent(new DialogComponentFileChooser(getPathModel(), TikaParserNodeDialog.class.toString(),
+        addDialogComponent(new DialogComponentFileChooser(TikaParserNodeModel.getPathModel(), TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
 
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(getRecursiveModel(), "Search recursively"));
+        addDialogComponent(new DialogComponentBoolean(TikaParserNodeModel.getRecursiveModel(), "Search recursively"));
 
-        addDialogComponent(new DialogComponentBoolean(getIgnoreHiddenFilesModel(), "Ignore hidden files"));
+        addDialogComponent(new DialogComponentBoolean(TikaParserNodeModel.getIgnoreHiddenFilesModel(), "Ignore hidden files"));
         setHorizontalPlacement(false);
 
-        m_typeModel = getTypeModel();
+        m_typeModel = TikaParserNodeModel.getTypeModel();
 
         ButtonGroupEnumInterface[] options = new ButtonGroupEnumInterface[2];
         options[0] = new TypeButtonGroup("File Extension", true, "Choose which file to parse through its extension",
@@ -179,101 +122,50 @@ public class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         m_typeModel.addChangeListener(new ButtonChangeListener());
 
-        m_filterModel = new TikaDialogComponentStringFilter(getFilterModel(), "EXT", TikaParserNodeModel.DEFAULT_TYPE_LIST);
+        m_filterModel = new TikaDialogComponentStringFilter(TikaParserNodeModel.getFilterModel(), "EXT", TikaParserNodeModel.DEFAULT_TYPE_LIST);
         addDialogComponent(m_filterModel);
 
         closeCurrentGroup();
 
         createNewGroup("Output settings");
-        addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
+        addDialogComponent(new DialogComponentStringListSelection(TikaParserNodeModel.getColumnModel(), "Metadata",
             new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
         setHorizontalPlacement(true);
-        m_errorColModel = getErrorColumnModel();
-        m_errorColModel.addChangeListener(new InternalChangeListenerErr());
+
+        m_errorColModel = TikaParserNodeModel.getErrorColumnModel();
+        m_errorColNameModel = TikaParserNodeModel.getErrorColumnNameModel(m_errorColModel);
+
         DialogComponentBoolean errorColBooleanModel =
             new DialogComponentBoolean(m_errorColModel, "Create error column");
         errorColBooleanModel.setToolTipText(
             "Create an additional String column to show any error messages if they appear while parsing the files.");
         addDialogComponent(errorColBooleanModel);
-
-        m_errorColNameModel = getErrorColumnNameModel();
         addDialogComponent(new DialogComponentString(m_errorColNameModel, "New error output column"));
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
-        m_extractBooleanModel = getExtractAttachmentModel();
-        m_extractPathModel = getExtractPathModel();
+        setHorizontalPlacement(true);
+        m_extractBooleanModel = TikaParserNodeModel.getExtractAttachmentModel();
+        m_extractPathModel = TikaParserNodeModel.getExtractPathModel(m_extractBooleanModel);
+        setHorizontalPlacement(false);
 
-        m_extractBooleanModel.addChangeListener(new InternalChangeListenerExt());
-
+        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
         addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
+        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Encrypted files settings");
-        m_authBooleanModel = getAuthBooleanModel();
-        m_authBooleanModel.addChangeListener(new InternalChangeListenerAuth());
-        m_authModel = getCredentials();
+        setHorizontalPlacement(true);
+        m_authBooleanModel = TikaParserNodeModel.getAuthBooleanModel();
+        m_authModel = TikaParserNodeModel.getCredentials(m_authBooleanModel);
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
         addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
+        setHorizontalPlacement(false);
 
         closeCurrentGroup();
-    }
-
-    /**
-     * Listens to state change and enables / disables the model of the extracted path model
-     */
-    class InternalChangeListenerExt implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            if (m_extractBooleanModel.getBooleanValue()) {
-                m_extractPathModel.setEnabled(true);
-            } else {
-                m_extractPathModel.setEnabled(false);
-            }
-        }
-    }
-
-    /**
-     * Listens to state change and enables / disables the model of the authentication model
-     */
-    class InternalChangeListenerAuth implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            if (m_authBooleanModel.getBooleanValue()) {
-                m_authModel.setEnabled(true);
-            } else {
-                m_authModel.setEnabled(false);
-            }
-        }
-    }
-
-    /**
-     * Listens to state change and enables / disables the model of the authentication model
-     */
-    class InternalChangeListenerErr implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            if (m_errorColModel.getBooleanValue()) {
-                m_errorColNameModel.setEnabled(true);
-            } else {
-                m_errorColNameModel.setEnabled(false);
-            }
-        }
     }
 
     class ButtonChangeListener implements ChangeListener {
