@@ -54,8 +54,8 @@ import java.util.List;
 
 import org.knime.core.data.DataCell;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
 
 /**
  *
@@ -78,11 +78,11 @@ class FeedReaderResult {
     /**
      * Creates a new instance of {@code FeedReaderResult}.
      */
-    FeedReaderResult(final String url, final boolean docCol, final boolean xmlCol, final boolean HttpResponseCol) {
+    FeedReaderResult(final String url, final boolean docCol, final boolean xmlCol, final boolean httpResponseCol) {
         m_url = url;
         m_createDocCol = docCol;
         m_createXMLCol = xmlCol;
-        m_createHttpColumn = HttpResponseCol;
+        m_createHttpColumn = httpResponseCol;
     }
 
     /**
@@ -94,7 +94,6 @@ class FeedReaderResult {
         // get entries
         SyndFeed feed = feedResults;
         if (feed != null) {
-            @SuppressWarnings("unchecked")
             List<SyndEntry> entries = feed.getEntries();
             Iterator<SyndEntry> itEntries = entries.iterator();
             // read entries and fill cells with information
@@ -134,7 +133,6 @@ class FeedReaderResult {
 
     /**
      * Set the HTTP response code for the FeedReaderResult.
-     *
      * @param responseCode The HTTP response code.
      */
     void setHttpCode(final int responseCode) {

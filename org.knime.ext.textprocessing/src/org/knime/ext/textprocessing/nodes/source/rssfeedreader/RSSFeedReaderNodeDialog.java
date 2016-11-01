@@ -99,12 +99,12 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Returns the SettingsModelIntegerBounded for the time until the connection times out (in ms).
      */
-    static SettingsModelIntegerBounded createTimeOutModel() {
+    static final SettingsModelIntegerBounded createTimeOutModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_TIMEOUT,
             RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT, RSSFeedReaderNodeModel.MAX_TIMEOUT);
     }
 
-    static SettingsModelBoolean getHttpResponseCodeModel() {
+    static final SettingsModelBoolean getHttpResponseCodeModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_GET_HTTP_RESPONSE_CODE_COLUMN,
             RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN);
     }

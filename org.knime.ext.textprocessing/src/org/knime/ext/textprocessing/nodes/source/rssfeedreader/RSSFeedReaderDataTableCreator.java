@@ -77,10 +77,12 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.data.DocumentCell;
 
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
+
+
 
 /**
  *
@@ -131,11 +133,9 @@ class RSSFeedReaderDataTableCreator {
             String urlAsString = ((StringValue)inputCell).getStringValue();
             FeedReaderResult result =
                 new FeedReaderResult(urlAsString, m_createDocCol, m_createXMLCol, m_createHttpColumn);
-            URL url = null;
             SyndFeedInput feedInput = new SyndFeedInput();
             SyndFeed feed = null;
-            boolean isLocal = true;
-            InputStreamReader isr = null;
+            URL url = null;
             try {
                 url = new URL(urlAsString);
             } catch (MalformedURLException e) {
@@ -143,11 +143,15 @@ class RSSFeedReaderDataTableCreator {
             }
             LOGGER.debug("Connect to " + urlAsString + " or load file.");
             //Reading the feeds
+            boolean isLocal = true;
+            InputStreamReader isr = null;
             try {
                 // try to read local URL which could also include knime:// protocol. This will fail for remote
                 // http:// URLs.
-                isr = new InputStreamReader(new FileInputStream(FileUtil.getFileFromURL(url)), "UTF-8");
-                feed = feedInput.build(isr);
+                if (url != null) {
+                    isr = new InputStreamReader(new FileInputStream(FileUtil.getFileFromURL(url)), "UTF-8");
+                    feed = feedInput.build(isr);
+                }
             } catch (IllegalArgumentException e) {
                 // URL is not a local URL. URL will be red again.
                 isLocal = false;
@@ -252,7 +256,7 @@ class RSSFeedReaderDataTableCreator {
     }
 
     /**
-     * @param exec
+     * @param exec The {@code ExecutionContext}
      * @return Returns the {@code BufferedDataTable} containing the results from the {@code DataContainer}.
      */
     synchronized BufferedDataTable createDataTable(final ExecutionContext exec) {

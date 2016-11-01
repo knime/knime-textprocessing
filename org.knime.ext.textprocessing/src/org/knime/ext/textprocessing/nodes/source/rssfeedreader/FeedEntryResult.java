@@ -74,10 +74,10 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.xml.sax.SAXException;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
 
 /**
  *
@@ -219,7 +219,7 @@ class FeedEntryResult {
                 cell = XMLCellFactory.create(m_xml);
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read XML String for feed entry " + m_itemUrl);
+            LOGGER.warn("Could not read XML String for feed entry (" + m_itemUrl + ")");
         } catch (ParserConfigurationException | SAXException e) {
             LOGGER.warn("Could not parse XML to create content for XMLCell (" + m_itemUrl + ")");
         } catch (XMLStreamException e) {
@@ -260,7 +260,7 @@ class FeedEntryResult {
         } catch (IOException e) {
             LOGGER.warn("Could not write feed entry (" + entry.getLink() + ") to StringWriter");
         } catch (FeedException e) {
-            LOGGER.warn("Could not create XML representation for feed entry: " + entry.getLink(), e);
+            LOGGER.warn("Could not create XML representation for feed entry: " + entry.getLink());
         }
         return xmlWriter.toString();
     }
