@@ -48,14 +48,462 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.exception.EncryptedDocumentException;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.Property;
+import org.apache.tika.metadata.TikaMetadataKeys;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.PasswordProvider;
+import org.apache.tika.sax.BodyContentHandler;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
+import org.knime.core.util.FileUtil;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig.TikaColumnKeys;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+
 /**
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
 public class TikaParser {
 
-    public TikaParser(){
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaParser.class);
 
+    private ContentHandler m_handler;
+
+    private AutoDetectParser m_parser;
+
+    private Metadata m_metadata;
+
+    private ParseContext m_context;
+
+    private List<String> m_outputColumnsOne;
+
+    private List<String> m_validTypes; // MIME types
+
+    private String m_errorColName;
+
+    private boolean m_authBoolean;
+
+    private boolean m_extBoolean;
+
+    private boolean m_sourceNode;
+
+    private String m_password;
+
+    private String m_errorMsg;
+
+    private HashMap<String, Integer> m_duplicates;
+
+    /**
+     * @param sourceNode set to true for TikaParser, else false
+     */
+    public TikaParser(final boolean sourceNode) {
+        m_handler = new BodyContentHandler(-1);
+        m_parser = new AutoDetectParser();
+        m_metadata = new Metadata();
+        m_context = new ParseContext();
+        m_sourceNode = sourceNode;
+        m_errorMsg = "";
+    }
+
+    /** This method parses a file and creates a list of DataCell arrays containing the parsed information and its attachments.
+     * @param file the file to be parsed
+     * @param attachmentDir the directory where any attachments should be stored
+     * @return a list of data cells (index 0 should contain cells for the first output port, the rest for the second
+     *         output port
+     */
+    public List<DataCell[]> parse(final File file, final File attachmentDir) {
+        String mime_type = "-";
+        List<DataCell[]> result = new ArrayList<DataCell[]>();
+
+        if (!m_sourceNode && !file.isFile() && file.canRead()) {
+            m_errorMsg = "File might be a directory";
+            result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            return result;
+        }
+
+        if (!m_sourceNode && m_extBoolean) {
+            if (!m_validTypes.contains(FilenameUtils.getExtension(file.getName()).toLowerCase())) {
+                m_errorMsg = "File doesn't match any selected extension(s)";
+                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                return result;
+            }
+        }
+
+        if (!file.canRead()) {
+            m_errorMsg = "Unreadable file";
+            if (!m_sourceNode || m_extBoolean) {
+                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
+            return result;
+        }
+
+        if (m_authBoolean) {
+            setPasswordToContext();
+        }
+
+        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
+
+        try (BufferedInputStream str = new BufferedInputStream(new FileInputStream(file.getPath()))) {
+            mime_type = m_parser.getDetector().detect(str, m_metadata).toString();
+        } catch (FileNotFoundException e) {
+            m_errorMsg = "Could not find file";
+            if (!m_sourceNode || m_extBoolean) {
+                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
+            return result;
+        } catch (IOException e) {
+            m_errorMsg = "Unable to determine the MIME-type";
+            if (!m_sourceNode || m_extBoolean) {
+                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
+            return result;
+        }
+
+        if (mime_type.equals(MediaType.OCTET_STREAM.toString())) {
+            if (m_extBoolean) {
+                m_errorMsg = "Could not detect/parse file";
+                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                return result;
+            }
+        }
+        if (!m_extBoolean) {
+            if (!m_validTypes.contains(mime_type)) {
+                if (!m_sourceNode) {
+                    m_errorMsg = "File doesn't match any selected MIME-type(s)";
+                    result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                } // for source node, skip if mime type is not in the list of input mime types --> return empty list
+                return result;
+            }
+        }
+
+        try {
+            if (attachmentDir != null) {
+                try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
+                    EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
+                    ex.setContext(m_context);
+                    ex.setDuplicateFilesList(m_duplicates);
+                    ex.extract(stream, attachmentDir.toPath(), file.getName());
+                    if (ex.hasError()) {
+                        m_errorMsg = "Could not write embedded files to the output directory";
+                        LOGGER.error(m_errorMsg + ": " + file.getAbsolutePath());
+                    }
+                    m_metadata = ex.getMetadata();
+                    m_handler = ex.getHandler();
+
+                    DataCell[] cellsTwo = {};
+                    for (String entry : ex.getOutputFiles()) {
+                        cellsTwo = new DataCell[TikaParserConfig.OUTPUT_TWO_COL_NAMES.length];
+                        cellsTwo[0] = new StringCell(file.getAbsolutePath());
+                        cellsTwo[1] = new StringCell(entry);
+                        result.add(cellsTwo);
+                    }
+                }
+            } else {
+                try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
+                    m_parser.parse(stream, m_handler, m_metadata, m_context);
+                }
+            }
+        } catch (EncryptedDocumentException e) {
+            m_errorMsg = "Could not parse encrypted file, invalid password";
+            result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            return result;
+        } catch (IOException | SAXException | TikaException e) {
+            m_errorMsg = "Could not parse file, it might be broken";
+            result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            return result;
+        }
+
+        DataCell[] cellsOne = new DataCell[m_outputColumnsOne.size()];
+        for (int j = 0; j < m_outputColumnsOne.size(); j++) {
+            String colName = m_outputColumnsOne.get(j);
+            Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
+            if (prop == null && colName.equals(TikaColumnKeys.COL_FILEPATH)) {
+                cellsOne[j] = new StringCell(file.getAbsolutePath());
+            } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
+                if (mime_type.equals("-")) {
+                    cellsOne[j] = DataType.getMissingCell();
+                } else {
+                    cellsOne[j] = new StringCell(mime_type);
+                }
+            } else if (prop == null && colName.equals(TikaColumnKeys.COL_CONTENT)) {
+                cellsOne[j] = new StringCell(m_handler.toString());
+            } else if (prop == null && colName.equals(m_errorColName)) {
+                cellsOne[j] = m_errorMsg.isEmpty() ? DataType.getMissingCell() : new StringCell(m_errorMsg);
+            } else {
+                String val = m_metadata.get(prop);
+                if (val == null) {
+                    cellsOne[j] = DataType.getMissingCell();
+                } else {
+                    cellsOne[j] = new StringCell(val);
+                }
+            }
+        }
+        result.add(0, cellsOne);
+        return result;
+    }
+
+    private void setPasswordToContext() {
+        m_context.set(PasswordProvider.class, new PasswordProvider() {
+            @Override
+            public String getPassword(final Metadata md) {
+                return m_password;
+            }
+        });
+    }
+
+    private DataCell[] createMissingRow(final String file, final String errorMsg) {
+        int outputSize = m_outputColumnsOne.size();
+        DataCell[] cells = new DataCell[outputSize];
+        for (int j = 0; j < outputSize; j++) {
+            String colName = m_outputColumnsOne.get(j);
+            if (colName.equals(TikaColumnKeys.COL_FILEPATH)) {
+                cells[j] = new StringCell(file);
+            } else if (colName.equals(m_errorColName)) {
+                cells[j] = new StringCell(errorMsg);
+            } else {
+                cells[j] = DataType.getMissingCell();
+            }
+        }
+        return cells;
+    }
+
+    /**
+     * @param outputCols names of output columns
+     * @param file the file path
+     * @param rowKey row key for the output row
+     * @param errorMsg error message that should be contained in the row
+     * @param errorColName the name of the error column
+     * @return DataRow a data row containing missing cells and an error message
+     */
+    public static DataRow setMissingRow(final List<String> outputCols, final String file, final RowKey rowKey,
+        final String errorMsg, final String errorColName) {
+        int outputSize = outputCols.size();
+        DataCell[] cellsOne = new DataCell[outputSize];
+        for (int j = 0; j < outputSize; j++) {
+            String colName = outputCols.get(j);
+            if (colName.equals(TikaColumnKeys.COL_FILEPATH)) {
+                cellsOne[j] = file.isEmpty() ? DataType.getMissingCell() : new StringCell(file);
+            } else if (colName.equals(errorColName)) {
+                cellsOne[j] = new StringCell(errorMsg);
+            } else {
+                cellsOne[j] = DataType.getMissingCell();
+            }
+        }
+        return new DefaultRow(rowKey, cellsOne);
+    }
+
+    /**
+     * @param outputCols names of output columns
+     * @param file the file path
+     * @param rowKey row key for the output row
+     * @param errorMsg error message that should be contained in the row
+     * @param errorColName the name of the error column
+     * @return DataRow a data row containing missing cells and an error message
+     */
+    public static DataRow setMissingRow(final List<String> outputCols, final String file, final int rowKey,
+        final String errorMsg, final String errorColName) {
+        return setMissingRow(outputCols, file, RowKey.createRowKey((long)rowKey), errorMsg, errorColName);
+    }
+
+    /**
+     * @return the list of all supported MIME types in Tika.
+     */
+    public static String[] getMimeTypes() {
+        Iterator<MediaType> it = TikaParserConfig.VALID_TYPES.iterator();
+        List<String> list = new ArrayList<String>();
+        while (it.hasNext()) {
+            list.add(it.next().toString());
+        }
+        Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
+        return list.toArray(new String[list.size()]);
+    }
+
+    /**
+     * @return the list of all supported extensions in Tika.
+     */
+    public static String[] getExtensions() {
+        List<String> result = new ArrayList<String>();
+        MimeTypes allTypes = MimeTypes.getDefaultMimeTypes();
+        Iterator<MediaType> mimeTypes = TikaParserConfig.VALID_TYPES.iterator();
+        while (mimeTypes.hasNext()) {
+            String mime = mimeTypes.next().toString();
+
+            try {
+                List<String> extList = allTypes.forName(mime).getExtensions();
+                if (!extList.isEmpty()) {
+                    for (String s : extList) {
+                        String withoutDot = s.substring(1, s.length());
+                        if (!result.contains(withoutDot)) {
+                            result.add(withoutDot);
+                        }
+                    }
+                }
+            } catch (MimeTypeException e) {
+                LOGGER.error("Could not fetch MIME type: " + mime, new MimeTypeException("Fetching MIME type failed!"));
+            }
+        }
+        Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
+        return result.toArray(new String[result.size()]);
+    }
+
+    /**
+     * @param file the file path in String.
+     * @param dir true if the file is a directory.
+     * @return the file path in type of File.
+     * @throws InvalidSettingsException if the file is not a directory and unreadable.
+     */
+    public static File getFile(final String file, final boolean dir) throws InvalidSettingsException {
+        File f = null;
+        try {
+            // first try if file string is an URL (files in drop dir come as URLs)
+            final URL url = new URL(file);
+            f = FileUtil.getFileFromURL(url);
+        } catch (MalformedURLException e) {
+            // if no URL try string as path to file
+            f = new File(file);
+        }
+
+        if (dir && (!f.isDirectory() || !f.exists() || !f.canRead())) {
+            throw new InvalidSettingsException("Selected dir: " + file + " cannot be accessed!");
+        }
+
+        return f;
+    }
+
+    /////// getters and setters ///////
+
+    /**
+     * @return the m_authBoolean
+     */
+    public boolean getAuthBoolean() {
+        return m_authBoolean;
+    }
+
+    /**
+     * @param authBoolean the authBoolean to set
+     */
+    public void setAuthBoolean(final boolean authBoolean) {
+        this.m_authBoolean = authBoolean;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return m_password;
+    }
+
+    /**
+     * @param auth the password to set
+     */
+    public void setPassword(final String auth) {
+        this.m_password = auth;
+    }
+
+    /**
+     * @return the m_outputColumnsOne
+     */
+    public List<String> getOutputColumnsOne() {
+        return m_outputColumnsOne;
+    }
+
+    /**
+     * @param outputColumnsOne the outputColumnsOne to set
+     */
+    public void setOutputColumnsOne(final List<String> outputColumnsOne) {
+        this.m_outputColumnsOne = outputColumnsOne;
+    }
+
+    /**
+     * @return the m_errorColName
+     */
+    public String getErrorColName() {
+        return m_errorColName;
+    }
+
+    /**
+     * @param errorColName the errorColName to set
+     */
+    public void setErrorColName(final String errorColName) {
+        this.m_errorColName = errorColName;
+    }
+
+    /**
+     * @return the m_extBoolean
+     */
+    public boolean getExtBoolean() {
+        return m_extBoolean;
+    }
+
+    /**
+     * @param extBoolean the extBoolean to set
+     */
+    public void setExtBoolean(final boolean extBoolean) {
+        this.m_extBoolean = extBoolean;
+    }
+
+    /**
+     * @return the m_validTypes
+     */
+    public List<String> getValidTypes() {
+        return m_validTypes;
+    }
+
+    /**
+     * @param validTypes the validTypes to set
+     */
+    public void setValidTypes(final List<String> validTypes) {
+        this.m_validTypes = validTypes;
+    }
+
+    /**
+     * @return the m_duplicates
+     */
+    public HashMap<String, Integer> getDuplicates() {
+        return m_duplicates;
+    }
+
+    /**
+     * @param duplicates the duplicates to set
+     */
+    public void setDuplicates(final HashMap<String, Integer> duplicates) {
+        this.m_duplicates = duplicates;
+    }
+
+    /**
+     * @return the m_errorMsg
+     */
+    public String getErrorMsg() {
+        return m_errorMsg;
     }
 
 }

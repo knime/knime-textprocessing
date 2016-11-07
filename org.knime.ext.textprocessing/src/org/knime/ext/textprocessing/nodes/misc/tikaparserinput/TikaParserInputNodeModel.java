@@ -48,31 +48,14 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.exception.EncryptedDocumentException;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.io.TikaInputStream;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.Property;
-import org.apache.tika.metadata.TikaMetadataKeys;
-import org.apache.tika.mime.MediaType;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.PasswordProvider;
-import org.apache.tika.sax.BodyContentHandler;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -111,13 +94,8 @@ import org.knime.core.node.streamable.RowInput;
 import org.knime.core.node.streamable.RowOutput;
 import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.node.util.CheckUtils;
-import org.knime.core.util.FileUtil;
-import org.knime.ext.textprocessing.nodes.source.parser.tika.EmbeddedFilesExtractor;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParser;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
-import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig.TikaColumnKeys;
-import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserUtils;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 /**
  * The node model of the Tika Parser URL Input node. This model extends {@link org.knime.core.node.NodeModel} and is
@@ -145,7 +123,8 @@ final class TikaParserInputNodeModel extends NodeModel {
 
     private final SettingsModelBoolean m_errorColumnModel = TikaParserConfig.getErrorColumnModel();
 
-    private final SettingsModelString m_errorColNameModel = TikaParserConfig.getErrorColumnNameModel(m_errorColumnModel);
+    private final SettingsModelString m_errorColNameModel =
+        TikaParserConfig.getErrorColumnNameModel(m_errorColumnModel);
 
     private final SettingsModelFilterString m_filterModel = TikaParserConfig.getFilterModel();
 
@@ -287,41 +266,20 @@ final class TikaParserInputNodeModel extends NodeModel {
                     outputColumnsOne.add(m_errorColNameModel.getStringValue());
                 }
                 HashMap<String, Integer> duplicateFiles = new HashMap<String, Integer>();
-                int rowKeyOne = 0;
                 int rowKeyTwo = 0;
-
                 DataRow row;
                 int count = 0;
-
-                final File attachmentDir;
-                if (m_extractAttachmentModel.getBooleanValue()) {
-                    String outputDir = m_extractPathModel.getStringValue();
-
-                    File file = null;
-                    try {
-                        URL url = new URL(outputDir);
-                        file = FileUtil.getFileFromURL(url);
-                    } catch (MalformedURLException e) {
-                        file = new File(outputDir);
-                    }
-
-                    if (!file.exists()) {
-                        CheckUtils.checkSetting(file.mkdirs(),
-                            "Directory \"%s\" cannot be created. Please give a valid path.", outputDir);
-                        setWarningMessage("Attachment directory didn't exist and was created: " + outputDir);
-                    }
-                    attachmentDir = file;
-                } else {
-                    attachmentDir = null;
-                }
+                final File attachmentDir = getAttachmentDir();
 
                 while ((row = rowInput.poll()) != null) {
                     String errorMsg = "";
                     String url;
                     DataCell cell = row.getCell(colIndex);
+                    RowKey rowKeyOne = row.getKey();
                     if (cell.isMissing()) {
                         errorMsg = "Missing cell. Cannot locate file path";
-                        rowOutput1.push(setMissingRow(outputColumnsOne, "", rowKeyOne++, errorMsg));
+                        rowOutput1.push(TikaParser.setMissingRow(outputColumnsOne, "", rowKeyOne, errorMsg,
+                            m_errorColNameModel.getStringValue()));
                         continue;
                     }
                     // we can safely assume the type of the cell is either String or URI compatible as this was
@@ -332,163 +290,43 @@ final class TikaParserInputNodeModel extends NodeModel {
                         url = ((StringCell)cell).getStringValue();
                     }
 
-                    File file = TikaParserUtils.getFile(url, false);
+                    File file = TikaParser.getFile(url, false);
 
-                    if (!file.isFile() && file.canRead()) {
-                        errorMsg = "File might be a directory";
-                        rowOutput1.push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
-                        error = true;
-                        continue;
-                    }
+                    TikaParser tikaParser = new TikaParser(false);
+                    tikaParser.setOutputColumnsOne(outputColumnsOne);
+                    tikaParser.setValidTypes(validTypes);
+                    tikaParser.setErrorColName(m_errorColNameModel.getStringValue());
+                    tikaParser.setAuthBoolean(m_authBooleanModel.getBooleanValue());
+                    tikaParser.setExtBoolean(ext);
+                    tikaParser.setPassword(m_authModel.getStringValue());
+                    tikaParser.setDuplicates(duplicateFiles);
 
-                    if (ext) {
-                        if (!validTypes.contains(FilenameUtils.getExtension(file.getName()).toLowerCase())) {
-                            errorMsg = "File doesn't match any selected extension(s)";
-                            rowOutput1
-                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                            continue;
-                        }
-                    }
-
-                    if (!file.canRead()) {
-                        errorMsg = "Unreadable file";
-                        rowOutput1.push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
-                        error = true;
-                        continue;
-                    }
-
-                    String mime_type = "-";
-                    ContentHandler handler = new BodyContentHandler(-1);
-                    AutoDetectParser parser = new AutoDetectParser();
-                    Metadata metadata = new Metadata();
-                    ParseContext context = new ParseContext();
-                    if (m_authBooleanModel.getBooleanValue()) {
-                        final String password = m_authModel.getStringValue();
-                        context.set(PasswordProvider.class, new PasswordProvider() {
-                            @Override
-                            public String getPassword(final Metadata md) {
-                                return password;
-                            }
-                        });
-                    }
-                    metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
-
-                    try (BufferedInputStream str = new BufferedInputStream(new FileInputStream(file.getPath()))) {
-                        mime_type = parser.getDetector().detect(str, metadata).toString();
-                    } catch (FileNotFoundException e) {
-                        errorMsg = "Could not find file";
-                        if (ext) {
-                            rowOutput1
-                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        }
-                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
-                        error = true;
-                        continue;
-                    } catch (IOException e) {
-                        errorMsg = "Unable to determine the MIME-type";
-                        if (ext) {
-                            rowOutput1
-                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        }
-                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
-                        error = true;
-                        continue;
-                    }
-
-                    if (mime_type.equals(MediaType.OCTET_STREAM.toString())) {
-                        if (ext) {
-                            errorMsg = "Could not detect/parse file";
-                            rowOutput1
-                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                            LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
+                    List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
+                    duplicateFiles = tikaParser.getDuplicates();
+                    errorMsg = tikaParser.getErrorMsg();
+                    if (datacells.isEmpty()) {
+                        if (!errorMsg.isEmpty()) {
+                            setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
                             error = true;
-                            continue;
                         }
-                    }
-                    if (!ext) {
-                        if (!validTypes.contains(mime_type)) {
-                            errorMsg = "File doesn't match any selected MIME-type(s)";
-                            rowOutput1
-                                .push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                            continue;
-                        }
+                        continue; // skipped files
                     }
 
-                    try {
-                        if (attachmentDir != null) {
-                            try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
-                                EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
-                                ex.setContext(context);
-                                ex.setDuplicateFilesList(duplicateFiles);
-                                ex.extract(stream, attachmentDir.toPath(), file.getName());
-                                if (ex.hasError()) {
-                                    errorMsg = "Could not write embedded files to the output directory";
-                                    LOGGER.error(errorMsg + ": " + file.getAbsolutePath());
-                                    error = true;
-                                }
-                                metadata = ex.getMetadata();
-                                handler = ex.getHandler();
+                    DataCell[] rowOne = datacells.get(0);
+                    rowOutput1.push(new DefaultRow(rowKeyOne, rowOne));
 
-                                DataCell[] cellsTwo;
-                                DataRow rowTwo;
-                                for (String entry : ex.getOutputFiles()) {
-                                    cellsTwo = new DataCell[TikaParserConfig.OUTPUT_TWO_COL_NAMES.length];
-                                    cellsTwo[0] = new StringCell(file.getAbsolutePath());
-                                    cellsTwo[1] = new StringCell(entry);
-                                    rowTwo = new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), cellsTwo);
-                                    rowOutput2.push(rowTwo);
-                                    rowKeyTwo++;
-                                }
-                            }
-                        } else {
-                            try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
-                                parser.parse(stream, handler, metadata, context);
-                            }
-                        }
-                    } catch (EncryptedDocumentException e) {
-                        errorMsg = "Could not parse encrypted file, invalid password";
-                        rowOutput1.push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
-                        error = true;
-                        continue;
-                    } catch (IOException | SAXException | TikaException e) {
-                        errorMsg = "Could not parse file, it might be broken";
-                        rowOutput1.push(setMissingRow(outputColumnsOne, file.getAbsolutePath(), rowKeyOne++, errorMsg));
-                        LOGGER.warn(errorMsg + ": " + file.getAbsolutePath());
+                    if (!errorMsg.isEmpty()) {
+                        setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
                         error = true;
                         continue;
                     }
-                    DataCell[] cellsOne = new DataCell[outputColumnsOne.size()];
-                    for (int j = 0; j < outputColumnsOne.size(); j++) {
-                        String colName = outputColumnsOne.get(j);
-                        Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
-                        if (prop == null && colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                            cellsOne[j] = new StringCell(file.getAbsolutePath());
-                        } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
-                            if (mime_type.equals("-")) {
-                                cellsOne[j] = DataType.getMissingCell();
-                            } else {
-                                cellsOne[j] = new StringCell(mime_type);
-                            }
-                        } else if (prop == null && colName.equals(TikaColumnKeys.COL_CONTENT)) {
-                            cellsOne[j] = new StringCell(handler.toString());
-                        } else if (prop == null && colName.equals(m_errorColNameModel.getStringValue())) {
-                            cellsOne[j] = errorMsg.isEmpty() ? DataType.getMissingCell() : new StringCell(errorMsg);
-                        } else {
-                            String val = metadata.get(prop);
-                            if (val == null) {
-                                cellsOne[j] = DataType.getMissingCell();
-                            } else {
-                                cellsOne[j] = new StringCell(val);
-                            }
+
+                    if (datacells.size() > 1) {
+                        for (int j = 1; j < datacells.size(); j++) {
+                            rowOutput2.push(new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), datacells.get(j)));
+                            rowKeyTwo++;
                         }
                     }
-
-                    DataRow rowOne = new DefaultRow(RowKey.createRowKey((long)rowKeyOne), cellsOne);
-                    rowOutput1.push(rowOne);
-                    rowKeyOne++;
 
                     exec.checkCanceled();
 
@@ -501,7 +339,7 @@ final class TikaParserInputNodeModel extends NodeModel {
                 } // end for loop
 
                 if (error) {
-                    setWarningMessage("Could not parse all files properly!");
+                    setWarningMessage("Not all files are parsed!");
                 }
 
                 rowInput.close();
@@ -601,27 +439,6 @@ final class TikaParserInputNodeModel extends NodeModel {
         m_noRows = 0;
     }
 
-    private DataRow setMissingRow(final List<String> outputCols, final String file, final int rowKey,
-        final String errorMsg) {
-        int outputSize = outputCols.size();
-        DataCell[] cellsOne = new DataCell[outputSize];
-        for (int j = 0; j < outputSize; j++) {
-            String colName = outputCols.get(j);
-            if (colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                if (file.isEmpty()) {
-                    cellsOne[j] = DataType.getMissingCell();
-                } else {
-                    cellsOne[j] = new StringCell(file);
-                }
-            } else if (colName.equals(m_errorColNameModel.getStringValue())) {
-                cellsOne[j] = new StringCell(errorMsg);
-            } else {
-                cellsOne[j] = DataType.getMissingCell();
-            }
-        }
-        return new DefaultRow(RowKey.createRowKey((long)rowKey), cellsOne);
-    }
-
     private void stateChange() {
         if (m_extractAttachmentModel.getBooleanValue()) {
             m_extractPathModel.setEnabled(true);
@@ -639,6 +456,25 @@ final class TikaParserInputNodeModel extends NodeModel {
         } else {
             m_errorColNameModel.setEnabled(false);
         }
+    }
+
+    private File getAttachmentDir() throws InvalidSettingsException {
+        final File attachmentDir;
+        if (m_extractAttachmentModel.getBooleanValue()) {
+            String outputDir = m_extractPathModel.getStringValue();
+
+            File file = TikaParser.getFile(outputDir, false);
+
+            if (!file.exists()) {
+                CheckUtils.checkSetting(file.mkdirs(), "Directory \"%s\" cannot be created. Please give a valid path.",
+                    outputDir);
+                setWarningMessage("Attachment directory didn't exist and was created: " + outputDir);
+            }
+            attachmentDir = file;
+        } else {
+            attachmentDir = null;
+        }
+        return attachmentDir;
     }
 
 }

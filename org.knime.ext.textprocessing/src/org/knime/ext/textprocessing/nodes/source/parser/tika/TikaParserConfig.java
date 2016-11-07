@@ -71,7 +71,7 @@ public class TikaParserConfig {
     /**
      * The default path of the directory containing the files to parse.
      */
-    static final String DEFAULT_PATH = System.getProperty("user.home");
+    public static final String DEFAULT_PATH = System.getProperty("user.home");
 
     /**
      * The name of the document column to parse.
@@ -81,13 +81,13 @@ public class TikaParserConfig {
     /**
      * The default value of the recursive flag (if set <code>true</code> the specified directory is search recursively).
      */
-    static final boolean DEFAULT_RECURSIVE = false;
+    public static final boolean DEFAULT_RECURSIVE = false;
 
     /**
      * The default value of the ignore hidden files flag (if set <code>true</code> the hidden files will be not
      * considered for parsing.
      */
-    static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
+    public static final boolean DEFAULT_IGNORE_HIDDENFILES = true;
 
     /**
      * The action command value for choosing file extension in the dialog selection.
@@ -112,12 +112,12 @@ public class TikaParserConfig {
     /**
      * The list of all MIME-Types that will be shown in the dialog.
      */
-    public static final String[] MIMETYPE_LIST = TikaParserUtils.getMimeTypes();
+    public static final String[] MIMETYPE_LIST = TikaParser.getMimeTypes();
 
     /**
      * The list of all file extensions that will be shown in the dialog.
      */
-    public static final String[] EXTENSION_LIST = TikaParserUtils.getExtensions();
+    public static final String[] EXTENSION_LIST = TikaParser.getExtensions();
 
     /**
      * The default list that will be shown in the dialog. The default is the list of file extensions.
@@ -160,7 +160,10 @@ public class TikaParserConfig {
      */
     public static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments"};
 
-    static SettingsModelString getPathModel() {
+    /**
+     * @return SettingsModelString contains the string of the path to the input directory.
+     */
+    public static SettingsModelString getPathModel() {
         return new SettingsModelString(TikaParserConfigKeys.CFGKEY_PATH, DEFAULT_PATH);
     }
 
@@ -171,11 +174,17 @@ public class TikaParserConfig {
         return new SettingsModelString(TikaParserConfigKeys.CFGKEY_COL, DEFAULT_COLNAME);
     }
 
-    static SettingsModelBoolean getRecursiveModel() {
+    /**
+     * @return SettingsModelBoolean to decide whether to look in the input dir recursively.
+     */
+    public static SettingsModelBoolean getRecursiveModel() {
         return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_RECURSIVE, DEFAULT_RECURSIVE);
     }
 
-    static SettingsModelBoolean getIgnoreHiddenFilesModel() {
+    /**
+     * @return SettingsModelBoolean to decide whether to ignore hidden files.
+     */
+    public static SettingsModelBoolean getIgnoreHiddenFilesModel() {
         return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_IGNORE_HIDDENFILES, DEFAULT_IGNORE_HIDDENFILES);
     }
 
