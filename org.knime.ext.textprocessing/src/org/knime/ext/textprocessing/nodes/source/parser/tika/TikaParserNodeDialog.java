@@ -101,39 +101,39 @@ class TikaParserNodeDialog extends DefaultNodeSettingsPane {
      */
     TikaParserNodeDialog() {
         createNewGroup("Directory and files settings");
-        addDialogComponent(new DialogComponentFileChooser(TikaParserNodeModel.getPathModel(), TikaParserNodeDialog.class.toString(),
+        addDialogComponent(new DialogComponentFileChooser(TikaParserConfig.getPathModel(), TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
 
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(TikaParserNodeModel.getRecursiveModel(), "Search recursively"));
+        addDialogComponent(new DialogComponentBoolean(TikaParserConfig.getRecursiveModel(), "Search recursively"));
 
-        addDialogComponent(new DialogComponentBoolean(TikaParserNodeModel.getIgnoreHiddenFilesModel(), "Ignore hidden files"));
+        addDialogComponent(new DialogComponentBoolean(TikaParserConfig.getIgnoreHiddenFilesModel(), "Ignore hidden files"));
         setHorizontalPlacement(false);
 
-        m_typeModel = TikaParserNodeModel.getTypeModel();
+        m_typeModel = TikaParserConfig.getTypeModel();
 
         ButtonGroupEnumInterface[] options = new ButtonGroupEnumInterface[2];
         options[0] = new TypeButtonGroup("File Extension", true, "Choose which file to parse through its extension",
-            TikaParserNodeModel.EXT_TYPE);
+            TikaParserConfig.EXT_TYPE);
         options[1] = new TypeButtonGroup("MIME-Type", false, "Choose which file to parse through its MIME-Type",
-            TikaParserNodeModel.MIME_TYPE);
+            TikaParserConfig.MIME_TYPE);
 
         addDialogComponent(new DialogComponentButtonGroup(m_typeModel, "Choose which type to parse", false, options));
 
         m_typeModel.addChangeListener(new ButtonChangeListener());
 
-        m_filterModel = new TikaDialogComponentStringFilter(TikaParserNodeModel.getFilterModel(), "EXT", TikaParserNodeModel.DEFAULT_TYPE_LIST);
+        m_filterModel = new TikaDialogComponentStringFilter(TikaParserConfig.getFilterModel(), "EXT", TikaParserConfig.DEFAULT_TYPE_LIST);
         addDialogComponent(m_filterModel);
 
         closeCurrentGroup();
 
         createNewGroup("Output settings");
-        addDialogComponent(new DialogComponentStringListSelection(TikaParserNodeModel.getColumnModel(), "Metadata",
-            new ArrayList<String>(Arrays.asList(TikaParserNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
+        addDialogComponent(new DialogComponentStringListSelection(TikaParserConfig.getColumnModel(), "Metadata",
+            new ArrayList<String>(Arrays.asList(TikaParserConfig.DEFAULT_COLUMNS_LIST)), true, 5));
         setHorizontalPlacement(true);
 
-        m_errorColModel = TikaParserNodeModel.getErrorColumnModel();
-        m_errorColNameModel = TikaParserNodeModel.getErrorColumnNameModel(m_errorColModel);
+        m_errorColModel = TikaParserConfig.getErrorColumnModel();
+        m_errorColNameModel = TikaParserConfig.getErrorColumnNameModel(m_errorColModel);
 
         DialogComponentBoolean errorColBooleanModel =
             new DialogComponentBoolean(m_errorColModel, "Create error column");
@@ -146,8 +146,8 @@ class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         createNewGroup("Extract embedded files to a directory");
         setHorizontalPlacement(true);
-        m_extractBooleanModel = TikaParserNodeModel.getExtractAttachmentModel();
-        m_extractPathModel = TikaParserNodeModel.getExtractPathModel(m_extractBooleanModel);
+        m_extractBooleanModel = TikaParserConfig.getExtractAttachmentModel();
+        m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractBooleanModel);
         setHorizontalPlacement(false);
 
         setHorizontalPlacement(true);
@@ -159,8 +159,8 @@ class TikaParserNodeDialog extends DefaultNodeSettingsPane {
 
         createNewGroup("Encrypted files settings");
         setHorizontalPlacement(true);
-        m_authBooleanModel = TikaParserNodeModel.getAuthBooleanModel();
-        m_authModel = TikaParserNodeModel.getCredentials(m_authBooleanModel);
+        m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
+        m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
         addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
         setHorizontalPlacement(false);
@@ -176,13 +176,13 @@ class TikaParserNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             String selectedButton = m_typeModel.getStringValue();
-            if (selectedButton.equals(TikaParserNodeModel.EXT_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserNodeModel.EXTENSION_LIST);
+            if (selectedButton.equals(TikaParserConfig.EXT_TYPE)) {
+                m_filterModel.setAllTypes(TikaParserConfig.EXTENSION_LIST);
                 m_filterModel.setType("EXT");
                 m_filterModel.updateLists();
 
-            } else if (selectedButton.equals(TikaParserNodeModel.MIME_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserNodeModel.MIMETYPE_LIST);
+            } else if (selectedButton.equals(TikaParserConfig.MIME_TYPE)) {
+                m_filterModel.setAllTypes(TikaParserConfig.MIMETYPE_LIST);
                 m_filterModel.setType("MIME");
                 m_filterModel.updateLists();
             }

@@ -66,10 +66,9 @@ import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaDialogComponentStringFilter;
 
 /**
@@ -78,56 +77,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaDialogComponent
  */
 final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
 
-    static SettingsModelString getColModel() {
-        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_COL, TikaParserInputNodeModel.DEFAULT_COLNAME);
-    }
-
-    static SettingsModelStringArray getColumnModel() {
-        return new SettingsModelStringArray(TikaParserInputConfigKeys.CFGKEY_COLUMNS_LIST,
-            TikaParserInputNodeModel.DEFAULT_COLUMNS_LIST);
-    }
-
-    static SettingsModelString getTypeModel() {
-        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_TYPE, TikaParserInputNodeModel.DEFAULT_TYPE);
-    }
-
-    static SettingsModelBoolean getErrorColumnModel() {
-        return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_ERROR_COLUMN,
-            TikaParserInputNodeModel.DEFAULT_ERROR_COLUMN);
-    }
-
-    static SettingsModelString getErrorColumnNameModel() {
-        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_ERROR_COLUMN_NAME,
-            TikaParserInputNodeModel.DEFAULT_ERROR_COLUMN_NAME);
-    }
-
-    static SettingsModelBoolean getExtractAttachmentModel() {
-        return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_EXTRACT_BOOLEAN,
-            TikaParserInputNodeModel.DEFAULT_EXTRACT);
-    }
-
-    static SettingsModelString getExtractPathModel() {
-        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_EXTRACT_PATH,
-            TikaParserInputNodeModel.DEFAULT_EXTRACT_PATH);
-    }
-
-    static SettingsModelString getCredentials() {
-        return new SettingsModelString(TikaParserInputConfigKeys.CFGKEY_CREDENTIALS, "");
-    }
-
-    static SettingsModelBoolean getAuthBooleanModel() {
-        return new SettingsModelBoolean(TikaParserInputConfigKeys.CFGKEY_ENCRYPTED,
-            TikaParserInputNodeModel.DEFAULT_ENCRYPTED);
-    }
-
-    static SettingsModelFilterString getFilterModel() {
-        return new SettingsModelFilterString(TikaParserInputConfigKeys.CFGKEY_FILTER_LIST,
-            TikaParserInputNodeModel.DEFAULT_TYPE_LIST, new String[0]);
-    }
-
     private SettingsModelString m_typeModel;
-
-    private DialogComponentStringListSelection m_typeListModel;
 
     private SettingsModelBoolean m_extractBooleanModel;
 
@@ -156,31 +106,31 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public TikaParserInputNodeDialog() {
         createNewGroup("Input column and files settings");
-        addDialogComponent(new DialogComponentColumnNameSelection(getColModel(), "File path column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(TikaParserConfig.getColModel(), "File path column", 0,
             StringValue.class, URIDataValue.class));
 
-        m_typeModel = getTypeModel();
+        m_typeModel = TikaParserConfig.getTypeModel();
 
         ButtonGroupEnumInterface[] options = new ButtonGroupEnumInterface[2];
         options[0] = new TypeButtonGroup("File Extension", true, "Choose which file to parse through its extension",
-            TikaParserInputNodeModel.EXT_TYPE);
+            TikaParserConfig.EXT_TYPE);
         options[1] = new TypeButtonGroup("MIME-Type", false, "Choose which file to parse through its MIME-Type",
-            TikaParserInputNodeModel.MIME_TYPE);
+            TikaParserConfig.MIME_TYPE);
 
         addDialogComponent(new DialogComponentButtonGroup(m_typeModel, "Choose which type to parse", false, options));
 
         m_typeModel.addChangeListener(new ButtonChangeListener());
 
-        m_filterModel = new TikaDialogComponentStringFilter(getFilterModel(), "EXT", TikaParserInputNodeModel.DEFAULT_TYPE_LIST);
+        m_filterModel = new TikaDialogComponentStringFilter(TikaParserConfig.getFilterModel(), "EXT", TikaParserConfig.DEFAULT_TYPE_LIST);
         addDialogComponent(m_filterModel);
 
         closeCurrentGroup();
 
         createNewGroup("Output settings");
-        addDialogComponent(new DialogComponentStringListSelection(getColumnModel(), "Metadata",
-            new ArrayList<String>(Arrays.asList(TikaParserInputNodeModel.DEFAULT_COLUMNS_LIST)), true, 5));
+        addDialogComponent(new DialogComponentStringListSelection(TikaParserConfig.getColumnModel(), "Metadata",
+            new ArrayList<String>(Arrays.asList(TikaParserConfig.DEFAULT_COLUMNS_LIST)), true, 5));
         setHorizontalPlacement(true);
-        m_errorColModel = getErrorColumnModel();
+        m_errorColModel = TikaParserConfig.getErrorColumnModel();
         m_errorColModel.addChangeListener(new InternalChangeListenerErr());
         DialogComponentBoolean errorColBooleanModel =
             new DialogComponentBoolean(m_errorColModel, "Create error column");
@@ -188,14 +138,14 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
             "Create an additional String column to show any error messages if they appear while parsing the files.");
         addDialogComponent(errorColBooleanModel);
 
-        m_errorColNameModel = getErrorColumnNameModel();
+        m_errorColNameModel = TikaParserConfig.getErrorColumnNameModel(m_errorColModel);
         addDialogComponent(new DialogComponentString(m_errorColNameModel, "New error output column"));
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
-        m_extractBooleanModel = getExtractAttachmentModel();
-        m_extractPathModel = getExtractPathModel();
+        m_extractBooleanModel = TikaParserConfig.getExtractAttachmentModel();
+        m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractBooleanModel);
         m_extractBooleanModel.addChangeListener(new InternalChangeListenerExt());
 
         addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Parse attachments and embedded files"));
@@ -204,9 +154,9 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
 
         createNewGroup("Encrypted files settings");
-        m_authBooleanModel = getAuthBooleanModel();
+        m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
         m_authBooleanModel.addChangeListener(new InternalChangeListenerAuth());
-        m_authModel = getCredentials();
+        m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
         addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
         closeCurrentGroup();
@@ -275,13 +225,13 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             String selectedButton = m_typeModel.getStringValue();
-            if (selectedButton.equals(TikaParserInputNodeModel.EXT_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserInputNodeModel.EXTENSION_LIST);
+            if (selectedButton.equals(TikaParserConfig.EXT_TYPE)) {
+                m_filterModel.setAllTypes(TikaParserConfig.EXTENSION_LIST);
                 m_filterModel.setType("EXT");
                 m_filterModel.updateLists();
 
-            } else if (selectedButton.equals(TikaParserInputNodeModel.MIME_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserInputNodeModel.MIMETYPE_LIST);
+            } else if (selectedButton.equals(TikaParserConfig.MIME_TYPE)) {
+                m_filterModel.setAllTypes(TikaParserConfig.MIMETYPE_LIST);
                 m_filterModel.setType("MIME");
                 m_filterModel.updateLists();
             }

@@ -62,6 +62,11 @@ final class TikaParserConfigKeys {
     static final String CFGKEY_PATH = "Path";
 
     /**
+     * The configuration key of the column containing the documents or strings.
+     */
+    static final String CFGKEY_COL = "Column";
+
+    /**
      * The configuration key of the recursive flag (if set the specified directory is search recursively).
      */
     static final String CFGKEY_RECURSIVE = "Rec";

@@ -44,66 +44,18 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   26.07.2016 (andisadewi): created
+ *   07.11.2016 (andisadewi): created
  */
-package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
+package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
 /**
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-final class TikaParserInputConfigKeys {
-    private TikaParserInputConfigKeys() {
+public class TikaParser {
+
+    public TikaParser(){
+
     }
-
-    /**
-     * The configuration key of the column containing the documents or strings.
-     */
-    static final String CFGKEY_COL = "Column";
-
-    /**
-     * The configuration key of the list of the file types (either file extensions or MIME-Types).
-     */
-    static final String CFGKEY_FILTER_LIST = "TypeFilterList";
-
-    /**
-     * The configuration key of the list of the metadata information that are to be extracted.
-     */
-    static final String CFGKEY_COLUMNS_LIST = "ColumnsList";
-
-    /**
-     * The configuration key of the type button to choose between file extension or MIME-Type.
-     */
-    static final String CFGKEY_TYPE = "Type";
-
-    /**
-     * The configuration key of the "create error column" flag.
-     */
-    static final String CFGKEY_ERROR_COLUMN = "ErrorColumn";
-
-    /**
-     * The configuration key of the name of the error column.
-     */
-    static final String CFGKEY_ERROR_COLUMN_NAME = "ErrorColumnName";
-
-    /**
-     * The configuration key of the "extract attachments" flag.
-     */
-    static final String CFGKEY_EXTRACT_BOOLEAN = "ExtractAttachments";
-
-    /**
-     * The configuration key of the directory path where attachments will be extracted.
-     */
-    static final String CFGKEY_EXTRACT_PATH = "ExtractAttachmentsPath";
-
-    /**
-     * The configuration key of the input password for encrypted files.
-     */
-    static final String CFGKEY_CREDENTIALS = "CredentialsKey";
-
-    /**
-     * The configuration key of the "parse encrypted files" flag.
-     */
-    static final String CFGKEY_ENCRYPTED = "ExtractEncrypted";
 
 }
