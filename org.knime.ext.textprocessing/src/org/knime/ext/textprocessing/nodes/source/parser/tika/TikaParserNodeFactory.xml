@@ -96,7 +96,7 @@
 			encrypted files using the given password. If the password is invalid,
 			a warning will be given.
 		</option>
-		<option name="Enter password for any encrypted files">
+		<option name="Enter password">
 			Specify the password for any encrypted files in
 			the directory. Note: this password will be used to open all encrypted
 			files in the directory.
