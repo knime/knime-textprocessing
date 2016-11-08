@@ -44,201 +44,42 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   08.06.2016 (andisadewi): created
+ *   08.11.2016 (andisadewi): created
  */
 package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import javax.swing.JFileChooser;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
-import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
-import org.knime.core.node.defaultnodesettings.DialogComponentString;
-import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.util.ButtonGroupEnumInterface;
 
 /**
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-class TikaParserNodeDialog extends DefaultNodeSettingsPane {
+class TikaParserNodeDialog extends AbstractTikaNodeDialog {
 
-    private SettingsModelString m_typeModel;
-
-    private SettingsModelString m_errorColNameModel;
-
-    private SettingsModelBoolean m_errorColModel;
-
-    private SettingsModelBoolean m_extractBooleanModel;
-
-    private SettingsModelString m_extractPathModel;
-
-    private SettingsModelBoolean m_authBooleanModel;
-
-    private SettingsModelString m_authModel;
-
-    private TikaDialogComponentStringFilter m_filterModel;
+    TikaParserNodeDialog() {
+        super();
+    }
 
     /**
-     * Creates a new instance of {@code TikaParserNodeDialog} which displays a file chooser component, to specify the
-     * directory containing the files to parse, two checkbox components to specify if the directory is searched
-     * recursively for files to parse and whether to ignore hidden files, button and list components to specify which
-     * file types are to be parsed (through file extension or MIME-Type), and the last list component is to specify
-     * which meta data information are to be extracted. A tick box for creating an additional error column is provided.
-     * Another boolean button is added to specify whether embedded files should be extracted as well to a specific
-     * directory using a file chooser component. For encrypted files, there is a boolean button to specify whether any
-     * detected encrypted files should be parsed. If set to true, a password has to be given in the authentication
-     * component.
+     * {@inheritDoc}
      */
-    TikaParserNodeDialog() {
-        createNewGroup("Directory and files settings");
-        addDialogComponent(new DialogComponentFileChooser(TikaParserConfig.getPathModel(), TikaParserNodeDialog.class.toString(),
-            JFileChooser.OPEN_DIALOG, true));
+    @Override
+    protected void createInputGroup() {
+        createNewGroup("Directory settings");
+      addDialogComponent(new DialogComponentFileChooser(TikaParserConfig.getPathModel(),
+          TikaParserNodeDialog.class.toString(), JFileChooser.OPEN_DIALOG, true));
 
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(TikaParserConfig.getRecursiveModel(), "Search recursively"));
+      setHorizontalPlacement(true);
+      addDialogComponent(new DialogComponentBoolean(TikaParserConfig.getRecursiveModel(), "Search recursively"));
 
-        addDialogComponent(new DialogComponentBoolean(TikaParserConfig.getIgnoreHiddenFilesModel(), "Ignore hidden files"));
-        setHorizontalPlacement(false);
+      addDialogComponent(
+          new DialogComponentBoolean(TikaParserConfig.getIgnoreHiddenFilesModel(), "Ignore hidden files"));
+      setHorizontalPlacement(false);
+      closeCurrentGroup();
 
-        m_typeModel = TikaParserConfig.getTypeModel();
-
-        ButtonGroupEnumInterface[] options = new ButtonGroupEnumInterface[2];
-        options[0] = new TypeButtonGroup("File Extension", true, "Choose which file to parse through its extension",
-            TikaParserConfig.EXT_TYPE);
-        options[1] = new TypeButtonGroup("MIME-Type", false, "Choose which file to parse through its MIME-Type",
-            TikaParserConfig.MIME_TYPE);
-
-        addDialogComponent(new DialogComponentButtonGroup(m_typeModel, "Choose which type to parse", false, options));
-
-        m_typeModel.addChangeListener(new ButtonChangeListener());
-
-        m_filterModel = new TikaDialogComponentStringFilter(TikaParserConfig.getFilterModel(), "EXT", TikaParserConfig.DEFAULT_TYPE_LIST);
-        addDialogComponent(m_filterModel);
-
-        closeCurrentGroup();
-
-        createNewGroup("Output settings");
-        addDialogComponent(new DialogComponentStringListSelection(TikaParserConfig.getColumnModel(), "Metadata",
-            new ArrayList<String>(Arrays.asList(TikaParserConfig.DEFAULT_COLUMNS_LIST)), true, 5));
-        setHorizontalPlacement(true);
-
-        m_errorColModel = TikaParserConfig.getErrorColumnModel();
-        m_errorColNameModel = TikaParserConfig.getErrorColumnNameModel(m_errorColModel);
-
-        DialogComponentBoolean errorColBooleanModel =
-            new DialogComponentBoolean(m_errorColModel, "Create error column");
-        errorColBooleanModel.setToolTipText(
-            "Create an additional String column to show any error messages if they appear while parsing the files.");
-        addDialogComponent(errorColBooleanModel);
-        addDialogComponent(new DialogComponentString(m_errorColNameModel, "New error output column"));
-        setHorizontalPlacement(false);
-        closeCurrentGroup();
-
-        createNewGroup("Extract embedded files to a directory");
-        setHorizontalPlacement(true);
-        m_extractBooleanModel = TikaParserConfig.getExtractAttachmentModel();
-        m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractBooleanModel);
-        setHorizontalPlacement(false);
-
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
-        addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserNodeDialog.class.toString(),
-            JFileChooser.OPEN_DIALOG, true));
-        setHorizontalPlacement(false);
-        closeCurrentGroup();
-
-        createNewGroup("Encrypted files settings");
-        setHorizontalPlacement(true);
-        m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
-        m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
-        addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
-        addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
-        setHorizontalPlacement(false);
-
-        closeCurrentGroup();
-    }
-
-    class ButtonChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            String selectedButton = m_typeModel.getStringValue();
-            if (selectedButton.equals(TikaParserConfig.EXT_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserConfig.EXTENSION_LIST);
-                m_filterModel.setType("EXT");
-                m_filterModel.updateLists();
-
-            } else if (selectedButton.equals(TikaParserConfig.MIME_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserConfig.MIMETYPE_LIST);
-                m_filterModel.setType("MIME");
-                m_filterModel.updateLists();
-            }
-
-        }
-    }
-
-    private final class TypeButtonGroup implements ButtonGroupEnumInterface {
-
-        private String m_text;
-
-        private String m_tooltip;
-
-        private boolean m_default;
-
-        private String m_command;
-
-        private TypeButtonGroup(final String text, final boolean isDefault, final String toolTip,
-            final String command) {
-            m_text = text;
-            m_tooltip = toolTip;
-            m_default = isDefault;
-            m_command = command;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getActionCommand() {
-            return m_command;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getText() {
-            return m_text;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getToolTip() {
-            return m_tooltip;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isDefault() {
-            return m_default;
-        }
     }
 
 }
