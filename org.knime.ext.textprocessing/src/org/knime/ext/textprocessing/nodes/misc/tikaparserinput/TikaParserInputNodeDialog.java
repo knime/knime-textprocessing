@@ -68,8 +68,8 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
-import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaDialogComponentStringFilter;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
 
 /**
  *
@@ -131,7 +131,6 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
             new ArrayList<String>(Arrays.asList(TikaParserConfig.DEFAULT_COLUMNS_LIST)), true, 5));
         setHorizontalPlacement(true);
         m_errorColModel = TikaParserConfig.getErrorColumnModel();
-        m_errorColModel.addChangeListener(new InternalChangeListenerErr());
         DialogComponentBoolean errorColBooleanModel =
             new DialogComponentBoolean(m_errorColModel, "Create error column");
         errorColBooleanModel.setToolTipText(
@@ -144,21 +143,24 @@ final class TikaParserInputNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
+        setHorizontalPlacement(true);
         m_extractBooleanModel = TikaParserConfig.getExtractAttachmentModel();
         m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractBooleanModel);
-        m_extractBooleanModel.addChangeListener(new InternalChangeListenerExt());
-
-        addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Parse attachments and embedded files"));
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
         addDialogComponent(new DialogComponentFileChooser(m_extractPathModel,
             TikaParserInputNodeDialog.class.toString(), JFileChooser.OPEN_DIALOG, true));
+        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Encrypted files settings");
+        setHorizontalPlacement(true);
         m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
-        m_authBooleanModel.addChangeListener(new InternalChangeListenerAuth());
         m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
-        addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Extract encrypted files"));
+        addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
         addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
+        setHorizontalPlacement(false);
         closeCurrentGroup();
 
     }
