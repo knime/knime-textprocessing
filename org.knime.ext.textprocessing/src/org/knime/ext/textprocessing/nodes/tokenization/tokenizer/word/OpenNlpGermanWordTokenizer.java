@@ -81,7 +81,7 @@ public class OpenNlpGermanWordTokenizer implements Tokenizer {
             TokenizerModel model = new TokenizerModel(is);
             m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);
         } catch (IOException e) {
-            LOGGER.error("German word tokenizer model could not be red!");
+            LOGGER.error("German word tokenizer model could not be read!");
             LOGGER.error(e.getStackTrace());
         }
     }

@@ -90,7 +90,8 @@ public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
             + "It is based heavily on the FrenchTokenizer. "
             + "The tokenizer tokenizes according to the modified AnCora corpus tokenization standards, "
             + "so the rules are a little different from PTB.\" "
-            + "For more information about the StanfordNLP tokenizer, visit their website.";
+            + "For more information about the StanfordNLP tokenizer, visit their website: "
+            + "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/international/spanish/process/SpanishTokenizer.html";
     }
 
 }
