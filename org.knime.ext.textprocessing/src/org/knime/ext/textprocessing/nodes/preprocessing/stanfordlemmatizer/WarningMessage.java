@@ -56,7 +56,7 @@ import org.knime.core.node.streamable.simple.SimpleStreamableOperatorInternals;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public final class WarningMessage extends SimpleStreamableOperatorInternals {
+final class WarningMessage extends SimpleStreamableOperatorInternals {
 
     private static final String CONFIG_KEY = "warningmessage";
 
