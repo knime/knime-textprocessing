@@ -72,22 +72,6 @@ public class StanfordLemmatizer implements TermPreprocessing {
     private WarningMessage m_warnMessage;
 
     /**
-     * Creates new instance of StanfordLemmatizer where the terms with no POS tags will be skipped by default.
-     */
-    public StanfordLemmatizer() {
-        this(DEF_FAIL);
-    }
-
-    /**
-     * Creates new instance of StanfordLemmatizer.
-     *
-     * @param skip boolean whether terms with no POS tags should be skipped or not
-     */
-    public StanfordLemmatizer(final boolean skip) {
-        m_skipTerms = skip;
-    }
-
-    /**
      * Creates new instance of StanfordLemmatizer.
      *
      * @param msg a WarningMessage object to store any warning message that may appear after processing
