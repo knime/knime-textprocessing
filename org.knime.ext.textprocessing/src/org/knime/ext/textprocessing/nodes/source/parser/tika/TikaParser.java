@@ -98,29 +98,29 @@ public class TikaParser {
 
     private ContentHandler m_handler;
 
-    private AutoDetectParser m_parser;
+    final private AutoDetectParser m_parser;
 
     private Metadata m_metadata;
 
-    private ParseContext m_context;
+    final private ParseContext m_context;
 
-    private List<String> m_outputColumnsOne;
+    private List<String> m_outputColumnsOne = null;
 
-    private List<String> m_validTypes; // MIME types
+    private List<String> m_validTypes = null; // MIME types
 
-    private String m_errorColName;
+    private String m_errorColName = "";
 
-    private boolean m_authBoolean;
+    private boolean m_authBoolean = false;
 
-    private boolean m_extBoolean;
+    private boolean m_extBoolean = false;
 
-    private boolean m_sourceNode;
+    private boolean m_sourceNode = false;
 
-    private String m_password;
+    private String m_password = "";
 
-    private String m_errorMsg;
+    private String m_errorMsg = "";
 
-    private HashMap<String, Integer> m_duplicates;
+    private HashMap<String, Integer> m_duplicates = null;
 
     /**
      * @param sourceNode set to true for TikaParser, else false
@@ -131,10 +131,12 @@ public class TikaParser {
         m_metadata = new Metadata();
         m_context = new ParseContext();
         m_sourceNode = sourceNode;
-        m_errorMsg = "";
     }
 
-    /** This method parses a file and creates a list of DataCell arrays containing the parsed information and its attachments.
+    /**
+     * This method parses a file and creates a list of DataCell arrays containing the parsed information and its
+     * attachments.
+     *
      * @param file the file to be parsed
      * @param attachmentDir the directory where any attachments should be stored
      * @return a list of data cells (index 0 should contain cells for the first output port, the rest for the second
