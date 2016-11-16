@@ -53,11 +53,11 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
+ * Dialog for the Stanford lemmatizer node.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class StanfordLemmatizerNodeDialog extends PreprocessingNodeSettingsPane2 {
-
+class StanfordLemmatizerNodeDialog extends PreprocessingNodeSettingsPane2 {
     /**
      * @return Creates and returns a boolean model which determines if the node should fail in case of no POS tags found.
      */
@@ -66,17 +66,17 @@ public class StanfordLemmatizerNodeDialog extends PreprocessingNodeSettingsPane2
     }
 
     /**
-     * Creates a new instance of {@code StanfordLemmatizerNodeDialog} providing a check box to
-     * determine whether the node should fail when at least one term has no POS tag.
+     * Creates a new instance of {@code StanfordLemmatizerNodeDialog} providing a check box to determine whether the
+     * node should fail when at least one term has no POS tag.
      */
     public StanfordLemmatizerNodeDialog() {
-        super();
-
         createNewTab("Lemmatizer options");
         setSelected("Lemmatizer options");
 
-        DialogComponentBoolean skipTerms = new DialogComponentBoolean(getFailModel(), "Node should fail when terms with no POS tag are found");
-        skipTerms.setToolTipText("If checked, node will fail when any terms with no POS tag are found, else they will be skipped.");
+        DialogComponentBoolean skipTerms =
+            new DialogComponentBoolean(getFailModel(), "Node should fail when terms with no POS tag are found");
+        skipTerms.setToolTipText(
+            "If checked, node will fail when any terms with no POS tag are found, else they will be skipped.");
         addDialogComponent(skipTerms);
     }
 }

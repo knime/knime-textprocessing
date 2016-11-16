@@ -52,11 +52,9 @@ package org.knime.ext.textprocessing.nodes.preprocessing.stanfordlemmatizer;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class StanfordLemmatizerConfigKeys {
-
+class StanfordLemmatizerConfigKeys {
     private StanfordLemmatizerConfigKeys() { }
 
     /** The configuration key for deciding if the node should fail */
     public static final String CFG_KEY_FAIL = "Fail";
-
 }

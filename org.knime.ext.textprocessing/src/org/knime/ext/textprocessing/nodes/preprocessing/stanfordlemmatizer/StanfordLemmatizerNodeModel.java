@@ -48,29 +48,28 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.stanfordlemmatizer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.streamable.StreamableOperatorInternals;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableProcessingWithInternalsNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- * The node model for the Stanford Lemmatizer
+ * The node model for the Stanford Lemmatizer.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class StanfordLemmatizerNodeModel extends StreamableProcessingWithInternalsNodeModel<WarningMessage> {
-
+class StanfordLemmatizerNodeModel extends StreamableProcessingWithInternalsNodeModel<WarningMessage> {
     private SettingsModelBoolean m_failModel = StanfordLemmatizerNodeDialog.getFailModel();
     private StanfordLemmatizer m_lemma;
 
     /**
-     * @param cl The class of the {@link StreamableOperatorInternals}.
+     * Creates a new node model.
      */
-    public StanfordLemmatizerNodeModel(final Class<WarningMessage> cl) {
-        super(cl);
+    public StanfordLemmatizerNodeModel() {
+        super(WarningMessage.class);
     }
 
     /**
@@ -87,9 +86,9 @@ public class StanfordLemmatizerNodeModel extends StreamableProcessingWithInterna
      */
     @Override
     protected void afterProcessing() {
-        WarningMessage warningMessage = m_lemma.getWarnMessage();
-        if (warningMessage.get() != null && warningMessage.get().length() > 0) {
-            setWarningMessage(warningMessage.get());
+        String warningMessage = m_lemma.getWarnMessage().get();
+        if (!StringUtils.isEmpty(warningMessage)) {
+            setWarningMessage(warningMessage);
         }
     }
 
@@ -155,6 +154,5 @@ public class StanfordLemmatizerNodeModel extends StreamableProcessingWithInterna
         super.validateSettings(settings);
         m_failModel.validateSettings(settings);
     }
-
 }
 

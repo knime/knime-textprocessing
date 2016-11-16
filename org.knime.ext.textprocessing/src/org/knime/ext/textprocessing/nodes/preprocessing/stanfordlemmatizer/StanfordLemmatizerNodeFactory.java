@@ -63,7 +63,7 @@ public class StanfordLemmatizerNodeFactory extends NodeFactory<StanfordLemmatize
      */
     @Override
     public StanfordLemmatizerNodeModel createNodeModel() {
-        return new StanfordLemmatizerNodeModel(WarningMessage.class);
+        return new StanfordLemmatizerNodeModel();
     }
 
     /**

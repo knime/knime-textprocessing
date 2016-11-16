@@ -63,7 +63,7 @@ import org.knime.core.node.streamable.StreamableFunction;
 import org.knime.core.node.streamable.StreamableOperatorInternals;
 
 /**
- * Abstract class of preprocessing streaming node that needs to have some final processing afterwards e.g, set an error
+ * Abstract class for preprocessing streaming nodes that need to have some final processing afterwards e.g, set an error
  * message.
  *
  * @param <I> The sub type of the internals used by the implementation
@@ -183,7 +183,7 @@ public abstract class StreamableProcessingWithInternalsNodeModel<I extends Strea
                         throw new NullPointerException("internals at position " + i + " is null");
                     } else if (!m_class.isInstance(o)) {
                         throw new IllegalStateException(String.format(
-                            "Internals at position %d is not of expected " + "class \"%s\", it's a \"%s\"", i,
+                            "Internals at position %d is not of expected class \"%s\", it's a \"%s\"", i,
                             m_class.getSimpleName(), o.getClass().getSimpleName()));
                     }
                     castedInternals[i] = m_class.cast(o);
