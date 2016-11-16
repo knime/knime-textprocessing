@@ -60,7 +60,7 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorApplyNodeDialog extends DefaultNodeSettingsPane {
+final class WordVectorApplyNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * New pane for configuring the WordVectorApply node.
