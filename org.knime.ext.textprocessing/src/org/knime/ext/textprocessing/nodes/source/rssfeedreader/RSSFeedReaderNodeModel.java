@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
@@ -61,12 +62,14 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -81,11 +84,19 @@ import org.knime.core.util.ThreadPool;
  */
 public class RSSFeedReaderNodeModel extends NodeModel {
 
+    static final NodeLogger LOGGER = NodeLogger.getLogger(RSSFeedReaderNodeModel.class);
+
     static final Boolean DEF_CREATE_DOC_COLUMN = false;
 
     static final Boolean DEF_CREATE_XML_COLUMN = false;
 
     static final Boolean DEF_GET_HTTP_RESPONSE_CODE_COLUMN = false;
+
+    static final String DEF_DOC_COL_NAME = "Document";
+
+    static final String DEF_XML_COL_NAME = "XML";
+
+    static final String DEF_HTTP_COL_NAME = "HTTP Response Code";
 
     static final int DEF_THREADS = 2;
 
@@ -110,6 +121,12 @@ public class RSSFeedReaderNodeModel extends NodeModel {
     private SettingsModelIntegerBounded m_timeOutModel = RSSFeedReaderNodeDialog.createTimeOutModel();
 
     private SettingsModelBoolean m_getHttpResponseCodeColumn = RSSFeedReaderNodeDialog.getHttpResponseCodeModel();
+
+    private SettingsModelString m_docColName = RSSFeedReaderNodeDialog.createDocColumnNameModel();
+
+    private SettingsModelString m_xmlColName = RSSFeedReaderNodeDialog.createXmlColumnNameModel();
+
+    private SettingsModelString m_httpColName = RSSFeedReaderNodeDialog.createHttpColumnNameModel();
 
     private int m_urlColIndex = -1;
 
@@ -138,13 +155,16 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
         RSSFeedReaderDataTableCreator joiner =
             new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
-                m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue());
+                m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
+                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue());
         List<DataCell> dataCellChunk = null;
 
         AtomicInteger urlCount = new AtomicInteger(0);
         int itCount = 0;
         RowIterator iterator = inputTable.iterator();
         List<Future<?>> futures = new ArrayList<>();
+
+        final FileStoreFactory fsFactory = FileStoreFactory.createWorkflowFileStoreFactory(exec);
 
         // iterating through urls
         while (iterator.hasNext()) {
@@ -164,7 +184,8 @@ public class RSSFeedReaderNodeModel extends NodeModel {
                 //chunk is full, process and clear
             } else {
                 dataCellChunk.add(row.getCell(m_urlColIndex));
-                futures.add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, semaphore, urlCount, rowCount)));
+                futures.add(
+                    pool.enqueue(processChunk(dataCellChunk, joiner, exec, semaphore, urlCount, rowCount, fsFactory)));
                 dataCellChunk = null;
                 itCount = 0;
             }
@@ -172,7 +193,8 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
         // enqueue the last chunk and wait
         if (dataCellChunk != null && dataCellChunk.size() > 0) {
-            futures.add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, semaphore, urlCount, rowCount)));
+            futures
+                .add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, semaphore, urlCount, rowCount, fsFactory)));
         }
 
         for (Future<?> f : futures) {
@@ -182,14 +204,14 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         exec.setMessage("Creating output table.");
         if (joiner.getMissingRowCount() > 0) {
             this.setWarningMessage(
-                "Could not connect to " + joiner.getMissingRowCount() + " of " + rowCount + " URLs.");
+                "Could not load/connect to " + joiner.getMissingRowCount() + " of " + rowCount + " URLs.");
         }
         return new BufferedDataTable[]{joiner.createDataTable(exec)};
     }
 
     private Runnable processChunk(final List<DataCell> dataCellsWithUrls, final RSSFeedReaderDataTableCreator joiner,
-        final ExecutionContext exec, final Semaphore semaphore, final AtomicInteger urlCount, final long inputTableSize)
-            throws CanceledExecutionException {
+        final ExecutionContext exec, final Semaphore semaphore, final AtomicInteger urlCount, final long inputTableSize,
+        final FileStoreFactory fsFactory) throws CanceledExecutionException {
         exec.checkCanceled();
         return new Runnable() {
             @Override
@@ -199,10 +221,11 @@ public class RSSFeedReaderNodeModel extends NodeModel {
                     semaphore.acquire();
                     rssFeedReaderTC = new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(),
                         m_createXMLColumn.getBooleanValue(), m_getHttpResponseCodeColumn.getBooleanValue(),
-                        m_timeOutModel.getIntValue());
+                        m_timeOutModel.getIntValue(), m_docColName.getStringValue(), m_xmlColName.getStringValue(),
+                        m_httpColName.getStringValue());
                     for (DataCell dataCell : dataCellsWithUrls) {
                         exec.checkCanceled();
-                        rssFeedReaderTC.createDataCellsFromUrl(dataCell);
+                        rssFeedReaderTC.createDataCellsFromUrl(dataCell, fsFactory);
                         int processedUrls = urlCount.addAndGet(1);
                         double progress = (double)processedUrls / (double)inputTableSize;
                         exec.setProgress(progress,
@@ -229,6 +252,11 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
         // checking specified string column and guessing first available string column if no column is set.
         DataTableSpec inSpec = inSpecs[0];
+
+        checkColumnNames(m_docColName.getStringValue());
+        checkColumnNames(m_xmlColName.getStringValue());
+        checkColumnNames(m_httpColName.getStringValue());
+
         int colIndex = inSpec.findColumnIndex(m_feedUrlColumn.getStringValue());
         if (colIndex < 0) {
             for (int i = 0; i < inSpec.getNumColumns(); i++) {
@@ -241,6 +269,7 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         }
 
         if (colIndex < 0) {
+            LOGGER.error("Input table contains no string column!");
             throw new InvalidSettingsException("Input table contains no string column!");
         }
 
@@ -248,8 +277,18 @@ public class RSSFeedReaderNodeModel extends NodeModel {
 
         RSSFeedReaderDataTableCreator rssFeedReaderDTC =
             new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
-                m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue());
+                m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
+                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue());
         return new DataTableSpec[]{rssFeedReaderDTC.createDataTableSpec()};
+    }
+
+    private void checkColumnNames(final String str) throws InvalidSettingsException {
+        final List<String> columnNamesList = Arrays.asList("Feed Url", "Title", "Description", "Item Url", "Published");
+        if (columnNamesList.contains(str)) {
+            LOGGER.error("Can't create new column " + str + " as output spec already contains such column");
+            throw new InvalidSettingsException(
+                "Can't create new column " + str + " as output spec already contains such column");
+        }
     }
 
     /**
@@ -281,6 +320,9 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         m_numberOfThreadsModel.saveSettingsTo(settings);
         m_timeOutModel.saveSettingsTo(settings);
         m_getHttpResponseCodeColumn.saveSettingsTo(settings);
+        m_docColName.saveSettingsTo(settings);
+        m_xmlColName.saveSettingsTo(settings);
+        m_httpColName.saveSettingsTo(settings);
     }
 
     /**
@@ -294,6 +336,9 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         m_numberOfThreadsModel.validateSettings(settings);
         m_timeOutModel.validateSettings(settings);
         m_getHttpResponseCodeColumn.validateSettings(settings);
+        m_docColName.validateSettings(settings);
+        m_xmlColName.validateSettings(settings);
+        m_httpColName.validateSettings(settings);
     }
 
     /**
@@ -307,6 +352,9 @@ public class RSSFeedReaderNodeModel extends NodeModel {
         m_numberOfThreadsModel.loadSettingsFrom(settings);
         m_timeOutModel.loadSettingsFrom(settings);
         m_getHttpResponseCodeColumn.loadSettingsFrom(settings);
+        m_docColName.loadSettingsFrom(settings);
+        m_xmlColName.loadSettingsFrom(settings);
+        m_httpColName.loadSettingsFrom(settings);
     }
 
     /**

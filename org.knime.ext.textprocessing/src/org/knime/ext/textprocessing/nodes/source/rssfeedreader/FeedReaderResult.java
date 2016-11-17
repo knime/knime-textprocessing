@@ -53,12 +53,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.filestore.FileStoreFactory;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
 /**
- *
+ * The {@code FeedReaderResult} collects a list of {@code FeedEntryResult}s containing all the results that could have been
+ * parsed from the specific feed.
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 class FeedReaderResult {
@@ -75,14 +77,18 @@ class FeedReaderResult {
 
     private int m_responseCode = -2;
 
+    private final FileStoreFactory m_fileStoreFactory;
+
     /**
      * Creates a new instance of {@code FeedReaderResult}.
      */
-    FeedReaderResult(final String url, final boolean docCol, final boolean xmlCol, final boolean httpResponseCol) {
+    FeedReaderResult(final String url, final boolean docCol, final boolean xmlCol, final boolean httpResponseCol,
+        final FileStoreFactory fileStoreFactory) {
         m_url = url;
         m_createDocCol = docCol;
         m_createXMLCol = xmlCol;
         m_createHttpColumn = httpResponseCol;
+        m_fileStoreFactory = fileStoreFactory;
     }
 
     /**
@@ -98,14 +104,12 @@ class FeedReaderResult {
             Iterator<SyndEntry> itEntries = entries.iterator();
             // read entries and fill cells with information
             if (entries.size() == 0) {
-                FeedEntryResult entryResult =
-                    new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
-                entryResult.createEntryResultasDataCell();
-                m_entryResults.add(entryResult);
+                createEmptyFeedResults();
             } else {
                 while (itEntries.hasNext()) {
                     FeedEntryResult entryResult =
-                        new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
+                        new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn,
+                            m_fileStoreFactory);
                     SyndEntry entry = itEntries.next();
                     entryResult.setEntry(entry, feed);
                     entryResult.createEntryResultasDataCell();
@@ -113,11 +117,19 @@ class FeedReaderResult {
                 }
             }
         } else {
-            FeedEntryResult entryResult =
-                new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn);
-            entryResult.createEntryResultasDataCell();
-            m_entryResults.add(entryResult);
+            createEmptyFeedResults();
         }
+    }
+
+    /**
+     * Creates empty result set that will result in one row for this feed, containing missing values.
+     */
+    private void createEmptyFeedResults() {
+        FeedEntryResult entryResult =
+            new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn,
+                m_fileStoreFactory);
+        entryResult.createEntryResultasDataCell();
+        m_entryResults.add(entryResult);
     }
 
     /**

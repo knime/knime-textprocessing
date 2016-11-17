@@ -48,11 +48,15 @@
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumberEdit;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -80,12 +84,28 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
+     * @return Returns the SettingsModelString containing the name for the document column.
+     */
+    static final SettingsModelString createDocColumnNameModel() {
+        return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_DOC_COL_NAME,
+            RSSFeedReaderNodeModel.DEF_DOC_COL_NAME);
+    }
+
+    /**
      * @return Returns the SettingsModelBoolean containing the boolean value for creating an XML column for feed
      *         entries.
      */
     static final SettingsModelBoolean createXMLColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_XML_COLUMN,
             RSSFeedReaderNodeModel.DEF_CREATE_XML_COLUMN);
+    }
+
+    /**
+     * @return Returns the SettingsModelString containing the name for the XML column.
+     */
+    static final SettingsModelString createXmlColumnNameModel() {
+        return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_XML_COL_NAME,
+            RSSFeedReaderNodeModel.DEF_XML_COL_NAME);
     }
 
     /**
@@ -104,10 +124,33 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
             RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT, RSSFeedReaderNodeModel.MAX_TIMEOUT);
     }
 
+    /**
+     * @return Returns the SettingsModelBoolean containing the boolean value for creating an HTTP column for feed entries.
+     */
     static final SettingsModelBoolean getHttpResponseCodeModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_GET_HTTP_RESPONSE_CODE_COLUMN,
             RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN);
     }
+
+    /**
+     * @return Returns the SettingsModelString containing the name of the HTTP column.
+     */
+    static final SettingsModelString createHttpColumnNameModel() {
+        return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_HTTP_COL_NAME,
+            RSSFeedReaderNodeModel.DEF_HTTP_COL_NAME);
+    }
+
+    private final SettingsModelBoolean m_createDocCol = createDocumentColumnModel();
+
+    private final SettingsModelBoolean m_createXmlCol = createXMLColumnModel();
+
+    private final SettingsModelBoolean m_createHttpCol = getHttpResponseCodeModel();
+
+    private final SettingsModelString m_docColName = createDocColumnNameModel();
+
+    private final SettingsModelString m_xmlColName = createXmlColumnNameModel();
+
+    private final SettingsModelString m_httpColName = createHttpColumnNameModel();
 
     /**
      *
@@ -126,16 +169,62 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
         // components for number of threads and timeout settings
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentNumberEdit(createNumberOfThreadsModel(), "Number of threads"));
-        addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "Time out"));
+        addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "Time out (in millis)"));
         setHorizontalPlacement(false);
 
         // components for additional Document and/or XML columns
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(createDocumentColumnModel(), "Create Document column"));
-        addDialogComponent(new DialogComponentBoolean(createXMLColumnModel(), "Create XML column"));
+        addDialogComponent(new DialogComponentBoolean(m_createDocCol, "Create Document column"));
+        m_createDocCol.addChangeListener(new ColumnHandlingListener());
+        DialogComponentString docColNameComp = new DialogComponentString(m_docColName, "", true, 20);
+        docColNameComp.setToolTipText("Name of the Document column");
+        addDialogComponent(docColNameComp);
         setHorizontalPlacement(false);
-        addDialogComponent(new DialogComponentBoolean(getHttpResponseCodeModel(), "Create HTTP status code column"));
 
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentBoolean(m_createXmlCol, "Create XML column"));
+        m_createXmlCol.addChangeListener(new ColumnHandlingListener());
+        DialogComponentString xmlColNameComp = new DialogComponentString(m_xmlColName, "", true, 20);
+        xmlColNameComp.setToolTipText("Name of the XML column");
+        addDialogComponent(xmlColNameComp);
+        setHorizontalPlacement(false);
+
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentBoolean(m_createHttpCol, "Create HTTP status code column"));
+        m_createHttpCol.addChangeListener(new ColumnHandlingListener());
+        DialogComponentString httpColNameComp = new DialogComponentString(m_httpColName, "", true, 20);
+        httpColNameComp.setToolTipText("Name of the HTTP column");
+        addDialogComponent(httpColNameComp);
+
+        checkSettings();
     }
 
+    private final class ColumnHandlingListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            checkSettings();
+        }
+    }
+
+    void checkSettings(){
+        if (m_createDocCol.getBooleanValue()) {
+            m_docColName.setEnabled(true);
+        } else {
+            m_docColName.setEnabled(false);
+        }
+        if (m_createXmlCol.getBooleanValue()) {
+            m_xmlColName.setEnabled(true);
+        } else {
+            m_xmlColName.setEnabled(false);
+        }
+        if (m_createHttpCol.getBooleanValue()) {
+            m_httpColName.setEnabled(true);
+        } else {
+            m_httpColName.setEnabled(false);
+        }
+    }
 }

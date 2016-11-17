@@ -65,4 +65,10 @@ class RSSFeedReaderConfigKeys {
     static final String CFGKEY_TIMEOUT = "Time Out";
 
     static final String CFGKEY_GET_HTTP_RESPONSE_CODE_COLUMN = "Create HTTP Response Code Column";
+
+    static final String CFGKEY_DOC_COL_NAME = "Document column name";
+
+    static final String CFGKEY_XML_COL_NAME = "XML column name";
+
+    static final String CFGKEY_HTTP_COL_NAME = "HTTP Response code column name";
 }

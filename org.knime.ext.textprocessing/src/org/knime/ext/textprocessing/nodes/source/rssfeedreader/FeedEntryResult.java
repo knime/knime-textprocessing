@@ -64,14 +64,16 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.data.xml.XMLCellFactory;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
-import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.xml.sax.SAXException;
 
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -80,7 +82,8 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
 
 /**
- *
+ * Creates an FeedEntryResult object containing the information parsed from the specific feed entry and creates an array
+ * of DataCells that will be used for row generation in the {@code RSSFeedReaderDataTableCreator}.
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 class FeedEntryResult {
@@ -109,16 +112,21 @@ class FeedEntryResult {
 
     private boolean m_createHttpColumn = RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN;
 
+    private final TextContainerDataCellFactory m_documentCellFac;
+
     /**
      * Creates a new instance of {@code FeedEntryResult}.
      */
     FeedEntryResult(final String feedUrl, final int responseCode, final boolean docCol, final boolean xmlCol,
-        final boolean httpResponseCol) {
+        final boolean httpResponseCol, final FileStoreFactory fileStoreFactory) {
         m_feedURL = feedUrl;
         m_responseCode = responseCode;
         m_createDocCol = docCol;
         m_createHttpColumn = httpResponseCol;
         m_createXMLCol = xmlCol;
+
+        m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        m_documentCellFac.prepare(fileStoreFactory);
     }
 
     /**
@@ -206,7 +214,7 @@ class FeedEntryResult {
     private DataCell createDocumentCell() {
         DataCell cell = DataType.getMissingCell();
         if (m_document != null) {
-            cell = new DocumentCell(m_document);
+            cell = m_documentCellFac.createDataCell(m_document);
         }
         return cell;
     }
@@ -248,7 +256,7 @@ class FeedEntryResult {
         return cell;
     }
 
-    // builds xmlcontent based on the feed and feed entry information
+    // build xml content based on the feed and feed entry information
     private String createXMLContentFromEntry(final SyndEntry entry, final SyndFeed feed) {
         SyndFeedOutput feedoutput = new SyndFeedOutput();
         List<SyndEntry> entries = new LinkedList<>();
@@ -265,7 +273,7 @@ class FeedEntryResult {
         return xmlWriter.toString();
     }
 
-    // builds document based on the feed entry information
+    // build document based on the feed entry information
     private Document createDocumentFromEntry(final SyndEntry entry) {
         DocumentBuilder docBuilder = new DocumentBuilder();
 
