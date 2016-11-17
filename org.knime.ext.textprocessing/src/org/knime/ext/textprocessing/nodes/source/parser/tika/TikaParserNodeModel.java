@@ -49,49 +49,23 @@
 package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.StringCell;
-import org.knime.core.node.BufferedDataContainer;
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.streamable.BufferedDataTableRowOutput;
-import org.knime.core.node.streamable.PartitionInfo;
-import org.knime.core.node.streamable.PortInput;
-import org.knime.core.node.streamable.PortOutput;
-import org.knime.core.node.streamable.RowOutput;
-import org.knime.core.node.streamable.StreamableOperator;
-import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 
 /**
- * The node model of the Tika Parser node. This model extends {@link org.knime.core.node.NodeModel} and is streamable.
+ * The node model of the Tika Parser node. This model extends
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.tika.TikaNodeModel} and is streamable.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-final class TikaParserNodeModel extends NodeModel {
+final class TikaParserNodeModel extends TikaNodeModel {
 
     private SettingsModelString m_pathModel = TikaParserConfig.getPathModel();
 
@@ -99,259 +73,42 @@ final class TikaParserNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_ignoreHiddenFilesModel = TikaParserConfig.getIgnoreHiddenFilesModel();
 
-    private SettingsModelString m_typesModel = TikaParserConfig.getTypeModel();
-
-    private SettingsModelStringArray m_columnModel = TikaParserConfig.getColumnModel();
-
-    private SettingsModelBoolean m_extractAttachmentModel = TikaParserConfig.getExtractAttachmentModel();
-
-    private SettingsModelString m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractAttachmentModel);
-
-    private SettingsModelBoolean m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
-
-    private SettingsModelString m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
-
-    private SettingsModelBoolean m_errorColumnModel = TikaParserConfig.getErrorColumnModel();
-
-    private SettingsModelString m_errorColNameModel = TikaParserConfig.getErrorColumnNameModel(m_errorColumnModel);
-
-    private SettingsModelFilterString m_filterModel = TikaParserConfig.getFilterModel();
-
     /**
      * Creates a new instance of {@code TikaParserNodeModel}
      */
     TikaParserNodeModel() {
         super(0, 2);
-        stateChange();
+        setSourceNode(true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        List<String> listOutputCols = Arrays.asList(m_columnModel.getStringArrayValue());
-        if (m_errorColumnModel.getBooleanValue()) {
-            listOutputCols = new ArrayList<String>(listOutputCols);
-            listOutputCols.add(m_errorColNameModel.getStringValue());
-        }
-        DataTableSpec col1 = createOutputTableSpec(listOutputCols);
-        DataTableSpec col2 = createOutputTableSpec(Arrays.asList(TikaParserConfig.OUTPUT_TWO_COL_NAMES));
-        return new DataTableSpec[]{col1, col2};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] data, final ExecutionContext exec)
-        throws Exception {
-        // create output spec and its container
-        List<String> listOutputCols = Arrays.asList(m_columnModel.getStringArrayValue());
-        if (m_errorColumnModel.getBooleanValue()) {
-            listOutputCols = new ArrayList<String>(listOutputCols);
-            listOutputCols.add(m_errorColNameModel.getStringValue());
-        }
-        BufferedDataContainer container1 = exec.createDataContainer(createOutputTableSpec(listOutputCols));
-        BufferedDataContainer container2 =
-            exec.createDataContainer(createOutputTableSpec(Arrays.asList(TikaParserConfig.OUTPUT_TWO_COL_NAMES)));
-
-        BufferedDataTableRowOutput output1 = new BufferedDataTableRowOutput(container1);
-        BufferedDataTableRowOutput output2 = new BufferedDataTableRowOutput(container2);
-
-        createStreamableOperator(null, null).runFinal(new PortInput[0], new PortOutput[]{output1, output2}, exec);
-
-        return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
-        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        return new StreamableOperator() {
-
-            @Override
-            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
-                throws Exception {
-                assert inputs.length == 0;
-
-                RowOutput rowOutput1 = (RowOutput)outputs[0]; // data output port 1
-                RowOutput rowOutput2 = (RowOutput)outputs[1]; // data output port 2
-
-                boolean ext, error = false;
-                if (m_typesModel.getStringValue().equals(TikaParserConfig.EXT_TYPE)) {
-                    ext = true;
-                } else {
-                    ext = false;
-                }
-
-                final File dir = TikaParser.getFile(m_pathModel.getStringValue(), true);
-                final boolean recursive = m_recursiveModel.getBooleanValue();
-                final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-                final List<String> validTypes = m_filterModel.getIncludeList();
-
-                final FileCollector fc;
-                if (ext) {
-                    fc = new FileCollector(dir, validTypes, recursive, ignoreHiddenFiles);
-                } else {
-                    fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
-                }
-
-                final List<File> files = fc.getFiles();
-                final int numberOfFiles = files.size();
-
-                HashMap<String, Integer> duplicateFiles = new HashMap<String, Integer>();
-                List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
-                if (m_errorColumnModel.getBooleanValue()) {
-                    outputColumnsOne = new ArrayList<String>(outputColumnsOne);
-                    outputColumnsOne.add(m_errorColNameModel.getStringValue());
-                }
-
-                int rowKeyOne = 0;
-                int rowKeyTwo = 0;
-
-                final File attachmentDir = getAttachmentDir();
-
-                for (int i = 0; i < numberOfFiles; i++) {
-                    String errorMsg = "";
-                    File file = files.get(i);
-
-                    if (!ext && !file.isFile()) {
-                        continue; // skip all directories
-                    }
-
-                    TikaParser tikaParser = new TikaParser(true);
-                    tikaParser.setOutputColumnsOne(outputColumnsOne);
-                    tikaParser.setValidTypes(validTypes);
-                    tikaParser.setErrorColName(m_errorColNameModel.getStringValue());
-                    tikaParser.setAuthBoolean(m_authBooleanModel.getBooleanValue());
-                    tikaParser.setExtBoolean(ext);
-                    tikaParser.setPassword(m_authModel.getStringValue());
-                    tikaParser.setDuplicates(duplicateFiles);
-
-                    List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
-                    duplicateFiles = tikaParser.getDuplicates();
-                    errorMsg = tikaParser.getErrorMsg();
-                    if (datacells.isEmpty()) {
-                        if (!errorMsg.isEmpty()) {
-                            setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
-                            error = true;
-                        }
-                        continue; // skipped files
-                    }
-
-                    DataCell[] rowOne = datacells.get(0);
-                    rowOutput1.push(new DefaultRow(RowKey.createRowKey((long)rowKeyOne), rowOne));
-                    rowKeyOne++;
-
-                    if (!errorMsg.isEmpty()) {
-                        setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
-                        error = true;
-                        continue;
-                    }
-
-                    if (datacells.size() > 1) {
-                        for (int j = 1; j < datacells.size(); j++) {
-                            rowOutput2.push(new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), datacells.get(j)));
-                            rowKeyTwo++;
-                        }
-                    }
-
-                    exec.checkCanceled();
-                    exec.setProgress(i / (double)numberOfFiles, "Parsing file " + i + " of " + numberOfFiles);
-
-                } // end for loop
-
-                if (error) {
-                    setWarningMessage("Not all files are parsed!");
-                }
-
-                for (int i = 0; i < outputs.length; i++) {
-                    ((RowOutput)outputs[i]).close();
-                }
-
-            }
-        };
-    }
-
-    private DataTableSpec createOutputTableSpec(final List<String> selectedColumns) {
-        DataColumnSpec[] cspecs = new DataColumnSpec[selectedColumns.size()];
-        int i = 0;
-        for (String col : selectedColumns) {
-            cspecs[i] = new DataColumnSpecCreator(col, StringCell.TYPE).createSpec();
-            i++;
-        }
-
-        return new DataTableSpec(cspecs);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
+    protected void saveInputSettingsTo(final NodeSettingsWO settings) {
         m_pathModel.saveSettingsTo(settings);
         m_recursiveModel.saveSettingsTo(settings);
         m_ignoreHiddenFilesModel.saveSettingsTo(settings);
-        m_typesModel.saveSettingsTo(settings);
-        m_columnModel.saveSettingsTo(settings);
-        m_extractAttachmentModel.saveSettingsTo(settings);
-        m_extractPathModel.saveSettingsTo(settings);
-        m_authModel.saveSettingsTo(settings);
-        m_authBooleanModel.saveSettingsTo(settings);
-        m_errorColumnModel.saveSettingsTo(settings);
-        m_errorColNameModel.saveSettingsTo(settings);
-        m_filterModel.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void validateInputSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_pathModel.validateSettings(settings);
         m_recursiveModel.validateSettings(settings);
         m_ignoreHiddenFilesModel.validateSettings(settings);
-        m_typesModel.validateSettings(settings);
-        m_columnModel.validateSettings(settings);
-        m_extractAttachmentModel.validateSettings(settings);
-        m_extractPathModel.validateSettings(settings);
-        m_authModel.validateSettings(settings);
-        m_authBooleanModel.validateSettings(settings);
-        m_errorColumnModel.validateSettings(settings);
-        m_errorColNameModel.validateSettings(settings);
-        m_filterModel.validateSettings(settings);
-
-        Boolean extract =
-            ((SettingsModelBoolean)m_extractAttachmentModel.createCloneWithValidatedValue(settings)).getBooleanValue();
-
-        if (extract) {
-            String outputDir =
-                ((SettingsModelString)m_extractPathModel.createCloneWithValidatedValue(settings)).getStringValue();
-            CheckUtils.checkSetting(StringUtils.isNotBlank(outputDir),
-                "Path to attachment directory must not be blank");
-        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void loadValidatedInputSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_pathModel.loadSettingsFrom(settings);
         m_recursiveModel.loadSettingsFrom(settings);
         m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
-        m_typesModel.loadSettingsFrom(settings);
-        m_columnModel.loadSettingsFrom(settings);
-        m_extractAttachmentModel.loadSettingsFrom(settings);
-        m_extractPathModel.loadSettingsFrom(settings);
-        m_authModel.loadSettingsFrom(settings);
-        m_authBooleanModel.loadSettingsFrom(settings);
-        m_errorColumnModel.loadSettingsFrom(settings);
-        m_errorColNameModel.loadSettingsFrom(settings);
-        m_filterModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -364,58 +121,23 @@ final class TikaParserNodeModel extends NodeModel {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidSettingsException
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-
-    }
-
-    private void stateChange() {
-        if (m_extractAttachmentModel.getBooleanValue()) {
-            m_extractPathModel.setEnabled(true);
+    protected List<File> getListOfFiles(final List<String> validTypes, final boolean ext)
+        throws InvalidSettingsException {
+        File dir = getFile(m_pathModel.getStringValue(), true);
+        boolean recursive = m_recursiveModel.getBooleanValue();
+        boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
+        FileCollector fc;
+        if (ext) {
+            fc = new FileCollector(dir, validTypes, recursive, ignoreHiddenFiles);
         } else {
-            m_extractPathModel.setEnabled(false);
+            fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
         }
 
-        if (m_authBooleanModel.getBooleanValue()) {
-            m_authModel.setEnabled(true);
-        } else {
-            m_authModel.setEnabled(false);
-        }
-        if (m_errorColumnModel.getBooleanValue()) {
-            m_errorColNameModel.setEnabled(true);
-        } else {
-            m_errorColNameModel.setEnabled(false);
-        }
-    }
-
-    private File getAttachmentDir() throws InvalidSettingsException {
-        final File attachmentDir;
-        if (m_extractAttachmentModel.getBooleanValue()) {
-            String outputDir = m_extractPathModel.getStringValue();
-
-            File file = TikaParser.getFile(outputDir, false);
-
-            if (!file.exists()) {
-                CheckUtils.checkSetting(file.mkdirs(), "Directory \"%s\" cannot be created. Please give a valid path.",
-                    outputDir);
-                setWarningMessage("Attachment directory didn't exist and was created: " + outputDir);
-            }
-            attachmentDir = file;
-        } else {
-            attachmentDir = null;
-        }
-        return attachmentDir;
+        return fc.getFiles();
     }
 
 }

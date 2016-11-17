@@ -53,8 +53,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,15 +79,13 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig.TikaColumnKeys;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * The class to parse any files based on Tika
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
 public class TikaParser {
@@ -375,30 +371,6 @@ public class TikaParser {
         }
         Collections.sort(result, String.CASE_INSENSITIVE_ORDER);
         return result.toArray(new String[result.size()]);
-    }
-
-    /**
-     * @param file the file path in String.
-     * @param dir true if the file is a directory.
-     * @return the file path in type of File.
-     * @throws InvalidSettingsException if the file is not a directory and unreadable.
-     */
-    public static File getFile(final String file, final boolean dir) throws InvalidSettingsException {
-        File f = null;
-        try {
-            // first try if file string is an URL (files in drop dir come as URLs)
-            final URL url = new URL(file);
-            f = FileUtil.getFileFromURL(url);
-        } catch (MalformedURLException e) {
-            // if no URL try string as path to file
-            f = new File(file);
-        }
-
-        if (dir && (!f.isDirectory() || !f.exists() || !f.canRead())) {
-            throw new InvalidSettingsException("Selected dir: " + file + " cannot be accessed!");
-        }
-
-        return f;
     }
 
     /////// getters and setters ///////
