@@ -78,6 +78,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListe
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 import org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -93,7 +94,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     private static final NodeLogger LOGGER =
             NodeLogger.getLogger(PubMedDocumentGrabber.class);
 
-    private static final String PROTOCOL = "http";
+    private static final String PROTOCOL = "https";
 
     private static final String HOST = "eutils.ncbi.nlm.nih.gov";
 
@@ -117,21 +118,34 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
 
     private static final String FILE_EXTENSION = "gz";
 
-
-
     private int m_stepSize = 100;
 
     private long m_delayMillis = 1000;
 
     private List<Integer> m_idList = new ArrayList<Integer>();
 
+    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+
 
     /**
      * Creates empty instance of <code>PubMedDocumentGrabber</code>.
+     * @deprecated Use {@link #PubMedDocumentGrabber(String)} to define the tokenizer used for word tokenization.
      */
+    @Deprecated
     PubMedDocumentGrabber() {
         super();
     }
+
+    /**
+     * Creates empty instance of <code>PubMedDocumentGrabber</code>.
+     * @since 3.3
+     */
+    PubMedDocumentGrabber(final String tokenizerName) {
+        super();
+        m_tokenizerName = tokenizerName;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -266,7 +280,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     }
 
     private void parseDocumentsAndNotify(final File dir) throws Exception {
-        DocumentParser parser = new PubMedDocumentParser(getExtractMetaInfo());
+        DocumentParser parser = new PubMedDocumentParser(getExtractMetaInfo(), m_tokenizerName);
 
         parser.addDocumentParsedListener(
                 new InternalDocumentParsedEventListener());
@@ -319,7 +333,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     private List < Document > parseDocuments(final File dir) throws Exception {
         List<Document> docs = new ArrayList<Document>();
 
-        DocumentParser parser = new PubMedDocumentParser();
+        DocumentParser parser = new PubMedDocumentParser(m_tokenizerName);
         parser.setDocumentSource(new DocumentSource(SOURCE));
         if (getDocumentCategory() != null) {
             parser.setDocumentCategory(getDocumentCategory());

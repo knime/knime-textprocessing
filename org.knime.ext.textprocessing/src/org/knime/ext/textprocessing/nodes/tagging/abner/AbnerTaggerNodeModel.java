@@ -61,9 +61,8 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
- * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger.
- * Extends {@link org.knime.core.node.NodeModel} and provides methods to
- * configure and execute the node.
+ * The node model of the ABNER (A Biomedical Named Entity Recognizer) tagger. Extends
+ * {@link org.knime.core.node.NodeModel} and provides methods to configure and execute the node.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -77,29 +76,29 @@ public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
     /**
      * The default value of the ABNER tagging model.
      */
-    public static final String DEF_ABNERMODEL =
-        AbnerDocumentTagger.MODEL_BIOCREATIVE;
+    public static final String DEF_ABNERMODEL = AbnerDocumentTagger.MODEL_BIOCREATIVE;
 
-    private SettingsModelBoolean m_setUnmodifiableModel =
-        AbnerTaggerNodeDialog.createSetUnmodifiableModel();
+    private SettingsModelBoolean m_setUnmodifiableModel = AbnerTaggerNodeDialog.createSetUnmodifiableModel();
 
-    private SettingsModelString m_abnerTaggingModel =
-        AbnerTaggerNodeDialog.createAbnerModelModel();
+    private SettingsModelString m_abnerTaggingModel = AbnerTaggerNodeDialog.createAbnerModelModel();
 
     /**
      * Creates a new instance of <code>AbnerTaggerNodeModel</code> with one table in and one out port.
      */
     public AbnerTaggerNodeModel() {
         super();
+        m_tokenizer = AbnerTaggerNodeDialog.getTokenizerModel();
     }
 
     /**
      * {@inheritDoc}
+     *
      * @since 2.9
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        return new AbnerDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), m_abnerTaggingModel.getStringValue());
+        return new AbnerDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), m_abnerTaggingModel.getStringValue(),
+            m_tokenizer.getStringValue());
     }
 
     /**
@@ -115,11 +114,15 @@ public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.loadSettingsFrom(settings);
+        try {
+            m_tokenizer.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // just catch exception for backwards compatibility
+        }
     }
 
     /**
@@ -130,40 +133,44 @@ public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
         super.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
         m_abnerTaggingModel.saveSettingsTo(settings);
+        m_tokenizer.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.validateSettings(settings);
+        try {
+            m_tokenizer.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // just catch exception for backwards compatibility
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void reset() { }
+    protected void reset() {
+    }
 }

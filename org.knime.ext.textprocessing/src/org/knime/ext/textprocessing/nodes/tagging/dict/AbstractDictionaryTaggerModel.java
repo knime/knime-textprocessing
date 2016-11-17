@@ -73,7 +73,6 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
 import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeDialog;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
-
 /**
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
@@ -93,8 +92,7 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
     /**
      * The default value of the default tag.
      */
-    public static final String DEFAULT_TAG =
-        NamedEntityTag.UNKNOWN.getTag().getTagValue();
+    public static final String DEFAULT_TAG = NamedEntityTag.UNKNOWN.getTag().getTagValue();
 
     /**
      * The default tag type.
@@ -111,35 +109,29 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
      */
     public static final int DATA_TABLE_INDEX = 0;
 
-
     private Set<String> m_dictionary;
 
-    private SettingsModelBoolean m_setUnmodifiableModel =
-        DictionaryTaggerNodeDialog.createSetUnmodifiableModel();
+    private SettingsModelBoolean m_setUnmodifiableModel = DictionaryTaggerNodeDialog.createSetUnmodifiableModel();
 
-    private SettingsModelString m_tagModel =
-        DictionaryTaggerNodeDialog.createTagModel();
+    private SettingsModelString m_tagModel = DictionaryTaggerNodeDialog.createTagModel();
 
-    private SettingsModelString m_tagTypeModel =
-        DictionaryTaggerNodeDialog.createTagTypeModel();
+    private SettingsModelString m_tagTypeModel = DictionaryTaggerNodeDialog.createTagTypeModel();
 
-    private SettingsModelBoolean m_caseSensitiveModel =
-        DictionaryTaggerNodeDialog.createCaseSensitiveModel();
+    private SettingsModelBoolean m_caseSensitiveModel = DictionaryTaggerNodeDialog.createCaseSensitiveModel();
 
-    private SettingsModelString m_columnModel =
-        DictionaryTaggerNodeDialog.createColumnModel();
+    private SettingsModelString m_columnModel = DictionaryTaggerNodeDialog.createColumnModel();
 
 
     /**
-     * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two
-     * table in ports and one out port.
+     * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two table in ports and one out port.
      */
     public AbstractDictionaryTaggerModel() {
-        super(2, new InputPortRole[] {InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
+        super(2, new InputPortRole[]{InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
     }
 
     /**
      * Checks if spec of second input data table contains a string column that can be used as dictionary.
+     *
      * @param inSpecs The specs of the input data tables.
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      * @since 2.9
@@ -152,6 +144,7 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
 
     /**
      * Reads strings of string column of second input data table to build dictionary.
+     *
      * @param inData Input data tables.
      * @param exec The execution context of the node.
      * @throws Exception If tagger cannot be prepared.
@@ -173,8 +166,9 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
     }
 
     /**
-     * Creates a new instance of {@code DocumentTagger} with the specified settings. This tagger instance is used to
-     * tag the documents of the input table.
+     * Creates a new instance of {@code DocumentTagger} with the specified settings. This tagger instance is used to tag
+     * the documents of the input table.
+     *
      * @param dictionary The dictionary to use for tagging.
      * @return The tagger instance to use for tagging.
      */
@@ -182,6 +176,7 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
 
     /**
      * {@inheritDoc}
+     *
      * @since 2.9
      */
     @Override
@@ -282,15 +277,15 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
      * {@inheritDoc}
      */
     @Override
-    protected void reset() { }
+    protected void reset() {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected final void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -298,9 +293,8 @@ public abstract class AbstractDictionaryTaggerModel extends StreamableTaggerNode
      * {@inheritDoc}
      */
     @Override
-    protected final void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected final void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }

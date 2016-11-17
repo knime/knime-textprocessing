@@ -56,12 +56,11 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 
-
 /**
- * Tags multiple as well as single terms as named entities if specified regular expressions match. Matching is
- * applied on sentence level, not on term level. All specified expressions are used for matching. If more than
- * one expression matches, the last matching expression overrides previous, conflicting matches. If multiple terms
- * are matching one regular expression all terms will be tagged, as long as terms do not overlap (conflicting terms).
+ * Tags multiple as well as single terms as named entities if specified regular expressions match. Matching is applied
+ * on sentence level, not on term level. All specified expressions are used for matching. If more than one expression
+ * matches, the last matching expression overrides previous, conflicting matches. If multiple terms are matching one
+ * regular expression all terms will be tagged, as long as terms do not overlap (conflicting terms).
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
@@ -69,21 +68,39 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 public class MultiTermRegexDocumentTagger extends RegexDocumentTagger {
 
     /**
-     * Creates a new instance of <code>MultiTermRegexDocumentTagger</code> with
-     * given flag to set found named entities unmodifiable, to ignore the case
-     * of the named entities to detect, the tag to assign to the matching named
+     * Creates a new instance of <code>MultiTermRegexDocumentTagger</code> with given flag to set found named entities
+     * unmodifiable, to ignore the case of the named entities to detect, the tag to assign to the matching named
      * entities and the set of regular expressions to match.
      *
-     * @param setUnmodifiable If <code>true</code> found named entities are set
-     * unmodifiable, otherwise not.
+     * @param setUnmodifiable If <code>true</code> found named entities are set unmodifiable, otherwise not.
      * @param regexpattern The set of regex pattern to match.
      * @param tag The tag to assign to found named entities.
-     * @param caseSensitive If <code>false</code> the case of named entities
-     * and words of the sentences are ignored, otherwise not.
+     * @param caseSensitive If <code>false</code> the case of named entities and words of the sentences are ignored,
+     *            otherwise not.
+     * @deprecated Use {@link #MultiTermRegexDocumentTagger(boolean, Set, Tag, boolean, String)} instead to define the
+     *             tokenizer used for word tokenization.
+     */
+    @Deprecated
+    public MultiTermRegexDocumentTagger(final boolean setUnmodifiable, final Set<Pattern> regexpattern, final Tag tag,
+        final boolean caseSensitive) {
+        super(setUnmodifiable, regexpattern, tag, caseSensitive);
+    }
+
+    /**
+     * Creates a new instance of <code>MultiTermRegexDocumentTagger</code> with given flag to set found named entities
+     * unmodifiable, to ignore the case of the named entities to detect, the tag to assign to the matching named
+     * entities and the set of regular expressions to match.
+     *
+     * @param setUnmodifiable If <code>true</code> found named entities are set unmodifiable, otherwise not.
+     * @param regexpattern The set of regex pattern to match.
+     * @param tag The tag to assign to found named entities.
+     * @param caseSensitive If <code>false</code> the case of named entities and words of the sentences are ignored,
+     *            otherwise not.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
      */
     public MultiTermRegexDocumentTagger(final boolean setUnmodifiable, final Set<Pattern> regexpattern, final Tag tag,
-            final boolean caseSensitive) {
-        super(setUnmodifiable, regexpattern, tag, caseSensitive);
+        final boolean caseSensitive, final String tokenizerName) {
+        super(setUnmodifiable, regexpattern, tag, caseSensitive, tokenizerName);
     }
 
     /*

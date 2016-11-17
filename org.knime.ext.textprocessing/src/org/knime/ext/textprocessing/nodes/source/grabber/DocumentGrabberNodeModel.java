@@ -115,7 +115,6 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     static final String QUERYCOL_NAME = "Query";
 
-
     private SettingsModelString m_queryModel =
         DocumentGrabberNodeDialog.getQueryModel();
 
@@ -143,17 +142,17 @@ public class DocumentGrabberNodeModel extends NodeModel {
     private SettingsModelBoolean m_appendQueryColumnModel =
             DocumentGrabberNodeDialog.getAppendQueryColumnModel();
 
-    private DocumentDataTableBuilder m_dtBuilder;
+    private SettingsModelString m_tokenizerModel =
+            DocumentGrabberNodeDialog.getTokenizerModel();
+
+    private DocumentDataTableBuilder m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
 
     /**
      * Creates new instance of <code>DocumentGrabberNodeModel</code>.
      */
     public DocumentGrabberNodeModel() {
         super(0, 1);
-        m_dtBuilder = new DocumentDataTableBuilder();
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -161,6 +160,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
+        m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{createColumnRearranger(m_dtBuilder.createDataTableSpec()).createSpec()};
     }
 
@@ -186,7 +186,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         DocumentGrabber grabber =
-            DocumentGrabberFactory.getInstance().getGrabber(
+            DocumentGrabberFactory.getInstanceWithTokenizerInfo(m_tokenizerModel.getStringValue()).getGrabber(
                     m_dataBaseModel.getStringValue());
 
         try {
@@ -265,6 +265,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_typeModel.saveSettingsTo(settings);
         m_extractMetaInfoSettingsModel.saveSettingsTo(settings);
         m_appendQueryColumnModel.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
@@ -288,6 +289,11 @@ public class DocumentGrabberNodeModel extends NodeModel {
         } catch (InvalidSettingsException e) {
             // catch for the sake of downward compatibility
         }
+        try {
+            m_tokenizerModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // catch for the sake of downward compatibility
+        }
     }
 
     /**
@@ -307,6 +313,11 @@ public class DocumentGrabberNodeModel extends NodeModel {
         try {
             m_extractMetaInfoSettingsModel.loadSettingsFrom(settings);
             m_appendQueryColumnModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // catch for the sake of downward compatibility
+        }
+        try {
+            m_tokenizerModel.loadSettingsFrom(settings);
         } catch (InvalidSettingsException e) {
             // catch for the sake of downward compatibility
         }

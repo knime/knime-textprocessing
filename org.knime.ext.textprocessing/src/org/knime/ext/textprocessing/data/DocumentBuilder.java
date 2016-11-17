@@ -114,7 +114,7 @@ public class DocumentBuilder {
     private HashMap<String, String> m_metaInfo = new LinkedHashMap<String, String>();
 
     // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-    private String m_tokenizerName = TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER;
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     private Tokenizer m_sentenceTokenizer = DefaultTokenization
             .getSentenceTokenizer(m_tokenizerName);

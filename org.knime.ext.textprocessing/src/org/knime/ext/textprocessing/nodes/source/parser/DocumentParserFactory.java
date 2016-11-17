@@ -57,8 +57,18 @@ package org.knime.ext.textprocessing.nodes.source.parser;
 public interface DocumentParserFactory {
 
     /**
+     * @param tokenizerName The word tokenizer that should be used.
      * @return Creates a new concrete {@code DocumentParser} instance and returns it.
      * @throws InstantiationException if parser instance could not be created.
+     * @since 3.3
      */
+    public DocumentParser createParser(String tokenizerName) throws InstantiationException;
+
+    /**
+     * @return Creates a new concrete {@code DocumentParser} instance and returns it.
+     * @throws InstantiationException if parser instance could not be created.
+     * @deprecated Use {@link #createParser(String)} instead to define the tokenizer used for word tokenization.
+     */
+    @Deprecated
     public DocumentParser createParser() throws InstantiationException;
 }

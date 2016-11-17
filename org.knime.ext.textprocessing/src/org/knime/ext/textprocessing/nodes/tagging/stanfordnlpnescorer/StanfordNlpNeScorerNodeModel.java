@@ -90,11 +90,13 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.NERModelPortObjectSpec;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -119,6 +121,8 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
     private StanfordNERModelPortObject m_inputModelPortObject;
 
     private CRFClassifier<CoreLabel> m_inputModel;
+
+    private String m_tokenizerName;
 
     /**
      * An array of DataColumnSpecs for the scores table.
@@ -147,7 +151,7 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec spec = (DataTableSpec)inSpecs[0];
-
+        NERModelPortObjectSpec modelSpec = (NERModelPortObjectSpec)inSpecs[1];
         // guessing the document column
         int colIndex = spec.findColumnIndex(m_docColumnModel.getStringValue());
         if (colIndex < 0) {
@@ -160,6 +164,14 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
             }
         } else if (colIndex >= 0) {
             m_docColumnName = m_docColumnModel.getStringValue();
+        }
+
+        //check tokenizer settings from incoming document column
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
+        if (!dataTableSpecVerifier.verifyTokenizer(colIndex, modelSpec.getTokenizerName())) {
+            setWarningMessage(
+                "Tokenization of input documents (" + dataTableSpecVerifier.getTokenizerFromInputDocCol(colIndex)
+                    + ") differs to tokenizer used in learner node (" + modelSpec.getTokenizerName() + ").");
         }
 
         return new DataTableSpec[]{new DataTableSpec(QUALITY_MEASURES_SPECS)};
@@ -175,6 +187,7 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         m_inputModel = m_inputModelPortObject.getNERModel();
         m_usedDict = m_inputModelPortObject.getDictSet();
         m_tag = m_inputModelPortObject.getTag();
+        m_tokenizerName = m_inputModelPortObject.getTokenizerName();
 
         //create a BufferedDataContainer for the scoring values
         BufferedDataContainer accTable = exec.createDataContainer(new DataTableSpec(QUALITY_MEASURES_SPECS));
@@ -189,7 +202,7 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
 
         // create dictionary tagger to tag the input documents with the dictionary used for building the model
         MultiTermRegexDocumentTagger tagger =
-            new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag, true);
+            new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag, true, m_tokenizerName);
 
         // create UUID to add them to the file path to avoid cases where two instances of the node model used the same file path at the same time
         String tempDir = KNIMEConstants.getKNIMETempDir() + "/";

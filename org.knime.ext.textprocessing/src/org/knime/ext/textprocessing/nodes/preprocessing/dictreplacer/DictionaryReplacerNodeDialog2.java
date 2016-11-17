@@ -48,11 +48,20 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import javax.swing.JFileChooser;
 
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  *
@@ -71,6 +80,16 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
     }
 
     /**
+     * @return Creates and returns a new instance of {@link SettingsModelString} containing the name of the tokenizer
+     *         used for word tokenization.
+     * @since 3.3
+     */
+    public static final SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(DictionaryReplacerConfigKeys2.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
      * Creates new instance of {@link DictionaryReplacerNodeDialog2}.
      */
     public DictionaryReplacerNodeDialog2() {
@@ -82,5 +101,12 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
         addDialogComponent(
             new DialogComponentFileChooser(getDictionaryFileModel(), DictionaryReplacerNodeDialog2.class.toString(),
                 JFileChooser.FILES_ONLY, DictionaryReplacerNodeModel2.VALID_DICTFILE_EXTENIONS));
+
+        Set<String> tokenizerList = new TreeSet<String>();
+        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap()
+            .entrySet()) {
+            tokenizerList.add(entry.getKey());
+        }
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 }

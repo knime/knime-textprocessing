@@ -48,10 +48,19 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  *
@@ -77,6 +86,16 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
     }
 
     /**
+     * @return Creates and returns a new instance of {@link SettingsModelString} containing the name of the tokenizer
+     *         used for word tokenization.
+     * @since 3.3
+     */
+    public static final SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(DictionaryReplacer2InPortsConfigKeys2.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
      * Constructor of {@link DictionaryReplacer2InPortsNodeDialog2}.
      */
     @SuppressWarnings("unchecked")
@@ -91,5 +110,12 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
 
         addDialogComponent(new DialogComponentColumnNameSelection(getReplacementColumnModel(),
             "Column containing the replacement strings", 1, true, StringValue.class));
+
+        Set<String> tokenizerList = new TreeSet<String>();
+        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap()
+            .entrySet()) {
+            tokenizerList.add(entry.getKey());
+        }
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 }

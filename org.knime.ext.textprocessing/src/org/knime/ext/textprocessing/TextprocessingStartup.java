@@ -48,14 +48,14 @@
 package org.knime.ext.textprocessing;
 
 import org.eclipse.ui.IStartup;
-import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Startup class, initializing models and instances of the textprocessing plugin.
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
+ * @deprecated no replacement or newer version for this class.
  */
+@Deprecated
 public class TextprocessingStartup implements IStartup {
 
     /**
@@ -63,9 +63,6 @@ public class TextprocessingStartup implements IStartup {
      */
     @Override
     public void earlyStartup() {
-        // initialize tokenizer pool
-        if (TextprocessingPreferenceInitializer.initTokenizerPoolOnStartup()) {
-            DefaultTokenization.createNewTokenizerPool();
-        }
+        // nothing to do here...
     }
 }

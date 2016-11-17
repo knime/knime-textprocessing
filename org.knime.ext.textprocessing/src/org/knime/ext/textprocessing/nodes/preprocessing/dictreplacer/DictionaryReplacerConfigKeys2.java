@@ -59,4 +59,9 @@ public final class DictionaryReplacerConfigKeys2 {
 
     /** Config key for the dictionary file. */
     public static final String CFGKEY_DICTFILE = "Dictionary File";
+
+    /** Config key for the word tokenizer.
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
 }

@@ -104,11 +104,33 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
+     * Creates a new instance of {@code StanfordNlpNeDocumentTagger}.
+     *
+     * @param setNeUnmodifiable The unmodifiable flag.
+     * @param model The model.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @throws ClassNotFoundException If the classifier could not be created from given path.
+     * @throws IOException If the classifier could not be created from given path.
+     */
+    public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String model, final String tokenizerName)
+        throws ClassNotFoundException, IOException {
+        super(setNeUnmodifiable, tokenizerName);
+        if (!TAGGERMODELS.containsKey(model)) {
+            throw new IllegalArgumentException("Model \"" + model + "\" does not exist.");
+        }
+        String path = TAGGERMODELS.get(model);
+        m_tagger = CRFClassifier.getClassifier(path);
+    }
+
+    /**
      * @param setNeUnmodifiable
      * @param model
-     * @throws ClassNotFoundException
-     * @throws IOException
+     * @throws ClassNotFoundException If the classifier could not be created from given path.
+     * @throws IOException If the classifier could not be created from given path.
+     * @deprecated Use {@link #StanfordNlpNeDocumentTagger(boolean, String, String)} instead to define the tokenizer
+     *             used for word tokenization.
      */
+    @Deprecated
     public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String model)
         throws ClassNotFoundException, IOException {
         super(setNeUnmodifiable);
@@ -120,10 +142,26 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * @param setNeUnmodifiable
-     * @param crf
-     * @param tag
+     * @param setNeUnmodifiable The unmodifiable flag.
+     * @param crf The CRFClassifer.
+     * @param tag The used tag.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
      */
+    public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final CRFClassifier<CoreLabel> crf,
+        final Tag tag, final String tokenizerName) {
+        super(setNeUnmodifiable, tokenizerName);
+        m_tagger = crf;
+        m_tag = tag;
+    }
+
+    /**
+     * @param setNeUnmodifiable The unmodifiable flag.
+     * @param crf The CRFClassifer.
+     * @param tag The used tag.
+     * @deprecated Use {@link #StanfordNlpNeDocumentTagger(boolean, CRFClassifier, Tag, String)} instead to define the
+     *             tokenizer used for word tokenization.
+     */
+    @Deprecated
     public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final CRFClassifier<CoreLabel> crf,
         final Tag tag) {
         super(setNeUnmodifiable);

@@ -76,7 +76,6 @@ import edu.stanford.nlp.ling.CoreLabel;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @param <T>
  * @since 3.3
  */
 public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier<CoreLabel>> {
@@ -168,11 +167,14 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     }
 
     /**
-     * @param outputBuffer
-     * @param tag
-     * @param dict
+     * Creates an instance of {@code StanfordNERModelPortObject}.
+     *
+     * @param outputBuffer The byte array containing the NER model.
+     * @param tag The used tag.
+     * @param dict The used dictionary.
      * @throws Exception
-     * @deprecated
+     * @deprecated Use {@link StanfordNERModelPortObject#StanfordNERModelPortObject(byte[], Tag, Set, String)
+     *             StanfordNERModelPortObject(byte[], Tag, Set, String)} to set the user word tokenizer for upstream nodes.
      */
     @Deprecated
     public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict)
@@ -181,9 +183,11 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     }
 
     /**
-     * @param outputBuffer
-     * @param tag
-     * @param dict
+     *
+     * Creates an instance of {@code StanfordNERModelPortObject}.
+     * @param outputBuffer The byte array containing the NER model.
+     * @param tag The used tag.
+     * @param dict The used dictionary.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws Exception
      */
@@ -195,9 +199,9 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     /**
      * {@inheritDoc}
      *
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws ClassCastException
+     * @throws IOException If the model file cannot be created or if there are problems accessing the input stream.
+     * @throws ClassNotFoundException If there are problems interpreting the serialized data.
+     * @throws ClassCastException If there are problems interpreting the serialized data.
      */
     @Override
     public CRFClassifier<CoreLabel> getNERModel() throws IOException, ClassCastException, ClassNotFoundException {

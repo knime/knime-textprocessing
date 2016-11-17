@@ -69,13 +69,10 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 /**
- * The POS tagger node adds part of speech (POS) tags to terms of documents.
- * Here the Penn Treebank part-of-speech tag set is used to define all kinds
- * of tags, see {@link org.knime.ext.textprocessing.data.PartOfSpeechTag} for
- * more details. The underlying tagger model which is used to choose the
- * (hopefully) proper tags for all the terms is an external model of the
- * Stanford framework, see (http://nlp.stanford.edu/software/tagger.shtml)
- * for more details.
+ * The POS tagger node adds part of speech (POS) tags to terms of documents. Here the Penn Treebank part-of-speech tag
+ * set is used to define all kinds of tags, see {@link org.knime.ext.textprocessing.data.PartOfSpeechTag} for more
+ * details. The underlying tagger model which is used to choose the (hopefully) proper tags for all the terms is an
+ * external model of the Stanford framework, see (http://nlp.stanford.edu/software/tagger.shtml) for more details.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -84,36 +81,25 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
     /**
      * Contains the paths to the models.
      */
-    private static final StanfordModelPaths PATHS =
-        StanfordModelPaths.getStanfordModelPaths();
+    private static final StanfordModelPaths PATHS = StanfordModelPaths.getStanfordModelPaths();
 
     /**
      * The tagger model names and their corresponding model file.
      */
-    public static final Hashtable<String, String> TAGGERMODELS =
-        new Hashtable<>();
+    public static final Hashtable<String, String> TAGGERMODELS = new Hashtable<>();
+
     static {
-        TAGGERMODELS.put("English bidirectional",
-                PATHS.getEnglishBidirectionalPosModelFile());
-        TAGGERMODELS.put("English left 3 words",
-                PATHS.getEnglishLeft3WordsPosModelFile());
-        TAGGERMODELS.put("English left 3 words caseless",
-                PATHS.getEnglishLeft3WordsCaselessPosModelFile());
-        TAGGERMODELS.put("German fast",
-                PATHS.getGermanFastPosModelFile());
-        TAGGERMODELS.put("German hgc",
-                PATHS.getGermanHgcPosModelFile());
-        TAGGERMODELS.put("German dewac",
-                         PATHS.getGermanDewacPosModelFile());
-        TAGGERMODELS.put("French",
-                         PATHS.getFrenchPosModelFile());
+        TAGGERMODELS.put("English bidirectional", PATHS.getEnglishBidirectionalPosModelFile());
+        TAGGERMODELS.put("English left 3 words", PATHS.getEnglishLeft3WordsPosModelFile());
+        TAGGERMODELS.put("English left 3 words caseless", PATHS.getEnglishLeft3WordsCaselessPosModelFile());
+        TAGGERMODELS.put("German fast", PATHS.getGermanFastPosModelFile());
+        TAGGERMODELS.put("German hgc", PATHS.getGermanHgcPosModelFile());
+        TAGGERMODELS.put("German dewac", PATHS.getGermanDewacPosModelFile());
+        TAGGERMODELS.put("French", PATHS.getFrenchPosModelFile());
     }
 
     private enum Language {
-        ENGLISH,
-        GERMAN,
-        FRENCH,
-        ARABIC;
+            ENGLISH, GERMAN, FRENCH, ARABIC;
     }
 
     private MaxentTagger m_tagger;
@@ -123,24 +109,22 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
     private Language m_lang;
 
     /**
-     * Creates a new instance of StanfordDocumentTagger and loads internally the
-     * specified tagging model of the Stanford library to POS tag the
-     * documents. If <code>setNeUnmodifiable</code> is set <code>true</code>
-     * all recognized terms are set to unmodifiable.
+     * Creates a new instance of StanfordDocumentTagger and loads internally the specified tagging model of the Stanford
+     * library to POS tag the documents. If <code>setNeUnmodifiable</code> is set <code>true</code> all recognized terms
+     * are set to unmodifiable.
      *
-     * @param setNeUnmodifiable If true all recognized terms are set
-     * unmodifiable.
+     * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
      * @param model The model to load and use.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws ClassNotFoundException If model cannot be found.
      * @throws IOException If model cannot be red.
+     * @since 3.3
      */
-    public StanfordDocumentTagger(final boolean setNeUnmodifiable,
-            final String model)
-    throws ClassNotFoundException, IOException {
-        super(setNeUnmodifiable);
+    public StanfordDocumentTagger(final boolean setNeUnmodifiable, final String model, final String tokenizerName)
+        throws ClassNotFoundException, IOException {
+        super(setNeUnmodifiable, tokenizerName);
         if (!TAGGERMODELS.containsKey(model)) {
-            throw new IllegalArgumentException("Model \"" + model
-                    + "\" does not exists.");
+            throw new IllegalArgumentException("Model \"" + model + "\" does not exists.");
         }
         m_tagger = new MaxentTagger(TAGGERMODELS.get(model));
         m_modelName = model;
@@ -152,8 +136,40 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
         } else if (m_modelName.contains("French")) {
             m_lang = Language.FRENCH;
         } else {
-            throw new IllegalArgumentException(
-                    "Language could not be specified from model!");
+            throw new IllegalArgumentException("Language could not be specified from model!");
+        }
+    }
+
+    /**
+     * Creates a new instance of StanfordDocumentTagger and loads internally the specified tagging model of the Stanford
+     * library to POS tag the documents. If <code>setNeUnmodifiable</code> is set <code>true</code> all recognized terms
+     * are set to unmodifiable.
+     *
+     * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
+     * @param model The model to load and use.
+     * @throws ClassNotFoundException If model cannot be found.
+     * @throws IOException If model cannot be red.
+     * @deprecated Use {@link #StanfordDocumentTagger(boolean, String, String)} instead to define the tokenizer used for
+     *             word tokenization.
+     */
+    @Deprecated
+    public StanfordDocumentTagger(final boolean setNeUnmodifiable, final String model)
+        throws ClassNotFoundException, IOException {
+        super(setNeUnmodifiable);
+        if (!TAGGERMODELS.containsKey(model)) {
+            throw new IllegalArgumentException("Model \"" + model + "\" does not exists.");
+        }
+        m_tagger = new MaxentTagger(TAGGERMODELS.get(model));
+        m_modelName = model;
+
+        if (m_modelName.contains("German")) {
+            m_lang = Language.GERMAN;
+        } else if (m_modelName.contains("English")) {
+            m_lang = Language.ENGLISH;
+        } else if (m_modelName.contains("French")) {
+            m_lang = Language.FRENCH;
+        } else {
+            throw new IllegalArgumentException("Language could not be specified from model!");
         }
     }
 

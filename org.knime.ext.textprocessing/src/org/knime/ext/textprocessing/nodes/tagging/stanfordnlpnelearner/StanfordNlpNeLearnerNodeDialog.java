@@ -50,6 +50,8 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -65,6 +67,11 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  *
@@ -227,6 +234,14 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
             StanfordNlpNeLearnerNodeModel.DEF_USE_DISJUNCTIVE);
     }
 
+    /**
+     * @return Creates and returns the boolean settings model for the "use disjunctive" flag.
+     */
+    public static final SettingsModelString createTokenizerModel() {
+        return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
     private SettingsModelString m_tagtypemodel;
 
     private DialogComponentStringSelection m_tagSelection;
@@ -252,7 +267,6 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
             new DialogComponentColumnNameSelection(knownEntitiesColModel, "Dictionary column", 1, StringValue.class);
         docComp.setToolTipText("The dictionary to train the model with.");
         addDialogComponent(knownEntitiesComp);
-
         setHorizontalPlacement(false);
 
         // tag type model
@@ -269,8 +283,16 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
             new DialogComponentStringSelection(m_tagtypemodel, "Tag type", TagFactory.getInstance().getTagTypes()));
         addDialogComponent(m_tagSelection);
 
+        setHorizontalPlacement(false);
+
+        Set<String> tokenizerList = new TreeSet<String>();
+        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet()) {
+            tokenizerList.add(entry.getKey());
+        }
+        addDialogComponent(new DialogComponentStringSelection(createTokenizerModel(), "Word tokenizer", tokenizerList));
+
         createNewTab("Learner Properties");
-        selectTab("Properties");
+        selectTab("Learner Properties");
         String wordShapes =
             "none,dan1,chris1,dan2,dan2useLC,dan2bio,dan2bioUseLC,jenny1,jenny1useLC,chris2,chris2useLC,chris3,chris3useLC,chris4";
         List<String> wordShapeList = Arrays.asList(wordShapes.split(","));
@@ -304,6 +326,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(createUseTypeYSeqsModel(), "Use Type Y Seqs"));
         setHorizontalPlacement(false);
         addDialogComponent(new DialogComponentStringSelection(createWordShapeModel(), "Word Shape", wordShapeList));
+
 
     }
 

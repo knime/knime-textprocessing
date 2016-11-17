@@ -47,9 +47,12 @@
  */
 package org.knime.ext.textprocessing.util;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -82,7 +85,15 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
      */
     public static final String DEF_DOCUMENT_VECTOR_COLNAME = "Document Vector";
 
+    /**
+     * The key for the word tokenizer setting contained in the document column property.
+     * @since 3.3
+     */
+    public static final String WORD_TOKENIZER_KEY = "Word Tokenizer";
+
     private final TextContainerDataCellFactory m_documentCellFac;
+
+    private String m_tokenizerName;
 
     /**
      * Empty constructor of <code>DocumentDataTableBuilder</code>.
@@ -90,6 +101,16 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
     public DocumentDataTableBuilder() {
         m_documentCellFac =
             TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+    }
+
+    /**
+     * Creates an instance of {@code DocumentDataTableBuilder} with the used word tokenizer.
+     * @param tokenizerName
+     * @since 3.3
+     */
+    public DocumentDataTableBuilder(final String tokenizerName) {
+        m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        m_tokenizerName = tokenizerName;
     }
 
     /**
@@ -261,6 +282,11 @@ public class DocumentDataTableBuilder implements DataTableBuilder {
         DataColumnSpecCreator dcscDocs = new DataColumnSpecCreator(
                 DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME,
                 m_documentCellFac.getDataType());
+        if (m_tokenizerName != null) {
+            Map<String, String> props = new HashMap<String, String>();
+            props.put(WORD_TOKENIZER_KEY, m_tokenizerName);
+            dcscDocs.setProperties(new DataColumnProperties(props));
+        }
         return new DataTableSpec(dcscDocs.createSpec());
     }
 }

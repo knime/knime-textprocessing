@@ -61,6 +61,8 @@ import org.knime.core.node.port.PortObjectSpec;
  */
 public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
 
+    private String m_tokenizerName;
+
     /**
      * Not used.
      */
@@ -69,8 +71,11 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
 
     /**
      * Creates a new instance of {NERModelPortObjectSpec}
+     * @param tokenizerName The tokenizer used for word tokenization.
      */
-    public NERModelPortObjectSpec() { }
+    public NERModelPortObjectSpec(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+    }
 
     /**
      * {@inheritDoc}
@@ -86,6 +91,13 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
     @Override
     protected void load(final ModelContentRO model) throws InvalidSettingsException {
         //Nothing to do here
+    }
+
+    /**
+     * @return Returns the name of the used word tokenizer.
+     */
+    public String getTokenizerName() {
+        return m_tokenizerName;
     }
 
     /**

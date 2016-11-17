@@ -68,10 +68,12 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.node.streamable.InputPortRole;
+import org.knime.ext.textprocessing.data.NERModelPortObjectSpec;
 import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -137,6 +139,20 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
         // check for optional model input and enable/disable "own model" flag.
         if (inSpecs[1] != null) {
             m_hasModelInput = true;
+            NERModelPortObjectSpec spec = (NERModelPortObjectSpec)inSpecs[1];
+            String tokenizer = spec.getTokenizerName();
+            if (tokenizer != null) {
+                if (!tokenizer.equals(getTokenizerName())) {
+                    setWarningMessage("Tokenization of input model (" + tokenizer
+                        + ") differs to selected tokenization (" + getTokenizerName() + ").");
+                }
+            } else {
+                if (!getTokenizerName().equals(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER)) {
+                    setWarningMessage(
+                        "Tokenization of input model (" + TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER
+                            + ") differs to selected tokenization (" + getTokenizerName() + ").");
+                }
+            }
         } else if (inSpecs[1] == null) {
             m_hasModelInput = false;
         }
@@ -170,14 +186,16 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        // create the tagger for the "real" tagging, since the first tagging in the execute() method is only for validation purposes
+        // create the tagger
         final DocumentTagger tagger;
         final String modelName;
         if (m_useInportModel.isEnabled() && m_useInportModel.getBooleanValue()) {
-            tagger = new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(), m_inputModel, m_tag);
+            tagger = new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(), m_inputModel, m_tag,
+                getTokenizerName());
         } else {
             modelName = m_classifierModel.getStringValue();
-            tagger = new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(), modelName);
+            tagger =
+                new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(), modelName, getTokenizerName());
         }
         return tagger;
     }

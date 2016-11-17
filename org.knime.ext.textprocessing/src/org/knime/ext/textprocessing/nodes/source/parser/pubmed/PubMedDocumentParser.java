@@ -69,6 +69,7 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -243,25 +244,59 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
 
     private boolean m_extractMetaData = false;
 
+    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+
     /**
      * Creates a new instance of <code>PubMedDocumentParser</code>. The document source is set to
      * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} by default.
      * The document category and file path will be set to <code>null</code> by default.
+     *
+     * @deprecated Use {@link #PubMedDocumentParser(String)} instead to define the tokenizer used for word tokenization.
      */
+    @Deprecated
     public PubMedDocumentParser() {
         this(null, null, new DocumentSource(DEFAULT_SOURCE), false);
     }
 
     /**
+     * Creates a new instance of {@code PubMedDocumentParser}. The document source is set to
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} by default.
+     * The document category and file path will be set to <code>null</code> by default.
+     *
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public PubMedDocumentParser(final String tokenizerName) {
+        this(null, null, new DocumentSource(DEFAULT_SOURCE), false, tokenizerName);
+    }
+
+    /**
      * Creates a new instance of <code>PubMedDocumentParser</code>. The document source is set to
      * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} by default.
      * The document category and file path will be set to <code>null</code> by default.
      *
      * @param extractMetaData The flag whether meta data (mesh info and pub med id) are extracted or not.
      * @since 2.7
+     * @deprecated Use {@link #PubMedDocumentParser(boolean, String)} instead to define the tokenizer used for word
+     *             tokenization.
      */
+    @Deprecated
     public PubMedDocumentParser(final boolean extractMetaData) {
         this(null, null, new DocumentSource(DEFAULT_SOURCE), extractMetaData);
+    }
+
+    /**
+     * Creates a new instance of {@code PubMedDocumentParser}. The document source is set to
+     * {@link org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParser#DEFAULT_SOURCE} by default.
+     * The document category and file path will be set to <code>null</code> by default.
+     *
+     * @param extractMetaData The flag whether meta data (mesh info and pub med id) are extracted or not.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public PubMedDocumentParser(final boolean extractMetaData, final String tokenizerName) {
+        this(null, null, new DocumentSource(DEFAULT_SOURCE), extractMetaData, tokenizerName);
     }
 
     /**
@@ -271,9 +306,27 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
+     * @deprecated Use {@link #PubMedDocumentParser(String, DocumentCategory, DocumentSource, String)} instead to define
+     *             the tokenizer used for word tokenization.
      */
+    @Deprecated
     public PubMedDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         this(docPath, category, source, false);
+    }
+
+    /**
+     * Creates a new instance of {@code PubMedDocumentParser}. The given source, category and file path is set to the
+     * created documents.
+     *
+     * @param docPath The path to the file containing the document.
+     * @param category The category of the document to set.
+     * @param source The source of the document to set.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public PubMedDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final String tokenizerName) {
+        this(docPath, category, source, false, tokenizerName);
     }
 
     /**
@@ -285,7 +338,10 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
      * @param source The source of the document to set.
      * @param extractMetaData The flag whether meta data (mesh info and pub med id) are extracted or not.
      * @since 2.7
+     * @deprecated Use {@link #PubMedDocumentParser(String, DocumentCategory, DocumentSource, boolean, String)} instead
+     *             to define the tokenizer used for word tokenization.
      */
+    @Deprecated
     public PubMedDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
         final boolean extractMetaData) {
         m_category = category;
@@ -296,7 +352,29 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     }
 
     /**
+     * Creates a new instance of {@code PubMedDocumentParser}. The given source, category and file path is set to the
+     * created documents.
+     *
+     * @param docPath The path to the file containing the document.
+     * @param category The category of the document to set.
+     * @param source The source of the document to set.
+     * @param extractMetaData The flag whether meta data (mesh info and pub med id) are extracted or not.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public PubMedDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final boolean extractMetaData, final String tokenizerName) {
+        m_category = category;
+        m_source = source;
+        m_docPath = docPath;
+        m_listener = new ArrayList<DocumentParsedEventListener>();
+        m_extractMetaData = extractMetaData;
+        m_tokenizerName = tokenizerName;
+    }
+
+    /**
      * {@inheritDoc}
+     *
      * @deprecated
      */
     @Deprecated
@@ -333,12 +411,12 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
-    {
+    public void startElement(final String uri, final String localName, final String qName,
+        final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(PUBMEDARTICLE)) {
-            m_currentDoc = new DocumentBuilder();
+            m_currentDoc = new DocumentBuilder(m_tokenizerName);
             if (m_category != null) {
                 m_currentDoc.addDocumentCategory(m_category);
             }
@@ -422,8 +500,8 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
             if (m_currentDoc != null) {
                 m_currentDoc.addSection(m_abstract.trim(), SectionAnnotation.ABSTRACT);
             } else {
-                LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Abstract (" + ABSTRACTTEXT
-                    + ") cannot be set.");
+                LOGGER.info(
+                    "No <" + PUBMEDARTICLE + "> start Element: " + "Abstract (" + ABSTRACTTEXT + ") cannot be set.");
             }
         } else if (name.equals(ARTICLETITLE)) {
             if (m_currentDoc != null) {
@@ -662,8 +740,10 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
 
     /**
      * {@inheritDoc}
+     *
      * @since 3.1
      */
     @Override
-    public void setFilenameAsTitle(final boolean filenameAsTitle) { }
+    public void setFilenameAsTitle(final boolean filenameAsTitle) {
+    }
 }

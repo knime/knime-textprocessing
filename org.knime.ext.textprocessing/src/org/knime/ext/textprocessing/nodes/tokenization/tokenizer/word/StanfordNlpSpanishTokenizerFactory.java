@@ -85,12 +85,12 @@ public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public String getTokenizerDescription() {
-        return "\"Tokenizer for raw Spanish text. This tokenization scheme is a derivative of PTB tokenization, "
-            + "but with extra rules for Spanish contractions and assimilations. "
-            + "It is based heavily on the FrenchTokenizer. "
-            + "The tokenizer tokenizes according to the modified AnCora corpus tokenization standards, "
-            + "so the rules are a little different from PTB.\" "
-            + "For more information about the StanfordNLP tokenizer, visit their website: "
+        return "\"Tokenizer for raw Spanish text. This tokenization scheme is a derivative of PTB tokenization, \n"
+            + "but with extra rules for Spanish contractions and assimilations. \n"
+            + "It is based heavily on the FrenchTokenizer. \n"
+            + "The tokenizer tokenizes according to the modified AnCora corpus tokenization standards, \n"
+            + "so the rules are a little different from PTB.\" \n"
+            + "For more information about the StanfordNLP tokenizer, visit their website: \n"
             + "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/international/spanish/process/SpanishTokenizer.html";
     }
 

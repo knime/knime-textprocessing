@@ -56,10 +56,6 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import opennlp.tools.postag.POSModel;
-import opennlp.tools.postag.POSTagger;
-import opennlp.tools.postag.POSTaggerME;
-
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.PartOfSpeechTag;
 import org.knime.ext.textprocessing.data.Sentence;
@@ -70,13 +66,15 @@ import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTagger;
+import opennlp.tools.postag.POSTaggerME;
+
 /**
- * The POS tagger node adds part of speech (POS) tags to terms of documents.
- * Here the Penn Treebank part-of-speech tag set is used to define all kinds
- * of tags, see {@link org.knime.ext.textprocessing.data.PartOfSpeechTag} for
- * more details. The underlying tagger model which is used to choose the
- * (hopefully) proper tags for all the terms is an external model of the
- * OpenNLP framework, see (http://opennlp.sourceforge.net) for more details.
+ * The POS tagger node adds part of speech (POS) tags to terms of documents. Here the Penn Treebank part-of-speech tag
+ * set is used to define all kinds of tags, see {@link org.knime.ext.textprocessing.data.PartOfSpeechTag} for more
+ * details. The underlying tagger model which is used to choose the (hopefully) proper tags for all the terms is an
+ * external model of the OpenNLP framework, see (http://opennlp.sourceforge.net) for more details.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -85,21 +83,37 @@ public class PosDocumentTagger extends AbstractDocumentTagger {
     private POSTagger m_tagger;
 
     /**
-     * Creates a new instance of PosDocumentTagger and loads internally the
-     * POS tagging model of the OpenNLP framework to POS tag the documents.
-     * If the model file could not be loaded an <code>IOException</code> will
-     * be thrown. If <code>setNeUnmodifiable</code> is set <code>true</code>
-     * all recognized terms are set to unmodifiable.
+     * Creates a new instance of PosDocumentTagger and loads internally the POS tagging model of the OpenNLP framework
+     * to POS tag the documents. If the model file could not be loaded an <code>IOException</code> will be thrown. If
+     * <code>setNeUnmodifiable</code> is set <code>true</code> all recognized terms are set to unmodifiable.
      *
-     * @param setNeUnmodifiable If true all recognized terms are set
-     * unmodifiable.
+     * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws IOException If the model file could not be loaded.
+     * @since 3.3
      */
-    public PosDocumentTagger(final boolean setNeUnmodifiable)
-    throws IOException {
+    public PosDocumentTagger(final boolean setNeUnmodifiable, final String tokenizerName) throws IOException {
+        super(setNeUnmodifiable, tokenizerName);
+        String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths().getPosTaggerModelFile();
+        InputStream is = new FileInputStream(new File(modelPath));
+        POSModel model = new POSModel(is);
+        m_tagger = new POSTaggerME(model);
+    }
+
+    /**
+     * Creates a new instance of PosDocumentTagger and loads internally the POS tagging model of the OpenNLP framework
+     * to POS tag the documents. If the model file could not be loaded an <code>IOException</code> will be thrown. If
+     * <code>setNeUnmodifiable</code> is set <code>true</code> all recognized terms are set to unmodifiable.
+     *
+     * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
+     * @throws IOException If the model file could not be loaded.
+     * @deprecated Use {@link #PosDocumentTagger(boolean, String)} instead to define the tokenizer used for word
+     *             tokenization.
+     */
+    @Deprecated
+    public PosDocumentTagger(final boolean setNeUnmodifiable) throws IOException {
         super(setNeUnmodifiable);
-        String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths()
-                .getPosTaggerModelFile();
+        String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths().getPosTaggerModelFile();
         InputStream is = new FileInputStream(new File(modelPath));
         POSModel model = new POSModel(is);
         m_tagger = new POSTaggerME(model);
@@ -129,8 +143,7 @@ public class PosDocumentTagger extends AbstractDocumentTagger {
         String[] wordsArr = words.toArray(new String[0]);
         String[] tagsArr = m_tagger.tag(wordsArr);
 
-        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(
-                tagsArr.length);
+        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(tagsArr.length);
         for (int i = 0; i < wordsArr.length; i++) {
             taggedEntities.add(new TaggedEntity(wordsArr[i], tagsArr[i]));
         }

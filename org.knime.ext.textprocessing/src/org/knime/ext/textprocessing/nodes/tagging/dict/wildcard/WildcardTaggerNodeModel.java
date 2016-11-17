@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.knime.base.util.WildcardMatcher;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -175,10 +176,10 @@ public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {
         // create single or multi term tagger
         if (m_matchingLevelModel.getStringValue().equals(SINGLETERM_MATCHINGLEVEL)) {
             return new SingleTermRegexDocumentTagger(getUnmodifiableSetting(), pattern, getTagSetting(),
-                                                    getCaseSensitiveSetting());
+                                                    getCaseSensitiveSetting(), getTokenizerName());
         } else {
             return new MultiTermRegexDocumentTagger(getUnmodifiableSetting(), pattern, getTagSetting(),
-                                                 getCaseSensitiveSetting());
+                                                 getCaseSensitiveSetting(), getTokenizerName());
         }
     }
 

@@ -33,7 +33,11 @@
         </option>
         
         <option name="Ignore unmodifiable tag">
-              If checked, unmodifiable terms will be preprocessed too.
+            If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
         </option>
         </tab>
     </fullDescription>

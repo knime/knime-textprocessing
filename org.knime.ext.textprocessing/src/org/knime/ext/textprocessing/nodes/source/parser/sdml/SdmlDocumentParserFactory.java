@@ -60,9 +60,20 @@ public class SdmlDocumentParserFactory implements DocumentParserFactory {
 
     /**
      * {@inheritDoc}
+     * @deprecated Use {@link #createParser(String)} instead to define the tokenizer used for word tokenization.
      */
+    @Deprecated
     @Override
     public DocumentParser createParser() throws InstantiationException {
         return new SdmlDocumentParser();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public DocumentParser createParser(final String tokenizerName) throws InstantiationException {
+        return new SdmlDocumentParser(tokenizerName);
     }
 }

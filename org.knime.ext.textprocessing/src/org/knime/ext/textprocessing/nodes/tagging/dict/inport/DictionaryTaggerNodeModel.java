@@ -56,7 +56,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel;
 
-
 /**
  *
  * @author thiel, University of Konstanz
@@ -65,17 +64,15 @@ public class DictionaryTaggerNodeModel extends AbstractDictionaryTaggerModel {
 
     /**
      * The default value of the exact match setting.
+     *
      * @since 2.8
      */
     public static final boolean DEFAULT_EXACTMATCH = true;
 
-
-    private SettingsModelBoolean m_exactMatchModel =
-            DictionaryTaggerNodeDialog.createExactMatchModel();
+    private SettingsModelBoolean m_exactMatchModel = DictionaryTaggerNodeDialog.createExactMatchModel();
 
     /**
-     * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two
-     * table in ports and one out port.
+     * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two table in ports and one out port.
      */
     public DictionaryTaggerNodeModel() {
         super();
@@ -89,7 +86,7 @@ public class DictionaryTaggerNodeModel extends AbstractDictionaryTaggerModel {
     @Override
     protected DocumentTagger createDocumentTagger(final Set<String> dictionary) {
         return new DictionaryDocumentTagger(getUnmodifiableSetting(), dictionary, getTagSetting(),
-                                            getCaseSensitiveSetting(), m_exactMatchModel.getBooleanValue());
+            getCaseSensitiveSetting(), m_exactMatchModel.getBooleanValue(), getTokenizerName());
     }
 
     /**

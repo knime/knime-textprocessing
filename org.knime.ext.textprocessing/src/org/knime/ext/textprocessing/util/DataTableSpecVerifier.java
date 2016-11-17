@@ -41,12 +41,13 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   11.01.2007 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.util;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.StringValue;
@@ -55,15 +56,15 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.TermValue;
 
 /**
- * Provides methods that verify various kinds of 
- * {@link org.knime.core.data.DataTableSpec}s. These methods return 
+ * Provides methods that verify various kinds of
+ * {@link org.knime.core.data.DataTableSpec}s. These methods return
  * <code>false</code> or throw <code>InvalidSettingsException</code> if the
  * spec to verify is not valid accordant to a specified setting, i.e. it can
  * be verified if a spec contains at least one <code>DocumentCell</code>,
  * a <code>DocumentCell</code> and a <code>TermCell</code> and much more. With
- * these methods it can be verified conveniently, i.e. in a nodes configure 
- * method, if a given spec fits the node needs. 
- * 
+ * these methods it can be verified conveniently, i.e. in a nodes configure
+ * method, if a given spec fits the node needs.
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DataTableSpecVerifier {
@@ -75,7 +76,7 @@ public class DataTableSpecVerifier {
     private int m_documentCellIndex = -1;
 
     private int m_stringCellIndex = -1;
-    
+
     private int m_numberCellIndex = -1;
 
     private int m_numTermCells = 0;
@@ -83,13 +84,15 @@ public class DataTableSpecVerifier {
     private int m_numDocumentCells = 0;
 
     private int m_numStringCells = 0;
-    
+
     private int m_numNumberCells = 0;
+
+    private String m_tokenizerWarningMsg = "";
 
     /**
      * Creates a new instance of <code>DataTableSpecVerifier</code> with given
      * <code>DataTableSpec</code> to verify.
-     * 
+     *
      * @param spec <code>DataTableSpec</code> to verify.
      */
     public DataTableSpecVerifier(final DataTableSpec spec) {
@@ -151,7 +154,7 @@ public class DataTableSpecVerifier {
     public int getNumberCellIndex() {
         return m_numberCellIndex;
     }
-    
+
     /**
      * @return the number of term cells.
      */
@@ -178,8 +181,8 @@ public class DataTableSpecVerifier {
      */
     public int getNumberNumberCells() {
         return m_numNumberCells;
-    }    
-    
+    }
+
     private void throwException(final boolean throwException, final String msg)
             throws InvalidSettingsException {
         if (throwException) {
@@ -188,10 +191,61 @@ public class DataTableSpecVerifier {
     }
 
     /**
+     * Verifies tokenizer of first document column against the given tokenizer name. Returns {@code true}
+     * if tokenization is equal, otherwise {@code false}.
+     * @param tokenizerName Tokenizer name to test.
+     * @return {@code true} if tokenization is equal, otherwise {@code false}.
+     * @since 3.3
+     */
+    public boolean verifyTokenizer(final String tokenizerName) {
+        return verifyTokenizer(getDocumentCellIndex(), tokenizerName);
+    }
+
+    /**
+     * Verifies tokenization of document column of specified index against the given tokenizer name. Returns {@code true}
+     * if tokenization is equal, otherwise {@code false}.
+     * @param docColIndex Index of document column to test.
+     * @param tokenizerName Tokenizer name to test.
+     * @return {@code true} if tokenization is equal, otherwise {@code false}.
+     * @since 3.3
+     */
+    public boolean verifyTokenizer(final int docColIndex, final String tokenizerName) {
+        String tokenizer = getTokenizerFromInputDocCol(docColIndex);
+        if (tokenizer != null) {
+            if (!tokenizer.equals(tokenizerName)) {
+                m_tokenizerWarningMsg = "Tokenization of input documents (" + tokenizer
+                    + ") differs to selected tokenization (" + tokenizerName + ").";
+                return false;
+            }
+        }
+        m_tokenizerWarningMsg = "";
+        return true;
+    }
+
+    /**
+     * @return The warning message if tokenizer could not be verified.
+     * @since 3.3
+     */
+    public String getTokenizerWarningMsg() {
+        return m_tokenizerWarningMsg;
+    }
+
+    /**
+     * @param docColIndex The document column index to get the tokenizer name from.
+     * @return The tokenizer used in the input document column.
+     * @since 3.3
+     */
+    public String getTokenizerFromInputDocCol(final int docColIndex) {
+        DataColumnSpec docColSpec = m_spec.getColumnSpec(docColIndex);
+        return docColSpec.getProperties().getProperty(DocumentDataTableBuilder.WORD_TOKENIZER_KEY);
+    }
+
+
+    /**
      * Verifies the <code>DataTableSpec</code> and checks if it has exactly
-     * one column containing <code>DocumentCell</code>s. If so, true is 
+     * one column containing <code>DocumentCell</code>s. If so, true is
      * returned otherwise false.
-     * 
+     *
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> has at least one
@@ -215,13 +269,13 @@ public class DataTableSpecVerifier {
 
         return valid;
     }
-       
+
 
     /**
      * Verifies the <code>DataTableSpec</code> and checks if it has exactly
-     * one column containing <code>StringCell</code>s. If so, true is 
+     * one column containing <code>StringCell</code>s. If so, true is
      * returned otherwise false.
-     * 
+     *
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> has at least one
@@ -235,7 +289,7 @@ public class DataTableSpecVerifier {
 
         if (m_numStringCells < 1) {
             valid = false;
-            throwException(throwException, 
+            throwException(throwException,
                     "No column with StringCells found !");
         } else if (m_numStringCells > 1) {
             valid = false;
@@ -246,19 +300,19 @@ public class DataTableSpecVerifier {
     }
 
     /**
-     * Verifies the <code>DataTableSpec</code> and checks if it contains a 
-     * certain number of column containing <code>StringCell</code>s specified 
+     * Verifies the <code>DataTableSpec</code> and checks if it contains a
+     * certain number of column containing <code>StringCell</code>s specified
      * by the given parameter noStringCells. If so, true is returned, if not an
      * <code>InvalidSettingsException</code> is thrown.
-     * 
-     * @param noStringCells The number of columns containing 
+     *
+     * @param noStringCells The number of columns containing
      * <code>StringCell</code>s to check for.
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> contains the specified number
      * of column with <code>StringCell</code>s.
      * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
-     * more or less than the specified number of columns 
+     * more or less than the specified number of columns
      * with <code>StringCell</code>.
      */
     public boolean verifyStringCells(final int noStringCells,
@@ -278,19 +332,19 @@ public class DataTableSpecVerifier {
     }
 
     /**
-     * Verifies the <code>DataTableSpec</code> and checks if it contains at 
-     * least the given number minimumStringCells of columns containing 
-     * <code>StringCell</code>s. If so, true is returned, if not an 
+     * Verifies the <code>DataTableSpec</code> and checks if it contains at
+     * least the given number minimumStringCells of columns containing
+     * <code>StringCell</code>s. If so, true is returned, if not an
      * <code>InvalidSettingsException</code> is thrown.
-     * 
-     * @param minimumStringCells The number of minimum columns containing 
+     *
+     * @param minimumStringCells The number of minimum columns containing
      * <code>StringCell</code>s to check for.
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> contains at least
      * the given number of columns containing <code>StringCell</code>s.
      * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
-     * less than the specified number minimumStringCells of 
+     * less than the specified number minimumStringCells of
      * columns containing <code>StringCell</code>s.
      */
     public boolean verifyMinimumStringCells(final int minimumStringCells,
@@ -304,21 +358,21 @@ public class DataTableSpecVerifier {
         }
         return valid;
     }
-    
+
     /**
-     * Verifies the <code>DataTableSpec</code> and checks if it contains at 
-     * least the given number minimumDocCells of columns containing 
-     * <code>DocumentCell</code>s. If so, true is returned, if not an 
+     * Verifies the <code>DataTableSpec</code> and checks if it contains at
+     * least the given number minimumDocCells of columns containing
+     * <code>DocumentCell</code>s. If so, true is returned, if not an
      * <code>InvalidSettingsException</code> is thrown.
-     * 
-     * @param minimumDocCells The number of minimum columns containing 
+     *
+     * @param minimumDocCells The number of minimum columns containing
      * <code>DocumentCell</code>s to check for.
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> contains at least
      * the given number of columns containing <code>DocumentCell</code>s.
      * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
-     * less than the specified number minimumDocCells of 
+     * less than the specified number minimumDocCells of
      * columns containing <code>DocumentCell</code>s.
      */
     public boolean verifyMinimumDocumentCells(final int minimumDocCells,
@@ -332,21 +386,21 @@ public class DataTableSpecVerifier {
         }
         return valid;
     }
-    
+
     /**
-     * Verifies the <code>DataTableSpec</code> and checks if it contains at 
-     * least the given number minimumTermCells of columns containing 
-     * <code>TermCell</code>s. If so, true is returned, if not an 
+     * Verifies the <code>DataTableSpec</code> and checks if it contains at
+     * least the given number minimumTermCells of columns containing
+     * <code>TermCell</code>s. If so, true is returned, if not an
      * <code>InvalidSettingsException</code> is thrown.
-     * 
-     * @param minimumTermCells The number of minimum columns containing 
+     *
+     * @param minimumTermCells The number of minimum columns containing
      * <code>TermCell</code>s to check for.
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> contains at least
      * the given number of columns containing <code>TermCell</code>s.
      * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
-     * less than the specified number minimumTermCells of 
+     * less than the specified number minimumTermCells of
      * columns containing <code>TermCell</code>s.
      */
     public boolean verifyMinimumTermCells(final int minimumTermCells,
@@ -359,22 +413,22 @@ public class DataTableSpecVerifier {
                     + minimumTermCells + " columns containing TermCells !");
         }
         return valid;
-    }    
+    }
 
     /**
-     * Verifies the <code>DataTableSpec</code> and checks if it contains at 
-     * least the given number minimumNumberCells of columns containing 
-     * number cells. If so, true is returned, if not an 
+     * Verifies the <code>DataTableSpec</code> and checks if it contains at
+     * least the given number minimumNumberCells of columns containing
+     * number cells. If so, true is returned, if not an
      * <code>InvalidSettingsException</code> is thrown.
-     * 
-     * @param minimumNumberCells The number of minimum columns containing 
+     *
+     * @param minimumNumberCells The number of minimum columns containing
      * number cells to check for.
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
      * @return true if <code>DataTableSpec</code> contains at least
      * the given number of columns containing number cells.
      * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
-     * less than the specified number minimumNumberCells of 
+     * less than the specified number minimumNumberCells of
      * columns containing number cells.
      */
     public boolean verifyMinimumNumberCells(final int minimumNumberCells,
@@ -387,17 +441,17 @@ public class DataTableSpecVerifier {
                     + minimumNumberCells + " columns containing number cells!");
         }
         return valid;
-    }    
-    
+    }
+
     /**
      * Verifies the <code>DataTableSpec</code> and checks if it contains
-     * one columns with <code>TermCell</code>s only. If so, 
-     * true is returned, if not an <code>InvalidSettingsException</code> is 
+     * one columns with <code>TermCell</code>s only. If so,
+     * true is returned, if not an <code>InvalidSettingsException</code> is
      * thrown.
-     * 
+     *
      * @param throwException If true an exception is throw in case of an error,
      * if false just false is returned.
-     * @return true if <code>DataTableSpec</code> contains one column with 
+     * @return true if <code>DataTableSpec</code> contains one column with
      * <code>TermCell</code>s only.
      * @throws InvalidSettingsException If <code>DataTableSpec</code> contains
      * more or less than one column containing <code>TermCell</code>s.
@@ -408,11 +462,11 @@ public class DataTableSpecVerifier {
 
         if (m_numTermCells < 1) {
             valid = false;
-            throwException(throwException, 
+            throwException(throwException,
                     "No column containing TermCells found !");
         } else if (m_numTermCells > 1) {
             valid = false;
-            throwException(throwException, 
+            throwException(throwException,
                     "Only one column conmtaining TermCells allowed !");
         }
 

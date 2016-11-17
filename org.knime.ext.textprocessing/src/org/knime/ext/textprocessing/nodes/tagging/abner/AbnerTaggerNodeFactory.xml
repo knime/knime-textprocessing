@@ -23,6 +23,10 @@
             recognizes proteins only, the <i>NLPBA</i> model 
             recognizes cells, dna and rna lines as well.
         </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
     </fullDescription>
         
     <ports>

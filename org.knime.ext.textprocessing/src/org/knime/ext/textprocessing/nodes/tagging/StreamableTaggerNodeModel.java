@@ -49,9 +49,12 @@ package org.knime.ext.textprocessing.nodes.tagging;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -65,6 +68,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -76,6 +80,7 @@ import org.knime.core.node.streamable.PortObjectInput;
 import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
@@ -91,6 +96,11 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
 
     /** The settings model storing the number of threads to use for tagging. */
     private SettingsModelIntegerBounded m_numberOfThreadsModel = TaggerNodeSettingsPane.getNumberOfThreadsModel();
+
+    /**
+     * @since 3.3
+     */
+    protected SettingsModelString m_tokenizer = TaggerNodeSettingsPane.getTokenizerModel();
 
     /**
      * Default constructor, defining one data input and one data output port.
@@ -144,7 +154,8 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * @param outPortTypes
      * @since 3.3
      */
-    public StreamableTaggerNodeModel(final PortType[] inPortTypes, final InputPortRole[] roles, final PortType[] outPortTypes) {
+    public StreamableTaggerNodeModel(final PortType[] inPortTypes, final InputPortRole[] roles,
+        final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
 
         if (roles.length != inPortTypes.length - 1) {
@@ -185,6 +196,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
 
         checkInputDataTableSpecs(inDataTableSpecs);
         checkInputPortSpecs(inSpecs);
+        checkDocColTokenizerSettings(inDataTableSpecs);
 
         DataTableSpec in = inDataTableSpecs[0];
         ColumnRearranger r = createColumnRearranger(in);
@@ -207,6 +219,19 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      */
     protected void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+    }
+
+    /**
+     * Method to check tokenizer settings from incoming document column.
+     *
+     * @param inSpecs Specs of the input data tables.
+     * @since 3.3
+     */
+    private void checkDocColTokenizerSettings(final DataTableSpec[] inSpecs) {
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {
+            setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
+        }
     }
 
     /**
@@ -233,6 +258,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
     /**
      * Method to prepare the tagger model. This method can be overwritten to apply loading of data from input data
      * tables for tagging.
+     *
      * @param inObjects Input port objects.
      * @param exec The execution context of the node.
      * @throws Exception If tagger cannot be prepared.
@@ -265,7 +291,11 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
         final int docColIndex = verfier.getDocumentCellIndex();
 
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        DataColumnSpec docCol = new DataColumnSpecCreator("Document", docFactory.getDataType()).createSpec();
+        Map<String, String> props = new HashMap<String, String>();
+        DataColumnSpecCreator docColSpecCreator = new DataColumnSpecCreator("Document", docFactory.getDataType());
+        props.put(DocumentDataTableBuilder.WORD_TOKENIZER_KEY, m_tokenizer.getStringValue());
+        docColSpecCreator.setProperties(new DataColumnProperties(props));
+        DataColumnSpec docCol = docColSpecCreator.createSpec();
 
         final int maxNumberOfParalleThreads;
         if (getMaxNumberOfParallelThreads() <= 0) {
@@ -325,6 +355,14 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
         };
     }
 
+    /**
+     * @return The name of the tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    protected String getTokenizerName() {
+        return m_tokenizer.getStringValue();
+    }
+
     /** {@inheritDoc} */
     @Override
     protected void reset() {
@@ -355,6 +393,11 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
         } catch (InvalidSettingsException e) {
             // don't warn just catch (for downwards compatibility)
         }
+        try {
+            m_tokenizer.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // don't warn just catch (for downwards compatibility)
+        }
     }
 
     /**
@@ -363,6 +406,7 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_numberOfThreadsModel.saveSettingsTo(settings);
+        m_tokenizer.saveSettingsTo(settings);
     }
 
     /**
@@ -372,6 +416,11 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         try {
             m_numberOfThreadsModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // don't warn just catch (for downwards compatibility)
+        }
+        try {
+            m_tokenizer.validateSettings(settings);
         } catch (InvalidSettingsException e) {
             // don't warn just catch (for downwards compatibility)
         }
