@@ -50,14 +50,11 @@ import org.deeplearning4j.text.documentiterator.LabelledDocument;
 import org.deeplearning4j.text.documentiterator.LabelsSource;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
-import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CloseableRowIterator;
-import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
-import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * {@link LabelAwareIterator} for a {@link BufferedDataTable}. Expects a column contained in the data table holding one
@@ -106,7 +103,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
      * Returns the next {@link LabelledDocument} containing a document and a corresponding label from the
      * {@link BufferedDataTable}.
      *
-     * @return
+     * @return the next labelled document
      */
     @Override
     public LabelledDocument nextDocument() {
@@ -123,19 +120,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         String documentContent = null;
         String documentLabel = null;
         try {
-            /*
-             * Can't use converter for documents because the getStringValue()
-             * method used for conversion to String returns the document title
-             * and no the content
-             */
-            if (documentCell.getType().isCompatible(DocumentValue.class)) {
-                final DocumentValue dCell = (DocumentValue)documentCell;
-                documentContent = dCell.getDocument().getDocumentBodyText();
-            } else if (documentCell.getType().isCompatible(StringValue.class)) {
-                final StringCell sCell = (StringCell)documentCell;
-                documentContent = sCell.getStringValue();
-            }
-
+            documentContent = ConverterUtils.convertDataCellToJava(documentCell, String.class);
             documentLabel = ConverterUtils.convertDataCellToJava(labelCell, String.class);
         } catch (DataCellConversionException e) {
             throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);

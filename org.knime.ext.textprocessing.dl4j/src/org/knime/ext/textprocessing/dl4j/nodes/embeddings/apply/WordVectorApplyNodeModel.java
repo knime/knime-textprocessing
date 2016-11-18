@@ -63,7 +63,6 @@ import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -88,6 +87,7 @@ import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
 import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
+import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.dl4j.base.util.NDArrayUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -154,7 +154,7 @@ final class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         final List<DataCell> cells = TableUtils.toListOfCells(row);
         final DataCell cell = row.getCell(documentColumnIndex);
 
-        final String document = getString(cell);
+        final String document = ConverterUtils.convertDataCellToJava(cell, String.class);
         ListCell convertedDocument;
 
         if (m_calculateMean.getBooleanValue()) {
@@ -168,16 +168,6 @@ final class WordVectorApplyNodeModel extends AbstractDLNodeModel {
         cells.add(convertedDocument);
 
         return new DefaultRow(row.getKey(), cells);
-    }
-
-    private String getString(final DataCell cell) {
-        if (cell.getType().isCompatible(DocumentValue.class)) {
-            return ((DocumentValue)cell).getDocument().getDocumentBodyText();
-        } else if (cell.getType().isCompatible(StringValue.class)) {
-            return ((StringCell)cell).getStringValue();
-        } else {
-            throw new IllegalArgumentException("Data Type " + cell.getType().getName() + " is not supported.");
-        }
     }
 
     /**

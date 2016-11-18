@@ -6,20 +6,17 @@
       <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory"
-            id="org.knime.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory">
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory">
       </node>
       <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory"
-            id="org.knime.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
       </node>
       <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory"
-            id="org.knime.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory">
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory">
       </node>
    </extension>
    <extension
@@ -42,6 +39,12 @@
             name="Word Embeddings"
             path="/labs/deeplearning/">
       </category>
+   </extension>
+   <extension
+         point="org.knime.ext.dl4j.base.DL4JConverter">
+      <DL4JConverter
+            converterClass="org.knime.ext.textprocessing.dl4j.data.convert.DocumentValueToStringConverter">
+      </DL4JConverter>
    </extension>
 
 </plugin>
