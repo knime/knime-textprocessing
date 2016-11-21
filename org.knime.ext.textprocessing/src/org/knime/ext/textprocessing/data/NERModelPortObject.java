@@ -74,7 +74,6 @@ import com.google.common.io.Files;
  * @since 3.3
  */
 public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
-
     private PortObjectSpec m_spec;
 
     private final byte[] m_outputByteArray;
@@ -88,22 +87,6 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
     private final Set<String> m_dict;
 
     private final String m_tokenizerName;
-
-    /**
-     * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
-     * @param tag The tag that has been used to build the model.
-     * @deprecated Use {@link #NERModelPortObject(byte[], Tag, String) instead for tokenizer support.}
-     */
-    @Deprecated
-    public NERModelPortObject(final byte[] outputBuffer, final Tag tag) {
-        m_outputByteArray = outputBuffer;
-        m_tag = tag;
-        m_tagType = tag.getTagType() ;
-        m_tagValue = tag.getTagValue() ;
-        m_dict = null;
-        m_tokenizerName = "OpenNLP English WordTokenizer";
-        m_spec = new NERModelPortObjectSpec(m_tokenizerName);
-    }
 
     /**
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
@@ -125,25 +108,7 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
      * @param tag The tag that has been used to build the model.
      * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
-     * @deprecated Use {@link #NERModelPortObject(byte[], Tag, Set, String) instead for tokenizer support.}
-     */
-    @Deprecated
-    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict) {
-        m_outputByteArray = outputBuffer;
-        m_tag = tag;
-        m_tagType = tag.getTagType() ;
-        m_tagValue = tag.getTagValue() ;
-        m_dict = dict;
-        m_tokenizerName = "OpenNLP English WordTokenizer";
-        m_spec = new NERModelPortObjectSpec(m_tokenizerName);
-    }
-
-    /**
-     * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
-     * @param tag The tag that has been used to build the model.
-     * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
-     * @since 3.3
      */
     public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict, final String tokenizerName) {
         m_outputByteArray = outputBuffer;
@@ -254,7 +219,6 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
 
     /**
      * @return Returns the name of the tokenizer used for word tokenization.
-     * @since 3.3
      */
     public String getTokenizerName() {
         return m_tokenizerName;

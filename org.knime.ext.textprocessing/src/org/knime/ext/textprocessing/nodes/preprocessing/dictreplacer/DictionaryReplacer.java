@@ -66,8 +66,7 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  *
  */
 public class DictionaryReplacer implements TermPreprocessing, StringPreprocessing {
-
-    private HashMap<String, String> m_replaceDict;
+    private Map<String, String> m_replaceDict;
 
     // initialize the old standard word tokenizer for backwards compatibility
     private final String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
@@ -86,24 +85,6 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      */
     @Deprecated
     public DictionaryReplacer(final Hashtable<String, String> replaceDict) {
-        super();
-        m_replaceDict = new HashMap<String, String>(replaceDict);
-        m_wordTokenizer = DefaultTokenization.getWordTokenizer(m_tokenizerName);
-    }
-
-    /**
-     * Creates new instance of {@link DictionaryReplacer} with give dictionary, containing key value pairs for
-     * replacement.
-     *
-     * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
-     *            corresponding values).
-     * @since 3.1
-     * @deprecated Use {@link DictionaryReplacer#DictionaryReplacer(Map, String) DictionaryReplacer(Map, String)}
-     *             instead to define the word tokenizer.
-     */
-    @Deprecated
-    public DictionaryReplacer(final Map<String, String> replaceDict) {
-        super();
         m_replaceDict = new HashMap<String, String>(replaceDict);
         m_wordTokenizer = DefaultTokenization.getWordTokenizer(m_tokenizerName);
     }
@@ -118,7 +99,6 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      * @since 3.3
      */
     public DictionaryReplacer(final Map<String, String> replaceDict, final String tokenizerName) {
-        super();
         m_replaceDict = new HashMap<String, String>(replaceDict);
         m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
     }

@@ -57,17 +57,6 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserFactory;
  * @since 2.9
  */
 public class PubMedDocumentParserFactory implements DocumentParserFactory {
-
-    /**
-     * {@inheritDoc}
-     * @deprecated Use {@link #createParser(String)} instead to define the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    @Override
-    public DocumentParser createParser() throws InstantiationException {
-        return new PubMedDocumentParser();
-    }
-
     /**
      * {@inheritDoc}
      * @since 3.3
@@ -76,5 +65,4 @@ public class PubMedDocumentParserFactory implements DocumentParserFactory {
     public DocumentParser createParser(final String tokenizerName) throws InstantiationException {
         return new PubMedDocumentParser(tokenizerName);
     }
-
 }

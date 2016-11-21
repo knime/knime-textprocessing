@@ -90,7 +90,6 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentBuilder {
-
     private List<Term> m_terms = new ArrayList<Term>();
 
     private List<Sentence> m_sentences = new ArrayList<Sentence>();
@@ -105,28 +104,27 @@ public class DocumentBuilder {
 
     private DocumentType m_type = DocumentType.UNKNOWN;
 
-    private Set<Author> m_authors = new LinkedHashSet<Author>();
+    private final Set<Author> m_authors = new LinkedHashSet<Author>();
 
-    private Set<DocumentSource> m_sources = new LinkedHashSet<DocumentSource>();
+    private final Set<DocumentSource> m_sources = new LinkedHashSet<DocumentSource>();
 
-    private Set<DocumentCategory> m_categories = new LinkedHashSet<DocumentCategory>();
+    private final Set<DocumentCategory> m_categories = new LinkedHashSet<DocumentCategory>();
 
-    private HashMap<String, String> m_metaInfo = new LinkedHashMap<String, String>();
+    private final HashMap<String, String> m_metaInfo = new LinkedHashMap<String, String>();
 
-    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+    private final Tokenizer m_sentenceTokenizer;
 
-    private Tokenizer m_sentenceTokenizer = DefaultTokenization
-            .getSentenceTokenizer(m_tokenizerName);
-
-    private Tokenizer m_wordTokenizer = DefaultTokenization.getWordTokenizer(m_tokenizerName);
+    private final Tokenizer m_wordTokenizer;
 
     /**
      * Creates new empty instance of {@code DocumentBuilder}.
      * @deprecated Use {@link #DocumentBuilder(String)} instead for tokenizer selection support.
      */
     @Deprecated
-    public DocumentBuilder() { /* empty */ }
+    public DocumentBuilder() {
+        // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+        this(TextprocessingPreferenceInitializer.tokenizerName());
+    }
 
     /**
      * Creates new instance of {@code DocumentBuilder} with specified word tokenizer.
@@ -134,7 +132,6 @@ public class DocumentBuilder {
      * @since 3.3
      */
     public DocumentBuilder(final String tokenizerName) {
-        m_tokenizerName = tokenizerName;
         m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
         m_sentenceTokenizer = DefaultTokenization.getSentenceTokenizer(tokenizerName);
     }
@@ -151,6 +148,7 @@ public class DocumentBuilder {
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
+        this();
         // Add authors
         for (Author a : doc.getAuthors()) {
             addAuthor(a);
@@ -192,9 +190,7 @@ public class DocumentBuilder {
      * @since 3.3
      */
     public DocumentBuilder(final Document doc, final String tokenizerName) {
-        m_tokenizerName = tokenizerName;
-        m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
-        m_sentenceTokenizer = DefaultTokenization.getSentenceTokenizer(tokenizerName);
+        this(tokenizerName);
         // Add authors
         for (Author a : doc.getAuthors()) {
             addAuthor(a);

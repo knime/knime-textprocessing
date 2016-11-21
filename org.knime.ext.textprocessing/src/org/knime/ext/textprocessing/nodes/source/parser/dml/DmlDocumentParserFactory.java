@@ -57,17 +57,6 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserFactory;
  * @since 2.9
  */
 public class DmlDocumentParserFactory implements DocumentParserFactory {
-
-    /**
-     * {@inheritDoc}
-     * @deprecated Use {@link #createParser(String)} instead to define the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    @Override
-    public DocumentParser createParser() throws InstantiationException {
-        return new DmlDocumentParser();
-    }
-
     /**
      * {@inheritDoc}
      * @since 3.3

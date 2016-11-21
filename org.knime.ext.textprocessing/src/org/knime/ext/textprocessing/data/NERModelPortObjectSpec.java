@@ -72,7 +72,6 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
     /**
      * Creates a new instance of {NERModelPortObjectSpec}
      * @param tokenizerName The tokenizer used for word tokenization.
-     * @since 3.3
      */
     public NERModelPortObjectSpec(final String tokenizerName) {
         m_tokenizerName = tokenizerName;
@@ -96,7 +95,6 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
 
     /**
      * @return Returns the name of the used word tokenizer.
-     * @since 3.3
      */
     public String getTokenizerName() {
         return m_tokenizerName;

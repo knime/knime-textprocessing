@@ -662,11 +662,6 @@
       </dataValue>
    </extension>
    <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="org.knime.ext.textprocessing.TextprocessingStartup"></startup>
-   </extension>
-   <extension
          point="org.knime.core.DataType">
       <DataType
             cellClass="org.knime.ext.textprocessing.data.filestore.DocumentBufferedFileStoreCell">

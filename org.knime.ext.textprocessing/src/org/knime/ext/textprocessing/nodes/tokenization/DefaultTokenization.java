@@ -59,7 +59,6 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Kilian Thiel, University of Konstanz
  */
 public final class DefaultTokenization {
-
     private static Map<String, TokenizerPool> m_tokenizerPoolMap = new HashMap<String, TokenizerPool>();
 
     private DefaultTokenization() {

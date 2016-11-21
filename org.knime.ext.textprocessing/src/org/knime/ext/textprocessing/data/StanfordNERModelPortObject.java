@@ -167,22 +167,6 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     }
 
     /**
-     * Creates an instance of {@code StanfordNERModelPortObject}.
-     *
-     * @param outputBuffer The byte array containing the NER model.
-     * @param tag The used tag.
-     * @param dict The used dictionary.
-     * @throws Exception
-     * @deprecated Use {@link StanfordNERModelPortObject#StanfordNERModelPortObject(byte[], Tag, Set, String)
-     *             StanfordNERModelPortObject(byte[], Tag, Set, String)} to set the user word tokenizer for upstream nodes.
-     */
-    @Deprecated
-    public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict)
-        throws Exception {
-        super(outputBuffer, tag, dict);
-    }
-
-    /**
      *
      * Creates an instance of {@code StanfordNERModelPortObject}.
      * @param outputBuffer The byte array containing the NER model.
@@ -190,7 +174,6 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
      * @param dict The used dictionary.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws Exception
-     * @since 3.3
      */
     public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict,
         final String tokenizerName) throws Exception {
