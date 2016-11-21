@@ -48,11 +48,17 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.data.uri.URIDataCell;
 import org.knime.core.data.uri.URIDataValue;
 import org.knime.core.node.InvalidSettingsException;
@@ -62,6 +68,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
+import org.knime.core.node.streamable.RowInput;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.AbstractTikaNodeModel;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
@@ -164,10 +171,30 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidSettingsException
+     * @throws InterruptedException
      */
     @Override
-    protected String getInputColumnName() {
-        return m_colModel.getStringValue();
+    protected Iterable<File> readInput(final RowInput input) throws InvalidSettingsException, InterruptedException {
+        List<File> files = new ArrayList<File>();
+        int colIndex = input.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
+        DataRow row;
+        while ((row = input.poll()) != null) {
+            String url;
+            DataCell cell = row.getCell(colIndex);
+            if (cell.isMissing()) {
+                files.add(null);
+                continue;
+            }
+            if (cell instanceof URIDataValue) {
+                url = ((URIDataValue)cell).getURIContent().getURI().toString();
+            } else {
+                url = ((StringCell)cell).getStringValue();
+            }
+            files.add(getFile(url, false));
+        }
+        return files;
     }
 
 }

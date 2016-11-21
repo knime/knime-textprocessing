@@ -61,12 +61,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.uri.URIDataValue;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -91,6 +89,8 @@ import org.knime.core.node.streamable.RowOutput;
 import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
+
+import com.google.common.collect.Iterables;
 
 /**
  * The super class for the Tika node model.
@@ -117,10 +117,9 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
 
     private SettingsModelFilterString m_filterModel = TikaParserConfig.getFilterModel();
 
-    private long m_noRows = 0;
-
     /**
      * Creates a new instance.
+     *
      * @param isSourceNode Whether or not this is the source node (no input port) or not.
      */
     protected AbstractTikaNodeModel(final boolean isSourceNode) {
@@ -175,12 +174,18 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
             portInput = new PortInput[0];
         } else {
             portInput = new PortInput[]{new DataTableRowInput(data[0])};
-            m_noRows = data[0].size();
         }
         createStreamableOperator(null, null).runFinal(portInput, new PortOutput[]{output1, output2}, exec);
 
         return new BufferedDataTable[]{output1.getDataTable(), output2.getDataTable()};
     }
+
+    /**
+     * @param input null for Tika Parser node, otherwise the rowInput from the input port
+     * @return iterable list of parsable files
+     * @throws Exception InvalidSettingsException, InterruptedException
+     */
+    protected abstract Iterable<File> readInput(final RowInput input) throws Exception;
 
     /**
      * {@inheritDoc}
@@ -216,141 +221,57 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                 int rowKeyOne = 0;
                 int rowKeyTwo = 0;
 
+                Iterable<File> files = readInput(isSourceNode() ? null : (RowInput)inputs[0]);
+                int count = 1;
+                for (File file : files) {
+                    String errorMsg = "";
 
-                // TODO Andisa: This should be no if-else with a bunch of copied code in it. Instead define a new
-                // abstract method that provides the input, e.g.
-                //    protected abstract Iterable<File> readInput(final RowInput[] inputs)
-                // ... with this implementation in TikaParserNodeModel:
-                //    protected Iterable<File> readInput(final RowInput[] inputs) {
-                //        return inputs[0]; ...
-                //
-                // .... and this for the source node
-                //    protected Iterable<File> readInput(final RowInput[] inputs) {
-                //       ... something that scans a directory and returns a list of files
+                    if (file == null) {
+                        errorMsg = "Missing cell. Cannot locate file path";
+                        rowOutput1.push(TikaParser.setMissingRow(outputColumnsOne, "", rowKeyOne, errorMsg,
+                            m_errorColNameModel.getStringValue()));
+                        continue;
+                    }
+                    TikaParser tikaParser = new TikaParser(isSourceNode() ? true : false);
+                    tikaParser.setOutputColumnsOne(outputColumnsOne);
+                    tikaParser.setValidTypes(validTypes);
+                    tikaParser.setErrorColName(m_errorColNameModel.getStringValue());
+                    tikaParser.setAuthBoolean(m_authBooleanModel.getBooleanValue());
+                    tikaParser.setExtBoolean(ext);
+                    tikaParser.setPassword(m_authModel.getStringValue());
+                    tikaParser.setDuplicates(duplicateFiles);
 
-
-                // I have a particular problem with the code that is copied in the if and else branch
-
-                if (isSourceNode()) {
-                    List<File> files = getListOfFiles(validTypes, ext);
-                    final int numberOfFiles = files.size();
-                    for (int i = 0; i < numberOfFiles; i++) {
-                        String errorMsg = "";
-                        File file = files.get(i);
-
-                        if (!ext && !file.isFile()) {
-                            continue; // skip all directories
-                        }
-
-                        TikaParser tikaParser = new TikaParser(true);
-                        tikaParser.setOutputColumnsOne(outputColumnsOne);
-                        tikaParser.setValidTypes(validTypes);
-                        tikaParser.setErrorColName(m_errorColNameModel.getStringValue());
-                        tikaParser.setAuthBoolean(m_authBooleanModel.getBooleanValue());
-                        tikaParser.setExtBoolean(ext);
-                        tikaParser.setPassword(m_authModel.getStringValue());
-                        tikaParser.setDuplicates(duplicateFiles);
-
-                        List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
-                        duplicateFiles = tikaParser.getDuplicates();
-                        errorMsg = tikaParser.getErrorMsg();
-                        if (datacells.isEmpty()) {
-                            if (!errorMsg.isEmpty()) {
-                                setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
-                                error = true;
-                            }
-                            continue; // skipped files
-                        }
-
-                        DataCell[] rowOne = datacells.get(0);
-                        rowOutput1.push(new DefaultRow(RowKey.createRowKey((long)rowKeyOne), rowOne));
-                        rowKeyOne++;
-
+                    List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
+                    duplicateFiles = tikaParser.getDuplicates();
+                    errorMsg = tikaParser.getErrorMsg();
+                    if (datacells.isEmpty()) {
                         if (!errorMsg.isEmpty()) {
                             setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
                             error = true;
-                            continue;
                         }
-
-                        if (datacells.size() > 1) {
-                            for (int j = 1; j < datacells.size(); j++) {
-                                rowOutput2.push(new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), datacells.get(j)));
-                                rowKeyTwo++;
-                            }
-                        }
-
-                        exec.checkCanceled();
-                        exec.setProgress(i / (double)numberOfFiles, "Parsing file " + i + " of " + numberOfFiles);
+                        continue; // skipped files
                     }
-                } else {
-                    RowInput rowInput = (RowInput)inputs[0];
-                    int colIndex = rowInput.getDataTableSpec().findColumnIndex(getInputColumnName());
-                    DataRow row;
-                    int count = 0;
-                    while ((row = rowInput.poll()) != null) {
-                        String errorMsg = "";
-                        String url;
-                        DataCell cell = row.getCell(colIndex);
-                        if (cell.isMissing()) {
-                            errorMsg = "Missing cell. Cannot locate file path";
-                            rowOutput1.push(TikaParser.setMissingRow(outputColumnsOne, "", rowKeyOne, errorMsg,
-                                m_errorColNameModel.getStringValue()));
-                            continue;
-                        }
-                        // we can safely assume the type of the cell is either String or URI compatible as this was
-                        // asserted during #configure
-                        if (cell instanceof URIDataValue) {
-                            url = ((URIDataValue)cell).getURIContent().getURI().toString();
-                        } else {
-                            url = ((StringCell)cell).getStringValue();
-                        }
 
-                        File file = getFile(url, false);
+                    DataCell[] rowOne = datacells.get(0);
+                    rowOutput1.push(new DefaultRow(RowKey.createRowKey((long)rowKeyOne), rowOne));
+                    rowKeyOne++;
 
-                        TikaParser tikaParser = new TikaParser(false);
-                        tikaParser.setOutputColumnsOne(outputColumnsOne);
-                        tikaParser.setValidTypes(validTypes);
-                        tikaParser.setErrorColName(m_errorColNameModel.getStringValue());
-                        tikaParser.setAuthBoolean(m_authBooleanModel.getBooleanValue());
-                        tikaParser.setExtBoolean(ext);
-                        tikaParser.setPassword(m_authModel.getStringValue());
-                        tikaParser.setDuplicates(duplicateFiles);
-
-                        List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
-                        duplicateFiles = tikaParser.getDuplicates();
-                        errorMsg = tikaParser.getErrorMsg();
-                        if (datacells.isEmpty()) {
-                            if (!errorMsg.isEmpty()) {
-                                setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
-                                error = true;
-                            }
-                            continue; // skipped files
-                        }
-
-                        DataCell[] rowOne = datacells.get(0);
-                        rowOutput1.push(new DefaultRow(RowKey.createRowKey((long)rowKeyOne), rowOne));
-                        rowKeyOne++;
-
-                        if (!errorMsg.isEmpty()) {
-                            setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
-                            error = true;
-                            continue;
-                        }
-
-                        if (datacells.size() > 1) {
-                            for (int j = 1; j < datacells.size(); j++) {
-                                rowOutput2.push(new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), datacells.get(j)));
-                                rowKeyTwo++;
-                            }
-                        }
-
-                        exec.checkCanceled();
-                        String msg = "Reading file #" + count++;
-                        if (m_noRows > 0) {
-                            msg += " of " + m_noRows;
-                        }
-                        exec.setProgress(msg);
+                    if (!errorMsg.isEmpty()) {
+                        setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
+                        error = true;
+                        continue;
                     }
+
+                    if (datacells.size() > 1) {
+                        for (int j = 1; j < datacells.size(); j++) {
+                            rowOutput2.push(new DefaultRow(RowKey.createRowKey((long)rowKeyTwo), datacells.get(j)));
+                            rowKeyTwo++;
+                        }
+                    }
+
+                    exec.checkCanceled();
+                    int filesSize = Iterables.size(files);
+                    exec.setProgress(count / (double)filesSize, "Parsing file " + count + " of " + filesSize);
                 }
 
                 if (error) {
@@ -362,6 +283,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                 }
 
             }
+
         };
     }
 
@@ -382,7 +304,9 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_filterModel.saveSettingsTo(settings);
     }
 
-    /** Saves input settingsmodels
+    /**
+     * Saves input settingsmodels
+     *
      * @param settings the WO node settings
      */
     protected abstract void saveInputSettingsTo(final NodeSettingsWO settings);
@@ -414,7 +338,9 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         }
     }
 
-    /** Validates input settingsmodels
+    /**
+     * Validates input settingsmodels
+     *
      * @param settings the node settings
      * @throws InvalidSettingsException throws exception if the settings are incorrect
      */
@@ -437,19 +363,20 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_filterModel.loadSettingsFrom(settings);
     }
 
-    /** Loads validated input settingsmodels
+    /**
+     * Loads validated input settingsmodels
+     *
      * @param settings the node settings
      * @throws InvalidSettingsException throws exception if the settings are incorrect
      */
     protected abstract void loadValidatedInputSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException;
+        throws InvalidSettingsException;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void reset() {
-        m_noRows = 0;
     }
 
     /**
@@ -479,7 +406,9 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_errorColNameModel.setEnabled(m_errorColumnModel.getBooleanValue());
     }
 
-    /** Retrieves the attachment dir, or creates one if the path doesn't exist
+    /**
+     * Retrieves the attachment dir, or creates one if the path doesn't exist
+     *
      * @return the path to the attachment directory
      * @throws InvalidSettingsException
      */
@@ -533,26 +462,6 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         return f;
     }
 
-    /**
-     * @return the input column name (only for Tika Input node)
-     */
-    protected String getInputColumnName() {
-        // TODO Andisa: remove this method. Why would the super class know about a column name containing urls?
-        return null;
-    }
-
-    /**
-     * @param validTypes
-     * @param ext the file type (ext or mime)
-     * @return the list of files to be parsed (only for Tika source node)
-     * @throws InvalidSettingsException
-     */
-    protected List<File> getListOfFiles(final List<String> validTypes, final boolean ext)
-        throws InvalidSettingsException {
-        // TODO Andisa: Remove this method from the super class (why would the super class know about files?)
-        return null;
-    }
-
     private DataTableSpec createOutputTableSpec(final List<String> selectedColumns) {
         DataColumnSpec[] cspecs = new DataColumnSpec[selectedColumns.size()];
         int i = 0;
@@ -562,6 +471,34 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         }
 
         return new DataTableSpec(cspecs);
+    }
+
+    /**
+     * @return the m_typesModel
+     */
+    protected SettingsModelString getTypesModel() {
+        return m_typesModel;
+    }
+
+    /**
+     * @param typesModel the m_typesModel to set
+     */
+    protected void setTypesModel(final SettingsModelString typesModel) {
+        this.m_typesModel = typesModel;
+    }
+
+    /**
+     * @return the m_filterModel
+     */
+    protected SettingsModelFilterString getFilterModel() {
+        return m_filterModel;
+    }
+
+    /**
+     * @param filterModel the m_filterModel to set
+     */
+    protected void setFilterModel(final SettingsModelFilterString filterModel) {
+        this.m_filterModel = filterModel;
     }
 
 }

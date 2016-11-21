@@ -57,6 +57,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.streamable.RowInput;
 import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 
 /**
@@ -111,11 +112,28 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
     }
 
     /**
-     * {@inheritDoc}
+     * @param validTypes
+     * @param ext the file type (ext or mime)
+     * @return the list of files to be parsed (only for Tika source node)
+     * @throws InvalidSettingsException
      */
-    @Override
-    protected void reset() {
+    private List<File> getListOfFiles(final List<String> validTypes, final boolean ext)
+        throws InvalidSettingsException {
+        File dir = getFile(m_pathModel.getStringValue(), true);
+        boolean recursive = m_recursiveModel.getBooleanValue();
+        boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
+        FileCollector fc;
+        List<File> result = new ArrayList<File>();
+        if (ext) {
+            fc = new FileCollector(dir, validTypes, recursive, ignoreHiddenFiles);
+            result = fc.getFiles();
+        } else {
+            fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
+            List<File> unmodifiableList = fc.getFiles();
+            result.addAll(unmodifiableList);
+        }
 
+        return result;
     }
 
     /**
@@ -124,19 +142,16 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
      * @throws InvalidSettingsException
      */
     @Override
-    protected List<File> getListOfFiles(final List<String> validTypes, final boolean ext)
-        throws InvalidSettingsException {
-        File dir = getFile(m_pathModel.getStringValue(), true);
-        boolean recursive = m_recursiveModel.getBooleanValue();
-        boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-        FileCollector fc;
-        if (ext) {
-            fc = new FileCollector(dir, validTypes, recursive, ignoreHiddenFiles);
-        } else {
-            fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
+    protected Iterable<File> readInput(final RowInput input) throws InvalidSettingsException {
+        boolean ext = getTypesModel().getStringValue().equals(TikaParserConfig.EXT_TYPE);
+        List<File> files = getListOfFiles(getFilterModel().getIncludeList(), ext);
+        for (int i = 0; i < files.size(); i++) {
+            if (!ext && !files.get(i).isFile()) {
+                files.remove(i); // skip all directories
+                i--;
+            }
         }
-
-        return fc.getFiles();
+        return files;
     }
 
 }
