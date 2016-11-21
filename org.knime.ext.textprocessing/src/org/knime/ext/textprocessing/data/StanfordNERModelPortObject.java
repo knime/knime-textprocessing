@@ -190,6 +190,7 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
      * @param dict The used dictionary.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws Exception
+     * @since 3.3
      */
     public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict,
         final String tokenizerName) throws Exception {

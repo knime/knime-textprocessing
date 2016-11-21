@@ -143,6 +143,7 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
      * @param tag The tag that has been used to build the model.
      * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
     public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict, final String tokenizerName) {
         m_outputByteArray = outputBuffer;
@@ -253,6 +254,7 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
 
     /**
      * @return Returns the name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
     public String getTokenizerName() {
         return m_tokenizerName;
