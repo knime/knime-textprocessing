@@ -97,7 +97,7 @@ import org.knime.core.util.FileUtil;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class TikaNodeModel extends NodeModel {
+public abstract class TikaNodeModel extends NodeModel {
 
     private SettingsModelString m_typesModel = TikaParserConfig.getTypeModel();
 
@@ -119,15 +119,12 @@ public class TikaNodeModel extends NodeModel {
 
     private long m_noRows = 0;
 
-    private boolean m_sourceNode = false;
-
     /**
-     * Creates a new instance of {@code TikaAbstractParserNodeModel}
-     * @param nrInputPort the number of input ports
-     * @param nrOutputPort the number of output ports
+     * Creates a new instance.
+     * @param isSourceNode Whether or not this is the source node (no input port) or not.
      */
-    protected TikaNodeModel(final int nrInputPort, final int nrOutputPort) {
-        super(nrInputPort, nrOutputPort);
+    protected TikaNodeModel(final boolean isSourceNode) {
+        super(isSourceNode ? 0 : 1, 2);
         stateChange();
     }
 
@@ -172,15 +169,13 @@ public class TikaNodeModel extends NodeModel {
         BufferedDataTableRowOutput output1 = new BufferedDataTableRowOutput(container1);
         BufferedDataTableRowOutput output2 = new BufferedDataTableRowOutput(container2);
 
-        if (!m_sourceNode) {
-            m_noRows = data[0].size();
-        }
-
         PortInput[] portInput;
-        if(m_sourceNode){
+
+        if (isSourceNode()) {
             portInput = new PortInput[0];
-        }else{
+        } else {
             portInput = new PortInput[]{new DataTableRowInput(data[0])};
+            m_noRows = data[0].size();
         }
         createStreamableOperator(null, null).runFinal(portInput, new PortOutput[]{output1, output2}, exec);
 
@@ -198,9 +193,7 @@ public class TikaNodeModel extends NodeModel {
             @Override
             public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
                 throws Exception {
-                if (m_sourceNode) {
-                    assert inputs.length == 0;
-                }
+                assert inputs.length > 0 || isSourceNode();
 
                 RowOutput rowOutput1 = (RowOutput)outputs[0]; // data output port 1
                 RowOutput rowOutput2 = (RowOutput)outputs[1]; // data output port 2
@@ -223,7 +216,22 @@ public class TikaNodeModel extends NodeModel {
                 int rowKeyOne = 0;
                 int rowKeyTwo = 0;
 
-                if (m_sourceNode) {
+
+                // TODO Andisa: This should be no if-else with a bunch of copied code in it. Instead define a new
+                // abstract method that provides the input, e.g.
+                //    protected abstract Iterable<File> readInput(final RowInput[] inputs)
+                // ... with this implementation in TikaParserNodeModel:
+                //    protected Iterable<File> readInput(final RowInput[] inputs) {
+                //        return inputs[0]; ...
+                //
+                // .... and this for the source node
+                //    protected Iterable<File> readInput(final RowInput[] inputs) {
+                //       ... something that scans a directory and returns a list of files
+
+
+                // I have a particular problem with the code that is copied in the if and else branch
+
+                if (isSourceNode()) {
                     List<File> files = getListOfFiles(validTypes, ext);
                     final int numberOfFiles = files.size();
                     for (int i = 0; i < numberOfFiles; i++) {
@@ -377,9 +385,7 @@ public class TikaNodeModel extends NodeModel {
     /** Saves input settingsmodels
      * @param settings the WO node settings
      */
-    protected void saveInputSettingsTo(final NodeSettingsWO settings){
-        // need to be implemented by subclasses
-    }
+    protected abstract void saveInputSettingsTo(final NodeSettingsWO settings);
 
     /**
      * {@inheritDoc}
@@ -412,9 +418,7 @@ public class TikaNodeModel extends NodeModel {
      * @param settings the node settings
      * @throws InvalidSettingsException throws exception if the settings are incorrect
      */
-    protected void validateInputSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
-        // need to be implemented by subclasses
-    }
+    protected abstract void validateInputSettings(final NodeSettingsRO settings) throws InvalidSettingsException;
 
     /**
      * {@inheritDoc}
@@ -437,10 +441,8 @@ public class TikaNodeModel extends NodeModel {
      * @param settings the node settings
      * @throws InvalidSettingsException throws exception if the settings are incorrect
      */
-    protected void loadValidatedInputSettingsFrom(final NodeSettingsRO settings)
-        throws InvalidSettingsException{
-        // need to be implemented by subclasses
-    }
+    protected abstract void loadValidatedInputSettingsFrom(final NodeSettingsRO settings)
+            throws InvalidSettingsException;
 
     /**
      * {@inheritDoc}
@@ -472,22 +474,9 @@ public class TikaNodeModel extends NodeModel {
      * Enables/disables dialog components according to the corresponding boolean values
      */
     private void stateChange() {
-        if (m_extractAttachmentModel.getBooleanValue()) {
-            m_extractPathModel.setEnabled(true);
-        } else {
-            m_extractPathModel.setEnabled(false);
-        }
-
-        if (m_authBooleanModel.getBooleanValue()) {
-            m_authModel.setEnabled(true);
-        } else {
-            m_authModel.setEnabled(false);
-        }
-        if (m_errorColumnModel.getBooleanValue()) {
-            m_errorColNameModel.setEnabled(true);
-        } else {
-            m_errorColNameModel.setEnabled(false);
-        }
+        m_extractPathModel.setEnabled(m_extractAttachmentModel.getBooleanValue());
+        m_authModel.setEnabled(m_authBooleanModel.getBooleanValue());
+        m_errorColNameModel.setEnabled(m_errorColumnModel.getBooleanValue());
     }
 
     /** Retrieves the attachment dir, or creates one if the path doesn't exist
@@ -514,17 +503,10 @@ public class TikaNodeModel extends NodeModel {
     }
 
     /**
-     * @return the m_sourceNode
+     * @return whether this is the source node (no input).
      */
     protected boolean isSourceNode() {
-        return m_sourceNode;
-    }
-
-    /**
-     * @param sourceNode the m_sourceNode to set
-     */
-    protected void setSourceNode(final boolean sourceNode) {
-        this.m_sourceNode = sourceNode;
+        return getNrInPorts() == 0;
     }
 
     /**
@@ -555,6 +537,7 @@ public class TikaNodeModel extends NodeModel {
      * @return the input column name (only for Tika Input node)
      */
     protected String getInputColumnName() {
+        // TODO Andisa: remove this method. Why would the super class know about a column name containing urls?
         return null;
     }
 
@@ -566,6 +549,7 @@ public class TikaNodeModel extends NodeModel {
      */
     protected List<File> getListOfFiles(final List<String> validTypes, final boolean ext)
         throws InvalidSettingsException {
+        // TODO Andisa: Remove this method from the super class (why would the super class know about files?)
         return null;
     }
 

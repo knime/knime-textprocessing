@@ -77,8 +77,7 @@ final class TikaParserNodeModel extends TikaNodeModel {
      * Creates a new instance of {@code TikaParserNodeModel}
      */
     TikaParserNodeModel() {
-        super(0, 2);
-        setSourceNode(true);
+        super(true);
     }
 
     /**
