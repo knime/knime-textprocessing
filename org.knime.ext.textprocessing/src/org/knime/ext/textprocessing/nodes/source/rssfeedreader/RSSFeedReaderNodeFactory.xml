@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcSource.png" type="Other">
+    <name>RSS Feed Reader</name>
+    <shortDescription>The RSS Feed Reader Node parses RSS/Atom feeds.</shortDescription>
+    <fullDescription>
+        <intro>
+            This node parses feeds from the URLs specified in the input data table and retrieves information like title,
+            description, publication date and article link from the feed entries. It is also possible to create a 
+            document, XML and/or HTTP response code column. The document will be created from the feed entry information
+            and the XML column shows the XML snippet for the specific feed entry.
+             
+            The RSS Feed Parser uses the <a href="https://rometools.github.io/rome/ROMEReleases/index.html">ROME(1.0)</a> library. 
+            ROME supports following formats and versions:
+            <ul>
+                <li>RSS 2.0</li>
+                <li>RSS 1.0</li>
+                <li>RSS 0.94</li>
+                <li>RSS 0.93</li>
+                <li>RSS 0.92</li>
+                <li>RSS 0.91 Userland</li>
+                <li>RSS 0.91 Netscape</li>
+                <li>RSS 0.90</li>
+                <li>Atom 1.0</li>
+                <li>Atom 0.3</li>
+            </ul>
+            For more information about <a href="https://rometools.github.io/rome/index.html">ROME</a>, visit their website.
+        </intro>
+        <option name="URL column">
+            The URLs to get the feeds from.
+        </option>
+        <option name="Number of threads">
+            Select the maximum number of threads that should be used to read the feeds.
+        </option>
+        <option name="Timeout">
+            Set the timeout (in milliseconds) for connecting to and reading from the input source.
+        </option>
+        <option name="Create document column">
+            If checked, the node creates an additional document column for each feed entry.
+        </option>
+        <option name="Create XML column">
+            If checked, the node creates an additional XML column, containing the XML snippet for each feed entry.
+        </option>
+        <option name="Create HTTP status code column">
+            If checked, the node create an additional integer column, containing the HTTP status code for each URL. This
+            is only applicable for HTTP URLs.
+        </option>
+    </fullDescription>      
+    <ports>
+        <inPort name="Input table" index="0">
+            An input table which contains a string column with URLs to RSS or Atom feeds.
+        </inPort>
+        <outPort name="Output table" index="0">
+            An output table which contains parsed feed information.
+        </outPort>
+    </ports>
+</knimeNode>
