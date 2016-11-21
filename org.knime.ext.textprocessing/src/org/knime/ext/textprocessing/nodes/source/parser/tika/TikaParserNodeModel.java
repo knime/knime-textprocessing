@@ -61,11 +61,11 @@ import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
 
 /**
  * The node model of the Tika Parser node. This model extends
- * {@link org.knime.ext.textprocessing.nodes.source.parser.tika.TikaNodeModel} and is streamable.
+ * {@link org.knime.ext.textprocessing.nodes.source.parser.tika.AbstractTikaNodeModel} and is streamable.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-final class TikaParserNodeModel extends TikaNodeModel {
+final class TikaParserNodeModel extends AbstractTikaNodeModel {
 
     private SettingsModelString m_pathModel = TikaParserConfig.getPathModel();
 

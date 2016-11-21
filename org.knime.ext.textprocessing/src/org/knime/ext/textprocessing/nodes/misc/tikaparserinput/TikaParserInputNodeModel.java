@@ -63,7 +63,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
 import org.knime.core.node.util.CheckUtils;
-import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaNodeModel;
+import org.knime.ext.textprocessing.nodes.source.parser.tika.AbstractTikaNodeModel;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
 
 /**
@@ -72,7 +72,7 @@ import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-final class TikaParserInputNodeModel extends TikaNodeModel {
+final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaParserInputNodeModel.class);
 

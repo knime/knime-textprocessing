@@ -97,7 +97,7 @@ import org.knime.core.util.FileUtil;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public abstract class TikaNodeModel extends NodeModel {
+public abstract class AbstractTikaNodeModel extends NodeModel {
 
     private SettingsModelString m_typesModel = TikaParserConfig.getTypeModel();
 
@@ -123,7 +123,7 @@ public abstract class TikaNodeModel extends NodeModel {
      * Creates a new instance.
      * @param isSourceNode Whether or not this is the source node (no input port) or not.
      */
-    protected TikaNodeModel(final boolean isSourceNode) {
+    protected AbstractTikaNodeModel(final boolean isSourceNode) {
         super(isSourceNode ? 0 : 1, 2);
         stateChange();
     }
