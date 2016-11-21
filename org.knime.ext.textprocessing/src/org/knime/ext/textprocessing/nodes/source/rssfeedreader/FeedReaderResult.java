@@ -48,9 +48,9 @@
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.filestore.FileStoreFactory;
@@ -97,24 +97,15 @@ class FeedReaderResult {
      * @param feedResults The feed containing the entries.
      */
     void setResults(final SyndFeed feedResults) {
-        // get entries
-        SyndFeed feed = feedResults;
-        if (feed != null) {
-            List<SyndEntry> entries = feed.getEntries();
-            Iterator<SyndEntry> itEntries = entries.iterator();
+        if ((feedResults != null)  && !feedResults.getEntries().isEmpty()) {
             // read entries and fill cells with information
-            if (entries.size() == 0) {
-                createEmptyFeedResults();
-            } else {
-                while (itEntries.hasNext()) {
-                    FeedEntryResult entryResult =
-                        new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn,
-                            m_fileStoreFactory);
-                    SyndEntry entry = itEntries.next();
-                    entryResult.setEntry(entry, feed);
-                    entryResult.createEntryResultasDataCell();
-                    m_entryResults.add(entryResult);
-                }
+            for (SyndEntry entry : feedResults.getEntries()) {
+                FeedEntryResult entryResult =
+                    new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn,
+                        m_fileStoreFactory);
+                entryResult.setEntry(entry, feedResults);
+                entryResult.createEntryResultasDataCell();
+                m_entryResults.add(entryResult);
             }
         } else {
             createEmptyFeedResults();
@@ -136,11 +127,7 @@ class FeedReaderResult {
      * @return Returns a list of DataCell arrays containing the information for every feed entry.
      */
     List<DataCell[]> createListOfDataCellsFromResults() {
-        List<DataCell[]> feedResultAsCells = new LinkedList<>();
-        for (FeedEntryResult fer : m_entryResults) {
-            feedResultAsCells.add(fer.createEntryResultasDataCell());
-        }
-        return feedResultAsCells;
+        return m_entryResults.stream().map(fer -> fer.createEntryResultasDataCell()).collect(Collectors.toList());
     }
 
     /**

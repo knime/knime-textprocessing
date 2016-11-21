@@ -48,10 +48,10 @@
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.StringValue;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -65,8 +65,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
-
+class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Returns the SettingsModelString containing the name of the url column.
      */
@@ -152,13 +151,8 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
 
     private final SettingsModelString m_httpColName = createHttpColumnNameModel();
 
-    /**
-     *
-     */
     @SuppressWarnings("unchecked")
-    public RSSFeedReaderNodeDialog() {
-        super();
-
+    RSSFeedReaderNodeDialog() {
         // component for the url column selection
         SettingsModelString feedUrlColumn = createFeedUrlColumnModel();
         DialogComponentColumnNameSelection feedUrlColComp =
@@ -175,7 +169,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
         // components for additional Document and/or XML columns
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(m_createDocCol, "Create Document column"));
-        m_createDocCol.addChangeListener(new ColumnHandlingListener());
+        m_createDocCol.addChangeListener(e -> toggleColumnNameFields());
         DialogComponentString docColNameComp = new DialogComponentString(m_docColName, "", true, 20);
         docColNameComp.setToolTipText("Name of the Document column");
         addDialogComponent(docColNameComp);
@@ -183,7 +177,7 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(m_createXmlCol, "Create XML column"));
-        m_createXmlCol.addChangeListener(new ColumnHandlingListener());
+        m_createXmlCol.addChangeListener(e -> toggleColumnNameFields());
         DialogComponentString xmlColNameComp = new DialogComponentString(m_xmlColName, "", true, 20);
         xmlColNameComp.setToolTipText("Name of the XML column");
         addDialogComponent(xmlColNameComp);
@@ -191,40 +185,25 @@ public class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(m_createHttpCol, "Create HTTP status code column"));
-        m_createHttpCol.addChangeListener(new ColumnHandlingListener());
+        m_createHttpCol.addChangeListener(e -> toggleColumnNameFields());
         DialogComponentString httpColNameComp = new DialogComponentString(m_httpColName, "", true, 20);
         httpColNameComp.setToolTipText("Name of the HTTP column");
         addDialogComponent(httpColNameComp);
-
-        checkSettings();
     }
 
-    private final class ColumnHandlingListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkSettings();
-        }
+    void toggleColumnNameFields(){
+        m_docColName.setEnabled(m_createDocCol.getBooleanValue());
+        m_xmlColName.setEnabled(m_createXmlCol.getBooleanValue());
+        m_httpColName.setEnabled(m_createHttpCol.getBooleanValue());
     }
 
-    void checkSettings(){
-        if (m_createDocCol.getBooleanValue()) {
-            m_docColName.setEnabled(true);
-        } else {
-            m_docColName.setEnabled(false);
-        }
-        if (m_createXmlCol.getBooleanValue()) {
-            m_xmlColName.setEnabled(true);
-        } else {
-            m_xmlColName.setEnabled(false);
-        }
-        if (m_createHttpCol.getBooleanValue()) {
-            m_httpColName.setEnabled(true);
-        } else {
-            m_httpColName.setEnabled(false);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        super.loadSettingsFrom(settings, specs);
+        toggleColumnNameFields();
     }
 }

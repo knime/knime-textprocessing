@@ -57,7 +57,6 @@ import org.knime.core.node.NodeView;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class RSSFeedReaderNodeFactory extends NodeFactory<RSSFeedReaderNodeModel> {
-
     /**
      * {@inheritDoc}
      */
@@ -98,5 +97,4 @@ public class RSSFeedReaderNodeFactory extends NodeFactory<RSSFeedReaderNodeModel
     protected NodeDialogPane createNodeDialogPane() {
         return new RSSFeedReaderNodeDialog();
     }
-
 }
