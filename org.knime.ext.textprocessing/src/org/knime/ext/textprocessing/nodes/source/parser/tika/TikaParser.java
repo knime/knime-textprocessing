@@ -94,11 +94,11 @@ public class TikaParser {
 
     private ContentHandler m_handler;
 
-    final private AutoDetectParser m_parser;
+    private final AutoDetectParser m_parser;
 
     private Metadata m_metadata;
 
-    final private ParseContext m_context;
+    private final ParseContext m_context;
 
     private List<String> m_outputColumnsOne = null;
 
