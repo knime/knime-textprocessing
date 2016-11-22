@@ -110,7 +110,7 @@ public class TikaParser {
 
     private boolean m_extBoolean = false;
 
-    private boolean m_sourceNode = false;
+    private final boolean m_sourceNode;
 
     private String m_password = "";
 

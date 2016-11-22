@@ -179,6 +179,7 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
     protected Iterable<File> readInput(final RowInput input) throws InvalidSettingsException, InterruptedException {
         List<File> files = new ArrayList<File>();
         int colIndex = input.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
+        CheckUtils.checkSetting(colIndex >= 0, "no such column \"%s\"", m_colModel.getStringValue());
         DataRow row;
         while ((row = input.poll()) != null) {
             String url;
@@ -190,6 +191,7 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
             if (cell instanceof URIDataValue) {
                 url = ((URIDataValue)cell).getURIContent().getURI().toString();
             } else {
+                // TODO Andisa... never(!!) cast to StringCell but StringValue (I could have fixed it but you should learn ;-) )
                 url = ((StringCell)cell).getStringValue();
             }
             files.add(getFile(url, false));

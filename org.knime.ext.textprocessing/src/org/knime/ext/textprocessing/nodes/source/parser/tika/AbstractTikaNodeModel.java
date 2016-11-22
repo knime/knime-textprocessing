@@ -232,7 +232,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                             m_errorColNameModel.getStringValue()));
                         continue;
                     }
-                    TikaParser tikaParser = new TikaParser(isSourceNode() ? true : false);
+                    TikaParser tikaParser = new TikaParser(isSourceNode());
                     tikaParser.setOutputColumnsOne(outputColumnsOne);
                     tikaParser.setValidTypes(validTypes);
                     tikaParser.setErrorColName(m_errorColNameModel.getStringValue());
