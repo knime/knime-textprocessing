@@ -93,7 +93,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     private static final NodeLogger LOGGER =
             NodeLogger.getLogger(PubMedDocumentGrabber.class);
 
-    private static final String PROTOCOL = "http";
+    private static final String PROTOCOL = "https";
 
     private static final String HOST = "eutils.ncbi.nlm.nih.gov";
 
