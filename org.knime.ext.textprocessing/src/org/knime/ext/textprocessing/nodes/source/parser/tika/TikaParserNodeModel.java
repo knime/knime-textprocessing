@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.tika;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -123,18 +124,12 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
         boolean recursive = m_recursiveModel.getBooleanValue();
         boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
         FileCollector fc;
-        // TODO Andisa: What is this? --- new arraylist but then below...?
-        List<File> result = new ArrayList<File>();
         if (ext) {
             fc = new FileCollector(dir, validTypes, recursive, ignoreHiddenFiles);
-            result = fc.getFiles(); // TODO Andisa -- result variable overwritten
         } else {
             fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
-            List<File> unmodifiableList = fc.getFiles();
-            result.addAll(unmodifiableList); // TODO Andisa -- result variable is modified?
         }
-
-        return result;
+        return fc.getFiles();
     }
 
     /**
@@ -146,17 +141,7 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
     protected Iterable<File> readInput(final RowInput input) throws InvalidSettingsException {
         boolean ext = getTypesModel().getStringValue().equals(TikaParserConfig.EXT_TYPE);
         List<File> files = getListOfFiles(getFilterModel().getIncludeList(), ext);
-        // TODO Andisa -- I don't get this block. Could this also (please double check the predicate logic in filter!)
-        // return files.stream().filter(f -> ext || f.isFile())).collect(Collectors.toList());
-
-        // this is to be removed then?
-        for (int i = 0; i < files.size(); i++) {
-            if (!ext && !files.get(i).isFile()) {
-                files.remove(i); // skip all directories
-                i--;
-            }
-        }
-        return files;
+        return files.stream().filter(f -> ext || f.isFile()).collect(Collectors.toList());
     }
 
 }

@@ -58,7 +58,6 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.def.StringCell;
 import org.knime.core.data.uri.URIDataCell;
 import org.knime.core.data.uri.URIDataValue;
 import org.knime.core.node.InvalidSettingsException;
@@ -191,8 +190,7 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
             if (cell instanceof URIDataValue) {
                 url = ((URIDataValue)cell).getURIContent().getURI().toString();
             } else {
-                // TODO Andisa... never(!!) cast to StringCell but StringValue (I could have fixed it but you should learn ;-) )
-                url = ((StringCell)cell).getStringValue();
+                url = ((StringValue)cell).getStringValue();
             }
             files.add(getFile(url, false));
         }
