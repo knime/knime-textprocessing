@@ -196,14 +196,18 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
                         docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
                     }
-                } else if (auhorsCell.isMissing()) {
-                    docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
+                    // If check box is set to use author names from column
+                    // if author first/last name is not specified and both first and last name in the node dialog
+                    // component are empty return an empty string.
+                } else if (auhorsCell.isMissing()
+                    && (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty())) {
+		            docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
                 }
 
             }
-        } else {
-
-            //Check if Author first or last name is specified, if not set the first or last name as "-"
+        } else if(!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()){
+            // if no check box is set to use authors name from column, if both dialog components name are empty
+            // return an empty string otherwise return "-" + the one specified.
             docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
         }
 
