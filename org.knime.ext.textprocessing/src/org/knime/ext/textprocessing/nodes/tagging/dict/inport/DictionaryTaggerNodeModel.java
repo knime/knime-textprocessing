@@ -105,11 +105,9 @@ public class DictionaryTaggerNodeModel extends AbstractDictionaryTaggerModel {
      */
     @Override
     protected void loadValidatedSettingsFromInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
-        try {
-            // added in 2.7.4
+        // added in 2.7.4, only load settings if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_exactMatchModel.getConfigName())) {
             m_exactMatchModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException ise) {
-            m_exactMatchModel.setBooleanValue(DEFAULT_EXACTMATCH);
         }
     }
 
@@ -132,7 +130,9 @@ public class DictionaryTaggerNodeModel extends AbstractDictionaryTaggerModel {
      */
     @Override
     protected void validateSettingsInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // added in 2.7.4
-        // m_exactMatchModel.validateSettings(settings);
+        // added in 2.7.4, only validate settings if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_exactMatchModel.getConfigName())) {
+            m_exactMatchModel.validateSettings(settings);
+        }
     }
 }

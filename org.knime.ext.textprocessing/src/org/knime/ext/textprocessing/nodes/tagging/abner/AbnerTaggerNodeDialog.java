@@ -48,20 +48,17 @@
 package org.knime.ext.textprocessing.nodes.tagging.abner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Creates the dialog of the AbnerTaggerNode with a checkbox component, to specify whether recognized named entity terms
@@ -116,11 +113,8 @@ public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
         modelNames.add(AbnerDocumentTagger.MODEL_NLPBA);
         addDialogComponent(new DialogComponentStringSelection(createAbnerModelModel(), "ABNER model", modelNames));
 
-        Set<String> tokenizerList = new TreeSet<String>();
-        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap()
-            .entrySet()) {
-            tokenizerList.add(entry.getKey());
-        }
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
+                .map(e -> e.getKey()).collect(Collectors.toList());
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
 
     }

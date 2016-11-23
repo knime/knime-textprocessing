@@ -150,10 +150,9 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         super.loadValidatedSettingsFrom(settings);
         m_replaceColumModel.loadSettingsFrom(settings);
         m_replacementColumModel.loadSettingsFrom(settings);
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // only catch for backwards compatibility
         }
     }
 
@@ -176,10 +175,9 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         super.validateSettings(settings);
         m_replaceColumModel.validateSettings(settings);
         m_replacementColumModel.validateSettings(settings);
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // only catch for backwards compatibility
         }
         String replaceColName =
             ((SettingsModelString)m_replaceColumModel.createCloneWithValidatedValue(settings)).getStringValue();

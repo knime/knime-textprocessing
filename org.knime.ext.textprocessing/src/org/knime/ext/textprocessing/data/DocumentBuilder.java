@@ -148,7 +148,8 @@ public class DocumentBuilder {
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
-        this();
+        // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+        this(TextprocessingPreferenceInitializer.tokenizerName());
         // Add authors
         for (Author a : doc.getAuthors()) {
             addAuthor(a);

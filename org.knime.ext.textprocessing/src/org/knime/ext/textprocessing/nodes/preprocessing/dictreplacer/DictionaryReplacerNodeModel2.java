@@ -133,10 +133,9 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_fileModel.loadSettingsFrom(settings);
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // only catch for backwards compatibility
         }
     }
 
@@ -157,10 +156,9 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_fileModel.validateSettings(settings);
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // only catch for backwards compatibility
         }
     }
 }

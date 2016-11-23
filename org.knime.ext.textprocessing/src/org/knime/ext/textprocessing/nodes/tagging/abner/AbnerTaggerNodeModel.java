@@ -118,11 +118,11 @@ public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
         super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.loadSettingsFrom(settings);
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // just catch exception for backwards compatibility
         }
+
     }
 
     /**
@@ -144,10 +144,9 @@ public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         m_abnerTaggingModel.validateSettings(settings);
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // just catch exception for backwards compatibility
         }
     }
 

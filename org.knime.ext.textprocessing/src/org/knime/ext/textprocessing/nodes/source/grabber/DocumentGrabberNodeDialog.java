@@ -51,9 +51,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
 
@@ -73,11 +73,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  *
@@ -224,11 +221,8 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getDocumentTypeModel(), "Document Type:", types));
 
-        Set<String> tokenizerList = new TreeSet<String>();
-        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap()
-            .entrySet()) {
-            tokenizerList.add(entry.getKey());
-        }
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
+                .map(e -> e.getKey()).collect(Collectors.toList());
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
 
         closeCurrentGroup();

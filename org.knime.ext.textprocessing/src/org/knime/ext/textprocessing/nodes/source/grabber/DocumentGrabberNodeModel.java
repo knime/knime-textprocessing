@@ -283,16 +283,15 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_typeModel.validateSettings(settings);
         m_directoryModel.validateSettings(settings);
 
-        try {
-            m_extractMetaInfoSettingsModel.validateSettings(settings);
-            m_appendQueryColumnModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // catch for the sake of downward compatibility
-        }
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // catch for the sake of downward compatibility
+        }
+        if (settings.containsKey(m_extractMetaInfoSettingsModel.getConfigName())) {
+            m_extractMetaInfoSettingsModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_appendQueryColumnModel.getConfigName())) {
+            m_appendQueryColumnModel.validateSettings(settings);
         }
     }
 
@@ -310,16 +309,15 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_maxResultsModel.loadSettingsFrom(settings);
         m_typeModel.loadSettingsFrom(settings);
 
-        try {
-            m_extractMetaInfoSettingsModel.loadSettingsFrom(settings);
-            m_appendQueryColumnModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // catch for the sake of downward compatibility
-        }
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // catch for the sake of downward compatibility
+        }
+        if (settings.containsKey(m_extractMetaInfoSettingsModel.getConfigName())) {
+            m_extractMetaInfoSettingsModel.loadSettingsFrom(settings);
+        }
+        if (settings.containsKey(m_appendQueryColumnModel.getConfigName())) {
+            m_appendQueryColumnModel.loadSettingsFrom(settings);
         }
     }
 

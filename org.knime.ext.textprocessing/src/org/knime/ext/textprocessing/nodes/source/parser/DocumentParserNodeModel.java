@@ -407,16 +407,12 @@ public class DocumentParserNodeModel extends NodeModel {
             m_charsetModel.loadSettingsFrom(settings);
         }
 
-        try {
-            m_fileNameAsTitleModel.loadSettingsFrom(settings);
-
-        } catch (InvalidSettingsException e) {
-            // catch exception for backwards compatibility
-        }
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // catch exception for backwards compatibility
+        }
+        if (settings.containsKey(m_fileNameAsTitleModel.getConfigName())) {
+            m_fileNameAsTitleModel.loadSettingsFrom(settings);
         }
     }
 
@@ -455,16 +451,12 @@ public class DocumentParserNodeModel extends NodeModel {
         if (m_withCharset) {
             m_charsetModel.validateSettings(settings);
         }
-
-        try {
-            m_fileNameAsTitleModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // catch exception for backwards compatibility
-        }
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // catch exception for backwards compatibility
+        }
+        if (settings.containsKey(m_fileNameAsTitleModel.getConfigName())) {
+            m_fileNameAsTitleModel.validateSettings(settings);
         }
     }
 }

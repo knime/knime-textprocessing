@@ -465,10 +465,9 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_maxLeft.validateSettings(settings);
         m_maxNGramLeng.validateSettings(settings);
 
-        try {
+        // only validate settings if settings contain SettingsModel key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // just catch for backwards compatibility
         }
     }
 
@@ -497,10 +496,10 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_maxLeft.loadSettingsFrom(settings);
         m_maxNGramLeng.loadSettingsFrom(settings);
 
-        try {
+
+        // only load settings if settings contain SettingsModel key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // just catch for backwards compatibility
         }
     }
 

@@ -47,19 +47,16 @@
 
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane} which provides additionally a tab
@@ -100,10 +97,8 @@ public class TaggerNodeSettingsPane extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentNumber(getNumberOfThreadsModel(),
             "Number of maximal parallel tagging processes", 1));
 
-        Set<String> tokenizerList = new TreeSet<String>();
-        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet()) {
-            tokenizerList.add(entry.getKey());
-        }
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
+                .map(e -> e.getKey()).collect(Collectors.toList());
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 }

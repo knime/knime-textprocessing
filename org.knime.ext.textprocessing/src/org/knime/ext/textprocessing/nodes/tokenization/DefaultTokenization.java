@@ -79,9 +79,7 @@ public final class DefaultTokenization {
      * @since 3.3
      */
     public static final synchronized Tokenizer getSentenceTokenizer(final String tokenizerName) {
-        if (m_tokenizerPoolMap.get(tokenizerName) == null) {
-            m_tokenizerPoolMap.put(tokenizerName, createTokenizerPool(tokenizerName));
-        }
+        m_tokenizerPoolMap.computeIfAbsent(tokenizerName, k -> createTokenizerPool(k));
         return m_tokenizerPoolMap.get(tokenizerName).nextSentenceTokenizer();
     }
 
@@ -91,13 +89,7 @@ public final class DefaultTokenization {
      */
     @Deprecated
     public static final synchronized Tokenizer getSentenceTokenizer() {
-        if (m_tokenizerPoolMap.get("OpenNLP English WordTokenizer") != null) {
-            return m_tokenizerPoolMap.get("OpenNLP English WordTokenizer").nextSentenceTokenizer();
-        } else {
-            m_tokenizerPoolMap.put("OpenNLP English WordTokenizer",
-                createTokenizerPool("OpenNLP English WordTokenizer"));
-            return m_tokenizerPoolMap.get("OpenNLP English WordTokenizer").nextSentenceTokenizer();
-        }
+        return getSentenceTokenizer(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER);
     }
 
     /**
@@ -106,9 +98,7 @@ public final class DefaultTokenization {
      * @since 3.3
      */
     public static final synchronized Tokenizer getWordTokenizer(final String tokenizerName) {
-        if (m_tokenizerPoolMap.get(tokenizerName) == null) {
-            m_tokenizerPoolMap.put(tokenizerName, createTokenizerPool(tokenizerName));
-        }
+        m_tokenizerPoolMap.computeIfAbsent(tokenizerName, k -> createTokenizerPool(k));
         return m_tokenizerPoolMap.get(tokenizerName).nextWordTokenizer();
     }
 
@@ -118,12 +108,6 @@ public final class DefaultTokenization {
      */
     @Deprecated
     public static final synchronized Tokenizer getWordTokenizer() {
-        if (m_tokenizerPoolMap.get("OpenNLP English WordTokenizer") != null) {
-            return m_tokenizerPoolMap.get("OpenNLP English WordTokenizer").nextWordTokenizer();
-        } else {
-            m_tokenizerPoolMap.put("OpenNLP English WordTokenizer",
-                createTokenizerPool("OpenNLP English WordTokenizer"));
-            return m_tokenizerPoolMap.get("OpenNLP English WordTokenizer").nextWordTokenizer();
-        }
+        return getWordTokenizer(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER);
     }
 }

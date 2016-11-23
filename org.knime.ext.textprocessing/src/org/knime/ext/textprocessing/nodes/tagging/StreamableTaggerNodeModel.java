@@ -388,15 +388,12 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        try {
+        // only load settings if settings contain key of SettingsModel (for backwards compatibility)
+        if (settings.containsKey(m_numberOfThreadsModel.getKey())) {
             m_numberOfThreadsModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // don't warn just catch (for downwards compatibility)
         }
-        try {
+        if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // don't warn just catch (for downwards compatibility)
         }
     }
 
@@ -414,15 +411,12 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        try {
+        // only validate settings if settings contain key of SettingsModel (for backwards compatibility)
+        if (settings.containsKey(m_numberOfThreadsModel.getKey())) {
             m_numberOfThreadsModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // don't warn just catch (for downwards compatibility)
         }
-        try {
+        if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // don't warn just catch (for downwards compatibility)
         }
     }
 }
