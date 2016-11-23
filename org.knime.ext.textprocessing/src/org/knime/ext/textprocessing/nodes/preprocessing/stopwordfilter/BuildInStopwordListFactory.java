@@ -71,18 +71,15 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  *
  */
 public final class BuildInStopwordListFactory {
-
     private static final NodeLogger LOGGER = NodeLogger.getLogger(BuildInStopwordListFactory.class);
 
-    private static final String STOPWORDLIST_PATH = "/resources/stopwordlists";
+    private static final String STOPWORDLIST_PATH = "stopwordlists";
 
-    private static BuildInStopwordListFactory instance;
+    private static final BuildInStopwordListFactory INSTANCE = new BuildInStopwordListFactory();
 
     private final Map<String, Set<String>> m_buildInStopwordLists;
 
     private final String m_defaultName;
-
-    private final String m_basePath;
 
     /**
      * Accessor method for the singleton class. Creates a new instance of <code>BuildInStopwordListFactory</code> if it
@@ -90,52 +87,47 @@ public final class BuildInStopwordListFactory {
      *
      * @return An instance of <code>BuildInStopwordListFactory</code>.
      */
-    public static synchronized BuildInStopwordListFactory getInstance() {
-        if (instance == null) {
-            TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
-            String pluginPath = plugin.getPluginRootPath();
-            instance = new BuildInStopwordListFactory(pluginPath);
-        }
-        return instance;
+    public static BuildInStopwordListFactory getInstance() {
+        return INSTANCE;
     }
 
-    private BuildInStopwordListFactory(final String basePath) {
-        m_basePath = basePath;
+    private BuildInStopwordListFactory() {
         m_buildInStopwordLists = new HashMap<String, Set<String>>();
 
-        final String englishFilename = m_basePath + STOPWORDLIST_PATH + "/English-Stopwords.txt";
-        final String englishName = "English";
+        File englishFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/English-Stopwords.txt");
+        String englishName = "English";
         m_buildInStopwordLists.put(englishName, readList(englishFilename));
         m_defaultName = englishName;
 
-        final String germanFilename = m_basePath + STOPWORDLIST_PATH + "/German-Stopwords.txt";
+        File germanFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/German-Stopwords.txt");
         m_buildInStopwordLists.put("German", readList(germanFilename));
 
-        final String italianFilename = m_basePath + STOPWORDLIST_PATH + "/Italian-Stopwords.txt";
+        File italianFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Italian-Stopwords.txt");
         m_buildInStopwordLists.put("Italian", readList(italianFilename));
 
-        final String spanishFilename = m_basePath + STOPWORDLIST_PATH + "/Spanish-Stopwords.txt";
+        File spanishFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Spanish-Stopwords.txt");
         m_buildInStopwordLists.put("Spanish", readList(spanishFilename));
 
-        final String frenchFilename = m_basePath + STOPWORDLIST_PATH + "/French-Stopwords.txt";
+        File frenchFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/French-Stopwords.txt");
         m_buildInStopwordLists.put("French", readList(frenchFilename));
 
-        final String bulgarianFilename = m_basePath + STOPWORDLIST_PATH + "/Bulgarian-Stopwords.txt";
+        File bulgarianFilename =
+            TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Bulgarian-Stopwords.txt");
         m_buildInStopwordLists.put("Bulgarian", readList(bulgarianFilename));
 
-        final String hungarianFilename = m_basePath + STOPWORDLIST_PATH + "/Hungarian-Stopwords.txt";
+        File hungarianFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Hungarian-Stopwords.txt");
         m_buildInStopwordLists.put("Hungarian", readList(hungarianFilename));
 
-        final String polishFilename = m_basePath + STOPWORDLIST_PATH + "/Polish-Stopwords.txt";
+        File polishFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Polish-Stopwords.txt");
         m_buildInStopwordLists.put("Polish", readList(polishFilename));
 
-        final String portugueseFilename = m_basePath + STOPWORDLIST_PATH + "/Portuguese-Stopwords.txt";
+        File portugueseFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Portuguese-Stopwords.txt");
         m_buildInStopwordLists.put("Portuguese", readList(portugueseFilename));
 
-        final String roumanianFilename = m_basePath + STOPWORDLIST_PATH + "/Roumanian-Stopwords.txt";
+        File roumanianFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Roumanian-Stopwords.txt");
         m_buildInStopwordLists.put("Roumanian", readList(roumanianFilename));
 
-        final String russianFilename = m_basePath + STOPWORDLIST_PATH + "/Russian-Stopwords.txt";
+        File russianFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Russian-Stopwords.txt");
         m_buildInStopwordLists.put("Russian", readList(russianFilename));
     }
 
@@ -174,29 +166,18 @@ public final class BuildInStopwordListFactory {
         return m_defaultName;
     }
 
-    private Set<String> readList(final String filename) {
+    private Set<String> readList(final File file) {
         final Set<String> stopWords = new LinkedHashSet<String>();
-        final File f = new File(filename);
-        if (f.exists() && f.canRead() && f.isFile()) {
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+        if (file.exists() && file.canRead() && file.isFile()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     stopWords.add(line.trim());
                 }
             } catch (FileNotFoundException e) {
-                LOGGER.warn("Stop word file not found: " + f.getAbsolutePath());
+                LOGGER.warn("Stop word file not found: " + file.getAbsolutePath());
             } catch (IOException e) {
-                LOGGER.warn("Can't read from stop word file: " + f.getAbsolutePath());
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        LOGGER.debug("Could not close stop word reader.");
-                    }
-                }
+                LOGGER.warn("Can't read from stop word file: " + file.getAbsolutePath());
             }
         }
         return stopWords;

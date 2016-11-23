@@ -46,14 +46,17 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  *
@@ -61,10 +64,6 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @since 2.7
  */
 public final class ImgLoaderUtil {
-
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(ImgLoaderUtil.class);
-
     /**
      * Path to image icons.
      */
@@ -80,22 +79,17 @@ public final class ImgLoaderUtil {
      */
     public static ImageIcon loadImageIcon(final String name,
                                           final String description) {
-        TextprocessingCorePlugin plugin =
-            TextprocessingCorePlugin.getDefault();
-        String pluginPath = plugin.getPluginRootPath();
-        String iconPath = pluginPath + ICON_IMAGE_PATH + name;
-        File imgFile = new File(iconPath);
-        URL imgURL = null;
+
+        Bundle myself = FrameworkUtil.getBundle(TextprocessingCorePlugin.class);
         try {
-            imgURL = imgFile.toURI().toURL();
-        } catch (MalformedURLException e) {
-            LOGGER.info("Specified path to icon: \"" + iconPath
-                        + "\" is not valid!");
+            URL url = FileLocator.toFileURL(FileLocator.find(myself, new Path(ICON_IMAGE_PATH + name), null));
+            if (url != null) {
+                return new ImageIcon(url, description);
+            }
+        } catch (IOException ex) {
+            NodeLogger.getLogger(ImgLoaderUtil.class)
+                .error("Could not load image icon '" + name + "': " + ex.getMessage(), ex);
         }
-        if (imgURL != null) {
-            return new ImageIcon(imgURL, description);
-        } else {
-            return null;
-        }
+        return new ImageIcon();
     }
 }

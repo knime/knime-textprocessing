@@ -52,6 +52,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -128,14 +129,8 @@ public class TagSetParser extends DefaultHandler {
     @Override
     public InputSource resolveEntity(final String pubId, final String sysId)
             throws IOException, SAXException {
-        if (pubId != null) {
-            TextprocessingCorePlugin plugin =
-                    TextprocessingCorePlugin.getDefault();
-            String path = plugin.getPluginRootPath();
-            if (pubId.equals(PUBLIC_IDENTIFIER)) {
-                path += TagFactory.TAGSET_DTD_POSTFIX;
-            }
-            InputStream in = new FileInputStream(path);
+        if (Objects.equals(pubId, PUBLIC_IDENTIFIER)) {
+            InputStream in = new FileInputStream(TextprocessingCorePlugin.resolvePath(TagFactory.TAGSET_DTD_POSTFIX));
             return new InputSource(in);
         }
         return super.resolveEntity(pubId, sysId);

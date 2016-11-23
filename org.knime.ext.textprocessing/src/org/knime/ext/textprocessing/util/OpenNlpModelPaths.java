@@ -63,74 +63,51 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @author Kilian Thiel, University of Konstanz
  */
 public final class OpenNlpModelPaths {
+    private static final OpenNlpModelPaths INSTANCE = new OpenNlpModelPaths();
 
-    private static OpenNlpModelPaths instance = null;
+    private static final String SENTENCE_MODEL_POSTFIX = "opennlpmodels/sentdetect/en-sent.bin";
 
-    private static final String SENTENCE_MODEL_POSTFIX =
-        "/resources/opennlpmodels/sentdetect/en-sent.bin";
+    private static final String TOKENIZATION_EN_MODEL_POSTFIX = "opennlpmodels/tokenize/en-token.bin";
 
-    private static final String TOKENIZATION_EN_MODEL_POSTFIX =
-        "/resources/opennlpmodels/tokenize/en-token.bin";
+    private static final String TOKENIZATION_DE_MODEL_POSTFIX = "opennlpmodels/tokenize/de-token.bin";
 
-    private static final String TOKENIZATION_DE_MODEL_POSTFIX =
-        "/resources/opennlpmodels/tokenize/de-token.bin";
-
-    private static final String POS_MODEL_POSTFIX =
-        "/resources/opennlpmodels/pos/en-pos-maxent.bin";
+    private static final String POS_MODEL_POSTFIX = "opennlpmodels/pos/en-pos-maxent.bin";
 
     /**
      * @deprecated tag dictionary is not used in opennlp > 1.3.0 anymore
      */
     @Deprecated
-    private static final String POS_DICT_POSTFIX =
-        "/resources/opennlpmodels/pos/tagdict";
+    private static final String POS_DICT_POSTFIX = "opennlpmodels/pos/tagdict";
 
-    private static final String NER_LOCATION_MODEL_POSTFIX =
-        "/resources/opennlpmodels/namefind/en-ner-location.bin";
+    private static final String NER_LOCATION_MODEL_POSTFIX = "opennlpmodels/namefind/en-ner-location.bin";
 
-    private static final String NER_PERSON_MODEL_POSTFIX =
-        "/resources/opennlpmodels/namefind/en-ner-person.bin";
+    private static final String NER_PERSON_MODEL_POSTFIX = "opennlpmodels/namefind/en-ner-person.bin";
 
-    private static final String NER_ORGANIZATION_MODEL_POSTFIX =
-        "/resources/opennlpmodels/namefind/en-ner-organization.bin";
+    private static final String NER_ORGANIZATION_MODEL_POSTFIX = "opennlpmodels/namefind/en-ner-organization.bin";
 
-    private static final String NER_MONEY_MODEL_POSTFIX =
-        "/resources/opennlpmodels/namefind/en-ner-money.bin";
+    private static final String NER_MONEY_MODEL_POSTFIX = "opennlpmodels/namefind/en-ner-money.bin";
 
-    private static final String NER_DATE_MODEL_POSTFIX =
-        "/resources/opennlpmodels/namefind/en-ner-date.bin";
+    private static final String NER_DATE_MODEL_POSTFIX = "opennlpmodels/namefind/en-ner-date.bin";
 
-    private static final String NER_TIME_MODEL_POSTFIX =
-        "/resources/opennlpmodels/namefind/en-ner-time.bin";
-
-    /**
-     * The base path to the models.
-     */
-    private String m_basePath;
+    private static final String NER_TIME_MODEL_POSTFIX = "opennlpmodels/namefind/en-ner-time.bin";
 
     /**
      * @return The singleton <code>OpenNlpModelPaths</code> instance holding
      * the paths to the OpenNlp models.
      */
     public static OpenNlpModelPaths getOpenNlpModelPaths() {
-        if (instance == null) {
-            TextprocessingCorePlugin plugin =
-                TextprocessingCorePlugin.getDefault();
-            String pluginPath = plugin.getPluginRootPath();
-            instance = new OpenNlpModelPaths(pluginPath);
-        }
-        return instance;
+        return INSTANCE;
     }
 
-    private OpenNlpModelPaths(final String basePath) {
-        m_basePath = basePath;
+    private OpenNlpModelPaths() {
+
     }
 
     /**
      * @return the model file of the sentence detection model.
      */
     public String getSentenceModelFile() {
-        return m_basePath + SENTENCE_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(SENTENCE_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
@@ -138,21 +115,21 @@ public final class OpenNlpModelPaths {
      * @since 3.3
      */
     public String getEnTokenizerModelFile() {
-        return m_basePath + TOKENIZATION_EN_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(TOKENIZATION_EN_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @since 3.3
      */
     public String getDeTokenizerModelFile() {
-        return m_basePath + TOKENIZATION_DE_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(TOKENIZATION_DE_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the pos tagger model.
      */
     public String getPosTaggerModelFile() {
-        return m_basePath + POS_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(POS_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
@@ -161,48 +138,48 @@ public final class OpenNlpModelPaths {
      */
     @Deprecated
     public String getPosTaggerDictFile() {
-        return m_basePath + POS_DICT_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(POS_DICT_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the person recognizer.
      */
     public String getPersonNERModelFile() {
-        return m_basePath + NER_PERSON_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(NER_PERSON_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the location recognizer.
      */
     public String getLocationNERModelFile() {
-        return m_basePath + NER_LOCATION_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(NER_LOCATION_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the organization recognizer.
      */
     public String getOrganizationNERModelFile() {
-        return m_basePath + NER_ORGANIZATION_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(NER_ORGANIZATION_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the money recognizer.
      */
     public String getMoneyNERModelFile() {
-        return m_basePath + NER_MONEY_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(NER_MONEY_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the date recognizer.
      */
     public String getDateNERModelFile() {
-        return m_basePath + NER_DATE_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(NER_DATE_MODEL_POSTFIX).getAbsolutePath();
     }
 
     /**
      * @return the model file of the time recognizer.
      */
     public String getTimeNERModelFile() {
-        return m_basePath + NER_TIME_MODEL_POSTFIX;
+        return TextprocessingCorePlugin.resolvePath(NER_TIME_MODEL_POSTFIX).getAbsolutePath();
     }
 }

@@ -49,8 +49,6 @@ package org.knime.ext.textprocessing.util;
 
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 
-
-
 /**
  * Provides the paths to the models used by the Stanford POS library. The paths
  * are based on the root directory of the Textprocessing plugin, which is
@@ -63,60 +61,39 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @author Kilian Thiel, University of Konstanz
  */
 public final class StanfordModelPaths {
+    private static final StanfordModelPaths INSTANCE = new StanfordModelPaths();
 
-    private static StanfordModelPaths instance = null;
+    private static final String GERMAN_FAST_POS = "stanfordmodels/pos/german-fast.tagger";
 
-    private static final String GERMAN_FAST_POS =
-        "/resources/stanfordmodels/pos/german-fast.tagger";
+    private static final String GERMAN_DEWAC_POS = "stanfordmodels/pos/german-dewac.tagger";
 
-    private static final String GERMAN_DEWAC_POS =
-        "/resources/stanfordmodels/pos/german-dewac.tagger";
+    private static final String GERMAN_HGC_POS = "stanfordmodels/pos/german-hgc.tagger";
 
-    private static final String GERMAN_HGC_POS =
-            "/resources/stanfordmodels/pos/german-hgc.tagger";
+    private static final String FRENCH_POS = "stanfordmodels/pos/french.tagger";
 
-    private static final String FRENCH_POS =
-            "/resources/stanfordmodels/pos/french.tagger";
-
-    private static final String ENGLISH_BIDIRECTIONAL_POS =
-            "/resources/stanfordmodels/pos/english-bidirectional-distsim.tagger";
+    private static final String ENGLISH_BIDIRECTIONAL_POS = "stanfordmodels/pos/english-bidirectional-distsim.tagger";
 
     private static final String ENGLISH_CASELESS_LEFT3WORDS_POS =
-            "/resources/stanfordmodels/pos/english-caseless-left3words-distsim.tagger";
+        "stanfordmodels/pos/english-caseless-left3words-distsim.tagger";
 
-    private static final String ENGLISH_LEFT3WORDS_POS =
-            "/resources/stanfordmodels/pos/english-left3words-distsim.tagger";
-
-
-    /**
-     * The base path to the models.
-     */
-    private String m_basePath;
+    private static final String ENGLISH_LEFT3WORDS_POS = "stanfordmodels/pos/english-left3words-distsim.tagger";
 
     /**
      * @return The singleton <code>StanfordModelPaths</code> instance holding
      * the paths to the OpenNlp models.
      */
     public static StanfordModelPaths getStanfordModelPaths() {
-        if (instance == null) {
-            TextprocessingCorePlugin plugin =
-                TextprocessingCorePlugin.getDefault();
-            String pluginPath = plugin.getPluginRootPath();
-            instance = new StanfordModelPaths(pluginPath);
-        }
-        return instance;
+        return INSTANCE;
     }
 
-    private StanfordModelPaths(final String basePath) {
-        m_basePath = basePath;
-    }
+    private StanfordModelPaths() {}
 
     /**
      * @return the model file of the french tagger.
      * @since 2.8
      */
     public String getFrenchPosModelFile() {
-        return m_basePath + FRENCH_POS;
+        return TextprocessingCorePlugin.resolvePath(FRENCH_POS).getAbsolutePath();
     }
 
     /**
@@ -127,7 +104,7 @@ public final class StanfordModelPaths {
      */
     @Deprecated
     public String getGermanAccuratePosModelFile() {
-        return m_basePath + GERMAN_HGC_POS;
+        return TextprocessingCorePlugin.resolvePath(GERMAN_HGC_POS).getAbsolutePath();
     }
 
     /**
@@ -135,7 +112,7 @@ public final class StanfordModelPaths {
      * @since 2.8
      */
     public String getGermanHgcPosModelFile() {
-        return m_basePath + GERMAN_HGC_POS;
+        return TextprocessingCorePlugin.resolvePath(GERMAN_HGC_POS).getAbsolutePath();
     }
 
     /**
@@ -143,14 +120,14 @@ public final class StanfordModelPaths {
      * @since 2.8
      */
     public String getGermanDewacPosModelFile() {
-        return m_basePath + GERMAN_DEWAC_POS;
+        return TextprocessingCorePlugin.resolvePath(GERMAN_DEWAC_POS).getAbsolutePath();
     }
 
     /**
      * @return the model file of the german fast tagger.
      */
     public String getGermanFastPosModelFile() {
-        return m_basePath + GERMAN_FAST_POS;
+        return TextprocessingCorePlugin.resolvePath(GERMAN_FAST_POS).getAbsolutePath();
     }
 
     /**
@@ -158,7 +135,7 @@ public final class StanfordModelPaths {
      * @since 2.8
      */
     public String getEnglishLeft3WordsCaselessPosModelFile() {
-        return m_basePath + ENGLISH_CASELESS_LEFT3WORDS_POS;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_CASELESS_LEFT3WORDS_POS).getAbsolutePath();
     }
 
     /**
@@ -169,7 +146,7 @@ public final class StanfordModelPaths {
      */
     @Deprecated
     public String getLeft3WordsDistSimPosModelFile() {
-        return m_basePath + ENGLISH_LEFT3WORDS_POS;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_LEFT3WORDS_POS).getAbsolutePath();
     }
 
     /**
@@ -177,7 +154,7 @@ public final class StanfordModelPaths {
      * @since 2.8
      */
     public String getEnglishLeft3WordsPosModelFile() {
-        return m_basePath + ENGLISH_LEFT3WORDS_POS;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_LEFT3WORDS_POS).getAbsolutePath();
     }
 
     /**
@@ -188,7 +165,7 @@ public final class StanfordModelPaths {
      */
     @Deprecated
     public String getLeft3WordsPosModelFile() {
-        return m_basePath + ENGLISH_LEFT3WORDS_POS;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_LEFT3WORDS_POS).getAbsolutePath();
     }
 
     /**
@@ -196,7 +173,7 @@ public final class StanfordModelPaths {
      * @since 2.8
      */
     public String getEnglishBidirectionalPosModelFile() {
-        return m_basePath + ENGLISH_BIDIRECTIONAL_POS;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_BIDIRECTIONAL_POS).getAbsolutePath();
     }
 
     /**
@@ -207,6 +184,6 @@ public final class StanfordModelPaths {
      */
     @Deprecated
     public String getBidirectionalPosModelFile() {
-        return m_basePath + ENGLISH_BIDIRECTIONAL_POS;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_BIDIRECTIONAL_POS).getAbsolutePath();
     }
 }

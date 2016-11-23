@@ -55,6 +55,7 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -148,7 +149,7 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
     /**
      * The path (postfix) of the sdml.dtd file relative to the plugin directory.
      */
-    public static final String SDML_DTD_POSTFIX = "/resources/documentformat/sdml.dtd";
+    private static final String SDML_DTD_POSTFIX = "documentformat/sdml.dtd";
 
     /**
      * The public identifier for (sdml) xml files.
@@ -252,13 +253,8 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
      */
     @Override
     public InputSource resolveEntity(final String pubId, final String sysId) throws IOException, SAXException {
-        if (pubId != null) {
-            TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
-            String path = plugin.getPluginRootPath();
-            if (pubId.equals(PUBLIC_IDENTIFIER)) {
-                path += SDML_DTD_POSTFIX;
-            }
-            InputStream in = new FileInputStream(path);
+        if (Objects.equals(pubId, PUBLIC_IDENTIFIER)) {
+            InputStream in = new FileInputStream(TextprocessingCorePlugin.resolvePath(SDML_DTD_POSTFIX));
             return new InputSource(in);
         }
         return super.resolveEntity(pubId, sysId);

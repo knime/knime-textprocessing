@@ -48,13 +48,17 @@
 package org.knime.ext.textprocessing;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.knime.core.node.NodeLogger;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -62,30 +66,14 @@ import org.osgi.framework.BundleContext;
  * @author Kilian Thiel, University of Konstanz
  */
 public class TextprocessingCorePlugin extends AbstractUIPlugin {
-
     // The shared instance.
     private static TextprocessingCorePlugin plugin;
-
-    private String m_pluginRootPath;
 
     /**
      * The constructor.
      */
     public TextprocessingCorePlugin() {
         plugin = this;
-    }
-
-    /**
-     * This method is called upon plug-in activation.
-     * @param context The bundle context.
-     * @throws Exception If cause by super class.
-     */
-    @Override
-    public void start(final BundleContext context) throws Exception {
-        super.start(context);
-        final URL pluginURL = FileLocator.toFileURL(FileLocator.find(getBundle(), new Path("/"), null));
-        final File tmpFile = new File(pluginURL.getPath());
-        m_pluginRootPath = tmpFile.getAbsolutePath();
     }
 
     /**
@@ -121,9 +109,21 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
     }
 
     /**
-     * @return the absolute root path of this plugin
+     * Resolves a path relative to the plug-in or any fragment's root into an absolute path.
+     *
+     * @param relativePath a relative path
+     * @return the resolved absolute path
+     * @since 3.3
      */
-    public String getPluginRootPath() {
-        return m_pluginRootPath;
+    public static File resolvePath(final String relativePath) {
+        Bundle myself = FrameworkUtil.getBundle(TextprocessingCorePlugin.class);
+        try {
+            URL fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath), null));
+            return new File(fileUrl.getPath());
+        } catch (IOException ex) {
+            NodeLogger.getLogger(TextprocessingCorePlugin.class)
+                .error("Could not resolve relativ path '" + relativePath + "': " + ex.getMessage(), ex);
+            return new File("");
+        }
     }
 }

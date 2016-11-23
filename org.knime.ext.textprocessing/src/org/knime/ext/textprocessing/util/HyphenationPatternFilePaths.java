@@ -58,47 +58,29 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @author thiel, University of Konstanz
  */
 public final class HyphenationPatternFilePaths {
+    private static final HyphenationPatternFilePaths INSTANCE = new HyphenationPatternFilePaths();
 
-    private static HyphenationPatternFilePaths instance = null;
+    private final Map<String, String> m_files = new HashMap<>();
 
-    private static final Map<String, String> LANG_PATTERNS =
-        new HashMap<String, String>();
-
-    static {
-        LANG_PATTERNS.put("German", "/resources/hyphenationpatterns/de.txt");
-        LANG_PATTERNS.put("English", "/resources/hyphenationpatterns/en.txt");
-        LANG_PATTERNS.put("Italian", "/resources/hyphenationpatterns/it.txt");
-        LANG_PATTERNS.put("French", "/resources/hyphenationpatterns/fr.txt");
-        LANG_PATTERNS.put("Czech", "/resources/hyphenationpatterns/cs.txt");
-        LANG_PATTERNS.put("Dutch", "/resources/hyphenationpatterns/nl.txt");
-        LANG_PATTERNS.put("Finnish", "/resources/hyphenationpatterns/fi.txt");
-        LANG_PATTERNS.put("Swedish", "/resources/hyphenationpatterns/fi.txt");
-        LANG_PATTERNS.put("Portuguese",
-                "/resources/hyphenationpatterns/pt.txt");
-        LANG_PATTERNS.put("Danish", "/resources/hyphenationpatterns/da.txt");
+    private HyphenationPatternFilePaths() {
+        m_files.put("German", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/de.txt").getAbsolutePath());
+        m_files.put("English", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/en.txt").getAbsolutePath());
+        m_files.put("Italian", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/it.txt").getAbsolutePath());
+        m_files.put("French", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/fr.txt").getAbsolutePath());
+        m_files.put("Czech", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/cs.txt").getAbsolutePath());
+        m_files.put("Dutch", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/nl.txt").getAbsolutePath());
+        m_files.put("Finnish", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/fi.txt").getAbsolutePath());
+        m_files.put("Swedish", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/fi.txt").getAbsolutePath());
+        m_files.put("Portuguese", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/pt.txt").getAbsolutePath());
+        m_files.put("Danish", TextprocessingCorePlugin.resolvePath("hyphenationpatterns/da.txt").getAbsolutePath());
     }
-
-    /**
-     * The base path to the pattern files.
-     */
-    private String m_basePath;
 
     /**
      * @return The singleton <code>HyphenationPatternFilePaths</code> instance
      * holding the paths to the pattern files.
      */
     public static HyphenationPatternFilePaths getHyphenationPatternlPaths() {
-        if (instance == null) {
-            TextprocessingCorePlugin plugin =
-                TextprocessingCorePlugin.getDefault();
-            String pluginPath = plugin.getPluginRootPath();
-            instance = new HyphenationPatternFilePaths(pluginPath);
-        }
-        return instance;
-    }
-
-    private HyphenationPatternFilePaths(final String basePath) {
-        m_basePath = basePath;
+        return INSTANCE;
     }
 
     /**
@@ -107,13 +89,13 @@ public final class HyphenationPatternFilePaths {
      * @return the corresponding pattern file.
      */
     public String getPatternFile(final String lang) {
-        return m_basePath + LANG_PATTERNS.get(lang);
+        return m_files.get(lang);
     }
 
     /**
      * @return A set of all available languages.
      */
     public Set<String> getLanguages() {
-        return LANG_PATTERNS.keySet();
+        return m_files.keySet();
     }
 }

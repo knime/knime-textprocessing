@@ -330,6 +330,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/TextprocessingCorePlugin.java" type="org.knime.ext.textprocessing.TextprocessingCorePlugin">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.TextprocessingCorePlugin"/>
+                <message_argument value="getPluginRootPath()"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/data/SentimentTag.java" type="org.knime.ext.textprocessing.data.SentimentTag">
         <filter id="372293724">
             <message_arguments>
@@ -356,6 +364,22 @@
         <filter id="1177550852">
             <message_arguments>
                 <message_argument value="UNCERTAINTY"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/data/TagFactory.java" type="org.knime.ext.textprocessing.data.TagFactory">
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.data.TagFactory"/>
+                <message_argument value="TAGSET_DTD_POSTFIX"/>
+                <message_argument value="/resources/tagset/tagset.dtd"/>
+            </message_arguments>
+        </filter>
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.data.TagFactory"/>
+                <message_argument value="TAGSET_XML_POSTFIX"/>
+                <message_argument value="/resources/tagset/tagset.xml"/>
             </message_arguments>
         </filter>
     </resource>
@@ -524,6 +548,22 @@
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.DocumentParser"/>
                 <message_argument value="setFilenameAsTitle(boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/dml/DmlDocumentParser.java" type="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser">
+        <filter id="388018290">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser"/>
+                <message_argument value="DML_DTD_POSTFIX"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/sdml/SdmlDocumentParser.java" type="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParser">
+        <filter id="388018290">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParser"/>
+                <message_argument value="SDML_DTD_POSTFIX"/>
             </message_arguments>
         </filter>
     </resource>

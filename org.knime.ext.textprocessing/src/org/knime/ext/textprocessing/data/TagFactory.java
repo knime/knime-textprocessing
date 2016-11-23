@@ -90,26 +90,21 @@ public final class TagFactory {
      * The path (postix) of the tagset.xml file relative to the plugin
      * directory.
      */
-    public static final String TAGSET_XML_POSTFIX =
-            "/resources/tagset/tagset.xml";
+    public static final String TAGSET_XML_POSTFIX = "tagset/tagset.xml";
 
     /**
      * The path (postix) of the tagset.dtd file relative to the plugin
      * directory.
      */
-    public static final String TAGSET_DTD_POSTFIX =
-            "/resources/tagset/tagset.dtd";
+    public static final String TAGSET_DTD_POSTFIX = "tagset/tagset.dtd";
 
-    private static TagFactory instance;
+    private static final TagFactory INSTANCE = new TagFactory();
 
     private Hashtable<String, TagBuilder> m_tagBuilder =
             new Hashtable<String, TagBuilder>();
 
     private TagFactory() {
-        TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
-        String pluginPath = plugin.getPluginRootPath();
-        String tagSetPath = pluginPath + TAGSET_XML_POSTFIX;
-        addTagSet(new File(tagSetPath));
+        addTagSet(TextprocessingCorePlugin.resolvePath(TAGSET_XML_POSTFIX));
         registerExtensionPoints();
     }
 
@@ -117,10 +112,7 @@ public final class TagFactory {
      * @return The singleton instance of <code>TagFactory</code>.
      */
     public static TagFactory getInstance() {
-        if (instance == null) {
-            instance = new TagFactory();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     /**

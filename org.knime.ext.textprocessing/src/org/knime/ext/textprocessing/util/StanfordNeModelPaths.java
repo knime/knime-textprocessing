@@ -56,128 +56,113 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @since 3.3
  */
 public final class StanfordNeModelPaths {
-
-    private static StanfordNeModelPaths instance = null;
+    private static final StanfordNeModelPaths INSTANCE = new StanfordNeModelPaths();
 
     private static final String ENGLISH_ALL_3CLASS_DISTSIM =
-        "/resources/stanfordmodels/nermodels/english.all.3class.distsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.all.3class.distsim.crf.ser.gz";
 
     private static final String ENGLISH_CONLL_4CLASS_DISTSIM =
-        "/resources/stanfordmodels/nermodels/english.conll.4class.distsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.conll.4class.distsim.crf.ser.gz";
 
     private static final String ENGLISH_MUC_7CLASS_DISTSIM =
-        "/resources/stanfordmodels/nermodels/english.muc.7class.distsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.muc.7class.distsim.crf.ser.gz";
 
     private static final String ENGLISH_ALL_3CLASS_NODISTSIM =
-        "/resources/stanfordmodels/nermodels/english.all.3class.nodistsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.all.3class.nodistsim.crf.ser.gz";
 
     private static final String ENGLISH_CONLL_4CLASS_NODISTSIM =
-        "/resources/stanfordmodels/nermodels/english.conll.4class.nodistsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.conll.4class.nodistsim.crf.ser.gz";
 
     private static final String ENGLISH_MUC_7CLASS_NODISTSIM =
-        "/resources/stanfordmodels/nermodels/english.muc.7class.nodistsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.muc.7class.nodistsim.crf.ser.gz";
 
     private static final String ENGLISH_NOWIKI_3CLASS_CASELESS_DISTSIM =
-        "/resources/stanfordmodels/nermodels/english.nowiki.3class.caseless.distsim.crf.ser.gz";
+        "stanfordmodels/nermodels/english.nowiki.3class.caseless.distsim.crf.ser.gz";
 
-    private static final String GERMAN_DEWAC_175M_600 =
-        "/resources/stanfordmodels/nermodels/german.dewac_175m_600.crf.ser.gz";
+    private static final String GERMAN_DEWAC_175M_600 = "stanfordmodels/nermodels/german.dewac_175m_600.crf.ser.gz";
 
-    private static final String GERMAN_HGC_175M_600 =
-        "/resources/stanfordmodels/nermodels/german.hgc_175m_600.crf.ser.gz";
+    private static final String GERMAN_HGC_175M_600 = "stanfordmodels/nermodels/german.hgc_175m_600.crf.ser.gz";
 
     private static final String SPANISH_ANCORA_DISTSIM =
-        "/resources/stanfordmodels/nermodels/spanish.ancora.distsim.s512.crf.ser.gz";
-
-    /**
-     * The base path to the models.
-     */
-    private String m_basePath;
+        "stanfordmodels/nermodels/spanish.ancora.distsim.s512.crf.ser.gz";
 
     /**
      * @return The singleton {@code StanfordNeModelPaths} instance holding the paths to the StanfordNLP NE models.
      */
     public static StanfordNeModelPaths getStanfordNeModelPaths() {
-        if (instance == null) {
-            TextprocessingCorePlugin plugin = TextprocessingCorePlugin.getDefault();
-            String pluginPath = plugin.getPluginRootPath();
-            instance = new StanfordNeModelPaths(pluginPath);
-        }
-        return instance;
+        return INSTANCE;
     }
 
-    private StanfordNeModelPaths(final String basePath) {
-        m_basePath = basePath;
+    private StanfordNeModelPaths() {
     }
 
     /**
      * @return the model file of the English 3 class classifier (distsim)
      */
     public String getEnglishAll3ClassDistSimModelFile() {
-        return m_basePath + ENGLISH_ALL_3CLASS_DISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_ALL_3CLASS_DISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the English 4 class classifier (distsim)
      */
     public String getEnglishConll4ClassDistSimModelFile() {
-        return m_basePath + ENGLISH_CONLL_4CLASS_DISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_CONLL_4CLASS_DISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the English 7 class classifier (distsim)
      */
     public String getEnglishMuc7ClassDistSimModelFile() {
-        return m_basePath + ENGLISH_MUC_7CLASS_DISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_MUC_7CLASS_DISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the English 3 class classifier (nodistsim)
      */
     public String getEnglishAll3ClassNoDistSimModelFile() {
-        return m_basePath + ENGLISH_ALL_3CLASS_NODISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_ALL_3CLASS_NODISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the English 4 class classifier (nodistsim)
      */
     public String getEnglishConll4ClassNoDistSimModelFile() {
-        return m_basePath + ENGLISH_CONLL_4CLASS_NODISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_CONLL_4CLASS_NODISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the English 7 class classifier (nodistsim)
      */
     public String getEnglishMuc7ClassNoDistSimModelFile() {
-        return m_basePath + ENGLISH_MUC_7CLASS_NODISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_MUC_7CLASS_NODISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the English no wiki 3 class classifier (distsim)
      */
     public String getEnglishNoWiki3ClassCaselessDistSimModelFile() {
-        return m_basePath + ENGLISH_NOWIKI_3CLASS_CASELESS_DISTSIM;
+        return TextprocessingCorePlugin.resolvePath(ENGLISH_NOWIKI_3CLASS_CASELESS_DISTSIM).getAbsolutePath();
     }
 
     /**
      * @return the model file of the German dewac classifier
      */
     public String getGermanDewacModelFile() {
-        return m_basePath + GERMAN_DEWAC_175M_600;
+        return TextprocessingCorePlugin.resolvePath(GERMAN_DEWAC_175M_600).getAbsolutePath();
     }
 
     /**
      * @return the model file of the German hgc classifier
      */
     public String getGermanHgcModelFile() {
-        return m_basePath + GERMAN_HGC_175M_600;
+        return TextprocessingCorePlugin.resolvePath(GERMAN_HGC_175M_600).getAbsolutePath();
     }
 
     /**
      * @return the model file of the Spanish ancora classifier
      */
     public String getSpanishAncoraDistSimModelFile() {
-        return m_basePath + SPANISH_ANCORA_DISTSIM;
+        return TextprocessingCorePlugin.resolvePath(SPANISH_ANCORA_DISTSIM).getAbsolutePath();
     }
-
 }

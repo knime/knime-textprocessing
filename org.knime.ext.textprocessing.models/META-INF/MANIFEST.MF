@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Static model files for the textprocessing extension
+Bundle-SymbolicName: org.knime.ext.textprocessing.models;singleton:=true
+Bundle-Version: 2016.11.23.qualifier
+Fragment-Host: org.knime.ext.textprocessing;bundle-version="[3.3.0,4.0.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: KNIME GmbH, Konstanz, Germany
