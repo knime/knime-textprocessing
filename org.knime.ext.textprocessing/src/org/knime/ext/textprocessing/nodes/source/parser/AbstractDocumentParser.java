@@ -109,6 +109,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
 
     /**
      * The name of the word tokenizer.
+     * @since 3.3
      */
     protected String m_tokenizerName;
 

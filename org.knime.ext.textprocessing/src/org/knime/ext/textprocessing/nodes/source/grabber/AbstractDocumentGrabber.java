@@ -264,6 +264,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
 
     /**
      * {@inheritDoc}
+     * @since 3.3
      */
     @Override
     public void setTokenizerName(final String tokenizerName) {
@@ -272,6 +273,7 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
 
     /**
      * {@inheritDoc}
+     * @since 3.3
      */
     @Override
     public String getTokenizerName() {
