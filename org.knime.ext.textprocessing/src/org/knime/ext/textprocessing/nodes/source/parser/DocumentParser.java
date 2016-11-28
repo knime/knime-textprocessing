@@ -142,6 +142,14 @@ public interface DocumentParser {
     public void setCharset(final Charset charset);
 
     /**
+     * Sets the name of the tokenizer for the document parser.
+     *
+     * @param tokenizerName the name of the word tokenizer, must not be <code>null</code>
+     * @since 3.3
+     */
+    public void setTokenizerName(final String tokenizerName);
+
+    /**
      * @param filenameAsTitle If {@code true} filename will be set as title, otherwise the concrete parser
      * implementation will define the title.
      * @since 3.1

@@ -47,6 +47,9 @@
  */
 package org.knime.ext.textprocessing.nodes.tokenization;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
@@ -56,40 +59,37 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Kilian Thiel, University of Konstanz
  */
 public final class DefaultTokenization {
-
-    private static TokenizerPool tokenizerPool =
-        new TokenizerPool(TextprocessingPreferenceInitializer.tokenizerPoolSize(),
-            TextprocessingPreferenceInitializer.tokenizerName());
+    private static Map<String, TokenizerPool> m_tokenizerPoolMap = new HashMap<String, TokenizerPool>();
 
     private DefaultTokenization() {
     }
 
     /**
-     * Creates new tokenizer pool with pool size set in preferences only if current pool size is different from
-     * preference pool size.
-     *
-     * @since 2.9
+     * @return Creates and returns a new {@code TokenizerPool} for the specified tokenizer.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public static final void createNewTokenizerPool() {
-        final int newPoolSize = TextprocessingPreferenceInitializer.tokenizerPoolSize();
-        final String newTokenizer = TextprocessingPreferenceInitializer.tokenizerName();
-        if ((newPoolSize != tokenizerPool.getPoolSize()) || (!newTokenizer.equals(tokenizerPool.getTokenizerName()))) {
-            tokenizerPool = new TokenizerPool(newPoolSize, newTokenizer);
-        }
+    private static TokenizerPool createTokenizerPool(final String tokenizerName) {
+        return new TokenizerPool(TextprocessingPreferenceInitializer.tokenizerPoolSize(), tokenizerName);
     }
 
     /**
-     * @return The default sentence tokenizer.
+     * @param tokenizerName The specified tokenizer used for word tokenization.
+     * @return Returns the sentence tokenizer taken from the same TokenizerPool as the word tokenizer.
+     * @since 3.3
      */
-    public static final Tokenizer getSentenceTokenizer() {
-        return tokenizerPool.nextSentenceTokenizer();
+    public static final synchronized Tokenizer getSentenceTokenizer(final String tokenizerName) {
+        m_tokenizerPoolMap.computeIfAbsent(tokenizerName, k -> createTokenizerPool(k));
+        return m_tokenizerPoolMap.get(tokenizerName).nextSentenceTokenizer();
     }
 
     /**
-     * @return The default word tokenizer.
+     * @param tokenizerName The specified tokenizer used for word tokenization
+     * @return Returns the specified word tokenizer.
+     * @since 3.3
      */
-    public static final Tokenizer getWordTokenizer() {
-        return tokenizerPool.nextWordTokenizer();
+    public static final synchronized Tokenizer getWordTokenizer(final String tokenizerName) {
+        m_tokenizerPoolMap.computeIfAbsent(tokenizerName, k -> createTokenizerPool(k));
+        return m_tokenizerPoolMap.get(tokenizerName).nextWordTokenizer();
     }
-
 }

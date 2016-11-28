@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports
 import java.util.HashMap;
 
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.BufferedDataTable;
@@ -63,6 +64,7 @@ import org.knime.core.node.streamable.InputPortRole;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacer;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  *
@@ -78,6 +80,8 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         DictionaryReplacer2InPortsNodeDialog2.getReplacementColumnModel();
 
     private HashMap<String, String> m_replacementDict;
+
+    private final SettingsModelString m_tokenizerModel = DictionaryReplacer2InPortsNodeDialog2.getTokenizerModel();
 
     /**
      * Constructor of {@link DictionaryReplacer2InPortsNodeModel2}.
@@ -114,8 +118,19 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
      * {@inheritDoc}
      */
     @Override
+    protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizerModel.getStringValue())) {
+            setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected TermPreprocessing createPreprocessing() throws Exception {
-        return new DictionaryReplacer(m_replacementDict);
+        return new DictionaryReplacer(m_replacementDict, m_tokenizerModel.getStringValue());
     }
 
     /**
@@ -131,11 +146,14 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_replaceColumModel.loadSettingsFrom(settings);
         m_replacementColumModel.loadSettingsFrom(settings);
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -146,18 +164,21 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         super.saveSettingsTo(settings);
         m_replaceColumModel.saveSettingsTo(settings);
         m_replacementColumModel.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_replaceColumModel.validateSettings(settings);
         m_replacementColumModel.validateSettings(settings);
-
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.validateSettings(settings);
+        }
         String replaceColName =
             ((SettingsModelString)m_replaceColumModel.createCloneWithValidatedValue(settings)).getStringValue();
         String replacementColName =

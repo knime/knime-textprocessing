@@ -86,6 +86,7 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -232,8 +233,8 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DmlDocumentParser.class);
 
-    private static final SAXTransformerFactory TRANSFORMER_FACTORY = (SAXTransformerFactory)TransformerFactory
-        .newInstance();
+    private static final SAXTransformerFactory TRANSFORMER_FACTORY =
+        (SAXTransformerFactory)TransformerFactory.newInstance();
 
     private static final String DEF_WHITESPACE_SUFFIX = " ";
 
@@ -283,31 +284,53 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
 
     private boolean m_storeInList = false;
 
+    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+
     /**
      * Creates a new instance of <code>DmlDocumentParser</code>. The documents source, category and file path will be
      * set to <code>null</code> by default.
+     *
+     * @deprecated Use {@link #DmlDocumentParser(String)} instead to define the tokenizer used for word tokenization.
      */
+    @Deprecated
     public DmlDocumentParser() {
-        this(null, null, null);
+        this(null, null, null, TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
+     * Creates a new instance of {@code DmlDocumentParser}. The document source, category and file path will be set to
+     * {@code null} by default. The parser instance will use the given tokenizer.
+     *
+     * @param tokenizerName The tokenizer used to tokenize words.
+     * @since 3.3
+     */
+    public DmlDocumentParser(final String tokenizerName) {
+        this(null, null, null, tokenizerName);
     }
 
     /**
      * Creates a new instance of <code>DmlDocumentParser</code>. The given source, category and file path is set to the
-     * created documents.
+     * created documents. The parser instance will use the given tokenizer.
      *
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
+     * @param tokenizerName The tokenizer used to tokenize words.
+     * @since 3.3
      */
-    public DmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
+    public DmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final String tokenizerName) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
+        m_tokenizerName = tokenizerName;
         m_listener = new ArrayList<DocumentParsedEventListener>();
     }
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated
      */
     @Deprecated
@@ -360,12 +383,12 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
-    {
+    public void startElement(final String uri, final String localName, final String qName,
+        final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(DOCUMENT)) {
-            m_currentDoc = new DocumentBuilder();
+            m_currentDoc = new DocumentBuilder(m_tokenizerName);
             if (m_category != null) {
                 m_currentDoc.addDocumentCategory(m_category);
             }
@@ -841,8 +864,19 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
 
     /**
      * {@inheritDoc}
+     *
      * @since 3.1
      */
     @Override
-    public void setFilenameAsTitle(final boolean filenameAsTitle) { }
+    public void setFilenameAsTitle(final boolean filenameAsTitle) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+    }
 }

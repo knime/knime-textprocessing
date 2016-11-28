@@ -72,6 +72,7 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -80,12 +81,11 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
  * {@link org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser#parse(InputStream)} is able to parse
- * the data of the given input stream representing <i>sdml</i> (<b>S</b>imple <b>D</b>ocument <b>M</b>arkup
- * <b>L</b>anguage) formatted text documents. See the <i>sdml.dtd</i> file for more details about the format. This
- * format enables a simple representation of textual documents and can be used as a transfer format to get text
- * documents formatted in various kinds of xml formats into knime without implementing an extra parser node for each
- * format. The only thing what have to be done is to transform documents in other xml formats via xslt transformation
- * into sdml.
+ * the data of the given input stream representing <i>sdml</i> (<b>S</b>imple <b>D</b>ocument <b>M</b>arkup <b>L</b>
+ * anguage) formatted text documents. See the <i>sdml.dtd</i> file for more details about the format. This format
+ * enables a simple representation of textual documents and can be used as a transfer format to get text documents
+ * formatted in various kinds of xml formats into knime without implementing an extra parser node for each format. The
+ * only thing what have to be done is to transform documents in other xml formats via xslt transformation into sdml.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -190,12 +190,29 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
 
     private boolean m_storeInList = false;
 
+    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+
     /**
      * Creates a new instance of <code>SdmlDocumentParser</code>. The documents source, category and file path will be
      * set to <code>null</code> by default.
+     *
+     * @deprecated Use {@link #SdmlDocumentParser(String)} instead to define the tokenizer used for word tokenization.
      */
+    @Deprecated
     public SdmlDocumentParser() {
         this(null, null, null);
+    }
+
+    /**
+     * Creates a new instance of {@code SdmlDocumentParser}. The documents source, category and file path will be set to
+     * <code>null</code> by default.
+     *
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public SdmlDocumentParser(final String tokenizerName) {
+        this(null, null, null, tokenizerName);
     }
 
     /**
@@ -205,7 +222,10 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
+     * @deprecated Use {@link #SdmlDocumentParser(String, DocumentCategory, DocumentSource, String)} instead to define
+     *             the tokenizer used for word tokenization.
      */
+    @Deprecated
     public SdmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         m_category = category;
         m_source = source;
@@ -214,7 +234,27 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
     }
 
     /**
+     * Creates a new instance of {@code SdmlDocumentParser}. The given source, category and file path is set to the
+     * created documents.
+     *
+     * @param docPath The path to the file containing the document.
+     * @param category The category of the document to set.
+     * @param source The source of the document to set.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public SdmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final String tokenizerName) {
+        m_category = category;
+        m_source = source;
+        m_docPath = docPath;
+        m_listener = new ArrayList<DocumentParsedEventListener>();
+        m_tokenizerName = tokenizerName;
+    }
+
+    /**
      * {@inheritDoc}
+     *
      * @deprecated
      */
     @Deprecated
@@ -264,12 +304,12 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
      * {@inheritDoc}
      */
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
-    {
+    public void startElement(final String uri, final String localName, final String qName,
+        final Attributes attributes) {
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(DOCUMENT)) {
-            m_currentDoc = new DocumentBuilder();
+            m_currentDoc = new DocumentBuilder(m_tokenizerName);
             if (m_category != null) {
                 m_currentDoc.addDocumentCategory(m_category);
             }
@@ -465,8 +505,19 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
 
     /**
      * {@inheritDoc}
+     *
      * @since 3.1
      */
     @Override
-    public void setFilenameAsTitle(final boolean filenameAsTitle) { }
+    public void setFilenameAsTitle(final boolean filenameAsTitle) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+    }
 }

@@ -136,4 +136,20 @@ public interface DocumentGrabber {
      * from the list of listeners.
      */
     public void removeAllDocumentParsedListener();
+
+    /**
+     * Sets the name of the tokenizer for the document grabber.
+     *
+     * @param tokenizerName The name of the word tokenizer, must not be <code>null</code>
+     * @since 3.3
+     */
+    public void setTokenizerName(final String tokenizerName);
+
+    /**
+     * Returns the name of the tokenizer used for word tokenization.
+     *
+     * @return the name of the word tokenizer, never <code>null</code>
+     * @since 3.3
+     */
+    public String getTokenizerName();
 }

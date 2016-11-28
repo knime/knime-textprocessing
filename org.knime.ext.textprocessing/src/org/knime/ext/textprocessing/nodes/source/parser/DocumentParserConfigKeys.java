@@ -96,4 +96,11 @@ public final class DocumentParserConfigKeys {
     /** The configuration key of the filepath as title setting.
      * @since 3.1*/
     public static final String CFGKEY_FILENAME_TITLE = "Filepath as title";
+
+    /**
+     * The configuration key of the tokenizer.
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "WordTokenizer";
+
 }

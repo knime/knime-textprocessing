@@ -76,7 +76,6 @@ import edu.stanford.nlp.ling.CoreLabel;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @param <T>
  * @since 3.3
  */
 public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier<CoreLabel>> {
@@ -106,6 +105,7 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             ModelContent config = new ModelContent(XML_CONFIG_NAME);
             config.addString("tagValue", portObject.getTagValue());
             config.addString("tagType", portObject.getTagType());
+            config.addString("tokenizerName", portObject.getTokenizerName());
             config.saveToXML(new NonClosableOutputStream.Zip(out));
             out.putNextEntry(new ZipEntry(MODEL_FILE_NAME));
             out.write(portObject.getByteArray());
@@ -129,9 +129,16 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             Tag usedTag;
             String usedTagValue;
             String usedTagType;
+            String nameOfUsedTokenizer;
             try {
                 usedTagValue = config.getString("tagValue");
                 usedTagType = config.getString("tagType");
+                try {
+                    nameOfUsedTokenizer = config.getString("tokenizerName");
+                } catch (InvalidSettingsException e) {
+                    // use old standard tokenizer for backwards compatibility
+                    nameOfUsedTokenizer = "OpenNLP English WordTokenizer";
+                }
                 usedTag = new Tag(usedTagValue, usedTagType);
             } catch (InvalidSettingsException e) {
                 throw new IOException("Failed to deserialize port object", e);
@@ -145,14 +152,13 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             byte[] dictByteArray = IOUtils.toByteArray(in);
             String dict = new String(dictByteArray);
             BufferedReader stringReader = new BufferedReader(new StringReader(dict));
-            String line= null;
+            String line = null;
             Set<String> dictSet = new LinkedHashSet<String>();
-            while((line=stringReader.readLine()) != null )
-            {
+            while ((line = stringReader.readLine()) != null) {
                 dictSet.add(line);
             }
             try {
-                return new StanfordNERModelPortObject(outputModelByteArray, usedTag, dictSet);
+                return new StanfordNERModelPortObject(outputModelByteArray, usedTag, dictSet, nameOfUsedTokenizer);
             } catch (Exception e) {
                 throw new IOException("Could not create NLPModelPortObject");
             }
@@ -161,20 +167,26 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     }
 
     /**
-     * @param outputBuffer
-     * @param tag
-     * @param dict
+     *
+     * Creates an instance of {@code StanfordNERModelPortObject}.
+     * @param outputBuffer The byte array containing the NER model.
+     * @param tag The used tag.
+     * @param dict The used dictionary.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws Exception
+     * @since 3.3
      */
-    public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict) throws Exception {
-        super(outputBuffer, tag, dict);
+    public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict,
+        final String tokenizerName) throws Exception {
+        super(outputBuffer, tag, dict, tokenizerName);
     }
 
     /**
      * {@inheritDoc}
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws ClassCastException
+     *
+     * @throws IOException If the model file cannot be created or if there are problems accessing the input stream.
+     * @throws ClassNotFoundException If there are problems interpreting the serialized data.
+     * @throws ClassCastException If there are problems interpreting the serialized data.
      */
     @Override
     public CRFClassifier<CoreLabel> getNERModel() throws IOException, ClassCastException, ClassNotFoundException {

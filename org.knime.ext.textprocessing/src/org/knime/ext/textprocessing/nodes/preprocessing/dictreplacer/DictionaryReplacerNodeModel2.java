@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
@@ -63,6 +64,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  *
@@ -70,7 +72,6 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @since 3.1
  */
 public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
-
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DictionaryReplacerNodeModel2.class);
 
@@ -85,6 +86,7 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
 
     private SettingsModelString m_fileModel = DictionaryReplacerNodeDialog2.getDictionaryFileModel();
 
+    private SettingsModelString m_tokenizerModel = DictionaryReplacerNodeDialog2.getTokenizerModel();
 
     /**
      * {@inheritDoc}
@@ -95,8 +97,7 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
         File f = new File(m_fileModel.getStringValue());
         if (f.exists() && f.canRead() && f.isFile()) {
             try {
-                BufferedReader reader = new BufferedReader(
-                        new FileReader(f));
+                BufferedReader reader = new BufferedReader(new FileReader(f));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] keyVal = line.trim().split(DEFAULT_SEPARATOR);
@@ -111,18 +112,31 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
                 LOGGER.warn("Cant read from file");
             }
         }
-        return new DictionaryReplacer(dictionary);
+        return new DictionaryReplacer(dictionary, m_tokenizerModel.getStringValue());
     }
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizerModel.getStringValue())) {
+            setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_fileModel.loadSettingsFrom(settings);
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -132,15 +146,19 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         super.saveSettingsTo(settings);
         m_fileModel.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_fileModel.validateSettings(settings);
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.validateSettings(settings);
+        }
     }
 }

@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.nodes.tagging.abner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
@@ -55,61 +56,63 @@ import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * Creates the dialog of the AbnerTaggerNode with a checkbox component,
- * to specify whether recognized named entity terms should be set unmodifiable
- * or not.
+ * Creates the dialog of the AbnerTaggerNode with a checkbox component, to specify whether recognized named entity terms
+ * should be set unmodifiable or not.
  *
  * @author Kilian Thiel, University of Konstanz
  */
 public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * Creates and returns a
-     * {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean}
-     * containing the user settings whether terms representing named entities
-     * have to be set unmodifiable or not.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the user
+     * settings whether terms representing named entities have to be set unmodifiable or not.
      *
-     * @return A <code>SettingsModelBoolean</code> containing the terms
-     * unmodifiable flag.
+     * @return A <code>SettingsModelBoolean</code> containing the terms unmodifiable flag.
      */
     public static SettingsModelBoolean createSetUnmodifiableModel() {
-        return new SettingsModelBoolean(
-                AbnerTaggerConfigKeys.CFGKEY_UNMODIFIABLE,
-                AbnerTaggerNodeModel.DEFAULT_UNMODIFIABLE);
+        return new SettingsModelBoolean(AbnerTaggerConfigKeys.CFGKEY_UNMODIFIABLE,
+            AbnerTaggerNodeModel.DEFAULT_UNMODIFIABLE);
     }
 
     /**
-     * Creates and returns a
-     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
-     * containing the name of the ABNER tagging model to use.
-     *
-     * @return A <code>SettingsModelString</code> containing the the name of
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the name of
      * the ABNER tagging model to use.
+     *
+     * @return A <code>SettingsModelString</code> containing the the name of the ABNER tagging model to use.
      */
     public static SettingsModelString createAbnerModelModel() {
-        return new SettingsModelString(
-                AbnerTaggerConfigKeys.CFGKEY_MODEL,
-                AbnerTaggerNodeModel.DEF_ABNERMODEL);
+        return new SettingsModelString(AbnerTaggerConfigKeys.CFGKEY_MODEL, AbnerTaggerNodeModel.DEF_ABNERMODEL);
     }
 
     /**
-     * Creates a new instance of <code>AbnerTaggerNodeDialog</code> providing
-     * a checkbox enabling the user to specify whether terms representing named
-     * entities have to be set unmodifiable or not.
+     * @return Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} for the word
+     *         tokenizer.
+     * @since 3.3
+     */
+    public static final SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(AbnerTaggerConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
+     * Creates a new instance of <code>AbnerTaggerNodeDialog</code> providing a checkbox enabling the user to specify
+     * whether terms representing named entities have to be set unmodifiable or not.
      */
     public AbnerTaggerNodeDialog() {
         super();
 
-        addDialogComponent(new DialogComponentBoolean(
-                        createSetUnmodifiableModel(),
-                        "Set named entities unmodifiable"));
+        addDialogComponent(new DialogComponentBoolean(createSetUnmodifiableModel(), "Set named entities unmodifiable"));
 
         List<String> modelNames = new ArrayList<String>();
         modelNames.add(AbnerDocumentTagger.MODEL_BIOCREATIVE);
         modelNames.add(AbnerDocumentTagger.MODEL_NLPBA);
-        addDialogComponent(new DialogComponentStringSelection(
-                createAbnerModelModel(), "ABNER model", modelNames));
+        addDialogComponent(new DialogComponentStringSelection(createAbnerModelModel(), "ABNER model", modelNames));
+
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 }

@@ -117,20 +117,17 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
 
     private static final String FILE_EXTENSION = "gz";
 
-
-
     private int m_stepSize = 100;
 
     private long m_delayMillis = 1000;
 
     private List<Integer> m_idList = new ArrayList<Integer>();
 
-
     /**
      * Creates empty instance of <code>PubMedDocumentGrabber</code>.
      */
     PubMedDocumentGrabber() {
-        super();
+    	super();
     }
 
     /**
@@ -266,7 +263,8 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     }
 
     private void parseDocumentsAndNotify(final File dir) throws Exception {
-        DocumentParser parser = new PubMedDocumentParser(getExtractMetaInfo());
+
+        DocumentParser parser = new PubMedDocumentParser(getExtractMetaInfo(), getTokenizerName());
 
         parser.addDocumentParsedListener(
                 new InternalDocumentParsedEventListener());
@@ -319,7 +317,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
     private List < Document > parseDocuments(final File dir) throws Exception {
         List<Document> docs = new ArrayList<Document>();
 
-        DocumentParser parser = new PubMedDocumentParser();
+        DocumentParser parser = new PubMedDocumentParser(getTokenizerName());
         parser.setDocumentSource(new DocumentSource(SOURCE));
         if (getDocumentCategory() != null) {
             parser.setDocumentCategory(getDocumentCategory());

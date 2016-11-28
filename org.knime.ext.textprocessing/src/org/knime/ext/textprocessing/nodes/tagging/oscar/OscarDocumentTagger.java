@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   06.10.2011 (thiel): created
  */
@@ -61,25 +61,26 @@ import uk.ac.cam.ch.wwmm.oscar.Oscar;
 import uk.ac.cam.ch.wwmm.oscar.document.NamedEntity;
 
 /**
- * 
+ *
  * @author thiel, University of Konstanz
  */
 public class OscarDocumentTagger extends AbstractDocumentTagger {
 
     private Oscar m_oscar;
-    
+
     /**
-     * Creates a new instance of <code>OscarDocumentTagger</code> with given
-     * flag specifying if recognized named entities is set unmodifiable.
-     * The Oscar lib is used for chemical named entity recognition.
-     * 
+     * Creates a new instance of <code>OscarDocumentTagger</code> with given flag specifying if recognized named
+     * entities is set unmodifiable. The Oscar lib is used for chemical named entity recognition.
+     *
      * @param setNeUnmodifiable The unmodifiable flag to set.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public OscarDocumentTagger(final boolean setNeUnmodifiable) {
-        super(setNeUnmodifiable);
+    public OscarDocumentTagger(final boolean setNeUnmodifiable, final String tokenizerName) {
+        super(setNeUnmodifiable, tokenizerName);
         m_oscar = new Oscar();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -97,16 +98,14 @@ public class OscarDocumentTagger extends AbstractDocumentTagger {
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
         String sentenceStr = sentence.getText();
         List<NamedEntity> entities = m_oscar.findNamedEntities(sentenceStr);
-        
-        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(
-                entities.size());
+
+        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(entities.size());
         for (NamedEntity ent : entities) {
-            taggedEntities.add(new TaggedEntity(ent.getSurface(), 
-                    ent.getType().getName()));
+            taggedEntities.add(new TaggedEntity(ent.getSurface(), ent.getType().getName()));
         }
         return taggedEntities;
     }
-    
+
     /**
      * {@inheritDoc}
      */

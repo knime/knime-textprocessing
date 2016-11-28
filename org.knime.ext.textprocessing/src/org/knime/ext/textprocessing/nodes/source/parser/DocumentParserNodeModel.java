@@ -155,13 +155,15 @@ public class DocumentParserNodeModel extends NodeModel {
     private SettingsModelBoolean m_fileNameAsTitleModel =
         FilepathTitleDocumentParserNodeDialog.getFileNameAsTitleModel();
 
+    private SettingsModelString m_tokenizerModel = DocumentParserNodeDialog.getTokenizerModel();
+
     private boolean m_withCharset = false;
 
     private final DocumentParserFactory m_parserFactory;
 
     private final List<String> m_validExtensions;
 
-    private final DocumentDataTableBuilder m_dtBuilder;
+    private DocumentDataTableBuilder m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
 
     /**
      * Creates a new instance of <code>DocumentParserNodeModel</code> with the specified parser factory to create the
@@ -180,7 +182,6 @@ public class DocumentParserNodeModel extends NodeModel {
         super(0, 1);
         m_parserFactory = parserFac;
         m_validExtensions = Arrays.asList(validFileExtensions);
-        m_dtBuilder = new DocumentDataTableBuilder();
         m_withCharset = withCharset;
     }
 
@@ -195,7 +196,7 @@ public class DocumentParserNodeModel extends NodeModel {
         if (!f.isDirectory() || !f.exists() || !f.canRead()) {
             throw new InvalidSettingsException("Selected directory: " + dir + " is not valid!");
         }
-
+        m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
@@ -207,7 +208,7 @@ public class DocumentParserNodeModel extends NodeModel {
      * @throws Exception If parser could not be created.
      */
     private final DocumentParser createParser() throws InstantiationException {
-        final DocumentParser parser = m_parserFactory.createParser();
+        final DocumentParser parser = m_parserFactory.createParser(m_tokenizerModel.getStringValue());
 
         final String category = m_categoryModel.getStringValue();
         if (category != null && category.length() > 0) {
@@ -406,10 +407,12 @@ public class DocumentParserNodeModel extends NodeModel {
             m_charsetModel.loadSettingsFrom(settings);
         }
 
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.loadSettingsFrom(settings);
+        }
+        if (settings.containsKey(m_fileNameAsTitleModel.getConfigName())) {
             m_fileNameAsTitleModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // catch exception for backwards compatibility
         }
     }
 
@@ -430,6 +433,7 @@ public class DocumentParserNodeModel extends NodeModel {
         }
 
         m_fileNameAsTitleModel.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
@@ -447,11 +451,12 @@ public class DocumentParserNodeModel extends NodeModel {
         if (m_withCharset) {
             m_charsetModel.validateSettings(settings);
         }
-
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_fileNameAsTitleModel.getConfigName())) {
             m_fileNameAsTitleModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // catch exception for backwards compatibility
         }
     }
 }

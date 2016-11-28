@@ -35,6 +35,10 @@
         <option name="Charset">
             Specifies the charset of the documents.
         </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
     </fullDescription>
         
     <ports>

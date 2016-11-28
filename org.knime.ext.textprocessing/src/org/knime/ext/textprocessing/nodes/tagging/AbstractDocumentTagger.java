@@ -60,25 +60,21 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * The abstract class <code>AbstractDocumentTagger</code> implements the
- * interface {@link org.knime.ext.textprocessing.nodes.tagging.DocumentTagger}
- * and additionally provides methods to tag documents and change their term
- * granularity conveniently. External libraries as well as internal
- * implementations can be used easily. The whole process of applying the new
- * term granularity is done by this class internally. Classes extending
- * <code>AbstractDocumentTagger</code> on the one hand have to provide the
- * procedure of tagging terms (or recognizing named entities etc.) by the
- * implementation of
- * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger#tagEntities(Sentence)}
- * and on the other hand they need to provide the proper tag type accordant to
- * their tagging, i.e. POS tagger need to provide POS tag and so on. Proper tags
- * are provided by the implementation of
- * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger#getTags(String)}
- * which is called by <code>AbstractDocumentTagger</code> to add the tags to a
- * recognized term. Underlying classes have to build the right tag out of the
- * given string.
+ * The abstract class <code>AbstractDocumentTagger</code> implements the interface
+ * {@link org.knime.ext.textprocessing.nodes.tagging.DocumentTagger} and additionally provides methods to tag documents
+ * and change their term granularity conveniently. External libraries as well as internal implementations can be used
+ * easily. The whole process of applying the new term granularity is done by this class internally. Classes extending
+ * <code>AbstractDocumentTagger</code> on the one hand have to provide the procedure of tagging terms (or recognizing
+ * named entities etc.) by the implementation of
+ * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger#tagEntities(Sentence)} and on the other hand
+ * they need to provide the proper tag type accordant to their tagging, i.e. POS tagger need to provide POS tag and so
+ * on. Proper tags are provided by the implementation of
+ * {@link org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger#getTags(String)} which is called by
+ * <code>AbstractDocumentTagger</code> to add the tags to a recognized term. Underlying classes have to build the right
+ * tag out of the given string.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -96,46 +92,60 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
     /**
      * The exact match flag.
+     *
      * @since 2.8
      */
     protected boolean m_exactMatch = true;
 
-    protected Tokenizer m_wordTokenizer =
-        DefaultTokenization.getWordTokenizer();
+    /**
+     * Initialize old standard word tokenizer name for backwards compatibility.
+     *
+     * @since 3.3
+     */
+    protected String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
-     * Constructor of <code>AbstractDocumentTagger</code> with the given flag
-     * which specifies if recognized named entities have to be set unmodifiable
-     * or not.
+     * Initialize old standard word tokenizer for backwards compatibility.
+     */
+    protected Tokenizer m_wordTokenizer =
+        DefaultTokenization.getWordTokenizer(TextprocessingPreferenceInitializer.tokenizerName());
+
+
+    /**
+     * Constructor of {@code AbstractDocumentTagger} with the given flag which specifies if recognized named entities
+     * have to be set unmodifiable or not and the tokenizer used for word tokenization.
      *
      * @param setUnmodifiable It true recognized tags are set unmodifiable.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public AbstractDocumentTagger(final boolean setUnmodifiable) {
+    public AbstractDocumentTagger(final boolean setUnmodifiable, final String tokenizerName) {
         m_setNeUnmodifiable = setUnmodifiable;
+        m_tokenizerName = tokenizerName;
+        m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
     }
 
     /**
-     * Constructor of <code>AbstractDocumentTagger</code> with the given flags
-     * specifying if recognized named entities have to be set unmodifiable or
-     * not and if search for named entities is case sensitive or not.
+     * Constructor of <code>AbstractDocumentTagger</code> with the given flags specifying if recognized named entities
+     * have to be set unmodifiable or not and if search for named entities is case sensitive or not.
      *
-     * @param setUnmodifiable If <code>true</code> recognized tags are set
-     *            unmodifiable.
-     * @param caseSensitive If <code>true</code> search for named entities is
-     *            done case sensitive, otherwise not.
+     * @param setUnmodifiable If <code>true</code> recognized tags are set unmodifiable.
+     * @param caseSensitive If <code>true</code> search for named entities is done case sensitive, otherwise not.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public AbstractDocumentTagger(final boolean setUnmodifiable,
-            final boolean caseSensitive) {
+    public AbstractDocumentTagger(final boolean setUnmodifiable, final boolean caseSensitive,
+        final String tokenizerName) {
         m_setNeUnmodifiable = setUnmodifiable;
         m_caseSensitive = caseSensitive;
+        m_tokenizerName = tokenizerName;
+        m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
     }
 
     /**
-     * Creates proper tags out if the given string accordant to the underlying
-     * tagger implementation and returns them. A part of speech tagger (POS
-     * tagger) for instance creates POS tags, a biomedical named entity
-     * recognizer provides biomedical named entity tags, such as GENE, PROTEIN
-     * etc.
+     * Creates proper tags out if the given string accordant to the underlying tagger implementation and returns them. A
+     * part of speech tagger (POS tagger) for instance creates POS tags, a biomedical named entity recognizer provides
+     * biomedical named entity tags, such as GENE, PROTEIN etc.
      *
      * @param tag The string to create a tag out of.
      * @return The tags build out of the given string.
@@ -143,9 +153,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     protected abstract List<Tag> getTags(final String tag);
 
     /**
-     * Analysis the given sentences and recognized certain terms, such as parts
-     * of speech or biomedical named entities. These terms and their
-     * corresponding tags are returned as a list.
+     * Analysis the given sentences and recognized certain terms, such as parts of speech or biomedical named entities.
+     * These terms and their corresponding tags are returned as a list.
      *
      * @param sentence The sentence to analyze.
      * @return A list of recognized entities and the corresponding tags.
@@ -153,9 +162,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     protected abstract List<TaggedEntity> tagEntities(final Sentence sentence);
 
     /**
-     * Preprocesses a document before tagging. This is where a tagger would
-     * build a private model to use for tagging entities in the method
-     * tagEntities(Sentence).
+     * Preprocesses a document before tagging. This is where a tagger would build a private model to use for tagging
+     * entities in the method tagEntities(Sentence).
+     *
      * @param doc The document to tag.
      */
     protected abstract void preprocess(final Document doc);
@@ -165,7 +174,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      */
     @Override
     public synchronized Document tag(final Document doc) {
-        DocumentBuilder db = new DocumentBuilder(doc);
+        DocumentBuilder db = new DocumentBuilder(doc, m_tokenizerName);
         for (Section s : doc.getSections()) {
             for (Paragraph p : s.getParagraphs()) {
                 List<Sentence> newSentenceList = new ArrayList<Sentence>();
@@ -212,8 +221,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         return new Sentence(termList);
     }
 
-    private List<Term> buildTermList(final List<Term> oldTermList,
-            final List<String> neWords, final String entityTag) {
+    private List<Term> buildTermList(final List<Term> oldTermList, final List<String> neWords, final String entityTag) {
         List<Term> newTermList = null;
         List<Term> oldList = oldTermList;
 
@@ -237,14 +245,10 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         newTermList = new ArrayList<Term>();
 
         // get the first start and stop indices
-        int startTermIndex =
-                startStopRanges.get(startStopIndex).getStartTermIndex();
-        int stopTermIndex =
-                startStopRanges.get(startStopIndex).getStopTermIndex();
-        int startWordIndex =
-                startStopRanges.get(startStopIndex).getStartWordIndex();
-        int stopWordIndex =
-                startStopRanges.get(startStopIndex).getStopWordIndex();
+        int startTermIndex = startStopRanges.get(startStopIndex).getStartTermIndex();
+        int stopTermIndex = startStopRanges.get(startStopIndex).getStopTermIndex();
+        int startWordIndex = startStopRanges.get(startStopIndex).getStartWordIndex();
+        int stopWordIndex = startStopRanges.get(startStopIndex).getStopWordIndex();
 
         boolean endTerm = false;
         // list to save term representing named entity at.
@@ -284,8 +288,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         }
 
                         // CREATE NEW TERM !!!
-                        Term newTerm = new Term(term.getWords(), tags,
-                                        m_setNeUnmodifiable);
+                        Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
                         newTermList.add(newTerm);
 
                         // the old term consists of more than one word so split
@@ -314,8 +317,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                     }
 
                                     // CREATE NEW TERM !!!
-                                    Term newTerm = new Term(newWords, tags,
-                                                    m_setNeUnmodifiable);
+                                    Term newTerm = new Term(newWords, tags, m_setNeUnmodifiable);
                                     newTermList.add(newTerm);
                                     endTerm = true;
                                 }
@@ -338,18 +340,10 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     // named entity range
                     startStopIndex++;
                     if (startStopIndex < startStopRanges.size()) {
-                        startTermIndex =
-                                startStopRanges.get(startStopIndex)
-                                        .getStartTermIndex();
-                        stopTermIndex =
-                                startStopRanges.get(startStopIndex)
-                                        .getStopTermIndex();
-                        startWordIndex =
-                                startStopRanges.get(startStopIndex)
-                                        .getStartWordIndex();
-                        stopWordIndex =
-                                startStopRanges.get(startStopIndex)
-                                        .getStopWordIndex();
+                        startTermIndex = startStopRanges.get(startStopIndex).getStartTermIndex();
+                        stopTermIndex = startStopRanges.get(startStopIndex).getStopTermIndex();
+                        startWordIndex = startStopRanges.get(startStopIndex).getStartWordIndex();
+                        stopWordIndex = startStopRanges.get(startStopIndex).getStopWordIndex();
                         namedEntity.clear();
                     }
 
@@ -397,9 +391,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                                     }
 
                                     // CREATE NEW TERM !!!
-                                    Term newTerm =
-                                            new Term(namedEntity, tags,
-                                                    m_setNeUnmodifiable);
+                                    Term newTerm = new Term(namedEntity, tags, m_setNeUnmodifiable);
                                     newTermList.add(newTerm);
                                 }
 
@@ -424,33 +416,24 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         endTerm = false;
                         startStopIndex++;
                         if (startStopIndex < startStopRanges.size()) {
-                            startTermIndex =
-                                    startStopRanges.get(startStopIndex)
-                                            .getStartTermIndex();
-                            stopTermIndex =
-                                    startStopRanges.get(startStopIndex)
-                                            .getStopTermIndex();
-                            startWordIndex =
-                                    startStopRanges.get(startStopIndex)
-                                            .getStartWordIndex();
-                            stopWordIndex =
-                                    startStopRanges.get(startStopIndex)
-                                            .getStopWordIndex();
+                            startTermIndex = startStopRanges.get(startStopIndex).getStartTermIndex();
+                            stopTermIndex = startStopRanges.get(startStopIndex).getStopTermIndex();
+                            startWordIndex = startStopRanges.get(startStopIndex).getStartWordIndex();
+                            stopWordIndex = startStopRanges.get(startStopIndex).getStopWordIndex();
                             namedEntity.clear();
                         }
                     }
                 }
             } else {
-            // if we are before or after the interesting part just add the
-            // terms without rearrangement
+                // if we are before or after the interesting part just add the
+                // terms without rearrangement
                 newTermList.add(term);
             }
         }
         return newTermList;
     }
 
-    private List<IndexRange> findNe(final List<Term> sentence,
-            final List<String> ne) {
+    private List<IndexRange> findNe(final List<Term> sentence, final List<String> ne) {
         List<IndexRange> ranges = new ArrayList<IndexRange>();
         int found = 0;
         boolean foundFlag = false;
@@ -481,9 +464,9 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 }
 
                 // if ne element at "found" equals the current word
-                if (found < ne.size() && ((m_exactMatch && wordStr.equals(neStr))
-                        || (!m_exactMatch && wordStr.contains(neStr)))) {
-                //if (found < ne.size() && wordStr.equals(neStr)) {
+                if (found < ne.size()
+                    && ((m_exactMatch && wordStr.equals(neStr)) || (!m_exactMatch && wordStr.contains(neStr)))) {
+                    //if (found < ne.size() && wordStr.equals(neStr)) {
                     // if "found" 0 means we are at the beginning of the named
                     // entity
                     if (found == 0) {
@@ -499,8 +482,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         stopTermIndex = t;
                         stopWordIndex = w;
 
-                        ranges.add(new IndexRange(startTermIndex,
-                                stopTermIndex, startWordIndex, stopWordIndex));
+                        ranges.add(new IndexRange(startTermIndex, stopTermIndex, startWordIndex, stopWordIndex));
 
                         startTermIndex = -1;
                         stopTermIndex = -1;

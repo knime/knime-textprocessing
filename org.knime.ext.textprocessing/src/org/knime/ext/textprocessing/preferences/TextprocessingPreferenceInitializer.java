@@ -71,7 +71,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
 
     /** The default setting whether tokenizer pool is initialized on startup. */
     public static final boolean DEFAULT_TOKENIZER_INIT_ONSTARTUP = true;
-
+    
     /*** The maximum size of the tokenizer pool. */
     public static final int MAX_TOKENIZER_POOLSIZE = 1000;
 
@@ -89,7 +89,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
 
     /** Preference key setting whether tokenizer pool is initialized on startup. */
     public static final String PREF_TOKENIZER_INIT_ONSTARTUP = "knime.textprocessing.tokenizer.initonstartup";
-
+    
     /**
      * Preference key for the tokenizer.
      */
@@ -106,7 +106,6 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
         store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
         store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
         store.setDefault(PREF_TOKENIZER_POOLSIZE, DEFAULT_TOKENIZER_POOLSIZE);
-        store.setDefault(PREF_TOKENIZER_INIT_ONSTARTUP, DEFAULT_TOKENIZER_INIT_ONSTARTUP);
         store.setDefault(PREF_TOKENIZER, DEFAULT_TOKENIZER);
     }
 
@@ -143,7 +142,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      *
      * @return the size of the tokenizer pool.
      */
-    public static final int tokenizerPoolSize() {
+    public static int tokenizerPoolSize() {
         final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
         if (!pStore.contains(PREF_TOKENIZER_POOLSIZE)) {
             return DEFAULT_TOKENIZER_POOLSIZE;
@@ -152,24 +151,11 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
     }
 
     /**
-     * Returns the init on startup flag of the tokenizer pool.
-     *
-     * @return the setting whether the tokenizer pool is initialized on startup or lazy.
-     */
-    public static final boolean initTokenizerPoolOnStartup() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_TOKENIZER_INIT_ONSTARTUP)) {
-            return DEFAULT_TOKENIZER_INIT_ONSTARTUP;
-        }
-        return pStore.getBoolean(PREF_TOKENIZER_INIT_ONSTARTUP);
-    }
-
-    /**
      * Returns the select tokenizer name. If not tokenizer is selected, the default tokenizer will be returned.
      *
      * @return a tokenizer name
      */
-    public static final String tokenizerName() {
+    public static String tokenizerName() {
         final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
         if(!pStore.contains(PREF_TOKENIZER)) {
             return DEFAULT_TOKENIZER;

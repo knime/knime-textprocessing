@@ -67,7 +67,7 @@ public class TokenizerPool {
 
     private final int m_poolSize;
 
-    private final String m_tokenizer;
+    private final String m_tokenizerName;
 
     private int m_wordIndex = 0;
 
@@ -75,22 +75,22 @@ public class TokenizerPool {
 
     /**
      * Constructor for class OpenNLPTokenizerPool.
-     *
+     * @param tokenizerName The name of the word tokenizer.
      * @param poolSize The number of word and sentence tokenizers of the pool.
      */
-    TokenizerPool(final int poolSize, final String tokenizer) {
+    TokenizerPool(final int poolSize, final String tokenizerName) {
         if (poolSize < 1) {
             throw new IllegalArgumentException("Tokenizer pool size must be larger than 0!");
         }
 
         m_poolSize = poolSize;
-        m_tokenizer = tokenizer;
+        m_tokenizerName = tokenizerName;
         m_wordTokenizer = new Tokenizer[m_poolSize];
         m_sentenceTokenizer = new OpenNlpSentenceTokenizer[m_poolSize];
 
         LOGGER.debug("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
         for (int i = 0; i < m_poolSize; i++) {
-            m_wordTokenizer[i] = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizer).getTokenizer();
+            m_wordTokenizer[i] = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizerName).getTokenizer();
             m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
         }
     }
@@ -116,8 +116,11 @@ public class TokenizerPool {
         return m_poolSize;
     }
 
+    /**
+     * @return The name of the tokenizer used for word tokenization.
+     */
     String getTokenizerName() {
-        return m_tokenizer;
+        return m_tokenizerName;
     }
 
 }

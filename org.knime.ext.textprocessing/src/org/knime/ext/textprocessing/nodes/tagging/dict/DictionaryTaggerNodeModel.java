@@ -146,7 +146,7 @@ public class DictionaryTaggerNodeModel extends TaggerNodeModel {
         final Tag tag = TagFactory.getInstance().getTagSetByType(tagTypeStr).buildTag(tagStr);
 
         return new DictionaryDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), namedEntities, tag,
-            m_caseSensitiveModel.getBooleanValue());
+            m_caseSensitiveModel.getBooleanValue(), getTokenizerName());
     }
 
     /**

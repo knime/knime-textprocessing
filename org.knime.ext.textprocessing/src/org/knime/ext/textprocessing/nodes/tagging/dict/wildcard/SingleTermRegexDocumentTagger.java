@@ -56,7 +56,6 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 
-
 /**
  * Tags single terms as named entities if at least one of the specified regular expressions matches. If more than one
  * expression is matching the last matching expression overrides previous, conflicting matches.
@@ -67,21 +66,21 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 public class SingleTermRegexDocumentTagger extends RegexDocumentTagger {
 
     /**
-     * Creates a new instance of <code>SingleTermRegexDocumentTagger</code> with
-     * given flag to set found named entities unmodifiable, to ignore the case
-     * of the named entities to detect, the tag to assign to the found named
-     * entities and the set of regular expressions to match.
+     * Creates a new instance of <code>SingleTermRegexDocumentTagger</code> with given flag to set found named entities
+     * unmodifiable, to ignore the case of the named entities to detect, the tag to assign to the found named entities
+     * and the set of regular expressions to match.
      *
-     * @param setUnmodifiable If <code>true</code> found named entities are set
-     * unmodifiable, otherwise not.
+     * @param setUnmodifiable If <code>true</code> found named entities are set unmodifiable, otherwise not.
      * @param regexpattern The set of regex pattern to match.
      * @param tag The tag to assign to found named entities.
-     * @param caseSensitive If <code>false</code> the case of named entities
-     * and words of the sentences are ignored, otherwise not.
+     * @param caseSensitive If <code>false</code> the case of named entities and words of the sentences are ignored,
+     *            otherwise not.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
     public SingleTermRegexDocumentTagger(final boolean setUnmodifiable, final Set<Pattern> regexpattern, final Tag tag,
-            final boolean caseSensitive) {
-        super(setUnmodifiable, regexpattern, tag, caseSensitive);
+        final boolean caseSensitive, final String tokenizerName) {
+        super(setUnmodifiable, regexpattern, tag, caseSensitive, tokenizerName);
     }
 
     /*
@@ -92,26 +91,26 @@ public class SingleTermRegexDocumentTagger extends RegexDocumentTagger {
      */
     @Override
     protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-      final List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
+        final List<TaggedEntity> foundEntities = new ArrayList<TaggedEntity>();
 
-      final Set<Pattern> pattern = getRegexpattern();
-      final List<Term> terms = sentence.getTerms();
+        final Set<Pattern> pattern = getRegexpattern();
+        final List<Term> terms = sentence.getTerms();
 
-      for (Pattern p : pattern) {
-          for (Term t : terms) {
-              String termStr = t.getText();
-              if (!m_caseSensitive) {
-                  termStr = termStr.toLowerCase();
-              }
+        for (Pattern p : pattern) {
+            for (Term t : terms) {
+                String termStr = t.getText();
+                if (!m_caseSensitive) {
+                    termStr = termStr.toLowerCase();
+                }
 
-              if (p.matcher(termStr).matches()) {
-                  TaggedEntity taggedEntity = new TaggedEntity(t.getText(), getTag().getTagValue());
-                  foundEntities.add(taggedEntity);
-              }
-          }
-      }
+                if (p.matcher(termStr).matches()) {
+                    TaggedEntity taggedEntity = new TaggedEntity(t.getText(), getTag().getTagValue());
+                    foundEntities.add(taggedEntity);
+                }
+            }
+        }
 
-      return foundEntities;
+        return foundEntities;
     }
 
 }

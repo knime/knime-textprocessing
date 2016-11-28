@@ -59,14 +59,14 @@ import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * @author Kilian Thiel, University of Konstanz
  *
  */
 public class DictionaryReplacer implements TermPreprocessing, StringPreprocessing {
-
-    private HashMap<String, String> m_replaceDict;
+    private Map<String, String> m_replaceDict;
 
     private Tokenizer m_wordTokenizer;
 
@@ -76,14 +76,14 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      *
      * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
      *            corresponding values).
-     * @deprecated use {@link DictionaryReplacer#DictionaryReplacer(HashMap)} instead.
+     * @deprecated use {@link DictionaryReplacer#DictionaryReplacer(Map, String) DictionaryReplacer(Map, String)}
+     *             instead to define the word tokenizer.
      * @since 3.1
      */
     @Deprecated
     public DictionaryReplacer(final Hashtable<String, String> replaceDict) {
-        super();
-        m_replaceDict = new HashMap<String, String>(replaceDict);
-        m_wordTokenizer = DefaultTokenization.getWordTokenizer();
+        // uses the tokenizer from preference page
+        this(replaceDict, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**
@@ -92,12 +92,12 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      *
      * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
      *            corresponding values).
-     * @since 3.1
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public DictionaryReplacer(final Map<String, String> replaceDict) {
-        super();
-        m_replaceDict = new HashMap<String, String>(replaceDict);
-        m_wordTokenizer = DefaultTokenization.getWordTokenizer();
+    public DictionaryReplacer(final Map<String, String> replaceDict, final String tokenizerName) {
+        m_replaceDict = new HashMap<>(replaceDict);
+        m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
     }
 
     /**

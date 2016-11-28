@@ -81,7 +81,7 @@ public class PosTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        return new PosDocumentTagger(false);
+        return new PosDocumentTagger(false, getTokenizerName());
     }
 
     /**

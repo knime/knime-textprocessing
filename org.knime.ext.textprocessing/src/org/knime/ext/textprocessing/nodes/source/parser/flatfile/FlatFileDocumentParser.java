@@ -85,9 +85,12 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
     /**
      * Creates a new instance of <code>FlatFileDocumentParser</code>. The document source, category and file path will
      * be set to <code>null</code> by default.
+     *
+     * @param tokenizerName The tokenizer used for tokenization.
+     * @since 3.3
      */
-    public FlatFileDocumentParser() {
-        super(null, null, null);
+    public FlatFileDocumentParser(final String tokenizerName) {
+        super(null, null, null, tokenizerName);
     }
 
     /**
@@ -97,9 +100,12 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
+     * @param tokenizerName The tokenizer used for tokenization.
+     * @since 3.3
      */
-    public FlatFileDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
-        super(docPath, category, source);
+    public FlatFileDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final String tokenizerName) {
+        super(docPath, category, source, tokenizerName);
     }
 
     /**
@@ -115,6 +121,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated
      */
     @Deprecated
@@ -135,7 +142,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
     }
 
     private Document parseInternal(final InputStream is) throws Exception {
-        m_currentDoc = new DocumentBuilder();
+        m_currentDoc = new DocumentBuilder(m_tokenizerName);
         m_currentDoc.setDocumentFile(new File(m_docPath));
         m_currentDoc.setDocumentType(m_type);
         m_currentDoc.addDocumentCategory(m_category);

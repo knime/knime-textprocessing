@@ -57,12 +57,12 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserFactory;
  * @since 2.9
  */
 public class DmlDocumentParserFactory implements DocumentParserFactory {
-
     /**
      * {@inheritDoc}
+     * @since 3.3
      */
     @Override
-    public DocumentParser createParser() throws InstantiationException {
-        return new DmlDocumentParser();
+    public DocumentParser createParser(final String tokenizerName) throws InstantiationException {
+        return new DmlDocumentParser(tokenizerName);
     }
 }

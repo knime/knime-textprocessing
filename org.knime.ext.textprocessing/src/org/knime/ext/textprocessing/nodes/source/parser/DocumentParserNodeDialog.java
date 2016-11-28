@@ -47,6 +47,8 @@
  */
 package org.knime.ext.textprocessing.nodes.source.parser;
 
+import java.util.Collection;
+
 import javax.swing.JFileChooser;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
@@ -57,6 +59,8 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Creates the dialog of the DocumentParserNode with a file chooser component, to specify the directory containing the
@@ -120,6 +124,11 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
             DocumentParserNodeModel.DEFAULT_IGNORE_HIDDENFILES);
     }
 
+    static SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(DocumentParserConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
     /**
      * Creates a new instance of <code>DocumentParserNodeDialog</code> which displays a file chooser component, to
      * specify the directory containing the files to parse, and a checkbox component to specify if the directory is
@@ -141,5 +150,9 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
 
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document Type", types));
+
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
+
     }
 }

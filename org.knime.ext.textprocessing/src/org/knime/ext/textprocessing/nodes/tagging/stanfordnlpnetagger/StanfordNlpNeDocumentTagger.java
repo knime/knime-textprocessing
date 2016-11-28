@@ -104,14 +104,17 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * @param setNeUnmodifiable
-     * @param model
-     * @throws ClassNotFoundException
-     * @throws IOException
+     * Creates a new instance of {@code StanfordNlpNeDocumentTagger}.
+     *
+     * @param setNeUnmodifiable The unmodifiable flag.
+     * @param model The model.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @throws ClassNotFoundException If the classifier could not be created from given path.
+     * @throws IOException If the classifier could not be created from given path.
      */
-    public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String model)
+    public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String model, final String tokenizerName)
         throws ClassNotFoundException, IOException {
-        super(setNeUnmodifiable);
+        super(setNeUnmodifiable, tokenizerName);
         if (!TAGGERMODELS.containsKey(model)) {
             throw new IllegalArgumentException("Model \"" + model + "\" does not exist.");
         }
@@ -120,13 +123,14 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * @param setNeUnmodifiable
-     * @param crf
-     * @param tag
+     * @param setNeUnmodifiable The unmodifiable flag.
+     * @param crf The CRFClassifer.
+     * @param tag The used tag.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
      */
     public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final CRFClassifier<CoreLabel> crf,
-        final Tag tag) {
-        super(setNeUnmodifiable);
+        final Tag tag, final String tokenizerName) {
+        super(setNeUnmodifiable, tokenizerName);
         m_tagger = crf;
         m_tag = tag;
     }

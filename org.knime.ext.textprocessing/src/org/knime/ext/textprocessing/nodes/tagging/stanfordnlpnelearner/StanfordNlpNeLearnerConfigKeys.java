@@ -95,4 +95,7 @@ class StanfordNlpNeLearnerConfigKeys {
     static final String CFGKEY_WORDSHAPE = "Word shape";
 
     static final String CFGKEY_USE_DISJUNCTIVE = "Use disjunctive";
+
+    static final String CFGKEY_TOKENIZER = "Word Tokenizer";
+
 }

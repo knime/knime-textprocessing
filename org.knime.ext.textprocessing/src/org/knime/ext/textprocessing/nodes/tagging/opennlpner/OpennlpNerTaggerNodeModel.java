@@ -110,6 +110,7 @@ public class OpennlpNerTaggerNodeModel extends StreamableFunctionTaggerNodeModel
     private SettingsModelString m_modelFileModel =
             OpenNlpNerNodeDialog.createModelFileModel();
 
+
     /**
      * Creates new instance of <code>OpennlpNerTaggerNodeModel</code>.
      */
@@ -132,12 +133,12 @@ public class OpennlpNerTaggerNodeModel extends StreamableFunctionTaggerNodeModel
             modelFileName = m_modelFileModel.getStringValue();
             tagger =
                 new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(), m_modelNameModel.getStringValue(),
-                    modelFileName);
+                    modelFileName, getTokenizerName());
 
         } else {
             tagger =
                 new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(), OpenNlpModelFactory.getInstance()
-                    .getModelByName(m_modelNameModel.getStringValue()));
+                    .getModelByName(m_modelNameModel.getStringValue()), getTokenizerName());
         }
 
         return tagger;

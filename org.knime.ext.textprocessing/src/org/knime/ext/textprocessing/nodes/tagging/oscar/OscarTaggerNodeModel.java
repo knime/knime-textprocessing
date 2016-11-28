@@ -90,7 +90,7 @@ public class OscarTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        return new OscarDocumentTagger(m_setUnmodifiableModel.getBooleanValue());
+        return new OscarDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), getTokenizerName());
     }
 
     /**

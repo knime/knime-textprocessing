@@ -101,4 +101,10 @@ public final class DocumentGrabberConfigKeys {
      * @since 2.8
      */
     public static final String CFGKEY_APPEND_QUERYCOLUM = "AppendQueryColumn";
+
+    /**
+     * Config key for the word tokenizer.
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "WordTokenizer";
 }

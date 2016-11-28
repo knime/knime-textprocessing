@@ -90,7 +90,7 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        return new StanfordDocumentTagger(false, m_taggerModelModel.getStringValue());
+        return new StanfordDocumentTagger(false, m_taggerModelModel.getStringValue(), getTokenizerName());
     }
 
     /**

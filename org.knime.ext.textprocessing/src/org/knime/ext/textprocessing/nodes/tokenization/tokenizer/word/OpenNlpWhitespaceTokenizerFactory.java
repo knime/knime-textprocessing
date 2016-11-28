@@ -85,8 +85,9 @@ public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public String getTokenizerDescription() {
-        return "\"A whitespace tokenizer. Non-whitespace sequences are identified as tokens.\" "
-            + "For more information about the OpenNLP tokenizer, visit their website.";
+        return "\"A whitespace tokenizer. Non-whitespace sequences are identified as tokens.\" \n"
+            + "For more information about the OpenNLP tokenizer, visit their website. \n"
+            + "https://opennlp.apache.org/documentation/1.6.0/manual/opennlp.html#tools.tokenizer.introduction";
     }
 
 }

@@ -115,7 +115,6 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     static final String QUERYCOL_NAME = "Query";
 
-
     private SettingsModelString m_queryModel =
         DocumentGrabberNodeDialog.getQueryModel();
 
@@ -143,17 +142,17 @@ public class DocumentGrabberNodeModel extends NodeModel {
     private SettingsModelBoolean m_appendQueryColumnModel =
             DocumentGrabberNodeDialog.getAppendQueryColumnModel();
 
-    private DocumentDataTableBuilder m_dtBuilder;
+    private SettingsModelString m_tokenizerModel =
+            DocumentGrabberNodeDialog.getTokenizerModel();
+
+    private DocumentDataTableBuilder m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
 
     /**
      * Creates new instance of <code>DocumentGrabberNodeModel</code>.
      */
     public DocumentGrabberNodeModel() {
         super(0, 1);
-        m_dtBuilder = new DocumentDataTableBuilder();
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -161,6 +160,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
+        m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{createColumnRearranger(m_dtBuilder.createDataTableSpec()).createSpec()};
     }
 
@@ -185,9 +185,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        DocumentGrabber grabber =
-            DocumentGrabberFactory.getInstance().getGrabber(
-                    m_dataBaseModel.getStringValue());
+        DocumentGrabber grabber = DocumentGrabberFactory.getInstance().getGrabber(m_dataBaseModel.getStringValue());
 
         try {
             m_dtBuilder.openDataTable(exec);
@@ -204,6 +202,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
                     ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
                     ((AbstractDocumentGrabber)grabber).setExtractMetaInfo(m_extractMetaInfoSettingsModel
                         .getBooleanValue());
+                    ((AbstractDocumentGrabber)grabber).setTokenizerName(m_tokenizerModel.getStringValue());
                     ((AbstractDocumentGrabber)grabber).setExec(exec);
                 }
 
@@ -265,6 +264,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_typeModel.saveSettingsTo(settings);
         m_extractMetaInfoSettingsModel.saveSettingsTo(settings);
         m_appendQueryColumnModel.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
@@ -282,11 +282,15 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_typeModel.validateSettings(settings);
         m_directoryModel.validateSettings(settings);
 
-        try {
+        // only validate if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_extractMetaInfoSettingsModel.getConfigName())) {
             m_extractMetaInfoSettingsModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_appendQueryColumnModel.getConfigName())) {
             m_appendQueryColumnModel.validateSettings(settings);
-        } catch (InvalidSettingsException e) {
-            // catch for the sake of downward compatibility
         }
     }
 
@@ -304,11 +308,15 @@ public class DocumentGrabberNodeModel extends NodeModel {
         m_maxResultsModel.loadSettingsFrom(settings);
         m_typeModel.loadSettingsFrom(settings);
 
-        try {
+        // only load if key is contained in settings (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.loadSettingsFrom(settings);
+        }
+        if (settings.containsKey(m_extractMetaInfoSettingsModel.getConfigName())) {
             m_extractMetaInfoSettingsModel.loadSettingsFrom(settings);
+        }
+        if (settings.containsKey(m_appendQueryColumnModel.getConfigName())) {
             m_appendQueryColumnModel.loadSettingsFrom(settings);
-        } catch (InvalidSettingsException e) {
-            // catch for the sake of downward compatibility
         }
     }
 

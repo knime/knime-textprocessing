@@ -41,6 +41,10 @@
         <option name="Tag value">
         	The tag value to train the model with. This information will be used, if you forward the model to the Stanford NLP NE tagger.
         </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
         </tab>
         <tab name="Learner Properties">
         <option name="maxLeft">

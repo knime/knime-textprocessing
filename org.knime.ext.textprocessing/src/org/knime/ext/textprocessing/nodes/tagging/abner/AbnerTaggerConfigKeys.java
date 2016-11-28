@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+s *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -41,27 +41,34 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   28.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.abner;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public final class AbnerTaggerConfigKeys {
-    
+
     private AbnerTaggerConfigKeys() { }
-    
+
     /**
      * The configuration key of unmodifiable flag of terms.
      */
     public static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
-    
+
     /**
      * The configuration key for the ABNER tagging model.
      */
     public static final String CFGKEY_MODEL = "ABNER Model";
+
+    /**
+     * The configuration key for the word tokenizer.
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
+
 }

@@ -59,6 +59,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -86,6 +87,9 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
 
     /** The settings model storing the number of threads to use for tagging. */
     private SettingsModelIntegerBounded m_numberOfThreadsModel = TaggerNodeSettingsPane.getNumberOfThreadsModel();
+
+    /** The settings model storing the name of the word tokenizer. */
+    private SettingsModelString m_tokenizer = TaggerNodeSettingsPane.getTokenizerModel();
 
     /**
      * Constructor of {@link TaggerNodeModel} creating one data in and one data out port.
@@ -169,6 +173,14 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
     protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception { }
 
     /**
+     * @return The name of the tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    protected String getTokenizerName() {
+        return m_tokenizer.getStringValue();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -176,6 +188,11 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
             throws InvalidSettingsException {
         try {
             m_numberOfThreadsModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // don't warn just catch (for downwards compatibility)
+        }
+        try {
+            m_tokenizer.loadSettingsFrom(settings);
         } catch (InvalidSettingsException e) {
             // don't warn just catch (for downwards compatibility)
         }
@@ -187,6 +204,7 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_numberOfThreadsModel.saveSettingsTo(settings);
+        m_tokenizer.saveSettingsTo(settings);
     }
 
     /**
@@ -197,6 +215,11 @@ public abstract class TaggerNodeModel extends NodeModel implements DocumentTagge
             throws InvalidSettingsException {
         try {
             m_numberOfThreadsModel.validateSettings(settings);
+        } catch (InvalidSettingsException e) {
+            // don't warn just catch (for downwards compatibility)
+        }
+        try {
+            m_tokenizer.validateSettings(settings);
         } catch (InvalidSettingsException e) {
             // don't warn just catch (for downwards compatibility)
         }

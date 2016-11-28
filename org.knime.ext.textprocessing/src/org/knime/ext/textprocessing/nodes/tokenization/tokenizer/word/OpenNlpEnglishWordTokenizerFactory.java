@@ -85,10 +85,11 @@ public class OpenNlpEnglishWordTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public String getTokenizerDescription() {
-        return "\"A maximum entropy tokenizer, detects token boundaries based on probability model\". "
-            + "This tokenizer uses the probability model for English texts. "
-            + "The model is provided by the OpenNLP group. "
-            + "For more information about the OpenNLP tokenizer, visit their website.";
+        return "\"A maximum entropy tokenizer, detects token boundaries based on probability model\". \n"
+            + "This tokenizer uses the probability model for English texts. \n"
+            + "The model is provided by the OpenNLP group. \n"
+            + "For more information about the OpenNLP tokenizer, visit their website: \n"
+            + "https://opennlp.apache.org/documentation/1.6.0/manual/opennlp.html#tools.tokenizer.introduction";
     }
 
 }

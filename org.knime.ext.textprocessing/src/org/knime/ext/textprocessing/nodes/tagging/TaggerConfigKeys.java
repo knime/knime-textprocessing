@@ -61,4 +61,9 @@ final class TaggerConfigKeys {
      * The config key for the number of threads for parallel tagging.
      */
     public static final String CFGKEY_NUMBER_OF_THREADS = "Number of threads";
+
+    /**
+     * The config key for the name of the word tokenizer.
+     */
+    public static final String CFGKEY_TOKENIZER = "Word tokenizer";
 }

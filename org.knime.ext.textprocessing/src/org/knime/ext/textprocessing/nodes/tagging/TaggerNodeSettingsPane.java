@@ -47,9 +47,15 @@
 
 package org.knime.ext.textprocessing.nodes.tagging;
 
+import java.util.Collection;
+
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane} which provides additionally a tab
@@ -71,13 +77,26 @@ public class TaggerNodeSettingsPane extends DefaultNodeSettingsPane {
     }
 
     /**
+     * Creates and returns the settings model, storing the name of the word tokenizer.
+     * @return The settings model with the name of the word tokenizer.
+     * @since 3.3
+     */
+    public static final SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(TaggerConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
      * Creates new instance of {@code TaggerNodeSettingsPane}.
      */
     public TaggerNodeSettingsPane() {
         removeTab("Options");
-        createNewTabAt("Concurrency", 1);
+        createNewTabAt("General options", 1);
 
         addDialogComponent(new DialogComponentNumber(getNumberOfThreadsModel(),
             "Number of maximal parallel tagging processes", 1));
+
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 }

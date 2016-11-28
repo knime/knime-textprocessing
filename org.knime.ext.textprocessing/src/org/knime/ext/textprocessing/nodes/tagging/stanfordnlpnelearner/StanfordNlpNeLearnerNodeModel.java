@@ -86,6 +86,7 @@ import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import com.google.common.io.Files;
 
@@ -231,6 +232,8 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
 
     private SettingsModelIntegerBounded m_maxNGramLeng = StanfordNlpNeLearnerNodeDialog.createMaxNGramLengthModel();
 
+    private SettingsModelString m_tokenizer = StanfordNlpNeLearnerNodeDialog.createTokenizerModel();
+
     /**
      *
      */
@@ -260,7 +263,13 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
             m_docColumnName = m_docColumnModel.getStringValue();
         }
 
-        // checking specified string col and guessing first available string col if no col ist set.
+        //check tokenizer settings from incoming document column
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
+        if (!dataTableSpecVerifier.verifyTokenizer(colIndex, m_tokenizer.getStringValue())) {
+            setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
+        }
+
+        // checking specified string col and guessing first available string col if no col is set.
         DataTableSpec spec2 = (DataTableSpec)inSpecs[1];
         int colIndex2 = spec2.findColumnIndex(m_knownEntitiesColumnModel.getStringValue());
         if (colIndex2 < 0) {
@@ -275,7 +284,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
             m_knownEntitiesColumnName = m_knownEntitiesColumnModel.getStringValue();
         }
 
-        return new PortObjectSpec[]{new NERModelPortObjectSpec()};
+        return new PortObjectSpec[]{new NERModelPortObjectSpec(m_tokenizer.getStringValue())};
     }
 
     @Override
@@ -311,7 +320,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         // create tagger based on known entities
         // TODO: Case sensitivity!
         MultiTermRegexDocumentTagger tagger =
-            new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag, true);
+            new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag, true, m_tokenizer.getStringValue());
 
         // create UUID to add them to the file path to avoid cases where two instances of the node model used the same file path at the same time
         String tempDir = KNIMEConstants.getKNIMETempDir() + "/";
@@ -331,7 +340,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                 for (DataRow row : docDataInput) {
                     //set progress bar
                     counter++;
-                    double progress = (counter/(double)docDataInput.size())/(2.0);
+                    double progress = (counter / (double)docDataInput.size()) / (2.0);
                     exec.setProgress(progress, "Preparing documents");
 
                     Document doc = ((DocumentValue)row.getCell(i)).getDocument();
@@ -380,7 +389,8 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         outputModel.delete();
         m_annotatedDocFile.delete();
 
-        return new PortObject[]{new StanfordNERModelPortObject(modelOutputBuffer, m_tag, knownEntitiesStringSet)};
+        return new PortObject[]{new StanfordNERModelPortObject(modelOutputBuffer, m_tag, knownEntitiesStringSet,
+            m_tokenizer.getStringValue())};
     }
 
     /**
@@ -427,6 +437,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_wordShape.saveSettingsTo(settings);
         m_maxLeft.saveSettingsTo(settings);
         m_maxNGramLeng.saveSettingsTo(settings);
+        m_tokenizer.saveSettingsTo(settings);
     }
 
     /**
@@ -454,6 +465,10 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_maxLeft.validateSettings(settings);
         m_maxNGramLeng.validateSettings(settings);
 
+        // only validate settings if settings contain SettingsModel key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizer.getKey())) {
+            m_tokenizer.validateSettings(settings);
+        }
     }
 
     /**
@@ -480,6 +495,12 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_wordShape.loadSettingsFrom(settings);
         m_maxLeft.loadSettingsFrom(settings);
         m_maxNGramLeng.loadSettingsFrom(settings);
+
+
+        // only load settings if settings contain SettingsModel key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizer.getKey())) {
+            m_tokenizer.loadSettingsFrom(settings);
+        }
     }
 
     /**

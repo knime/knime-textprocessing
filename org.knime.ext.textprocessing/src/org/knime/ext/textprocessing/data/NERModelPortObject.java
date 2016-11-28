@@ -49,8 +49,10 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,7 +74,6 @@ import com.google.common.io.Files;
  * @since 3.3
  */
 public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
-
     private PortObjectSpec m_spec;
 
     private final byte[] m_outputByteArray;
@@ -85,40 +86,46 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
 
     private final Set<String> m_dict;
 
+    private final String m_tokenizerName;
 
     /**
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
      * @param tag The tag that has been used to build the model.
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public NERModelPortObject(final byte[] outputBuffer, final Tag tag) {
+    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final String tokenizerName) {
         m_outputByteArray = outputBuffer;
         m_tag = tag;
         m_tagType = tag.getTagType() ;
         m_tagValue = tag.getTagValue() ;
         m_dict = null;
-        m_spec = new NERModelPortObjectSpec();
+        m_tokenizerName = tokenizerName;
+        m_spec = new NERModelPortObjectSpec(tokenizerName);
     }
 
     /**
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
      * @param tag The tag that has been used to build the model.
      * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
-     * @throws Exception
+     * @param tokenizerName The name of the tokenizer used for word tokenization.
+     * @since 3.3
      */
-    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict) throws Exception {
+    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict, final String tokenizerName) {
         m_outputByteArray = outputBuffer;
         m_tag = tag;
         m_tagType = tag.getTagType() ;
         m_tagValue = tag.getTagValue() ;
         m_dict = dict;
-        m_spec = new NERModelPortObjectSpec();
+        m_tokenizerName = tokenizerName;
+        m_spec = new NERModelPortObjectSpec(tokenizerName);
     }
 
     /**
      * @return Returns the specific NER model.
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws ClassCastException
+     * @throws IOException If there are problems accessing the input stream.
+     * @throws ClassNotFoundException If there are problems interpreting the serialized data.
+     * @throws ClassCastException If there are problems interpreting the serialized data.
      */
     public abstract T getNERModel() throws IOException, ClassCastException, ClassNotFoundException;
 
@@ -129,7 +136,7 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
 
     /**
      * @return Returns the model file.
-     * @throws IOException
+     * @throws IOException If the file could not be created.
      */
     public File getModelFile() throws IOException {
         String tempDir = KNIMEConstants.getKNIMETempDir();
@@ -184,9 +191,11 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
 
     /**
      * @return Converts the dictionary as a byte array to serialize it.
-     * @throws Exception
+     * @throws UnsupportedEncodingException If the specified character encoding for the PrintWriter is not supported.
+     * @throws FileNotFoundException If the PrintWriter could not find the specified file.
+     * @throws IOException If the file could not be written to a byte array.
      */
-    public byte[] getDictAsByteArray() throws Exception {
+    public byte[] getDictAsByteArray() throws FileNotFoundException, UnsupportedEncodingException, IOException {
         StringBuilder dict = new StringBuilder();
         String dictTempDir = KNIMEConstants.getKNIMETempDir() + "/tempDict" + UUID.randomUUID() + ".txt";
         File dictFile = new File(dictTempDir);
@@ -207,6 +216,14 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
     @Override
     public PortObjectSpec getSpec() {
         return m_spec;
+    }
+
+    /**
+     * @return Returns the name of the tokenizer used for word tokenization.
+     * @since 3.3
+     */
+    public String getTokenizerName() {
+        return m_tokenizerName;
     }
 
     @Override

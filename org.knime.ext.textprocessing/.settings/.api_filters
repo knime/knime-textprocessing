@@ -20,6 +20,20 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.TextprocessingStartup">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.TextprocessingStartup"/>
+                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
+            </message_arguments>
+        </filter>
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.TextprocessingStartup"/>
+                <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilter">
         <filter id="305324134">
             <message_arguments>
@@ -391,6 +405,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/dictreplacer/DictionaryReplacer.java" type="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacer">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacer"/>
+                <message_argument value="DictionaryReplacer(Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/kuhlenstemmer/KuhlenStemmer.java" type="org.knime.ext.textprocessing.nodes.preprocessing.kuhlenstemmer.KuhlenStemmer">
         <filter id="337768515">
             <message_arguments>
@@ -543,6 +565,20 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/grabber/DocumentGrabber.java" type="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabber">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabber"/>
+                <message_argument value="getTokenizerName()"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.grabber.DocumentGrabber"/>
+                <message_argument value="setTokenizerName(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/DocumentParser.java" type="org.knime.ext.textprocessing.nodes.source.parser.DocumentParser">
         <filter id="403804204">
             <message_arguments>
@@ -550,12 +586,76 @@
                 <message_argument value="setFilenameAsTitle(boolean)"/>
             </message_arguments>
         </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.DocumentParser"/>
+                <message_argument value="setTokenizerName(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/DocumentParserFactory.java" type="org.knime.ext.textprocessing.nodes.source.parser.DocumentParserFactory">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.DocumentParserFactory"/>
+                <message_argument value="createParser(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.DocumentParserFactory"/>
+                <message_argument value="createParser()"/>
+            </message_arguments>
+        </filter>
     </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/dml/DmlDocumentParser.java" type="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser"/>
+                <message_argument value="DmlDocumentParser(String, DocumentCategory, DocumentSource)"/>
+            </message_arguments>
+        </filter>
         <filter id="388018290">
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser"/>
                 <message_argument value="DML_DTD_POSTFIX"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/dml/DmlDocumentParserFactory.java" type="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParserFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParserFactory"/>
+                <message_argument value="createParser()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/flatfile/FlatFileDocumentParser.java" type="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParser">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParser"/>
+                <message_argument value="FlatFileDocumentParser()"/>
+            </message_arguments>
+        </filter>
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParser"/>
+                <message_argument value="FlatFileDocumentParser(String, DocumentCategory, DocumentSource)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/flatfile/FlatFileDocumentParserFactory.java" type="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.flatfile.FlatFileDocumentParserFactory"/>
+                <message_argument value="createParser()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/pubmed/PubMedDocumentParserFactory.java" type="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.pubmed.PubMedDocumentParserFactory"/>
+                <message_argument value="createParser()"/>
             </message_arguments>
         </filter>
     </resource>
@@ -564,6 +664,86 @@
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParser"/>
                 <message_argument value="SDML_DTD_POSTFIX"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/source/parser/sdml/SdmlDocumentParserFactory.java" type="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserFactory">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.source.parser.sdml.SdmlDocumentParserFactory"/>
+                <message_argument value="createParser()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/AbstractDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger"/>
+                <message_argument value="AbstractDocumentTagger(boolean)"/>
+            </message_arguments>
+        </filter>
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger"/>
+                <message_argument value="AbstractDocumentTagger(boolean, boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/abner/AbnerDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerDocumentTagger">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerDocumentTagger"/>
+                <message_argument value="AbnerDocumentTagger(boolean, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/dict/DictionaryDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryDocumentTagger">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryDocumentTagger"/>
+                <message_argument value="DictionaryDocumentTagger(boolean, Set&lt;String&gt;, Tag, boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/opennlpner/OpennlpNerDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerDocumentTagger">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerDocumentTagger"/>
+                <message_argument value="OpennlpNerDocumentTagger(boolean, OpenNlpModel)"/>
+            </message_arguments>
+        </filter>
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerDocumentTagger"/>
+                <message_argument value="OpennlpNerDocumentTagger(boolean, String, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/pos/PosDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.pos.PosDocumentTagger">
+        <filter id="338722907">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.pos.PosDocumentTagger"/>
+                <message_argument value="PosDocumentTagger(boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tokenization/DefaultTokenization.java" type="org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization"/>
+                <message_argument value="createNewTokenizerPool()"/>
+            </message_arguments>
+        </filter>
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization"/>
+                <message_argument value="getSentenceTokenizer()"/>
+            </message_arguments>
+        </filter>
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization"/>
+                <message_argument value="getWordTokenizer()"/>
             </message_arguments>
         </filter>
     </resource>

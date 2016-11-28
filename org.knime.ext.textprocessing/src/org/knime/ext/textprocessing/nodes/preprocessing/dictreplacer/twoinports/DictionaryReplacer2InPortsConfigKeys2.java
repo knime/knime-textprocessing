@@ -62,4 +62,9 @@ public final class DictionaryReplacer2InPortsConfigKeys2 {
 
     /** Config key for the key column. */
     public static final String CFGKEY_VALUECOLUMN = "Replacement column";
+
+    /** Config key for the word tokenizer.
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
 }
