@@ -110,18 +110,6 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     protected Tokenizer m_wordTokenizer =
         DefaultTokenization.getWordTokenizer(TextprocessingPreferenceInitializer.tokenizerName());
 
-    /**
-     * Constructor of <code>AbstractDocumentTagger</code> with the given flag which specifies if recognized named
-     * entities have to be set unmodifiable or not.
-     *
-     * @param setUnmodifiable It true recognized tags are set unmodifiable.
-     * @deprecated Use {@link #AbstractDocumentTagger(boolean, String)} instead to define the tokenizer used for word
-     *             tokenization.
-     */
-    @Deprecated
-    public AbstractDocumentTagger(final boolean setUnmodifiable) {
-        m_setNeUnmodifiable = setUnmodifiable;
-    }
 
     /**
      * Constructor of {@code AbstractDocumentTagger} with the given flag which specifies if recognized named entities
@@ -135,21 +123,6 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         m_setNeUnmodifiable = setUnmodifiable;
         m_tokenizerName = tokenizerName;
         m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
-    }
-
-    /**
-     * Constructor of <code>AbstractDocumentTagger</code> with the given flags specifying if recognized named entities
-     * have to be set unmodifiable or not and if search for named entities is case sensitive or not.
-     *
-     * @param setUnmodifiable If <code>true</code> recognized tags are set unmodifiable.
-     * @param caseSensitive If <code>true</code> search for named entities is done case sensitive, otherwise not.
-     * @deprecated Use {@link #AbstractDocumentTagger(boolean, boolean, String)} instead to define the tokenizer used
-     *             for word tokenization.
-     */
-    @Deprecated
-    public AbstractDocumentTagger(final boolean setUnmodifiable, final boolean caseSensitive) {
-        m_setNeUnmodifiable = setUnmodifiable;
-        m_caseSensitive = caseSensitive;
     }
 
     /**

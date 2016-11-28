@@ -56,6 +56,7 @@ import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 
 /**
@@ -67,8 +68,6 @@ import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListe
  * @author Kilian Thiel, KNIME.com AG, Zurich
  */
 public abstract class AbstractDocumentGrabber implements DocumentGrabber {
-
-
     private ExecutionMonitor m_exec;
 
     private boolean m_delete;
@@ -78,6 +77,9 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
     private DocumentType m_documentType;
 
     private boolean m_extractMetaInfo = false;
+
+    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
      * List of listeners.
@@ -258,5 +260,21 @@ public abstract class AbstractDocumentGrabber implements DocumentGrabber {
      */
     public void setExtractMetaInfo(final boolean extractMetaInfo) {
         m_extractMetaInfo = extractMetaInfo;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerName() {
+        return m_tokenizerName;
     }
 }

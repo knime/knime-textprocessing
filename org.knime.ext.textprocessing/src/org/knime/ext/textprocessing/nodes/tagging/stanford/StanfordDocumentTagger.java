@@ -141,39 +141,6 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * Creates a new instance of StanfordDocumentTagger and loads internally the specified tagging model of the Stanford
-     * library to POS tag the documents. If <code>setNeUnmodifiable</code> is set <code>true</code> all recognized terms
-     * are set to unmodifiable.
-     *
-     * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
-     * @param model The model to load and use.
-     * @throws ClassNotFoundException If model cannot be found.
-     * @throws IOException If model cannot be red.
-     * @deprecated Use {@link #StanfordDocumentTagger(boolean, String, String)} instead to define the tokenizer used for
-     *             word tokenization.
-     */
-    @Deprecated
-    public StanfordDocumentTagger(final boolean setNeUnmodifiable, final String model)
-        throws ClassNotFoundException, IOException {
-        super(setNeUnmodifiable);
-        if (!TAGGERMODELS.containsKey(model)) {
-            throw new IllegalArgumentException("Model \"" + model + "\" does not exists.");
-        }
-        m_tagger = new MaxentTagger(TAGGERMODELS.get(model));
-        m_modelName = model;
-
-        if (m_modelName.contains("German")) {
-            m_lang = Language.GERMAN;
-        } else if (m_modelName.contains("English")) {
-            m_lang = Language.ENGLISH;
-        } else if (m_modelName.contains("French")) {
-            m_lang = Language.FRENCH;
-        } else {
-            throw new IllegalArgumentException("Language could not be specified from model!");
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

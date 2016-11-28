@@ -515,4 +515,13 @@ public class SdmlDocumentParser extends DefaultHandler implements DocumentParser
     @Override
     public void setFilenameAsTitle(final boolean filenameAsTitle) {
     }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+    }
 }

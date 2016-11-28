@@ -75,7 +75,6 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
 
     private OpenNlpModel m_model;
 
-
     /**
      * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
      * given unmodifiable flag and the model file to use.
@@ -114,43 +113,6 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
 
     /**
      * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
-     * given unmodifiable flag and the model file to use.
-     *
-     * @param setNeUnmodifiable The flag specifying whether found named entities
-     * will be set unmodifiable or not.
-     * @param modelType The type of the specified model (person, time,
-     * organization, etc.).
-     * @param modelFileName Use of model file.
-     * @throws IOException If something happens.
-     * @since 2.7
-     * @deprecated
-     */
-    @Deprecated
-    public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
-            final String modelType, final String modelFileName)
-    throws IOException {
-        super(setNeUnmodifiable);
-        if (modelType == null) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model type may not be null!");
-        }
-        if (modelFileName == null) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model file may not be null!");
-        }
-        File f = new File(modelFileName);
-        if (!f.exists() || !f.canRead() || !f.isFile()) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model file is not valid!");
-        }
-
-        m_model = new OpenNlpModel(modelType, modelFileName,
-                    OpenNlpModelFactory.getInstance().getTagByName(modelType));
-        m_tagger = new NameFinderME(m_model.getModel());
-    }
-
-    /**
-     * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
      * given unmodifiable flag and model to tag with.
      *
      * @param setNeUnmodifiable The flag specifying whether found named entities
@@ -164,30 +126,6 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
             final OpenNlpModel model, final String tokenizerName)
     throws IOException {
         super(setNeUnmodifiable, tokenizerName);
-        if (model == null) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model may not be null!");
-        }
-        m_model = model;
-        m_tagger = new NameFinderME(m_model.getModel());
-    }
-
-    /**
-     * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
-     * given unmodifiable flag and model to tag with.
-     *
-     * @param setNeUnmodifiable The flag specifying whether found named entities
-     * will be set unmodifiable or not.
-     * @param model The model to tag with.
-     * @throws IOException If something happens.
-     * @since 2.7
-     * @deprecated
-     */
-    @Deprecated
-    public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
-            final OpenNlpModel model)
-    throws IOException {
-        super(setNeUnmodifiable);
         if (model == null) {
             throw new IllegalArgumentException(
                     "The specified OpenNLP model may not be null!");

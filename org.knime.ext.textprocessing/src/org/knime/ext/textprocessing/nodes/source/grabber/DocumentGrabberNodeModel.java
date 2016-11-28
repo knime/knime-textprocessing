@@ -186,7 +186,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         DocumentGrabber grabber =
-            DocumentGrabberFactory.getInstanceWithTokenizerInfo(m_tokenizerModel.getStringValue()).getGrabber(
+            DocumentGrabberFactory.getInstance().getGrabber(
                     m_dataBaseModel.getStringValue());
 
         try {
@@ -204,6 +204,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
                     ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
                     ((AbstractDocumentGrabber)grabber).setExtractMetaInfo(m_extractMetaInfoSettingsModel
                         .getBooleanValue());
+                    ((AbstractDocumentGrabber)grabber).setTokenizerName(m_tokenizerModel.getStringValue());
                     ((AbstractDocumentGrabber)grabber).setExec(exec);
                 }
 

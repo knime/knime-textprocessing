@@ -56,6 +56,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * This abstract class implements conveniently all setter methods of the interface
@@ -107,12 +108,19 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     protected List<DocumentParsedEventListener> m_listener;
 
     /**
+     * The name of the word tokenizer.
+     */
+    protected String m_tokenizerName;
+
+
+    /**
      * Constructor of <code>AbstractDocumentParser</code>. The document source, category and file path will be set to
      * <code>null</code> by default.
      */
     public AbstractDocumentParser() {
-        this(null, null, null);
+        this(null, null, null, TextprocessingPreferenceInitializer.tokenizerName());
     }
+
 
     /**
      * Constructor of <code>AbstractDocumentParser</code>. The given source, category and file path is set to the
@@ -121,12 +129,38 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * @param docPath The path to the file containing the document.
      * @param category The category of the document to set.
      * @param source The source of the document to set.
+     * @param tokenizerName The name of the word tokenizer.
+     *
+     * @since 3.3
      */
+    public AbstractDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
+        final String tokenizerName) {
+        m_category = category;
+        m_source = source;
+        m_docPath = docPath;
+        m_listener = new ArrayList<DocumentParsedEventListener>();
+        m_tokenizerName = tokenizerName;
+    }
+
+
+    /**
+     * Constructor of <code>AbstractDocumentParser</code>. The given source, category and file path is set to the
+     * created documents.
+     *
+     * @param docPath The path to the file containing the document.
+     * @param category The category of the document to set.
+     * @param source The source of the document to set.
+     * @deprecated Use {@link #AbstractDocumentParser(String, DocumentCategory, DocumentSource, String)} to set word
+     *             tokenizer.
+     *
+     */
+    @Deprecated
     public AbstractDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
         m_category = category;
         m_source = source;
         m_docPath = docPath;
         m_listener = new ArrayList<DocumentParsedEventListener>();
+        m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
     }
 
     /**
@@ -191,6 +225,15 @@ public abstract class AbstractDocumentParser implements DocumentParser {
     @Override
     public void setFilenameAsTitle(final boolean filenameAsTitle) {
         m_filenameAsTitle = filenameAsTitle;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
     }
 
     /**

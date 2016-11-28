@@ -66,7 +66,6 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
@@ -83,21 +82,6 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
 
     private DocumentBuilder m_currentDoc;
 
-    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
-
-    /**
-     * Creates a new instance of <code>FlatFileDocumentParser</code>. The document source, category and file path will
-     * be set to <code>null</code> by default.
-     *
-     * @deprecated Use {@link #FlatFileDocumentParser(String)} instead to define the tokenizer used for word
-     *             tokenization.
-     */
-    @Deprecated
-    public FlatFileDocumentParser() {
-        super(null, null, null);
-    }
-
     /**
      * Creates a new instance of <code>FlatFileDocumentParser</code>. The document source, category and file path will
      * be set to <code>null</code> by default.
@@ -106,23 +90,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      * @since 3.3
      */
     public FlatFileDocumentParser(final String tokenizerName) {
-        super(null, null, null);
-        m_tokenizerName = tokenizerName;
-    }
-
-    /**
-     * Creates a new instance of <code>FlatFileDocumentParser</code>. The given source, category and file path is set to
-     * the created documents.
-     *
-     * @param docPath The path to the file containing the document.
-     * @param category The category of the document to set.
-     * @param source The source of the document to set.
-     * @deprecated Use {@link #FlatFileDocumentParser(String, DocumentCategory, DocumentSource, String)} instead to
-     *             define the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    public FlatFileDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
-        super(docPath, category, source);
+        super(null, null, null, tokenizerName);
     }
 
     /**
@@ -137,8 +105,7 @@ public class FlatFileDocumentParser extends AbstractDocumentParser {
      */
     public FlatFileDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
         final String tokenizerName) {
-        super(docPath, category, source);
-        m_tokenizerName = tokenizerName;
+        super(docPath, category, source, tokenizerName);
     }
 
     /**

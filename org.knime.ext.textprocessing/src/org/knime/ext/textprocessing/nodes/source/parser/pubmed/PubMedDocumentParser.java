@@ -746,4 +746,13 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     @Override
     public void setFilenameAsTitle(final boolean filenameAsTitle) {
     }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
+    }
 }

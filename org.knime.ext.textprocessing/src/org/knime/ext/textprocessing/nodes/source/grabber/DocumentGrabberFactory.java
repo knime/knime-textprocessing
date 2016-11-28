@@ -56,7 +56,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -83,34 +82,18 @@ public final class DocumentGrabberFactory {
 
     private final Map<String, DocumentGrabber> m_grabber = new Hashtable<String, DocumentGrabber>();
 
-    private static String m_tokenizerName;
-
     /**
      * @return The singelton instance of <code>DocumentGrabberFactory</code>.
      */
     public static DocumentGrabberFactory getInstance() {
-        m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
         if (instance == null) {
-            instance = new DocumentGrabberFactory(m_tokenizerName);
+            instance = new DocumentGrabberFactory();
         }
         return instance;
     }
 
-    /**
-     * @param tokenizerName The tokenizer used for word tokenization.
-     * @return The singleton instance of DocumentGrabberFactory
-     * @since 3.3
-     */
-    public static DocumentGrabberFactory getInstanceWithTokenizerInfo(final String tokenizerName) {
-        m_tokenizerName = tokenizerName;
-        if (instance == null) {
-            instance = new DocumentGrabberFactory(tokenizerName);
-        }
-        return instance;
-    }
-
-    private DocumentGrabberFactory(final String tokenizerName) {
-        registerDocumentGrabber(new PubMedDocumentGrabber(tokenizerName));
+    private DocumentGrabberFactory() {
+        registerDocumentGrabber(new PubMedDocumentGrabber());
         registerExtensionPoints();
     }
 

@@ -82,20 +82,6 @@ public class OscarDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * Creates a new instance of <code>OscarDocumentTagger</code> with given flag specifying if recognized named
-     * entities is set unmodifiable. The Oscar lib is used for chemical named entity recognition.
-     *
-     * @param setNeUnmodifiable The unmodifiable flag to set.
-     * @deprecated Use {@link #OscarDocumentTagger(boolean, String)} instead to define the tokenizer used for word
-     *             tokenization.
-     */
-    @Deprecated
-    public OscarDocumentTagger(final boolean setNeUnmodifiable) {
-        super(setNeUnmodifiable);
-        m_oscar = new Oscar();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

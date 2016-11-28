@@ -79,36 +79,6 @@ public abstract class RegexDocumentTagger extends AbstractDocumentTagger {
      * @param tag The tag to assign to found named entities.
      * @param caseSensitive If <code>false</code> the case of named entities and words of the sentences are ignored,
      *            otherwise not.
-     * @deprecated Use {@link #RegexDocumentTagger(boolean, Set, Tag, boolean, String)} instead to define the tokenizer
-     *             used for word tokenization.
-     */
-    @Deprecated
-    public RegexDocumentTagger(final boolean setUnmodifiable, final Set<Pattern> regexpattern, final Tag tag,
-        final boolean caseSensitive) {
-        super(setUnmodifiable, caseSensitive);
-
-        if (regexpattern == null) {
-            throw new NullPointerException("Set of regex pattern may not be null!");
-        } else if (tag == null) {
-            throw new NullPointerException("Specified tag my not be null!");
-        }
-
-        m_regexpattern = regexpattern;
-        m_tag = tag;
-        m_caseSensitve = caseSensitive;
-        m_exactMatch = true;
-    }
-
-    /**
-     * Creates a new instance of <code>RegexDocumentTagger</code> with given flag to set found named entities
-     * unmodifiable, to ignore the case of the named entities to detect, the tag to assign to the found named entities
-     * and the set of regular expressions to match.
-     *
-     * @param setUnmodifiable If <code>true</code> found named entities are set unmodifiable, otherwise not.
-     * @param regexpattern The set of regex pattern to match.
-     * @param tag The tag to assign to found named entities.
-     * @param caseSensitive If <code>false</code> the case of named entities and words of the sentences are ignored,
-     *            otherwise not.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @since 3.3
      */

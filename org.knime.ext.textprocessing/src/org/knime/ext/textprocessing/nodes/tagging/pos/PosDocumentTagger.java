@@ -101,25 +101,6 @@ public class PosDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * Creates a new instance of PosDocumentTagger and loads internally the POS tagging model of the OpenNLP framework
-     * to POS tag the documents. If the model file could not be loaded an <code>IOException</code> will be thrown. If
-     * <code>setNeUnmodifiable</code> is set <code>true</code> all recognized terms are set to unmodifiable.
-     *
-     * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
-     * @throws IOException If the model file could not be loaded.
-     * @deprecated Use {@link #PosDocumentTagger(boolean, String)} instead to define the tokenizer used for word
-     *             tokenization.
-     */
-    @Deprecated
-    public PosDocumentTagger(final boolean setNeUnmodifiable) throws IOException {
-        super(setNeUnmodifiable);
-        String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths().getPosTaggerModelFile();
-        InputStream is = new FileInputStream(new File(modelPath));
-        POSModel model = new POSModel(is);
-        m_tagger = new POSTaggerME(model);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

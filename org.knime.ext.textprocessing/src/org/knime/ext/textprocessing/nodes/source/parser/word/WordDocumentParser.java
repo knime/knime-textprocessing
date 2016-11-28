@@ -79,7 +79,6 @@ import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.AbstractDocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Implements the {@link org.knime.ext.textprocessing.nodes.source.parser.DocumentParser} interface. The provided method
@@ -99,20 +98,6 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
     private DocumentBuilder m_currentDoc;
 
-    // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
-
-    /**
-     * Creates a new instance of {@code WordDocumentParser}. The document source, category and file path will be set to
-     * {@code null} by default.
-     *
-     * @deprecated Use {@link #WordDocumentParser(String)} instead to define the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    public WordDocumentParser() {
-        super(null, null, null);
-    }
-
     /**
      * Creates a new instance of {@code WordDocumentParser}. The document source, category and file path will be set to
      * {@code null} by default.
@@ -121,23 +106,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
      * @since 3.3
      */
     public WordDocumentParser(final String tokenizerName) {
-        super(null, null, null);
-        m_tokenizerName = tokenizerName;
-    }
-
-    /**
-     * Creates a new instance of {@code WordDocumentParser}. The given source, category and file path is set to the
-     * created documents.
-     *
-     * @param docPath The path to the file containing the document.
-     * @param category The category of the document to set.
-     * @param source The source of the document to set.
-     * @deprecated Use {@link #WordDocumentParser(String, DocumentCategory, DocumentSource, String)} instead to define
-     *             the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    public WordDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
-        super(docPath, category, source);
+        super(null, null, null, tokenizerName);
     }
 
     /**
@@ -152,8 +121,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
      */
     public WordDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source,
         final String tokenizerName) {
-        super(docPath, category, source);
-        m_tokenizerName = tokenizerName;
+        super(docPath, category, source, tokenizerName);
     }
 
     /**

@@ -68,9 +68,6 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
 public class DictionaryReplacer implements TermPreprocessing, StringPreprocessing {
     private Map<String, String> m_replaceDict;
 
-    // initialize the old standard word tokenizer for backwards compatibility
-    private final String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
-
     private Tokenizer m_wordTokenizer;
 
     /**
@@ -85,8 +82,8 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      */
     @Deprecated
     public DictionaryReplacer(final Hashtable<String, String> replaceDict) {
-        m_replaceDict = new HashMap<String, String>(replaceDict);
-        m_wordTokenizer = DefaultTokenization.getWordTokenizer(m_tokenizerName);
+        // uses the tokenizer from preference page
+        this(replaceDict, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

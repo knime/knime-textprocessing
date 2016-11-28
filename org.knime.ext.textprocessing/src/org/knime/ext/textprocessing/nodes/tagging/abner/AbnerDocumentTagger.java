@@ -90,27 +90,6 @@ public class AbnerDocumentTagger extends AbstractDocumentTagger {
      *
      * @param setNeUnmodifiable The unmodifiable flag to set.
      * @param model The ABNER model to use for tagging.
-     * @deprecated Use {@link #AbnerDocumentTagger(boolean, String, String)} instead to define the tokenizer used for
-     *             word tokenization.
-     */
-    @Deprecated
-    public AbnerDocumentTagger(final boolean setNeUnmodifiable, final String model) {
-        super(setNeUnmodifiable);
-
-        if (model.equals(MODEL_NLPBA)) {
-            m_tagger = new Tagger(Tagger.NLPBA);
-        } else {
-            m_tagger = new Tagger(Tagger.BIOCREATIVE);
-        }
-    }
-
-    /**
-     * Creates a new instance of <code>AbnerDocumentTagger</code> with given flag specifying if recognized named
-     * entities is set unmodifiable. The specified ABNER model is used for named entity recognition, if no model or a
-     * non valid model is specified the "Biocreative" model is used by default.
-     *
-     * @param setNeUnmodifiable The unmodifiable flag to set.
-     * @param model The ABNER model to use for tagging.
      * @param tokenizerName The tokenizer used for word tokenization.
      * @since 3.3
      */

@@ -294,7 +294,7 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
      */
     @Deprecated
     public DmlDocumentParser() {
-        this(null, null, null);
+        this(null, null, null, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**
@@ -306,24 +306,6 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
      */
     public DmlDocumentParser(final String tokenizerName) {
         this(null, null, null, tokenizerName);
-    }
-
-    /**
-     * Creates a new instance of <code>DmlDocumentParser</code>. The given source, category and file path is set to the
-     * created documents.
-     *
-     * @param docPath The path to the file containing the document.
-     * @param category The category of the document to set.
-     * @param source The source of the document to set.
-     * @deprecated Use {@link #DmlDocumentParser(String, DocumentCategory, DocumentSource, String)} instead to define
-     *             the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    public DmlDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
-        m_category = category;
-        m_source = source;
-        m_docPath = docPath;
-        m_listener = new ArrayList<DocumentParsedEventListener>();
     }
 
     /**
@@ -891,5 +873,14 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
      */
     @Override
     public void setFilenameAsTitle(final boolean filenameAsTitle) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.3
+     */
+    @Override
+    public void setTokenizerName(final String tokenizerName) {
+        m_tokenizerName = tokenizerName;
     }
 }

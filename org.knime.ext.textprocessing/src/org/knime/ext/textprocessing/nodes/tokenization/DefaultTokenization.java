@@ -84,15 +84,6 @@ public final class DefaultTokenization {
     }
 
     /**
-     * @return The default sentence tokenizer.
-     * @deprecated Use {@link #getSentenceTokenizer(String)} instead to define the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    public static final synchronized Tokenizer getSentenceTokenizer() {
-        return getSentenceTokenizer(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER);
-    }
-
-    /**
      * @param tokenizerName The specified tokenizer used for word tokenization
      * @return Returns the specified word tokenizer.
      * @since 3.3
@@ -100,14 +91,5 @@ public final class DefaultTokenization {
     public static final synchronized Tokenizer getWordTokenizer(final String tokenizerName) {
         m_tokenizerPoolMap.computeIfAbsent(tokenizerName, k -> createTokenizerPool(k));
         return m_tokenizerPoolMap.get(tokenizerName).nextWordTokenizer();
-    }
-
-    /**
-     * @return The default word tokenizer.
-     * @deprecated Use {@link #getWordTokenizer(String)} instead to define the tokenizer used for word tokenization.
-     */
-    @Deprecated
-    public static final synchronized Tokenizer getWordTokenizer() {
-        return getWordTokenizer(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER);
     }
 }
