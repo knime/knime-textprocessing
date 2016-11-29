@@ -123,20 +123,6 @@ public class StanfordLemmatizer implements TermPreprocessing {
     }
 
     /**
-     * @param skip the boolean flag to set to
-     */
-    public void setSkipFlag(final boolean skip) {
-        m_skipTerms = skip;
-    }
-
-    /**
-     * @return the boolean flag
-     */
-    public boolean getSkipFlag() {
-        return m_skipTerms;
-    }
-
-    /**
      * @return the WarningMessage object that contains the warning message
      */
     public WarningMessage getWarnMessage() {
