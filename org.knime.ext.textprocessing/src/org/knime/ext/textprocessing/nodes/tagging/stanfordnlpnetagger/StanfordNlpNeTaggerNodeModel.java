@@ -141,6 +141,7 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
             m_hasModelInput = true;
             NERModelPortObjectSpec spec = (NERModelPortObjectSpec)inSpecs[1];
             String tokenizer = spec.getTokenizerName();
+            // compare tokenizer provided by model to tokenizer selected in node dialog
             if (tokenizer != null) {
                 if (!tokenizer.equals(getTokenizerName())) {
                     setWarningMessage("Tokenization of input model (" + tokenizer

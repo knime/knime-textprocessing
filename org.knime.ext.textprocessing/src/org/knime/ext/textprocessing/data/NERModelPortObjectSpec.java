@@ -48,11 +48,19 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+
+import org.knime.core.data.util.NonClosableInputStream;
+import org.knime.core.data.util.NonClosableOutputStream;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.ModelContent;
 import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.ModelContentWO;
 import org.knime.core.node.port.AbstractSimplePortObjectSpec;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortObjectSpecZipInputStream;
+import org.knime.core.node.port.PortObjectSpecZipOutputStream;
 
 /**
  *
@@ -67,6 +75,36 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
      * Not used.
      */
     public static final class Serializer extends AbstractSimplePortObjectSpecSerializer<NERModelPortObjectSpec> {
+        /**
+         * {@inheritDoc}
+         * @since 3.3
+         */
+        @Override
+        public NERModelPortObjectSpec loadPortObjectSpec(final PortObjectSpecZipInputStream in) throws IOException {
+            in.getNextEntry();
+            ModelContentRO config = ModelContent.loadFromXML(new NonClosableInputStream.Zip(in));
+            String nameOfUsedTokenizer;
+            try {
+                nameOfUsedTokenizer = config.getString("tokenizerName");
+            } catch (InvalidSettingsException e) {
+                throw new IOException("Failed to deserialize port object spec", e);
+            }
+            return new  NERModelPortObjectSpec(nameOfUsedTokenizer);
+        }
+
+        /**
+         * {@inheritDoc}
+         * @since 3.3
+         */
+        @Override
+        public void savePortObjectSpec(final NERModelPortObjectSpec portObject, final PortObjectSpecZipOutputStream out)
+            throws IOException {
+            String XML_CONFIG_NAME = "content.xml";
+            out.putNextEntry(new ZipEntry(XML_CONFIG_NAME));
+            ModelContent spec = new ModelContent(XML_CONFIG_NAME);
+            spec.addString("tokenizerName", portObject.getTokenizerName());
+            spec.saveToXML(new NonClosableOutputStream.Zip(out));
+        }
     }
 
     /**
