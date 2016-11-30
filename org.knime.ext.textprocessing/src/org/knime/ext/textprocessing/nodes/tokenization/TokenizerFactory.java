@@ -70,4 +70,10 @@ public interface TokenizerFactory {
      */
     public String getTokenizerDescription();
 
+    /**
+     * @return Returns the URL of the tokenizer info page.
+     * @since 3.3
+     */
+    public String getTokenizerDescLink();
+
 }

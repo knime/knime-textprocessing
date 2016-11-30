@@ -148,34 +148,8 @@ public class DocumentBuilder {
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
-        // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-        this(TextprocessingPreferenceInitializer.tokenizerName());
-        // Add authors
-        for (Author a : doc.getAuthors()) {
-            addAuthor(a);
-        }
-
-        // Add source
-        for (DocumentSource s : doc.getSources()) {
-            addDocumentSource(s);
-        }
-
-        // Add categories
-        for (DocumentCategory c : doc.getCategories()) {
-            addDocumentCategory(c);
-        }
-
-        // Add type
-        setDocumentType(doc.getType());
-
-        // Add file
-        setDocumentFile(doc.getDocFile());
-
-        // Add publication date
-        setPublicationDate(doc.getPubDate());
-
-        // Add meta info
-        addMetaInformation(doc.getMetaInformation());
+        // initialize the tokenizer with the tokenizer from preference page
+        this(doc, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

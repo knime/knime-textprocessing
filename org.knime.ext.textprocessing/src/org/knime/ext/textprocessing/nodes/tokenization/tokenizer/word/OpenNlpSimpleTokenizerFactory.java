@@ -86,8 +86,15 @@ public class OpenNlpSimpleTokenizerFactory implements TokenizerFactory {
     @Override
     public String getTokenizerDescription() {
         return "\"A character class tokenizer. Sequences of the same character class are tokens.\" \n"
-            + "For more information about the OpenNLP tokenizer, visit their website. \n"
-            + "https://opennlp.apache.org/documentation/1.6.0/manual/opennlp.html#tools.tokenizer.introduction";
+            + "The model is provided by the OpenNLP group.";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescLink() {
+        return "https://opennlp.apache.org/documentation/1.6.0/manual/opennlp.html#tools.tokenizer.introduction";
     }
 
 }

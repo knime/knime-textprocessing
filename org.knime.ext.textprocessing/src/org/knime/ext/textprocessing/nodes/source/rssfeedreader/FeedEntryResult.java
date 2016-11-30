@@ -112,18 +112,21 @@ class FeedEntryResult {
 
     private boolean m_createHttpColumn = RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN;
 
+    private String m_tokenizerName;
+
     private final TextContainerDataCellFactory m_documentCellFac;
 
     /**
      * Creates a new instance of {@code FeedEntryResult}.
      */
     FeedEntryResult(final String feedUrl, final int responseCode, final boolean docCol, final boolean xmlCol,
-        final boolean httpResponseCol, final FileStoreFactory fileStoreFactory) {
+        final boolean httpResponseCol, final String tokenizerName, final FileStoreFactory fileStoreFactory) {
         m_feedURL = feedUrl;
         m_responseCode = responseCode;
         m_createDocCol = docCol;
         m_createHttpColumn = httpResponseCol;
         m_createXMLCol = xmlCol;
+        m_tokenizerName = tokenizerName;
 
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_documentCellFac.prepare(fileStoreFactory);
@@ -275,7 +278,7 @@ class FeedEntryResult {
 
     // build document based on the feed entry information
     private Document createDocumentFromEntry(final SyndEntry entry) {
-        DocumentBuilder docBuilder = new DocumentBuilder();
+        DocumentBuilder docBuilder = new DocumentBuilder(m_tokenizerName);
 
         // initialize empty document
         docBuilder.addTitle(null);

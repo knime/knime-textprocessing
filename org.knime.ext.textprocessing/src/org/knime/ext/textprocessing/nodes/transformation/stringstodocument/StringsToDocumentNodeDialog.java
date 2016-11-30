@@ -47,6 +47,9 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -61,6 +64,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Provides the dialog for the String to Document node with all necessary dialog components.
@@ -229,6 +234,16 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentNodeModel.MAX_THREADS);
     }
 
+    /**
+     * Creates and returns the settings model, storing the name of the tokenizer used for word tokenization.
+     *
+     * @return The settings model with name of word tokenizer.
+     */
+    static final SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
     private SettingsModelString m_docCategoryModel;
 
     private SettingsModelString m_pubDateModel;
@@ -335,6 +350,12 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Processes");
         addDialogComponent(
             new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel processes", 1));
+        closeCurrentGroup();
+
+        createNewGroup("Tokenization");
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
+                .map(e -> e.getKey()).collect(Collectors.toList());
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
         closeCurrentGroup();
     }
 

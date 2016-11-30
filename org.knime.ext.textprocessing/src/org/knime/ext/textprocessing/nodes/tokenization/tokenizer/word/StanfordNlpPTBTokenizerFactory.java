@@ -87,9 +87,15 @@ public class StanfordNlpPTBTokenizerFactory implements TokenizerFactory {
     public String getTokenizerDescription() {
         return "\"A fast, rule-based tokenizer implementation, which produces Penn Treebank style tokenization of English "
             + "text. \nIt was initially written to conform to Penn Treebank tokenization conventions over ASCII text, \n "
-            + "but now provides a range of tokenization options over a broader space of Unicode text.\" \n"
-            + "For more information about the StanfordNLP tokenizer, visit their website: \n"
-            + "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/process/PTBTokenizer.html";
+            + "but now provides a range of tokenization options over a broader space of Unicode text.\"";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescLink() {
+        return "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/process/PTBTokenizer.html";
     }
 
 }

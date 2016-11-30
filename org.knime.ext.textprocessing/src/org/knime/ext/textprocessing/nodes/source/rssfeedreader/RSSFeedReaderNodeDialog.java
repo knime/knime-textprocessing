@@ -48,6 +48,8 @@
  */
 package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 
+import java.util.Collection;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.NodeSettingsRO;
@@ -57,9 +59,13 @@ import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumberEdit;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.source.parser.DocumentParserConfigKeys;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -139,6 +145,11 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
             RSSFeedReaderNodeModel.DEF_HTTP_COL_NAME);
     }
 
+    static SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
     private final SettingsModelBoolean m_createDocCol = createDocumentColumnModel();
 
     private final SettingsModelBoolean m_createXmlCol = createXMLColumnModel();
@@ -189,6 +200,11 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
         DialogComponentString httpColNameComp = new DialogComponentString(m_httpColName, "", true, 20);
         httpColNameComp.setToolTipText("Name of the HTTP column");
         addDialogComponent(httpColNameComp);
+
+        setHorizontalPlacement(false);
+
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 
     void toggleColumnNameFields(){

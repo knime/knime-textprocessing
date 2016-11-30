@@ -71,4 +71,6 @@ class RSSFeedReaderConfigKeys {
     static final String CFGKEY_XML_COL_NAME = "XML column name";
 
     static final String CFGKEY_HTTP_COL_NAME = "HTTP Response code column name";
+
+    static final String CFGKEY_TOKENIZER = "Word tokenizer";
 }

@@ -169,4 +169,11 @@ public final class StringsToDocumentConfigKeys {
      * @since 2.9
      */
     public static final String CFGKEY_THREADS = "Number of threads";
+
+    /**
+     * The configuration key of the number of threads to use.
+     *
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
 }

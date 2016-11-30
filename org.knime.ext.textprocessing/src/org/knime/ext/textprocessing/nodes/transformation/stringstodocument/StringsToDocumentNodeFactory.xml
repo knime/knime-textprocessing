@@ -82,6 +82,10 @@
             is checked, otherwise the current date from "Publication date" field is set as date). The date has to be
             formatted like "dd-mm-yyy".
         </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
     </fullDescription>
     <ports>
         <inPort name="String input table" index="0">

@@ -126,6 +126,8 @@ class RSSFeedReaderNodeModel extends NodeModel {
 
     private final SettingsModelString m_httpColName = RSSFeedReaderNodeDialog.createHttpColumnNameModel();
 
+    private final SettingsModelString m_tokenizerModel = RSSFeedReaderNodeDialog.getTokenizerModel();
+
     private int m_urlColIndex = -1;
 
     /**
@@ -153,7 +155,8 @@ class RSSFeedReaderNodeModel extends NodeModel {
         RSSFeedReaderDataTableCreator joiner =
             new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
                 m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
-                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue());
+                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue(),
+                m_tokenizerModel.getStringValue());
 
         List<DataCell> dataCellChunk = new ArrayList<>(chunkSize);
         AtomicLong urlCount = new AtomicLong(0);
@@ -207,7 +210,8 @@ class RSSFeedReaderNodeModel extends NodeModel {
                     RSSFeedReaderDataTableCreator rssFeedReaderTC = new RSSFeedReaderDataTableCreator(
                         m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
                         m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
-                        m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue());
+                        m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue(),
+                        m_tokenizerModel.getStringValue());
                     for (DataCell dataCell : dataCellsWithUrls) {
                         exec.checkCanceled();
                         rssFeedReaderTC.createDataCellsFromUrl(dataCell, fsFactory);
@@ -257,7 +261,8 @@ class RSSFeedReaderNodeModel extends NodeModel {
         RSSFeedReaderDataTableCreator rssFeedReaderDTC =
             new RSSFeedReaderDataTableCreator(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
                 m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
-                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue());
+                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue(),
+                m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{rssFeedReaderDTC.createDataTableSpec()};
     }
 
@@ -301,6 +306,7 @@ class RSSFeedReaderNodeModel extends NodeModel {
         m_docColName.saveSettingsTo(settings);
         m_xmlColName.saveSettingsTo(settings);
         m_httpColName.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
@@ -317,6 +323,11 @@ class RSSFeedReaderNodeModel extends NodeModel {
         m_docColName.validateSettings(settings);
         m_xmlColName.validateSettings(settings);
         m_httpColName.validateSettings(settings);
+
+        // only validate if NodeSettings contain key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.validateSettings(settings);
+        }
     }
 
     /**
@@ -333,6 +344,11 @@ class RSSFeedReaderNodeModel extends NodeModel {
         m_docColName.loadSettingsFrom(settings);
         m_xmlColName.loadSettingsFrom(settings);
         m_httpColName.loadSettingsFrom(settings);
+
+        // only load if NodeSettings contain key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.loadSettingsFrom(settings);
+        }
     }
 
     /**

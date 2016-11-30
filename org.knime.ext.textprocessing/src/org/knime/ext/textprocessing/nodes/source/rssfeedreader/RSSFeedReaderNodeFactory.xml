@@ -45,6 +45,10 @@
             If checked, the node create an additional integer column, containing the HTTP status code for each URL. This
             is only applicable for HTTP URLs.
         </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
     </fullDescription>      
     <ports>
         <inPort name="Input table" index="0">

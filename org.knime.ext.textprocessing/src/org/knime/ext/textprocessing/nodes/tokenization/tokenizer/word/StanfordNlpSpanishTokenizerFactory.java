@@ -89,9 +89,15 @@ public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
             + "but with extra rules for Spanish contractions and assimilations. \n"
             + "It is based heavily on the FrenchTokenizer. \n"
             + "The tokenizer tokenizes according to the modified AnCora corpus tokenization standards, \n"
-            + "so the rules are a little different from PTB.\" \n"
-            + "For more information about the StanfordNLP tokenizer, visit their website: \n"
-            + "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/international/spanish/process/SpanishTokenizer.html";
+            + "so the rules are a little different from PTB.\"";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenizerDescLink() {
+        return "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/international/spanish/process/SpanishTokenizer.html";
     }
 
 }

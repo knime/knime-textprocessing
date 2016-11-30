@@ -55,11 +55,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
@@ -77,6 +80,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.xml.sax.InputSource;
 
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -112,6 +116,8 @@ class RSSFeedReaderDataTableCreator {
 
     private String m_httpColName;
 
+    private String m_tokenizerName;
+
     private final List<FeedReaderResult> m_feedReaderResults = new LinkedList<FeedReaderResult>();
 
     private AtomicLong m_missingRowCount = new AtomicLong();
@@ -126,7 +132,7 @@ class RSSFeedReaderDataTableCreator {
      */
     RSSFeedReaderDataTableCreator(final boolean createDocumentColumn, final boolean createXMLColumn,
         final boolean createHttpColumn, final int timeOut, final String docColName, final String xmlColName,
-        final String httpColName) {
+        final String httpColName, final String tokenizerName) {
         m_createDocCol = createDocumentColumn;
         m_createXMLCol = createXMLColumn;
         m_timeOut = timeOut;
@@ -134,6 +140,7 @@ class RSSFeedReaderDataTableCreator {
         m_docColName = docColName;
         m_xmlColName = xmlColName;
         m_httpColName = httpColName;
+        m_tokenizerName = tokenizerName;
     }
 
     /**
@@ -143,8 +150,8 @@ class RSSFeedReaderDataTableCreator {
     void createDataCellsFromUrl(final DataCell inputCell, final FileStoreFactory fileStoreFactory) {
         if (!inputCell.isMissing()) {
             String urlAsString = ((StringValue)inputCell).getStringValue();
-            FeedReaderResult result =
-                new FeedReaderResult(urlAsString, m_createDocCol, m_createXMLCol, m_createHttpColumn, fileStoreFactory);
+            FeedReaderResult result = new FeedReaderResult(urlAsString, m_createDocCol, m_createXMLCol,
+                m_createHttpColumn, m_tokenizerName, fileStoreFactory);
             SyndFeed feed = null;
 
             try {
@@ -177,7 +184,7 @@ class RSSFeedReaderDataTableCreator {
         } else {
             m_missingRowCount.incrementAndGet();
             FeedReaderResult result = new FeedReaderResult(null, m_createDocCol, m_createXMLCol, m_createHttpColumn,
-                fileStoreFactory);
+                m_tokenizerName, fileStoreFactory);
             result.setResults(null);
             result.createListOfDataCellsFromResults();
             m_feedReaderResults.add(result);
@@ -253,6 +260,11 @@ class RSSFeedReaderDataTableCreator {
     DataTableSpec createDataTableSpec() {
         List<DataColumnSpec> outputColSpecs = new ArrayList<>();
 
+        Map<String, String> props = new HashMap<String,String>();
+        props.put(DocumentDataTableBuilder.WORD_TOKENIZER_KEY, m_tokenizerName);
+        DataColumnSpecCreator docSpecCreator = new DataColumnSpecCreator(m_docColName, DocumentCell.TYPE);
+        docSpecCreator.setProperties(new DataColumnProperties(props));
+
         outputColSpecs.add(new DataColumnSpecCreator("Feed Url", StringCell.TYPE).createSpec());
         outputColSpecs.add(new DataColumnSpecCreator("Title", StringCell.TYPE).createSpec());
         outputColSpecs.add(new DataColumnSpecCreator("Description", StringCell.TYPE).createSpec());
@@ -260,7 +272,7 @@ class RSSFeedReaderDataTableCreator {
         outputColSpecs.add(new DataColumnSpecCreator("Item Url", StringCell.TYPE).createSpec());
 
         if (m_createDocCol) {
-            outputColSpecs.add(new DataColumnSpecCreator(m_docColName, DocumentCell.TYPE).createSpec());
+            outputColSpecs.add(docSpecCreator.createSpec());
         }
         if (m_createXMLCol) {
             outputColSpecs.add(new DataColumnSpecCreator(m_xmlColName, XMLCell.TYPE).createSpec());

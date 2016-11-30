@@ -75,6 +75,8 @@ class FeedReaderResult {
 
     private boolean m_createHttpColumn = RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN;
 
+    private String m_tokenizerName;
+
     private int m_responseCode = -2;
 
     private final FileStoreFactory m_fileStoreFactory;
@@ -83,12 +85,13 @@ class FeedReaderResult {
      * Creates a new instance of {@code FeedReaderResult}.
      */
     FeedReaderResult(final String url, final boolean docCol, final boolean xmlCol, final boolean httpResponseCol,
-        final FileStoreFactory fileStoreFactory) {
+        final String tokenizerName, final FileStoreFactory fileStoreFactory) {
         m_url = url;
         m_createDocCol = docCol;
         m_createXMLCol = xmlCol;
         m_createHttpColumn = httpResponseCol;
         m_fileStoreFactory = fileStoreFactory;
+        m_tokenizerName = tokenizerName;
     }
 
     /**
@@ -102,7 +105,7 @@ class FeedReaderResult {
             for (SyndEntry entry : feedResults.getEntries()) {
                 FeedEntryResult entryResult =
                     new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn,
-                        m_fileStoreFactory);
+                        m_tokenizerName, m_fileStoreFactory);
                 entryResult.setEntry(entry, feedResults);
                 entryResult.createEntryResultasDataCell();
                 m_entryResults.add(entryResult);
@@ -118,7 +121,7 @@ class FeedReaderResult {
     private void createEmptyFeedResults() {
         FeedEntryResult entryResult =
             new FeedEntryResult(m_url, m_responseCode, m_createDocCol, m_createXMLCol, m_createHttpColumn,
-                m_fileStoreFactory);
+                m_tokenizerName, m_fileStoreFactory);
         entryResult.createEntryResultasDataCell();
         m_entryResults.add(entryResult);
     }

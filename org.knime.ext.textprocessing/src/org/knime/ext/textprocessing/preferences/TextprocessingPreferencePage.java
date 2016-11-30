@@ -47,6 +47,9 @@
  */
 package org.knime.ext.textprocessing.preferences;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -54,6 +57,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -61,8 +66,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 
@@ -71,6 +80,8 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
  * @author Kilian Thiel, University of Konstanz
  */
 public class TextprocessingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+    private static NodeLogger LOGGER = NodeLogger.getLogger(TextprocessingPreferencePage.class);
 
     private Composite m_mainComposite;
 
@@ -85,6 +96,8 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
     private Group m_tokenizationGrp;
 
     private Label m_lTokenizerDesc;
+
+    private Link m_lTokenizerDescLink;
 
     /**
      * Creates a new preference page.
@@ -168,6 +181,20 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
             .get(m_tokenizer.getPreferenceStore().getString("knime.textprocessing.tokenizer.tokenizer"))
             .getTokenizerDescription());
 
+        m_lTokenizerDescLink = new Link(m_tokenizerDescGroup, SWT.LEFT);
+        m_lTokenizerDescLink.setLayoutData(getDescriptionGridData());
+        m_lTokenizerDescLink.setText(buildDescLinkText(TextprocessingPreferenceInitializer.tokenizerName()));
+        m_lTokenizerDescLink.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                try {
+                    PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(new URL(e.text));
+                } catch (PartInitException | MalformedURLException ex) {
+                    LOGGER.error(ex);
+                }
+            }
+        });
+
         m_tokenizationGrp.setLayoutData(getGridData());
         m_tokenizationGrp.setLayout(getLayout());
 
@@ -206,6 +233,12 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
         gl.marginTop = 5;
         gl.verticalSpacing = 10;
         return gl;
+    }
+
+    private String buildDescLinkText(final String tokenizerName) {
+        return "For more information about the " + tokenizerName + ", click <a href=\""
+            + TokenizerFactoryRegistry.getTokenizerFactoryMap().get(tokenizerName).getTokenizerDescLink()
+            + "\">here</a>.";
     }
 
     /**
@@ -249,6 +282,7 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
             TokenizerFactoryRegistry.getInstance();
             m_lTokenizerDesc.setText(TokenizerFactoryRegistry.getTokenizerFactoryMap()
                 .get(event.getNewValue().toString()).getTokenizerDescription());
+            m_lTokenizerDescLink.setText(buildDescLinkText(event.getNewValue().toString()));
             m_tokenizerDescGroup.layout();
             m_tokenizationGrp.layout();
             m_mainComposite.layout();

@@ -51,9 +51,12 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -71,6 +74,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
@@ -118,6 +122,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
 
     private SettingsModelBoolean m_usePubDateColumnModel = StringsToDocumentNodeDialog.getUsePubDateColumnModel();
 
+    private SettingsModelString m_tokenizerModel = StringsToDocumentNodeDialog.getTokenizerModel();
+
     /** The default number of threads value. */
     static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
         (int)Math.ceil(Runtime.getRuntime().availableProcessors()));
@@ -135,10 +141,13 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         modelStateChanged();
     }
 
-    private static final DataColumnSpec[] createNewColSpecs() {
+    private final DataColumnSpec[] createNewColSpecs() {
+        Map<String, String> props = new HashMap<String,String>();
+        props.put(DocumentDataTableBuilder.WORD_TOKENIZER_KEY, m_tokenizerModel.getStringValue());
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        DataColumnSpec docCol = new DataColumnSpecCreator("Document", docFactory.getDataType()).createSpec();
-        return new DataColumnSpec[]{docCol};
+        DataColumnSpecCreator docColSpecCreator = new DataColumnSpecCreator("Document", docFactory.getDataType());
+        docColSpecCreator.setProperties(new DataColumnProperties(props));
+        return new DataColumnSpec[]{docColSpecCreator.createSpec()};
     }
 
     /** {@inheritDoc} */
@@ -215,8 +224,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         boolean usePubDateColumn = m_usePubDateColumnModel.getBooleanValue();
         conf.setUsePubDateColumn(usePubDateColumn);
 
-        StringsToDocumentCellFactory cellFac =
-            new StringsToDocumentCellFactory(conf, createNewColSpecs(), m_maxThreads.getIntValue());
+        StringsToDocumentCellFactory cellFac = new StringsToDocumentCellFactory(conf, createNewColSpecs(),
+            m_maxThreads.getIntValue(), m_tokenizerModel.getStringValue());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         rearranger.append(cellFac);
         return rearranger;
@@ -262,8 +271,10 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
             m_usePubDateColumnModel.loadSettingsFrom(settings);
         } catch(InvalidSettingsException e){ }
 
-
-
+        // only validate if NodeSettings contain key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.validateSettings(settings);
+        }
 
     }
 
@@ -299,6 +310,7 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         m_maxThreads.saveSettingsTo(settings);
         m_authorFirstNameModel.saveSettingsTo(settings);
         m_authorLastNameModel.saveSettingsTo(settings);
+        m_tokenizerModel.saveSettingsTo(settings);
     }
 
     /**
@@ -341,6 +353,10 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
             m_usePubDateColumnModel.loadSettingsFrom(settings);
         } catch(InvalidSettingsException e){ }
 
+        // only load if NodeSettings contain key (for backwards compatibility)
+        if (settings.containsKey(m_tokenizerModel.getKey())) {
+            m_tokenizerModel.loadSettingsFrom(settings);
+        }
 
         String pubDate = ((SettingsModelString)m_pubDateModel.createCloneWithValidatedValue(settings)).getStringValue();
 
