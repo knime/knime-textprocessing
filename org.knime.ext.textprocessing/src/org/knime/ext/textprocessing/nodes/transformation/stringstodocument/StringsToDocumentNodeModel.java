@@ -125,8 +125,8 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
     private SettingsModelString m_tokenizerModel = StringsToDocumentNodeDialog.getTokenizerModel();
 
     /** The default number of threads value. */
-    static final int DEF_THREADS = Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
-        (int)Math.ceil(Runtime.getRuntime().availableProcessors()));
+    static final int DEF_THREADS = Math.max(1, Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
+        (int)Math.ceil(Runtime.getRuntime().availableProcessors())));
 
     /** The min number of threads. */
     static final int MIN_THREADS = 1;
