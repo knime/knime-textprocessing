@@ -57,7 +57,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.DialogComponentNumberEdit;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
@@ -161,6 +161,8 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
 
     private final SettingsModelString m_httpColName = createHttpColumnNameModel();
 
+    private final SettingsModelString m_tokenizerName = getTokenizerModel();
+
     @SuppressWarnings("unchecked")
     RSSFeedReaderNodeDialog() {
         // component for the url column selection
@@ -172,8 +174,8 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
 
         // components for number of threads and timeout settings
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentNumberEdit(createNumberOfThreadsModel(), "Number of threads"));
-        addDialogComponent(new DialogComponentNumberEdit(createTimeOutModel(), "Time out (in millis)"));
+        addDialogComponent(new DialogComponentNumber(createNumberOfThreadsModel(), "Number of threads", 1));
+        addDialogComponent(new DialogComponentNumber(createTimeOutModel(), "Timeout (in milliseconds)", 100));
         setHorizontalPlacement(false);
 
         // components for additional Document and/or XML columns
@@ -203,13 +205,14 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
 
         Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
-        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
+        addDialogComponent(new DialogComponentStringSelection(m_tokenizerName, "Word tokenizer", tokenizerList));
     }
 
     void toggleColumnNameFields(){
         m_docColName.setEnabled(m_createDocCol.getBooleanValue());
         m_xmlColName.setEnabled(m_createXmlCol.getBooleanValue());
         m_httpColName.setEnabled(m_createHttpCol.getBooleanValue());
+        m_tokenizerName.setEnabled(m_createDocCol.getBooleanValue());
     }
 
     /**
