@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
@@ -104,6 +105,21 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
+     * This map stores tags used by the german and spanish stanford ner models and maps them to the tag naming used by
+     * KNIME.
+     */
+    private static final Map<String, String> tagDictionary = new HashMap<String, String>();
+
+    static {
+        tagDictionary.put("I-LOC", NamedEntityTag.LOCATION.getTag().getTagValue());
+        tagDictionary.put("LUG", NamedEntityTag.LOCATION.getTag().getTagValue());
+        tagDictionary.put("I-PER", NamedEntityTag.PERSON.getTag().getTagValue());
+        tagDictionary.put("PERS", NamedEntityTag.PERSON.getTag().getTagValue());
+        tagDictionary.put("I-ORG", NamedEntityTag.ORGANIZATION.getTag().getTagValue());
+        tagDictionary.put("ORG", NamedEntityTag.ORGANIZATION.getTag().getTagValue());
+    }
+
+    /**
      * Creates a new instance of {@code StanfordNlpNeDocumentTagger}.
      *
      * @param setNeUnmodifiable The unmodifiable flag.
@@ -139,11 +155,12 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
      * {@inheritDoc}
      */
     @Override
-    protected List<Tag> getTags(final String tag) {
-        List<Tag> tags = new ArrayList<Tag>();
+    protected List<Tag> getTags(String tag) {
+        List<Tag> tags = new ArrayList<Tag>(1);
         if (m_tag == null) {
+            tag = normalizeTag(tag);
             tags.add(NamedEntityTag.stringToTag(tag));
-        } else if (m_tag != null) {
+        } else {
             tags.add(m_tag);
         }
         return tags;
@@ -172,6 +189,16 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
             }
         }
         return taggedEntities;
+    }
+
+    /**
+     * Normalizes tags that do not fit to the KNIME tag naming.
+     *
+     * @param The tag as a string.
+     * @return The normalized tag.
+     */
+    private static String normalizeTag(final String str) {
+        return tagDictionary.getOrDefault(str, str);
     }
 
     /**
