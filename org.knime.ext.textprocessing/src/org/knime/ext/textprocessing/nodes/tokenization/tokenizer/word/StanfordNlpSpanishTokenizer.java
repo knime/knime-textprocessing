@@ -59,6 +59,9 @@ import edu.stanford.nlp.international.spanish.process.SpanishTokenizer.SpanishTo
 import edu.stanford.nlp.ling.CoreLabel;
 
 /**
+ * A tokenizer that detects Spanish words. It provides each word as one token.
+ * This word tokenizer is based on the "StanfordNLP Spanish Tokenizer" model, which is created on top of the
+ * "StanfordNLP PTB Tokenizer" model.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3

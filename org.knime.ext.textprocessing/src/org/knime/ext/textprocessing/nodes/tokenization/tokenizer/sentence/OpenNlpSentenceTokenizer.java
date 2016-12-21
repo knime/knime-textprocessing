@@ -54,19 +54,20 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import opennlp.tools.sentdetect.SentenceDetector;
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
-
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
+import opennlp.tools.sentdetect.SentenceDetector;
+import opennlp.tools.sentdetect.SentenceDetectorME;
+import opennlp.tools.sentdetect.SentenceModel;
+
 /**
- * A tokenizer which is able to detect sentences and and provides a tokenization
- * resulting each sentence as one token.
+ * A tokenizer which is able to detect sentences. It provides a tokenization each sentence as one token.
+ * This tokenizer is based on the "OpenNLP Sentence Detection" model.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 3.3
  */
 public class OpenNlpSentenceTokenizer implements Tokenizer {
 

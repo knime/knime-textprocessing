@@ -56,6 +56,8 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import opennlp.tools.tokenize.SimpleTokenizer;
 
 /**
+ * A tokenizer that detects char sequences based on the same character classes as words.
+ * It provides each word as one token. This word tokenizer is based on the "OpenNLP Simple Tokenizer".
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3

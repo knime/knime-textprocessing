@@ -58,6 +58,8 @@ import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 
 /**
+ * A tokenizer that detects English words based on the "StanfordNLP PTB Tokenizer" model.
+ * It provides each word as one token.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3

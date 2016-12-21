@@ -61,9 +61,11 @@ import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 import opennlp.tools.tokenize.TokenizerModel;
 
 /**
- * A tokenizer which is able to detect words and and provides a tokenization resulting each word as one token.
+ * A tokenizer which is able to detect English words. It provides each word as one token.
+ * This word tokenizer is based on the "OpenNLP English Tokenizer" model.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 3.3
  */
 public class OpenNlpEnglishWordTokenizer implements Tokenizer {
 
@@ -72,7 +74,7 @@ public class OpenNlpEnglishWordTokenizer implements Tokenizer {
     private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
     /**
-     * Creates new instance of <code>OpenNlpWordTokenizer</code>.
+     * Creates new instance of {@code OpenNlpEnglishWordTokenizer}.
      */
     public OpenNlpEnglishWordTokenizer() {
         try {
