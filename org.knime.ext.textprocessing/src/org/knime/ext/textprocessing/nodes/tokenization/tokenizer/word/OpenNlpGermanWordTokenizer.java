@@ -62,8 +62,11 @@ import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 import opennlp.tools.tokenize.TokenizerModel;
 
 /**
+ * A tokenizer which is able to detect German words. It provides each word as one token.
+ * This word tokenizer is based on the "OpenNLP German Tokenizer" model.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public class OpenNlpGermanWordTokenizer implements Tokenizer {
 
@@ -72,7 +75,7 @@ public class OpenNlpGermanWordTokenizer implements Tokenizer {
     private opennlp.tools.tokenize.Tokenizer m_tokenizer;
 
     /**
-     * Creates new instance of <code>OpenNlpWordTokenizer</code>.
+     * Creates a new instance of {@code OpenNlpGermanWordTokenizer}.
      */
     public OpenNlpGermanWordTokenizer() {
         try {

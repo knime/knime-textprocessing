@@ -52,8 +52,10 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
+ * This factory class creates instances of the German word tokenizer {@code OpenNlpGermanWordTokenizer}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.3
  */
 public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
 

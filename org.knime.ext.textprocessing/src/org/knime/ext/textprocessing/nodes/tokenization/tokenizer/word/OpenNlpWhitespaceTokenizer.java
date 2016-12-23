@@ -56,6 +56,8 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 /**
+ * A tokenizer that detects words seperated by whitespaces. It provides each word as one token.
+ * This word tokenizer is based on the "OpenNLP Whitespace Tokenizer".
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
