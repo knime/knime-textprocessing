@@ -82,6 +82,8 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_extractPathModel;
 
+    private SettingsModelBoolean m_extractInlineImagesModel;
+
     private SettingsModelBoolean m_authBooleanModel;
 
     private SettingsModelString m_authModel;
@@ -141,16 +143,15 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
-        setHorizontalPlacement(true);
         m_extractBooleanModel = TikaParserConfig.getExtractAttachmentModel();
         m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractBooleanModel);
-        setHorizontalPlacement(false);
+        m_extractInlineImagesModel = TikaParserConfig.getExtractInlineImagesModel();
 
-        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
+        m_extractBooleanModel.addChangeListener(new CheckboxChangeListener());
+        addDialogComponent(new DialogComponentBoolean(m_extractInlineImagesModel, "Extract inline images for PDFs"));
         addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
-        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Encrypted files settings");
@@ -162,6 +163,23 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
 
         closeCurrentGroup();
+    }
+
+    class CheckboxChangeListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            if(m_extractBooleanModel.getBooleanValue()){
+                m_extractInlineImagesModel.setEnabled(true);
+            }else{
+                m_extractInlineImagesModel.setEnabled(false);
+            }
+
+        }
+
     }
 
     class ButtonChangeListener implements ChangeListener {

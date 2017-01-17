@@ -118,6 +118,8 @@ public class TikaParser {
 
     private HashMap<String, Integer> m_duplicates = null;
 
+    private boolean m_extractInlineImages = false;
+
     /**
      * @param sourceNode set to true for TikaParser, else false
      */
@@ -209,6 +211,7 @@ public class TikaParser {
                     EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                     ex.setContext(m_context);
                     ex.setDuplicateFilesList(m_duplicates);
+                    ex.setExtractInlineImages(m_extractInlineImages);
                     ex.extract(stream, attachmentDir.toPath(), file.getName());
                     if (ex.hasError()) {
                         m_errorMsg = "Could not write embedded files to the output directory";
@@ -478,6 +481,20 @@ public class TikaParser {
      */
     public String getErrorMsg() {
         return m_errorMsg;
+    }
+
+    /**
+     * @return the m_extractInlineImages
+     */
+    public boolean getExtractInlineImages() {
+        return m_extractInlineImages;
+    }
+
+    /**
+     * @param extractInlineImages the boolean value to set
+     */
+    public void setExtractInlineImages(final boolean extractInlineImages) {
+        this.m_extractInlineImages = extractInlineImages;
     }
 
 }

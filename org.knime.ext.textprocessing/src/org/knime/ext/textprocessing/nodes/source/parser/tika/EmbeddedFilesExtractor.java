@@ -81,6 +81,7 @@ import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.EmbeddedContentHandler;
 import org.xml.sax.ContentHandler;
@@ -112,6 +113,8 @@ public final class EmbeddedFilesExtractor {
 
     private HashMap<String, Integer> dupFiles;
 
+    private boolean extractInlineImages;
+
     /**
      * Constructor for EmbeddedFilesExtractor class
      */
@@ -124,11 +127,16 @@ public final class EmbeddedFilesExtractor {
         outputFiles = new ArrayList<String>();
         hasError = false;
         context = new ParseContext();
+        extractInlineImages = false;
     }
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
-
         metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, filename);
+        if(extractInlineImages) {
+            PDFParserConfig pdfConfig = new PDFParserConfig();
+            pdfConfig.setExtractInlineImages(extractInlineImages);
+            context.set(PDFParserConfig.class, pdfConfig);
+        }
         CustomEmbeddedDocumentExtractor ex = new CustomEmbeddedDocumentExtractor(outputDir, context);
         context.set(EmbeddedDocumentExtractor.class, ex);
 
@@ -170,6 +178,15 @@ public final class EmbeddedFilesExtractor {
      */
     public void setDuplicateFilesList(final HashMap<String, Integer> duplicateFiles) {
         dupFiles = duplicateFiles;
+    }
+
+    /**
+     * Set whether to extract inline images for PDFs.
+     *
+     * @param extract the boolean value
+     */
+    public void setExtractInlineImages(final boolean extract) {
+        extractInlineImages = extract;
     }
 
     /**

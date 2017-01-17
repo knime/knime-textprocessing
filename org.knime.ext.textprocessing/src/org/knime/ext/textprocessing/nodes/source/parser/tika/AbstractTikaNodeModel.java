@@ -117,6 +117,8 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
 
     private SettingsModelFilterString m_filterModel = TikaParserConfig.getFilterModel();
 
+    private SettingsModelBoolean m_extractInlineImagesModel = TikaParserConfig.getExtractInlineImagesModel();
+
     /**
      * Creates a new instance.
      *
@@ -240,6 +242,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     tikaParser.setExtBoolean(ext);
                     tikaParser.setPassword(m_authModel.getStringValue());
                     tikaParser.setDuplicates(duplicateFiles);
+                    tikaParser.setExtractInlineImages(m_extractInlineImagesModel.getBooleanValue());
 
                     List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
                     duplicateFiles = tikaParser.getDuplicates();
@@ -302,6 +305,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_errorColumnModel.saveSettingsTo(settings);
         m_errorColNameModel.saveSettingsTo(settings);
         m_filterModel.saveSettingsTo(settings);
+        m_extractInlineImagesModel.saveSettingsTo(settings);
     }
 
     /**
@@ -326,6 +330,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_errorColumnModel.validateSettings(settings);
         m_errorColNameModel.validateSettings(settings);
         m_filterModel.validateSettings(settings);
+        m_extractInlineImagesModel.validateSettings(settings);
 
         Boolean extract =
             ((SettingsModelBoolean)m_extractAttachmentModel.createCloneWithValidatedValue(settings)).getBooleanValue();
@@ -361,6 +366,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_errorColumnModel.loadSettingsFrom(settings);
         m_errorColNameModel.loadSettingsFrom(settings);
         m_filterModel.loadSettingsFrom(settings);
+        m_extractInlineImagesModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -402,6 +408,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
      */
     private void stateChange() {
         m_extractPathModel.setEnabled(m_extractAttachmentModel.getBooleanValue());
+        m_extractInlineImagesModel.setEnabled(m_extractAttachmentModel.getBooleanValue());
         m_authModel.setEnabled(m_authBooleanModel.getBooleanValue());
         m_errorColNameModel.setEnabled(m_errorColumnModel.getBooleanValue());
     }
