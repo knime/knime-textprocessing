@@ -57,7 +57,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class NumberFilter implements TermPreprocessing, StringPreprocessing {
 
-    private static String numbers = "[+-]?(\\d*[.,]{1}\\d+|\\d)+";
+    private static String numbers = "^[+-]?(\\d*[.,]{1}\\d+|\\d)+";
 
     private static String replacement = "";
 
