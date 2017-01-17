@@ -591,6 +591,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.source.rssfeedreader.RSSFeedReaderNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentdatainserter.DocumentDataInserterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

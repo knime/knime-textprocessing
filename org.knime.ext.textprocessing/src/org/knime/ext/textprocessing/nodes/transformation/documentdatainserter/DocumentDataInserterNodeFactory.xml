@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator">
+    <name>Document Data Inserter</name>
+    <shortDescription>Inserts meta information into documents
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Tbd.
+		</intro>
+	</fullDescription>
+		
+    <ports>
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents.</inPort>
+        <outPort name="Enhanced data table." index="0">
+        The output table which contains the additional data columns.</outPort>
+    </ports>
+</knimeNode>
