@@ -56,9 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,6 +73,7 @@ import org.apache.tika.extractor.ParsingEmbeddedDocumentExtractor;
 import org.apache.tika.io.TemporaryResources;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.TikaMetadataKeys;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
@@ -107,7 +106,7 @@ public final class EmbeddedFilesExtractor {
 
     private ContentHandler handler;
 
-    private List<String> outputFiles;
+    private HashMap<String, String> outputFiles;
 
     private boolean hasError;
 
@@ -124,7 +123,7 @@ public final class EmbeddedFilesExtractor {
         config = TikaConfig.getDefaultConfig();
         metadata = new Metadata();
         handler = new BodyContentHandler(-1);
-        outputFiles = new ArrayList<String>();
+        outputFiles = new HashMap<String, String>();
         hasError = false;
         context = new ParseContext();
         extractInlineImages = false;
@@ -132,7 +131,7 @@ public final class EmbeddedFilesExtractor {
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
         metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, filename);
-        if(extractInlineImages) {
+        if (extractInlineImages) {
             PDFParserConfig pdfConfig = new PDFParserConfig();
             pdfConfig.setExtractInlineImages(extractInlineImages);
             context.set(PDFParserConfig.class, pdfConfig);
@@ -204,9 +203,9 @@ public final class EmbeddedFilesExtractor {
     }
 
     /**
-     * @return list of extracted files
+     * @return a map of extracted files and their types (attachment or inline image)
      */
-    public List<String> getOutputFiles() {
+    public HashMap<String, String> getOutputFiles() {
         return outputFiles;
     }
 
@@ -230,7 +229,7 @@ public final class EmbeddedFilesExtractor {
 
         private boolean error;
 
-        private List<String> output;
+        private HashMap<String, String> output;
 
         private CustomEmbeddedDocumentExtractor(final Path outputDirectory, final ParseContext parseContext) {
             super(parseContext);
@@ -239,7 +238,7 @@ public final class EmbeddedFilesExtractor {
             autoParser = new AutoDetectParser();
             skippedContainer = false;
             error = false;
-            output = new ArrayList<String>();
+            output = new HashMap<String, String>();
         }
 
         @Override
@@ -307,7 +306,21 @@ public final class EmbeddedFilesExtractor {
                     + String.valueOf(dupFiles.get(name)) + "." + FilenameUtils.getExtension(name));
 
             }
-            output.add(outputFile.getAbsolutePath());
+
+            // check if inline images or attachments
+            // might need more refinement for the attachment part
+            String type = mdata.get(TikaCoreProperties.EMBEDDED_RESOURCE_TYPE);
+            if (type != null) {
+                if (type.equals(TikaCoreProperties.EmbeddedResourceType.INLINE.toString())) {
+                    type = "Inline Image";
+                } else {
+                    type = "Attachment";
+                }
+            } else {
+                type = "Attachment";
+            }
+
+            output.put(outputFile.getAbsolutePath(), type);
             File parent = outputFile.getParentFile();
             if (!parent.exists()) {
                 if (!parent.mkdirs()) {
@@ -352,7 +365,7 @@ public final class EmbeddedFilesExtractor {
             return error;
         }
 
-        public List<String> getOutputFiles() {
+        public HashMap<String, String> getOutputFiles() {
             return output;
         }
 

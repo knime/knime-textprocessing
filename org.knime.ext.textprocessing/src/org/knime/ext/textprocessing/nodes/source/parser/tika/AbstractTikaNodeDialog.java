@@ -91,8 +91,8 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
     private TikaDialogComponentStringFilter m_filterModel;
 
     /**
-     * An abstract Tika node dialog class which displays an input group (either a file chooser component, to specify
-     * the directory containing the files to parse, or a column list to specify the input document column), then two
+     * An abstract Tika node dialog class which displays an input group (either a file chooser component, to specify the
+     * directory containing the files to parse, or a column list to specify the input document column), then two
      * checkbox components to specify if the directory is searched recursively for files to parse and whether to ignore
      * hidden files, button and list components to specify which file types are to be parsed (through file extension or
      * MIME-Type), and the last list component is to specify which meta data information are to be extracted. A tick box
@@ -172,9 +172,9 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            if(m_extractBooleanModel.getBooleanValue()){
+            if (m_extractBooleanModel.getBooleanValue()) {
                 m_extractInlineImagesModel.setEnabled(true);
-            }else{
+            } else {
                 m_extractInlineImagesModel.setEnabled(false);
             }
 

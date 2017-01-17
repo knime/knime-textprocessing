@@ -158,7 +158,7 @@ public class TikaParserConfig {
     /**
      * Column names for the second output port
      */
-    public static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments"};
+    public static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments", "Type"};
 
     /**
      * The default value of the "extract inline images for PDFs" flag.
@@ -449,6 +449,5 @@ public class TikaParserConfig {
         public static final int NO_COLUMNS = COLUMN_PROPERTY_MAP.size();
 
     }
-
 
 }

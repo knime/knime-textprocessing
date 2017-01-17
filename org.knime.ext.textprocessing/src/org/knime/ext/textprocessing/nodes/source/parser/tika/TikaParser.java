@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.exception.EncryptedDocumentException;
@@ -86,6 +87,7 @@ import org.xml.sax.SAXException;
 
 /**
  * The class to parse any files based on Tika
+ *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
 public class TikaParser {
@@ -221,10 +223,11 @@ public class TikaParser {
                     m_handler = ex.getHandler();
 
                     DataCell[] cellsTwo = {};
-                    for (String entry : ex.getOutputFiles()) {
+                    for (Entry<String, String> entry : ex.getOutputFiles().entrySet()) {
                         cellsTwo = new DataCell[TikaParserConfig.OUTPUT_TWO_COL_NAMES.length];
                         cellsTwo[0] = new StringCell(file.getAbsolutePath());
-                        cellsTwo[1] = new StringCell(entry);
+                        cellsTwo[1] = new StringCell(entry.getKey());
+                        cellsTwo[2] = new StringCell(entry.getValue());
                         result.add(cellsTwo);
                     }
                 }
