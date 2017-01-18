@@ -46,7 +46,7 @@
  * History
  *   17.01.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
+package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -56,14 +56,14 @@ import org.knime.core.node.NodeView;
  *
  * @author Julian Bunzel, KNIME.com Berlin
  */
-public class DocumentDataInserterNodeFactory extends NodeFactory<DocumentDataInserterNodeModel> {
+public class DocumentDataAssignerNodeFactory extends NodeFactory<DocumentDataAssignerNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DocumentDataInserterNodeModel createNodeModel() {
-        return new DocumentDataInserterNodeModel();
+    public DocumentDataAssignerNodeModel createNodeModel() {
+        return new DocumentDataAssignerNodeModel();
     }
 
     /**
@@ -78,8 +78,8 @@ public class DocumentDataInserterNodeFactory extends NodeFactory<DocumentDataIns
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentDataInserterNodeModel> createNodeView(final int viewIndex,
-        final DocumentDataInserterNodeModel nodeModel) {
+    public NodeView<DocumentDataAssignerNodeModel> createNodeView(final int viewIndex,
+        final DocumentDataAssignerNodeModel nodeModel) {
         return null;
     }
 
@@ -96,7 +96,7 @@ public class DocumentDataInserterNodeFactory extends NodeFactory<DocumentDataIns
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentDataInserterNodeDialog();
+        return new DocumentDataAssignerNodeDialog();
     }
 
 }

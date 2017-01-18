@@ -46,7 +46,7 @@
  * History
  *   17.01.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
+package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -69,48 +69,48 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Julian Bunzel, KNIME.com Berlin
  */
-public class DocumentDataInserterNodeModel extends SimpleStreamableFunctionNodeModel {
+public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeModel {
 
-    private SettingsModelString m_docColumnModel = DocumentDataInserterNodeDialog.getDocumentColumnModel();
+    private SettingsModelString m_docColumnModel = DocumentDataAssignerNodeDialog.getDocumentColumnModel();
 
-    private SettingsModelString m_authorsColModel = DocumentDataInserterNodeDialog.getAuthorsColumnModel();
+    private SettingsModelString m_authorsColModel = DocumentDataAssignerNodeDialog.getAuthorsColumnModel();
 
-    private SettingsModelString m_sourceColModel = DocumentDataInserterNodeDialog.getSourceColumnModel();
+    private SettingsModelString m_sourceColModel = DocumentDataAssignerNodeDialog.getSourceColumnModel();
 
-    private SettingsModelString m_categoryColModel = DocumentDataInserterNodeDialog.getCategoryColumnModel();
+    private SettingsModelString m_categoryColModel = DocumentDataAssignerNodeDialog.getCategoryColumnModel();
 
-    private SettingsModelString m_pubDateColModel = DocumentDataInserterNodeDialog.getPubDateColumnModel();
+    private SettingsModelString m_pubDateColModel = DocumentDataAssignerNodeDialog.getPubDateColumnModel();
 
-    private SettingsModelBoolean m_useAuthorsColModel = DocumentDataInserterNodeDialog.getUseAuthorsColumnModel();
+    private SettingsModelBoolean m_useAuthorsColModel = DocumentDataAssignerNodeDialog.getUseAuthorsColumnModel();
 
-    private SettingsModelBoolean m_useSourceColModel = DocumentDataInserterNodeDialog.getUseSourceColumnModel();
+    private SettingsModelBoolean m_useSourceColModel = DocumentDataAssignerNodeDialog.getUseSourceColumnModel();
 
-    private SettingsModelBoolean m_useCategoryColModel = DocumentDataInserterNodeDialog.getUseCategoryColumnModel();
+    private SettingsModelBoolean m_useCategoryColModel = DocumentDataAssignerNodeDialog.getUseCategoryColumnModel();
 
-    private SettingsModelBoolean m_usePubDateColModel = DocumentDataInserterNodeDialog.getUsePubDateColumnModel();
+    private SettingsModelBoolean m_usePubDateColModel = DocumentDataAssignerNodeDialog.getUsePubDateColumnModel();
 
-    private SettingsModelString m_authorsFirstNameModel = DocumentDataInserterNodeDialog.getAuthorsFirstNameModel();
+    private SettingsModelString m_authorsFirstNameModel = DocumentDataAssignerNodeDialog.getAuthorsFirstNameModel();
 
-    private SettingsModelString m_authorsLastNameModel = DocumentDataInserterNodeDialog.getAuthorsLastNameModel();
+    private SettingsModelString m_authorsLastNameModel = DocumentDataAssignerNodeDialog.getAuthorsLastNameModel();
 
-    private SettingsModelString m_authorsSplitStrModel = DocumentDataInserterNodeDialog.getAuthorsSplitStringModel();
+    private SettingsModelString m_authorsSplitStrModel = DocumentDataAssignerNodeDialog.getAuthorsSplitStringModel();
 
-    private SettingsModelString m_sourceModel = DocumentDataInserterNodeDialog.getSourceModel();
+    private SettingsModelString m_sourceModel = DocumentDataAssignerNodeDialog.getSourceModel();
 
-    private SettingsModelString m_categoryModel = DocumentDataInserterNodeDialog.getCategoryModel();
+    private SettingsModelString m_categoryModel = DocumentDataAssignerNodeDialog.getCategoryModel();
 
-    private SettingsModelString m_pubDateModel = DocumentDataInserterNodeDialog.getPubDateModel();
+    private SettingsModelString m_pubDateModel = DocumentDataAssignerNodeDialog.getPubDateModel();
 
-    private SettingsModelString m_typeModel = DocumentDataInserterNodeDialog.getTypeModel();
+    private SettingsModelString m_typeModel = DocumentDataAssignerNodeDialog.getTypeModel();
 
-    private SettingsModelIntegerBounded m_threadsModel = DocumentDataInserterNodeDialog.getNumberOfThreadsModel();
+    private SettingsModelIntegerBounded m_threadsModel = DocumentDataAssignerNodeDialog.getNumberOfThreadsModel();
 
-    private SettingsModelBoolean m_replaceDocColModel = DocumentDataInserterNodeDialog.getReplaceDocColumnModel();
+    private SettingsModelBoolean m_replaceDocColModel = DocumentDataAssignerNodeDialog.getReplaceDocColumnModel();
 
     /**
      *
      */
-    public DocumentDataInserterNodeModel() {
+    public DocumentDataAssignerNodeModel() {
         modelStateChanged();
     }
 
@@ -132,7 +132,7 @@ public class DocumentDataInserterNodeModel extends SimpleStreamableFunctionNodeM
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        DocumentDataInserterConfig conf = new DocumentDataInserterConfig();
+        DocumentDataAssignerConfig conf = new DocumentDataAssignerConfig();
 
         //document
         conf.setDocumentColumnIndex(spec.findColumnIndex(m_docColumnModel.getStringValue()));
@@ -173,7 +173,7 @@ public class DocumentDataInserterNodeModel extends SimpleStreamableFunctionNodeM
         //threads
         conf.setNumberOfThreads(m_threadsModel.getIntValue());
 
-        DocumentDataInserterCellFactory cellFac = new DocumentDataInserterCellFactory(conf, createNewColumnSpecs());
+        DocumentDataAssignerCellFactory cellFac = new DocumentDataAssignerCellFactory(conf, createNewColumnSpecs());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         if (m_replaceDocColModel.getBooleanValue()) {
             rearranger.replace(cellFac, m_docColumnModel.getStringValue());

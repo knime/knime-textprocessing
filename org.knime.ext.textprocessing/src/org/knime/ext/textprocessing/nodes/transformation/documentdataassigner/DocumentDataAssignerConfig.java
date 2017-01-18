@@ -46,7 +46,7 @@
  * History
  *   17.01.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
+package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import org.knime.core.node.KNIMEConstants;
 import org.knime.ext.textprocessing.data.DocumentType;
@@ -56,7 +56,7 @@ import org.knime.ext.textprocessing.data.PublicationDate;
  *
  * @author Julian Bunzel, KNIME.com Berlin
  */
-public class DocumentDataInserterConfig {
+public class DocumentDataAssignerConfig {
 
     static final String DEF_DOCUMENT_PUBDATE = PublicationDate.getToday();
 

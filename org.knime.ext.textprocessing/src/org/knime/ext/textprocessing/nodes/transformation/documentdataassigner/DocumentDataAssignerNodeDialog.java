@@ -46,7 +46,7 @@
  * History
  *   17.01.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
+package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -68,92 +68,92 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Julian Bunzel, KNIME.com Berlin
  */
-public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
+public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
     static final SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_DOCCOL, "");
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCCOL, "");
     }
 
     static final SettingsModelString getAuthorsColumnModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_AUTHORSCOL, "");
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHORSCOL, "");
     }
 
     static final SettingsModelString getCategoryColumnModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_CATCOLUMN, "");
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_CATCOLUMN, "");
     }
 
     static final SettingsModelString getSourceColumnModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_SOURCECOLUMN, "");
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_SOURCECOLUMN, "");
     }
 
     static final SettingsModelString getPubDateColumnModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_PUBDATECOL, "");
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_PUBDATECOL, "");
     }
 
     static final SettingsModelBoolean getUseAuthorsColumnModel() {
-        return new SettingsModelBoolean(DocumentDataInserterConfigKeys.CFGKEY_USE_AUTHORSCOLUMN,
-            DocumentDataInserterConfig.DEF_USE_AUTHORSCOLUMN);
+        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_AUTHORSCOLUMN,
+            DocumentDataAssignerConfig.DEF_USE_AUTHORSCOLUMN);
     }
 
     static final SettingsModelBoolean getUseCategoryColumnModel() {
-        return new SettingsModelBoolean(DocumentDataInserterConfigKeys.CFGKEY_USE_CATCOLUMN,
-            DocumentDataInserterConfig.DEF_USE_CATCOLUMN);
+        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_CATCOLUMN,
+            DocumentDataAssignerConfig.DEF_USE_CATCOLUMN);
     }
 
     static final SettingsModelBoolean getUseSourceColumnModel() {
-        return new SettingsModelBoolean(DocumentDataInserterConfigKeys.CFGKEY_USE_SOURCECOLUMN,
-            DocumentDataInserterConfig.DEF_USE_SOURCECOLUMN);
+        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_SOURCECOLUMN,
+            DocumentDataAssignerConfig.DEF_USE_SOURCECOLUMN);
     }
 
     static final SettingsModelBoolean getUsePubDateColumnModel() {
-        return new SettingsModelBoolean(DocumentDataInserterConfigKeys.CFGKEY_USE_PUBDATECOLUMN,
-            DocumentDataInserterConfig.DEF_USE_PUBDATECOLUMN);
+        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_PUBDATECOLUMN,
+            DocumentDataAssignerConfig.DEF_USE_PUBDATECOLUMN);
     }
 
     static final SettingsModelString getSourceModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_DOCSOURCE,
-            DocumentDataInserterConfig.DEF_DOCUMENT_SOURCE);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCSOURCE,
+            DocumentDataAssignerConfig.DEF_DOCUMENT_SOURCE);
     }
 
     static final SettingsModelString getCategoryModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_DOCCAT,
-            DocumentDataInserterConfig.DEF_DOCUMENT_CATEGORY);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCCAT,
+            DocumentDataAssignerConfig.DEF_DOCUMENT_CATEGORY);
     }
 
     static final SettingsModelString getAuthorsFirstNameModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
-            DocumentDataInserterConfig.DEF_AUTHOR_FIRST_NAME);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
+            DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME);
     }
 
     static final SettingsModelString getAuthorsLastNameModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
-            DocumentDataInserterConfig.DEF_AUTHOR_LAST_NAME);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
+            DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME);
     }
 
     static final SettingsModelString getAuthorsSplitStringModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_AUTHORSPLIT_STR,
-            DocumentDataInserterConfig.DEF_AUTHORSSPLIT_STR);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHORSPLIT_STR,
+            DocumentDataAssignerConfig.DEF_AUTHORSSPLIT_STR);
     }
 
     static final SettingsModelString getTypeModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_DOCTYPE,
-            DocumentDataInserterConfig.DEF_DOCUMENT_TYPE);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCTYPE,
+            DocumentDataAssignerConfig.DEF_DOCUMENT_TYPE);
     }
 
     static final SettingsModelString getPubDateModel() {
-        return new SettingsModelString(DocumentDataInserterConfigKeys.CFGKEY_PUBDATE,
-            DocumentDataInserterConfig.DEF_DOCUMENT_PUBDATE);
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_PUBDATE,
+            DocumentDataAssignerConfig.DEF_DOCUMENT_PUBDATE);
     }
 
     static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
-        return new SettingsModelIntegerBounded(DocumentDataInserterConfigKeys.CFGKEY_THREADS,
-            DocumentDataInserterConfig.DEF_THREADS, DocumentDataInserterConfig.MIN_THREADS,
-            DocumentDataInserterConfig.MAX_THREADS);
+        return new SettingsModelIntegerBounded(DocumentDataAssignerConfigKeys.CFGKEY_THREADS,
+            DocumentDataAssignerConfig.DEF_THREADS, DocumentDataAssignerConfig.MIN_THREADS,
+            DocumentDataAssignerConfig.MAX_THREADS);
     }
 
     static final SettingsModelBoolean getReplaceDocColumnModel() {
-        return new SettingsModelBoolean(DocumentDataInserterConfigKeys.CFGKEY_REPLACE_DOCCOL,
-            DocumentDataInserterConfig.DEF_REPLACE_DOCCOL);
+        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_DOCCOL,
+            DocumentDataAssignerConfig.DEF_REPLACE_DOCCOL);
     }
 
     SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
@@ -188,7 +188,7 @@ public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
      *
      */
     @SuppressWarnings("unchecked")
-    public DocumentDataInserterNodeDialog() {
+    public DocumentDataAssignerNodeDialog() {
         createNewGroup("Text");
         addDialogComponent(new DialogComponentColumnNameSelection(getDocumentColumnModel(), "Document column", 0,
             DocumentValue.class));

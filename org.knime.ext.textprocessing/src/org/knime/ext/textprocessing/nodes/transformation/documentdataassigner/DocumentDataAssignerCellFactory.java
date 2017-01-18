@@ -46,7 +46,7 @@
  * History
  *   17.01.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
+package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import java.text.ParseException;
 import java.util.regex.Matcher;
@@ -78,23 +78,23 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
- * @author Julian Bunzel, KNIME.com Berlin
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class DocumentDataInserterCellFactory extends AbstractCellFactory {
+public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentDataInserterCellFactory.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentDataAssignerCellFactory.class);
 
     private static final Pattern DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})-([\\d]{4})");
 
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
-    private DocumentDataInserterConfig m_conf;
+    private DocumentDataAssignerConfig m_conf;
 
     /**
      * @param conf
      * @param dataColumnSpec
      */
-    public DocumentDataInserterCellFactory(final DocumentDataInserterConfig conf,
+    public DocumentDataAssignerCellFactory(final DocumentDataAssignerConfig conf,
         final DataColumnSpec[] dataColumnSpec) {
         super(dataColumnSpec);
 
@@ -144,9 +144,9 @@ public class DocumentDataInserterCellFactory extends AbstractCellFactory {
 
         //set authors
         if (m_conf.getAuthorsColumnIndex() < 0) {
-            if ((m_conf.getAuthorsFirstName() != DocumentDataInserterConfig.DEF_AUTHOR_FIRST_NAME
+            if ((m_conf.getAuthorsFirstName() != DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME
                 && !m_conf.getAuthorsFirstName().isEmpty())
-                || (m_conf.getAuthorsLastName() != DocumentDataInserterConfig.DEF_AUTHOR_LAST_NAME
+                || (m_conf.getAuthorsLastName() != DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME
                     && !m_conf.getAuthorsLastName().isEmpty())) {
                 docBuilder.addAuthor(new Author(m_conf.getAuthorsFirstName(), m_conf.getAuthorsLastName()));
             }

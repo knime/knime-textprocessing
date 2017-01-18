@@ -594,7 +594,7 @@
       <node
             category-path="/labs/textprocessing/transformation"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentdatainserter.DocumentDataInserterNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeFactory">
       </node>
    </extension>
    <extension

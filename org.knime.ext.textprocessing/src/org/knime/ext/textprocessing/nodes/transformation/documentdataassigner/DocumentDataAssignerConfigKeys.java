@@ -46,13 +46,13 @@
  * History
  *   17.01.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
+package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com Berlin
  */
-public class DocumentDataInserterConfigKeys {
+public class DocumentDataAssignerConfigKeys {
 
     /**
      * The configuration key for the document column.
