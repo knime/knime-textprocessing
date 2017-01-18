@@ -152,7 +152,7 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
                 final SentenceIterator sentenceIter = new BufferedDataTableSentenceIterator(table, documentColumnName);
 
                 // build word2vec model
-                final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).learningRate(minLearningRate)
+                final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).minLearningRate(minLearningRate)
                     .seed(seed).layerSize(layerSize).batchSize(batchSize).windowSize(windowSize)
                     .minWordFrequency(minWordFrequency).iterations(trainingIterations).epochs(epochs)
                     .iterate(sentenceIter).tokenizerFactory(t).build();
