@@ -60,6 +60,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -290,6 +291,10 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         if (settingsNotConfigured()) {
             for (int i = 0; i < columns.length; i++) {
                 String column = columns[i];
+                if (dataTableSpec.getColumnSpec(column).getType().isCompatible(DocumentValue.class)
+                    && m_docColumnModel.getStringValue().isEmpty()) {
+                    m_docColumnModel.setStringValue(column);
+                }
                 if (column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
                     m_sourceColModel.setStringValue(column);
@@ -314,7 +319,8 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
      * @return true if settings have not been configured before
      */
     protected boolean settingsNotConfigured() {
-        return (m_authorsColModel.getStringValue().length() == 0 && m_sourceColModel.getStringValue().length() == 0
-            && m_categoryColModel.getStringValue().length() == 0 && m_pubDateColModel.getStringValue().length() == 0);
+        return (m_docColumnModel.getStringValue().isEmpty() && m_authorsColModel.getStringValue().isEmpty()
+            && m_sourceColModel.getStringValue().isEmpty() && m_categoryColModel.getStringValue().isEmpty()
+            && m_pubDateColModel.getStringValue().isEmpty());
     }
 }
