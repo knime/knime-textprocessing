@@ -85,9 +85,6 @@ import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettin
  */
 public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger.getLogger(WordVectorLearnerNodeModel.class);
-
     /* SettingsModels */
     private LearnerParameterSettingsModels m_learnerParameterSettings;
 
