@@ -58,13 +58,13 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
 import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
-import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels;
+import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
+import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.EnumUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
-import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels;
+import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels2;
 
 /**
  * <code>NodeDialog</code> for the "WordVectorLearner" Node.
@@ -81,9 +81,9 @@ public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
      * New pane for configuring the WordVectorLearner node.
      */
     protected WordVectorLearnerNodeDialog() {
-        final LearnerParameterSettingsModels learnerSettingsModels = new LearnerParameterSettingsModels();
-        final DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
-        final WordVectorParameterSettingsModels wordVectorSettingsModels = new WordVectorParameterSettingsModels();
+        final LearnerParameterSettingsModels2 learnerSettingsModels = new LearnerParameterSettingsModels2();
+        final DataParameterSettingsModels2 dataSettingsModels = new DataParameterSettingsModels2();
+        final WordVectorParameterSettingsModels2 wordVectorSettingsModels = new WordVectorParameterSettingsModels2();
 
         final SettingsModelString trainingModeSettings = (SettingsModelString)wordVectorSettingsModels
             .createParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
