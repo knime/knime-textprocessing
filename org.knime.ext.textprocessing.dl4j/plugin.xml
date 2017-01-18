@@ -15,8 +15,13 @@
       </node>
       <node
             category-path="/labs/deeplearning/embeddings"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory2">
       </node>
    </extension>
    <extension
