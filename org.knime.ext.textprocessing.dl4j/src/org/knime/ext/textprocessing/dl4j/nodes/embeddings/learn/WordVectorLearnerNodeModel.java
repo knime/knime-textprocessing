@@ -57,7 +57,6 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -65,8 +64,8 @@ import org.knime.core.node.port.PortType;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
 import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
 import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
-import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels;
+import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
+import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentIterator;
@@ -75,7 +74,7 @@ import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
-import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels;
+import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels2;
 
 /**
  * Node to learn a {@link WordVectors} model using either Wor2Vec or Doc2Vec using DL4J implementation. For details see:
@@ -86,11 +85,11 @@ import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettin
 public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 
     /* SettingsModels */
-    private LearnerParameterSettingsModels m_learnerParameterSettings;
+    private LearnerParameterSettingsModels2 m_learnerParameterSettings;
 
-    private DataParameterSettingsModels m_dataParameterSettings;
+    private DataParameterSettingsModels2 m_dataParameterSettings;
 
-    private WordVectorParameterSettingsModels m_wordVecParameterSettings;
+    private WordVectorParameterSettingsModels2 m_wordVecParameterSettings;
 
     private WordVectorPortObjectSpec m_outputSpec;
 
@@ -106,24 +105,24 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
         TableUtils.checkForEmptyTable(table);
 
         final WordVectorTrainingMode mode =
-            WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
-        final String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
-        final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
+            WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
+        final String labelColumnName = m_dataParameterSettings.getString(DataParameter.LABEL_COLUMN);
+        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
         WordVectors wordVectors = null;
 
         // training parameters
-        final int trainingIterations = m_learnerParameterSettings.getTrainingIterations().getIntValue();
-        final int minWordFrequency = m_wordVecParameterSettings.getMinWordFrequency().getIntValue();
-        final int layerSize = m_wordVecParameterSettings.getLayerSize().getIntValue();
-        final int seed = m_learnerParameterSettings.getSeed().getIntValue();
-        final double learningRate = m_learnerParameterSettings.getGlobalLearningRate().getDoubleValue();
-        final double minLearningRate = m_wordVecParameterSettings.getMinimumLearningRate().getDoubleValue();
-        final int windowSize = m_wordVecParameterSettings.getWindowSize().getIntValue();
-        final int epochs = m_dataParameterSettings.getEpochs().getIntValue();
-        final int batchSize = m_dataParameterSettings.getBatchSize().getIntValue();
+        final int trainingIterations = m_learnerParameterSettings.getInteger(LearnerParameter.TRAINING_ITERATIONS);
+        final int minWordFrequency = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
+        final int layerSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.LAYER_SIZE);
+        final int seed = m_learnerParameterSettings.getInteger(LearnerParameter.SEED);
+        final double learningRate = m_learnerParameterSettings.getDouble(LearnerParameter.GLOBAL_LEARNING_RATE);
+        final double minLearningRate = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
+        final int windowSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.WINDOW_SIZE);
+        final int epochs = m_dataParameterSettings.getInteger(DataParameter.EPOCHS);
+        final int batchSize = m_dataParameterSettings.getInteger(DataParameter.BATCH_SIZE);
 
         // sentence tokenizer and preprocessing
-        final boolean usePreproc = m_wordVecParameterSettings.getUseBasicPreprocessing().getBooleanValue();
+        final boolean usePreproc = m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING);
         final TokenizerFactory t = new DefaultTokenizerFactory();
         if (usePreproc) {
             t.setTokenPreProcessor(new CommonPreprocessor());
@@ -172,9 +171,9 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
         final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
         final WordVectorTrainingMode mode =
-            WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getWordVectorTrainingsMode().getStringValue());
-        final String labelColumnName = m_dataParameterSettings.getLabelColumn().getStringValue();
-        final String documentColumnName = m_dataParameterSettings.getDocumentColumn().getStringValue();
+                WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
+        final String labelColumnName = m_dataParameterSettings.getString(DataParameter.LABEL_COLUMN);
+        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
 
         switch (mode) {
             case DOC2VEC:
@@ -202,22 +201,22 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
 
     @Override
     protected List<SettingsModel> initSettingsModels() {
-        m_learnerParameterSettings = new LearnerParameterSettingsModels();
+        m_learnerParameterSettings = new LearnerParameterSettingsModels2();
         m_learnerParameterSettings.setParameter(LearnerParameter.GLOBAL_LEARNING_RATE);
         m_learnerParameterSettings.setParameter(LearnerParameter.TRAINING_ITERATIONS);
         m_learnerParameterSettings.setParameter(LearnerParameter.SEED);
 
-        m_dataParameterSettings = new DataParameterSettingsModels();
+        m_dataParameterSettings = new DataParameterSettingsModels2();
         m_dataParameterSettings.setParameter(DataParameter.BATCH_SIZE);
         m_dataParameterSettings.setParameter(DataParameter.EPOCHS);
         m_dataParameterSettings.setParameter(DataParameter.LABEL_COLUMN);
         // default training mode is Word2Vec so labels are not required by
         // default
-        m_dataParameterSettings.getLabelColumn().setEnabled(false);
+        m_dataParameterSettings.getParameter(DataParameter.LABEL_COLUMN).setEnabled(false);
 
         m_dataParameterSettings.setParameter(DataParameter.DOCUMENT_COLUMN);
 
-        m_wordVecParameterSettings = new WordVectorParameterSettingsModels();
+        m_wordVecParameterSettings = new WordVectorParameterSettingsModels2();
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LAYER_SIZE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
