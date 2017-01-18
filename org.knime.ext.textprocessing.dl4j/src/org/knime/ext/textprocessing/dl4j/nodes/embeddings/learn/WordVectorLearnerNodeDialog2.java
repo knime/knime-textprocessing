@@ -48,11 +48,9 @@ import javax.swing.event.ChangeListener;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumberEdit;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -115,10 +113,6 @@ public class WordVectorLearnerNodeDialog2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentStringSelection(trainingModeSettings, "WordVector Training Mode",
             EnumUtils.getStringCollectionFromToString(WordVectorTrainingMode.values())));
-        addDialogComponent(new DialogComponentBoolean(
-            (SettingsModelBoolean)wordVectorSettingsModels
-                .createParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING),
-            "Use Basic Token Preprocessing?"));
         addDialogComponent(new DialogComponentNumberEdit(
             (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.SEED), "Seed", 4));
         addDialogComponent(new DialogComponentNumberEdit(
