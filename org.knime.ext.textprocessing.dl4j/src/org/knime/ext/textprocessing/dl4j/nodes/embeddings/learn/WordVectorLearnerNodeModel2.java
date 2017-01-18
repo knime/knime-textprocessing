@@ -50,7 +50,6 @@ import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
-import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.knime.core.data.DataTableSpec;
@@ -122,11 +121,7 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         final int batchSize = m_dataParameterSettings.getInteger(DataParameter.BATCH_SIZE);
 
         // sentence tokenizer and preprocessing
-        final boolean usePreproc = m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING);
         final TokenizerFactory t = new DefaultTokenizerFactory();
-        if (usePreproc) {
-            t.setTokenPreProcessor(new CommonPreprocessor());
-        }
 
         switch (mode) {
             case DOC2VEC:
@@ -222,7 +217,6 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE);
-        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING);
 
         final List<SettingsModel> settings = new ArrayList<>();
         settings.addAll(m_learnerParameterSettings.getAllInitializedSettings());
