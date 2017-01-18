@@ -60,7 +60,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
-import org.knime.core.node.defaultnodesettings.SettingsModelNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -146,10 +145,15 @@ public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
             DocumentDataInserterConfig.DEF_DOCUMENT_PUBDATE);
     }
 
-    static final SettingsModelNumber getNumberOfThreadsModel() {
+    static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
         return new SettingsModelIntegerBounded(DocumentDataInserterConfigKeys.CFGKEY_THREADS,
-            DocumentDataInserterNodeModel.DEF_THREADS, DocumentDataInserterNodeModel.MIN_THREADS,
-            DocumentDataInserterNodeModel.MAX_THREADS);
+            DocumentDataInserterConfig.DEF_THREADS, DocumentDataInserterConfig.MIN_THREADS,
+            DocumentDataInserterConfig.MAX_THREADS);
+    }
+
+    static final SettingsModelBoolean getReplaceDocColumnModel() {
+        return new SettingsModelBoolean(DocumentDataInserterConfigKeys.CFGKEY_REPLACE_DOCCOL,
+            DocumentDataInserterConfig.DEF_REPLACE_DOCCOL);
     }
 
     SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
@@ -174,6 +178,12 @@ public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
 
     SettingsModelString m_pubDateColumnModel = getPubDateColumnModel();
 
+    SettingsModelString m_authorsFirstNameModel = getAuthorsFirstNameModel();
+
+    SettingsModelString m_authorsLastNameModel = getAuthorsLastNameModel();
+
+    SettingsModelString m_authorsSplitStrModel = getAuthorsSplitStringModel();
+
     /**
      *
      */
@@ -190,11 +200,11 @@ public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getAuthorsSplitStringModel(), "Author names separator"));
+        addDialogComponent(new DialogComponentString(m_authorsSplitStrModel, "Author names separator"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getAuthorsFirstNameModel(), "Default author first name"));
-        addDialogComponent(new DialogComponentString(getAuthorsLastNameModel(), "Default author last name"));
+        addDialogComponent(new DialogComponentString(m_authorsFirstNameModel, "Default author first name"));
+        addDialogComponent(new DialogComponentString(m_authorsLastNameModel, "Default author last name"));
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
@@ -231,6 +241,10 @@ public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
             StringValue.class));
         closeCurrentGroup();
 
+        createNewGroup("Column Settings");
+        addDialogComponent(new DialogComponentBoolean(getReplaceDocColumnModel(), "Replace document column"));
+        closeCurrentGroup();
+
         createNewGroup("Processes");
         addDialogComponent(
             new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel processes", 1));
@@ -247,6 +261,9 @@ public class DocumentDataInserterNodeDialog extends DefaultNodeSettingsPane {
         m_sourceColumnModel.setEnabled(m_useSourceColumnModel.getBooleanValue());
         m_sourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
         m_authorsColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+        m_authorsSplitStrModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+        m_authorsFirstNameModel.setEnabled(!m_useAuthorsColumnModel.getBooleanValue());
+        m_authorsLastNameModel.setEnabled(!m_useAuthorsColumnModel.getBooleanValue());
     }
 
     class ChangeStateListener implements ChangeListener {

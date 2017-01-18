@@ -54,9 +54,6 @@ package org.knime.ext.textprocessing.nodes.transformation.documentdatainserter;
  */
 public class DocumentDataInserterConfigKeys {
 
-    DocumentDataInserterConfigKeys() {
-        /* empty */}
-
     /**
      * The configuration key for the document column.
      */
@@ -142,4 +139,10 @@ public class DocumentDataInserterConfigKeys {
      * The configuration key of the number of threads to use.
      */
     static final String CFGKEY_THREADS = "Number of threads";
+
+    /**
+     * The configuration key for the document column replacement option.
+     */
+    static final String CFGKEY_REPLACE_DOCCOL = "ReplaceDocColumn";
+
 }

@@ -61,13 +61,11 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * A utility class which helps building up a
- * {@link org.knime.ext.textprocessing.data.Document} by providing methods which
- * allow to add sections, paragraphs and sentences in an easy way, create the a
- * documents word cache and much more.<br/>
+ * A utility class which helps building up a {@link org.knime.ext.textprocessing.data.Document} by providing methods
+ * which allow to add sections, paragraphs and sentences in an easy way, create the a documents word cache and much
+ * more.<br/>
  * <br/>
- * Example for building up a {@link org.knime.ext.textprocessing.data.Document}:
- * <br/>
+ * Example for building up a {@link org.knime.ext.textprocessing.data.Document}: <br/>
  * <code>
  * DocumentBuilder db = new DocumentBuilder();<br/>
  * db.addAuthor(new Author("John", "Public"));<br/>
@@ -118,6 +116,7 @@ public class DocumentBuilder {
 
     /**
      * Creates new empty instance of {@code DocumentBuilder}.
+     *
      * @deprecated Use {@link #DocumentBuilder(String)} instead for tokenizer selection support.
      */
     @Deprecated
@@ -128,6 +127,7 @@ public class DocumentBuilder {
 
     /**
      * Creates new instance of {@code DocumentBuilder} with specified word tokenizer.
+     *
      * @param tokenizerName The tokenizer used for word tokenization.
      * @since 3.3
      */
@@ -137,14 +137,13 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates new instance of {@code DocumentBuilder} and sets the meta
-     * information of the given {@code Document}.<br/>
-     * The meta information to copy is: the documents authors, the source, the
-     * category, the type, the file and the publication date.<br/>
-     * The text data like title or sections are not copied.
-     * Only use this constructor if you want to create a document based on another document.
-     * If you want to add new content based on Strings (e.g. with {@link #addSentence(String sentence)})
-     * use {@link #DocumentBuilder(Document doc, String tokenizerName)}
+     * Creates new instance of {@code DocumentBuilder} and sets the meta information of the given {@code Document}.<br/>
+     * The meta information to copy is: the documents authors, the source, the category, the type, the file and the
+     * publication date.<br/>
+     * The text data like title or sections are not copied. Only use this constructor if you want to create a document
+     * based on another document. If you want to add new content based on Strings (e.g. with
+     * {@link #addSentence(String sentence)}) use {@link #DocumentBuilder(Document doc, String tokenizerName)}
+     *
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
@@ -153,13 +152,12 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates new instance of {@code DocumentBuilder} and sets the meta
-     * information of the given {@code Document}.<br/>
-     * The meta information to copy is: the documents authors, the source, the
-     * category, the type, the file and the publication date.<br/>
-     * The text data like title or sections are not copied.
-     * Use this constructor if you are willing to add new information based on strings
-     * (e.g. with {@link #addSentence(String sentence)}).
+     * Creates new instance of {@code DocumentBuilder} and sets the meta information of the given {@code Document}.<br/>
+     * The meta information to copy is: the documents authors, the source, the category, the type, the file and the
+     * publication date.<br/>
+     * The text data like title or sections are not copied. Use this constructor if you are willing to add new
+     * information based on strings (e.g. with {@link #addSentence(String sentence)}).
+     *
      * @param doc The document containing the meta information to copy.
      * @param tokenizerName The tokenizer used for word tokenization.
      * @since 3.3
@@ -195,8 +193,35 @@ public class DocumentBuilder {
     }
 
     /**
+     * @param doc
+     * @param keepText
+     * @since 3.3
+     */
+    public DocumentBuilder(final Document doc, final boolean keepText) {
+        this(doc, keepText, TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
+     * @param doc
+     * @param keepText
+     * @param tokenizerName
+     * @since 3.3
+     */
+    public DocumentBuilder(final Document doc, final boolean keepText, final String tokenizerName) {
+        this(doc, tokenizerName);
+
+        if (keepText) {
+            // Add sections
+            for (Section s : doc.getSections()) {
+                addSection(s);
+            }
+        }
+    }
+
+    /**
      * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance containing the given data, such as
      * authors, sections, etc.
+     *
      * @param sections the section to set
      * @param type the type to set
      * @param authors the authors to set
@@ -215,20 +240,19 @@ public class DocumentBuilder {
     }
 
     /**
-     * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance
-     * with the specified data, like authors, sections, etc.
+     * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance with the specified data, like authors,
+     * sections, etc.
      *
-     * @return a new {@link org.knime.ext.textprocessing.data.Document} instance
-     *         with the specified data.
+     * @return a new {@link org.knime.ext.textprocessing.data.Document} instance with the specified data.
      */
     public Document createDocument() {
-        return new Document(m_sections, m_type, m_authors, m_sources,
-                m_categories, m_date, m_docFile,
-                new DocumentMetaInfo(m_metaInfo));
+        return new Document(m_sections, m_type, m_authors, m_sources, m_categories, m_date, m_docFile,
+            new DocumentMetaInfo(m_metaInfo));
     }
 
     /**
      * Adds the key value pair to the meta information of the document.
+     *
      * @param key The key of the meta information.
      * @param value The value of the meta information.
      * @since 2.8
@@ -240,15 +264,14 @@ public class DocumentBuilder {
     }
 
     /**
-     * Adds all the key value pairs of the given {@link DocumentMetaInfo} to the
-     * meta info section of the current document to build.
-     * @param metaInfo The {@link DocumentMetaInfo} containing the key value
-     * pairs to add.
+     * Adds all the key value pairs of the given {@link DocumentMetaInfo} to the meta info section of the current
+     * document to build.
+     *
+     * @param metaInfo The {@link DocumentMetaInfo} containing the key value pairs to add.
      * @since 2.8
      */
     public void addMetaInformation(final DocumentMetaInfo metaInfo) {
-        if (metaInfo != null && metaInfo.getClass() != null
-                && metaInfo.getMetaInfoKeys().size() > 0) {
+        if (metaInfo != null && metaInfo.getClass() != null && metaInfo.getMetaInfoKeys().size() > 0) {
             for (String key : metaInfo.getMetaInfoKeys()) {
                 addMetaInformation(key, metaInfo.getMetaInfoValue(key));
             }
@@ -256,8 +279,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * Adds the given {@link org.knime.ext.textprocessing.data.Author} to the
-     * list of authors.
+     * Adds the given {@link org.knime.ext.textprocessing.data.Author} to the list of authors.
      *
      * @param author the author to add to the authors list.
      */
@@ -268,8 +290,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentSource}
-     * to the list of sources.
+     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentSource} to the list of sources.
      *
      * @param source the source to add to the sources list.
      */
@@ -280,8 +301,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentCategory}
-     * to the list of categories.
+     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentCategory} to the list of categories.
      *
      * @param category the category to add to the categories list.
      */
@@ -292,8 +312,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * @param date The date to set as
-     *            {@link org.knime.ext.textprocessing.data.PublicationDate}.
+     * @param date The date to set as {@link org.knime.ext.textprocessing.data.PublicationDate}.
      */
     public void setPublicationDate(final PublicationDate date) {
         if (date != null) {
@@ -311,8 +330,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * @param type The type to set as
-     *            {@link org.knime.ext.textprocessing.data.DocumentType}.
+     * @param type The type to set as {@link org.knime.ext.textprocessing.data.DocumentType}.
      */
     public void setDocumentType(final DocumentType type) {
         if (type != null) {
@@ -321,9 +339,8 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given title and add it as a
-     * {@link org.knime.ext.textprocessing.data.Section} with <code>TITLE</code>
-     * annotation to the list of sections.
+     * Tokenizes the given title and add it as a {@link org.knime.ext.textprocessing.data.Section} with
+     * <code>TITLE</code> annotation to the list of sections.
      *
      * @param title The title to tokenize and to add as section.
      */
@@ -341,10 +358,9 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates a new {@link org.knime.ext.textprocessing.data.Sentence} out of
-     * the current list of {@link org.knime.ext.textprocessing.data.Term}s and
-     * adds it to the current list of sentences. After adding the current list
-     * of term to the new sentences a new empty term list is created.
+     * Creates a new {@link org.knime.ext.textprocessing.data.Sentence} out of the current list of
+     * {@link org.knime.ext.textprocessing.data.Term}s and adds it to the current list of sentences. After adding the
+     * current list of term to the new sentences a new empty term list is created.
      */
     public void createNewSentence() {
         if (m_terms != null && m_terms.size() > 0) {
@@ -355,11 +371,9 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates a new {@link org.knime.ext.textprocessing.data.Paragraph} out of
-     * the current list of {@link org.knime.ext.textprocessing.data.Sentence}s
-     * and adds it to the current list of paragraphs. After adding the current
-     * list of sentences to the new paragraph a new empty sentence list is
-     * created.
+     * Creates a new {@link org.knime.ext.textprocessing.data.Paragraph} out of the current list of
+     * {@link org.knime.ext.textprocessing.data.Sentence}s and adds it to the current list of paragraphs. After adding
+     * the current list of sentences to the new paragraph a new empty sentence list is created.
      */
     public void createNewParagraph() {
         if (m_sentences != null && m_sentences.size() > 0) {
@@ -370,16 +384,12 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates a new {@link org.knime.ext.textprocessing.data.Section} out of
-     * the current list of {@link org.knime.ext.textprocessing.data.Paragraph}s
-     * and ads it to the current list of sections. After adding the current list
-     * of paragraphs to the new section a new empty list is created. The given
-     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is added to
-     * the section and specifies its role.
+     * Creates a new {@link org.knime.ext.textprocessing.data.Section} out of the current list of
+     * {@link org.knime.ext.textprocessing.data.Paragraph}s and ads it to the current list of sections. After adding the
+     * current list of paragraphs to the new section a new empty list is created. The given
+     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is added to the section and specifies its role.
      *
-     * @param annotation The
-     *            {@link org.knime.ext.textprocessing.data.SectionAnnotation} to
-     *            add to the section.
+     * @param annotation The {@link org.knime.ext.textprocessing.data.SectionAnnotation} to add to the section.
      */
     public void createNewSection(final SectionAnnotation annotation) {
         if (m_paragraphs != null && m_paragraphs.size() > 0) {
@@ -404,12 +414,10 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given sentence and adds it as
-     * {@link org.knime.ext.textprocessing.data.Sentence} to the current list of
-     * sentences.
+     * Tokenizes the given sentence and adds it as {@link org.knime.ext.textprocessing.data.Sentence} to the current
+     * list of sentences.
      *
-     * @param sentence The sentence to tokenize and to add to the current list
-     *            of sentences.
+     * @param sentence The sentence to tokenize and to add to the current list of sentences.
      */
     public void addSentence(final String sentence) {
         Sentence s = internalAddSentence(sentence);
@@ -424,8 +432,7 @@ public class DocumentBuilder {
     /**
      * Adds the given sentence to the list of sentences.
      *
-     * @param sentence The sentence to add to add to the current list of
-     *            sentences.
+     * @param sentence The sentence to add to add to the current list of sentences.
      */
     public void addSentence(final Sentence sentence) {
         if (sentence != null && m_sentences != null) {
@@ -434,12 +441,10 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given paragraph and adds it as a
-     * {@link org.knime.ext.textprocessing.data.Paragraph} to the current list
-     * of paragraphs.
+     * Tokenizes the given paragraph and adds it as a {@link org.knime.ext.textprocessing.data.Paragraph} to the current
+     * list of paragraphs.
      *
-     * @param paragraph The paragraph to tokenize and to add to the current list
-     *            of paragraphs.
+     * @param paragraph The paragraph to tokenize and to add to the current list of paragraphs.
      */
     public void addParagraph(final String paragraph) {
         Paragraph p = internalAddParagraph(paragraph);
@@ -463,16 +468,13 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given section and adds it as a instance of
-     * {@link org.knime.ext.textprocessing.data.Section} to the current list of
-     * sections.
+     * Tokenizes the given section and adds it as a instance of {@link org.knime.ext.textprocessing.data.Section} to the
+     * current list of sections.
      *
-     * @param section The section to tokenize and to add to the current section
-     *            list.
+     * @param section The section to tokenize and to add to the current section list.
      * @param annotation The annotation of the section to create.
      */
-    public void addSection(final String section,
-            final SectionAnnotation annotation) {
+    public void addSection(final String section, final SectionAnnotation annotation) {
         Section s = internalAddSection(section, annotation);
         if (m_sections == null) {
             m_sections = new ArrayList<Section>();
@@ -495,6 +497,7 @@ public class DocumentBuilder {
 
     /**
      * Sets the given sections as sections to add to the document.
+     *
      * @param sections The sections to add to the document.
      * @since 2.8
      */
@@ -503,16 +506,14 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given string and creates a section out of it. The given
-     * annotation represents the sections annotation.
+     * Tokenizes the given string and creates a section out of it. The given annotation represents the sections
+     * annotation.
      *
      * @param section The string representing the text of the section.
      * @param annotation The annotation representing the role of the section.
-     * @return The created instance of
-     *         {@link org.knime.ext.textprocessing.data.Section}.
+     * @return The created instance of {@link org.knime.ext.textprocessing.data.Section}.
      */
-    private Section internalAddSection(final String section,
-            final SectionAnnotation annotation) {
+    private Section internalAddSection(final String section, final SectionAnnotation annotation) {
         if (section != null && section.length() > 0 && !section.equals("")) {
             List<Sentence> sentences = createSentenceList(section);
             Paragraph p = new Paragraph(sentences);
@@ -527,8 +528,7 @@ public class DocumentBuilder {
      * Tokenizes the given string and creates a paragraph out of it.
      *
      * @param paragraph The string representing the text of the paragraph.
-     * @return The created instance of
-     *         {@link org.knime.ext.textprocessing.data.Paragraph}.
+     * @return The created instance of {@link org.knime.ext.textprocessing.data.Paragraph}.
      */
     private Paragraph internalAddParagraph(final String paragraph) {
         if (paragraph != null && paragraph.length() > 0) {
@@ -540,6 +540,7 @@ public class DocumentBuilder {
 
     /**
      * Creates and returns list of sentences from given text.
+     *
      * @param text The text to create a list of sentences from
      * @return A list of sentences.
      */
@@ -588,8 +589,7 @@ public class DocumentBuilder {
      * Tokenizes the given string and creates a sentence out of it.
      *
      * @param sentence The string representing the text of the sentence.
-     * @return The created instance of
-     *         {@link org.knime.ext.textprocessing.data.Sentence}.
+     * @return The created instance of {@link org.knime.ext.textprocessing.data.Sentence}.
      */
     private Sentence internalAddSentence(final String sentence) {
         if (sentence != null) {
