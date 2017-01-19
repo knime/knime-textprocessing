@@ -119,6 +119,7 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         final int windowSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.WINDOW_SIZE);
         final int epochs = m_dataParameterSettings.getInteger(DataParameter.EPOCHS);
         final int batchSize = m_dataParameterSettings.getInteger(DataParameter.BATCH_SIZE);
+        final boolean skipMissing = m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
 
         // sentence tokenizer and preprocessing
         final TokenizerFactory t = new DefaultTokenizerFactory();
@@ -217,6 +218,7 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
 
         final List<SettingsModel> settings = new ArrayList<>();
         settings.addAll(m_learnerParameterSettings.getAllInitializedSettings());

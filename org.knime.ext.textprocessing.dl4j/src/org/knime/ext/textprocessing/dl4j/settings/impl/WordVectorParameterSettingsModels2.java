@@ -56,7 +56,8 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerPar
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorParameterSettingsModels2 extends AbstractMapSetParameterSettingsModels<WordVectorLearnerParameter> {
+public class WordVectorParameterSettingsModels2
+    extends AbstractMapSetParameterSettingsModels<WordVectorLearnerParameter> {
 
     @Override
     public SettingsModel createParameter(final WordVectorLearnerParameter enumerate) throws IllegalStateException {
@@ -79,6 +80,8 @@ public class WordVectorParameterSettingsModels2 extends AbstractMapSetParameterS
             case USE_BASIC_PREPROCESSING:
                 return new SettingsModelBoolean("use_basic_preprocessing",
                     WordVectorLearnerParameter.DEFAULT_USE_BASIC_PREPROCESSING);
+            case SKIP_MISSING_CELLS:
+                return new SettingsModelBoolean("skip_missing_cells", false);
             default:
                 throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
         }

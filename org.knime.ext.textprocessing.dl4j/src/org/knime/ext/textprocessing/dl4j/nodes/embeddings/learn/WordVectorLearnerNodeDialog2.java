@@ -48,9 +48,11 @@ import javax.swing.event.ChangeListener;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumberEdit;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -134,6 +136,8 @@ public class WordVectorLearnerNodeDialog2 extends DefaultNodeSettingsPane {
             .createParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY), "Minimum Word Frequency", 4));
         addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
             .createParameter(WordVectorLearnerParameter.WINDOW_SIZE), "Window Size", 4));
+        addDialogComponent(new DialogComponentBoolean((SettingsModelBoolean)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.SKIP_MISSING_CELLS), "Skip missing cells?"));
 
         createNewTab("Column Selection");
         addDialogComponent(

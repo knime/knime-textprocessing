@@ -60,6 +60,8 @@ public enum WordVectorLearnerParameter {
         MIN_LEARNING_RATE,
         /** Whether to enable basic preprocessing (convert to lower case and strip punctuation) of tokens. */
         USE_BASIC_PREPROCESSING,
+        /** Whether to skip rows containing missing cells. */
+        SKIP_MISSING_CELLS;
 
     // Parameter default values
     public static final int DEFAULT_INT = 1;
