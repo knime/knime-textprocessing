@@ -127,7 +127,7 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         switch (mode) {
             case DOC2VEC:
                 final LabelAwareIterator docIter =
-                    new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName);
+                    new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName, skipMissing);
 
                 // build doc2vec model
                 final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)
