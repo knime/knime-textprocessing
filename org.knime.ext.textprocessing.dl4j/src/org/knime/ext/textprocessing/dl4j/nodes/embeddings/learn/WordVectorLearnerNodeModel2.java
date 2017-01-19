@@ -141,7 +141,7 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
                 break;
 
             case WORD2VEC:
-                final SentenceIterator sentenceIter = new BufferedDataTableSentenceIterator(table, documentColumnName);
+                final SentenceIterator sentenceIter = new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
 
                 // build word2vec model
                 final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).minLearningRate(minLearningRate)
