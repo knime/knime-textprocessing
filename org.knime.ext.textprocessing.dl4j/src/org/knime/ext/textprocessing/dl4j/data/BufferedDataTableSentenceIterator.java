@@ -91,7 +91,6 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
         String documentContent = null;
 
         try {
-            ConverterUtils.checkMissing(cell);
             documentContent = ConverterUtils.convertDataCellToJava(cell, String.class);
         } catch (DataCellConversionException e) {
             throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);

@@ -77,6 +77,10 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     private final LabelsSource m_labelsSource;
 
+    private final List<String> m_labels;
+
+    private int m_currentRow = 0;
+
     /**
      * Constructor for class BufferedDataTableLabelledDocumentIterator.
      *
@@ -86,12 +90,18 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
      */
     public BufferedDataTableLabelledDocumentIterator(final BufferedDataTable table, final String documentColumnName,
         final String labelColumnName) {
-        this.m_table = table;
-        this.m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
-        this.m_labelColumnIndex = table.getSpec().findColumnIndex(labelColumnName);
-        this.m_tableIterator = table.iterator();
-        this.m_labelsSource = initLabelsSource();
+        m_table = table;
+        m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
+        m_labelColumnIndex = table.getSpec().findColumnIndex(labelColumnName);
+        m_tableIterator = table.iterator();
+        m_labels = new ArrayList<>();
+        m_labelsSource = initLabelsSource();
         this.reset();
+
+        if(table.size() != m_labels.size()){
+            logger.coding("Number of labels is not equal to table size!");
+            assert(table.size() == m_labels.size());
+        }
     }
 
     @Override
@@ -109,22 +119,16 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     public LabelledDocument nextDocument() {
         final DataRow row = m_tableIterator.next();
         final DataCell documentCell = row.getCell(m_documentColumnIndex);
-        final DataCell labelCell = row.getCell(m_labelColumnIndex);
-
-        try {
-            ConverterUtils.checkMissing(documentCell);
-        } catch (DataCellConversionException e) {
-            throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
-        }
 
         String documentContent = null;
-        String documentLabel = null;
         try {
             documentContent = ConverterUtils.convertDataCellToJava(documentCell, String.class);
-            documentLabel = ConverterUtils.convertDataCellToJava(labelCell, String.class);
         } catch (DataCellConversionException e) {
             throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
         }
+
+        String documentLabel = m_labels.get(m_currentRow);
+        m_currentRow++;
 
         final LabelledDocument output = new LabelledDocument();
         output.setContent(documentContent);
@@ -137,6 +141,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     public void reset() {
         m_tableIterator.close();
         m_tableIterator = m_table.iterator();
+        m_currentRow = 0;
     }
 
     @Override
@@ -150,17 +155,16 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
      * @return {@link LabelsSource} containing the collected labels.
      */
     private LabelsSource initLabelsSource() {
-        final List<String> labels = new ArrayList<>();
         while (m_tableIterator.hasNext()) {
             final DataRow row = m_tableIterator.next();
             final DataCell labelCell = row.getCell(m_labelColumnIndex);
 
             try {
-                labels.add(ConverterUtils.convertDataCellToJava(labelCell, String.class));
+                m_labels.add(ConverterUtils.convertDataCellToJava(labelCell, String.class));
             } catch (DataCellConversionException e) {
                 throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
             }
         }
-        return new LabelsSource(labels);
+        return new LabelsSource(m_labels);
     }
 }
