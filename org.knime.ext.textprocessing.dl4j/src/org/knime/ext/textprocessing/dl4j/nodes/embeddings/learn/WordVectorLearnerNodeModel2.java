@@ -103,37 +103,40 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
         TableUtils.checkForEmptyTable(table);
 
-        final WordVectorTrainingMode mode =
-            WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
+        final WordVectorTrainingMode mode = WordVectorTrainingMode
+            .valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
         final String labelColumnName = m_dataParameterSettings.getString(DataParameter.LABEL_COLUMN);
         final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
         WordVectors wordVectors = null;
 
         // training parameters
         final int trainingIterations = m_learnerParameterSettings.getInteger(LearnerParameter.TRAINING_ITERATIONS);
-        final int minWordFrequency = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
+        final int minWordFrequency =
+            m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
         final int layerSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.LAYER_SIZE);
         final int seed = m_learnerParameterSettings.getInteger(LearnerParameter.SEED);
         final double learningRate = m_learnerParameterSettings.getDouble(LearnerParameter.GLOBAL_LEARNING_RATE);
-        final double minLearningRate = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
+        final double minLearningRate =
+            m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
         final int windowSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.WINDOW_SIZE);
         final int epochs = m_dataParameterSettings.getInteger(DataParameter.EPOCHS);
         final int batchSize = m_dataParameterSettings.getInteger(DataParameter.BATCH_SIZE);
-        final boolean skipMissing = m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
+        final boolean skipMissing =
+            m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
 
         // sentence tokenizer and preprocessing
         final TokenizerFactory t = new DefaultTokenizerFactory();
 
         switch (mode) {
             case DOC2VEC:
-                final LabelAwareIterator docIter =
-                    new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName, skipMissing);
+                final LabelAwareIterator docIter = new BufferedDataTableLabelledDocumentIterator(table,
+                    documentColumnName, labelColumnName, skipMissing);
 
                 // build doc2vec model
                 final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)
                     .minLearningRate(minLearningRate).seed(seed).layerSize(layerSize).batchSize(batchSize)
                     .windowSize(windowSize).minWordFrequency(minWordFrequency).iterations(trainingIterations)
-                    .epochs(epochs).iterate(docIter).trainWordVectors(true).tokenizerFactory(t).build();
+                    .epochs(epochs).iterate(docIter).trainElementsRepresentation(true).tokenizerFactory(t).build();
 
                 d2v.fit();
                 wordVectors = d2v;
@@ -141,7 +144,8 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
                 break;
 
             case WORD2VEC:
-                final SentenceIterator sentenceIter = new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
+                final SentenceIterator sentenceIter =
+                    new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
 
                 // build word2vec model
                 final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).minLearningRate(minLearningRate)
@@ -166,8 +170,8 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
     protected WordVectorPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
-        final WordVectorTrainingMode mode =
-                WordVectorTrainingMode.valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
+        final WordVectorTrainingMode mode = WordVectorTrainingMode
+            .valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
         final String labelColumnName = m_dataParameterSettings.getString(DataParameter.LABEL_COLUMN);
         final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
 
