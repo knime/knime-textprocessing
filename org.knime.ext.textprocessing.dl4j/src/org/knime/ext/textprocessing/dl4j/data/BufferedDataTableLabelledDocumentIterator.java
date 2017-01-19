@@ -55,6 +55,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
+import org.knime.ext.dl4j.base.util.TableUtils;
 
 /**
  * {@link LabelAwareIterator} for a {@link BufferedDataTable}. Expects a column contained in the data table holding one
@@ -71,6 +72,8 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     private CloseableRowIterator m_tableIterator;
 
+    private CloseableRowIterator m_hasNextTableIterator;
+
     private final int m_documentColumnIndex;
 
     private final int m_labelColumnIndex;
@@ -81,8 +84,11 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     private int m_currentRow = 0;
 
+    private final boolean m_skipMissing;
+
     /**
-     * Constructor for class BufferedDataTableLabelledDocumentIterator.
+     * Convenience constructor for class BufferedDataTableLabelledDocumentIterator. Equal to calling
+     * <code>this(table, documentColumnName, labelColumnName, false)</code>
      *
      * @param table the table to iterate
      * @param documentColumnName the name of the document column
@@ -90,23 +96,68 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
      */
     public BufferedDataTableLabelledDocumentIterator(final BufferedDataTable table, final String documentColumnName,
         final String labelColumnName) {
+        this(table, documentColumnName, labelColumnName, false);
+    }
+
+    /**
+     * Constructor for class BufferedDataTableLabelledDocumentIterator.
+     *
+     * @param table the table to iterate
+     * @param documentColumnName the name of the document column
+     * @param labelColumnName the name of the label column
+     * @param skipMissing whether rows containing missing cells should be skipped
+     */
+    public BufferedDataTableLabelledDocumentIterator(final BufferedDataTable table, final String documentColumnName,
+        final String labelColumnName, final boolean skipMissing) {
+        m_skipMissing = skipMissing;
         m_table = table;
         m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
         m_labelColumnIndex = table.getSpec().findColumnIndex(labelColumnName);
         m_tableIterator = table.iterator();
+        m_hasNextTableIterator = table.iterator();
         m_labels = new ArrayList<>();
         m_labelsSource = initLabelsSource();
         this.reset();
-
-        if(table.size() != m_labels.size()){
-            logger.coding("Number of labels is not equal to table size!");
-            assert(table.size() == m_labels.size());
-        }
     }
 
     @Override
     public boolean hasNextDocument() {
-        return m_tableIterator.hasNext();
+        if (m_skipMissing) {
+            return hasNextNonEmptyRow();
+        } else {
+            return m_tableIterator.hasNext();
+        }
+
+    }
+
+    /**
+     * Search for a next row that does not contain empty cells. This is needed if we skip rows containing missing cells
+     * in the <code>nextDocument()</code> method.
+     *
+     * @return true if at least one of the following rows does not contain a missing cell, false otherwise or if the end
+     *         of the table is reached
+     */
+    private boolean hasNextNonEmptyRow() {
+        if (!m_hasNextTableIterator.hasNext()) {
+            return false;
+        } else {
+            final DataRow row = m_hasNextTableIterator.next();
+            if (containsMissing(row)) {
+                return hasNextNonEmptyRow();
+            } else {
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Convenience helper because we always check for the same indices.
+     *
+     * @param row
+     * @return
+     */
+    private boolean containsMissing(final DataRow row) {
+        return TableUtils.hasMissing(row, new int[]{m_documentColumnIndex, m_labelColumnIndex});
     }
 
     /**
@@ -119,6 +170,10 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     public LabelledDocument nextDocument() {
         final DataRow row = m_tableIterator.next();
         final DataCell documentCell = row.getCell(m_documentColumnIndex);
+
+        if (m_skipMissing && containsMissing(row)) {
+            return nextDocument();
+        }
 
         String documentContent = null;
         try {
@@ -141,6 +196,8 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     public void reset() {
         m_tableIterator.close();
         m_tableIterator = m_table.iterator();
+        m_hasNextTableIterator.close();
+        m_hasNextTableIterator = m_table.iterator();
         m_currentRow = 0;
     }
 
@@ -158,6 +215,10 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         while (m_tableIterator.hasNext()) {
             final DataRow row = m_tableIterator.next();
             final DataCell labelCell = row.getCell(m_labelColumnIndex);
+
+            if (m_skipMissing && labelCell.isMissing()) {
+                continue;
+            }
 
             try {
                 m_labels.add(ConverterUtils.convertDataCellToJava(labelCell, String.class));
