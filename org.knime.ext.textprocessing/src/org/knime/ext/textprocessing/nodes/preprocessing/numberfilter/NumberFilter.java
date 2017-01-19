@@ -47,6 +47,8 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
+import java.util.regex.Pattern;
+
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
@@ -57,9 +59,9 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class NumberFilter implements TermPreprocessing, StringPreprocessing {
 
-    private static String numbers = "^[+-]?(\\d*[.,]{1}\\d+|\\d)+";
+    private static final Pattern NUMBER_REGEX = Pattern.compile("^[-+]?(?:\\d*[.,]{1}\\d+|\\d)+");
 
-    private static String replacement = "";
+    private static final String REPLACEMENT = "";
 
     /**
      * Filters all strings containing numbers . or , the strings may also
@@ -69,7 +71,7 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
      * @return Filtered String.
      */
     private String numberFilter(final String str) {
-        return str.replaceAll(numbers, replacement);
+        return NUMBER_REGEX.matcher(str).replaceAll(REPLACEMENT);
     }
 
     /**

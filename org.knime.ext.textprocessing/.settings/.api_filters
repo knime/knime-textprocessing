@@ -426,14 +426,6 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/numberfilter/NumberFilter.java" type="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilter">
-        <filter id="421572723">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.numberfilter.NumberFilter"/>
-                <message_argument value="numberFilter(String)"/>
-            </message_arguments>
-        </filter>
-    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/porterstemmer/PorterStemmer.java" type="org.knime.ext.textprocessing.nodes.preprocessing.porterstemmer.PorterStemmer">
         <filter id="421572723">
             <message_arguments>
