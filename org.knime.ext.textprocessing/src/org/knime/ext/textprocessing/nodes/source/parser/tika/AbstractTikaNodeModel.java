@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.data.DataCell;
@@ -213,7 +214,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                 }
 
                 final List<String> validTypes = m_filterModel.getIncludeList();
-                HashMap<String, Integer> duplicateFiles = new HashMap<String, Integer>();
+                Map<String, Integer> duplicateFiles = new HashMap<String, Integer>();
                 List<String> outputColumnsOne = Arrays.asList(m_columnModel.getStringArrayValue());
                 if (m_errorColumnModel.getBooleanValue()) {
                     outputColumnsOne = new ArrayList<String>(outputColumnsOne);
@@ -242,7 +243,11 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     tikaParser.setExtBoolean(ext);
                     tikaParser.setPassword(m_authModel.getStringValue());
                     tikaParser.setDuplicates(duplicateFiles);
-                    tikaParser.setExtractInlineImages(m_extractInlineImagesModel.getBooleanValue());
+                    boolean inlineImage = m_extractInlineImagesModel.getBooleanValue();
+                    if (!m_extractInlineImagesModel.isEnabled()) {
+                        inlineImage = false;
+                    }
+                    tikaParser.setExtractInlineImages(inlineImage);
 
                     List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
                     duplicateFiles = tikaParser.getDuplicates();
@@ -330,7 +335,11 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_errorColumnModel.validateSettings(settings);
         m_errorColNameModel.validateSettings(settings);
         m_filterModel.validateSettings(settings);
-        m_extractInlineImagesModel.validateSettings(settings);
+        try {
+            m_extractInlineImagesModel.validateSettings(settings);
+        } catch (Exception e) {
+            //do nothing, just to make sure it's backwards compatible
+        }
 
         Boolean extract =
             ((SettingsModelBoolean)m_extractAttachmentModel.createCloneWithValidatedValue(settings)).getBooleanValue();
@@ -366,7 +375,11 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_errorColumnModel.loadSettingsFrom(settings);
         m_errorColNameModel.loadSettingsFrom(settings);
         m_filterModel.loadSettingsFrom(settings);
-        m_extractInlineImagesModel.loadSettingsFrom(settings);
+        try {
+            m_extractInlineImagesModel.loadSettingsFrom(settings);
+        } catch (Exception e) {
+            //do nothing, just to make sure it's backwards compatible
+        }
     }
 
     /**

@@ -55,9 +55,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
@@ -118,7 +118,7 @@ public class TikaParser {
 
     private String m_errorMsg = "";
 
-    private HashMap<String, Integer> m_duplicates = null;
+    private Map<String, Integer> m_duplicates = null;
 
     private boolean m_extractInlineImages = false;
 
@@ -468,14 +468,14 @@ public class TikaParser {
     /**
      * @return the m_duplicates
      */
-    public HashMap<String, Integer> getDuplicates() {
+    public Map<String, Integer> getDuplicates() {
         return m_duplicates;
     }
 
     /**
      * @param duplicates the duplicates to set
      */
-    public void setDuplicates(final HashMap<String, Integer> duplicates) {
+    public void setDuplicates(final Map<String, Integer> duplicates) {
         this.m_duplicates = duplicates;
     }
 

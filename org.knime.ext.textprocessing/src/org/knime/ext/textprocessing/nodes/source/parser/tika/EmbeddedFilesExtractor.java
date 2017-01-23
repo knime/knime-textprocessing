@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -106,11 +107,11 @@ public final class EmbeddedFilesExtractor {
 
     private ContentHandler handler;
 
-    private HashMap<String, String> outputFiles;
+    private Map<String, String> outputFiles;
 
     private boolean hasError;
 
-    private HashMap<String, Integer> dupFiles;
+    private Map<String, Integer> dupFiles;
 
     private boolean extractInlineImages;
 
@@ -175,7 +176,7 @@ public final class EmbeddedFilesExtractor {
      *
      * @param duplicateFiles the hash map containing filenames and their corresponding file counter
      */
-    public void setDuplicateFilesList(final HashMap<String, Integer> duplicateFiles) {
+    public void setDuplicateFilesList(final Map<String, Integer> duplicateFiles) {
         dupFiles = duplicateFiles;
     }
 
@@ -205,7 +206,7 @@ public final class EmbeddedFilesExtractor {
     /**
      * @return a map of extracted files and their types (attachment or inline image)
      */
-    public HashMap<String, String> getOutputFiles() {
+    public Map<String, String> getOutputFiles() {
         return outputFiles;
     }
 
@@ -219,6 +220,10 @@ public final class EmbeddedFilesExtractor {
     private class CustomEmbeddedDocumentExtractor extends ParsingEmbeddedDocumentExtractor {
         private static final String UNKNOWN_EXT = ".bin";
 
+        private static final String INLINE_IMG = "Inline Image";
+
+        private static final String ATTACHMENT = "Attachment";
+
         private final Path outputDir;
 
         private int fileCount;
@@ -229,7 +234,7 @@ public final class EmbeddedFilesExtractor {
 
         private boolean error;
 
-        private HashMap<String, String> output;
+        private Map<String, String> output;
 
         private CustomEmbeddedDocumentExtractor(final Path outputDirectory, final ParseContext parseContext) {
             super(parseContext);
@@ -310,14 +315,10 @@ public final class EmbeddedFilesExtractor {
             // check if inline images or attachments
             // might need more refinement for the attachment part
             String type = mdata.get(TikaCoreProperties.EMBEDDED_RESOURCE_TYPE);
-            if (type != null) {
-                if (type.equals(TikaCoreProperties.EmbeddedResourceType.INLINE.toString())) {
-                    type = "Inline Image";
-                } else {
-                    type = "Attachment";
-                }
+            if (type != null && type.equals(TikaCoreProperties.EmbeddedResourceType.INLINE.toString())) {
+                type = INLINE_IMG;
             } else {
-                type = "Attachment";
+                type = ATTACHMENT;
             }
 
             output.put(outputFile.getAbsolutePath(), type);
@@ -365,7 +366,7 @@ public final class EmbeddedFilesExtractor {
             return error;
         }
 
-        public HashMap<String, String> getOutputFiles() {
+        public Map<String, String> getOutputFiles() {
             return output;
         }
 
