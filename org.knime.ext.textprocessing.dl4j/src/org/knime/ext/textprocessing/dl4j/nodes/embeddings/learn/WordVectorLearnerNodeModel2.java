@@ -92,6 +92,9 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
     private WordVectorPortObjectSpec m_outputSpec;
 
+    /**
+     * Constructor for the node model.
+     */
     public WordVectorLearnerNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{WordVectorPortObject.TYPE});
     }
