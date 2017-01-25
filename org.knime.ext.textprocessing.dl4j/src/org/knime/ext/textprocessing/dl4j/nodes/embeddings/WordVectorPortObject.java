@@ -118,9 +118,9 @@ public class WordVectorPortObject extends AbstractPortObject {
     @Override
     protected void load(final PortObjectZipInputStream in, final PortObjectSpec spec, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        final WordVectorPortObject port = WordVectorPortObjectUtils.loadPortFromZip(in);
-
         this.m_spec = (WordVectorPortObjectSpec)spec;
+
+        final WordVectorPortObject port = WordVectorPortObjectUtils.loadPortFromZip(in, m_spec.getWordVectorTrainingsMode());
         this.m_wordVectors = port.getWordVectors();
     }
 }
