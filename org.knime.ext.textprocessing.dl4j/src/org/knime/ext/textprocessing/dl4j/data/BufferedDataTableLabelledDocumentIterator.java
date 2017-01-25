@@ -72,8 +72,6 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     private CloseableRowIterator m_tableIterator;
 
-    private CloseableRowIterator m_hasNextTableIterator;
-
     private final int m_documentColumnIndex;
 
     private final int m_labelColumnIndex;
@@ -82,7 +80,11 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     private final List<String> m_labels;
 
-    private int m_currentRow = 0;
+    private int m_nonEmptyRowCounter = 0;
+
+    private long m_currentRow = 0;
+
+    private long m_lastIndexWithoutMissing;
 
     private final boolean m_skipMissing;
 
@@ -114,40 +116,36 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
         m_labelColumnIndex = table.getSpec().findColumnIndex(labelColumnName);
         m_tableIterator = table.iterator();
-        m_hasNextTableIterator = table.iterator();
         m_labels = new ArrayList<>();
         m_labelsSource = initLabelsSource();
+        if(skipMissing){
+            m_lastIndexWithoutMissing = searchLastIndexWithoutMissing();
+        }
         this.reset();
     }
 
     @Override
     public boolean hasNextDocument() {
         if (m_skipMissing) {
-            return hasNextNonEmptyRow();
+            return m_currentRow <= m_lastIndexWithoutMissing;
         } else {
             return m_tableIterator.hasNext();
         }
 
     }
 
-    /**
-     * Search for a next row that does not contain empty cells. This is needed if we skip rows containing missing cells
-     * in the <code>nextDocument()</code> method.
-     *
-     * @return true if at least one of the following rows does not contain a missing cell, false otherwise or if the end
-     *         of the table is reached
-     */
-    private boolean hasNextNonEmptyRow() {
-        if (!m_hasNextTableIterator.hasNext()) {
-            return false;
-        } else {
-            final DataRow row = m_hasNextTableIterator.next();
-            if (containsMissing(row)) {
-                return hasNextNonEmptyRow();
-            } else {
-                return true;
+    private long searchLastIndexWithoutMissing() {
+        long lastIndex = 0;
+        long i = 0;
+        while (m_tableIterator.hasNext()) {
+            final DataRow row = m_tableIterator.next();
+            if (!containsMissing(row)) {
+                lastIndex = i;
             }
+            i++;
         }
+        reset();
+        return lastIndex;
     }
 
     /**
@@ -172,6 +170,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         final DataCell documentCell = row.getCell(m_documentColumnIndex);
 
         if (m_skipMissing && containsMissing(row)) {
+            m_currentRow++;
             return nextDocument();
         }
 
@@ -182,12 +181,13 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
             throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
         }
 
-        String documentLabel = m_labels.get(m_currentRow);
-        m_currentRow++;
-
+        String documentLabel = m_labels.get(m_nonEmptyRowCounter);
         final LabelledDocument output = new LabelledDocument();
         output.setContent(documentContent);
         output.setLabel(documentLabel);
+
+        m_nonEmptyRowCounter++;
+        m_currentRow++;
 
         return output;
     }
@@ -196,8 +196,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     public void reset() {
         m_tableIterator.close();
         m_tableIterator = m_table.iterator();
-        m_hasNextTableIterator.close();
-        m_hasNextTableIterator = m_table.iterator();
+        m_nonEmptyRowCounter = 0;
         m_currentRow = 0;
     }
 
@@ -226,6 +225,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
                 throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
             }
         }
+        reset();
         return new LabelsSource(m_labels);
     }
 }
