@@ -116,6 +116,12 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
         return TableUtils.hasMissing(row, new int[]{m_documentColumnIndex});
     }
 
+    /**
+     * Returns the index of the last row in the table that contains no missing values. Missing in the sense of
+     * <code>containsMissing(final DataRow row)</code> implementation.
+     *
+     * @return
+     */
     private long searchLastIndexWithoutMissing() {
         long lastIndex = 0;
         long i = 0;
@@ -160,6 +166,7 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
     @Override
     public boolean hasNext() {
         if (m_skipMissing) {
+            //if no follow up rows are valid we are done
             return m_currentRow <= m_lastIndexWithoutMissing;
         } else {
             return m_tableIterator.hasNext();
