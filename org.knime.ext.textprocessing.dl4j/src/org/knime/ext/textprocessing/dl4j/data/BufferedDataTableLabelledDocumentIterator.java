@@ -127,6 +127,7 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     @Override
     public boolean hasNextDocument() {
         if (m_skipMissing) {
+            //if no follow up rows are valid we are done
             return m_currentRow <= m_lastIndexWithoutMissing;
         } else {
             return m_tableIterator.hasNext();
@@ -134,6 +135,12 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     }
 
+    /**
+     * Returns the index of the last row in the table that contains no missing values. Missing in the sense of
+     * <code>containsMissing(final DataRow row)</code> implementation.
+     *
+     * @return
+     */
     private long searchLastIndexWithoutMissing() {
         long lastIndex = 0;
         long i = 0;
