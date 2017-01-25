@@ -46,7 +46,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
+import org.deeplearning4j.models.embeddings.wordvectors.WordVectorsImpl;
+import org.deeplearning4j.models.word2vec.VocabWord;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -62,7 +63,6 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -82,9 +82,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
  * @author David Kolb, KNIME.com GmbH
  */
 public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
-
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger.getLogger(VocabularyExtractorNodeModel2.class);
 
     private WordVectorTrainingMode m_trainingMode;
 
@@ -106,22 +103,26 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         final WordVectorPortObject portObject = (WordVectorPortObject)inObjects[0];
         WordVectors wordVec = portObject.getWordVectors();
+        WordVectorsImpl<VocabWord> wvImpl = null;
+
+        if(wordVec instanceof WordVectorsImpl){
+            wvImpl = (WordVectorsImpl)wordVec;
+        } else {
+            throw new IllegalStateException("Word Vector model expected to be at least of type: " + WordVectorsImpl.class);
+        }
 
         final List<String> vocabulary = new ArrayList<>();
         final List<String> labels = new ArrayList<>();
 
-        switch (m_trainingMode) {
-            case DOC2VEC:
-                ParagraphVectors pv = (ParagraphVectors)wordVec;
-                labels.addAll(pv.getLabelsSource().getLabels());
-
-                vocabulary.addAll(pv.vocab().words());
-                vocabulary.removeAll(labels);
-            case WORD2VEC:
-                vocabulary.addAll(wordVec.vocab().words());
+        for(VocabWord vw : wvImpl.getVocab().tokens()){
+            if(vw.isLabel()){
+                labels.add(vw.getWord());
+            } else {
+                vocabulary.add(vw.getWord());
+            }
         }
 
-        m_maxProgress = vocabulary.size();
+        m_maxProgress = vocabulary.size() + labels.size();
 
         PortObject[] outputTables = new PortObject[2];
         outputTables[0] = createWordVectorTableFromWordList((DataTableSpec)m_outputSpec[0], vocabulary, wordVec, exec);
