@@ -94,6 +94,9 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
 
     private double m_maxProgress;
 
+    /**
+     * Constructor for the node model.
+     */
     public VocabularyExtractorNodeModel2() {
         super(new PortType[]{WordVectorPortObject.TYPE},
             new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE});
@@ -137,6 +140,15 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
         m_progressCounter++;
     }
 
+    /**
+     * Create a BufferedDataTable with two columns containing the word and the corresponding word vector.
+     *
+     * @param tableSpec the spec to use for container creation
+     * @param words the words to write to the container
+     * @param wv the model containing the words and vectors
+     * @param exec the execution context to use for container creation
+     * @return table containing the words and vectors
+     */
     private BufferedDataTable createWordVectorTableFromWordList(final DataTableSpec tableSpec, final List<String> words,
         final WordVectors wv, final ExecutionContext exec) {
         final BufferedDataContainer container = exec.createDataContainer(tableSpec);
