@@ -20,9 +20,7 @@
       		<li>Word2Vec: Training without labels. Learns word vectors based on words.</li>
       		<li>Doc2Vec: Training with labels. Learns word vectors based on labels associated with documents.</li>
       	</ul>
-        </option>
-        <option name="Use Basic Token Preprocessing?">Whether to do basic preprocessing of the tokens, meaning to
-        convert them to lower case and remove punctuation.</option>
+        </option>        
         <option name="Seed">A seed value to use for training.</option>
         <option name="Learning Rate">The learning rate that should be used for training.</option>
         <option name="Minimum Learning Rate">Minimum learning rate threshold which the learning rate should not fall below.</option>
@@ -31,8 +29,10 @@
         <option name="Number of Training Iterations">The number of updates done for each batch.</option>
         <option name="Layer Size">The size of the output Layer. This means this will be the length of the resulting word vectors.</option>
         <option name="Minimum Word Frequency">Minimum frequency of a word to appear in the corpus to be considered for learning. Words
-        with a lower frequency will no appear in the vocabulary contained in the Word Vector Model.</option>
+        with a lower frequency will not appear in the vocabulary contained in the Word Vector Model.</option>
         <option name="Window Size">Size of the context, meaning number of words, to consider for learning.</option>
+        <option name="Skip missing cells?">Whether rows containing missing cells should be skipped or not. If missing cells should not
+        be skipped but the table contains missing cells the node will fail.</option>
     </tab> 
     <tab name="Column Selection">   
     	<option name="Label Column">Possible String column containing labels for Documents.</option>

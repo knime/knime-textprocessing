@@ -3,18 +3,26 @@
     <name>Vocabulary Extractor</name>
     
     <shortDescription>
-        Extract vocabulary and word vectors from Word Vector Model.
+        Extract vocabulary and word vectors from  a Word Vector Model.
     </shortDescription>
     
     <fullDescription>
-        <intro>This node extracts the vocabulary with corresponding word vectors from a Word Vector Model.</intro>        
+        <intro>
+        This node extracts the vocabulary with corresponding word vectors from a Word Vector Model. The first output port will
+        contain all words from the vocabulary and the second one the labels (if Doc2Vec model was trained). If there are no labels
+        available (Word2Vec model) the second port will be inactive.
+        </intro>        
     </fullDescription>
     
     <ports>
         <inPort index="0" name="Word Vector Model">The Word Vector Model to extract the vocabulary from.</inPort>        
-        <outPort index="0" name="Data Table">
+        <outPort index="0" name="Words">
         Data table containing extracted words from vocabulary and corresponding
         word vectors.
+        </outPort>    
+        <outPort index="1" name="Labels">
+        Data table containing extracted labels from vocabulary and corresponding
+        word vectors. This port will be inactive if there are no labels contained in the model.
         </outPort>       
     </ports>    
 </knimeNode>
