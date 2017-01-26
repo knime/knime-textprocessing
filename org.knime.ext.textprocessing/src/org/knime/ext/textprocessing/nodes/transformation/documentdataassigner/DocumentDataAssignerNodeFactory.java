@@ -53,8 +53,9 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * The node factory for the Document Data Assigner node.
  *
- * @author Julian Bunzel, KNIME.com Berlin
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class DocumentDataAssignerNodeFactory extends NodeFactory<DocumentDataAssignerNodeModel> {
 

@@ -78,6 +78,8 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
+ * The {@code DocumentDataAssignerCellFactory} is a cell factory that builds new document cells from incoming documents
+ * and adds desired metainformation like authors, source, category etc.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
@@ -92,8 +94,8 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
     private DocumentDataAssignerConfig m_conf;
 
     /**
-     * @param conf
-     * @param dataColumnSpec
+     * @param conf The {@code DocumentDataAssignerConfig} that contains information about how to build new Documents.
+     * @param dataColumnSpec The {@code DataColumnSpec} containing the information of the new column.
      */
     public DocumentDataAssignerCellFactory(final DocumentDataAssignerConfig conf,
         final DataColumnSpec[] dataColumnSpec) {
@@ -112,7 +114,9 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
     }
 
     /**
-     * @return
+     * Callback from initializer - only be called when executing.
+     *
+     * @return The {@code DataCellCache} with the given document cell factory to create data cells with.
      */
     private DataCellCache initializeDataCellCache() {
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
@@ -122,7 +126,9 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
         return new LRUDataCellCache(docCellFac);
     }
 
-    /** @return the cache from the initializer, not null. Throws RuntimeException if needed. */
+    /**
+     * @return The {@code DataCellCache} from the initializer, not null. Throws RuntimeException if needed.
+     */
     private DataCellCache getDataCellCache() {
         DataCellCache dataCellCache;
         try {
@@ -138,80 +144,93 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
+        // check if cell contains missing value
         if (!row.getCell(m_conf.getDocumentColumnIndex()).isMissing()) {
+            // get document content from incoming table
             DocumentBufferedFileStoreCell docCell =
-                    (DocumentBufferedFileStoreCell)row.getCell(m_conf.getDocumentColumnIndex());
-                Document doc = docCell.getDocument();
-                DocumentBuilder docBuilder = new DocumentBuilder(doc, true);
+                (DocumentBufferedFileStoreCell)row.getCell(m_conf.getDocumentColumnIndex());
+            Document doc = docCell.getDocument();
 
-                //set authors
-                if (m_conf.getAuthorsColumnIndex() < 0) {
-                    if ((m_conf.getAuthorsFirstName() != DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME
-                        && !m_conf.getAuthorsFirstName().isEmpty())
-                        || (m_conf.getAuthorsLastName() != DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME
-                            && !m_conf.getAuthorsLastName().isEmpty())) {
-                        docBuilder.addAuthor(new Author(m_conf.getAuthorsFirstName(), m_conf.getAuthorsLastName()));
-                    }
-                } else {
-                    DataCell authorCell = row.getCell(m_conf.getAuthorsColumnIndex());
-                    if (!authorCell.isMissing() && authorCell.getType().isCompatible(StringValue.class)) {
-                        String authors[] = ((StringCell)authorCell).getStringValue().split(m_conf.getAuthorsSplitStr());
-                        for (String author : authors) {
-                            final String[] names = author.split(" ");
-                            if (names.length > 1) {
-                                docBuilder.addAuthor(new Author(names[0], names[names.length - 1]));
-                            } else {
-                                docBuilder.addAuthor(new Author("-", names[0]));
-                            }
+            // create document builder and set sections from incoming document
+            DocumentBuilder docBuilder = new DocumentBuilder(doc);
+            docBuilder.setSections(doc.getSections());
+
+            // set authors
+            if (m_conf.getAuthorsColumnIndex() < 0) {
+                if ((m_conf.getAuthorsFirstName() != DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME
+                    && !m_conf.getAuthorsFirstName().isEmpty())
+                    || (m_conf.getAuthorsLastName() != DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME
+                        && !m_conf.getAuthorsLastName().isEmpty())) {
+                    docBuilder.addAuthor(new Author(m_conf.getAuthorsFirstName(), m_conf.getAuthorsLastName()));
+                }
+            } else {
+                DataCell authorCell = row.getCell(m_conf.getAuthorsColumnIndex());
+                if (!authorCell.isMissing() && authorCell.getType().isCompatible(StringValue.class)) {
+                    String authors[] = ((StringCell)authorCell).getStringValue().split(m_conf.getAuthorsSplitStr());
+                    for (String author : authors) {
+                        final String[] names = author.split(" ");
+                        if (names.length > 1) {
+                            docBuilder.addAuthor(new Author(names[0], names[names.length - 1]));
+                        } else {
+                            docBuilder.addAuthor(new Author("-", names[0]));
                         }
                     }
                 }
+            }
 
-                //set document source
-                if (m_conf.getSourceColumnIndex() < 0) {
-                    if (!m_conf.getDocSource().isEmpty()) {
-                        docBuilder.addDocumentSource(new DocumentSource(m_conf.getDocSource()));
-                    }
-                } else {
-                    DataCell sourceCell = row.getCell(m_conf.getSourceColumnIndex());
-                    if (!sourceCell.isMissing() && sourceCell.getType().isCompatible(StringValue.class)) {
-                        docBuilder.addDocumentSource(new DocumentSource(((StringCell)sourceCell).getStringValue()));
-                    }
+            // set document source
+            if (m_conf.getSourceColumnIndex() < 0) {
+                if (!m_conf.getDocSource().isEmpty()) {
+                    docBuilder.addDocumentSource(new DocumentSource(m_conf.getDocSource()));
                 }
-
-                //set document category
-                if (m_conf.getCategoryColumnIndex() < 0) {
-                    if (!m_conf.getDocCategory().isEmpty()) {
-                        docBuilder.addDocumentCategory(new DocumentCategory(m_conf.getDocCategory()));
-                    }
-                } else {
-                    DataCell categoryCell = row.getCell(m_conf.getCategoryColumnIndex());
-                    if (!categoryCell.isMissing() && categoryCell.getType().isCompatible(StringValue.class)) {
-                        docBuilder.addDocumentCategory(new DocumentCategory(((StringCell)categoryCell).getStringValue()));
-                    }
+            } else {
+                DataCell sourceCell = row.getCell(m_conf.getSourceColumnIndex());
+                if (!sourceCell.isMissing() && sourceCell.getType().isCompatible(StringValue.class)) {
+                    docBuilder.addDocumentSource(new DocumentSource(((StringCell)sourceCell).getStringValue()));
                 }
+            }
 
-                //set document type
-                docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_conf.getDocType()));
-
-                //set publication date
-                if (m_conf.getPubDateColumnIndex() < 0) {
-                    setPublicationDate(m_conf.getDocPubDate(), docBuilder);
-                } else {
-                    DataCell pubDateCell = row.getCell(m_conf.getPubDateColumnIndex());
-                    if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(StringValue.class)) {
-                        setPublicationDate(((StringCell)pubDateCell).getStringValue(), docBuilder);
-                    }
+            // set document category
+            if (m_conf.getCategoryColumnIndex() < 0) {
+                if (!m_conf.getDocCategory().isEmpty()) {
+                    docBuilder.addDocumentCategory(new DocumentCategory(m_conf.getDocCategory()));
                 }
+            } else {
+                DataCell categoryCell = row.getCell(m_conf.getCategoryColumnIndex());
+                if (!categoryCell.isMissing() && categoryCell.getType().isCompatible(StringValue.class)) {
+                    docBuilder.addDocumentCategory(new DocumentCategory(((StringCell)categoryCell).getStringValue()));
+                }
+            }
 
-                DataCellCache dataCellCache = getDataCellCache();
-                return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
+            // set document type
+            docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_conf.getDocType()));
+
+            // set publication date
+            if (m_conf.getPubDateColumnIndex() < 0) {
+                setPublicationDate(m_conf.getDocPubDate(), docBuilder);
+            } else {
+                DataCell pubDateCell = row.getCell(m_conf.getPubDateColumnIndex());
+                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(StringValue.class)) {
+                    setPublicationDate(((StringCell)pubDateCell).getStringValue(), docBuilder);
+                }
+            }
+
+            // return new data cell
+            DataCellCache dataCellCache = getDataCellCache();
+            return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
         } else {
+            // return new missing value cell (if incoming document cell is missing)
             return new DataCell[]{DataType.getMissingCell()};
         }
 
     }
 
+    /**
+     * Sets the publication date to the DocumentBuilder and checks if it is valid.
+     *
+     * @param str The publication date: "dd-MM-yyyy"
+     * @param docBuilder The {@code DocumentBuilder}.
+     */
     private void setPublicationDate(final String str, final DocumentBuilder docBuilder) {
         if (!str.isEmpty()) {
             Matcher m = DATE_PATTERN.matcher(str);

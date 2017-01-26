@@ -65,92 +65,152 @@ import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
+ * The node dialog for the Document Data Assigner.
  *
- * @author Julian Bunzel, KNIME.com Berlin
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the document column name.
+     */
     static final SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCCOL, "");
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the authors column name.
+     */
     static final SettingsModelString getAuthorsColumnModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHORSCOL, "");
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the category column name.
+     */
     static final SettingsModelString getCategoryColumnModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_CATCOLUMN, "");
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the source column name.
+     */
     static final SettingsModelString getSourceColumnModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_SOURCECOLUMN, "");
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the publication date column name.
+     */
     static final SettingsModelString getPubDateColumnModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_PUBDATECOL, "");
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to use the
+     *         authors column or not.
+     */
     static final SettingsModelBoolean getUseAuthorsColumnModel() {
         return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_AUTHORSCOLUMN,
             DocumentDataAssignerConfig.DEF_USE_AUTHORSCOLUMN);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to use the
+     *         category column or not.
+     */
     static final SettingsModelBoolean getUseCategoryColumnModel() {
         return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_CATCOLUMN,
             DocumentDataAssignerConfig.DEF_USE_CATCOLUMN);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to use the source
+     *         column or not.
+     */
     static final SettingsModelBoolean getUseSourceColumnModel() {
         return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_SOURCECOLUMN,
             DocumentDataAssignerConfig.DEF_USE_SOURCECOLUMN);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to use the
+     *         publication date column or not.
+     */
     static final SettingsModelBoolean getUsePubDateColumnModel() {
         return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_USE_PUBDATECOLUMN,
             DocumentDataAssignerConfig.DEF_USE_PUBDATECOLUMN);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the document source.
+     */
     static final SettingsModelString getSourceModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCSOURCE,
             DocumentDataAssignerConfig.DEF_DOCUMENT_SOURCE);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the document category.
+     */
     static final SettingsModelString getCategoryModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCCAT,
             DocumentDataAssignerConfig.DEF_DOCUMENT_CATEGORY);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the authors first name.
+     */
     static final SettingsModelString getAuthorsFirstNameModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
             DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the authors last name.
+     */
     static final SettingsModelString getAuthorsLastNameModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
             DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the delimiter for author names.
+     */
     static final SettingsModelString getAuthorsSplitStringModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHORSPLIT_STR,
             DocumentDataAssignerConfig.DEF_AUTHORSSPLIT_STR);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the document type.
+     */
     static final SettingsModelString getTypeModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_DOCTYPE,
             DocumentDataAssignerConfig.DEF_DOCUMENT_TYPE);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the publication date.
+     */
     static final SettingsModelString getPubDateModel() {
         return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_PUBDATE,
             DocumentDataAssignerConfig.DEF_DOCUMENT_PUBDATE);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelIntegerBounded} containing number of threads.
+     */
     static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
         return new SettingsModelIntegerBounded(DocumentDataAssignerConfigKeys.CFGKEY_THREADS,
             DocumentDataAssignerConfig.DEF_THREADS, DocumentDataAssignerConfig.MIN_THREADS,
             DocumentDataAssignerConfig.MAX_THREADS);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to replace the
+     *         old document column or append a new one.
+     */
     static final SettingsModelBoolean getReplaceDocColumnModel() {
         return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_DOCCOL,
             DocumentDataAssignerConfig.DEF_REPLACE_DOCCOL);
@@ -189,6 +249,8 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public DocumentDataAssignerNodeDialog() {
+
+        // dialog for document column selection and author
         createNewGroup("Text");
         addDialogComponent(new DialogComponentColumnNameSelection(getDocumentColumnModel(), "Document column", 0,
             DocumentValue.class));
@@ -197,7 +259,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
             new DialogComponentColumnNameSelection(m_authorsColumnModel, "Authors column", 0, StringValue.class));
-
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentString(m_authorsSplitStrModel, "Author names separator"));
@@ -208,6 +269,7 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
+        // dialog for source and category
         createNewGroup("Source and Category");
         addDialogComponent(new DialogComponentString(m_sourceModel, "Document source"));
         setHorizontalPlacement(false);
@@ -217,7 +279,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(m_sourceColumnModel, "Document source column", 0,
             StringValue.class));
         setHorizontalPlacement(false);
-
         addDialogComponent(new DialogComponentString(m_categoryModel, "Document category"));
         setHorizontalPlacement(true);
         m_useCategoryColumnModel.addChangeListener(new ChangeStateListener());
@@ -227,13 +288,15 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
+        // dialog for type and date
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document type", types));
         DialogComponentString dcs = new DialogComponentString(m_pubDateModel, "Publication date (dd-mm-yyyy)");
         dcs.setToolTipText("Date has to be specified like \"dd-mm-yyyy!\"");
         addDialogComponent(dcs);
-        // Pub Date
+
+        // dialog for publication date
         setHorizontalPlacement(true);
         m_usePubDateColumnModel.addChangeListener(new ChangeStateListener());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
@@ -241,10 +304,12 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
             StringValue.class));
         closeCurrentGroup();
 
+        // dialog for output column settings
         createNewGroup("Column Settings");
         addDialogComponent(new DialogComponentBoolean(getReplaceDocColumnModel(), "Replace document column"));
         closeCurrentGroup();
 
+        // dialog for number of threads
         createNewGroup("Processes");
         addDialogComponent(
             new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel processes", 1));
@@ -253,6 +318,7 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
     }
 
+    /** Sets the state of some SettingModels to enabled/disabled depending on the related 'use ... column' value. */
     private void checkState() {
         m_categoryColumnModel.setEnabled(m_useCategoryColumnModel.getBooleanValue());
         m_categoryModel.setEnabled(!m_useCategoryColumnModel.getBooleanValue());
@@ -267,7 +333,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
     }
 
     class ChangeStateListener implements ChangeListener {
-
         /**
          * {@inheritDoc}
          */

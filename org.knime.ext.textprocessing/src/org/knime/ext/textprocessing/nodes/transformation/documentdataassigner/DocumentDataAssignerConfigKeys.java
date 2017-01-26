@@ -49,91 +49,92 @@
 package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 /**
+ * The configuration keys for the DocumentDataAssigner.
  *
- * @author Julian Bunzel, KNIME.com Berlin
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class DocumentDataAssignerConfigKeys {
 
     /**
-     * The configuration key for the document column.
+     * The configuration key of the document column.
      */
-    static final String CFGKEY_DOCCOL = "DocumentCol";
+    static final String CFGKEY_DOCCOL = "Document column";
 
     /**
      * The configuration key of the authors column.
      */
-    static final String CFGKEY_AUTHORSCOL = "AuthorsCol";
+    static final String CFGKEY_AUTHORSCOL = "Authors column";
 
     /**
-     * configuration key for the publication date column
+     * The configuration key of the publication date column.
      */
-    static final String CFGKEY_PUBDATECOL = "PubdateCol";
+    static final String CFGKEY_PUBDATECOL = "Pubdate column";
+
+    /**
+     * The configuration key of the category column name setting.
+     */
+    static final String CFGKEY_CATCOLUMN = "Category column";
+
+    /**
+     * The configuration key of the source column name setting.
+     */
+    static final String CFGKEY_SOURCECOLUMN = "Source column";
 
     /**
      * The configuration key of the "use authors column" setting.
      *
      */
-    static final String CFGKEY_USE_AUTHORSCOLUMN = "useAuthorsColumn";
+    static final String CFGKEY_USE_AUTHORSCOLUMN = "Use authors column";
 
     /**
-     * The configuration key of the author name split string.
+     * The configuration key of the "use publication date column" setting.
      */
-    static final String CFGKEY_AUTHORSPLIT_STR = "AuthorSplitChar";
-
-    /**
-     * The configuration key of the author name placeholder for first name
-     */
-    static final String CFGKEY_AUTHOR_FIRST_NAME = "AuthorFirstName";
-
-    /**
-     * The configuration key of the author name placeholder for last name
-     */
-    static final String CFGKEY_AUTHOR_LAST_NAME = "AuthorLastName";
-
-    /**
-     * The configuration key of the document source.
-     */
-    static final String CFGKEY_DOCSOURCE = "DocumentSource";
-
-    /**
-     * The configuration key of the document category.
-     */
-    static final String CFGKEY_DOCCAT = "DocumentCategory";
-
-    /**
-     * The configuration key of the document type.
-     */
-    static final String CFGKEY_DOCTYPE = "DocumentType";
-
-    /**
-     * The configuration key of the publication date.
-     */
-    static final String CFGKEY_PUBDATE = "PublicationDate";
-
-    /**
-     * The configuration key of the "use publication date column"
-     */
-    static final String CFGKEY_USE_PUBDATECOLUMN = "UsePubDateColumn";
+    static final String CFGKEY_USE_PUBDATECOLUMN = "Use pubdate column";
 
     /**
      * The configuration key of the "use category column" setting.
      */
-    static final String CFGKEY_USE_CATCOLUMN = "UseCategoryColumn";
-
-    /**
-     * The configuration key of the category column setting.
-     */
-    static final String CFGKEY_CATCOLUMN = "CategoryColumn";
+    static final String CFGKEY_USE_CATCOLUMN = "Use category column";
 
     /**
      * The configuration key of the "use source column" setting.
      */
-    static final String CFGKEY_USE_SOURCECOLUMN = "UseSourceColumn";
+    static final String CFGKEY_USE_SOURCECOLUMN = "Use source column";
 
     /**
-     * The configuration key of the source column setting.
+     * The configuration key of the author name split string.
      */
-    static final String CFGKEY_SOURCECOLUMN = "SourceColumn";
+    static final String CFGKEY_AUTHORSPLIT_STR = "Authors split char";
+
+    /**
+     * The configuration key of the authors first name.
+     */
+    static final String CFGKEY_AUTHOR_FIRST_NAME = "Authors first name";
+
+    /**
+     * The configuration key of the authors last name.
+     */
+    static final String CFGKEY_AUTHOR_LAST_NAME = "Authors last name";
+
+    /**
+     * The configuration key of the document source.
+     */
+    static final String CFGKEY_DOCSOURCE = "Document source";
+
+    /**
+     * The configuration key of the document category.
+     */
+    static final String CFGKEY_DOCCAT = "Document category";
+
+    /**
+     * The configuration key of the document type.
+     */
+    static final String CFGKEY_DOCTYPE = "Document type";
+
+    /**
+     * The configuration key of the publication date.
+     */
+    static final String CFGKEY_PUBDATE = "Publication date";
 
     /**
      * The configuration key of the number of threads to use.
@@ -143,6 +144,6 @@ public class DocumentDataAssignerConfigKeys {
     /**
      * The configuration key for the document column replacement option.
      */
-    static final String CFGKEY_REPLACE_DOCCOL = "ReplaceDocColumn";
+    static final String CFGKEY_REPLACE_DOCCOL = "Replace document column";
 
 }

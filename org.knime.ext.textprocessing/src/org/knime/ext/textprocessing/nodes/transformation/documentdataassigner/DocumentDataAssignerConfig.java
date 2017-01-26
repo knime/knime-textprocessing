@@ -53,33 +53,45 @@ import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 
 /**
+ * The {@code DocumentDataAssignerConfig} contains the default values for the setting models and is used to pass
+ * information from the NodeModel to the {@code DocumentDataAssignerCellFactory}.
  *
- * @author Julian Bunzel, KNIME.com Berlin
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class DocumentDataAssignerConfig {
+    // default values for setting models.
 
+    /** The default publication date. */
     static final String DEF_DOCUMENT_PUBDATE = PublicationDate.getToday();
 
+    /** The default string for the document source. */
     static final String DEF_DOCUMENT_SOURCE = "";
 
+    /** The default string for the document category. */
     static final String DEF_DOCUMENT_CATEGORY = "";
 
+    /** The default string for the document type. */
     static final String DEF_DOCUMENT_TYPE = DocumentType.UNKNOWN.toString();
 
-    static final String DEF_AUTHORS_NAME = "-";
-
+    /** The default string splitting author names. */
     static final String DEF_AUTHORSSPLIT_STR = ", ";
 
+    /** The default authors first name. */
     static final String DEF_AUTHOR_FIRST_NAME = "-";
 
+    /** The default authors last name. */
     static final String DEF_AUTHOR_LAST_NAME = "-";
 
+    /** The default value for using an incoming column as authors column. */
     static final boolean DEF_USE_AUTHORSCOLUMN = false;
 
+    /** The default value for using an incoming column as category column. */
     static final boolean DEF_USE_CATCOLUMN = false;
 
+    /** The default value for using an incoming column as source column. */
     static final boolean DEF_USE_SOURCECOLUMN = false;
 
+    /** The default value for using an incoming column as pubdate column. */
     static final boolean DEF_USE_PUBDATECOLUMN = false;
 
     /** The default number of threads. */
@@ -92,275 +104,230 @@ public class DocumentDataAssignerConfig {
     /** The max number of threads. */
     static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
 
+    /** The default value for replacing the document column. */
     static final boolean DEF_REPLACE_DOCCOL = false;
 
+    /* Following information is used for DocumentDataAssingerCellFactory.
+     * The values are initialized here and can be set in the DocumentDataAssignerNodeModel while using the set-Methods.
+     * Then the created config will be forwarded to the cell factory.
+     */
+
+    /** The publication date used for creating a new document. */
     private String m_docPubDate = DEF_DOCUMENT_PUBDATE;
 
+    /** The document source used for creating a new document. */
     private String m_docSource = DEF_DOCUMENT_SOURCE;
 
+    /** The document category used for creating a new document. */
     private String m_docCategory = DEF_DOCUMENT_CATEGORY;
 
+    /** The document type used for creating a new document. */
     private String m_docType = DEF_DOCUMENT_TYPE;
 
+    /** The index of the incoming document column. */
     private int m_documentColumnIndex = -1;
 
+    /** The index of the incoming authors column. */
     private int m_authorsColumnIndex = -1;
 
+    /** The index of the incoming category column. */
     private int m_categoryColumnIndex = -1;
 
+    /** The index of the incoming source column. */
     private int m_sourceColumnIndex = -1;
 
+    /** The index of the incoming pubdate column. */
     private int m_pubDateColumnIndex = -1;
 
-    private boolean m_useAuthorsColumn = DEF_USE_AUTHORSCOLUMN;
-
-    private boolean m_useSourceColumn = DEF_USE_SOURCECOLUMN;
-
-    private boolean m_usePubDateColumn = DEF_USE_PUBDATECOLUMN;
-
-    private boolean m_useCategoryColumn = DEF_USE_CATCOLUMN;
-
+    /** The string splitting author names while processing the authors column. */
     private String m_authorsSplitStr = DEF_AUTHORSSPLIT_STR;
 
+    /** The authors first name used for the new document. */
     private String m_authorsFirstName = DEF_AUTHOR_FIRST_NAME;
 
+    /** The authors last name used for the new document. */
     private String m_authorsLastName = DEF_AUTHOR_LAST_NAME;
 
+    /** The number of threads used to create new document cells. */
     private int m_numberOfThreads = DEF_THREADS;
 
     /**
-     * @return the m_documentColumnIndex
+     * @return The document column index.
      */
     public int getDocumentColumnIndex() {
         return m_documentColumnIndex;
     }
 
     /**
-     * @param documentColumnIndex the m_documentColumnIndex to set
+     * @param documentColumnIndex Sets the document column index.
      */
     public void setDocumentColumnIndex(final int documentColumnIndex) {
         this.m_documentColumnIndex = documentColumnIndex;
     }
 
     /**
-     * @return the m_authorsColumnIndex
+     * @return The authors column index.
      */
     public int getAuthorsColumnIndex() {
         return m_authorsColumnIndex;
     }
 
     /**
-     * @param authorsColumnIndex the m_authorsColumnIndex to set
+     * @param authorsColumnIndex Sets the authors column index.
      */
     public void setAuthorsColumnIndex(final int authorsColumnIndex) {
         this.m_authorsColumnIndex = authorsColumnIndex;
     }
 
     /**
-     * @return the m_categoryColumnIndex
+     * @return The category column index.
      */
     public int getCategoryColumnIndex() {
         return m_categoryColumnIndex;
     }
 
     /**
-     * @param categoryColumnIndex the m_categoryColumnIndex to set
+     * @param categoryColumnIndex Sets the category column index.
      */
     public void setCategoryColumnIndex(final int categoryColumnIndex) {
         this.m_categoryColumnIndex = categoryColumnIndex;
     }
 
     /**
-     * @return the m_sourceColumnIndex
+     * @return The source column index.
      */
     public int getSourceColumnIndex() {
         return m_sourceColumnIndex;
     }
 
     /**
-     * @param sourceColumnIndex the m_sourceColumnIndex to set
+     * @param sourceColumnIndex Sets The source column index.
      */
     public void setSourceColumnIndex(final int sourceColumnIndex) {
         this.m_sourceColumnIndex = sourceColumnIndex;
     }
 
     /**
-     * @return the m_pubDateColumnIndex
+     * @return The publication date column index.
      */
     public int getPubDateColumnIndex() {
         return m_pubDateColumnIndex;
     }
 
     /**
-     * @param pubDateColumnIndex the m_pubDateColumnIndex to set
+     * @param pubDateColumnIndex The publication date column index.
      */
     public void setPubDateColumnIndex(final int pubDateColumnIndex) {
         this.m_pubDateColumnIndex = pubDateColumnIndex;
     }
 
     /**
-     * @return the m_docPubDate
+     * @return The publication date.
      */
     public String getDocPubDate() {
         return m_docPubDate;
     }
 
     /**
-     * @param docPubDate the m_docPubDate to set
+     * @param docPubDate Sets the publication date.
      */
     public void setDocPubDate(final String docPubDate) {
         this.m_docPubDate = docPubDate;
     }
 
     /**
-     * @return the m_docSource
+     * @return The document source.
      */
     public String getDocSource() {
         return m_docSource;
     }
 
     /**
-     * @param docSource the m_docSource to set
+     * @param docSource Sets the document source.
      */
     public void setDocSource(final String docSource) {
         this.m_docSource = docSource;
     }
 
     /**
-     * @return the m_docCategory
+     * @return The document category.
      */
     public String getDocCategory() {
         return m_docCategory;
     }
 
     /**
-     * @param docCategory the m_docCategory to set
+     * @param docCategory Sets the document category.
      */
     public void setDocCategory(final String docCategory) {
         this.m_docCategory = docCategory;
     }
 
     /**
-     * @return the m_docType
+     * @return The doc type.
      */
     public String getDocType() {
         return m_docType;
     }
 
     /**
-     * @param docType the m_docType to set
+     * @param docType Sets the document type.
      */
     public void setDocType(final String docType) {
         this.m_docType = docType;
     }
 
     /**
-     * @return the m_useAuthorsColumn
-     */
-    public boolean isUseAuthorsColumn() {
-        return m_useAuthorsColumn;
-    }
-
-    /**
-     * @param useAuthorsColumn the m_useAuthorsColumn to set
-     */
-    public void setUseAuthorsColumn(final boolean useAuthorsColumn) {
-        this.m_useAuthorsColumn = useAuthorsColumn;
-    }
-
-    /**
-     * @return the m_useSourceColumn
-     */
-    public boolean isUseSourceColumn() {
-        return m_useSourceColumn;
-    }
-
-    /**
-     * @param useSourceColumn the m_useSourceColumn to set
-     */
-    public void setUseSourceColumn(final boolean useSourceColumn) {
-        this.m_useSourceColumn = useSourceColumn;
-    }
-
-    /**
-     * @return the m_usePubDateColumn
-     */
-    public boolean isUsePubDateColumn() {
-        return m_usePubDateColumn;
-    }
-
-    /**
-     * @param usePubDateColumn the m_usePubDateColumn to set
-     */
-    public void setUsePubDateColumn(final boolean usePubDateColumn) {
-        this.m_usePubDateColumn = usePubDateColumn;
-    }
-
-    /**
-     * @return the m_useCategoryColumn
-     */
-    public boolean isUseCategoryColumn() {
-        return m_useCategoryColumn;
-    }
-
-    /**
-     * @param useCategoryColumn the m_useCategoryColumn to set
-     */
-    public void setUseCategoryColumn(final boolean useCategoryColumn) {
-        this.m_useCategoryColumn = useCategoryColumn;
-    }
-
-    /**
-     * @return the m_authorsSplitStr
+     * @return The delimiter for splitting author names.
      */
     public String getAuthorsSplitStr() {
         return m_authorsSplitStr;
     }
 
     /**
-     * @param m_authorsSplitStr the m_authorsSplitStr to set
+     * @param authorsSplitStr Sets the delimiter for splitting author names.
      */
-    public void setAuthorsSplitStr(final String m_authorsSplitStr) {
-        this.m_authorsSplitStr = m_authorsSplitStr;
+    public void setAuthorsSplitStr(final String authorsSplitStr) {
+        this.m_authorsSplitStr = authorsSplitStr;
     }
 
     /**
-     * @return the m_authorsFirstName
+     * @return The authors first name.
      */
     public String getAuthorsFirstName() {
         return m_authorsFirstName;
     }
 
     /**
-     * @param authorsFirstName the m_authorsFirstName to set
+     * @param authorsFirstName Sets the authors first name..
      */
     public void setAuthorsFirstName(final String authorsFirstName) {
         this.m_authorsFirstName = authorsFirstName;
     }
 
     /**
-     * @return the m_authorsLastName
+     * @return The authors last name.
      */
     public String getAuthorsLastName() {
         return m_authorsLastName;
     }
 
     /**
-     * @param authorsLastName the m_authorsLastName to set
+     * @param authorsLastName Sets the authors last name.
      */
     public void setAuthorsLastName(final String authorsLastName) {
         this.m_authorsLastName = authorsLastName;
     }
 
     /**
-     * @return the m_numberOfThreads
+     * @return The number of threads.
      */
     public int getNumberOfThreads() {
         return m_numberOfThreads;
     }
 
     /**
-     * @param numberOfThreads the m_numberOfThreads to set
+     * @param numberOfThreads Sets the number of threads.
      */
     public void setNumberOfThreads(final int numberOfThreads) {
         this.m_numberOfThreads = numberOfThreads;

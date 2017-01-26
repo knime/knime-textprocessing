@@ -67,8 +67,10 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
+ * The node model for the Document Data Assigner. This node sets meta information like authors, source, category, type
+ * and publication date to existing documents.
  *
- * @author Julian Bunzel, KNIME.com Berlin
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeModel {
 
@@ -109,12 +111,13 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     private SettingsModelBoolean m_replaceDocColModel = DocumentDataAssignerNodeDialog.getReplaceDocColumnModel();
 
     /**
-     *
+     * Creates a new instance of the {@code DocumentDataAssignerNodeModel} and checks the states of some SettingsModels.
      */
     public DocumentDataAssignerNodeModel() {
         modelStateChanged();
     }
 
+    /** Creates and returns the {@code DataColumnSpec} for the output document column. */
     private final DataColumnSpec[] createNewColumnSpecs() {
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         String newDocColName = m_docColumnModel.getStringValue();
@@ -133,12 +136,13 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
+        // creates the config
         DocumentDataAssignerConfig conf = new DocumentDataAssignerConfig();
 
-        //document
+        // set information of incoming document column
         conf.setDocumentColumnIndex(spec.findColumnIndex(m_docColumnModel.getStringValue()));
 
-        //authors
+        // set author information
         if (m_useAuthorsColModel.getBooleanValue()) {
             conf.setAuthorsColumnIndex(spec.findColumnIndex(m_authorsColModel.getStringValue()));
             conf.setAuthorsSplitStr(m_authorsSplitStrModel.getStringValue());
@@ -147,35 +151,37 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
             conf.setAuthorsLastName(m_authorsLastNameModel.getStringValue());
         }
 
-        //source
+        // set source information
         if (m_useSourceColModel.getBooleanValue()) {
             conf.setSourceColumnIndex(spec.findColumnIndex(m_sourceColModel.getStringValue()));
         } else {
             conf.setDocSource(m_sourceModel.getStringValue());
         }
 
-        //category
+        // set category information
         if (m_useCategoryColModel.getBooleanValue()) {
             conf.setCategoryColumnIndex(spec.findColumnIndex(m_categoryColModel.getStringValue()));
         } else {
             conf.setDocCategory(m_categoryModel.getStringValue());
         }
 
-        //pubdate
+        // set publication date information
         if (m_usePubDateColModel.getBooleanValue()) {
             conf.setPubDateColumnIndex(spec.findColumnIndex(m_pubDateColModel.getStringValue()));
         } else {
             conf.setDocPubDate(m_pubDateModel.getStringValue());
         }
 
-        //type
+        // set documnent type information
         conf.setDocType(m_typeModel.getStringValue());
 
-        //threads
+        // set number of threads
         conf.setNumberOfThreads(m_threadsModel.getIntValue());
 
+        // create new document column based on the config, cellfactory and column specs.
         DocumentDataAssignerCellFactory cellFac = new DocumentDataAssignerCellFactory(conf, createNewColumnSpecs());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
+        // append/replace new document column to existing data table
         if (m_replaceDocColModel.getBooleanValue()) {
             rearranger.replace(cellFac, m_docColumnModel.getStringValue());
         } else {
@@ -259,6 +265,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_replaceDocColModel.loadSettingsFrom(settings);
     }
 
+    /** Sets the state of some SettingModels to enabled/disabled depending on the related 'use ... column' value. */
     private void modelStateChanged() {
         m_categoryModel.setEnabled(!m_useCategoryColModel.getBooleanValue());
         m_sourceModel.setEnabled(!m_useSourceColModel.getBooleanValue());
@@ -282,11 +289,11 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     }
 
     /**
-     * Automatically detects column names that fit to some options.
+     * Automatically detects fitting column names.
      *
      * @param dataTableSpec The DataTableSpec.
      */
-    protected void doSmartDialogSelection(final DataTableSpec dataTableSpec) {
+    private void doSmartDialogSelection(final DataTableSpec dataTableSpec) {
         String[] columns = dataTableSpec.getColumnNames();
         if (settingsNotConfigured()) {
             for (int i = 0; i < columns.length; i++) {
@@ -316,9 +323,9 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     }
 
     /**
-     * @return true if settings have not been configured before
+     * @return True, if settings have not been configured before.
      */
-    protected boolean settingsNotConfigured() {
+    private boolean settingsNotConfigured() {
         return (m_docColumnModel.getStringValue().isEmpty() && m_authorsColModel.getStringValue().isEmpty()
             && m_sourceColModel.getStringValue().isEmpty() && m_categoryColModel.getStringValue().isEmpty()
             && m_pubDateColModel.getStringValue().isEmpty());
