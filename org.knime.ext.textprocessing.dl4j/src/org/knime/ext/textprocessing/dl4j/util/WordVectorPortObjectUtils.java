@@ -139,7 +139,9 @@ public class WordVectorPortObjectUtils {
                     case DOC2VEC:
                         return WordVectorSerializer.readParagraphVectors(in);
                     case WORD2VEC:
-                        return WordVectorSerializer.loadTxtVectors(in, false);
+                        //need to convert to Word2Vec here because if we don't we write Word2Vec
+                        //but would return WordVectorsImp here which leads to inconsistencies
+                        return wordVectorsToWord2Vec(WordVectorSerializer.loadTxtVectors(in, false));
                     default:
                         break;
                 }
