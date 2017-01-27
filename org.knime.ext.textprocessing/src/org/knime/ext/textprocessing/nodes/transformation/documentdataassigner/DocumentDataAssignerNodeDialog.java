@@ -55,11 +55,9 @@ import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -159,22 +157,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} containing the authors first name.
-     */
-    static final SettingsModelString getAuthorsFirstNameModel() {
-        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
-            DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME);
-    }
-
-    /**
-     * @return Creates and returns an instance of {@SettingsModelString} containing the authors last name.
-     */
-    static final SettingsModelString getAuthorsLastNameModel() {
-        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
-            DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME);
-    }
-
-    /**
      * @return Creates and returns an instance of {@SettingsModelString} containing the delimiter for author names.
      */
     static final SettingsModelString getAuthorsSplitStringModel() {
@@ -199,15 +181,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelIntegerBounded} containing number of threads.
-     */
-    static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
-        return new SettingsModelIntegerBounded(DocumentDataAssignerConfigKeys.CFGKEY_THREADS,
-            DocumentDataAssignerConfig.DEF_THREADS, DocumentDataAssignerConfig.MIN_THREADS,
-            DocumentDataAssignerConfig.MAX_THREADS);
-    }
-
-    /**
      * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to replace the
      *         old document column or append a new one.
      */
@@ -216,33 +189,29 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
             DocumentDataAssignerConfig.DEF_REPLACE_DOCCOL);
     }
 
-    SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
+    private SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
 
-    SettingsModelString m_authorsColumnModel = getAuthorsColumnModel();
+    private SettingsModelString m_authorsColumnModel = getAuthorsColumnModel();
 
-    SettingsModelString m_sourceModel = getSourceModel();
+    private SettingsModelString m_sourceModel = getSourceModel();
 
-    SettingsModelString m_sourceColumnModel = getSourceColumnModel();
+    private SettingsModelString m_sourceColumnModel = getSourceColumnModel();
 
-    SettingsModelBoolean m_useSourceColumnModel = getUseSourceColumnModel();
+    private SettingsModelBoolean m_useSourceColumnModel = getUseSourceColumnModel();
 
-    SettingsModelString m_categoryModel = getCategoryModel();
+    private SettingsModelString m_categoryModel = getCategoryModel();
 
-    SettingsModelString m_categoryColumnModel = getCategoryColumnModel();
+    private SettingsModelString m_categoryColumnModel = getCategoryColumnModel();
 
-    SettingsModelBoolean m_useCategoryColumnModel = getUseCategoryColumnModel();
+    private SettingsModelBoolean m_useCategoryColumnModel = getUseCategoryColumnModel();
 
-    SettingsModelString m_pubDateModel = getPubDateModel();
+    private SettingsModelString m_pubDateModel = getPubDateModel();
 
-    SettingsModelBoolean m_usePubDateColumnModel = getUsePubDateColumnModel();
+    private SettingsModelBoolean m_usePubDateColumnModel = getUsePubDateColumnModel();
 
-    SettingsModelString m_pubDateColumnModel = getPubDateColumnModel();
+    private SettingsModelString m_pubDateColumnModel = getPubDateColumnModel();
 
-    SettingsModelString m_authorsFirstNameModel = getAuthorsFirstNameModel();
-
-    SettingsModelString m_authorsLastNameModel = getAuthorsLastNameModel();
-
-    SettingsModelString m_authorsSplitStrModel = getAuthorsSplitStringModel();
+    private SettingsModelString m_authorsSplitStrModel = getAuthorsSplitStringModel();
 
     /**
      *
@@ -262,11 +231,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentString(m_authorsSplitStrModel, "Author names separator"));
-        setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(m_authorsFirstNameModel, "Default author first name"));
-        addDialogComponent(new DialogComponentString(m_authorsLastNameModel, "Default author last name"));
-        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         // dialog for source and category
@@ -306,13 +270,8 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
         // dialog for output column settings
         createNewGroup("Column Settings");
-        addDialogComponent(new DialogComponentBoolean(getReplaceDocColumnModel(), "Replace document column"));
-        closeCurrentGroup();
-
-        // dialog for number of threads
-        createNewGroup("Processes");
-        addDialogComponent(
-            new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel processes", 1));
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentBoolean(getReplaceDocColumnModel(), "Replace document column:"));
         closeCurrentGroup();
         checkState();
 
@@ -328,8 +287,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         m_sourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
         m_authorsColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         m_authorsSplitStrModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
-        m_authorsFirstNameModel.setEnabled(!m_useAuthorsColumnModel.getBooleanValue());
-        m_authorsLastNameModel.setEnabled(!m_useAuthorsColumnModel.getBooleanValue());
     }
 
     class ChangeStateListener implements ChangeListener {

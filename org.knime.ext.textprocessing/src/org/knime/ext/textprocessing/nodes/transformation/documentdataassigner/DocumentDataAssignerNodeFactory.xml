@@ -8,11 +8,9 @@
     <fullDescription>
         <intro>
 			The Document Data Assigner adds meta information like authors, source, category, type and publication date
-			to documents of an incoming document column that can be defined in the node dialog. The meta information 
-			can be set directly in the node dialog for all cells of the document column. It is possible to use other 
-			columns to get the information from.
-			The new document column can be appended or replaces the old one.
-			This node can be used inside of a streamable wrapped meta node.
+			to input documents. What meta information will be assigned from which columns 
+			can be specified in the node dialog. The new document column can be appended or replaces the old one.
+			This node is streamable.
 		</intro>
 		<option name="Use author(s) from column">
             If checked, the string values of the specified column will be used
@@ -20,14 +18,6 @@
         </option>
         <option name="Author name separator">
             The string separating the author names while processing the authors column.
-        </option>
-        <option name="Default author first name">
-            The default authors first name. It is set to all documents if "Use authors from column" is unchecked, but 
-            will not be set if the string remains "-" or is empty.
-        </option>
-        <option name="Default author last name">
-            The default authors first name. It is set to all documents if "Use authors from column" is unchecked, but 
-            will not be set if the string remains "-" or is empty.
         </option>
         <option name="Document source">
             The source which is set to all documents (if 
@@ -84,7 +74,7 @@
         	The input table which contains documents to process and optionally string columns containing the meta information.
         </inPort>
         <outPort name="Enhanced data table." index="0">
-        	The output table which contains the additional data column.
+        	The output table which contains the processed document column.
         </outPort>
     </ports>
 </knimeNode>

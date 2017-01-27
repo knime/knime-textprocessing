@@ -62,6 +62,7 @@ import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.filestore.FileStoreFactory;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
@@ -83,7 +84,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
+class DocumentDataAssignerCellFactory extends AbstractCellFactory {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentDataAssignerCellFactory.class);
 
@@ -102,7 +103,8 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
         super(dataColumnSpec);
 
         m_conf = conf;
-        this.setParallelProcessing(true, m_conf.getNumberOfThreads(), 10 * m_conf.getNumberOfThreads());
+        this.setParallelProcessing(true, KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(),
+            10 * KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
 
         m_cacheInitializer = new LazyInitializer<DataCellCache>() {
 
@@ -156,14 +158,7 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
             docBuilder.setSections(doc.getSections());
 
             // set authors
-            if (m_conf.getAuthorsColumnIndex() < 0) {
-                if ((m_conf.getAuthorsFirstName() != DocumentDataAssignerConfig.DEF_AUTHOR_FIRST_NAME
-                    && !m_conf.getAuthorsFirstName().isEmpty())
-                    || (m_conf.getAuthorsLastName() != DocumentDataAssignerConfig.DEF_AUTHOR_LAST_NAME
-                        && !m_conf.getAuthorsLastName().isEmpty())) {
-                    docBuilder.addAuthor(new Author(m_conf.getAuthorsFirstName(), m_conf.getAuthorsLastName()));
-                }
-            } else {
+            if (m_conf.getAuthorsColumnIndex() >= 0) {
                 DataCell authorCell = row.getCell(m_conf.getAuthorsColumnIndex());
                 if (!authorCell.isMissing() && authorCell.getType().isCompatible(StringValue.class)) {
                     String authors[] = ((StringCell)authorCell).getStringValue().split(m_conf.getAuthorsSplitStr());
@@ -172,7 +167,7 @@ public class DocumentDataAssignerCellFactory extends AbstractCellFactory {
                         if (names.length > 1) {
                             docBuilder.addAuthor(new Author(names[0], names[names.length - 1]));
                         } else {
-                            docBuilder.addAuthor(new Author("-", names[0]));
+                            docBuilder.addAuthor(new Author("", names[0]));
                         }
                     }
                 }

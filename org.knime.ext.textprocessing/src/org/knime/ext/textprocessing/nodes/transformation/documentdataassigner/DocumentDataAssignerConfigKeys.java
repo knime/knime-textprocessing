@@ -53,7 +53,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class DocumentDataAssignerConfigKeys {
+class DocumentDataAssignerConfigKeys {
 
     /**
      * The configuration key of the document column.

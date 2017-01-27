@@ -48,7 +48,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
-import org.knime.core.node.KNIMEConstants;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 
@@ -58,7 +57,7 @@ import org.knime.ext.textprocessing.data.PublicationDate;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class DocumentDataAssignerConfig {
+class DocumentDataAssignerConfig {
     // default values for setting models.
 
     /** The default publication date. */
@@ -76,12 +75,6 @@ public class DocumentDataAssignerConfig {
     /** The default string splitting author names. */
     static final String DEF_AUTHORSSPLIT_STR = ", ";
 
-    /** The default authors first name. */
-    static final String DEF_AUTHOR_FIRST_NAME = "-";
-
-    /** The default authors last name. */
-    static final String DEF_AUTHOR_LAST_NAME = "-";
-
     /** The default value for using an incoming column as authors column. */
     static final boolean DEF_USE_AUTHORSCOLUMN = false;
 
@@ -94,18 +87,9 @@ public class DocumentDataAssignerConfig {
     /** The default value for using an incoming column as pubdate column. */
     static final boolean DEF_USE_PUBDATECOLUMN = false;
 
-    /** The default number of threads. */
-    static final int DEF_THREADS = Math.max(1, Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
-        (int)Math.ceil(Runtime.getRuntime().availableProcessors())));
-
-    /** The min number of threads. */
-    static final int MIN_THREADS = 1;
-
-    /** The max number of threads. */
-    static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
-
     /** The default value for replacing the document column. */
     static final boolean DEF_REPLACE_DOCCOL = false;
+
 
     /* Following information is used for DocumentDataAssingerCellFactory.
      * The values are initialized here and can be set in the DocumentDataAssignerNodeModel while using the set-Methods.
@@ -142,14 +126,6 @@ public class DocumentDataAssignerConfig {
     /** The string splitting author names while processing the authors column. */
     private String m_authorsSplitStr = DEF_AUTHORSSPLIT_STR;
 
-    /** The authors first name used for the new document. */
-    private String m_authorsFirstName = DEF_AUTHOR_FIRST_NAME;
-
-    /** The authors last name used for the new document. */
-    private String m_authorsLastName = DEF_AUTHOR_LAST_NAME;
-
-    /** The number of threads used to create new document cells. */
-    private int m_numberOfThreads = DEF_THREADS;
 
     /**
      * @return The document column index.
@@ -289,48 +265,6 @@ public class DocumentDataAssignerConfig {
      */
     public void setAuthorsSplitStr(final String authorsSplitStr) {
         this.m_authorsSplitStr = authorsSplitStr;
-    }
-
-    /**
-     * @return The authors first name.
-     */
-    public String getAuthorsFirstName() {
-        return m_authorsFirstName;
-    }
-
-    /**
-     * @param authorsFirstName Sets the authors first name..
-     */
-    public void setAuthorsFirstName(final String authorsFirstName) {
-        this.m_authorsFirstName = authorsFirstName;
-    }
-
-    /**
-     * @return The authors last name.
-     */
-    public String getAuthorsLastName() {
-        return m_authorsLastName;
-    }
-
-    /**
-     * @param authorsLastName Sets the authors last name.
-     */
-    public void setAuthorsLastName(final String authorsLastName) {
-        this.m_authorsLastName = authorsLastName;
-    }
-
-    /**
-     * @return The number of threads.
-     */
-    public int getNumberOfThreads() {
-        return m_numberOfThreads;
-    }
-
-    /**
-     * @param numberOfThreads Sets the number of threads.
-     */
-    public void setNumberOfThreads(final int numberOfThreads) {
-        this.m_numberOfThreads = numberOfThreads;
     }
 
 }

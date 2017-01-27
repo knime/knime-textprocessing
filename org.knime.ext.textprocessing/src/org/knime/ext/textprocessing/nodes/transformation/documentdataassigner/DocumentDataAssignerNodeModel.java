@@ -57,7 +57,6 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -92,10 +91,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
 
     private SettingsModelBoolean m_usePubDateColModel = DocumentDataAssignerNodeDialog.getUsePubDateColumnModel();
 
-    private SettingsModelString m_authorsFirstNameModel = DocumentDataAssignerNodeDialog.getAuthorsFirstNameModel();
-
-    private SettingsModelString m_authorsLastNameModel = DocumentDataAssignerNodeDialog.getAuthorsLastNameModel();
-
     private SettingsModelString m_authorsSplitStrModel = DocumentDataAssignerNodeDialog.getAuthorsSplitStringModel();
 
     private SettingsModelString m_sourceModel = DocumentDataAssignerNodeDialog.getSourceModel();
@@ -105,8 +100,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     private SettingsModelString m_pubDateModel = DocumentDataAssignerNodeDialog.getPubDateModel();
 
     private SettingsModelString m_typeModel = DocumentDataAssignerNodeDialog.getTypeModel();
-
-    private SettingsModelIntegerBounded m_threadsModel = DocumentDataAssignerNodeDialog.getNumberOfThreadsModel();
 
     private SettingsModelBoolean m_replaceDocColModel = DocumentDataAssignerNodeDialog.getReplaceDocColumnModel();
 
@@ -146,9 +139,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         if (m_useAuthorsColModel.getBooleanValue()) {
             conf.setAuthorsColumnIndex(spec.findColumnIndex(m_authorsColModel.getStringValue()));
             conf.setAuthorsSplitStr(m_authorsSplitStrModel.getStringValue());
-        } else {
-            conf.setAuthorsFirstName(m_authorsFirstNameModel.getStringValue());
-            conf.setAuthorsLastName(m_authorsLastNameModel.getStringValue());
         }
 
         // set source information
@@ -175,9 +165,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         // set documnent type information
         conf.setDocType(m_typeModel.getStringValue());
 
-        // set number of threads
-        conf.setNumberOfThreads(m_threadsModel.getIntValue());
-
         // create new document column based on the config, cellfactory and column specs.
         DocumentDataAssignerCellFactory cellFac = new DocumentDataAssignerCellFactory(conf, createNewColumnSpecs());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
@@ -197,8 +184,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_docColumnModel.saveSettingsTo(settings);
         m_authorsColModel.saveSettingsTo(settings);
-        m_authorsFirstNameModel.saveSettingsTo(settings);
-        m_authorsLastNameModel.saveSettingsTo(settings);
         m_authorsSplitStrModel.saveSettingsTo(settings);
         m_categoryColModel.saveSettingsTo(settings);
         m_categoryModel.saveSettingsTo(settings);
@@ -208,7 +193,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_useCategoryColModel.saveSettingsTo(settings);
         m_usePubDateColModel.saveSettingsTo(settings);
         m_useSourceColModel.saveSettingsTo(settings);
-        m_threadsModel.saveSettingsTo(settings);
         m_typeModel.saveSettingsTo(settings);
         m_sourceColModel.saveSettingsTo(settings);
         m_sourceModel.saveSettingsTo(settings);
@@ -222,8 +206,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColumnModel.validateSettings(settings);
         m_authorsColModel.validateSettings(settings);
-        m_authorsFirstNameModel.validateSettings(settings);
-        m_authorsLastNameModel.validateSettings(settings);
         m_authorsSplitStrModel.validateSettings(settings);
         m_categoryColModel.validateSettings(settings);
         m_categoryModel.validateSettings(settings);
@@ -233,7 +215,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_useCategoryColModel.validateSettings(settings);
         m_usePubDateColModel.validateSettings(settings);
         m_useSourceColModel.validateSettings(settings);
-        m_threadsModel.validateSettings(settings);
         m_typeModel.validateSettings(settings);
         m_sourceColModel.validateSettings(settings);
         m_sourceModel.validateSettings(settings);
@@ -247,8 +228,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColumnModel.loadSettingsFrom(settings);
         m_authorsColModel.loadSettingsFrom(settings);
-        m_authorsFirstNameModel.loadSettingsFrom(settings);
-        m_authorsLastNameModel.loadSettingsFrom(settings);
         m_authorsSplitStrModel.loadSettingsFrom(settings);
         m_categoryColModel.loadSettingsFrom(settings);
         m_categoryModel.loadSettingsFrom(settings);
@@ -258,7 +237,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_useCategoryColModel.loadSettingsFrom(settings);
         m_usePubDateColModel.loadSettingsFrom(settings);
         m_useSourceColModel.loadSettingsFrom(settings);
-        m_threadsModel.loadSettingsFrom(settings);
         m_typeModel.loadSettingsFrom(settings);
         m_sourceColModel.loadSettingsFrom(settings);
         m_sourceModel.loadSettingsFrom(settings);
@@ -273,8 +251,6 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_categoryColModel.setEnabled(m_useCategoryColModel.getBooleanValue());
         m_authorsColModel.setEnabled(m_useAuthorsColModel.getBooleanValue());
         m_authorsSplitStrModel.setEnabled(m_useAuthorsColModel.getBooleanValue());
-        m_authorsFirstNameModel.setEnabled(!m_useAuthorsColModel.getBooleanValue());
-        m_authorsLastNameModel.setEnabled(!m_useAuthorsColModel.getBooleanValue());
         m_pubDateColModel.setEnabled(m_usePubDateColModel.getBooleanValue());
         m_pubDateModel.setEnabled(!m_usePubDateColModel.getBooleanValue());
     }
@@ -297,25 +273,33 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         String[] columns = dataTableSpec.getColumnNames();
         if (settingsNotConfigured()) {
             for (int i = 0; i < columns.length; i++) {
-                String column = columns[i];
+                String column = columns[i].toLowerCase();
                 if (dataTableSpec.getColumnSpec(column).getType().isCompatible(DocumentValue.class)
                     && m_docColumnModel.getStringValue().isEmpty()) {
                     m_docColumnModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                if ((column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
+                    || column.contains(DocumentDataExtractor.SOURCE.getName().toLowerCase()))
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
+                    && m_sourceColModel.getStringValue().isEmpty()) {
                     m_sourceColModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                if ((column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
+                    || column.contains(DocumentDataExtractor.AUTHOR.getName().toLowerCase()))
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
+                    && m_authorsColModel.getStringValue().isEmpty()) {
                     m_authorsColModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                if ((column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
+                    || column.contains(DocumentDataExtractor.CATEGORY.getName().toLowerCase()))
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
+                    && m_categoryColModel.getStringValue().isEmpty()) {
                     m_categoryColModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                if ((column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
+                    || column.contains(DocumentDataExtractor.PUB_DATE.getName().toLowerCase()))
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
+                    && m_pubDateColModel.getStringValue().isEmpty()) {
                     m_pubDateColModel.setStringValue(column);
                 }
             }
