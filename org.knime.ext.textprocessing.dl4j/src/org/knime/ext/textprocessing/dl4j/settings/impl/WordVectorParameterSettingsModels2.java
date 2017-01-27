@@ -42,15 +42,13 @@
  *******************************************************************************/
 package org.knime.ext.textprocessing.dl4j.settings.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.dl4j.base.settings.IParameterSettingsModels;
+import org.knime.ext.dl4j.base.settings.impl.AbstractMapSetParameterSettingsModels;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 
 /**
@@ -58,21 +56,8 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerPar
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorParameterSettingsModels implements IParameterSettingsModels<WordVectorLearnerParameter> {
-
-    private SettingsModelIntegerBounded m_minWordFrequency;
-
-    private SettingsModelIntegerBounded m_layerSize;
-
-    private SettingsModelIntegerBounded m_windowSize;
-
-    private SettingsModelString m_wordVectorTrainingsMode;
-
-    private SettingsModelDoubleBounded m_minimumLearningRate;
-
-    private SettingsModelBoolean m_useBasicPreprocessing;
-
-    private final List<SettingsModel> m_allInitializedSettings = new ArrayList<>();
+public class WordVectorParameterSettingsModels2
+    extends AbstractMapSetParameterSettingsModels<WordVectorLearnerParameter> {
 
     @Override
     public SettingsModel createParameter(final WordVectorLearnerParameter enumerate) throws IllegalStateException {
@@ -95,76 +80,10 @@ public class WordVectorParameterSettingsModels implements IParameterSettingsMode
             case USE_BASIC_PREPROCESSING:
                 return new SettingsModelBoolean("use_basic_preprocessing",
                     WordVectorLearnerParameter.DEFAULT_USE_BASIC_PREPROCESSING);
+            case SKIP_MISSING_CELLS:
+                return new SettingsModelBoolean("skip_missing_cells", false);
             default:
                 throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
         }
     }
-
-    @Override
-    public void setParameter(final WordVectorLearnerParameter enumerate) throws IllegalStateException {
-        switch (enumerate) {
-            case LAYER_SIZE:
-                m_layerSize = (SettingsModelIntegerBounded)createParameter(enumerate);
-                addToSet(m_layerSize);
-                break;
-            case MIN_WORD_FREQUENCY:
-                m_minWordFrequency = (SettingsModelIntegerBounded)createParameter(enumerate);
-                addToSet(m_minWordFrequency);
-                break;
-            case WINDOW_SIZE:
-                m_windowSize = (SettingsModelIntegerBounded)createParameter(enumerate);
-                addToSet(m_windowSize);
-                break;
-            case WORD_VECTOR_TRAINING_MODE:
-                m_wordVectorTrainingsMode = (SettingsModelString)createParameter(enumerate);
-                addToSet(m_wordVectorTrainingsMode);
-                break;
-            case MIN_LEARNING_RATE:
-                m_minimumLearningRate = (SettingsModelDoubleBounded)createParameter(enumerate);
-                addToSet(m_minimumLearningRate);
-                break;
-            case USE_BASIC_PREPROCESSING:
-                m_useBasicPreprocessing = (SettingsModelBoolean)createParameter(enumerate);
-                addToSet(m_useBasicPreprocessing);
-                break;
-            default:
-                throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
-        }
-    }
-
-    @Override
-    public List<SettingsModel> getAllInitializedSettings() {
-        return m_allInitializedSettings;
-    }
-
-    private void addToSet(final SettingsModel model) {
-        if (!m_allInitializedSettings.contains(model)) {
-            m_allInitializedSettings.add(model);
-        }
-    }
-
-    public SettingsModelDoubleBounded getMinimumLearningRate() {
-        return m_minimumLearningRate;
-    }
-
-    public SettingsModelIntegerBounded getMinWordFrequency() {
-        return m_minWordFrequency;
-    }
-
-    public SettingsModelIntegerBounded getLayerSize() {
-        return m_layerSize;
-    }
-
-    public SettingsModelIntegerBounded getWindowSize() {
-        return m_windowSize;
-    }
-
-    public SettingsModelString getWordVectorTrainingsMode() {
-        return m_wordVectorTrainingsMode;
-    }
-
-    public SettingsModelBoolean getUseBasicPreprocessing() {
-        return m_useBasicPreprocessing;
-    }
-
 }

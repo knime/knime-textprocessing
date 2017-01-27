@@ -75,12 +75,12 @@ import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettin
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
+public class WordVectorLearnerNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
      * New pane for configuring the WordVectorLearner node.
      */
-    protected WordVectorLearnerNodeDialog() {
+    protected WordVectorLearnerNodeDialog2() {
         final LearnerParameterSettingsModels2 learnerSettingsModels = new LearnerParameterSettingsModels2();
         final DataParameterSettingsModels2 dataSettingsModels = new DataParameterSettingsModels2();
         final WordVectorParameterSettingsModels2 wordVectorSettingsModels = new WordVectorParameterSettingsModels2();
@@ -115,10 +115,6 @@ public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentStringSelection(trainingModeSettings, "WordVector Training Mode",
             EnumUtils.getStringCollectionFromToString(WordVectorTrainingMode.values())));
-        addDialogComponent(new DialogComponentBoolean(
-            (SettingsModelBoolean)wordVectorSettingsModels
-                .createParameter(WordVectorLearnerParameter.USE_BASIC_PREPROCESSING),
-            "Use Basic Token Preprocessing?"));
         addDialogComponent(new DialogComponentNumberEdit(
             (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.SEED), "Seed", 4));
         addDialogComponent(new DialogComponentNumberEdit(
@@ -140,6 +136,8 @@ public class WordVectorLearnerNodeDialog extends DefaultNodeSettingsPane {
             .createParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY), "Minimum Word Frequency", 4));
         addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
             .createParameter(WordVectorLearnerParameter.WINDOW_SIZE), "Window Size", 4));
+        addDialogComponent(new DialogComponentBoolean((SettingsModelBoolean)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.SKIP_MISSING_CELLS), "Skip missing cells?"));
 
         createNewTab("Column Selection");
         addDialogComponent(

@@ -48,19 +48,20 @@ package org.knime.ext.textprocessing.dl4j.settings.enumerate;
  * @author David Kolb, KNIME.com GmbH
  */
 public enum WordVectorLearnerParameter {
-        /**
-         * minimum frequency threshold, words with less frequency will be discarded
-         */
-    MIN_WORD_FREQUENCY, /** number of epochs to train the model */
-    LAYER_SIZE, /** size of the context window */
-    WINDOW_SIZE, /** what word vectors to train */
-    WORD_VECTOR_TRAINING_MODE, /**
-                                * learning rate decays in word vector learning, minimum learning rate to use
-                                */
-    MIN_LEARNING_RATE, /**
-                        * whether to enable basic preprocessing (convert to lower case and strip punctuation) of tokens
-                        */
-    USE_BASIC_PREPROCESSING;
+        /** Minimum frequency threshold, words which are less frequent will be discarded. */
+        MIN_WORD_FREQUENCY,
+        /** Number of epochs to train the model. */
+        LAYER_SIZE,
+        /** Size of the context window. */
+        WINDOW_SIZE,
+        /** What word vectors to train. */
+        WORD_VECTOR_TRAINING_MODE,
+        /** Learning rate decays in word vector learning, minimum learning rate to use. */
+        MIN_LEARNING_RATE,
+        /** Whether to enable basic preprocessing (convert to lower case and strip punctuation) of tokens. */
+        USE_BASIC_PREPROCESSING,
+        /** Whether to skip rows containing missing cells. */
+        SKIP_MISSING_CELLS;
 
     // Parameter default values
     public static final int DEFAULT_INT = 1;

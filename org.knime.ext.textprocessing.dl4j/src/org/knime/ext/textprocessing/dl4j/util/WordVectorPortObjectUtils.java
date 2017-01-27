@@ -42,32 +42,21 @@
  *******************************************************************************/
 package org.knime.ext.textprocessing.dl4j.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.deeplearning4j.berkeley.Pair;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
-import org.deeplearning4j.models.embeddings.inmemory.InMemoryLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.models.word2vec.VocabWord;
+import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
-import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 /**
  * Utility class for {@link WordVectorPortObject} and {@link WordVectorPortObjectSpec} Serialisation. Also contains
@@ -124,75 +113,41 @@ public class WordVectorPortObjectUtils {
      * Reads {@link WordVectorPortObject} from specified {@link ZipInputStream}.
      *
      * @param inStream stream to read from
+     * @param mode the type of WordVector model to expect
      * @return WordVectorPortObject
      * @throws IOException
      */
-    public static WordVectorPortObject loadPortFromZip(final ZipInputStream inStream) throws IOException {
-        return new WordVectorPortObject(loadWordVectors(inStream), null);
+    public static WordVectorPortObject loadPortFromZip(final ZipInputStream inStream, final WordVectorTrainingMode mode)
+        throws IOException {
+        return new WordVectorPortObject(loadWordVectors(inStream, mode), null);
     }
 
     /**
      * Reads {@link WordVectors} from specified {@link ZipInputStream}.
      *
      * @param in stream to read from
+     * @param mode the type of WordVector model to expect
      * @return {@link WordVectors} loaded from stream
      * @throws IOException
      */
-    public static WordVectors loadWordVectors(final ZipInputStream in) throws IOException {
-        final String whitespaceReplacement = "_Az92_";
-        AbstractCache<VocabWord> cache = null;
-        InMemoryLookupTable<VocabWord> lookupTable = null;
+    public static WordVectors loadWordVectors(final ZipInputStream in, final WordVectorTrainingMode mode)
+        throws IOException {
         ZipEntry entry;
-
         while ((entry = in.getNextEntry()) != null) {
             if (entry.getName().matches("word_vectors")) {
-
-                // Normally just call
-                // WordVectorSerializer.loadTxtVectors(stream, skipFirstLine),
-                // however, this results
-                // in encoding problems. Method loadTxtVectors can't be called
-                // with reader using UTF-8 encoding, which is
-                // used for writing method. Thus copy implementation and use
-                // InputStreamReader specifying UTF-8 encoding.
-
-                cache = new AbstractCache.Builder<VocabWord>().build();
-
-                final BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
-                String line = "";
-                final List<INDArray> arrays = new ArrayList<>();
-
-                while ((line = reader.readLine()) != null) {
-                    final String[] split = line.split(" ");
-                    final String word = split[0].replaceAll(whitespaceReplacement, " ");
-                    final VocabWord word1 = new VocabWord(1.0, word);
-
-                    word1.setIndex(cache.numWords());
-
-                    cache.addToken(word1);
-
-                    cache.addWordToIndex(word1.getIndex(), word);
-
-                    cache.putVocabWord(word);
-                    final INDArray row = Nd4j.create(Nd4j.createBuffer(split.length - 1));
-                    for (int i = 1; i < split.length; i++) {
-                        row.putScalar(i - 1, Float.parseFloat(split[i]));
-                    }
-                    arrays.add(row);
+                switch (mode) {
+                    case DOC2VEC:
+                        return WordVectorSerializer.readParagraphVectors(in);
+                    case WORD2VEC:
+                        //need to convert to Word2Vec here because if we don't we write Word2Vec
+                        //but would return WordVectorsImp here which leads to inconsistencies
+                        return wordVectorsToWord2Vec(WordVectorSerializer.loadTxtVectors(in, false));
+                    default:
+                        break;
                 }
-
-                lookupTable = (InMemoryLookupTable<VocabWord>)new InMemoryLookupTable.Builder<VocabWord>()
-                    .vectorLength(arrays.get(0).columns()).cache(cache).build();
-
-                final INDArray syn = Nd4j.create(new int[]{arrays.size(), arrays.get(0).columns()});
-                for (int i = 0; i < syn.rows(); i++) {
-                    syn.putRow(i, arrays.get(i));
-                }
-
-                Nd4j.clearNans(syn);
-                lookupTable.setSyn0(syn);
             }
         }
-        return WordVectorSerializer.fromPair(Pair.makePair((InMemoryLookupTable)lookupTable, (VocabCache)cache));
+        throw new IllegalStateException("No deserialization method defined for WordVectors of type: " + mode);
     }
 
     /**
@@ -244,7 +199,6 @@ public class WordVectorPortObjectUtils {
         throws IOException {
         final ZipEntry entry = new ZipEntry("word_vector_trainings_mode");
         out.putNextEntry(entry);
-        // TODO may cause problems with encoding on different os
         out.write(mode.toString().getBytes(Charset.forName("UTF-8")));
     }
 
@@ -256,12 +210,19 @@ public class WordVectorPortObjectUtils {
      * @throws IOException
      */
     public static void writeWordVectors(final WordVectors wordVectors, final ZipOutputStream out) throws IOException {
-        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, Charset.forName("UTF-8")));
-        final Word2Vec vec = wordVectorsToWord2Vec(wordVectors);
         final ZipEntry entry = new ZipEntry("word_vectors");
         out.putNextEntry(entry);
-
-        WordVectorSerializer.writeWordVectors(vec, writer);
+        //first check if ParagraphVectors because it extends Word2Vec
+        if (wordVectors instanceof ParagraphVectors) {
+            ParagraphVectors d2v = (ParagraphVectors)wordVectors;
+            WordVectorSerializer.writeParagraphVectors(d2v, out);
+        } else if (wordVectors instanceof Word2Vec) {
+            Word2Vec w2v = (Word2Vec)wordVectors;
+            WordVectorSerializer.writeWordVectors(w2v, out);
+        } else {
+            throw new IllegalStateException(
+                "No serialization method defined for WordVectors of type: " + wordVectors.getClass().getSimpleName());
+        }
     }
 
     private static String readStringFromZipStream(final ZipInputStream in) throws IOException {

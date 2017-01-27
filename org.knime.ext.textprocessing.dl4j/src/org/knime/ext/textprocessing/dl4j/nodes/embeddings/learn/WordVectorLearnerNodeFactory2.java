@@ -40,87 +40,59 @@
  * may freely choose the license terms applicable to such Node, including
  * when such Node is propagated with or for interoperation with KNIME.
  *******************************************************************************/
-package org.knime.ext.textprocessing.dl4j.nodes.embeddings;
+package org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn;
 
-import java.io.IOException;
-
-import javax.swing.JComponent;
-
-import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionMonitor;
-import org.knime.core.node.port.AbstractPortObject;
-import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.port.PortObjectZipInputStream;
-import org.knime.core.node.port.PortObjectZipOutputStream;
-import org.knime.core.node.port.PortType;
-import org.knime.core.node.port.PortTypeRegistry;
-import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * Port Object for Word Vector Models.
+ * <code>NodeFactory</code> for the "WordVectorLearner" Node.
+ *
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorPortObject extends AbstractPortObject {
+public class WordVectorLearnerNodeFactory2 extends NodeFactory<WordVectorLearnerNodeModel2> {
 
-    public static final class Serializer extends AbstractPortObjectSerializer<WordVectorPortObject> {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WordVectorLearnerNodeModel2 createNodeModel() {
+        return new WordVectorLearnerNodeModel2();
     }
 
     /**
-     * Define port type of objects of this class when used as PortObjects.
+     * {@inheritDoc}
      */
-    public static final PortType TYPE = PortTypeRegistry.getInstance().getPortType(WordVectorPortObject.class);
-
-    private static final String SUMMARY = "Word Vector Model";
-
-    private WordVectors m_wordVectors;
-
-    private WordVectorPortObjectSpec m_spec;
+    @Override
+    public int getNrNodeViews() {
+        return 0;
+    }
 
     /**
-     * Empty no-arg constructor as needed by {@link AbstractPortObject}
+     * {@inheritDoc}
      */
-    public WordVectorPortObject() {
-
-    }
-
-    public WordVectorPortObject(final WordVectors wordVectors, final WordVectorPortObjectSpec spec) {
-        this.m_spec = spec;
-        this.m_wordVectors = wordVectors;
-    }
-
     @Override
-    public String getSummary() {
-        return SUMMARY;
+    public NodeView<WordVectorLearnerNodeModel2> createNodeView(final int viewIndex,
+        final WordVectorLearnerNodeModel2 nodeModel) {
+        return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public PortObjectSpec getSpec() {
-        return m_spec;
+    public boolean hasDialog() {
+        return true;
     }
 
-    public WordVectors getWordVectors() {
-        return m_wordVectors;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public JComponent[] getViews() {
-        return new JComponent[]{};
+    public NodeDialogPane createNodeDialogPane() {
+        return new WordVectorLearnerNodeDialog2();
     }
 
-    @Override
-    protected void save(final PortObjectZipOutputStream out, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        WordVectorPortObjectUtils.saveModelToZip(this, true, false, out);
-    }
-
-    @Override
-    protected void load(final PortObjectZipInputStream in, final PortObjectSpec spec, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        this.m_spec = (WordVectorPortObjectSpec)spec;
-
-        final WordVectorPortObject port = WordVectorPortObjectUtils.loadPortFromZip(in, m_spec.getWordVectorTrainingsMode());
-        this.m_wordVectors = port.getWordVectors();
-    }
 }

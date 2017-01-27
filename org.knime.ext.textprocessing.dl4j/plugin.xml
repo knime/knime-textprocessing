@@ -6,16 +6,30 @@
       <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory"
+            after="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory2"
+            after="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
+      </node>
+      
+      <!-- Deprecated nodes -->
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory">
       </node>
       <node
             category-path="/labs/deeplearning/embeddings"
-            deprecated="false"
-            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
-      </node>
-      <node
-            category-path="/labs/deeplearning/embeddings"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory">
       </node>
    </extension>

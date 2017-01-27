@@ -51,6 +51,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
+import org.knime.ext.dl4j.base.util.TableUtils;
 
 /**
  * {@link SentenceIterator} for a {@link BufferedDataTable}. Expects a column contained in the data table holding one
@@ -69,16 +70,70 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
 
     private final int m_documentColumnIndex;
 
+    private final boolean m_skipMissing;
+
+    private long m_currentRow = 0;
+
+    private long m_lastIndexWithoutMissing;
+
+
     /**
-     * Constructor for class BufferedDataTableSentenceIterator
+     * Convenience constructor for class BufferedDataTableSentenceIterator. Equal to calling
+     * <code>this(table, documentColumnName, false)</code>
      *
      * @param table the table to iterate
      * @param documentColumnName the name of the document column
      */
     public BufferedDataTableSentenceIterator(final BufferedDataTable table, final String documentColumnName) {
-        this.m_table = table;
-        this.m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
-        this.m_tableIterator = table.iterator();
+        this(table, documentColumnName, false);
+    }
+
+    /**
+     * Constructor for class BufferedDataTableSentenceIterator
+     *
+     * @param table the table to iterate
+     * @param documentColumnName the name of the document column
+     * @param skipMissing whether rows containing missing cells should be skipped
+     */
+    public BufferedDataTableSentenceIterator(final BufferedDataTable table, final String documentColumnName, final boolean skipMissing) {
+        m_skipMissing = skipMissing;
+        m_table = table;
+        m_documentColumnIndex = table.getSpec().findColumnIndex(documentColumnName);
+        m_tableIterator = table.iterator();
+        if(skipMissing){
+            m_lastIndexWithoutMissing = searchLastIndexWithoutMissing();
+        }
+        reset();
+    }
+
+    /**
+     * Convenience helper because we always check for the same index.
+     *
+     * @param row
+     * @return
+     */
+    private boolean containsMissing(final DataRow row) {
+        return TableUtils.hasMissing(row, new int[]{m_documentColumnIndex});
+    }
+
+    /**
+     * Returns the index of the last row in the table that contains no missing values. Missing in the sense of
+     * <code>containsMissing(final DataRow row)</code> implementation.
+     *
+     * @return
+     */
+    private long searchLastIndexWithoutMissing() {
+        long lastIndex = 0;
+        long i = 0;
+        while (m_tableIterator.hasNext()) {
+            final DataRow row = m_tableIterator.next();
+            if (!containsMissing(row)) {
+                lastIndex = i;
+            }
+            i++;
+        }
+        reset();
+        return lastIndex;
     }
 
     /**
@@ -90,12 +145,18 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
         final DataCell cell = row.getCell(m_documentColumnIndex);
         String documentContent = null;
 
+        if (m_skipMissing && containsMissing(row)) {
+            m_currentRow++;
+            return nextSentence();
+        }
+
         try {
-            ConverterUtils.checkMissing(cell);
             documentContent = ConverterUtils.convertDataCellToJava(cell, String.class);
         } catch (DataCellConversionException e) {
             throw new RuntimeException("Error in row " + row.getKey() + " : " + e.getMessage(), e);
         }
+
+        m_currentRow++;
         return documentContent;
     }
 
@@ -104,7 +165,12 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
      */
     @Override
     public boolean hasNext() {
-        return m_tableIterator.hasNext();
+        if (m_skipMissing) {
+            //if no follow up rows are valid we are done
+            return m_currentRow <= m_lastIndexWithoutMissing;
+        } else {
+            return m_tableIterator.hasNext();
+        }
     }
 
     /**
@@ -114,6 +180,7 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
     public void reset() {
         m_tableIterator.close();
         m_tableIterator = m_table.iterator();
+        m_currentRow = 0;
     }
 
     /**
