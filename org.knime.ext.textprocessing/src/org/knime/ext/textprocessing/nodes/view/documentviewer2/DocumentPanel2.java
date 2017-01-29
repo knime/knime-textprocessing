@@ -51,7 +51,6 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -71,6 +70,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.knime.core.util.DesktopUtil;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
@@ -318,29 +318,16 @@ final class DocumentPanel2 extends JPanel implements Observer {
     }
 
     private static final boolean checkBrowsingSupport() {
-        Desktop desktop = null;
-        if (Desktop.isDesktopSupported()) {
-            desktop = Desktop.getDesktop();
-            if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                return true;
-            }
-        }
-        return false;
+        return DesktopUtil.isSupported(Desktop.Action.BROWSE);
     }
 
     private static final void openUrlInBrowser(final URL u) {
         if (u != null) {
-            Desktop desktop = null;
-            if (Desktop.isDesktopSupported()) {
-                desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        desktop.browse(u.toURI());
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    } catch (URISyntaxException e1) {
-                        e1.printStackTrace();
-                    }
+            if (DesktopUtil.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    DesktopUtil.browse(u);
+                } catch (URISyntaxException e1) {
+                    e1.printStackTrace();
                 }
             }
         }
