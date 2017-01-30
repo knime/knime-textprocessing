@@ -103,6 +103,12 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
 
     private SettingsModelBoolean m_replaceDocColModel = DocumentDataAssignerNodeDialog.getReplaceDocColumnModel();
 
+    private SettingsModelBoolean m_appendDocColModel = DocumentDataAssignerNodeDialog.getAppendDocColumnModel();
+
+    private SettingsModelString m_replacedColNameModel = DocumentDataAssignerNodeDialog.getReplacedColNameModel();
+
+    private SettingsModelString m_appendedColNameModel = DocumentDataAssignerNodeDialog.getAppendedColNameModel();
+
     /**
      * Creates a new instance of the {@code DocumentDataAssignerNodeModel} and checks the states of some SettingsModels.
      */
@@ -113,9 +119,11 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     /** Creates and returns the {@code DataColumnSpec} for the output document column. */
     private final DataColumnSpec[] createNewColumnSpecs() {
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        String newDocColName = m_docColumnModel.getStringValue();
-        if (!m_replaceDocColModel.getBooleanValue()) {
-            newDocColName = "Processed " + newDocColName;
+        String newDocColName;
+        if (m_replaceDocColModel.getBooleanValue()) {
+            newDocColName = m_replacedColNameModel.getStringValue();
+        } else {
+            newDocColName = m_appendedColNameModel.getStringValue();
         }
         DataColumnSpecCreator docColSpecCreator = new DataColumnSpecCreator(newDocColName, docFactory.getDataType());
         return new DataColumnSpec[]{docColSpecCreator.createSpec()};
@@ -197,6 +205,9 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_sourceColModel.saveSettingsTo(settings);
         m_sourceModel.saveSettingsTo(settings);
         m_replaceDocColModel.saveSettingsTo(settings);
+        m_replacedColNameModel.saveSettingsTo(settings);
+        m_appendDocColModel.saveSettingsTo(settings);
+        m_appendedColNameModel.saveSettingsTo(settings);
     }
 
     /**
@@ -219,6 +230,9 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_sourceColModel.validateSettings(settings);
         m_sourceModel.validateSettings(settings);
         m_replaceDocColModel.validateSettings(settings);
+        m_replacedColNameModel.validateSettings(settings);
+        m_appendDocColModel.validateSettings(settings);
+        m_appendedColNameModel.validateSettings(settings);
     }
 
     /**
@@ -241,6 +255,9 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_sourceColModel.loadSettingsFrom(settings);
         m_sourceModel.loadSettingsFrom(settings);
         m_replaceDocColModel.loadSettingsFrom(settings);
+        m_replacedColNameModel.loadSettingsFrom(settings);
+        m_appendedColNameModel.loadSettingsFrom(settings);
+        m_appendDocColModel.loadSettingsFrom(settings);
     }
 
     /** Sets the state of some SettingModels to enabled/disabled depending on the related 'use ... column' value. */
@@ -253,6 +270,10 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_authorsSplitStrModel.setEnabled(m_useAuthorsColModel.getBooleanValue());
         m_pubDateColModel.setEnabled(m_usePubDateColModel.getBooleanValue());
         m_pubDateModel.setEnabled(!m_usePubDateColModel.getBooleanValue());
+        m_replacedColNameModel.setEnabled(m_replaceDocColModel.getBooleanValue());
+        m_appendedColNameModel.setEnabled(m_appendDocColModel.getBooleanValue());
+        m_replaceDocColModel.setBooleanValue(!m_appendDocColModel.getBooleanValue());
+        m_appendDocColModel.setBooleanValue(!m_replaceDocColModel.getBooleanValue());
     }
 
     /**
@@ -273,31 +294,31 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         String[] columns = dataTableSpec.getColumnNames();
         if (settingsNotConfigured()) {
             for (int i = 0; i < columns.length; i++) {
-                String column = columns[i].toLowerCase();
+                String column = columns[i];
                 if (dataTableSpec.getColumnSpec(column).getType().isCompatible(DocumentValue.class)
                     && m_docColumnModel.getStringValue().isEmpty()) {
                     m_docColumnModel.setStringValue(column);
                 }
                 if ((column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
-                    || column.contains(DocumentDataExtractor.SOURCE.getName().toLowerCase()))
+                    || column.toLowerCase().contains(DocumentDataExtractor.SOURCE.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_sourceColModel.getStringValue().isEmpty()) {
                     m_sourceColModel.setStringValue(column);
                 }
                 if ((column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
-                    || column.contains(DocumentDataExtractor.AUTHOR.getName().toLowerCase()))
+                    || column.toLowerCase().contains(DocumentDataExtractor.AUTHOR.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_authorsColModel.getStringValue().isEmpty()) {
                     m_authorsColModel.setStringValue(column);
                 }
                 if ((column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
-                    || column.contains(DocumentDataExtractor.CATEGORY.getName().toLowerCase()))
+                    || column.toLowerCase().contains(DocumentDataExtractor.CATEGORY.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_categoryColModel.getStringValue().isEmpty()) {
                     m_categoryColModel.setStringValue(column);
                 }
                 if ((column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
-                    || column.contains(DocumentDataExtractor.PUB_DATE.getName().toLowerCase()))
+                    || column.toLowerCase().contains(DocumentDataExtractor.PUB_DATE.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_pubDateColModel.getStringValue().isEmpty()) {
                     m_pubDateColModel.setStringValue(column);

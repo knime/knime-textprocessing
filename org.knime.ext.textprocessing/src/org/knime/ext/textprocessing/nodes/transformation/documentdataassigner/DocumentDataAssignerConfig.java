@@ -90,6 +90,15 @@ class DocumentDataAssignerConfig {
     /** The default value for replacing the document column. */
     static final boolean DEF_REPLACE_DOCCOL = false;
 
+    /** The default value for replacing the document column. */
+    static final boolean DEF_APPEND_DOCCOL = true;
+
+    /** The default name of the column that replaces the input column. */
+    static final String DEF_REPLACE_COLNAME = "Document (replaced)";
+
+    /** The default name of the appended document column. */
+    static final String DEF_APPEND_COLNAME = "Document (appended)";
+
 
     /* Following information is used for DocumentDataAssingerCellFactory.
      * The values are initialized here and can be set in the DocumentDataAssignerNodeModel while using the set-Methods.

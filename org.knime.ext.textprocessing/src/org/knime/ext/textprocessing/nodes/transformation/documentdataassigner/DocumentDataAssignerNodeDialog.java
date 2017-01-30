@@ -189,6 +189,31 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
             DocumentDataAssignerConfig.DEF_REPLACE_DOCCOL);
     }
 
+    /**
+     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to replace the
+     *         old document column or append a new one.
+     */
+    static final SettingsModelBoolean getAppendDocColumnModel() {
+        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_APPEND_DOCCOL,
+            DocumentDataAssignerConfig.DEF_APPEND_DOCCOL);
+    }
+
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the publication date.
+     */
+    static final SettingsModelString getReplacedColNameModel() {
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_COLNAME,
+            DocumentDataAssignerConfig.DEF_REPLACE_COLNAME);
+    }
+
+    /**
+     * @return Creates and returns an instance of {@SettingsModelString} containing the publication date.
+     */
+    static final SettingsModelString getAppendedColNameModel() {
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_APPEND_COLNAME,
+            DocumentDataAssignerConfig.DEF_APPEND_COLNAME);
+    }
+
     private SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
 
     private SettingsModelString m_authorsColumnModel = getAuthorsColumnModel();
@@ -212,6 +237,14 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelString m_pubDateColumnModel = getPubDateColumnModel();
 
     private SettingsModelString m_authorsSplitStrModel = getAuthorsSplitStringModel();
+
+    private SettingsModelBoolean m_replaceDocColModel = getReplaceDocColumnModel();
+
+    private SettingsModelBoolean m_appendDocColModel = getAppendDocColumnModel();
+
+    private SettingsModelString m_replacedColNameModel = getReplacedColNameModel();
+
+    private SettingsModelString m_appendedColNameModel = getAppendedColNameModel();
 
     /**
      *
@@ -270,8 +303,15 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
         // dialog for output column settings
         createNewGroup("Column Settings");
+        m_replaceDocColModel.addChangeListener(new ChangeStateListener());
+        m_appendDocColModel.addChangeListener(new ChangeStateListener());
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(getReplaceDocColumnModel(), "Replace document column:"));
+        addDialogComponent(new DialogComponentBoolean(m_replaceDocColModel, "Replace document column:"));
+        addDialogComponent(new DialogComponentString(m_replacedColNameModel, ""));
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentBoolean(m_appendDocColModel, "Append document column:"));
+        addDialogComponent(new DialogComponentString(m_appendedColNameModel, ""));
         closeCurrentGroup();
         checkState();
 
@@ -287,6 +327,17 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         m_sourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
         m_authorsColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         m_authorsSplitStrModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+        m_replacedColNameModel.setEnabled(m_replaceDocColModel.getBooleanValue());
+        m_appendedColNameModel.setEnabled(m_appendDocColModel.getBooleanValue());
+    }
+
+    private void checkReplaced(final ChangeEvent e) {
+        SettingsModelBoolean settingsModel = (SettingsModelBoolean)e.getSource();
+        if (settingsModel.getConfigName().equals(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_DOCCOL)) {
+            m_appendDocColModel.setBooleanValue(!m_replaceDocColModel.getBooleanValue());
+        } else {
+            m_replaceDocColModel.setBooleanValue(!m_appendDocColModel.getBooleanValue());
+        }
     }
 
     class ChangeStateListener implements ChangeListener {
@@ -296,6 +347,7 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             checkState();
+            checkReplaced(e);
         }
     }
 }
