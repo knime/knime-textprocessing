@@ -47,7 +47,6 @@
 package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -141,16 +140,14 @@ final class DocumentPanel2 extends JPanel implements Observer {
         m_fulltextPane.setDocument(doc);
         m_fulltextPane.setText(getPreparedText());
 
-        if (checkBrowsingSupport()) {
-            m_rightClickMenue = new JPopupMenu();
-            JMenuItem item;
-            for (String source : SearchEngines.getInstance().getSearchEngineNames()) {
-                item = new JMenuItem(source);
-                item.addActionListener(new RightClickMenueListener());
-                m_rightClickMenue.add(item);
-            }
-            m_fulltextPane.setComponentPopupMenu(m_rightClickMenue);
+        m_rightClickMenue = new JPopupMenu();
+        JMenuItem item;
+        for (String source : SearchEngines.getInstance().getSearchEngineNames()) {
+            item = new JMenuItem(source);
+            item.addActionListener(new RightClickMenueListener());
+            m_rightClickMenue.add(item);
         }
+        m_fulltextPane.setComponentPopupMenu(m_rightClickMenue);
 
         JScrollPane jsp = new JScrollPane(m_fulltextPane);
         jsp.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
@@ -317,18 +314,12 @@ final class DocumentPanel2 extends JPanel implements Observer {
         return false;
     }
 
-    private static final boolean checkBrowsingSupport() {
-        return DesktopUtil.isSupported(Desktop.Action.BROWSE);
-    }
-
     private static final void openUrlInBrowser(final URL u) {
         if (u != null) {
-            if (DesktopUtil.isSupported(Desktop.Action.BROWSE)) {
-                try {
-                    DesktopUtil.browse(u);
-                } catch (URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
+            try {
+                DesktopUtil.browse(u);
+            } catch (URISyntaxException e1) {
+                e1.printStackTrace();
             }
         }
     }
