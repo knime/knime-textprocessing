@@ -62,7 +62,6 @@ import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.filestore.FileStoreFactory;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
@@ -103,9 +102,7 @@ class DocumentDataAssignerCellFactory extends AbstractCellFactory {
         super(dataColumnSpec);
 
         m_conf = conf;
-        this.setParallelProcessing(true, KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(),
-            10 * KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
-
+        this.setParallelProcessing(true);
         m_cacheInitializer = new LazyInitializer<DataCellCache>() {
 
             @Override

@@ -60,6 +60,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeDialog.ReplaceOrAppend;
 import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -101,11 +102,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
 
     private SettingsModelString m_typeModel = DocumentDataAssignerNodeDialog.getTypeModel();
 
-    private SettingsModelBoolean m_replaceDocColModel = DocumentDataAssignerNodeDialog.getReplaceDocColumnModel();
-
-    private SettingsModelBoolean m_appendDocColModel = DocumentDataAssignerNodeDialog.getAppendDocColumnModel();
-
-    private SettingsModelString m_replacedColNameModel = DocumentDataAssignerNodeDialog.getReplacedColNameModel();
+    private SettingsModelString m_replaceOrAppendColModel = DocumentDataAssignerNodeDialog.getReplaceOrAppendColModel();
 
     private SettingsModelString m_appendedColNameModel = DocumentDataAssignerNodeDialog.getAppendedColNameModel();
 
@@ -120,8 +117,8 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     private final DataColumnSpec[] createNewColumnSpecs() {
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         String newDocColName;
-        if (m_replaceDocColModel.getBooleanValue()) {
-            newDocColName = m_replacedColNameModel.getStringValue();
+        if (m_replaceOrAppendColModel.getStringValue().equals(ReplaceOrAppend.getDefault().name())) {
+            newDocColName = m_docColumnModel.getStringValue();
         } else {
             newDocColName = m_appendedColNameModel.getStringValue();
         }
@@ -177,7 +174,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         DocumentDataAssignerCellFactory cellFac = new DocumentDataAssignerCellFactory(conf, createNewColumnSpecs());
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         // append/replace new document column to existing data table
-        if (m_replaceDocColModel.getBooleanValue()) {
+        if (m_replaceOrAppendColModel.getStringValue().equals(ReplaceOrAppend.getDefault().name())) {
             rearranger.replace(cellFac, m_docColumnModel.getStringValue());
         } else {
             rearranger.append(cellFac);
@@ -204,9 +201,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_typeModel.saveSettingsTo(settings);
         m_sourceColModel.saveSettingsTo(settings);
         m_sourceModel.saveSettingsTo(settings);
-        m_replaceDocColModel.saveSettingsTo(settings);
-        m_replacedColNameModel.saveSettingsTo(settings);
-        m_appendDocColModel.saveSettingsTo(settings);
+        m_replaceOrAppendColModel.saveSettingsTo(settings);
         m_appendedColNameModel.saveSettingsTo(settings);
     }
 
@@ -229,9 +224,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_typeModel.validateSettings(settings);
         m_sourceColModel.validateSettings(settings);
         m_sourceModel.validateSettings(settings);
-        m_replaceDocColModel.validateSettings(settings);
-        m_replacedColNameModel.validateSettings(settings);
-        m_appendDocColModel.validateSettings(settings);
+        m_replaceOrAppendColModel.validateSettings(settings);
         m_appendedColNameModel.validateSettings(settings);
     }
 
@@ -254,10 +247,8 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_typeModel.loadSettingsFrom(settings);
         m_sourceColModel.loadSettingsFrom(settings);
         m_sourceModel.loadSettingsFrom(settings);
-        m_replaceDocColModel.loadSettingsFrom(settings);
-        m_replacedColNameModel.loadSettingsFrom(settings);
+        m_replaceOrAppendColModel.loadSettingsFrom(settings);
         m_appendedColNameModel.loadSettingsFrom(settings);
-        m_appendDocColModel.loadSettingsFrom(settings);
     }
 
     /** Sets the state of some SettingModels to enabled/disabled depending on the related 'use ... column' value. */
@@ -270,10 +261,8 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         m_authorsSplitStrModel.setEnabled(m_useAuthorsColModel.getBooleanValue());
         m_pubDateColModel.setEnabled(m_usePubDateColModel.getBooleanValue());
         m_pubDateModel.setEnabled(!m_usePubDateColModel.getBooleanValue());
-        m_replacedColNameModel.setEnabled(m_replaceDocColModel.getBooleanValue());
-        m_appendedColNameModel.setEnabled(m_appendDocColModel.getBooleanValue());
-        m_replaceDocColModel.setBooleanValue(!m_appendDocColModel.getBooleanValue());
-        m_appendDocColModel.setBooleanValue(!m_replaceDocColModel.getBooleanValue());
+        m_appendedColNameModel
+            .setEnabled(!m_replaceOrAppendColModel.getStringValue().equals(ReplaceOrAppend.getDefault().name()));
     }
 
     /**
@@ -282,6 +271,12 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         doSmartDialogSelection(inSpecs[0]);
+        if (inSpecs[0].containsName(m_appendedColNameModel.getStringValue())) {
+            setWarningMessage("Can't create new column \"" + m_appendedColNameModel.getStringValue()
+                + "\" as input spec already contains such column!");
+            throw new InvalidSettingsException("Can't create new column \"" + m_appendedColNameModel.getStringValue()
+                + "\" as input spec already contains such column!");
+        }
         return super.configure(inSpecs);
     }
 

@@ -18,6 +18,11 @@
         </option>
         <option name="Author name separator">
             The string separating the author names while processing the authors column.
+            The authors column has to be formatted like "John Doe<i>SEPERATOR</i>Jennifer Doe". At first, 
+            the authors will be seperated at the defined character(s), then each name will be split at the whitespace 
+            between first name and last name.
+            Care: Only the first and the last name will be assigned to the document, so second names will be dropped 
+            (e.g. 'John Franklin Doe' will be handled as 'John Doe').
         </option>
         <option name="Document source">
             The source which is set to all documents (if 
@@ -65,8 +70,11 @@
         	If checked, the incoming document column will be replaced by the processed document column. Otherwise, the 
         	new document column will be appended.
         </option>
-        <option name="Number of maximal parallel processes">
-        	The number of threads used to process the documents.
+        <option name="Append document column">
+        	If checked, a new document column containing the processed documents will be appended to the existing table.
+        </option>
+        <option name="Appended document column name">
+        	The name of the appended document column.
         </option>
 	</fullDescription>
     <ports>

@@ -144,17 +144,7 @@ class DocumentDataAssignerConfigKeys {
     /**
      * The configuration key for the document column replacement option.
      */
-    static final String CFGKEY_REPLACE_DOCCOL = "Replace document column";
-
-    /**
-     * The configuration key for the document column replacement option.
-     */
-    static final String CFGKEY_APPEND_DOCCOL = "Append document column";
-
-    /**
-     * The configuration key for the name of the replaced column.
-     */
-    static final String CFGKEY_REPLACE_COLNAME = "Name of replaced document column";
+    static final String CFGKEY_REPLACE_OR_APPEND_COL = "Replace or append document column";
 
     /**
      * The configuration key for the name of the appended column.

@@ -48,17 +48,22 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.util.ButtonGroupEnumInterface;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
@@ -181,29 +186,11 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to replace the
-     *         old document column or append a new one.
-     */
-    static final SettingsModelBoolean getReplaceDocColumnModel() {
-        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_DOCCOL,
-            DocumentDataAssignerConfig.DEF_REPLACE_DOCCOL);
-    }
-
-    /**
-     * @return Creates and returns an instance of {@SettingsModelBoolean} containing the value whether to replace the
-     *         old document column or append a new one.
-     */
-    static final SettingsModelBoolean getAppendDocColumnModel() {
-        return new SettingsModelBoolean(DocumentDataAssignerConfigKeys.CFGKEY_APPEND_DOCCOL,
-            DocumentDataAssignerConfig.DEF_APPEND_DOCCOL);
-    }
-
-    /**
      * @return Creates and returns an instance of {@SettingsModelString} containing the publication date.
      */
-    static final SettingsModelString getReplacedColNameModel() {
-        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_COLNAME,
-            DocumentDataAssignerConfig.DEF_REPLACE_COLNAME);
+    static final SettingsModelString getReplaceOrAppendColModel() {
+        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_OR_APPEND_COL,
+            DocumentDataAssignerConfig.DEF_REPLACE_OR_APPEND_COL);
     }
 
     /**
@@ -238,11 +225,7 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_authorsSplitStrModel = getAuthorsSplitStringModel();
 
-    private SettingsModelBoolean m_replaceDocColModel = getReplaceDocColumnModel();
-
-    private SettingsModelBoolean m_appendDocColModel = getAppendDocColumnModel();
-
-    private SettingsModelString m_replacedColNameModel = getReplacedColNameModel();
+    private SettingsModelString m_replaceOrAppendModel = getReplaceOrAppendColModel();
 
     private SettingsModelString m_appendedColNameModel = getAppendedColNameModel();
 
@@ -303,15 +286,12 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
         // dialog for output column settings
         createNewGroup("Column Settings");
-        m_replaceDocColModel.addChangeListener(new ChangeStateListener());
-        m_appendDocColModel.addChangeListener(new ChangeStateListener());
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(m_replaceDocColModel, "Replace document column:"));
-        addDialogComponent(new DialogComponentString(m_replacedColNameModel, ""));
+
+        m_replaceOrAppendModel.addChangeListener(new ChangeStateListener());
+        addDialogComponent(new DialogComponentButtonGroup(m_replaceOrAppendModel, "Append or replace", false,
+            ReplaceOrAppend.values()));
         setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentBoolean(m_appendDocColModel, "Append document column:"));
-        addDialogComponent(new DialogComponentString(m_appendedColNameModel, ""));
+        addDialogComponent(new DialogComponentString(m_appendedColNameModel, "Appended column name:"));
         closeCurrentGroup();
         checkState();
 
@@ -327,17 +307,8 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         m_sourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
         m_authorsColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         m_authorsSplitStrModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
-        m_replacedColNameModel.setEnabled(m_replaceDocColModel.getBooleanValue());
-        m_appendedColNameModel.setEnabled(m_appendDocColModel.getBooleanValue());
-    }
-
-    private void checkReplaced(final ChangeEvent e) {
-        SettingsModelBoolean settingsModel = (SettingsModelBoolean)e.getSource();
-        if (settingsModel.getConfigName().equals(DocumentDataAssignerConfigKeys.CFGKEY_REPLACE_DOCCOL)) {
-            m_appendDocColModel.setBooleanValue(!m_replaceDocColModel.getBooleanValue());
-        } else {
-            m_replaceDocColModel.setBooleanValue(!m_appendDocColModel.getBooleanValue());
-        }
+        m_appendedColNameModel
+            .setEnabled(!m_replaceOrAppendModel.getStringValue().equals(ReplaceOrAppend.getDefault().name()));
     }
 
     class ChangeStateListener implements ChangeListener {
@@ -347,7 +318,82 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             checkState();
-            checkReplaced(e);
         }
+    }
+
+    /**
+     * An enum implementing the {@code ButtonGroupEnumInterface}. It is used to create a
+     * {@code DialogComponentButtonGroup} containing radio buttons for the replace/append column option.
+     */
+    enum ReplaceOrAppend implements ButtonGroupEnumInterface {
+            REPLACE("Replace document column", "Replaces the input document column with the new documents"),
+            APPEND("Append document column", "Appends a document column containing the processed documents");
+
+        private final String m_name;
+
+        private final String m_tooltip;
+
+        /**
+         * Creates a new instance of the ReplaceOrAppend enum.
+         *
+         * @param The name of the radio button.
+         * @param The tooltip of the radio button.
+         */
+        ReplaceOrAppend(final String name, final String tooltip) {
+            m_name = name;
+            m_tooltip = tooltip;
+        }
+
+        /**
+         * @return Returns the enumeration fields as a String list of their names.
+         */
+        public static List<String> asStringList() {
+            final Enum<ReplaceOrAppend>[] values = values();
+            final List<String> list = new ArrayList<String>();
+            for (int i = 0; i < values.length; i++) {
+                list.add(values[i].name());
+            }
+            return list;
+        }
+
+        /**
+         * @return Returns the default instance of the ReplaceOrAppend enum.
+         */
+        public static ReplaceOrAppend getDefault() {
+            return ReplaceOrAppend.REPLACE;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getText() {
+            return m_name;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getActionCommand() {
+            return name();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getToolTip() {
+            return m_tooltip;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDefault() {
+            return this.equals(ReplaceOrAppend.getDefault());
+        }
+
     }
 }

@@ -50,6 +50,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
+import org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeDialog.ReplaceOrAppend;
 
 /**
  * The {@code DocumentDataAssignerConfig} contains the default values for the setting models and is used to pass
@@ -87,14 +88,8 @@ class DocumentDataAssignerConfig {
     /** The default value for using an incoming column as pubdate column. */
     static final boolean DEF_USE_PUBDATECOLUMN = false;
 
-    /** The default value for replacing the document column. */
-    static final boolean DEF_REPLACE_DOCCOL = false;
-
-    /** The default value for replacing the document column. */
-    static final boolean DEF_APPEND_DOCCOL = true;
-
     /** The default name of the column that replaces the input column. */
-    static final String DEF_REPLACE_COLNAME = "Document (replaced)";
+    static final String DEF_REPLACE_OR_APPEND_COL = ReplaceOrAppend.getDefault().name();
 
     /** The default name of the appended document column. */
     static final String DEF_APPEND_COLNAME = "Document (appended)";
@@ -139,140 +134,140 @@ class DocumentDataAssignerConfig {
     /**
      * @return The document column index.
      */
-    public int getDocumentColumnIndex() {
+    int getDocumentColumnIndex() {
         return m_documentColumnIndex;
     }
 
     /**
      * @param documentColumnIndex Sets the document column index.
      */
-    public void setDocumentColumnIndex(final int documentColumnIndex) {
+    void setDocumentColumnIndex(final int documentColumnIndex) {
         this.m_documentColumnIndex = documentColumnIndex;
     }
 
     /**
      * @return The authors column index.
      */
-    public int getAuthorsColumnIndex() {
+    int getAuthorsColumnIndex() {
         return m_authorsColumnIndex;
     }
 
     /**
      * @param authorsColumnIndex Sets the authors column index.
      */
-    public void setAuthorsColumnIndex(final int authorsColumnIndex) {
+    void setAuthorsColumnIndex(final int authorsColumnIndex) {
         this.m_authorsColumnIndex = authorsColumnIndex;
     }
 
     /**
      * @return The category column index.
      */
-    public int getCategoryColumnIndex() {
+    int getCategoryColumnIndex() {
         return m_categoryColumnIndex;
     }
 
     /**
      * @param categoryColumnIndex Sets the category column index.
      */
-    public void setCategoryColumnIndex(final int categoryColumnIndex) {
+    void setCategoryColumnIndex(final int categoryColumnIndex) {
         this.m_categoryColumnIndex = categoryColumnIndex;
     }
 
     /**
      * @return The source column index.
      */
-    public int getSourceColumnIndex() {
+    int getSourceColumnIndex() {
         return m_sourceColumnIndex;
     }
 
     /**
      * @param sourceColumnIndex Sets The source column index.
      */
-    public void setSourceColumnIndex(final int sourceColumnIndex) {
+    void setSourceColumnIndex(final int sourceColumnIndex) {
         this.m_sourceColumnIndex = sourceColumnIndex;
     }
 
     /**
      * @return The publication date column index.
      */
-    public int getPubDateColumnIndex() {
+    int getPubDateColumnIndex() {
         return m_pubDateColumnIndex;
     }
 
     /**
      * @param pubDateColumnIndex The publication date column index.
      */
-    public void setPubDateColumnIndex(final int pubDateColumnIndex) {
+    void setPubDateColumnIndex(final int pubDateColumnIndex) {
         this.m_pubDateColumnIndex = pubDateColumnIndex;
     }
 
     /**
      * @return The publication date.
      */
-    public String getDocPubDate() {
+    String getDocPubDate() {
         return m_docPubDate;
     }
 
     /**
      * @param docPubDate Sets the publication date.
      */
-    public void setDocPubDate(final String docPubDate) {
+    void setDocPubDate(final String docPubDate) {
         this.m_docPubDate = docPubDate;
     }
 
     /**
      * @return The document source.
      */
-    public String getDocSource() {
+    String getDocSource() {
         return m_docSource;
     }
 
     /**
      * @param docSource Sets the document source.
      */
-    public void setDocSource(final String docSource) {
+    void setDocSource(final String docSource) {
         this.m_docSource = docSource;
     }
 
     /**
      * @return The document category.
      */
-    public String getDocCategory() {
+    String getDocCategory() {
         return m_docCategory;
     }
 
     /**
      * @param docCategory Sets the document category.
      */
-    public void setDocCategory(final String docCategory) {
+    void setDocCategory(final String docCategory) {
         this.m_docCategory = docCategory;
     }
 
     /**
      * @return The doc type.
      */
-    public String getDocType() {
+    String getDocType() {
         return m_docType;
     }
 
     /**
      * @param docType Sets the document type.
      */
-    public void setDocType(final String docType) {
+    void setDocType(final String docType) {
         this.m_docType = docType;
     }
 
     /**
      * @return The delimiter for splitting author names.
      */
-    public String getAuthorsSplitStr() {
+    String getAuthorsSplitStr() {
         return m_authorsSplitStr;
     }
 
     /**
      * @param authorsSplitStr Sets the delimiter for splitting author names.
      */
-    public void setAuthorsSplitStr(final String authorsSplitStr) {
+    void setAuthorsSplitStr(final String authorsSplitStr) {
         this.m_authorsSplitStr = authorsSplitStr;
     }
 
