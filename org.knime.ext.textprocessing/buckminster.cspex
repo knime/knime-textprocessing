@@ -5,7 +5,7 @@
              for the knime.create.helpfiles action. -->
     <dependency name="org.knime.workbench.help" componentType="osgi.bundle"/>
     <dependency name="org.knime.config" componentType="osgi.bundle"/>
-    <dependency name="org.jdom" componentType="osgi.bundle"/>
+    <dependency name="org.jdom" componentType="osgi.bundle" versionDesignator="2.0.0"/>
   </dependencies>
   <actions>
     <!-- Dynamically build the files for the Eclipse help. -->
