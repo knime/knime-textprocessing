@@ -51,7 +51,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Observable;
@@ -316,11 +315,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
 
     private static final void openUrlInBrowser(final URL u) {
         if (u != null) {
-            try {
-                DesktopUtil.browse(u);
-            } catch (URISyntaxException e1) {
-                e1.printStackTrace();
-            }
+            DesktopUtil.browse(u);
         }
     }
 
