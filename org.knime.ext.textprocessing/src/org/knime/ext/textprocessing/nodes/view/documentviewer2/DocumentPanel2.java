@@ -47,13 +47,10 @@
 package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Observable;
@@ -71,6 +68,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.knime.core.util.DesktopUtil;
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
@@ -141,16 +139,14 @@ final class DocumentPanel2 extends JPanel implements Observer {
         m_fulltextPane.setDocument(doc);
         m_fulltextPane.setText(getPreparedText());
 
-        if (checkBrowsingSupport()) {
-            m_rightClickMenue = new JPopupMenu();
-            JMenuItem item;
-            for (String source : SearchEngines.getInstance().getSearchEngineNames()) {
-                item = new JMenuItem(source);
-                item.addActionListener(new RightClickMenueListener());
-                m_rightClickMenue.add(item);
-            }
-            m_fulltextPane.setComponentPopupMenu(m_rightClickMenue);
+        m_rightClickMenue = new JPopupMenu();
+        JMenuItem item;
+        for (String source : SearchEngines.getInstance().getSearchEngineNames()) {
+            item = new JMenuItem(source);
+            item.addActionListener(new RightClickMenueListener());
+            m_rightClickMenue.add(item);
         }
+        m_fulltextPane.setComponentPopupMenu(m_rightClickMenue);
 
         JScrollPane jsp = new JScrollPane(m_fulltextPane);
         jsp.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
@@ -303,7 +299,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
         str = replaceWhitespacesWithHtml(str);
         if (!m_docViewModel.isDisableHtmlTags()) {
             str = StringEscapeUtils.escapeHtml4(str);
-            }
+        }
         str = cleanWhitespaces(str);
         return str;
     }
@@ -317,32 +313,9 @@ final class DocumentPanel2 extends JPanel implements Observer {
         return false;
     }
 
-    private static final boolean checkBrowsingSupport() {
-        Desktop desktop = null;
-        if (Desktop.isDesktopSupported()) {
-            desktop = Desktop.getDesktop();
-            if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static final void openUrlInBrowser(final URL u) {
         if (u != null) {
-            Desktop desktop = null;
-            if (Desktop.isDesktopSupported()) {
-                desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        desktop.browse(u.toURI());
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    } catch (URISyntaxException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
+            DesktopUtil.browse(u);
         }
     }
 
