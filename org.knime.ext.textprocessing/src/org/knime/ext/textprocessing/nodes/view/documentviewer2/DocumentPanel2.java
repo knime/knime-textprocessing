@@ -299,7 +299,7 @@ final class DocumentPanel2 extends JPanel implements Observer {
         str = replaceWhitespacesWithHtml(str);
         if (!m_docViewModel.isDisableHtmlTags()) {
             str = StringEscapeUtils.escapeHtml4(str);
-            }
+        }
         str = cleanWhitespaces(str);
         return str;
     }
