@@ -60,7 +60,7 @@ import opennlp.tools.tokenize.WhitespaceTokenizer;
  * This word tokenizer is based on the "OpenNLP Whitespace Tokenizer".
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class OpenNlpWhitespaceTokenizer implements Tokenizer {
 

@@ -55,7 +55,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
  * This factory class creates instances of {@code OpenNlpWhitespaceTokenizer}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class OpenNlpWhitespaceTokenizerFactory implements TokenizerFactory {
 

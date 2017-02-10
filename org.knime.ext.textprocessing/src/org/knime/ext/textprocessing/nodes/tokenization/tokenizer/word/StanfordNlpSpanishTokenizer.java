@@ -64,7 +64,7 @@ import edu.stanford.nlp.ling.CoreLabel;
  * "StanfordNLP PTB Tokenizer" model.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class StanfordNlpSpanishTokenizer implements Tokenizer {
 

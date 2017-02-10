@@ -66,7 +66,7 @@ import opennlp.tools.tokenize.TokenizerModel;
  * This word tokenizer is based on the "OpenNLP German Tokenizer" model.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class OpenNlpGermanWordTokenizer implements Tokenizer {
 

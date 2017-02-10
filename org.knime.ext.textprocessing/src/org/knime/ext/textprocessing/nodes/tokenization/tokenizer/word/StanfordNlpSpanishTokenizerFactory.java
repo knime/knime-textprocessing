@@ -55,7 +55,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
  * This factory class creates instances of the Spanish word tokenizer {@code StanfordNlpSpanishTokenizer}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class StanfordNlpSpanishTokenizerFactory implements TokenizerFactory {
 

@@ -62,7 +62,7 @@ import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
  * It provides each word as one token.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class StanfordNlpPTBTokenizer implements Tokenizer {
 

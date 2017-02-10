@@ -67,7 +67,7 @@ import opennlp.tools.sentdetect.SentenceModel;
  * This tokenizer is based on the "OpenNLP Sentence Detection" model.
  *
  * @author Kilian Thiel, University of Konstanz
- * @since 3.3
+ * @since 3.4
  */
 public class OpenNlpSentenceTokenizer implements Tokenizer {
 

@@ -60,7 +60,7 @@ import opennlp.tools.tokenize.SimpleTokenizer;
  * It provides each word as one token. This word tokenizer is based on the "OpenNLP Simple Tokenizer".
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @since 3.4
  */
 public class OpenNlpSimpleTokenizer implements Tokenizer {
 

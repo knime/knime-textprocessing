@@ -65,7 +65,7 @@ import opennlp.tools.tokenize.TokenizerModel;
  * This word tokenizer is based on the "OpenNLP English Tokenizer" model.
  *
  * @author Kilian Thiel, University of Konstanz
- * @since 3.3
+ * @since 3.4
  */
 public class OpenNlpEnglishWordTokenizer implements Tokenizer {
 
