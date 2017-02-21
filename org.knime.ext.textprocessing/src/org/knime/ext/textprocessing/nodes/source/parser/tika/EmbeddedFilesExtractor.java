@@ -56,7 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
@@ -124,7 +124,7 @@ public final class EmbeddedFilesExtractor {
         config = TikaConfig.getDefaultConfig();
         metadata = new Metadata();
         handler = new BodyContentHandler(-1);
-        outputFiles = new HashMap<String, String>();
+        outputFiles = new LinkedHashMap<String, String>();
         hasError = false;
         context = new ParseContext();
         extractInlineImages = false;
@@ -243,7 +243,7 @@ public final class EmbeddedFilesExtractor {
             autoParser = new AutoDetectParser();
             skippedContainer = false;
             error = false;
-            output = new HashMap<String, String>();
+            output = new LinkedHashMap<String, String>();
         }
 
         @Override
