@@ -61,7 +61,9 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
  * Port Object for Word Vector Models.
  *
  * @author David Kolb, KNIME.com GmbH
+ * @deprecated
  */
+@Deprecated
 public class WordVectorPortObject extends AbstractPortObject {
 
     public static final class Serializer extends AbstractPortObjectSerializer<WordVectorPortObject> {
