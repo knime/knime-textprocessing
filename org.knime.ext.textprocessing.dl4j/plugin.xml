@@ -43,6 +43,14 @@
             specClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec"
             specSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec$Serializer">
       </portType>
+      <portType
+            hidden="false"
+            name="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject"
+            objectClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject"
+            objectSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject$Serializer"
+            specClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec"
+            specSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec$Serializer">
+      </portType>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
