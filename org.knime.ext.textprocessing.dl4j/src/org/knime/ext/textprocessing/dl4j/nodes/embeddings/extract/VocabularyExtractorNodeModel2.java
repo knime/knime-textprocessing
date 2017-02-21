@@ -71,7 +71,7 @@ import org.knime.core.node.port.inactive.InactiveBranchPortObject;
 import org.knime.core.node.port.inactive.InactiveBranchPortObjectSpec;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
 import org.knime.ext.dl4j.base.util.NDArrayUtils;
-import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
+import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -95,13 +95,13 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
      * Constructor for the node model.
      */
     public VocabularyExtractorNodeModel2() {
-        super(new PortType[]{WordVectorPortObject.TYPE},
+        super(new PortType[]{WordVectorFileStorePortObject.TYPE},
             new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE});
     }
 
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        final WordVectorPortObject portObject = (WordVectorPortObject)inObjects[0];
+        final WordVectorFileStorePortObject portObject = (WordVectorFileStorePortObject)inObjects[0];
         WordVectors wordVec = portObject.getWordVectors();
         WordVectorsImpl<VocabWord> wvImpl = null;
 
