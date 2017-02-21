@@ -11,14 +11,19 @@
       <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory2"
             after="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory2">
       </node>
       <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory2"
-            after="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
+            after="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings"
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
       </node>
       
       <!-- Deprecated nodes -->
