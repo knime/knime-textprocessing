@@ -63,6 +63,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
 
@@ -71,6 +72,10 @@ import org.knime.core.node.util.ButtonGroupEnumInterface;
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
 public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
+
+    private static final String PDF_EXT = "pdf";
+
+    private static final String PDF_MIME = "application/pdf";
 
     private SettingsModelString m_typeModel;
 
@@ -82,15 +87,19 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_extractPathModel;
 
+    private SettingsModelBoolean m_extractInlineImagesModel;
+
     private SettingsModelBoolean m_authBooleanModel;
 
     private SettingsModelString m_authModel;
 
-    private TikaDialogComponentStringFilter m_filterModel;
+    private TikaDialogComponentStringFilter m_filterComponent;
+
+    private SettingsModelFilterString m_filterModel;
 
     /**
-     * An abstract Tika node dialog class which displays an input group (either a file chooser component, to specify
-     * the directory containing the files to parse, or a column list to specify the input document column), then two
+     * An abstract Tika node dialog class which displays an input group (either a file chooser component, to specify the
+     * directory containing the files to parse, or a column list to specify the input document column), then two
      * checkbox components to specify if the directory is searched recursively for files to parse and whether to ignore
      * hidden files, button and list components to specify which file types are to be parsed (through file extension or
      * MIME-Type), and the last list component is to specify which meta data information are to be extracted. A tick box
@@ -114,12 +123,13 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
             TikaParserConfig.MIME_TYPE);
 
         addDialogComponent(new DialogComponentButtonGroup(m_typeModel, "Choose which type to parse", false, options));
-
         m_typeModel.addChangeListener(new ButtonChangeListener());
 
-        m_filterModel = new TikaDialogComponentStringFilter(TikaParserConfig.getFilterModel(), "EXT",
-            TikaParserConfig.DEFAULT_TYPE_LIST);
-        addDialogComponent(m_filterModel);
+        m_filterModel = TikaParserConfig.getFilterModel();
+        m_filterModel.addChangeListener(new FilterChangeListener());
+        m_filterComponent =
+            new TikaDialogComponentStringFilter(m_filterModel, "EXT", TikaParserConfig.DEFAULT_TYPE_LIST);
+        addDialogComponent(m_filterComponent);
 
         closeCurrentGroup();
 
@@ -141,16 +151,15 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
 
         createNewGroup("Extract embedded files to a directory");
-        setHorizontalPlacement(true);
         m_extractBooleanModel = TikaParserConfig.getExtractAttachmentModel();
         m_extractPathModel = TikaParserConfig.getExtractPathModel(m_extractBooleanModel);
-        setHorizontalPlacement(false);
+        m_extractInlineImagesModel = TikaParserConfig.getExtractInlineImagesModel();
 
-        setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(m_extractBooleanModel, "Extract attachments and embedded files"));
+        m_extractBooleanModel.addChangeListener(new CheckboxChangeListener());
+        addDialogComponent(new DialogComponentBoolean(m_extractInlineImagesModel, "Extract inline images from PDFs"));
         addDialogComponent(new DialogComponentFileChooser(m_extractPathModel, TikaParserNodeDialog.class.toString(),
             JFileChooser.OPEN_DIALOG, true));
-        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Encrypted files settings");
@@ -164,6 +173,47 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
     }
 
+    class FilterChangeListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            String selectedButton = m_typeModel.getStringValue();
+            if (selectedButton.equals(TikaParserConfig.EXT_TYPE) && m_filterModel.getExcludeList().contains(PDF_EXT)) {
+                m_extractInlineImagesModel.setEnabled(false);
+            } else if (selectedButton.equals(TikaParserConfig.MIME_TYPE)
+                && m_filterModel.getExcludeList().contains(PDF_MIME)) {
+                m_extractInlineImagesModel.setEnabled(false);
+            } else {
+                m_extractInlineImagesModel.setEnabled(true);
+            }
+        }
+    }
+
+    class CheckboxChangeListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            String selectedButton = m_typeModel.getStringValue();
+            if (m_extractBooleanModel.getBooleanValue() && (selectedButton.equals(TikaParserConfig.EXT_TYPE)
+                && !m_filterComponent.getExtExcList().contains(PDF_EXT))) {
+                m_extractInlineImagesModel.setEnabled(true);
+            } else if (m_extractBooleanModel.getBooleanValue() && (selectedButton.equals(TikaParserConfig.MIME_TYPE)
+                && !m_filterComponent.getMimeExcList().contains(PDF_MIME))) {
+                m_extractInlineImagesModel.setEnabled(true);
+            } else {
+                m_extractInlineImagesModel.setEnabled(false);
+            }
+
+        }
+
+    }
+
     class ButtonChangeListener implements ChangeListener {
 
         /**
@@ -172,15 +222,25 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             String selectedButton = m_typeModel.getStringValue();
+            boolean extractCheckbox = m_extractBooleanModel.getBooleanValue();
             if (selectedButton.equals(TikaParserConfig.EXT_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserConfig.EXTENSION_LIST);
-                m_filterModel.setType("EXT");
-                m_filterModel.updateLists();
-
+                m_filterComponent.setAllTypes(TikaParserConfig.EXTENSION_LIST);
+                m_filterComponent.setType("EXT");
+                m_filterComponent.updateLists();
+                if (extractCheckbox && !m_filterComponent.getExtExcList().contains(PDF_EXT)) {
+                    m_extractInlineImagesModel.setEnabled(true);
+                } else {
+                    m_extractInlineImagesModel.setEnabled(false);
+                }
             } else if (selectedButton.equals(TikaParserConfig.MIME_TYPE)) {
-                m_filterModel.setAllTypes(TikaParserConfig.MIMETYPE_LIST);
-                m_filterModel.setType("MIME");
-                m_filterModel.updateLists();
+                m_filterComponent.setAllTypes(TikaParserConfig.MIMETYPE_LIST);
+                m_filterComponent.setType("MIME");
+                m_filterComponent.updateLists();
+                if (extractCheckbox && !m_filterComponent.getMimeExcList().contains(PDF_MIME)) {
+                    m_extractInlineImagesModel.setEnabled(true);
+                } else {
+                    m_extractInlineImagesModel.setEnabled(false);
+                }
             }
 
         }

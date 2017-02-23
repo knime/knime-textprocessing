@@ -158,7 +158,12 @@ public class TikaParserConfig {
     /**
      * Column names for the second output port
      */
-    public static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments"};
+    public static final String[] OUTPUT_TWO_COL_NAMES = {"Files", "Attachments", "Type"};
+
+    /**
+     * The default value of the "extract inline images for PDFs" flag.
+     */
+    public static final boolean DEFAULT_EXTRACT_INLINE_IMGS = false;
 
     /**
      * @return SettingsModelString contains the string of the path to the input directory.
@@ -262,6 +267,13 @@ public class TikaParserConfig {
      */
     public static SettingsModelFilterString getFilterModel() {
         return new SettingsModelFilterString(TikaParserConfigKeys.CFGKEY_FILTER_LIST, DEFAULT_TYPE_LIST, new String[0]);
+    }
+
+    /**
+     * @return SettingsModelBoolean to decide whether to extract inline images in PDFs.
+     */
+    public static SettingsModelBoolean getExtractInlineImagesModel() {
+        return new SettingsModelBoolean(TikaParserConfigKeys.CFGKEY_EXTRACT_INLINE_IMGS, DEFAULT_EXTRACT_INLINE_IMGS);
     }
 
     /**
@@ -437,4 +449,5 @@ public class TikaParserConfig {
         public static final int NO_COLUMNS = COLUMN_PROPERTY_MAP.size();
 
     }
+
 }

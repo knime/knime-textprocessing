@@ -212,6 +212,34 @@ public final class TikaDialogComponentStringFilter extends DialogComponent {
     }
 
     /**
+     * @return the m_ext_incList
+     */
+    public List<String> getExtIncList() {
+        return m_ext_incList;
+    }
+
+    /**
+     * @return the m_ext_excList
+     */
+    public List<String> getExtExcList() {
+        return m_ext_excList;
+    }
+
+    /**
+     * @return the m_mime_incList
+     */
+    public List<String> getMimeIncList() {
+        return m_mime_incList;
+    }
+
+    /**
+     * @return the m_mime_excList
+     */
+    public List<String> getMimeExcList() {
+        return m_mime_excList;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

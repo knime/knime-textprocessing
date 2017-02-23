@@ -56,9 +56,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,12 +74,14 @@ import org.apache.tika.extractor.ParsingEmbeddedDocumentExtractor;
 import org.apache.tika.io.TemporaryResources;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.TikaMetadataKeys;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.EmbeddedContentHandler;
 import org.xml.sax.ContentHandler;
@@ -92,49 +93,56 @@ import org.xml.sax.SAXException;
  */
 public final class EmbeddedFilesExtractor {
 
-    private Parser parser;
+    private Parser m_parser;
 
-    private Detector detector;
+    private Detector m_detector;
 
-    private TikaConfig config;
+    private TikaConfig m_config;
 
-    private String filename;
+    private String m_filename;
 
-    private Metadata metadata;
+    private Metadata m_metadata;
 
-    private ParseContext context;
+    private ParseContext m_context;
 
-    private ContentHandler handler;
+    private ContentHandler m_handler;
 
-    private List<String> outputFiles;
+    private Map<String, String> m_outputFiles;
 
-    private boolean hasError;
+    private boolean m_hasError;
 
-    private HashMap<String, Integer> dupFiles;
+    private Map<String, Integer> m_dupFiles;
+
+    private boolean m_extractInlineImages;
 
     /**
      * Constructor for EmbeddedFilesExtractor class
      */
     public EmbeddedFilesExtractor() {
-        parser = new AutoDetectParser();
-        detector = ((AutoDetectParser)parser).getDetector();
-        config = TikaConfig.getDefaultConfig();
-        metadata = new Metadata();
-        handler = new BodyContentHandler(-1);
-        outputFiles = new ArrayList<String>();
-        hasError = false;
-        context = new ParseContext();
+        m_parser = new AutoDetectParser();
+        m_detector = ((AutoDetectParser)m_parser).getDetector();
+        m_config = TikaConfig.getDefaultConfig();
+        m_metadata = new Metadata();
+        m_handler = new BodyContentHandler(-1);
+        m_outputFiles = new LinkedHashMap<String, String>();
+        m_hasError = false;
+        m_context = new ParseContext();
+        m_extractInlineImages = false;
     }
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
+        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, m_filename);
+        if (m_extractInlineImages) {
+            PDFParserConfig pdfConfig = new PDFParserConfig();
+            pdfConfig.setExtractInlineImages(m_extractInlineImages);
+            m_context.set(PDFParserConfig.class, pdfConfig);
+        }
+        CustomEmbeddedDocumentExtractor ex = new CustomEmbeddedDocumentExtractor(outputDir, m_context);
+        m_context.set(EmbeddedDocumentExtractor.class, ex);
 
-        metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, filename);
-        CustomEmbeddedDocumentExtractor ex = new CustomEmbeddedDocumentExtractor(outputDir, context);
-        context.set(EmbeddedDocumentExtractor.class, ex);
-
-        parser.parse(is, handler, metadata, context);
-        outputFiles = ex.getOutputFiles();
-        hasError = ex.hasError();
+        m_parser.parse(is, m_handler, m_metadata, m_context);
+        m_outputFiles = ex.getOutputFiles();
+        m_hasError = ex.hasError();
     }
 
     /**
@@ -149,7 +157,7 @@ public final class EmbeddedFilesExtractor {
      */
     public void extract(final InputStream is, final Path outputDir, final String fname)
         throws SAXException, TikaException, IOException {
-        filename = fname.split("\\.")[0];
+        m_filename = fname.split("\\.")[0];
         extract(is, outputDir);
     }
 
@@ -159,7 +167,7 @@ public final class EmbeddedFilesExtractor {
      * @param pcontext the parse context to be used
      */
     public void setContext(final ParseContext pcontext) {
-        context = pcontext;
+        m_context = pcontext;
     }
 
     /**
@@ -168,40 +176,53 @@ public final class EmbeddedFilesExtractor {
      *
      * @param duplicateFiles the hash map containing filenames and their corresponding file counter
      */
-    public void setDuplicateFilesList(final HashMap<String, Integer> duplicateFiles) {
-        dupFiles = duplicateFiles;
+    public void setDuplicateFilesList(final Map<String, Integer> duplicateFiles) {
+        m_dupFiles = duplicateFiles;
+    }
+
+    /**
+     * Set whether to extract inline images for PDFs.
+     *
+     * @param extract the boolean value
+     */
+    public void setExtractInlineImages(final boolean extract) {
+        m_extractInlineImages = extract;
     }
 
     /**
      * @return metadata of the container file
      */
     public Metadata getMetadata() {
-        return metadata;
+        return m_metadata;
     }
 
     /**
      * @return content handler that contains the content of the container file
      */
     public ContentHandler getHandler() {
-        return handler;
+        return m_handler;
     }
 
     /**
-     * @return list of extracted files
+     * @return a map of extracted files and their types (attachment or inline image)
      */
-    public List<String> getOutputFiles() {
-        return outputFiles;
+    public Map<String, String> getOutputFiles() {
+        return m_outputFiles;
     }
 
     /**
      * @return boolean if the extract method throws an error
      */
     public boolean hasError() {
-        return hasError;
+        return m_hasError;
     }
 
     private class CustomEmbeddedDocumentExtractor extends ParsingEmbeddedDocumentExtractor {
         private static final String UNKNOWN_EXT = ".bin";
+
+        private static final String INLINE_IMG = "Inline Image";
+
+        private static final String ATTACHMENT = "Attachment";
 
         private final Path outputDir;
 
@@ -213,7 +234,7 @@ public final class EmbeddedFilesExtractor {
 
         private boolean error;
 
-        private List<String> output;
+        private Map<String, String> output;
 
         private CustomEmbeddedDocumentExtractor(final Path outputDirectory, final ParseContext parseContext) {
             super(parseContext);
@@ -222,7 +243,7 @@ public final class EmbeddedFilesExtractor {
             autoParser = new AutoDetectParser();
             skippedContainer = false;
             error = false;
-            output = new ArrayList<String>();
+            output = new LinkedHashMap<String, String>();
         }
 
         @Override
@@ -237,7 +258,7 @@ public final class EmbeddedFilesExtractor {
             TemporaryResources tmp = new TemporaryResources();
             TikaInputStream tis = TikaInputStream.get(stream, tmp);
 
-            MediaType contentType = detector.detect(tis, mdata);
+            MediaType contentType = m_detector.detect(tis, mdata);
 
             byte[] byteArray = getBytes(tis, tis.available());
             TikaInputStream tisParse = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp);
@@ -257,20 +278,20 @@ public final class EmbeddedFilesExtractor {
                     skippedContainer = true;
                     return;
                 }
-                name = filename + "_file_" + fileCount++;
+                name = m_filename + "_file_" + fileCount++;
             } else {
                 String outputName = FilenameUtils.normalize(name);
                 if (outputName == null) {
                     outputName = FilenameUtils.normalize(FilenameUtils.getName(name));
                 }
-                if (!outputName.contains(filename)) {
-                    name = filename + "_" + outputName;
+                if (!outputName.contains(m_filename)) {
+                    name = m_filename + "_" + outputName;
                 }
             }
 
             if (name.indexOf('.') == -1 && contentType != null) {
                 try {
-                    name += config.getMimeRepository().forName(contentType.toString()).getExtension();
+                    name += m_config.getMimeRepository().forName(contentType.toString()).getExtension();
                     if (name.indexOf('.') == -1) {
                         name += UNKNOWN_EXT;
                     }
@@ -282,15 +303,25 @@ public final class EmbeddedFilesExtractor {
             }
 
             File outputFile = new File(outputDir.toFile(), name);
-            if (!dupFiles.containsKey(name)) {
-                dupFiles.put(name, 0);
+            if (!m_dupFiles.containsKey(name)) {
+                m_dupFiles.put(name, 0);
             } else {
-                dupFiles.replace(name, dupFiles.get(name) + 1);
+                m_dupFiles.replace(name, m_dupFiles.get(name) + 1);
                 outputFile = new File(outputDir.toFile(), FilenameUtils.getBaseName(name) + "_"
-                    + String.valueOf(dupFiles.get(name)) + "." + FilenameUtils.getExtension(name));
+                    + String.valueOf(m_dupFiles.get(name)) + "." + FilenameUtils.getExtension(name));
 
             }
-            output.add(outputFile.getAbsolutePath());
+
+            // check if inline images or attachments
+            // might need more refinement for the attachment part
+            String type = mdata.get(TikaCoreProperties.EMBEDDED_RESOURCE_TYPE);
+            if (type != null && type.equals(TikaCoreProperties.EmbeddedResourceType.INLINE.toString())) {
+                type = INLINE_IMG;
+            } else {
+                type = ATTACHMENT;
+            }
+
+            output.put(outputFile.getAbsolutePath(), type);
             File parent = outputFile.getParentFile();
             if (!parent.exists()) {
                 if (!parent.mkdirs()) {
@@ -335,7 +366,7 @@ public final class EmbeddedFilesExtractor {
             return error;
         }
 
-        public List<String> getOutputFiles() {
+        public Map<String, String> getOutputFiles() {
             return output;
         }
 
@@ -347,7 +378,6 @@ public final class EmbeddedFilesExtractor {
                 } else {
                     try (InputStream contents = new DocumentInputStream((DocumentEntry)entry)) {
                         destDir.createDocument(entry.getName(), contents);
-                        contents.close();
                     }
                 }
             }

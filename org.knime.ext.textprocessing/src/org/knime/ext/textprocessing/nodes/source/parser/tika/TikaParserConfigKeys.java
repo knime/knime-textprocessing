@@ -117,8 +117,13 @@ final class TikaParserConfigKeys {
     static final String CFGKEY_CREDENTIALS = "CredentialsKey";
 
     /**
-     * he configuration key of the "parse encrypted files" flag.
+     * The configuration key of the "parse encrypted files" flag.
      */
     static final String CFGKEY_ENCRYPTED = "ExtractEncrypted";
+
+    /**
+     * The configuration key of the "extract inline images for PDFs" flag.
+     */
+    static final String CFGKEY_EXTRACT_INLINE_IMGS = "ExtractInlineImagesPDF";
 
 }

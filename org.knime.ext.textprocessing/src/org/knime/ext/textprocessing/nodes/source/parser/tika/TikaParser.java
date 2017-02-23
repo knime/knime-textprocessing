@@ -55,9 +55,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.exception.EncryptedDocumentException;
@@ -86,6 +87,7 @@ import org.xml.sax.SAXException;
 
 /**
  * The class to parse any files based on Tika
+ *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
 public class TikaParser {
@@ -116,7 +118,9 @@ public class TikaParser {
 
     private String m_errorMsg = "";
 
-    private HashMap<String, Integer> m_duplicates = null;
+    private Map<String, Integer> m_duplicates = null;
+
+    private boolean m_extractInlineImages = false;
 
     /**
      * @param sourceNode set to true for TikaParser, else false
@@ -209,6 +213,7 @@ public class TikaParser {
                     EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                     ex.setContext(m_context);
                     ex.setDuplicateFilesList(m_duplicates);
+                    ex.setExtractInlineImages(m_extractInlineImages);
                     ex.extract(stream, attachmentDir.toPath(), file.getName());
                     if (ex.hasError()) {
                         m_errorMsg = "Could not write embedded files to the output directory";
@@ -218,10 +223,11 @@ public class TikaParser {
                     m_handler = ex.getHandler();
 
                     DataCell[] cellsTwo = {};
-                    for (String entry : ex.getOutputFiles()) {
+                    for (Entry<String, String> entry : ex.getOutputFiles().entrySet()) {
                         cellsTwo = new DataCell[TikaParserConfig.OUTPUT_TWO_COL_NAMES.length];
                         cellsTwo[0] = new StringCell(file.getAbsolutePath());
-                        cellsTwo[1] = new StringCell(entry);
+                        cellsTwo[1] = new StringCell(entry.getKey());
+                        cellsTwo[2] = new StringCell(entry.getValue());
                         result.add(cellsTwo);
                     }
                 }
@@ -462,14 +468,14 @@ public class TikaParser {
     /**
      * @return the m_duplicates
      */
-    public HashMap<String, Integer> getDuplicates() {
+    public Map<String, Integer> getDuplicates() {
         return m_duplicates;
     }
 
     /**
      * @param duplicates the duplicates to set
      */
-    public void setDuplicates(final HashMap<String, Integer> duplicates) {
+    public void setDuplicates(final Map<String, Integer> duplicates) {
         this.m_duplicates = duplicates;
     }
 
@@ -478,6 +484,20 @@ public class TikaParser {
      */
     public String getErrorMsg() {
         return m_errorMsg;
+    }
+
+    /**
+     * @return the m_extractInlineImages
+     */
+    public boolean getExtractInlineImages() {
+        return m_extractInlineImages;
+    }
+
+    /**
+     * @param extractInlineImages the boolean value to set
+     */
+    public void setExtractInlineImages(final boolean extractInlineImages) {
+        this.m_extractInlineImages = extractInlineImages;
     }
 
 }
