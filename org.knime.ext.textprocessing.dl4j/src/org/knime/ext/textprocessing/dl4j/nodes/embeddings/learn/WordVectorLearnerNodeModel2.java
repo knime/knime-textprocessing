@@ -44,6 +44,7 @@ package org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
@@ -69,7 +70,7 @@ import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentIterator;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableSentenceIterator;
-import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
+import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
@@ -96,11 +97,11 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
      * Constructor for the node model.
      */
     public WordVectorLearnerNodeModel2() {
-        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{WordVectorPortObject.TYPE});
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{WordVectorFileStorePortObject.TYPE});
     }
 
     @Override
-    protected WordVectorPortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
+    protected WordVectorFileStorePortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
         final BufferedDataTable table = (BufferedDataTable)inObjects[0];
 
@@ -165,8 +166,9 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
                 throw new InvalidSettingsException("No case defined for WordVectorTrainingMode: " + mode);
         }
 
-        final WordVectorPortObject outPortObject = new WordVectorPortObject(wordVectors, m_outputSpec);
-        return new WordVectorPortObject[]{outPortObject};
+        final WordVectorFileStorePortObject outPortObject = WordVectorFileStorePortObject.create(wordVectors,
+            m_outputSpec, exec.createFileStore(UUID.randomUUID().toString() + ""));
+        return new WordVectorFileStorePortObject[]{outPortObject};
     }
 
     @Override

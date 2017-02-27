@@ -40,52 +40,39 @@
  * may freely choose the license terms applicable to such Node, including
  * when such Node is propagated with or for interoperation with KNIME.
  *******************************************************************************/
-package org.knime.ext.textprocessing.dl4j.nodes.embeddings;
+package org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObjectSpec;
-import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
+import org.knime.core.data.StringValue;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
+import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
+import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
- * Port Object Spec for Word Vector Models.
+ * <code>NodeDialog</code> for the "WordVectorApply" Node.
  *
- * @author David Kolb
+ *
+ * This node dialog derives from {@link DefaultNodeSettingsPane} which allows creation of a simple dialog with standard
+ * components. If you need a more complex dialog please derive directly from {@link org.knime.core.node.NodeDialogPane}.
+ *
+ * @author David Kolb, KNIME.com GmbH
  */
-public final class WordVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
-
-    public static final class Serializer extends AbstractSimplePortObjectSpecSerializer<WordVectorPortObjectSpec> {
-    }
-
-    private static final String CFGKEY_WORD_VECTOR_TRAINING_MODE = "WordVectorTrainingsMode";
-
-    private WordVectorTrainingMode m_wordVectorTrainingsMode;
+final class WordVectorApplyNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
-     * Empty no-arg constructor as needed by {@link AbstractSimplePortObjectSpec}
+     * New pane for configuring the WordVectorApply node.
      */
-    public WordVectorPortObjectSpec() {
+    protected WordVectorApplyNodeDialog2() {
+        final DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
 
+        addDialogComponent(new DialogComponentColumnNameSelection(
+            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN), "Document Column:",
+            0, true, StringValue.class, DocumentValue.class));
+
+        addDialogComponent(new DialogComponentBoolean(WordVectorApplyNodeModel.createCalculateMeanSettings(),
+            "Calculate Document Mean Vector?"));
     }
-
-    public WordVectorPortObjectSpec(final WordVectorTrainingMode mode) {
-        this.m_wordVectorTrainingsMode = mode;
-    }
-
-    @Override
-    protected void save(final ModelContentWO model) {
-        model.addString(CFGKEY_WORD_VECTOR_TRAINING_MODE, m_wordVectorTrainingsMode.toString());
-    }
-
-    @Override
-    protected void load(final ModelContentRO model) throws InvalidSettingsException {
-        m_wordVectorTrainingsMode = WordVectorTrainingMode.valueOf(model.getString(CFGKEY_WORD_VECTOR_TRAINING_MODE));
-
-    }
-
-    public WordVectorTrainingMode getWordVectorTrainingsMode() {
-        return m_wordVectorTrainingsMode;
-    }
-
 }

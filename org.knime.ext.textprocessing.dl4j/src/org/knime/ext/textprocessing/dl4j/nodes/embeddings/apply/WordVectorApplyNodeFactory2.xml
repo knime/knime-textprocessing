@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./apply.png" type="Manipulator" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Word Vector Apply</name>
+    
+    <shortDescription>
+        Applies a Word Vector Model to Documents or Strings.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>This node applies a Word Vector Model to Documents or Strings, meaning that every
+        word contained in the text will be replaced by the corresponding Word Vector if the word
+        is available in the Word Vector dictionary. This will result in a list of Word Vectors. 
+        If specified the node calculates the mean of these vectors resulting in a single representation
+        of the input.</intro>
+        
+        
+        <option name="Document Column">
+        The column containing the text where the Word Vector Model should be applied to.
+        </option>
+        <option name="Calculate Document Mean Vector?">
+        Whether to calculate the mean of the word vectors.
+        </option>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Data Table">Table containing Document or String Column.</inPort>
+        <inPort index="1" name="Word Vector Model">The Word Vector Model to use for word vector lookup.</inPort>
+        <outPort index="0" name="Data Table">Table with list of word vectors or single mean word vector.</outPort>
+    </ports>    
+</knimeNode>
