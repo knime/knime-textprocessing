@@ -53,7 +53,7 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMo
  *
  * @author David Kolb
  */
-public class WordVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
+public final class WordVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
 
     public static final class Serializer extends AbstractSimplePortObjectSpecSerializer<WordVectorPortObjectSpec> {
     }

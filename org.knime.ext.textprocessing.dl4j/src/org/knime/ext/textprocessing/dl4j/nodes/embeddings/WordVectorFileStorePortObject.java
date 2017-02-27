@@ -70,7 +70,7 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorFileStorePortObject extends FileStorePortObject {
+public final class WordVectorFileStorePortObject extends FileStorePortObject {
 
     /**
      * Serializer for class WordVectorFileStorePortObject.
