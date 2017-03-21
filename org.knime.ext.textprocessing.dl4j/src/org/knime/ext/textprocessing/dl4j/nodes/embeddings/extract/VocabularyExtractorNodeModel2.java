@@ -136,8 +136,9 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
         return outputTables;
     }
 
-    private void incrementProgess(final ExecutionContext exec) {
-        exec.setProgress((m_progressCounter + 1) / m_maxProgress);
+    private void incrementProgessAndSetMessage(final ExecutionContext exec, final String word) {
+        exec.setProgress((m_progressCounter + 1) / m_maxProgress,
+            () -> String.format("Processing vocabulary entry: \"%s\"", word));
         m_progressCounter++;
     }
 
@@ -155,7 +156,7 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
         final BufferedDataContainer container = exec.createDataContainer(tableSpec);
         int i = 0;
         for (final String word : words) {
-            incrementProgess(exec);
+            incrementProgessAndSetMessage(exec, word);
             final List<DataCell> cells = new ArrayList<>();
 
             cells.add(new StringCell(word));
