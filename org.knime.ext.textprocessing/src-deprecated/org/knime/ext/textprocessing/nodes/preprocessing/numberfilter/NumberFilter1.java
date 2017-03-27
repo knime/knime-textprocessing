@@ -43,58 +43,55 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   16.04.2008 (thiel): created
+ *   11.05.2007 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionMonitor;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeModel;
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
+import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
 /**
- *
+ * Added this class with previous regex to keep old business logic for deprecated node.
  * @author Kilian Thiel, University of Konstanz
- * @deprecated use {@link NumberFilterNodeModel2} instead.
+ * @deprecated use {@link NumberFilter} instead.
+ * @since 3.3
  */
 @Deprecated
-public class NumberFilterNodeModel extends PreprocessingNodeModel {
+class NumberFilter1 implements TermPreprocessing, StringPreprocessing {
+
+    private static String numbers = "^[-+]?[\\d.,]+";
+
+    private static String replacement = "";
 
     /**
-     * {@inheritDoc}
+     * Filters all strings containing numbers . or , the strings may also
+     * start with + or - and replaces them with "". The filtered String is
+     * returned.
+     * @param str String to filter numbers from.
+     * @return Filtered String.
      */
-    @Override
-    protected void initPreprocessing() {
-        m_preprocessing = new NumberFilter1();
+    private String numberFilter(final String str) {
+        return str.replaceAll(numbers, replacement);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        // Nothing to do ...
+    public Term preprocessTerm(final Term term) {
+        String filtered = numberFilter(term.getText());
+        if (filtered.length() <= 0) {
+            return null;
+        }
+        return term;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
-        // Nothing to do ...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
-        // Nothing to do ...
+    public String preprocessString(final String str) {
+        return numberFilter(str);
     }
 }
