@@ -52,7 +52,6 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
@@ -64,9 +63,6 @@ import org.knime.ext.dl4j.base.util.TableUtils;
  * @author David Kolb, KNIME.com GmbH
  */
 public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIterator {
-
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger.getLogger(BufferedDataTableLabelledDocumentIterator.class);
 
     private final BufferedDataTable m_table;
 
@@ -234,5 +230,29 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         }
         reset();
         return new LabelsSource(m_labels);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNext() {
+        return hasNextDocument();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LabelledDocument next() {
+        return nextDocument();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void shutdown() {
+        // nothing to do here
     }
 }
