@@ -76,7 +76,15 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
     public StanfordNlpSpanishTokenizer() {
         m_tokenizer = (SpanishTokenizerFactory<CoreLabel>)SpanishTokenizer.ancoraFactory();
         m_tokenizer.setOptions(
-            "ptb3Ellipsis=true,normalizeParentheses=false,normalizeOtherBrackets=false,ptb3Dashes=false,splitAll=false");
+            "normalizeAmpersandEntity=false,"
+            + "normalizeFractions=false,"
+            + "normalizeParentheses=false,"
+            + "normalizeOtherBrackets=false,"
+            + "ptb3Ellipsis=false,"
+            + "unicodeEllipsis=false,"
+            + "ptb3Dashes=false,"
+            + "escapeForwardSlashAsterisk=false,"
+            + "splitAll=false");
     }
 
     /**
