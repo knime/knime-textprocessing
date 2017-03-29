@@ -72,4 +72,9 @@ final class MarkupTagFilterConfigKeys {
      */
     static final String COLUMN_SUFFIX = "Column Suffix";
 
+    /**
+     * The configuration key for the name of the word tokenizer.
+     */
+    static final String TOKENIZER_NAME = "Tokenizer Name";
+
 }

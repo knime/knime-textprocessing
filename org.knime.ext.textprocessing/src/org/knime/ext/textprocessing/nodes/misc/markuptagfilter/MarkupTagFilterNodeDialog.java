@@ -48,6 +48,8 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.markuptagfilter;
 
+import java.util.Collection;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -55,11 +57,15 @@ import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter2;
+import org.knime.core.node.defaultnodesettings.DialogComponentLabel;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -98,9 +104,21 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
             MarkupTagFilterNodeModel.DEF_COLUMN_SUFFIX);
     }
 
+    /**
+     * @return
+     */
+    static SettingsModelString getTokenizerNameModel() {
+        return new SettingsModelString(MarkupTagFilterConfigKeys.TOKENIZER_NAME,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
     private SettingsModelString m_suffixModel;
 
+    private SettingsModelColumnFilter2 m_filterModel;
+
     private SettingsModelBoolean m_appendColumnModel;
+
+    private SettingsModelString m_tokenizerNameModel;
 
     /**
      * Creates new instance of {@code MarkupTagFilterNodeDialog}
@@ -108,7 +126,9 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
     public MarkupTagFilterNodeDialog() {
         // COLUMN SELECTION
         createNewGroup("Column Selection");
-        addDialogComponent(new DialogComponentColumnFilter2(getFilterColModel(), 0));
+        m_filterModel = getFilterColModel();
+        m_filterModel.addChangeListener(new FilteredColumnsChangeListener());
+        addDialogComponent(new DialogComponentColumnFilter2(m_filterModel, 0));
         closeCurrentGroup();
 
         // COLUMN SETTINGS
@@ -123,7 +143,13 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
         closeCurrentGroup();
-
+        createNewGroup("Tokenizer settings");
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        m_tokenizerNameModel = getTokenizerNameModel();
+        addDialogComponent(
+            new DialogComponentStringSelection(m_tokenizerNameModel, "Word tokenizer", tokenizerList));
+        addDialogComponent(new DialogComponentLabel(
+            "Attention: The documents will be retokenized after filtering. During this process, all tags will be lost."));
     }
 
     private class AppendColumnChangeListener implements ChangeListener {
@@ -133,6 +159,16 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             m_suffixModel.setEnabled(m_appendColumnModel.getBooleanValue());
+        }
+    }
+
+    private class FilteredColumnsChangeListener implements ChangeListener {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+
         }
     }
 }

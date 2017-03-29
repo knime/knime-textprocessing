@@ -71,6 +71,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
+import org.knime.ext.textprocessing.data.DocumentCell;
 
 /**
  *
@@ -94,11 +95,16 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
 
     private SettingsModelString m_columnSuffixModel = MarkupTagFilterNodeDialog.getColumnSuffixModel();
 
+    private SettingsModelString m_tokenizerNameModel = MarkupTagFilterNodeDialog.getTokenizerNameModel();
+
+    private boolean m_includesContainsDocument = false;
+
     /**
      * Creates new instance of {@code MarkupTagFilterNodeModel}
      */
     MarkupTagFilterNodeModel() {
         m_appendColumnsModel.addChangeListener(new AppendColumnChangeListener());
+        m_filterColModel.addChangeListener(new FilteredColumnsChangeListener());
     }
 
     /**
@@ -110,6 +116,11 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         /// SPEC CHECKS
         //
         FilterResult filteredCols = m_filterColModel.applyTo(dataSpec);
+        for (String includedCol : filteredCols.getIncludes()) {
+            if(dataSpec.getColumnSpec(includedCol).getType().equals(DocumentCell.TYPE)) {
+                m_includesContainsDocument = true;
+            }
+        }
 
         // check for at least one string column in input data table spec
         if (filteredCols.getIncludes().length == 0) {
@@ -142,7 +153,8 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
 
         // Pass all necessary parameters to the cell factory, which filters
         // the strings and creates new cells to replace.
-        MarkupTagFilterCellFactory cellFac = new MarkupTagFilterCellFactory(includedColIndices, newColsSpecs);
+        MarkupTagFilterCellFactory cellFac =
+            new MarkupTagFilterCellFactory(includedColIndices, newColsSpecs, m_tokenizerNameModel.getStringValue());
 
         // replace or append columns
         if (append) {
@@ -211,6 +223,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_filterColModel.saveSettingsTo(settings);
         m_appendColumnsModel.saveSettingsTo(settings);
         m_columnSuffixModel.saveSettingsTo(settings);
+        m_tokenizerNameModel.saveSettingsTo(settings);
     }
 
     /**
@@ -221,6 +234,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_filterColModel.validateSettings(settings);
         m_appendColumnsModel.validateSettings(settings);
         m_columnSuffixModel.validateSettings(settings);
+        m_tokenizerNameModel.validateSettings(settings);
 
         // additional sanity checks
         StringBuffer errMsgBuffer = new StringBuffer();
@@ -250,7 +264,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_filterColModel.loadSettingsFrom(settings);
         m_appendColumnsModel.loadSettingsFrom(settings);
         m_columnSuffixModel.loadSettingsFrom(settings);
-
+        m_tokenizerNameModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -286,6 +300,17 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         @Override
         public void stateChanged(final ChangeEvent e) {
             m_columnSuffixModel.setEnabled(m_appendColumnsModel.getBooleanValue());
+        }
+    }
+
+    private class FilteredColumnsChangeListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            m_tokenizerNameModel.setEnabled(m_includesContainsDocument);
         }
     }
 }
