@@ -42,12 +42,15 @@
  *******************************************************************************/
 package org.knime.ext.textprocessing.dl4j.util;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
@@ -139,9 +142,10 @@ public class WordVectorPortObjectUtils {
                     case DOC2VEC:
                         return WordVectorSerializer.readParagraphVectors(in);
                     case WORD2VEC:
-                        //need to convert to Word2Vec here because if we don't we write Word2Vec
-                        //but would return WordVectorsImp here which leads to inconsistencies
-                        return wordVectorsToWord2Vec(WordVectorSerializer.loadTxtVectors(in, false));
+                        /* Need to copy stream to temp file because API does not support Word2VecModel reading
+                         * with InputStreams. */
+                        File tmpFile = inputStreamToTmpFile(in, "w2v_model");
+                        return WordVectorSerializer.readWord2VecModel(tmpFile);
                     default:
                         break;
                 }
@@ -218,7 +222,7 @@ public class WordVectorPortObjectUtils {
             WordVectorSerializer.writeParagraphVectors(d2v, out);
         } else if (wordVectors instanceof Word2Vec) {
             Word2Vec w2v = (Word2Vec)wordVectors;
-            WordVectorSerializer.writeWordVectors(w2v, out);
+            WordVectorSerializer.writeWord2VecModel(w2v, out);
         } else {
             throw new IllegalStateException(
                 "No serialization method defined for WordVectors of type: " + wordVectors.getClass().getSimpleName());
@@ -238,10 +242,26 @@ public class WordVectorPortObjectUtils {
     }
 
     /**
+     * Copies the content of the specified InputStream to a temp file using the specified file name as prefix. The file
+     * name must be at least three characters long. The temp file will be deleted when the virtual machine terminates.
+     *
+     * @param is stream to copy
+     * @param tmpFileName name to use for the temp file, must be at least three characters long
+     * @return file containing stream content
+     * @throws IOException
+     */
+    private static File inputStreamToTmpFile(final InputStream is, final String tmpFileName) throws IOException {
+        File tmpFile = File.createTempFile(tmpFileName, null);
+        tmpFile.deleteOnExit();
+        FileUtils.copyInputStreamToFile(is, tmpFile);
+        return tmpFile;
+    }
+
+    /**
      * Converts wordVectors to {@link Word2Vec}. Sets {@link WeightLookupTable} and {@link VocabCache}.
      *
      * @param wordVectors
-     * @return
+     * @return Word2Vec containing vocab and lookup table
      */
     public static Word2Vec wordVectorsToWord2Vec(final WordVectors wordVectors) {
         final Word2Vec w2v = new Word2Vec();
