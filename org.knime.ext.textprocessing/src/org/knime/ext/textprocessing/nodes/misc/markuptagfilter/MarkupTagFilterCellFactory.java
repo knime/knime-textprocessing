@@ -81,14 +81,19 @@ class MarkupTagFilterCellFactory extends AbstractCellFactory {
 
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
+    private final String m_tokenizerName;
+
     /**
      * Creates instance of {@code MarkupTagFilterCellFactory}
      *
      * @param colIndextoFilter The indices of the columns with the Strings to filter.
      * @param newColSpecs The specs of the new columns (replaced or appended).
+     * @param tokenizerName The name of the tokenizer used to retokenize filtered documents.
      */
-    MarkupTagFilterCellFactory(final int[] colIndexToFilter, final DataColumnSpec[] newColSpecs) {
+    MarkupTagFilterCellFactory(final int[] colIndexToFilter, final DataColumnSpec[] newColSpecs,
+        final String tokenizerName) {
         super(newColSpecs);
+        m_tokenizerName = tokenizerName;
 
         m_colIndexToFilter = colIndexToFilter;
 
@@ -150,7 +155,7 @@ class MarkupTagFilterCellFactory extends AbstractCellFactory {
 
                         // create new instance of DocumentBuilder and copy the meta-information from input document
                         // excluding the text information
-                        final DocumentBuilder docBuilder = new DocumentBuilder(doc);
+                        final DocumentBuilder docBuilder = new DocumentBuilder(doc, m_tokenizerName);
 
                         // get section annotation names and section texts, filter the texts for tags
                         // and add them to the new DocumentBuilder
