@@ -232,12 +232,15 @@ public class DataTableSpecVerifier {
 
     /**
      * @param docColIndex The document column index to get the tokenizer name from.
-     * @return The tokenizer used in the input document column.
+     * @return The tokenizer used in the input document column or null if index is invalid.
      * @since 3.3
      */
     public String getTokenizerFromInputDocCol(final int docColIndex) {
-        DataColumnSpec docColSpec = m_spec.getColumnSpec(docColIndex);
-        return docColSpec.getProperties().getProperty(DocumentDataTableBuilder.WORD_TOKENIZER_KEY);
+        if (docColIndex >= 0) {
+            DataColumnSpec docColSpec = m_spec.getColumnSpec(docColIndex);
+            return docColSpec.getProperties().getProperty(DocumentDataTableBuilder.WORD_TOKENIZER_KEY);
+        }
+        return null;
     }
 
 
