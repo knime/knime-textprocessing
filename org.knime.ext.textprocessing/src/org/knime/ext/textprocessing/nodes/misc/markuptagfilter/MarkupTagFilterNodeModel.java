@@ -71,7 +71,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
-import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  *
@@ -117,7 +117,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         //
         FilterResult filteredCols = m_filterColModel.applyTo(dataSpec);
         for (String includedCol : filteredCols.getIncludes()) {
-            if(dataSpec.getColumnSpec(includedCol).getType().equals(DocumentCell.TYPE)) {
+            if(dataSpec.getColumnSpec(includedCol).getType().isCompatible(DocumentValue.class)) {
                 m_includesContainDocuments = true;
             }
         }
@@ -234,7 +234,10 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_filterColModel.validateSettings(settings);
         m_appendColumnsModel.validateSettings(settings);
         m_columnSuffixModel.validateSettings(settings);
-        m_tokenizerNameModel.validateSettings(settings);
+        //check key for backwards compatibility
+        if(settings.containsKey(m_tokenizerNameModel.getKey())) {
+            m_tokenizerNameModel.validateSettings(settings);
+        }
 
         // additional sanity checks
         StringBuffer errMsgBuffer = new StringBuffer();
@@ -264,7 +267,12 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_filterColModel.loadSettingsFrom(settings);
         m_appendColumnsModel.loadSettingsFrom(settings);
         m_columnSuffixModel.loadSettingsFrom(settings);
-        m_tokenizerNameModel.loadSettingsFrom(settings);
+
+        //check key for backwards compatibility
+        if(settings.containsKey(m_tokenizerNameModel.getKey())) {
+            m_tokenizerNameModel.loadSettingsFrom(settings);
+        }
+
     }
 
     /**
