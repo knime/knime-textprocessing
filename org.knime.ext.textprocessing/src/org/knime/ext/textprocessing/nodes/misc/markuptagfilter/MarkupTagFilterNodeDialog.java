@@ -53,7 +53,10 @@ import java.util.Collection;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.StringValue;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter2;
@@ -63,6 +66,8 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
+import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -72,6 +77,10 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
+
+    private static final String WARNING_MESSAGE =
+        "<html><font color='red'>Attention: Documents will be retokenized after filtering. During this process,"
+        + " all tag information will get lost.</font></html>";
 
     /**
      * Creates and returns the settings model, storing the selected columns.
@@ -105,7 +114,9 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return
+     * Creates and returns the settings model, storing the name of the tokenizer.
+     *
+     * @return The settings model with the name of the word tokenizer.
      */
     static SettingsModelString getTokenizerNameModel() {
         return new SettingsModelString(MarkupTagFilterConfigKeys.TOKENIZER_NAME,
@@ -119,6 +130,10 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
     private SettingsModelBoolean m_appendColumnModel;
 
     private SettingsModelString m_tokenizerNameModel;
+
+    private DataTableSpec m_inSpecs;
+
+    private DialogComponentLabel m_warningLabel;
 
     /**
      * Creates new instance of {@code MarkupTagFilterNodeDialog}
@@ -143,13 +158,44 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
         closeCurrentGroup();
+
         createNewGroup("Tokenizer settings");
         Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
         m_tokenizerNameModel = getTokenizerNameModel();
-        addDialogComponent(
-            new DialogComponentStringSelection(m_tokenizerNameModel, "Word tokenizer", tokenizerList));
-        addDialogComponent(new DialogComponentLabel(
-            "Attention: The documents will be retokenized after filtering. During this process, all tags will be lost."));
+        addDialogComponent(new DialogComponentStringSelection(m_tokenizerNameModel, "Word tokenizer", tokenizerList));
+        m_warningLabel = new DialogComponentLabel(WARNING_MESSAGE);
+        addDialogComponent(m_warningLabel);
+        closeCurrentGroup();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        m_inSpecs = specs[0];
+        checkState(m_filterModel);
+    }
+
+    /**
+     * Checks the type of the included columns and enables/disables the tokenizer selection & the related warning
+     * message depending on availability of document columns.
+     *
+     * @param filterModel The SettingsModelColumnFilter2 to check the inSpecs with
+     */
+    private void checkState(final SettingsModelColumnFilter2 filterModel) {
+        if (m_inSpecs != null) {
+            m_tokenizerNameModel.setEnabled(false);
+            m_warningLabel.setText("");
+            FilterResult result = filterModel.applyTo(m_inSpecs);
+            for (String columnName : result.getIncludes()) {
+                if (m_inSpecs.getColumnSpec(columnName).getType().equals(DocumentCell.TYPE)) {
+                    m_tokenizerNameModel.setEnabled(true);
+                    m_warningLabel.setText(WARNING_MESSAGE);
+                }
+            }
+        }
     }
 
     private class AppendColumnChangeListener implements ChangeListener {
@@ -168,7 +214,9 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-
+            SettingsModelColumnFilter2 filterModel = (SettingsModelColumnFilter2)e.getSource();
+            checkState(filterModel);
         }
     }
+
 }
