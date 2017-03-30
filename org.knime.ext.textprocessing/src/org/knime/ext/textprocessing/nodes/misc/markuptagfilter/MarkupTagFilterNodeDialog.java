@@ -67,7 +67,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
-import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -175,7 +174,7 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
         throws NotConfigurableException {
         m_inSpecs = specs[0];
-        checkState(m_filterModel);
+        checkState();
     }
 
     /**
@@ -184,13 +183,13 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
      *
      * @param filterModel The SettingsModelColumnFilter2 to check the inSpecs with
      */
-    private void checkState(final SettingsModelColumnFilter2 filterModel) {
+    private void checkState() {
         if (m_inSpecs != null) {
             m_tokenizerNameModel.setEnabled(false);
             m_warningLabel.setText("");
-            FilterResult result = filterModel.applyTo(m_inSpecs);
+            FilterResult result = m_filterModel.applyTo(m_inSpecs);
             for (String columnName : result.getIncludes()) {
-                if (m_inSpecs.getColumnSpec(columnName).getType().equals(DocumentCell.TYPE)) {
+                if(m_inSpecs.getColumnSpec(columnName).getType().isCompatible(DocumentValue.class)) {
                     m_tokenizerNameModel.setEnabled(true);
                     m_warningLabel.setText(WARNING_MESSAGE);
                 }
@@ -214,8 +213,7 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            SettingsModelColumnFilter2 filterModel = (SettingsModelColumnFilter2)e.getSource();
-            checkState(filterModel);
+            checkState();
         }
     }
 
