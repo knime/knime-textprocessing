@@ -97,7 +97,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
 
     private SettingsModelString m_tokenizerNameModel = MarkupTagFilterNodeDialog.getTokenizerNameModel();
 
-    private boolean m_includesContainsDocument = false;
+    private boolean m_includesContainDocuments = false;
 
     /**
      * Creates new instance of {@code MarkupTagFilterNodeModel}
@@ -118,7 +118,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         FilterResult filteredCols = m_filterColModel.applyTo(dataSpec);
         for (String includedCol : filteredCols.getIncludes()) {
             if(dataSpec.getColumnSpec(includedCol).getType().equals(DocumentCell.TYPE)) {
-                m_includesContainsDocument = true;
+                m_includesContainDocuments = true;
             }
         }
 
@@ -310,7 +310,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            m_tokenizerNameModel.setEnabled(m_includesContainsDocument);
+            m_tokenizerNameModel.setEnabled(m_includesContainDocuments);
         }
     }
 }

@@ -8,7 +8,10 @@
         <intro>
         	Removes all Markup Language Tags contained in the input columns.
         	For string inputs the complete string will be filtered.
-        	For document inputs titles and all sections (abstract, body text) will be filtered. 
+        	For document inputs titles and all sections (abstract, body text) will be filtered.
+        	<br/>
+        	<b>ATTENTION:</b> Documents will be <b>retokenized</b> after filtering. 
+        	During this process, all tag information will get <b>lost</b>.
 		</intro>
 		<option name="Column selection">
 			The columns containing string or document values to filter for Markup Language Tags.
@@ -21,7 +24,10 @@
             new columns are those of the original columns with the specified suffix 
             appended.
         </option>
-
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
     </fullDescription>
 
     <ports>
