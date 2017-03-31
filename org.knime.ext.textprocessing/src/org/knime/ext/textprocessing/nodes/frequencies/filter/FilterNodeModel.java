@@ -128,7 +128,7 @@ public class FilterNodeModel extends NodeModel {
     /**
      * The max maximum number of threshold filtering.
      */
-    public static final double MAX_MAX_THRESHOLD = 1000;
+    public static final double MAX_MAX_THRESHOLD = Double.MAX_VALUE;
 
     /**
      * The default settings for deep filtering.
