@@ -74,7 +74,7 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
      * Creates a new instance of {@code StanfordNlpSpanishTokenizer}
      */
     public StanfordNlpSpanishTokenizer() {
-        m_tokenizer = (SpanishTokenizerFactory<CoreLabel>)SpanishTokenizer.ancoraFactory();
+        m_tokenizer = (SpanishTokenizerFactory<CoreLabel>)SpanishTokenizer.coreLabelFactory();
         m_tokenizer.setOptions(
             "normalizeAmpersandEntity=false,"
             + "normalizeFractions=false,"
@@ -84,7 +84,9 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
             + "unicodeEllipsis=false,"
             + "ptb3Dashes=false,"
             + "escapeForwardSlashAsterisk=false,"
-            + "splitAll=false");
+            + "splitAll=false,"
+            + "tokenizeNLs=false,"
+            + "strictTreebank3=true");
     }
 
     /**
