@@ -78,8 +78,8 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
 class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
 
     private static final String WARNING_MESSAGE =
-        "<html><font color='red'>Attention: Documents will be retokenized after filtering. During this process,"
-        + " all tag information will get lost.</font></html>";
+        "<html><font color='red'>Attention: Documents will be retokenized after filtering. During this process"
+        + " all tag information will be lost.</font></html>";
 
     /**
      * Creates and returns the settings model, storing the selected columns.
@@ -189,7 +189,7 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
             m_warningLabel.setText("");
             FilterResult result = m_filterModel.applyTo(m_inSpecs);
             for (String columnName : result.getIncludes()) {
-                if(m_inSpecs.getColumnSpec(columnName).getType().isCompatible(DocumentValue.class)) {
+                if (m_inSpecs.getColumnSpec(columnName).getType().isCompatible(DocumentValue.class)) {
                     m_tokenizerNameModel.setEnabled(true);
                     m_warningLabel.setText(WARNING_MESSAGE);
                 }
@@ -216,5 +216,4 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
             checkState();
         }
     }
-
 }

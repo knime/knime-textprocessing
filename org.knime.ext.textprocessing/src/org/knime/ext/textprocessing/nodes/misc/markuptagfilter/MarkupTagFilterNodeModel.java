@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -116,17 +117,16 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         /// SPEC CHECKS
         //
         FilterResult filteredCols = m_filterColModel.applyTo(dataSpec);
-        for (String includedCol : filteredCols.getIncludes()) {
-            if(dataSpec.getColumnSpec(includedCol).getType().isCompatible(DocumentValue.class)) {
-                m_includesContainDocuments = true;
-            }
-        }
-
         // check for at least one string column in input data table spec
         if (filteredCols.getIncludes().length == 0) {
             throw new InvalidSettingsException(
                 "There are no columns containing string or document values in the input table!");
         }
+        
+        m_includesContainDocuments = Stream.of(filteredCols.getIncludes())
+        		.map(c -> dataSpec.getColumnSpec(c))
+        		.filter(c -> c.getType().isCompatible(DocumentValue.class))
+        		.findAny().isPresent();
 
         // check if all included columns are available in spec
         String[] unknownCols = filteredCols.getRemovedFromIncludes();
@@ -235,7 +235,7 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_appendColumnsModel.validateSettings(settings);
         m_columnSuffixModel.validateSettings(settings);
         //check key for backwards compatibility
-        if(settings.containsKey(m_tokenizerNameModel.getKey())) {
+        if (settings.containsKey(m_tokenizerNameModel.getKey())) {
             m_tokenizerNameModel.validateSettings(settings);
         }
 
@@ -269,10 +269,9 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
         m_columnSuffixModel.loadSettingsFrom(settings);
 
         //check key for backwards compatibility
-        if(settings.containsKey(m_tokenizerNameModel.getKey())) {
+        if (settings.containsKey(m_tokenizerNameModel.getKey())) {
             m_tokenizerNameModel.loadSettingsFrom(settings);
         }
-
     }
 
     /**
@@ -312,7 +311,6 @@ class MarkupTagFilterNodeModel extends SimpleStreamableFunctionNodeModel {
     }
 
     private class FilteredColumnsChangeListener implements ChangeListener {
-
         /**
          * {@inheritDoc}
          */

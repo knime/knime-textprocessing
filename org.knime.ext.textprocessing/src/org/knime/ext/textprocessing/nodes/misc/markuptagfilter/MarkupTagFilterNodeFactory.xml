@@ -11,7 +11,7 @@
         	For document inputs titles and all sections (abstract, body text) will be filtered.
         	<br/>
         	<b>ATTENTION:</b> Documents will be <b>retokenized</b> after filtering. 
-        	During this process, all tag information will get <b>lost</b>.
+        	During this process all tag information will be <b>lost</b>.
 		</intro>
 		<option name="Column selection">
 			The columns containing string or document values to filter for Markup Language Tags.
