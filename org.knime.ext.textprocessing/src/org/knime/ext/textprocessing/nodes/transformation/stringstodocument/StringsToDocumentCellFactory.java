@@ -90,6 +90,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
+    private boolean m_cacheCreated = false;
+
     // initializing the old standard word tokenizer for backwards compatibility
     private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
@@ -132,7 +134,9 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         m_cacheInitializer = new LazyInitializer<DataCellCache>() {
             @Override
             protected DataCellCache initialize() throws ConcurrentException {
-                return initializeDataCellCache();
+                DataCellCache dataCellCache = initializeDataCellCache();
+                m_cacheCreated = true;
+                return dataCellCache;
             }
         };
         m_config = config;
@@ -308,6 +312,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     @Override
     public void afterProcessing() {
         super.afterProcessing();
-        getDataCellCache().close();
+        if (m_cacheCreated) {
+            getDataCellCache().close();
+        }
     }
 }
