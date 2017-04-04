@@ -409,6 +409,15 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/frequencies/filter/FilterNodeModel.java" type="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeModel">
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeModel"/>
+                <message_argument value="MAX_MAX_THRESHOLD"/>
+                <message_argument value="1000.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/caseconverter/CaseConverter.java" type="org.knime.ext.textprocessing.nodes.preprocessing.caseconverter.CaseConverter">
         <filter id="338792546">
             <message_arguments>
