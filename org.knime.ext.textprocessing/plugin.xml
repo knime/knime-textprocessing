@@ -776,5 +776,8 @@
       <TokenizerFactory
             TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpWhitespaceTokenizerFactory">
       </TokenizerFactory>
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpChineseTokenizerFactory">
+      </TokenizerFactory>
    </extension>
 </plugin>
