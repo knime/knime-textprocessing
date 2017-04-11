@@ -66,22 +66,16 @@ public class StanfordNlpChineseTokenizer implements Tokenizer {
 
     private CRFClassifier<CoreLabel> m_tokenizer;
 
-    private final String BASEDIR = TextprocessingCorePlugin.resolvePath("stanfordmodels/tokenizer/data").getAbsolutePath();
+    private static final String BASEDIR = TextprocessingCorePlugin.resolvePath("stanfordmodels/tokenizer/data").getAbsolutePath();
+
+    private static final Properties PROPERTIES = createProperties();
 
     /**
      *
      */
     public StanfordNlpChineseTokenizer() {
-        Properties props = new Properties();
-        props.setProperty("sighanCorporaDict", BASEDIR);
-        props.setProperty("NormalizationTable", BASEDIR + "/norm.simp.utf8");
-        props.setProperty("normTableEncoding", "UTF-8");
-        // below is needed because CTBSegDocumentIteratorFactory accesses it
-        props.setProperty("serDictionary", BASEDIR + "/dict-chris6.ser.gz");
-        props.setProperty("inputEncoding", "UTF-8");
-        props.setProperty("sighanPostProcessing", "true");
-        m_tokenizer = new CRFClassifier<>(props);
-        m_tokenizer.loadClassifierNoExceptions(BASEDIR + "/ctb.gz", props);
+        m_tokenizer = new CRFClassifier<>(PROPERTIES);
+        m_tokenizer.loadClassifierNoExceptions(BASEDIR + "/ctb.gz", PROPERTIES);
     }
 
     /**
@@ -95,6 +89,19 @@ public class StanfordNlpChineseTokenizer implements Tokenizer {
         } else {
             return null;
         }
+    }
+
+    private static Properties createProperties() {
+        Properties props = new Properties();
+        props.setProperty("sighanCorporaDict", BASEDIR);
+        props.setProperty("NormalizationTable", BASEDIR + "/norm.simp.utf8");
+        props.setProperty("normTableEncoding", "UTF-8");
+        // below is needed because CTBSegDocumentIteratorFactory accesses it
+        props.setProperty("serDictionary", BASEDIR + "/dict-chris6.ser.gz");
+        props.setProperty("inputEncoding", "UTF-8");
+        props.setProperty("sighanPostProcessing", "true");
+        props.setProperty("keepAllWhitespaces", "true");
+        return props;
     }
 
 }

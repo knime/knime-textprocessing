@@ -87,11 +87,20 @@ public class TokenizerPool {
         m_tokenizerName = tokenizerName;
         m_wordTokenizer = new Tokenizer[m_poolSize];
         m_sentenceTokenizer = new OpenNlpSentenceTokenizer[m_poolSize];
+        Tokenizer chineseTokenizer = null;
+        if (m_tokenizerName.equals("StanfordNLP ChineseTokenizer")) {
+            chineseTokenizer = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizerName).getTokenizer();
+        }
 
         LOGGER.debug("Initializing tokenizer pool with " + m_poolSize + " tokenizers.");
         for (int i = 0; i < m_poolSize; i++) {
-            m_wordTokenizer[i] = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizerName).getTokenizer();
+            if (!m_tokenizerName.equals("StanfordNLP ChineseTokenizer")) {
+                m_wordTokenizer[i] = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizerName).getTokenizer();
+            } else {
+                m_wordTokenizer[i] = chineseTokenizer;
+            }
             m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
+
         }
     }
 

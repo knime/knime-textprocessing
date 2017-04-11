@@ -86,7 +86,10 @@ public class StanfordNlpChineseTokenizerFactory implements TokenizerFactory {
     @Override
     public String getTokenizerDescription() {
         //TODO: set description text
-        return "";
+        return "\"Chinese is standardly written without spaces between words (as are some other languages). \n"
+            + " This software will split Chinese text into a sequence of words, \n"
+            + "defined according to some word segmentation standard.\"\n"
+            + "This model uses the Chinese Penn Treebank standard.";
     }
 
     /**
