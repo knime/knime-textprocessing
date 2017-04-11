@@ -66,7 +66,8 @@ public class StanfordNlpChineseTokenizer implements Tokenizer {
 
     private CRFClassifier<CoreLabel> m_tokenizer;
 
-    private static final String BASEDIR = TextprocessingCorePlugin.resolvePath("stanfordmodels/tokenizer/data").getAbsolutePath();
+    private static final String BASEDIR =
+        TextprocessingCorePlugin.resolvePath("stanfordmodels/tokenizer/data").getAbsolutePath();
 
     private static final Properties PROPERTIES = createProperties();
 

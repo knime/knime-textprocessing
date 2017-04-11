@@ -76,4 +76,30 @@ public interface TokenizerFactory {
      */
     public String getTokenizerDescLink();
 
+    /**
+     * Returns the maximum pool size for the {@link TokenizerPool}.
+     * Default maximum value provided by the interface is 10.
+     * To use the maximum value, the specific implementation of {@link TokenizerFactory} has to
+     * override {@link #forceMaxPoolSize()} and set the return value to {@code true}.
+     * To set a different maximum pool size, the specific implementation of {@link TokenizerFactory} has to
+     * override this method.
+     *
+     * @return Returns the maximum pool size for the specific tokenizer.
+     */
+    public default int getMaxPoolSize() {
+        return 10;
+    }
+
+    /**
+     * Returns if the maximum pool size should be used for the {@link TokenizerPool}.
+     * Default value provided by the interface is false. Override this method in the specific implementation
+     * of {@link TokenizerFactory} if the maximum pool size should be used, no matter what pool size
+     * is defined at the preference page.
+     *
+     * @return Returns if the maximum pool size should be used for the {@link TokenizerPool}.
+     */
+    public default boolean forceMaxPoolSize() {
+        return false;
+    }
+
 }

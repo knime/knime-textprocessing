@@ -85,7 +85,6 @@ public class StanfordNlpChineseTokenizerFactory implements TokenizerFactory {
      */
     @Override
     public String getTokenizerDescription() {
-        //TODO: set description text
         return "\"Chinese is standardly written without spaces between words (as are some other languages). \n"
             + " This software will split Chinese text into a sequence of words, \n"
             + "defined according to some word segmentation standard.\"\n"
@@ -98,6 +97,22 @@ public class StanfordNlpChineseTokenizerFactory implements TokenizerFactory {
     @Override
     public String getTokenizerDescLink() {
         return "https://nlp.stanford.edu/software/segmenter.shtml";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getMaxPoolSize() {
+        return 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean forceMaxPoolSize() {
+        return true;
     }
 
 }
