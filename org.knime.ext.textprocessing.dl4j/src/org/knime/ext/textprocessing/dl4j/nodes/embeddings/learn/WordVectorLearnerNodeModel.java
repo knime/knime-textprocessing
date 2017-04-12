@@ -137,7 +137,8 @@ public class WordVectorLearnerNodeModel extends AbstractDLNodeModel {
                 final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)
                     .minLearningRate(minLearningRate).seed(seed).layerSize(layerSize).batchSize(batchSize)
                     .windowSize(windowSize).minWordFrequency(minWordFrequency).iterations(trainingIterations)
-                    .epochs(epochs).iterate(docIter).trainWordVectors(true).tokenizerFactory(t).build();
+                    .epochs(epochs).iterate(docIter).trainWordVectors(true).tokenizerFactory(t)
+                    .allowParallelTokenization(false).build();
 
                 d2v.fit();
                 wordVectors = d2v;
