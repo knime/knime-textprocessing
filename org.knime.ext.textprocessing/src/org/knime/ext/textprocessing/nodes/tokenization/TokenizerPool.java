@@ -96,7 +96,6 @@ public class TokenizerPool {
         for (int i = 0; i < m_poolSize; i++) {
             m_wordTokenizer[i] = TokenizerFactoryRegistry.getTokenizerFactoryMap().get(m_tokenizerName).getTokenizer();
             m_sentenceTokenizer[i] = new OpenNlpSentenceTokenizer();
-
         }
     }
 

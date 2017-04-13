@@ -58,13 +58,15 @@ import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 
 /**
+ * A tokenizer that detects Chinese words. It provides each word as one token.
+ * This word tokenizer is based on the "StanfordNLP Chinese Tokenizer" model, which is created on top of the
+ * "StanfordNLP PTB Tokenizer" model.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
 public class StanfordNlpChineseTokenizer implements Tokenizer {
-
-    private CRFClassifier<CoreLabel> m_tokenizer;
+    private final CRFClassifier<CoreLabel> m_tokenizer;
 
     private static final String BASEDIR =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/tokenizer/data").getAbsolutePath();
@@ -72,7 +74,7 @@ public class StanfordNlpChineseTokenizer implements Tokenizer {
     private static final Properties PROPERTIES = createProperties();
 
     /**
-     *
+     * Creates a new tokenizer.
      */
     public StanfordNlpChineseTokenizer() {
         m_tokenizer = new CRFClassifier<>(PROPERTIES);
@@ -84,12 +86,7 @@ public class StanfordNlpChineseTokenizer implements Tokenizer {
      */
     @Override
     public synchronized List<String> tokenize(final String sentence) {
-
-        if (m_tokenizer != null) {
-            return m_tokenizer.segmentString(sentence);
-        } else {
-            return null;
-        }
+        return m_tokenizer.segmentString(sentence);
     }
 
     private static Properties createProperties() {
@@ -104,5 +101,4 @@ public class StanfordNlpChineseTokenizer implements Tokenizer {
         props.setProperty("keepAllWhitespaces", "true");
         return props;
     }
-
 }

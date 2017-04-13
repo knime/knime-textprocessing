@@ -52,18 +52,12 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
-*
-* @author Julian Bunzel, KNIME.com, Berlin, Germany
-* @since 3.4
-*/
+ * This factory class creates instances of the Chinese word tokenizer {@code StanfordNlpChineseTokenizer}.
+ *
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
+ */
 public class StanfordNlpChineseTokenizerFactory implements TokenizerFactory {
-
-    /**
-     * Creates a new instance of the {@code StanfordNlpPTBTokenizerFactory}.
-     */
-    public StanfordNlpChineseTokenizerFactory() {
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -114,5 +108,4 @@ public class StanfordNlpChineseTokenizerFactory implements TokenizerFactory {
     public boolean forceMaxPoolSize() {
         return true;
     }
-
 }

@@ -85,6 +85,7 @@ public interface TokenizerFactory {
      * override this method.
      *
      * @return Returns the maximum pool size for the specific tokenizer.
+     * @since 3.4
      */
     public default int getMaxPoolSize() {
         return 10;
@@ -97,9 +98,9 @@ public interface TokenizerFactory {
      * is defined at the preference page.
      *
      * @return Returns if the maximum pool size should be used for the {@link TokenizerPool}.
+     * @since 3.4
      */
     public default boolean forceMaxPoolSize() {
         return false;
     }
-
 }
