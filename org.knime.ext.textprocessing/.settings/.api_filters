@@ -828,4 +828,18 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/tokenization/TokenizerFactory.java" type="org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory"/>
+                <message_argument value="forceMaxPoolSize()"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory"/>
+                <message_argument value="getMaxPoolSize()"/>
+            </message_arguments>
+        </filter>
+    </resource>    
 </component>
