@@ -51,7 +51,6 @@ package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
  *
@@ -97,6 +96,6 @@ public final class NumberFilterNodeFactory2 extends NodeFactory<NumberFilterNode
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new PreprocessingNodeSettingsPane2();
+        return new NumberFilterNodeDialog();
     }
 }

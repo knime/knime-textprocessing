@@ -48,6 +48,10 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
@@ -59,10 +63,49 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
     /**
+     * The default value for filtering terms containing digits.
+     */
+    public static final boolean DEF_FILTERTERMSCONTAININGDIGITS = false;
+
+    private SettingsModelBoolean m_filterTermsContainingDigits =
+        NumberFilterNodeDialog.getFilterTermsContainingDigitsModel();
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected TermPreprocessing createPreprocessing() throws Exception {
-        return new NumberFilter();
+        return new NumberFilter(m_filterTermsContainingDigits.getBooleanValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
+        if (settings.containsKey(m_filterTermsContainingDigits.getConfigName())) {
+            m_filterTermsContainingDigits.loadSettingsFrom(settings);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
+        m_filterTermsContainingDigits.saveSettingsTo(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.validateSettings(settings);
+        if (settings.containsKey(m_filterTermsContainingDigits.getConfigName())) {
+            m_filterTermsContainingDigits.validateSettings(settings);
+        }
     }
 }

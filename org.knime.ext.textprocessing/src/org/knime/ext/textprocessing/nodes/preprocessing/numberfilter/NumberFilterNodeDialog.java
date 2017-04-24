@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,70 +44,40 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   11.05.2007 (thiel): created
+ *   24.04.2017 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
-import java.util.regex.Pattern;
-
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class NumberFilter implements TermPreprocessing, StringPreprocessing {
-
-    private static final Pattern NUMBER_REGEX = Pattern.compile("^[-+]?(?:\\d*[.,]{1}\\d+|\\d)+");
-
-    private static final Pattern NUMBER_REGEX_2 = Pattern.compile(".*\\d+.*");
-
-    private static final String REPLACEMENT = "";
-
-    private boolean m_filterTermsContainingDigits;
+public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
 
     /**
-     * @param filterTermsContainingDigits If true, the number filter also filters terms that are mixed with numbers and
-     *            different character classes.
+     * @return Returns and creates a {@code SettingsModelBoolean} containing a setting for filtering terms that contain
+     *         numbers.
      */
-    public NumberFilter(final boolean filterTermsContainingDigits) {
-        m_filterTermsContainingDigits = filterTermsContainingDigits;
+    public static final SettingsModelBoolean getFilterTermsContainingDigitsModel() {
+        return new SettingsModelBoolean(NumberFilterConfigKeys.CFGKEY_FILTERTERMSCONTAININGDIGITS,
+            NumberFilterNodeModel2.DEF_FILTERTERMSCONTAININGDIGITS);
     }
 
     /**
-     * Filters all strings containing numbers . or , the strings may also start with + or - and replaces them with "".
-     * The filtered String is returned.
-     *
-     * @param str String to filter numbers from.
-     * @return Filtered String.
+     * Creates a new instance of {@link NumberFilterNodeDialog}.
      */
-    private String numberFilter(final String str) {
-        if (m_filterTermsContainingDigits) {
-            return NUMBER_REGEX_2.matcher(str).replaceAll(REPLACEMENT);
-        } else {
-            return NUMBER_REGEX.matcher(str).replaceAll(REPLACEMENT);
-        }
+    public NumberFilterNodeDialog() {
+        super();
+
+        createNewTab("Filter options");
+        setSelected("Filter options");
+
+        addDialogComponent(
+            new DialogComponentBoolean(getFilterTermsContainingDigitsModel(), "Filter terms containing digits"));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Term preprocessTerm(final Term term) {
-        String filtered = numberFilter(term.getText());
-        if (filtered.length() <= 0) {
-            return null;
-        }
-        return term;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String preprocessString(final String str) {
-        return numberFilter(str);
-    }
 }

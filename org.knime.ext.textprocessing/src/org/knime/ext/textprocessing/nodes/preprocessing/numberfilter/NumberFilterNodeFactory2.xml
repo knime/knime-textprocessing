@@ -27,6 +27,11 @@
               If checked, unmodifiable terms will be preprocessed too.
         </option>
         </tab>
+		<tab name="Filter options">
+        <option name="Filter terms containing digits">
+            If checked, the number filter also filters terms that contain digits (e.g. abc123).
+        </option>
+        </tab>
     </fullDescription>
 
     <ports>

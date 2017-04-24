@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,70 +44,19 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   11.05.2007 (thiel): created
+ *   24.04.2017 (Julian): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
-import java.util.regex.Pattern;
-
-import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
-import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
-
 /**
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class NumberFilter implements TermPreprocessing, StringPreprocessing {
-
-    private static final Pattern NUMBER_REGEX = Pattern.compile("^[-+]?(?:\\d*[.,]{1}\\d+|\\d)+");
-
-    private static final Pattern NUMBER_REGEX_2 = Pattern.compile(".*\\d+.*");
-
-    private static final String REPLACEMENT = "";
-
-    private boolean m_filterTermsContainingDigits;
+public class NumberFilterConfigKeys {
 
     /**
-     * @param filterTermsContainingDigits If true, the number filter also filters terms that are mixed with numbers and
-     *            different character classes.
+     * The configuration key for the filter terms with numbers setting.
      */
-    public NumberFilter(final boolean filterTermsContainingDigits) {
-        m_filterTermsContainingDigits = filterTermsContainingDigits;
-    }
+    public static final String CFGKEY_FILTERTERMSCONTAININGDIGITS = "filterTermsContainingNumbers";
 
-    /**
-     * Filters all strings containing numbers . or , the strings may also start with + or - and replaces them with "".
-     * The filtered String is returned.
-     *
-     * @param str String to filter numbers from.
-     * @return Filtered String.
-     */
-    private String numberFilter(final String str) {
-        if (m_filterTermsContainingDigits) {
-            return NUMBER_REGEX_2.matcher(str).replaceAll(REPLACEMENT);
-        } else {
-            return NUMBER_REGEX.matcher(str).replaceAll(REPLACEMENT);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Term preprocessTerm(final Term term) {
-        String filtered = numberFilter(term.getText());
-        if (filtered.length() <= 0) {
-            return null;
-        }
-        return term;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String preprocessString(final String str) {
-        return numberFilter(str);
-    }
 }
