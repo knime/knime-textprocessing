@@ -73,6 +73,7 @@ import org.apache.tika.mime.MimeTypes;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.PasswordProvider;
+import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -145,6 +146,11 @@ public class TikaParser {
     public List<DataCell[]> parse(final File file, final File attachmentDir) {
         String mime_type = "-";
         List<DataCell[]> result = new ArrayList<DataCell[]>();
+
+        // sorts PDF sentences from left to right and up to down.
+        PDFParserConfig pdfConfig = new PDFParserConfig();
+        pdfConfig.setSortByPosition(true);
+        m_context.set(PDFParserConfig.class, pdfConfig);
 
         if (!m_sourceNode && !file.isFile() && file.canRead()) {
             m_errorMsg = "File might be a directory";

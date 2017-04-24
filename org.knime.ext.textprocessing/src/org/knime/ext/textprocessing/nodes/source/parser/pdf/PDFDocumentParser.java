@@ -165,6 +165,7 @@ public class PDFDocumentParser extends AbstractDocumentParser {
 
             // extract text from pdf
             PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setSortByPosition(true);
             String text = stripper.getText(document);
             m_currentDoc.addSection(text, SectionAnnotation.UNKNOWN);
 

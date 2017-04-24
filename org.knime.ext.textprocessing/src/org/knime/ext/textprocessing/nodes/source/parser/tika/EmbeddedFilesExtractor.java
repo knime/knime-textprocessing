@@ -133,7 +133,7 @@ public final class EmbeddedFilesExtractor {
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
         m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, m_filename);
         if (m_extractInlineImages) {
-            PDFParserConfig pdfConfig = new PDFParserConfig();
+            PDFParserConfig pdfConfig = m_context.get(PDFParserConfig.class);
             pdfConfig.setExtractInlineImages(m_extractInlineImages);
             m_context.set(PDFParserConfig.class, pdfConfig);
         }
