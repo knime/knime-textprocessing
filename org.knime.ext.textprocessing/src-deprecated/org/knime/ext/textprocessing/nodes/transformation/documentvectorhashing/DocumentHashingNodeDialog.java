@@ -68,13 +68,13 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
+public class DocumentHashingNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * @return the document column
      */
     static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_DOC_COL,
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_DOC_COL,
             DocumentHashingNodeModel.DEFAULT_DOCUMENT_COLNAME);
     }
 
@@ -82,43 +82,43 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
      * @return the number of buckets for the hashing function
      */
     static SettingsModelIntegerBounded getDimModel() {
-        return new SettingsModelIntegerBounded(DocumentHashingConfigKeys2.CFGKEY_DIM, 5000, 1, Integer.MAX_VALUE);
+        return new SettingsModelIntegerBounded(DocumentHashingConfigKeys.CFGKEY_DIM, 5000, 1, Integer.MAX_VALUE);
     }
 
     /**
      * @return the seed for the hashing function
      */
     static SettingsModelInteger getSeedModel() {
-        return new SettingsModelInteger(DocumentHashingConfigKeys2.CFGKEY_SEED, DocumentHashingNodeModel2.DEFAULT_SEED);
+        return new SettingsModelInteger(DocumentHashingConfigKeys.CFGKEY_SEED, DocumentHashingNodeModel.DEFAULT_SEED);
     }
 
     /**
      * @return the hashing function
      */
     static SettingsModelString getHashingMethod() {
-        return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_HASHING_FUNC, "murmur3_32bit");
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_HASHING_FUNC, "murmur3_32bit");
     }
 
     /**
      * @return the vector value type
      */
     static SettingsModelString getVectorValueModel() {
-        return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_VEC_VAL, "binary");
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_VEC_VAL, "binary");
     }
 
     /**
      * @return a flag to specify whether the vector should be put in columns or as collection
      */
     public static final SettingsModelBoolean getAsCollectionModel() {
-        return new SettingsModelBoolean(DocumentHashingConfigKeys2.CFGKEY_ASCOLLECTION,
-            DocumentHashingNodeModel2.DEFAULT_ASCOLLECTION);
+        return new SettingsModelBoolean(DocumentHashingConfigKeys.CFGKEY_ASCOLLECTION,
+            DocumentHashingNodeModel.DEFAULT_ASCOLLECTION);
     }
 
     /**
-     * Creates a new instance of <code>DocumentHashingNodeDialog2</code>.
+     * Creates a new instance of <code>DocumentHashingNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
-    public DocumentHashingNodeDialog2() {
+    public DocumentHashingNodeDialog() {
         createNewGroup("Document column setting");
         addDialogComponent(
             new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column: ", 0, DocumentValue.class));

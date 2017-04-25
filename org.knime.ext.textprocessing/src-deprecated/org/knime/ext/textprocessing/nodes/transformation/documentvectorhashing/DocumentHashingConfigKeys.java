@@ -48,54 +48,43 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-
 /**
  *
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
- * @since 3.3
  */
-public class DocumentHashingNodeFactory2 extends NodeFactory<DocumentHashingNodeModel2> {
+class DocumentHashingConfigKeys {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentHashingNodeDialog2();
+    private DocumentHashingConfigKeys() {
     }
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the document column.
      */
-    @Override
-    public DocumentHashingNodeModel2 createNodeModel() {
-        return new DocumentHashingNodeModel2();
-    }
+    public static final String CFGKEY_DOC_COL = "DocumentColumn";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the dimension of vector
      */
-    @Override
-    public NodeView<DocumentHashingNodeModel2> createNodeView(final int index, final DocumentHashingNodeModel2 model) {
-        return null;
-    }
+    public static final String CFGKEY_DIM = "vectorDimension";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the seed for the hashing function
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
+    public static final String CFGKEY_SEED = "seed";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the hashing function
      */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFGKEY_HASHING_FUNC = "hashingFunction";
+
+    /**
+     * The configuration key of the seed for the hashing function
+     */
+    public static final String CFGKEY_VEC_VAL = "vectorValue";
+
+    /**
+     * The configuration key of the flag to specify whether to use collection cell or columns as output
+     */
+    public static final String CFGKEY_ASCOLLECTION = "asCollectionCell";
+
 }

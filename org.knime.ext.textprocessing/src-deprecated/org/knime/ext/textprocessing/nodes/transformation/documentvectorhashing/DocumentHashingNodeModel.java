@@ -88,7 +88,7 @@ import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel {
+public class DocumentHashingNodeModel extends SimpleStreamableFunctionNodeModel {
 
     /**
      * The default document column to use.
@@ -109,23 +109,23 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
-    private final SettingsModelIntegerBounded m_dim = DocumentHashingNodeDialog2.getDimModel();
+    private final SettingsModelIntegerBounded m_dim = DocumentHashingNodeDialog.getDimModel();
 
-    private final SettingsModelString m_docCol = DocumentHashingNodeDialog2.getDocumentColModel();
+    private final SettingsModelString m_docCol = DocumentHashingNodeDialog.getDocumentColModel();
 
-    private SettingsModelInteger m_seed = DocumentHashingNodeDialog2.getSeedModel();
+    private SettingsModelInteger m_seed = DocumentHashingNodeDialog.getSeedModel();
 
-    private final SettingsModelString m_vectVal = DocumentHashingNodeDialog2.getVectorValueModel();
+    private final SettingsModelString m_vectVal = DocumentHashingNodeDialog.getVectorValueModel();
 
-    private final SettingsModelString m_hashFunc = DocumentHashingNodeDialog2.getHashingMethod();
+    private final SettingsModelString m_hashFunc = DocumentHashingNodeDialog.getHashingMethod();
 
-    private final SettingsModelBoolean m_asCol = DocumentHashingNodeDialog2.getAsCollectionModel();
+    private final SettingsModelBoolean m_asCol = DocumentHashingNodeDialog.getAsCollectionModel();
 
     /**
-     * Creates a new instance of <code>DocumentHashingNodeModel2</code>. For each node, a new integer value is assigned
+     * Creates a new instance of <code>DocumentHashingNodeModel</code>. For each node, a new integer value is assigned
      * as initial value of the seed
      */
-    public DocumentHashingNodeModel2() {
+    public DocumentHashingNodeModel() {
         m_seed.setIntValue(new Random().nextInt());
     }
 

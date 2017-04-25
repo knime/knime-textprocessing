@@ -57,29 +57,29 @@ import org.knime.core.node.NodeView;
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
  */
-public class DocumentHashingNodeFactory2 extends NodeFactory<DocumentHashingNodeModel2> {
+public class DocumentHashingNodeFactory extends NodeFactory<DocumentHashingNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentHashingNodeDialog2();
+        return new DocumentHashingNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DocumentHashingNodeModel2 createNodeModel() {
-        return new DocumentHashingNodeModel2();
+    public DocumentHashingNodeModel createNodeModel() {
+        return new DocumentHashingNodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentHashingNodeModel2> createNodeView(final int index, final DocumentHashingNodeModel2 model) {
+    public NodeView<DocumentHashingNodeModel> createNodeView(final int index, final DocumentHashingNodeModel model) {
         return null;
     }
 
