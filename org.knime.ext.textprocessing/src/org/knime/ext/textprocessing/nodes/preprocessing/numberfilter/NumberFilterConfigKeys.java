@@ -51,12 +51,12 @@ package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class NumberFilterConfigKeys {
-
     /**
-     * The configuration key for the filter terms with numbers setting.
+     * The configuration key for the "filter terms containing digits" option.
      */
-    public static final String CFGKEY_FILTERTERMSCONTAININGDIGITS = "filterTermsContainingNumbers";
+    public static final String CFGKEY_FILTERTERMSCONTAININGDIGITS = "filterTermsContainingDigits";
 
 }

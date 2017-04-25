@@ -55,12 +55,12 @@ import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSetting
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
-
     /**
-     * @return Returns and creates a {@code SettingsModelBoolean} containing a setting for filtering terms that contain
-     *         numbers.
+     * @return Returns and creates a {@code SettingsModelBoolean} for filtering terms that contain numbers.
+     *
      */
     public static final SettingsModelBoolean getFilterTermsContainingDigitsModel() {
         return new SettingsModelBoolean(NumberFilterConfigKeys.CFGKEY_FILTERTERMSCONTAININGDIGITS,
@@ -75,7 +75,6 @@ public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
 
         createNewTab("Filter options");
         setSelected("Filter options");
-
         addDialogComponent(
             new DialogComponentBoolean(getFilterTermsContainingDigitsModel(), "Filter terms containing digits"));
     }

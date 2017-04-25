@@ -61,7 +61,6 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @since 3.1
  */
 public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
-
     /**
      * The default value for filtering terms containing digits.
      */
@@ -84,6 +83,7 @@ public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessin
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
+        //check for key to guarantee backwardscompatibility
         if (settings.containsKey(m_filterTermsContainingDigits.getConfigName())) {
             m_filterTermsContainingDigits.loadSettingsFrom(settings);
         }
@@ -104,6 +104,7 @@ public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessin
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
+        //check for key to guarantee backwardscompatibility
         if (settings.containsKey(m_filterTermsContainingDigits.getConfigName())) {
             m_filterTermsContainingDigits.validateSettings(settings);
         }

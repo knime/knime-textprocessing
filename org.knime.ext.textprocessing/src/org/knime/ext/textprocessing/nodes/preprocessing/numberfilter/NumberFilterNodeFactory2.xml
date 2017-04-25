@@ -7,6 +7,7 @@
         <intro>
         	Filters all terms contained in the input documents that consist of digits, including decimal separators
         	"," or "." and possible leading "+" or "-".
+        	There is also an option to filter all terms that contain at least one digit.
 		</intro>
 
         <tab name="Preprocessing options">
@@ -29,7 +30,7 @@
         </tab>
 		<tab name="Filter options">
         <option name="Filter terms containing digits">
-            If checked, the number filter also filters terms that contain digits (e.g. abc123).
+            If checked, terms that contain at least one digit (e.g. abc1) will be filtered.
         </option>
         </tab>
     </fullDescription>

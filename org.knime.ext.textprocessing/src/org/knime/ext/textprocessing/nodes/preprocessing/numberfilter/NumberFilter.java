@@ -58,9 +58,10 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, University of Konstanz
  */
 public class NumberFilter implements TermPreprocessing, StringPreprocessing {
-
+    // regex for terms that consist of numbers, decimal seperators and leading +-.
     private static final Pattern NUMBER_REGEX = Pattern.compile("^[-+]?(?:\\d*[.,]{1}\\d+|\\d)+");
 
+    // regex for terms that contain at least one digit (e.g. "abc123")
     private static final Pattern NUMBER_REGEX_2 = Pattern.compile(".*\\d+.*");
 
     private static final String REPLACEMENT = "";
@@ -68,8 +69,8 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
     private boolean m_filterTermsContainingDigits;
 
     /**
-     * @param filterTermsContainingDigits If true, the number filter also filters terms that are mixed with numbers and
-     *            different character classes.
+     * @param filterTermsContainingDigits If true, the number filter filters every term that contain at least one digit.
+     * @since 3.4
      */
     public NumberFilter(final boolean filterTermsContainingDigits) {
         m_filterTermsContainingDigits = filterTermsContainingDigits;
