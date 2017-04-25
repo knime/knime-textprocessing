@@ -61,17 +61,17 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
     /**
      * Constant for filtering mode that filters terms that represent numbers.
      */
-    public static final String FILTERINGMODE_TERM_REPRESENTS_NUMBER = "Filter terms representing numbers";
+    static final String FILTERINGMODE_TERM_REPRESENTS_NUMBER = "Filter terms representing numbers";
 
     /**
      * Constant for filtering mode that filters any terms that contain numbers.
      */
-    public static final String FILTERINGMODE_TERM_CONTAINS_NUMBER = "Filter terms containing numbers";
+    static final String FILTERINGMODE_TERM_CONTAINS_NUMBER = "Filter terms containing numbers";
 
     /**
      * Constant for default filtering mode.
      */
-    public static final String DEF_FILTERINGMODE = FILTERINGMODE_TERM_REPRESENTS_NUMBER;
+    static final String DEF_FILTERINGMODE = FILTERINGMODE_TERM_REPRESENTS_NUMBER;
 
     // regex for terms that consist of numbers, decimal seperators and leading +-.
     private static final Pattern NUMBER_REGEX = Pattern.compile("^[-+]?(?:\\d*[.,]{1}\\d+|\\d)+");
@@ -86,6 +86,15 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
     private boolean m_filterTermsContainingNumbers = false;
 
     /**
+     * Parameter-free constructor for NumberFilter. Creates an instance of NumberFilter that is using the default
+     * filtering mode.
+     * @since 3.4
+     */
+    public NumberFilter() {
+        this(DEF_FILTERINGMODE);
+    }
+
+    /**
      * @param filterMode The name of the filtering mode.
      * @since 3.4
      */
@@ -95,7 +104,9 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
     }
 
     /**
-     * Filters all strings containing numbers . or , the strings may also start with + or - and replaces them with "".
+     * Filters strings depending on the used filtering mode. The default filtering mode filters terms that consists of
+     * numbers, decimal separators and leading +- signs. The second filtering mode filters any terms that contains at
+     * least on digit.
      * The filtered String is returned.
      *
      * @param str String to filter numbers from.

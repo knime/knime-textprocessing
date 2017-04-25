@@ -74,9 +74,9 @@ public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
         super();
         ButtonGroupEnumInterface[] modes = new ButtonGroupEnumInterface[2];
         modes[0] = new FilterModeButtonGroup("Filter terms representing numbers", true,
-            "Filters terms that represent numbers", NumberFilter.FILTERINGMODE_TERM_REPRESENTS_NUMBER);
+            "Filters terms, that represent numbers", NumberFilter.FILTERINGMODE_TERM_REPRESENTS_NUMBER);
         modes[1] = new FilterModeButtonGroup("Filter terms containing numbers", false,
-            "Filters any terms that contain numbers", NumberFilter.FILTERINGMODE_TERM_CONTAINS_NUMBER);
+            "Filters any terms, that contain numbers", NumberFilter.FILTERINGMODE_TERM_CONTAINS_NUMBER);
 
         createNewTab("Filter options");
         setSelected("Filter options");
