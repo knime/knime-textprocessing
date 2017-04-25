@@ -57,6 +57,6 @@ public class NumberFilterConfigKeys {
     /**
      * The configuration key for the "filter terms containing digits" option.
      */
-    public static final String CFGKEY_FILTERTERMSCONTAININGDIGITS = "filterTermsContainingDigits";
+    public static final String CFGKEY_FILTERINGMODE = "filteringMode";
 
 }

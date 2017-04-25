@@ -48,8 +48,9 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.util.ButtonGroupEnumInterface;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
@@ -62,9 +63,8 @@ public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
      * @return Returns and creates a {@code SettingsModelBoolean} for filtering terms that contain numbers.
      *
      */
-    public static final SettingsModelBoolean getFilterTermsContainingDigitsModel() {
-        return new SettingsModelBoolean(NumberFilterConfigKeys.CFGKEY_FILTERTERMSCONTAININGDIGITS,
-            NumberFilterNodeModel2.DEF_FILTERTERMSCONTAININGDIGITS);
+    public static final SettingsModelString getFilteringModeModel() {
+        return new SettingsModelString(NumberFilterConfigKeys.CFGKEY_FILTERINGMODE, NumberFilter.DEF_FILTERINGMODE);
     }
 
     /**
@@ -72,11 +72,67 @@ public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
      */
     public NumberFilterNodeDialog() {
         super();
+        ButtonGroupEnumInterface[] modes = new ButtonGroupEnumInterface[2];
+        modes[0] = new FilterModeButtonGroup("Filter terms representing numbers", true,
+            "Filters terms that represent numbers", NumberFilter.FILTERINGMODE_TERM_REPRESENTS_NUMBER);
+        modes[1] = new FilterModeButtonGroup("Filter terms containing numbers", false,
+            "Filters any terms that contain numbers", NumberFilter.FILTERINGMODE_TERM_CONTAINS_NUMBER);
 
         createNewTab("Filter options");
         setSelected("Filter options");
         addDialogComponent(
-            new DialogComponentBoolean(getFilterTermsContainingDigitsModel(), "Filter terms containing digits"));
+            new DialogComponentButtonGroup(getFilteringModeModel(), "Filtering mode", true, modes));
+    }
+
+    private final class FilterModeButtonGroup implements ButtonGroupEnumInterface {
+
+        private String m_text;
+
+        private String m_tooltip;
+
+        private boolean m_default;
+
+        private String m_command;
+
+        private FilterModeButtonGroup(final String text, final boolean isDefault, final String toolTip,
+            final String command) {
+            m_text = text;
+            m_tooltip = toolTip;
+            m_default = isDefault;
+            m_command = command;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getActionCommand() {
+            return m_command;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getText() {
+            return m_text;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getToolTip() {
+            return m_tooltip;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDefault() {
+            return m_default;
+        }
     }
 
 }

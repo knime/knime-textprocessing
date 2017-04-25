@@ -51,7 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
@@ -61,20 +61,16 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @since 3.1
  */
 public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
-    /**
-     * The default value for filtering terms containing digits.
-     */
-    public static final boolean DEF_FILTERTERMSCONTAININGDIGITS = false;
 
-    private SettingsModelBoolean m_filterTermsContainingDigits =
-        NumberFilterNodeDialog.getFilterTermsContainingDigitsModel();
+    private SettingsModelString m_filteringMode =
+        NumberFilterNodeDialog.getFilteringModeModel();
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected TermPreprocessing createPreprocessing() throws Exception {
-        return new NumberFilter(m_filterTermsContainingDigits.getBooleanValue());
+        return new NumberFilter(m_filteringMode.getStringValue());
     }
 
     /**
@@ -84,8 +80,8 @@ public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessin
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         //check for key to guarantee backwardscompatibility
-        if (settings.containsKey(m_filterTermsContainingDigits.getConfigName())) {
-            m_filterTermsContainingDigits.loadSettingsFrom(settings);
+        if (settings.containsKey(m_filteringMode.getKey())) {
+            m_filteringMode.loadSettingsFrom(settings);
         }
     }
 
@@ -95,7 +91,7 @@ public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessin
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         super.saveSettingsTo(settings);
-        m_filterTermsContainingDigits.saveSettingsTo(settings);
+        m_filteringMode.saveSettingsTo(settings);
     }
 
     /**
@@ -105,8 +101,8 @@ public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessin
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         //check for key to guarantee backwardscompatibility
-        if (settings.containsKey(m_filterTermsContainingDigits.getConfigName())) {
-            m_filterTermsContainingDigits.validateSettings(settings);
+        if (settings.containsKey(m_filteringMode.getKey())) {
+            m_filteringMode.validateSettings(settings);
         }
     }
 }

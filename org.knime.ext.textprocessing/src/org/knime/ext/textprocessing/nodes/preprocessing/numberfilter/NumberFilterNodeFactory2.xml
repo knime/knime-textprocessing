@@ -29,7 +29,10 @@
         </option>
         </tab>
 		<tab name="Filter options">
-        <option name="Filter terms containing digits">
+        <option name="Filter terms representing numbers">
+            If checked, terms that consist of numbers, decimal seperators and leading +- characters will be filtered.
+        </option>
+        <option name="Filter terms containing numbers">
             If checked, terms that contain at least one digit (e.g. abc1) will be filtered.
         </option>
         </tab>

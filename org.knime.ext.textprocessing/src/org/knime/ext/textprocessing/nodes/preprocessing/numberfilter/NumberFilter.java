@@ -58,6 +58,21 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, University of Konstanz
  */
 public class NumberFilter implements TermPreprocessing, StringPreprocessing {
+    /**
+     * Constant for filtering mode that filters terms that represent numbers.
+     */
+    public static final String FILTERINGMODE_TERM_REPRESENTS_NUMBER = "Filter terms representing numbers";
+
+    /**
+     * Constant for filtering mode that filters any terms that contain numbers.
+     */
+    public static final String FILTERINGMODE_TERM_CONTAINS_NUMBER = "Filter terms containing numbers";
+
+    /**
+     * Constant for default filtering mode.
+     */
+    public static final String DEF_FILTERINGMODE = FILTERINGMODE_TERM_REPRESENTS_NUMBER;
+
     // regex for terms that consist of numbers, decimal seperators and leading +-.
     private static final Pattern NUMBER_REGEX = Pattern.compile("^[-+]?(?:\\d*[.,]{1}\\d+|\\d)+");
 
@@ -66,14 +81,17 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
 
     private static final String REPLACEMENT = "";
 
-    private boolean m_filterTermsContainingDigits;
+    private String m_filteringMode = DEF_FILTERINGMODE;
+
+    private boolean m_filterTermsContainingNumbers = false;
 
     /**
-     * @param filterTermsContainingDigits If true, the number filter filters every term that contain at least one digit.
+     * @param filterMode The name of the filtering mode.
      * @since 3.4
      */
-    public NumberFilter(final boolean filterTermsContainingDigits) {
-        m_filterTermsContainingDigits = filterTermsContainingDigits;
+    public NumberFilter(final String filterMode) {
+        m_filteringMode = filterMode;
+        checkFilteringMode();
     }
 
     /**
@@ -84,7 +102,7 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
      * @return Filtered String.
      */
     private String numberFilter(final String str) {
-        if (m_filterTermsContainingDigits) {
+        if (m_filterTermsContainingNumbers) {
             return NUMBER_REGEX_2.matcher(str).replaceAll(REPLACEMENT);
         } else {
             return NUMBER_REGEX.matcher(str).replaceAll(REPLACEMENT);
@@ -109,5 +127,13 @@ public class NumberFilter implements TermPreprocessing, StringPreprocessing {
     @Override
     public String preprocessString(final String str) {
         return numberFilter(str);
+    }
+
+    private void checkFilteringMode() {
+        if (m_filteringMode.equals(FILTERINGMODE_TERM_CONTAINS_NUMBER)) {
+            m_filterTermsContainingNumbers = true;
+        } else {
+            m_filterTermsContainingNumbers = false;
+        }
     }
 }
