@@ -208,13 +208,13 @@
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
@@ -596,6 +596,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeFactory">
       </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingNodeFactory2">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -754,6 +759,14 @@
             objectSerializer="org.knime.ext.textprocessing.data.StanfordNERModelPortObject$Serializer"
             specClass="org.knime.ext.textprocessing.data.NERModelPortObjectSpec"
             specSerializer="org.knime.ext.textprocessing.data.NERModelPortObjectSpec$Serializer">
+      </portType>
+      <portType
+            hidden="false"
+            name="VectorHashingPortObject"
+            objectClass="org.knime.ext.textprocessing.data.VectorHashingPortObject"
+            objectSerializer="org.knime.ext.textprocessing.data.VectorHashingPortObject$Serializer"
+            specClass="org.knime.ext.textprocessing.VectorHashingPortObjectSpec"
+            specSerializer="org.knime.ext.textprocessing.VectorHashingPortObjectSpec$Serializer">
       </portType>
    </extension>
    <extension

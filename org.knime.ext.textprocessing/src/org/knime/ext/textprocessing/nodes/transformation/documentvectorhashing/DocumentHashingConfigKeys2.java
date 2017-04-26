@@ -87,4 +87,10 @@ class DocumentHashingConfigKeys2 {
      */
     public static final String CFGKEY_ASCOLLECTION = "asCollectionCell";
 
+    /**
+     * The configuration key of the flag to specify whether to use settings from input port or from dialog.
+     * @since 3.4
+     */
+    public static final String CFGKEY_USEINPORTSPECS = "useInportModelSpecs";
+
 }

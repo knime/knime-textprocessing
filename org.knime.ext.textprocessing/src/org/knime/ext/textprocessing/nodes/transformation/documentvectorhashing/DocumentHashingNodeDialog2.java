@@ -79,6 +79,15 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
+     * @return the value whether to use settings from inport model or from dialog.
+     * @since 3.4
+     */
+    static SettingsModelBoolean getUseSpecsFromInputPortModel() {
+        return new SettingsModelBoolean(DocumentHashingConfigKeys2.CFGKEY_USEINPORTSPECS,
+            DocumentHashingNodeModel2.DEFAULT_USEINPORTSPECS);
+    }
+
+    /**
      * @return the number of buckets for the hashing function
      */
     static SettingsModelIntegerBounded getDimModel() {
@@ -114,6 +123,14 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
             DocumentHashingNodeModel2.DEFAULT_ASCOLLECTION);
     }
 
+    private SettingsModelBoolean m_useSpecsFromInportModel = getUseSpecsFromInputPortModel();
+
+    private SettingsModelIntegerBounded m_dimModel = getDimModel();
+
+    private SettingsModelInteger m_seedModel = getSeedModel();
+
+    private SettingsModelString m_hashMethod = getHashingMethod();
+
     /**
      * Creates a new instance of <code>DocumentHashingNodeDialog2</code>.
      */
@@ -125,13 +142,15 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
         closeCurrentGroup();
 
         createNewGroup("Hashing function setting");
-        addDialogComponent(new DialogComponentNumber(getDimModel(), "Dimension: ", 100));
+        addDialogComponent(new DialogComponentBoolean(m_useSpecsFromInportModel, "Use settings from inport model"));
 
-        addDialogComponent(new DialogComponentNumberEdit(getSeedModel(), "Seed: "));
+        addDialogComponent(new DialogComponentNumber(m_dimModel, "Dimension: ", 100));
+
+        addDialogComponent(new DialogComponentNumberEdit(m_seedModel, "Seed: "));
 
         List<String> namesAsList = new ArrayList<String>(HashingFunctionFactory.getInstance().getHashNames());
 
-        addDialogComponent(new DialogComponentStringSelection(getHashingMethod(), "Hashing function: ", namesAsList));
+        addDialogComponent(new DialogComponentStringSelection(m_hashMethod, "Hashing function: ", namesAsList));
 
         addDialogComponent(new DialogComponentStringSelection(getVectorValueModel(), "Vector type: ", "Binary",
             "TF-Relative", "TF-Absolute"));
@@ -140,6 +159,14 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
         createNewGroup("Output column setting");
         addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
         closeCurrentGroup();
+
+        checkInportOption();
+    }
+
+    private void checkInportOption() {
+        m_dimModel.setEnabled(!m_useSpecsFromInportModel.getBooleanValue());
+        m_seedModel.setEnabled(!m_useSpecsFromInportModel.getBooleanValue());
+        m_hashMethod.setEnabled(!m_useSpecsFromInportModel.getBooleanValue());
     }
 
 }

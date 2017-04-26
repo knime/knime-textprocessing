@@ -53,6 +53,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -63,6 +66,8 @@ import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -70,6 +75,10 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -77,6 +86,8 @@ import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.VectorHashingPortObject;
+import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
@@ -105,28 +116,82 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
      */
     protected static final int DEFAULT_SEED = new Random().nextInt();
 
+    /**
+     * Default value whether to use settings from input port model or from dialog.
+     */
+    public static final boolean DEFAULT_USEINPORTSPECS = false;
+
     private int m_documentColIndex = -1;
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
-    private final SettingsModelIntegerBounded m_dim = DocumentHashingNodeDialog2.getDimModel();
+    private final SettingsModelIntegerBounded m_dimModel = DocumentHashingNodeDialog2.getDimModel();
 
     private final SettingsModelString m_docCol = DocumentHashingNodeDialog2.getDocumentColModel();
 
-    private SettingsModelInteger m_seed = DocumentHashingNodeDialog2.getSeedModel();
+    private SettingsModelInteger m_seedModel = DocumentHashingNodeDialog2.getSeedModel();
 
     private final SettingsModelString m_vectVal = DocumentHashingNodeDialog2.getVectorValueModel();
 
-    private final SettingsModelString m_hashFunc = DocumentHashingNodeDialog2.getHashingMethod();
+    private final SettingsModelString m_hashFuncModel = DocumentHashingNodeDialog2.getHashingMethod();
 
     private final SettingsModelBoolean m_asCol = DocumentHashingNodeDialog2.getAsCollectionModel();
+
+    private final SettingsModelBoolean m_useSpecsFromInportModel =
+        DocumentHashingNodeDialog2.getUseSpecsFromInputPortModel();
+
+    private boolean m_inportModelExists = false;
+
+    private int m_dim = m_dimModel.getIntValue();
+
+    private int m_seed = m_seedModel.getIntValue();
+
+    private String m_hashFunc = m_hashFuncModel.getStringValue();
 
     /**
      * Creates a new instance of <code>DocumentHashingNodeModel2</code>. For each node, a new integer value is assigned
      * as initial value of the seed
      */
     public DocumentHashingNodeModel2() {
-        m_seed.setIntValue(new Random().nextInt());
+        super(new PortType[]{BufferedDataTable.TYPE,
+            PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, true)},
+            new PortType[]{BufferedDataTable.TYPE,
+                PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false)},
+            1, 1);
+        m_seedModel.setIntValue(new Random().nextInt());
+        m_useSpecsFromInportModel.addChangeListener(new ChangeStateListener());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        BufferedDataTable in = (BufferedDataTable)inObjects[0];
+        ColumnRearranger r = createColumnRearranger(in.getDataTableSpec());
+        BufferedDataTable table = exec.createColumnRearrangeTable(in, r, exec);
+        return new PortObject[]{table, new VectorHashingPortObject(m_dim, m_seed, m_hashFunc)};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpec in = (DataTableSpec)inSpecs[0];
+        VectorHashingPortObjectSpec modelSpec = (VectorHashingPortObjectSpec)inSpecs[1];
+        if (modelSpec != null) {
+            m_inportModelExists = true;
+            if (m_useSpecsFromInportModel.getBooleanValue()) {
+                m_seed = modelSpec.getSeed();
+                m_dim = modelSpec.getDimension();
+                m_hashFunc = modelSpec.getHashFunc();
+            }
+        }
+        checkState();
+        ColumnRearranger r = createColumnRearranger(in);
+        DataTableSpec out = r.createSpec();
+        return new PortObjectSpec[]{out, new VectorHashingPortObjectSpec(m_dim, m_seed, m_hashFunc)};
     }
 
     /**
@@ -134,12 +199,13 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        m_dim.saveSettingsTo(settings);
+        m_dimModel.saveSettingsTo(settings);
         m_docCol.saveSettingsTo(settings);
-        m_seed.saveSettingsTo(settings);
+        m_seedModel.saveSettingsTo(settings);
         m_vectVal.saveSettingsTo(settings);
-        m_hashFunc.saveSettingsTo(settings);
+        m_hashFuncModel.saveSettingsTo(settings);
         m_asCol.saveSettingsTo(settings);
+        m_useSpecsFromInportModel.saveSettingsTo(settings);
     }
 
     /**
@@ -147,12 +213,15 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_dim.validateSettings(settings);
+        m_dimModel.validateSettings(settings);
         m_docCol.validateSettings(settings);
-        m_seed.validateSettings(settings);
+        m_seedModel.validateSettings(settings);
         m_vectVal.validateSettings(settings);
-        m_hashFunc.validateSettings(settings);
+        m_hashFuncModel.validateSettings(settings);
         m_asCol.validateSettings(settings);
+        if(settings.containsKey(m_useSpecsFromInportModel.getConfigName())) {
+            m_useSpecsFromInportModel.validateSettings(settings);
+        }
     }
 
     /**
@@ -160,12 +229,15 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_dim.loadSettingsFrom(settings);
+        m_dimModel.loadSettingsFrom(settings);
         m_docCol.loadSettingsFrom(settings);
-        m_seed.loadSettingsFrom(settings);
+        m_seedModel.loadSettingsFrom(settings);
         m_vectVal.loadSettingsFrom(settings);
-        m_hashFunc.loadSettingsFrom(settings);
+        m_hashFuncModel.loadSettingsFrom(settings);
         m_asCol.loadSettingsFrom(settings);
+        if(settings.containsKey(m_useSpecsFromInportModel.getConfigName())) {
+            m_useSpecsFromInportModel.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -192,7 +264,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
             @Override
             public DataCell[] getCells(final DataRow row) {
                 final DocumentValue doc = (DocumentValue)row.getCell(m_idx);
-                return createVector(m_dim.getIntValue(), doc.getDocument());
+                return createVector(m_dim, doc.getDocument());
             }
 
         });
@@ -203,7 +275,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
     private DataCell[] createVector(final int dim, final Document doc) {
         Double totalTerms = 0.0;
         final HashingFunction hashFunction =
-            HashingFunctionFactory.getInstance().getHashFunction(m_hashFunc.getStringValue());
+            HashingFunctionFactory.getInstance().getHashFunction(m_hashFunc);
 
         List<Integer> output = new ArrayList<Integer>(Collections.nCopies(dim, 0));
         List<Integer> occupiedIndexes = new ArrayList<Integer>();
@@ -214,7 +286,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
                 for (final Sentence sentence : sentences) {
                     final List<Term> terms = sentence.getTerms();
                     for (final Term term : terms) {
-                        int idx = hashFunction.hash(term.getText(), m_seed.getIntValue()) % dim;
+                        int idx = hashFunction.hash(term.getText(), m_seed) % dim;
 
                         if (idx < 0) {
                             idx += dim;
@@ -296,7 +368,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
 
     private DataColumnSpec[] createSpecAsColumns() {
         DataColumnSpecCreator creator = new DataColumnSpecCreator("Col1", DoubleCell.TYPE);
-        final int dim = m_dim.getIntValue();
+        final int dim = m_dim;
         final DataColumnSpec[] specs = new DataColumnSpec[dim];
 
         for (int i = 0; i < dim; i++) {
@@ -308,7 +380,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
     }
 
     private DataColumnSpec[] createSpecAsCollection() {
-        final int dim = m_dim.getIntValue();
+        final int dim = m_dim;
         DataColumnSpec[] columnSpecs;
         columnSpecs = new DataColumnSpec[1];
 
@@ -324,6 +396,26 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         return columnSpecs;
+    }
+
+    private void checkState() {
+        if (m_inportModelExists && m_useSpecsFromInportModel.getBooleanValue()) {
+            m_hashFuncModel.setEnabled(m_useSpecsFromInportModel.getBooleanValue());
+            m_seedModel.setEnabled(m_useSpecsFromInportModel.getBooleanValue());
+            m_dimModel.setEnabled(m_useSpecsFromInportModel.getBooleanValue());
+        }
+    }
+
+    private class ChangeStateListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            checkState();
+        }
+
     }
 
 }
