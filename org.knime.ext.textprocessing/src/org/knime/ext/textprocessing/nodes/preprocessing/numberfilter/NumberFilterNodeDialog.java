@@ -54,24 +54,26 @@ import org.knime.core.node.util.ButtonGroupEnumInterface;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
+ * The {@code NodeDialog} for the NumberFilter node. It extends the {@link PreprocessingNodeSettingsPane2} to keep
+ * general preprocessing options and provides the possibility to choose between to different kinds of filtering.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
-public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
+class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
     /**
-     * @return Returns and creates a {@code SettingsModelBoolean} for filtering terms that contain numbers.
+     * Returns and creates a {@code SettingsModelBoolean} for filtering terms that contain numbers.
      *
+     * @return a settings model
      */
-    public static final SettingsModelString getFilteringModeModel() {
+    static final SettingsModelString getFilteringModeModel() {
         return new SettingsModelString(NumberFilterConfigKeys.CFGKEY_FILTERINGMODE, NumberFilter.DEF_FILTERINGMODE);
     }
 
     /**
-     * Creates a new instance of {@link NumberFilterNodeDialog}.
+     * Creates a new instance of the dialog.
      */
     public NumberFilterNodeDialog() {
-        super();
         ButtonGroupEnumInterface[] modes = new ButtonGroupEnumInterface[2];
         modes[0] = new FilterModeButtonGroup("Filter terms representing numbers", true,
             "Filters terms, that represent numbers", NumberFilter.FILTERINGMODE_TERM_REPRESENTS_NUMBER);
@@ -80,12 +82,10 @@ public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
 
         createNewTab("Filter options");
         setSelected("Filter options");
-        addDialogComponent(
-            new DialogComponentButtonGroup(getFilteringModeModel(), "Filtering mode", true, modes));
+        addDialogComponent(new DialogComponentButtonGroup(getFilteringModeModel(), "Filtering mode", true, modes));
     }
 
     private final class FilterModeButtonGroup implements ButtonGroupEnumInterface {
-
         private String m_text;
 
         private String m_tooltip;
@@ -134,5 +134,4 @@ public class NumberFilterNodeDialog extends PreprocessingNodeSettingsPane2 {
             return m_default;
         }
     }
-
 }

@@ -49,14 +49,14 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.numberfilter;
 
 /**
+ * The configuration keys used to save settings for the NumberFilter node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
 class NumberFilterConfigKeys {
     /**
-     * The configuration key for the "filter terms containing digits" option.
+     * The configuration key for the "filtering mode" options.
      */
     static final String CFGKEY_FILTERINGMODE = "filteringMode";
-
 }

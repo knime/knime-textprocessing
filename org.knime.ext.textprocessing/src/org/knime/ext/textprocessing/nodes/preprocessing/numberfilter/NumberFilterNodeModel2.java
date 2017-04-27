@@ -79,7 +79,7 @@ public final class NumberFilterNodeModel2 extends StreamableFunctionPreprocessin
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
-        //check for key to guarantee backwardscompatibility
+        //check for key to guarantee backwards compatibility
         if (settings.containsKey(m_filteringMode.getKey())) {
             m_filteringMode.loadSettingsFrom(settings);
         }
