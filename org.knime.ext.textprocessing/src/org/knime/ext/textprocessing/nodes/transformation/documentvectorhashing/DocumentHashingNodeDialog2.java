@@ -51,6 +51,11 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -61,6 +66,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
@@ -75,7 +81,7 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString getDocumentColModel() {
         return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_DOC_COL,
-            DocumentHashingNodeModel.DEFAULT_DOCUMENT_COLNAME);
+            DocumentHashingNodeModel2.DEFAULT_DOCUMENT_COLNAME);
     }
 
     /**
@@ -131,6 +137,12 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_hashMethod = getHashingMethod();
 
+    private SettingsModelString m_vectValModel = getVectorValueModel();
+
+    private boolean m_inportModelExists;
+
+    private boolean m_modelAlreadyRecognized;
+
     /**
      * Creates a new instance of <code>DocumentHashingNodeDialog2</code>.
      */
@@ -140,6 +152,8 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(
             new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column: ", 0, DocumentValue.class));
         closeCurrentGroup();
+
+        m_useSpecsFromInportModel.addChangeListener(new ChangeStateListener());
 
         createNewGroup("Hashing function setting");
         addDialogComponent(new DialogComponentBoolean(m_useSpecsFromInportModel, "Use settings from inport model"));
@@ -152,7 +166,7 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentStringSelection(m_hashMethod, "Hashing function: ", namesAsList));
 
-        addDialogComponent(new DialogComponentStringSelection(getVectorValueModel(), "Vector type: ", "Binary",
+        addDialogComponent(new DialogComponentStringSelection(m_vectValModel, "Vector type: ", "Binary",
             "TF-Relative", "TF-Absolute"));
         closeCurrentGroup();
 
@@ -160,13 +174,68 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
         closeCurrentGroup();
 
-        checkInportOption();
+        checkSettings();
     }
 
-    private void checkInportOption() {
-        m_dimModel.setEnabled(!m_useSpecsFromInportModel.getBooleanValue());
-        m_seedModel.setEnabled(!m_useSpecsFromInportModel.getBooleanValue());
-        m_hashMethod.setEnabled(!m_useSpecsFromInportModel.getBooleanValue());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+        throws NotConfigurableException {
+        super.loadAdditionalSettingsFrom(settings, specs);
+
+        if (specs[1] != null) {
+            if (m_inportModelExists == false) {
+                m_inportModelExists = true;
+                m_modelAlreadyRecognized = false;
+            } else {
+                m_modelAlreadyRecognized = true;
+            }
+        } else {
+            m_inportModelExists = false;
+            m_modelAlreadyRecognized = false;
+        }
+
+        checkInputModel();
+    }
+
+    private void checkInputModel(){
+        if (!m_inportModelExists) {
+            m_useSpecsFromInportModel.setBooleanValue(false);
+            m_useSpecsFromInportModel.setEnabled(false);
+        } else {
+            m_useSpecsFromInportModel.setEnabled(true);
+            if (!m_modelAlreadyRecognized) {
+                m_useSpecsFromInportModel.setBooleanValue(true);
+            }
+        }
+    }
+
+    private void checkSettings() {
+        if (m_useSpecsFromInportModel.isEnabled() && m_useSpecsFromInportModel.getBooleanValue()) {
+            m_seedModel.setEnabled(false);
+            m_dimModel.setEnabled(false);
+            m_hashMethod.setEnabled(false);
+            m_vectValModel.setEnabled(false);
+        } else if (!m_useSpecsFromInportModel.isEnabled() || !m_useSpecsFromInportModel.getBooleanValue()) {
+            m_seedModel.setEnabled(true);
+            m_dimModel.setEnabled(true);
+            m_hashMethod.setEnabled(true);
+            m_vectValModel.setEnabled(true);
+        }
+    }
+
+    private class ChangeStateListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            checkSettings();
+        }
+
     }
 
 }

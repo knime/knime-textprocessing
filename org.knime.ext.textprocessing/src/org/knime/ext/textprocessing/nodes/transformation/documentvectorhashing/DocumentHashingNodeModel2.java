@@ -131,7 +131,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
 
     private SettingsModelInteger m_seedModel = DocumentHashingNodeDialog2.getSeedModel();
 
-    private final SettingsModelString m_vectVal = DocumentHashingNodeDialog2.getVectorValueModel();
+    private final SettingsModelString m_vectValModel = DocumentHashingNodeDialog2.getVectorValueModel();
 
     private final SettingsModelString m_hashFuncModel = DocumentHashingNodeDialog2.getHashingMethod();
 
@@ -140,13 +140,20 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
     private final SettingsModelBoolean m_useSpecsFromInportModel =
         DocumentHashingNodeDialog2.getUseSpecsFromInputPortModel();
 
-    private boolean m_inportModelExists = false;
-
     private int m_dim = m_dimModel.getIntValue();
 
     private int m_seed = m_seedModel.getIntValue();
 
     private String m_hashFunc = m_hashFuncModel.getStringValue();
+
+    private String m_vectVal = m_vectValModel.getStringValue();
+
+    VectorHashingPortObjectSpec m_modelSpec;
+
+    private boolean m_inportModelExists;
+
+    private boolean m_modelAlreadyRecognized;
+
 
     /**
      * Creates a new instance of <code>DocumentHashingNodeModel2</code>. For each node, a new integer value is assigned
@@ -157,7 +164,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
             PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, true)},
             new PortType[]{BufferedDataTable.TYPE,
                 PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false)},
-            1, 1);
+            0, 0);
         m_seedModel.setIntValue(new Random().nextInt());
         m_useSpecsFromInportModel.addChangeListener(new ChangeStateListener());
     }
@@ -170,7 +177,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         BufferedDataTable in = (BufferedDataTable)inObjects[0];
         ColumnRearranger r = createColumnRearranger(in.getDataTableSpec());
         BufferedDataTable table = exec.createColumnRearrangeTable(in, r, exec);
-        return new PortObject[]{table, new VectorHashingPortObject(m_dim, m_seed, m_hashFunc)};
+        return new PortObject[]{table, new VectorHashingPortObject(m_dim, m_seed, m_hashFunc, m_vectVal)};
     }
 
     /**
@@ -179,19 +186,23 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = (DataTableSpec)inSpecs[0];
-        VectorHashingPortObjectSpec modelSpec = (VectorHashingPortObjectSpec)inSpecs[1];
-        if (modelSpec != null) {
-            m_inportModelExists = true;
-            if (m_useSpecsFromInportModel.getBooleanValue()) {
-                m_seed = modelSpec.getSeed();
-                m_dim = modelSpec.getDimension();
-                m_hashFunc = modelSpec.getHashFunc();
+        if (inSpecs[1] != null) {
+            if (!m_inportModelExists) {
+                m_inportModelExists = true;
+                m_modelAlreadyRecognized = false;
+            } else {
+                m_modelAlreadyRecognized = true;
             }
+            m_modelSpec = (VectorHashingPortObjectSpec)inSpecs[1];
+        } else {
+            m_inportModelExists = false;
         }
-        checkState();
+        checkInputModel();
+        checkSettings();
+        setValues();
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
-        return new PortObjectSpec[]{out, new VectorHashingPortObjectSpec(m_dim, m_seed, m_hashFunc)};
+        return new PortObjectSpec[]{out, new VectorHashingPortObjectSpec(m_dim, m_seed, m_hashFunc, m_vectVal)};
     }
 
     /**
@@ -202,7 +213,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         m_dimModel.saveSettingsTo(settings);
         m_docCol.saveSettingsTo(settings);
         m_seedModel.saveSettingsTo(settings);
-        m_vectVal.saveSettingsTo(settings);
+        m_vectValModel.saveSettingsTo(settings);
         m_hashFuncModel.saveSettingsTo(settings);
         m_asCol.saveSettingsTo(settings);
         m_useSpecsFromInportModel.saveSettingsTo(settings);
@@ -216,12 +227,13 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         m_dimModel.validateSettings(settings);
         m_docCol.validateSettings(settings);
         m_seedModel.validateSettings(settings);
-        m_vectVal.validateSettings(settings);
+        m_vectValModel.validateSettings(settings);
         m_hashFuncModel.validateSettings(settings);
         m_asCol.validateSettings(settings);
         if(settings.containsKey(m_useSpecsFromInportModel.getConfigName())) {
             m_useSpecsFromInportModel.validateSettings(settings);
         }
+        checkInputModel();
     }
 
     /**
@@ -232,7 +244,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         m_dimModel.loadSettingsFrom(settings);
         m_docCol.loadSettingsFrom(settings);
         m_seedModel.loadSettingsFrom(settings);
-        m_vectVal.loadSettingsFrom(settings);
+        m_vectValModel.loadSettingsFrom(settings);
         m_hashFuncModel.loadSettingsFrom(settings);
         m_asCol.loadSettingsFrom(settings);
         if(settings.containsKey(m_useSpecsFromInportModel.getConfigName())) {
@@ -310,17 +322,17 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
             List<DoubleCell> featureVector = initFeatureVector(dim);
             cells = new DataCell[1];
 
-            if (m_vectVal.getStringValue().equals("Binary")) {
+            if (m_vectVal.equals("Binary")) {
                 for (int i = 0, length = featureVector.size(); i < length; i++) {
                     featureVector.set(i, output.get(i) > 0 ? one : zero);
                 }
-            } else if (m_vectVal.getStringValue().equals("TF-Absolute")) {
+            } else if (m_vectVal.equals("TF-Absolute")) {
                 for (int i = 0, length = featureVector.size(); i < length; i++) {
                     if (occupiedIndexes.contains(i)) {
                         featureVector.add(i, new DoubleCell(output.get(i)));
                     }
                 }
-            } else if (m_vectVal.getStringValue().equals("TF-Relative")) {
+            } else if (m_vectVal.equals("TF-Relative")) {
                 for (int i = 0, length = featureVector.size(); i < length; i++) {
                     if (occupiedIndexes.contains(i)) {
                         featureVector.add(i, new DoubleCell(output.get(i) / totalTerms));
@@ -333,11 +345,11 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         } else {
             cells = new DataCell[dim];
 
-            if (m_vectVal.getStringValue().equals("Binary")) {
+            if (m_vectVal.equals("Binary")) {
                 for (int i = 0, length = cells.length; i < length; i++) {
                     cells[i] = output.get(i) > 0 ? one : zero;
                 }
-            } else if (m_vectVal.getStringValue().equals("TF-Absolute")) {
+            } else if (m_vectVal.equals("TF-Absolute")) {
                 for (int i = 0, length = cells.length; i < length; i++) {
                     if (occupiedIndexes.contains(i)) {
                         cells[i] = new DoubleCell(output.get(i));
@@ -345,7 +357,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
                         cells[i] = DEFAULT_CELL;
                     }
                 }
-            } else if (m_vectVal.getStringValue().equals("TF-Relative")) {
+            } else if (m_vectVal.equals("TF-Relative")) {
                 for (int i = 0, length = cells.length; i < length; i++) {
                     if (occupiedIndexes.contains(i)) {
                         cells[i] = new DoubleCell(output.get(i) / totalTerms);
@@ -398,11 +410,50 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
         return columnSpecs;
     }
 
-    private void checkState() {
-        if (m_inportModelExists && m_useSpecsFromInportModel.getBooleanValue()) {
-            m_hashFuncModel.setEnabled(m_useSpecsFromInportModel.getBooleanValue());
-            m_seedModel.setEnabled(m_useSpecsFromInportModel.getBooleanValue());
-            m_dimModel.setEnabled(m_useSpecsFromInportModel.getBooleanValue());
+    private void setValues() {
+        if (m_useSpecsFromInportModel.isEnabled() && m_useSpecsFromInportModel.getBooleanValue()) {
+            m_seed = m_modelSpec.getSeed();
+            m_dim = m_modelSpec.getDimension();
+            m_hashFunc = m_modelSpec.getHashFunc();
+            m_vectVal = m_modelSpec.getVectVal();
+        } else if (!m_useSpecsFromInportModel.isEnabled() || !m_useSpecsFromInportModel.getBooleanValue()) {
+            m_seed = m_seedModel.getIntValue();
+            m_dim = m_dimModel.getIntValue();
+            m_hashFunc = m_hashFuncModel.getStringValue();
+            m_vectVal = m_vectValModel.getStringValue();
+        }
+    }
+
+    private void checkInputModel() throws InvalidSettingsException {
+        // sanity check if copied node uses input model but the input model is not connected.
+        if (!m_inportModelExists && m_useSpecsFromInportModel.getBooleanValue()) {
+            m_useSpecsFromInportModel.setBooleanValue(false);
+            throw new InvalidSettingsException(
+                "No input model port connected. Can not use model from input model port!");
+        }
+
+        if (!m_inportModelExists) {
+            m_useSpecsFromInportModel.setBooleanValue(false);
+            m_useSpecsFromInportModel.setEnabled(false);
+        } else {
+            m_useSpecsFromInportModel.setEnabled(true);
+            if (!m_modelAlreadyRecognized) {
+                m_useSpecsFromInportModel.setBooleanValue(true);
+            }
+        }
+    }
+
+    private void checkSettings() {
+        if (m_useSpecsFromInportModel.isEnabled() && m_useSpecsFromInportModel.getBooleanValue()) {
+            m_seedModel.setEnabled(false);
+            m_dimModel.setEnabled(false);
+            m_hashFuncModel.setEnabled(false);
+            m_vectValModel.setEnabled(false);
+        } else if (!m_useSpecsFromInportModel.isEnabled() || !m_useSpecsFromInportModel.getBooleanValue()) {
+            m_seedModel.setEnabled(true);
+            m_dimModel.setEnabled(true);
+            m_hashFuncModel.setEnabled(true);
+            m_vectValModel.setEnabled(true);
         }
     }
 
@@ -413,7 +464,7 @@ public class DocumentHashingNodeModel2 extends SimpleStreamableFunctionNodeModel
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            checkState();
+            checkSettings();
         }
 
     }

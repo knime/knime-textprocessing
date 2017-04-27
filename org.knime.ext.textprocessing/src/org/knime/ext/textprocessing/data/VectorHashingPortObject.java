@@ -76,6 +76,8 @@ public class VectorHashingPortObject extends AbstractSimplePortObject {
 
     private final String m_hashFunc;
 
+    private final String m_vectVal;
+
     private final PortObjectSpec m_spec;
 
     /**
@@ -95,6 +97,7 @@ public class VectorHashingPortObject extends AbstractSimplePortObject {
             config.addInt("dimension", portObject.getDimension());
             config.addInt("seed", portObject.getSeed());
             config.addString("hashFunc", portObject.getHashFunc());
+            config.addString("vectorVal", portObject.getVectVal());
             config.saveToXML(new NonClosableOutputStream.Zip(out));
         }
 
@@ -109,15 +112,17 @@ public class VectorHashingPortObject extends AbstractSimplePortObject {
             int dim;
             int seed;
             String hashFunc;
+            String vectVal;
 
             try {
                 dim = config.getInt("dimension");
                 seed = config.getInt("seed");
                 hashFunc = config.getString("hashFunc");
+                vectVal = config.getString("vectorVal");
             } catch (InvalidSettingsException e) {
                 throw new IOException("Failed to deserialize port object", e);
             }
-            return new VectorHashingPortObject(dim, seed, hashFunc);
+            return new VectorHashingPortObject(dim, seed, hashFunc, vectVal);
         }
     }
 
@@ -125,12 +130,14 @@ public class VectorHashingPortObject extends AbstractSimplePortObject {
      * @param dim
      * @param seed
      * @param hashFunc
+     * @param vectVal
      */
-    public VectorHashingPortObject(final int dim, final int seed, final String hashFunc) {
+    public VectorHashingPortObject(final int dim, final int seed, final String hashFunc, final String vectVal) {
         m_dim = dim;
         m_seed = seed;
         m_hashFunc = hashFunc;
-        m_spec = new VectorHashingPortObjectSpec(dim, seed, hashFunc);
+        m_vectVal = vectVal;
+        m_spec = new VectorHashingPortObjectSpec(dim, seed, hashFunc, vectVal);
     }
 
     /**
@@ -168,6 +175,13 @@ public class VectorHashingPortObject extends AbstractSimplePortObject {
      */
     public String getHashFunc() {
         return m_hashFunc;
+    }
+
+    /**
+     * @return Returns the value type that fills the vector.
+     */
+    public String getVectVal() {
+        return m_vectVal;
     }
 
     /**

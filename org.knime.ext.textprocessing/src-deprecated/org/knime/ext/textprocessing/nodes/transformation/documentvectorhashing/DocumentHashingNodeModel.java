@@ -87,7 +87,9 @@ import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
  *
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
+ * @deprecated
  */
+@Deprecated
 public class DocumentHashingNodeModel extends SimpleStreamableFunctionNodeModel {
 
     /**

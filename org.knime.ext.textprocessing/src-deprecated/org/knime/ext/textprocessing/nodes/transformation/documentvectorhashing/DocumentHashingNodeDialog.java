@@ -67,7 +67,9 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
+ * @deprecated
  */
+@Deprecated
 public class DocumentHashingNodeDialog extends DefaultNodeSettingsPane {
 
     /**
