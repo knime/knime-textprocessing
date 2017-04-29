@@ -69,9 +69,6 @@
 		<inPort name="Documents input table" index="0">The input table
 			containing the documents.
 		</inPort>
-		<inPort name="Model input" index="1">The input model
-			containing document vector specifications.
-		</inPort>
 		<outPort name="Documents output table" index="0">An output table
 			containing the input documents with the corresponding document
 			vectors.

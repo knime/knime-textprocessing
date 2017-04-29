@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcVectors.png" type="Predictor">
+	<name>Document vector hashing applier</name>
+	<shortDescription>Creates a document vector for each document using a
+		hash function.
+	</shortDescription>
+	<fullDescription>
+		<intro>
+			This node creates a document vector for each document
+			representing it in the terms space. The values of the feature vectors
+			will be boolean values or as values of either the
+			relative frequency or the absolute frequency of the terms.
+			This node needs a model input provided by the Document vector hashing node. 
+		</intro>
+		<option name="Document column">
+			The column containing the documents to use.
+		</option>
+		<option name="As collection cell">
+			If checked all vector entries will be stored in a
+			collection cell
+			consisting of double cells. If not checked all double
+			cells will be stored in corresponding columns. The advantage
+			of the
+			column representation is that most of the regular algorithms
+			in KNIME
+			can be applied. The disadvantage is (which is on the
+			other hand the
+			advantage of the collection representation) that
+			processing of
+			subsequent nodes will be slowed down, due to the many
+			columns that
+			will be created (dependent on the input data of
+			course).
+		</option>
+	</fullDescription>
+
+	<ports>
+		<inPort name="Model input" index="0">The model
+			containing the settings to create the document vector space.
+		</inPort>
+		<inPort name="Documents input table" index="1">The input table
+			containing the documents.
+		</inPort>
+		<outPort name="Documents output table" index="0">An output table
+			containing the input documents with the corresponding document
+			vectors.
+		</outPort>
+	</ports>
+</knimeNode>

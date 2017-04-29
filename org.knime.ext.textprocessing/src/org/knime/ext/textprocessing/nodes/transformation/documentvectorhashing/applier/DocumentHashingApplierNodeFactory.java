@@ -44,53 +44,44 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   10.08.2016 (andisadewi): created
+ *   28.04.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
+package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier;
+
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  *
- * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  */
-class DocumentHashingConfigKeys2 {
+public class DocumentHashingApplierNodeFactory extends NodeFactory<DocumentHashingApplierNodeModel> {
 
-    private DocumentHashingConfigKeys2() {
+    @Override
+    public DocumentHashingApplierNodeModel createNodeModel() {
+        return new DocumentHashingApplierNodeModel();
     }
 
-    /**
-     * The configuration key of the document column.
-     */
-    public static final String CFGKEY_DOC_COL = "DocumentColumn";
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
 
-    /**
-     * The configuration key of the dimension of vector
-     */
-    public static final String CFGKEY_DIM = "vectorDimension";
+    @Override
+    public NodeView<DocumentHashingApplierNodeModel> createNodeView(final int viewIndex,
+        final DocumentHashingApplierNodeModel nodeModel) {
+        return null;
+    }
 
-    /**
-     * The configuration key of the seed for the hashing function
-     */
-    public static final String CFGKEY_SEED = "seed";
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 
-    /**
-     * The configuration key of the hashing function
-     */
-    public static final String CFGKEY_HASHING_FUNC = "hashingFunction";
-
-    /**
-     * The configuration key of the seed for the hashing function
-     */
-    public static final String CFGKEY_VEC_VAL = "vectorValue";
-
-    /**
-     * The configuration key of the flag to specify whether to use collection cell or columns as output
-     */
-    public static final String CFGKEY_ASCOLLECTION = "asCollectionCell";
-
-    /**
-     * The configuration key of the flag to specify whether to use settings from input port or from dialog.
-     * @since 3.4
-     */
-    public static final String CFGKEY_USEINPORTSPECS = "useInportModelSpecs";
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new DocumentHashingApplierNodeDialog();
+    }
 
 }

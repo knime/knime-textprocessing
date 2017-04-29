@@ -44,84 +44,80 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   25.04.2017 (Julian): created
+ *   28.04.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.data;
+package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObject;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.PortTypeRegistry;
+import org.knime.ext.textprocessing.data.VectorHashingPortObject;
+import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
+import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.AbstractDocumentHashingNodeModel;
 
 /**
- * The {@code VectorHashingPortObject} is used to transfer vector creation specifications from one Document vector
- * hashing node to another.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
-public class VectorHashingPortObject extends AbstractSimplePortObject {
+public class DocumentHashingApplierNodeModel extends AbstractDocumentHashingNodeModel {
 
-    private PortObjectSpec m_spec;
+    private VectorHashingPortObjectSpec m_modelSpec;
 
     /**
-     * The (empty) serializer. Values will be saved and loaded via
-     * {@link VectorHashingPortObject#load(ModelContentRO, PortObjectSpec, ExecutionMonitor)} and
-     * {@link VectorHashingPortObject#save(ModelContentWO, ExecutionMonitor)}.
      *
-     * @author Julian Bunzel, KNIME.com, Berlin, Germany
      */
-    public static final class Serializer extends AbstractSimplePortObjectSerializer<VectorHashingPortObject> {
-        // Nothing to do here...
+    public DocumentHashingApplierNodeModel() {
+        super(new PortType[]{PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false),
+            BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE}, 1, 0);
     }
 
-    /**
-     * Empty constructor. Necessary for loading.
-     */
-    public VectorHashingPortObject() {
-    }
-
-    /**
-     * TODO!
-     * @param spec
-     */
-    public VectorHashingPortObject(final PortObjectSpec spec) {
-        m_spec = spec;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String getSummary() {
-        return "This VectorHashingPortObject contains dimension, seed, hashfunction and vectorvalue "
-            + "used to create document vectors.";
+    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        BufferedDataTable in = (BufferedDataTable)inObjects[1];
+        ColumnRearranger r = createColumnRearranger(in.getDataTableSpec());
+        BufferedDataTable table = exec.createColumnRearrangeTable(in, r, exec);
+        return new PortObject[]{table};
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public PortObjectSpec getSpec() {
-        return m_spec;
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        DataTableSpec in = (DataTableSpec)inSpecs[1];
+        m_modelSpec = (VectorHashingPortObjectSpec)inSpecs[0];
+        setValues(m_modelSpec.getDimension(), m_modelSpec.getSeed(), m_modelSpec.getHashFunc(),
+            m_modelSpec.getVectVal());
+        ColumnRearranger r = createColumnRearranger(in);
+        DataTableSpec out = r.createSpec();
+        return new PortObjectSpec[]{out};
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void save(final ModelContentWO model, final ExecutionMonitor exec) throws CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+        // TODO Auto-generated method stub
+
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void load(final ModelContentRO model, final PortObjectSpec spec, final ExecutionMonitor exec)
-        throws InvalidSettingsException, CanceledExecutionException {
-        m_spec = spec;
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void reset() {
+        m_modelSpec = null;
     }
 
 }

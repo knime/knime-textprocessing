@@ -48,93 +48,51 @@
  */
 package org.knime.ext.textprocessing.data;
 
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-
-import org.knime.core.data.util.NonClosableInputStream;
-import org.knime.core.data.util.NonClosableOutputStream;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContent;
 import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.ModelContentWO;
 import org.knime.core.node.port.AbstractSimplePortObjectSpec;
-import org.knime.core.node.port.PortObjectSpecZipInputStream;
-import org.knime.core.node.port.PortObjectSpecZipOutputStream;
 
 /**
+ * The {@code VectorHashingPortObjectSpec} is used to transfer vector creation specifications from one Document vector
+ * hashing node to another.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class VectorHashingPortObjectSpec extends AbstractSimplePortObjectSpec {
 
-    private final int m_dim;
+    private int m_dim;
 
-    private final int m_seed;
+    private int m_seed;
 
-    private final String m_hashFunc;
+    private String m_hashFunc;
 
-    private final String m_vectVal;
+    private String m_vectVal;
 
     /**
+     * The (empty) serializer. Values will be saved and loaded via
+     * {@link VectorHashingPortObjectSpec#load(ModelContentRO)} and
+     * {@link VectorHashingPortObjectSpec#save(ModelContentWO)}
      *
      * @author Julian Bunzel, KNIME.com, Berlin, Germany
      */
     public final static class Serializer extends AbstractSimplePortObjectSpecSerializer<VectorHashingPortObjectSpec> {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void savePortObjectSpec(final VectorHashingPortObjectSpec portObject,
-            final PortObjectSpecZipOutputStream out) throws IOException {
-            String XML_CONFIG_NAME = "config.xml";
-            out.putNextEntry(new ZipEntry(XML_CONFIG_NAME));
-            ModelContent config = new ModelContent(XML_CONFIG_NAME);
-            config.addInt("dimension", portObject.getDimension());
-            config.addInt("seed", portObject.getSeed());
-            config.addString("hashFunc", portObject.getHashFunc());
-            config.addString("vectorVal", portObject.getVectVal());
-            config.saveToXML(new NonClosableOutputStream.Zip(out));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public VectorHashingPortObjectSpec loadPortObjectSpec(final PortObjectSpecZipInputStream in)
-            throws IOException {
-            in.getNextEntry();
-            ModelContentRO config = ModelContent.loadFromXML(new NonClosableInputStream.Zip(in));
-            int dim;
-            int seed;
-            String hashFunc;
-            String vectVal;
-
-            try {
-                dim = config.getInt("dimension");
-                seed = config.getInt("seed");
-                hashFunc = config.getString("hashFunc");
-                vectVal = config.getString("vectorVal");
-
-            } catch (InvalidSettingsException e) {
-                throw new IOException("Failed to deserialize port object spec", e);
-            }
-            return new VectorHashingPortObjectSpec(dim, seed, hashFunc, vectVal);
-        }
     }
 
     /**
-     *
+     * Empty constructor. Needed for loading.
      */
     public VectorHashingPortObjectSpec() {
-        this(0, 0, null, null);
     }
 
     /**
-     * @param dim
-     * @param seed
-     * @param hashFunc
-     * @param vectVal
+     * Creates a new instance of {@code VectorHashingPortObjectSpec} that contains information about vector creation of
+     * the Document vector hashing node.
      *
+     * @param dim The dimension of the vector
+     * @param seed The seed.
+     * @param hashFunc The hashing function
+     * @param vectVal The type of value that is stored in the vector (binary, tf-rel, tf-abs).
      */
     public VectorHashingPortObjectSpec(final int dim, final int seed, final String hashFunc, final String vectVal) {
         m_dim = dim;
@@ -176,7 +134,10 @@ public class VectorHashingPortObjectSpec extends AbstractSimplePortObjectSpec {
      */
     @Override
     protected void save(final ModelContentWO model) {
-        // Nothing to do here...
+        model.addInt("dimension", getDimension());
+        model.addInt("seed", getSeed());
+        model.addString("hashFunc", getHashFunc());
+        model.addString("vectorVal", getVectVal());
 
     }
 
@@ -185,7 +146,10 @@ public class VectorHashingPortObjectSpec extends AbstractSimplePortObjectSpec {
      */
     @Override
     protected void load(final ModelContentRO model) throws InvalidSettingsException {
-        // Nothing to do here...
+        m_dim = model.getInt("dimension");
+        m_seed = model.getInt("seed");
+        m_hashFunc = model.getString("hashFunc");
+        m_vectVal = model.getString("vectorVal");
     }
 
 }

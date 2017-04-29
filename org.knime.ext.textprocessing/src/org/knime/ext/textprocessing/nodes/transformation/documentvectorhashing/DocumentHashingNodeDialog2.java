@@ -51,11 +51,6 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -66,7 +61,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
@@ -80,68 +74,45 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
      * @return the document column
      */
     static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_DOC_COL,
-            DocumentHashingNodeModel2.DEFAULT_DOCUMENT_COLNAME);
-    }
-
-    /**
-     * @return the value whether to use settings from inport model or from dialog.
-     * @since 3.4
-     */
-    static SettingsModelBoolean getUseSpecsFromInputPortModel() {
-        return new SettingsModelBoolean(DocumentHashingConfigKeys2.CFGKEY_USEINPORTSPECS,
-            DocumentHashingNodeModel2.DEFAULT_USEINPORTSPECS);
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_DOC_COL,
+            AbstractDocumentHashingNodeModel.DEFAULT_DOCUMENT_COLNAME);
     }
 
     /**
      * @return the number of buckets for the hashing function
      */
     static SettingsModelIntegerBounded getDimModel() {
-        return new SettingsModelIntegerBounded(DocumentHashingConfigKeys2.CFGKEY_DIM, 5000, 1, Integer.MAX_VALUE);
+        return new SettingsModelIntegerBounded(DocumentHashingConfigKeys.CFGKEY_DIM, 5000, 1, Integer.MAX_VALUE);
     }
 
     /**
      * @return the seed for the hashing function
      */
     static SettingsModelInteger getSeedModel() {
-        return new SettingsModelInteger(DocumentHashingConfigKeys2.CFGKEY_SEED, DocumentHashingNodeModel2.DEFAULT_SEED);
+        return new SettingsModelInteger(DocumentHashingConfigKeys.CFGKEY_SEED, DocumentHashingNodeModel2.DEFAULT_SEED);
     }
 
     /**
      * @return the hashing function
      */
     static SettingsModelString getHashingMethod() {
-        return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_HASHING_FUNC, "murmur3_32bit");
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_HASHING_FUNC, "murmur3_32bit");
     }
 
     /**
      * @return the vector value type
      */
     static SettingsModelString getVectorValueModel() {
-        return new SettingsModelString(DocumentHashingConfigKeys2.CFGKEY_VEC_VAL, "binary");
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_VEC_VAL, "binary");
     }
 
     /**
      * @return a flag to specify whether the vector should be put in columns or as collection
      */
     public static final SettingsModelBoolean getAsCollectionModel() {
-        return new SettingsModelBoolean(DocumentHashingConfigKeys2.CFGKEY_ASCOLLECTION,
-            DocumentHashingNodeModel2.DEFAULT_ASCOLLECTION);
+        return new SettingsModelBoolean(DocumentHashingConfigKeys.CFGKEY_ASCOLLECTION,
+            AbstractDocumentHashingNodeModel.DEFAULT_ASCOLLECTION);
     }
-
-    private SettingsModelBoolean m_useSpecsFromInportModel = getUseSpecsFromInputPortModel();
-
-    private SettingsModelIntegerBounded m_dimModel = getDimModel();
-
-    private SettingsModelInteger m_seedModel = getSeedModel();
-
-    private SettingsModelString m_hashMethod = getHashingMethod();
-
-    private SettingsModelString m_vectValModel = getVectorValueModel();
-
-    private boolean m_inportModelExists;
-
-    private boolean m_modelAlreadyRecognized;
 
     /**
      * Creates a new instance of <code>DocumentHashingNodeDialog2</code>.
@@ -153,89 +124,22 @@ public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
             new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column: ", 0, DocumentValue.class));
         closeCurrentGroup();
 
-        m_useSpecsFromInportModel.addChangeListener(new ChangeStateListener());
-
         createNewGroup("Hashing function setting");
-        addDialogComponent(new DialogComponentBoolean(m_useSpecsFromInportModel, "Use settings from inport model"));
+        addDialogComponent(new DialogComponentNumber(getDimModel(), "Dimension: ", 100));
 
-        addDialogComponent(new DialogComponentNumber(m_dimModel, "Dimension: ", 100));
-
-        addDialogComponent(new DialogComponentNumberEdit(m_seedModel, "Seed: "));
+        addDialogComponent(new DialogComponentNumberEdit(getSeedModel(), "Seed: "));
 
         List<String> namesAsList = new ArrayList<String>(HashingFunctionFactory.getInstance().getHashNames());
 
-        addDialogComponent(new DialogComponentStringSelection(m_hashMethod, "Hashing function: ", namesAsList));
+        addDialogComponent(new DialogComponentStringSelection(getHashingMethod(), "Hashing function: ", namesAsList));
 
-        addDialogComponent(new DialogComponentStringSelection(m_vectValModel, "Vector type: ", "Binary",
+        addDialogComponent(new DialogComponentStringSelection(getVectorValueModel(), "Vector type: ", "Binary",
             "TF-Relative", "TF-Absolute"));
         closeCurrentGroup();
 
         createNewGroup("Output column setting");
         addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
         closeCurrentGroup();
-
-        checkSettings();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
-        throws NotConfigurableException {
-        super.loadAdditionalSettingsFrom(settings, specs);
-
-        if (specs[1] != null) {
-            if (m_inportModelExists == false) {
-                m_inportModelExists = true;
-                m_modelAlreadyRecognized = false;
-            } else {
-                m_modelAlreadyRecognized = true;
-            }
-        } else {
-            m_inportModelExists = false;
-            m_modelAlreadyRecognized = false;
-        }
-
-        checkInputModel();
-    }
-
-    private void checkInputModel(){
-        if (!m_inportModelExists) {
-            m_useSpecsFromInportModel.setBooleanValue(false);
-            m_useSpecsFromInportModel.setEnabled(false);
-        } else {
-            m_useSpecsFromInportModel.setEnabled(true);
-            if (!m_modelAlreadyRecognized) {
-                m_useSpecsFromInportModel.setBooleanValue(true);
-            }
-        }
-    }
-
-    private void checkSettings() {
-        if (m_useSpecsFromInportModel.isEnabled() && m_useSpecsFromInportModel.getBooleanValue()) {
-            m_seedModel.setEnabled(false);
-            m_dimModel.setEnabled(false);
-            m_hashMethod.setEnabled(false);
-            m_vectValModel.setEnabled(false);
-        } else if (!m_useSpecsFromInportModel.isEnabled() || !m_useSpecsFromInportModel.getBooleanValue()) {
-            m_seedModel.setEnabled(true);
-            m_dimModel.setEnabled(true);
-            m_hashMethod.setEnabled(true);
-            m_vectValModel.setEnabled(true);
-        }
-    }
-
-    private class ChangeStateListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkSettings();
-        }
-
     }
 
 }

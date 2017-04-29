@@ -44,84 +44,47 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   25.04.2017 (Julian): created
+ *   10.08.2016 (andisadewi): created
  */
-package org.knime.ext.textprocessing.data;
-
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionMonitor;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObject;
-import org.knime.core.node.port.PortObjectSpec;
+package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
 
 /**
- * The {@code VectorHashingPortObject} is used to transfer vector creation specifications from one Document vector
- * hashing node to another.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class VectorHashingPortObject extends AbstractSimplePortObject {
+public class DocumentHashingConfigKeys {
 
-    private PortObjectSpec m_spec;
-
-    /**
-     * The (empty) serializer. Values will be saved and loaded via
-     * {@link VectorHashingPortObject#load(ModelContentRO, PortObjectSpec, ExecutionMonitor)} and
-     * {@link VectorHashingPortObject#save(ModelContentWO, ExecutionMonitor)}.
-     *
-     * @author Julian Bunzel, KNIME.com, Berlin, Germany
-     */
-    public static final class Serializer extends AbstractSimplePortObjectSerializer<VectorHashingPortObject> {
-        // Nothing to do here...
+    private DocumentHashingConfigKeys() {
     }
 
     /**
-     * Empty constructor. Necessary for loading.
+     * The configuration key of the document column.
      */
-    public VectorHashingPortObject() {
-    }
+    public static final String CFGKEY_DOC_COL = "DocumentColumn";
 
     /**
-     * TODO!
-     * @param spec
+     * The configuration key of the dimension of vector
      */
-    public VectorHashingPortObject(final PortObjectSpec spec) {
-        m_spec = spec;
-    }
+    public static final String CFGKEY_DIM = "vectorDimension";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the seed for the hashing function
      */
-    @Override
-    public String getSummary() {
-        return "This VectorHashingPortObject contains dimension, seed, hashfunction and vectorvalue "
-            + "used to create document vectors.";
-    }
+    public static final String CFGKEY_SEED = "seed";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the hashing function
      */
-    @Override
-    public PortObjectSpec getSpec() {
-        return m_spec;
-    }
+    public static final String CFGKEY_HASHING_FUNC = "hashingFunction";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the seed for the hashing function
      */
-    @Override
-    protected void save(final ModelContentWO model, final ExecutionMonitor exec) throws CanceledExecutionException {
-    }
+    public static final String CFGKEY_VEC_VAL = "vectorValue";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the flag to specify whether to use collection cell or columns as output
      */
-    @Override
-    protected void load(final ModelContentRO model, final PortObjectSpec spec, final ExecutionMonitor exec)
-        throws InvalidSettingsException, CanceledExecutionException {
-        m_spec = spec;
-    }
+    public static final String CFGKEY_ASCOLLECTION = "asCollectionCell";
 
 }

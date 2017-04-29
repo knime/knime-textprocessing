@@ -44,49 +44,53 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   10.08.2016 (andisadewi): created
+ *   28.04.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
+package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier;
+
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.AbstractDocumentHashingNodeModel;
+import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingConfigKeys;
 
 /**
  *
- * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
- * @deprecated
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  */
-@Deprecated
-class DocumentHashingConfigKeys {
+public class DocumentHashingApplierNodeDialog extends DefaultNodeSettingsPane {
 
-    private DocumentHashingConfigKeys() {
+    /**
+     * @return the document column
+     */
+    static final SettingsModelString getDocumentColModel() {
+        return new SettingsModelString(DocumentHashingConfigKeys.CFGKEY_DOC_COL,
+            AbstractDocumentHashingNodeModel.DEFAULT_DOCUMENT_COLNAME);
     }
 
     /**
-     * The configuration key of the document column.
+     * @return a flag to specify whether the vector should be put in columns or as collection
      */
-    public static final String CFGKEY_DOC_COL = "DocumentColumn";
+    public static final SettingsModelBoolean getAsCollectionModel() {
+        return new SettingsModelBoolean(DocumentHashingConfigKeys.CFGKEY_ASCOLLECTION,
+            AbstractDocumentHashingNodeModel.DEFAULT_ASCOLLECTION);
+    }
 
     /**
-     * The configuration key of the dimension of vector
+     *
      */
-    public static final String CFGKEY_DIM = "vectorDimension";
+    @SuppressWarnings("unchecked")
+    public DocumentHashingApplierNodeDialog() {
+        createNewGroup("Document column setting");
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column: ", 1, DocumentValue.class));
+        closeCurrentGroup();
 
-    /**
-     * The configuration key of the seed for the hashing function
-     */
-    public static final String CFGKEY_SEED = "seed";
-
-    /**
-     * The configuration key of the hashing function
-     */
-    public static final String CFGKEY_HASHING_FUNC = "hashingFunction";
-
-    /**
-     * The configuration key of the seed for the hashing function
-     */
-    public static final String CFGKEY_VEC_VAL = "vectorValue";
-
-    /**
-     * The configuration key of the flag to specify whether to use collection cell or columns as output
-     */
-    public static final String CFGKEY_ASCOLLECTION = "asCollectionCell";
-
+        createNewGroup("Output column setting");
+        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
+        closeCurrentGroup();
+    }
 }
