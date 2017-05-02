@@ -68,11 +68,13 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
+import org.knime.core.node.streamable.MergeOperator;
 import org.knime.core.node.streamable.PartitionInfo;
 import org.knime.core.node.streamable.PortInput;
 import org.knime.core.node.streamable.PortObjectOutput;
 import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.StreamableOperator;
+import org.knime.core.node.streamable.StreamableOperatorInternals;
 import org.knime.ext.textprocessing.data.VectorHashingPortObject;
 import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
 
@@ -152,15 +154,36 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
 
             @Override
             public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec) throws Exception {
-
-                PortOutput[] out = new PortOutput[outputs.length];
-                out[0] = outputs[0];
-                PortObjectOutput po = new PortObjectOutput();
-                po.setPortObject(new VectorHashingPortObject(m_modelSpec));
-                out[1] = po;
-
                 ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
-                colre.createStreamableFunction().runFinal(inputs, out, exec);
+                colre.createStreamableFunction(0, 0).runFinal(inputs, outputs, exec);
+
+                // set model output to null since the runFinal method affects distributed outputs and the model output
+                // is not distributed
+                outputs[1] = null;
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void finishStreamableExecution(final StreamableOperatorInternals internals, final ExecutionContext exec,
+        final PortOutput[] output) throws Exception {
+        ((PortObjectOutput)output[1]).setPortObject(new VectorHashingPortObject(m_modelSpec));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MergeOperator createMergeOperator() {
+        // create MergeOperator to run finishStreamableExecution
+        return new MergeOperator() {
+
+            @Override
+            public StreamableOperatorInternals mergeFinal(final StreamableOperatorInternals[] operators) {
+                return operators[0];
             }
         };
     }
