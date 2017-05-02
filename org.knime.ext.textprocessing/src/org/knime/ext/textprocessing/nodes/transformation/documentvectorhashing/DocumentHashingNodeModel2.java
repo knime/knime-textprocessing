@@ -77,13 +77,17 @@ import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.node.streamable.StreamableOperatorInternals;
 import org.knime.ext.textprocessing.data.VectorHashingPortObject;
 import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
+import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier.DocumentHashingApplierNodeModel;
 
 /**
- * The node model of the Document vector hashing node. This model extends
- * {@link org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel} and is streamable.
+ * The {@code NodeModel} for the Document vector hashing node. This node model extends the
+ * {@link AbstractDocumentHashingNodeModel} which contains the business logic of this node. This class is necessary
+ * since this node has different input-/output-ports, configuration, execution and streaming handling compared to the
+ * Document vector hashing applier node ({@link DocumentHashingApplierNodeModel}) which shares the same superclass. This
+ * model is streamable.
  *
- * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @author Tobias Koetter, Andisa Dewi and Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
 
@@ -108,8 +112,9 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     private PortObjectSpec m_modelSpec;
 
     /**
-     * Creates a new instance of <code>DocumentHashingNodeModel2</code>. For each node, a new integer value is assigned
-     * as initial value of the seed
+     * Creates a new instance of {@code}DocumentHashingNodeModel2} with one {@code BufferedDataTable} input port, one
+     * {@code BufferedDataTable} output port and one {@code VectorHashingPortObject} output port. For each node, a new
+     * integer value is assigned as initial value of the seed.
      */
     public DocumentHashingNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
@@ -134,6 +139,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = (DataTableSpec)inSpecs[0];
+        // set the specifications for vector space creation
         setValues(m_dimModel.getIntValue(), m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(),
             m_vectValModel.getStringValue());
         ColumnRearranger r = createColumnRearranger(in);
@@ -150,6 +156,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
         final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 
+        // overriding this method to provide streaming functionality
         return new StreamableOperator() {
 
             @Override
@@ -171,6 +178,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     @Override
     public void finishStreamableExecution(final StreamableOperatorInternals internals, final ExecutionContext exec,
         final PortOutput[] output) throws Exception {
+        // set the model output to provide streaming fucnctionality
         ((PortObjectOutput)output[1]).setPortObject(new VectorHashingPortObject(m_modelSpec));
     }
 
@@ -179,7 +187,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
      */
     @Override
     public MergeOperator createMergeOperator() {
-        // create MergeOperator to run finishStreamableExecution
+        // override this method, so finishStreamableExection(..) will be called
         return new MergeOperator() {
 
             @Override
@@ -234,13 +242,13 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
+        // Nothing to do here...
     }
 
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
+        // Nothing to do here...
     }
 
 }

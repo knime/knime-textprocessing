@@ -30,13 +30,17 @@ import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier.DocumentHashingApplierNodeModel;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * @author Julian
+ * This class provides the business logic for {@link DocumentHashingNodeModel2} and {@link DocumentHashingApplierNodeModel}.
+ * It also takes care of some shared node settings and handles the PortRoles.
  *
+ * @author Tobias Koetter, Andisa Dewi and Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
 
@@ -88,8 +92,8 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
     }
 
     /**
-     * @param spec
-     * @return
+     * @param spec The DataTableSpec
+     * @return Returns the column rearranger used to build the output table.
      * @throws InvalidSettingsException
      */
     protected ColumnRearranger createColumnRearranger(final DataTableSpec spec) throws InvalidSettingsException {
@@ -245,22 +249,29 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
         return columnSpecs;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputPortRole[] getInputPortRoles() {
         return m_inPortRoles;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OutputPortRole[] getOutputPortRoles() {
         return m_outPortRoles;
     }
 
     /**
-     * @param dim
-     * @param seed
-     * @param hashFunc
-     * @param vectVal
+     * This method is used to set the vector creation specification.
      *
+     * @param dim The dimension of the vector space.
+     * @param seed The random seed.
+     * @param hashFunc The hash function.
+     * @param vectVal The value type represented in the vector cells.
      */
     protected void setValues(final int dim, final int seed, final String hashFunc, final String vectVal) {
         m_dim = dim;
@@ -269,18 +280,27 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
         m_vectVal = vectVal;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_docCol.saveSettingsTo(settings);
         m_asCol.saveSettingsTo(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docCol.validateSettings(settings);
         m_asCol.validateSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docCol.loadSettingsFrom(settings);

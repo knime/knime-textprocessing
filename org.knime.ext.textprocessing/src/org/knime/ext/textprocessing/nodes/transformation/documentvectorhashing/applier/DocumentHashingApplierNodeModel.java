@@ -69,23 +69,34 @@ import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.data.VectorHashingPortObject;
 import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
 import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.AbstractDocumentHashingNodeModel;
+import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingNodeModel2;
 
 /**
+ * The {@code NodeModel} for the Document vector hashing applier node. This node model extends the
+ * {@link AbstractDocumentHashingNodeModel} which contains the business logic of this node. This class is necessary
+ * since this node has different input-/output-ports, configuration, execution and streaming handling compared to the
+ * Document vector hashing node ({@link DocumentHashingNodeModel2} which shares the same superclass.
+ * This model is streamable.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class DocumentHashingApplierNodeModel extends AbstractDocumentHashingNodeModel {
 
     private VectorHashingPortObjectSpec m_modelSpec;
 
     /**
-     *
+     * Creates a new instance of the {@code DocumentHashingApplierNodeModel} with one {@code VectorHashingPortObject}
+     * input port, one {@code BufferedDataTable} input port and one {@code BufferedDataTable} output port.
      */
     public DocumentHashingApplierNodeModel() {
         super(new PortType[]{PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false),
             BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE}, 1, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         BufferedDataTable in = (BufferedDataTable)inObjects[1];
@@ -94,10 +105,14 @@ public class DocumentHashingApplierNodeModel extends AbstractDocumentHashingNode
         return new PortObject[]{table};
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = (DataTableSpec)inSpecs[1];
         m_modelSpec = (VectorHashingPortObjectSpec)inSpecs[0];
+        // set settings for vector creation
         setValues(m_modelSpec.getDimension(), m_modelSpec.getSeed(), m_modelSpec.getHashFunc(),
             m_modelSpec.getVectVal());
         ColumnRearranger r = createColumnRearranger(in);
@@ -123,22 +138,30 @@ public class DocumentHashingApplierNodeModel extends AbstractDocumentHashingNode
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
-
+        // Nothing to do here...
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
-
+        // Nothing to do here...
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void reset() {
+        // reset model spec
         m_modelSpec = null;
     }
 

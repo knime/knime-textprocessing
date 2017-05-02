@@ -53,9 +53,10 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * The {@code NodeFactory} for Document vector hashing node model.
  *
- * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class DocumentHashingNodeFactory2 extends NodeFactory<DocumentHashingNodeModel2> {
 

@@ -64,9 +64,10 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
+ * The {@code NodeDialog} for the Document vector hashing node.
  *
- * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class DocumentHashingNodeDialog2 extends DefaultNodeSettingsPane {
 

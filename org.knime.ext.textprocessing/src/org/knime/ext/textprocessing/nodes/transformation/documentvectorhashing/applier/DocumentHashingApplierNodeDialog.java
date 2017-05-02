@@ -58,8 +58,10 @@ import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.A
 import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.DocumentHashingConfigKeys;
 
 /**
+ * The {@code NodeDialog} for the Document vector hashing applier node.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.4
  */
 public class DocumentHashingApplierNodeDialog extends DefaultNodeSettingsPane {
 

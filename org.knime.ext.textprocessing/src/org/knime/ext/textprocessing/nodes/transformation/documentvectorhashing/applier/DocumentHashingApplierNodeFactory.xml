@@ -11,7 +11,8 @@
 			representing it in the terms space. The values of the feature vectors
 			will be boolean values or as values of either the
 			relative frequency or the absolute frequency of the terms.
-			This node needs a model input provided by the Document vector hashing node. 
+			This node needs a model input provided by the Document vector hashing node
+			 which contains the specifications for vector creation.
 		</intro>
 		<option name="Document column">
 			The column containing the documents to use.

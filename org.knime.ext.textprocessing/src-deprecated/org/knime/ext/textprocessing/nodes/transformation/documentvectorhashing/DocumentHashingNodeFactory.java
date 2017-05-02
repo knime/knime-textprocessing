@@ -56,7 +56,7 @@ import org.knime.core.node.NodeView;
  *
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
- * @deprecated
+ * @deprecated Use {@link DocumentHashingNodeFactory2} instead
  */
 @Deprecated
 public class DocumentHashingNodeFactory extends NodeFactory<DocumentHashingNodeModel> {

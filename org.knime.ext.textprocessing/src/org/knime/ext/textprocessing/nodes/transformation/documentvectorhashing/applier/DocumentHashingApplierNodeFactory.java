@@ -53,8 +53,10 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * The {@code NodeFactory} for the Document vector hashing applier node.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.4
  */
 public class DocumentHashingApplierNodeFactory extends NodeFactory<DocumentHashingApplierNodeModel> {
 
