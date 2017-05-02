@@ -219,8 +219,9 @@ public class WordVectorPortObjectUtils {
     @Deprecated
     private static void savePortObjectAndSpec(final WordVectorPortObject portObject,
         final WordVectorPortObjectSpec spec, final ZipOutputStream out) throws IOException {
-        savePortObjectOnly(portObject, out);
         saveSpecOnly(spec, out);
+        //writing of port object needs to be done at last in this case because the DL4J WordVectorSerializer closes the stream
+        savePortObjectOnly(portObject, out);
     }
 
     /**
