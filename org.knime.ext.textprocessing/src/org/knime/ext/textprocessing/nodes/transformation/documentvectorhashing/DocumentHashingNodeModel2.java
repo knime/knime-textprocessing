@@ -153,7 +153,8 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
         return new StreamableOperator() {
 
             @Override
-            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec) throws Exception {
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
                 ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
                 colre.createStreamableFunction(0, 0).runFinal(inputs, outputs, exec);
 

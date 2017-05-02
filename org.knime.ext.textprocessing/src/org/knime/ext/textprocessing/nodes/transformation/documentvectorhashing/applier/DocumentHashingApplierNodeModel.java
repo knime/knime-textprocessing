@@ -62,6 +62,10 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.PortInput;
+import org.knime.core.node.streamable.PortOutput;
+import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.data.VectorHashingPortObject;
 import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
 import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.AbstractDocumentHashingNodeModel;
@@ -99,6 +103,24 @@ public class DocumentHashingApplierNodeModel extends AbstractDocumentHashingNode
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
         return new PortObjectSpec[]{out};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StreamableOperator createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+
+        return new StreamableOperator() {
+
+            @Override
+            public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
+                throws Exception {
+                ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[1]);
+                colre.createStreamableFunction(1, 0).runFinal(inputs, outputs, exec);
+            }
+        };
     }
 
     @Override
