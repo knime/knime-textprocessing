@@ -62,8 +62,8 @@ import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSp
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 
 /**
- * Utility class for {@link WordVectorPortObject} and {@link WordVectorPortObjectSpec} Serialisation. Also contains
- * utility methods for members of port and spec class.
+ * Utility class for {@link WordVectorPortObject} and {@link WordVectorPortObjectSpec} Serialization. Also contains
+ * utility methods to load/save members of port and spec class.
  *
  * @author David Kolb, KNIME.com GmbH
  */
@@ -174,11 +174,25 @@ public class WordVectorPortObjectUtils {
         return mode;
     }
 
+    /**
+     * Writes port object without spec. Calling this will close the stream.
+     *
+     * @param portObject
+     * @param out
+     * @throws IOException
+     */
     private static void savePortObjectOnly(final WordVectorPortObject portObject, final ZipOutputStream out)
         throws IOException {
         writeWordVectors(portObject.getWordVectors(), out);
     }
 
+    /**
+     * Writes port spec without object.
+     *
+     * @param spec
+     * @param out
+     * @throws IOException
+     */
     private static void saveSpecOnly(final WordVectorPortObjectSpec spec, final ZipOutputStream out)
         throws IOException {
         final WordVectorTrainingMode mode = spec.getWordVectorTrainingsMode();
@@ -186,6 +200,14 @@ public class WordVectorPortObjectUtils {
         writeWordVectorTrainingsMode(mode, out);
     }
 
+    /**
+     * Writes port object and spec.
+     *
+     * @param portObject
+     * @param spec
+     * @param out
+     * @throws IOException
+     */
     private static void savePortObjectAndSpec(final WordVectorPortObject portObject,
         final WordVectorPortObjectSpec spec, final ZipOutputStream out) throws IOException {
         savePortObjectOnly(portObject, out);
@@ -259,6 +281,8 @@ public class WordVectorPortObjectUtils {
 
     /**
      * Converts wordVectors to {@link Word2Vec}. Sets {@link WeightLookupTable} and {@link VocabCache}.
+     * Depending on specified word vector type this may lead to information loss. E.g. labels for
+     * {@link ParagraphVectors}.
      *
      * @param wordVectors
      * @return Word2Vec containing vocab and lookup table
