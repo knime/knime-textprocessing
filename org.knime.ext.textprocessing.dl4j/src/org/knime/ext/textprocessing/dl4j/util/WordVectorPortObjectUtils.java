@@ -111,7 +111,11 @@ public class WordVectorPortObjectUtils {
      * @throws IOException
      */
     public static WordVectorPortObjectSpec loadSpecFromZip(final ZipInputStream inStream) throws IOException {
-        return new WordVectorPortObjectSpec(loadTrainingsMode(inStream));
+        WordVectorTrainingMode mode = loadTrainingsMode(inStream);
+        if (mode == null) {
+            throw new IOException("Error loading word vector training mode!");
+        }
+        return new WordVectorPortObjectSpec(mode);
     }
 
     /**
