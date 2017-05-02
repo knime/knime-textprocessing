@@ -4,6 +4,16 @@
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
+            category-path="/labs/deeplearning/embeddings/io"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.writer.WordVectorModelWriterNodeFactory">
+      </node>
+      <node
+            category-path="/labs/deeplearning/embeddings/io"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader.WordVectorModelReaderNodeFactory">
+      </node>
+      <node
             category-path="/labs/deeplearning/embeddings"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory2">
@@ -65,6 +75,13 @@
             locked="true"
             name="Word Embeddings"
             path="/labs/deeplearning/">
+      </category>
+      <category
+            icon="res/icons/missing.gif"
+            level-id="io"
+            locked="true"
+            name="I/O"
+            path="/labs/deeplearning/embeddings/">
       </category>
    </extension>
    <extension

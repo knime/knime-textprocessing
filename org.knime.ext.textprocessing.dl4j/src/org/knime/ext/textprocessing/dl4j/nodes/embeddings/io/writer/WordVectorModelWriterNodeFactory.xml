@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./modelwriter.png" type="Sink" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Word Vector Model Writer</name>
+    
+    <shortDescription>
+        Node to write word vector models.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        This node saves a word vector model to the specified location, which can be later read 
+        by the corresponding reader node. The written file is a .zip file with the following content:
+        <ul>
+		<li>'word_vector_trainings_mode' - Text file containing the type of word vector model which was written</li>	
+		<li>'word_vectors' - File containing the word vector model in DL4J format.</li>
+		</ul>
+        </intro>      
+        
+        <option name="Selected File">Enter a valid file name or URL. You can also choose a previously 
+        selected location from the drop-down list, or select a local file from the "Browse..." dialog. 
+		</option>
+        <option name="Overwrite existing file?">If unchecked, the node refuses to execute when the output file exists 
+        (prevent unintentional overwrite). 
+		</option>
+       
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Word Vector Model">The model which will be saved to the specified location.</inPort>  
+    </ports>    
+   
+</knimeNode>
