@@ -83,6 +83,7 @@ public class WordVectorPortObjectUtils {
      * @param outStream stream to write to
      * @throws IOException
      */
+    @Deprecated
     public static void saveModelToZip(final WordVectorPortObject portObject, final boolean writePortObject,
         final boolean writeSpec, final ZipOutputStream outStream) throws IOException {
         final WordVectorPortObjectSpec spec = (WordVectorPortObjectSpec)portObject.getSpec();
@@ -120,6 +121,7 @@ public class WordVectorPortObjectUtils {
      * @return WordVectorPortObject
      * @throws IOException
      */
+    @Deprecated
     public static WordVectorPortObject loadPortFromZip(final ZipInputStream inStream, final WordVectorTrainingMode mode)
         throws IOException {
         return new WordVectorPortObject(loadWordVectors(inStream, mode), null);
@@ -181,6 +183,7 @@ public class WordVectorPortObjectUtils {
      * @param out
      * @throws IOException
      */
+    @Deprecated
     private static void savePortObjectOnly(final WordVectorPortObject portObject, final ZipOutputStream out)
         throws IOException {
         writeWordVectors(portObject.getWordVectors(), out);
@@ -208,6 +211,7 @@ public class WordVectorPortObjectUtils {
      * @param out
      * @throws IOException
      */
+    @Deprecated
     private static void savePortObjectAndSpec(final WordVectorPortObject portObject,
         final WordVectorPortObjectSpec spec, final ZipOutputStream out) throws IOException {
         savePortObjectOnly(portObject, out);
