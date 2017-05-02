@@ -57,6 +57,7 @@ import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
+import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
@@ -233,7 +234,21 @@ public class WordVectorPortObjectUtils {
     }
 
     /**
-     * Writes {@link WordVectors} to specified {@link ZipInputStream}.
+     * Serializes the specified port object to the specified stream including port object spec.
+     *
+     * @param port
+     * @param out
+     * @throws IOException
+     */
+    public static void writeFileStorePortObject(final WordVectorFileStorePortObject port, final ZipOutputStream out) throws IOException{
+        WordVectorPortObjectSpec spec = (WordVectorPortObjectSpec)port.getSpec();
+        saveSpecOnly(spec, out);
+        writeWordVectors(port.getWordVectors(), out);
+    }
+
+    /**
+     * Writes {@link WordVectors} to specified {@link ZipInputStream}. Calling this method will close the stream (closed
+     * by WordVectorSerializer).
      *
      * @param wordVectors {@link WordVectors} to write
      * @param out stream to write to
