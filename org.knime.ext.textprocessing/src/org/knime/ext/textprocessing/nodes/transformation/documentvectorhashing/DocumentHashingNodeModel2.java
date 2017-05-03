@@ -89,6 +89,7 @@ import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.a
  * @author Tobias Koetter, Andisa Dewi and Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
+// TODO Julian: Make package scope + final (also the dialog and other utility classes)
 public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
 
     /**
@@ -103,12 +104,14 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
 
     private final SettingsModelIntegerBounded m_dimModel = DocumentHashingNodeDialog2.getDimModel();
 
+    // TODO Julian: Should be final?
     private SettingsModelInteger m_seedModel = DocumentHashingNodeDialog2.getSeedModel();
 
     private final SettingsModelString m_vectValModel = DocumentHashingNodeDialog2.getVectorValueModel();
 
     private final SettingsModelString m_hashFuncModel = DocumentHashingNodeDialog2.getHashingMethod();
 
+    // TODO Julian: NodeModels are usually (!) stateless (except for the settings); remove and calculate on-demand
     private PortObjectSpec m_modelSpec;
 
     /**
@@ -116,6 +119,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
      * {@code BufferedDataTable} output port and one {@code VectorHashingPortObject} output port. For each node, a new
      * integer value is assigned as initial value of the seed.
      */
+    // TODO make package scope only
     public DocumentHashingNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
             PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false)}, 0, 0);
@@ -140,6 +144,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = (DataTableSpec)inSpecs[0];
         // set the specifications for vector space creation
+        // TODO this is fishy? You have the members in this class and also in the abstract super class? Why?
         setValues(m_dimModel.getIntValue(), m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(),
             m_vectValModel.getStringValue());
         ColumnRearranger r = createColumnRearranger(in);

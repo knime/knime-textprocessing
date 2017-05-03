@@ -54,6 +54,7 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
      */
     public static final boolean DEFAULT_ASCOLLECTION = false;
 
+    // TODO Julian: remove this field?
     private int m_documentColIndex = -1;
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
