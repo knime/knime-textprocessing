@@ -69,6 +69,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -83,8 +84,6 @@ import org.knime.core.node.streamable.RowOutput;
 import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
 import org.knime.ext.dl4j.base.exception.DataCellConversionException;
-import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.dl4j.base.util.NDArrayUtils;
@@ -105,9 +104,9 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
     // the logger instance
     private static final NodeLogger logger = NodeLogger.getLogger(WordVectorApplyNodeModel2.class);
 
-    private DataParameterSettingsModels2 m_dataParameterSettings;
+    private SettingsModelString m_documentColumn;
 
-    private final SettingsModelBoolean m_calculateMean = createCalculateMeanSettings();
+    private SettingsModelBoolean m_calculateMean;
 
     private DataTableSpec m_outputSpec;
 
@@ -116,7 +115,6 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
     WordVectorApplyNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE, WordVectorFileStorePortObject.TYPE},
             new PortType[]{BufferedDataTable.TYPE});
-        addToSettingsModels(m_calculateMean);
     }
 
     @Override
@@ -126,7 +124,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
         final WordVectors wordVectors = portObject.getWordVectors();
 
         final int documentColumnIndex =
-            table.getDataTableSpec().findColumnIndex(m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN));
+            table.getDataTableSpec().findColumnIndex(m_documentColumn.getStringValue());
 
         final BufferedDataContainer container = exec.createDataContainer(m_outputSpec);
         final CloseableRowIterator tableIterator = table.iterator();
@@ -188,7 +186,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
                 RowOutput rowOutput = (RowOutput)outputs[0];
 
                 final int documentColumnIndex =
-                    tableSpec.findColumnIndex(m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN));
+                    tableSpec.findColumnIndex(m_documentColumn.getStringValue());
 
                 DataRow row;
                 while ((row = rowInput.poll()) != null) {
@@ -220,7 +218,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
-        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
+        final String documentColumnName = m_documentColumn.getStringValue();
         ConfigurationUtils.validateColumnSelection(tableSpec, documentColumnName);
         checkDocumentColumnType(tableSpec);
 
@@ -235,7 +233,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
     }
 
     private void checkDocumentColumnType(final DataTableSpec spec) throws InvalidSettingsException {
-        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
+        final String documentColumnName = m_documentColumn.getStringValue();
         DataColumnSpec documentColumnSpec = spec.getColumnSpec(documentColumnName);
         DataType type = documentColumnSpec.getType();
 
@@ -247,12 +245,12 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
 
     @Override
     protected List<SettingsModel> initSettingsModels() {
-        m_dataParameterSettings = new DataParameterSettingsModels2();
-        m_dataParameterSettings.setParameter(DataParameter.DOCUMENT_COLUMN);
+        m_documentColumn = createDocumentColumnSettings();
+        m_calculateMean = createCalculateMeanSettings();
 
-        final List<SettingsModel> settings = new ArrayList<SettingsModel>();
-        settings.addAll(m_dataParameterSettings.getAllInitializedSettings());
-
+        ArrayList<SettingsModel> settings = new ArrayList<SettingsModel>();
+        settings.add(m_calculateMean);
+        settings.add(m_documentColumn);
         return settings;
     }
 
@@ -348,5 +346,9 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
 
     public static SettingsModelBoolean createCalculateMeanSettings() {
         return new SettingsModelBoolean("do_calculate_mean", false);
+    }
+
+    public static SettingsModelString createDocumentColumnSettings() {
+        return new SettingsModelString("document_column", "");
     }
 }

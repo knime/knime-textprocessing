@@ -56,23 +56,45 @@ public enum WordVectorLearnerParameter {
         WINDOW_SIZE,
         /** What word vectors to train. */
         WORD_VECTOR_TRAINING_MODE,
+        /** Seed value RNG. */
+        SEED,
+        /** Number of iterations done for each mini-batch . */
+        TRAINING_ITERATIONS,
+        /** Start learning rate. */
+        LEARNING_RATE,
         /** Learning rate decays in word vector learning, minimum learning rate to use. */
         MIN_LEARNING_RATE,
         /** Whether to enable basic preprocessing (convert to lower case and strip punctuation) of tokens. */
         USE_BASIC_PREPROCESSING,
+        /** Column containing labels for Doc2Vec training. */
+        LABEL_COLUMN,
+        /** Column containing the Documents/Strings to train on. */
+        DOCUMENT_COLUMN,
+        /** Number of words to use for one mini-batch. */
+        BATCH_SIZE,
+        /** Number of epochs to train. */
+        EPOCHS,
         /** Whether to skip rows containing missing cells. */
         SKIP_MISSING_CELLS;
 
     // Parameter default values
-    public static final int DEFAULT_INT = 1;
-
     public static final Double DEFAULT_MIN_LEARNING_RATE = 0.0001;
+
+    public static final Double DEFAULT_LEARNING_RATE = 0.025;
+
+    public static final int DEFAULT_BATCH_SIZE = 10000;
+
+    public static final int DEFAULT_EPOCHS = 5;
+
+    public static final int DEFAULT_TRAINING_ITERATIONS = 1;
 
     public static final int DEFAULT_LAYER_SIZE = 100;
 
     public static final int DEFAULT_WINDOW_SIZE = 5;
 
-    public static final int DEFAULT_MIN_WORD_FREQUENCY = 0;
+    public static final int DEFAULT_SEED = 1;
+
+    public static final int DEFAULT_MIN_WORD_FREQUENCY = 5;
 
     public static final String DEFAULT_WORD_VECTOR_TRAININGS_MODE = "WORD2VEC";
 

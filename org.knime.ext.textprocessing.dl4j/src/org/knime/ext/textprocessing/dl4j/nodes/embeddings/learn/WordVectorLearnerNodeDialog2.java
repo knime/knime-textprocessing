@@ -56,10 +56,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
-import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
-import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.EnumUtils;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
@@ -81,17 +77,15 @@ public class WordVectorLearnerNodeDialog2 extends DefaultNodeSettingsPane {
      * New pane for configuring the WordVectorLearner node.
      */
     protected WordVectorLearnerNodeDialog2() {
-        final LearnerParameterSettingsModels2 learnerSettingsModels = new LearnerParameterSettingsModels2();
-        final DataParameterSettingsModels2 dataSettingsModels = new DataParameterSettingsModels2();
         final WordVectorParameterSettingsModels2 wordVectorSettingsModels = new WordVectorParameterSettingsModels2();
 
         final SettingsModelString trainingModeSettings = (SettingsModelString)wordVectorSettingsModels
             .createParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
 
         final SettingsModelString labelColumnSettings =
-            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.LABEL_COLUMN);
+            (SettingsModelString)wordVectorSettingsModels.createParameter(WordVectorLearnerParameter.LABEL_COLUMN);
         final SettingsModelString documentColumnSettings =
-            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN);
+            (SettingsModelString)wordVectorSettingsModels.createParameter(WordVectorLearnerParameter.DOCUMENT_COLUMN);
 
         trainingModeSettings.addChangeListener(new ChangeListener() {
             @Override
@@ -116,20 +110,22 @@ public class WordVectorLearnerNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentStringSelection(trainingModeSettings, "WordVector Training Mode",
             EnumUtils.getStringCollectionFromToString(WordVectorTrainingMode.values())));
         addDialogComponent(new DialogComponentNumberEdit(
-            (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.SEED), "Seed", 4));
-        addDialogComponent(new DialogComponentNumberEdit(
-            (SettingsModelDoubleBounded)learnerSettingsModels.createParameter(LearnerParameter.GLOBAL_LEARNING_RATE),
-            "Learning Rate", 4));
+            (SettingsModelIntegerBounded)wordVectorSettingsModels.createParameter(WordVectorLearnerParameter.SEED),
+            "Seed", 4));
+        addDialogComponent(new DialogComponentNumberEdit((SettingsModelDoubleBounded)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.LEARNING_RATE), "Learning Rate", 4));
         addDialogComponent(new DialogComponentNumberEdit((SettingsModelDoubleBounded)wordVectorSettingsModels
             .createParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE), "Minimum Learning Rate", 4));
+        addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
+            .createParameter(WordVectorLearnerParameter.BATCH_SIZE), "Batch Size", 4));
         addDialogComponent(new DialogComponentNumberEdit(
-            (SettingsModelIntegerBounded)dataSettingsModels.createParameter(DataParameter.BATCH_SIZE), "Batch Size",
-            4));
-        addDialogComponent(new DialogComponentNumberEdit(
-            (SettingsModelIntegerBounded)dataSettingsModels.createParameter(DataParameter.EPOCHS), "Epochs", 4));
-        addDialogComponent(new DialogComponentNumberEdit(
-            (SettingsModelIntegerBounded)learnerSettingsModels.createParameter(LearnerParameter.TRAINING_ITERATIONS),
-            "Number of Training Iterations", 4));
+            (SettingsModelIntegerBounded)wordVectorSettingsModels.createParameter(WordVectorLearnerParameter.EPOCHS),
+            "Epochs", 4));
+        addDialogComponent(
+            new DialogComponentNumberEdit(
+                (SettingsModelIntegerBounded)wordVectorSettingsModels
+                    .createParameter(WordVectorLearnerParameter.TRAINING_ITERATIONS),
+                "Number of Training Iterations", 4));
         addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels
             .createParameter(WordVectorLearnerParameter.LAYER_SIZE), "Layer Size", 4));
         addDialogComponent(new DialogComponentNumberEdit((SettingsModelIntegerBounded)wordVectorSettingsModels

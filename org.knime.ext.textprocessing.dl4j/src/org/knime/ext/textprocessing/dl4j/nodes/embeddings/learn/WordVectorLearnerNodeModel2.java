@@ -62,10 +62,6 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
-import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
-import org.knime.ext.dl4j.base.settings.enumerate.LearnerParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels2;
-import org.knime.ext.dl4j.base.settings.impl.LearnerParameterSettingsModels2;
 import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentIterator;
@@ -85,10 +81,6 @@ import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettin
 public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
     /* SettingsModels */
-    private LearnerParameterSettingsModels2 m_learnerParameterSettings;
-
-    private DataParameterSettingsModels2 m_dataParameterSettings;
-
     private WordVectorParameterSettingsModels2 m_wordVecParameterSettings;
 
     private WordVectorPortObjectSpec m_outputSpec;
@@ -109,22 +101,22 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
         final WordVectorTrainingMode mode = WordVectorTrainingMode
             .valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
-        final String labelColumnName = m_dataParameterSettings.getString(DataParameter.LABEL_COLUMN);
-        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
+        final String labelColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.LABEL_COLUMN);
+        final String documentColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN);
         WordVectors wordVectors = null;
 
         // training parameters
-        final int trainingIterations = m_learnerParameterSettings.getInteger(LearnerParameter.TRAINING_ITERATIONS);
+        final int trainingIterations = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.TRAINING_ITERATIONS);
         final int minWordFrequency =
             m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
         final int layerSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.LAYER_SIZE);
-        final int seed = m_learnerParameterSettings.getInteger(LearnerParameter.SEED);
-        final double learningRate = m_learnerParameterSettings.getDouble(LearnerParameter.GLOBAL_LEARNING_RATE);
+        final int seed = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.SEED);
+        final double learningRate = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.LEARNING_RATE);
         final double minLearningRate =
             m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
         final int windowSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.WINDOW_SIZE);
-        final int epochs = m_dataParameterSettings.getInteger(DataParameter.EPOCHS);
-        final int batchSize = m_dataParameterSettings.getInteger(DataParameter.BATCH_SIZE);
+        final int epochs = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.EPOCHS);
+        final int batchSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.BATCH_SIZE);
         final boolean skipMissing =
             m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
 
@@ -178,8 +170,8 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
         final WordVectorTrainingMode mode = WordVectorTrainingMode
             .valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
-        final String labelColumnName = m_dataParameterSettings.getString(DataParameter.LABEL_COLUMN);
-        final String documentColumnName = m_dataParameterSettings.getString(DataParameter.DOCUMENT_COLUMN);
+        final String labelColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.LABEL_COLUMN);
+        final String documentColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN);
 
         switch (mode) {
             case DOC2VEC:
@@ -207,22 +199,18 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
     @Override
     protected List<SettingsModel> initSettingsModels() {
-        m_learnerParameterSettings = new LearnerParameterSettingsModels2();
-        m_learnerParameterSettings.setParameter(LearnerParameter.GLOBAL_LEARNING_RATE);
-        m_learnerParameterSettings.setParameter(LearnerParameter.TRAINING_ITERATIONS);
-        m_learnerParameterSettings.setParameter(LearnerParameter.SEED);
-
-        m_dataParameterSettings = new DataParameterSettingsModels2();
-        m_dataParameterSettings.setParameter(DataParameter.BATCH_SIZE);
-        m_dataParameterSettings.setParameter(DataParameter.EPOCHS);
-        m_dataParameterSettings.setParameter(DataParameter.LABEL_COLUMN);
+        m_wordVecParameterSettings = new WordVectorParameterSettingsModels2();
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LEARNING_RATE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.TRAINING_ITERATIONS);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.SEED);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.BATCH_SIZE);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.EPOCHS);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LABEL_COLUMN);
         // default training mode is Word2Vec so labels are not required by
         // default
-        m_dataParameterSettings.getParameter(DataParameter.LABEL_COLUMN).setEnabled(false);
+        m_wordVecParameterSettings.getParameter(WordVectorLearnerParameter.LABEL_COLUMN).setEnabled(false);
 
-        m_dataParameterSettings.setParameter(DataParameter.DOCUMENT_COLUMN);
-
-        m_wordVecParameterSettings = new WordVectorParameterSettingsModels2();
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.DOCUMENT_COLUMN);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LAYER_SIZE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
@@ -231,8 +219,6 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
 
         final List<SettingsModel> settings = new ArrayList<>();
-        settings.addAll(m_learnerParameterSettings.getAllInitializedSettings());
-        settings.addAll(m_dataParameterSettings.getAllInitializedSettings());
         settings.addAll(m_wordVecParameterSettings.getAllInitializedSettings());
 
         return settings;

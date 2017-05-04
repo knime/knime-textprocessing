@@ -46,9 +46,6 @@ import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.dl4j.base.settings.enumerate.DataParameter;
-import org.knime.ext.dl4j.base.settings.impl.DataParameterSettingsModels;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
@@ -66,13 +63,11 @@ final class WordVectorApplyNodeDialog2 extends DefaultNodeSettingsPane {
      * New pane for configuring the WordVectorApply node.
      */
     protected WordVectorApplyNodeDialog2() {
-        final DataParameterSettingsModels dataSettingsModels = new DataParameterSettingsModels();
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(WordVectorApplyNodeModel2.createDocumentColumnSettings(),
+                "Document Column:", 0, true, StringValue.class, DocumentValue.class));
 
-        addDialogComponent(new DialogComponentColumnNameSelection(
-            (SettingsModelString)dataSettingsModels.createParameter(DataParameter.DOCUMENT_COLUMN), "Document Column:",
-            0, true, StringValue.class, DocumentValue.class));
-
-        addDialogComponent(new DialogComponentBoolean(WordVectorApplyNodeModel.createCalculateMeanSettings(),
+        addDialogComponent(new DialogComponentBoolean(WordVectorApplyNodeModel2.createCalculateMeanSettings(),
             "Calculate Document Mean Vector?"));
     }
 }

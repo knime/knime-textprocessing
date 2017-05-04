@@ -82,6 +82,25 @@ public class WordVectorParameterSettingsModels2
                     WordVectorLearnerParameter.DEFAULT_USE_BASIC_PREPROCESSING);
             case SKIP_MISSING_CELLS:
                 return new SettingsModelBoolean("skip_missing_cells", false);
+            case BATCH_SIZE:
+                return new SettingsModelIntegerBounded("batch_size", WordVectorLearnerParameter.DEFAULT_BATCH_SIZE, 0,
+                    Integer.MAX_VALUE);
+            case DOCUMENT_COLUMN:
+                return new SettingsModelString("document_column", "");
+            case EPOCHS:
+                return new SettingsModelIntegerBounded("epochs", WordVectorLearnerParameter.DEFAULT_EPOCHS, 0,
+                    Integer.MAX_VALUE);
+            case LABEL_COLUMN:
+                return new SettingsModelString("label_column", "");
+            case LEARNING_RATE:
+                return new SettingsModelDoubleBounded("learning_rate", WordVectorLearnerParameter.DEFAULT_LEARNING_RATE,
+                    0.0, Double.MAX_VALUE);
+            case SEED:
+                return new SettingsModelIntegerBounded("seed", WordVectorLearnerParameter.DEFAULT_SEED, 0,
+                    Integer.MAX_VALUE);
+            case TRAINING_ITERATIONS:
+                return new SettingsModelIntegerBounded("training_iterations",
+                    WordVectorLearnerParameter.DEFAULT_TRAINING_ITERATIONS, 0, Integer.MAX_VALUE);
             default:
                 throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
         }
