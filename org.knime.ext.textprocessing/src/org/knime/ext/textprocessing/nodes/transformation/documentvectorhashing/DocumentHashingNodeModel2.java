@@ -77,20 +77,19 @@ import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.node.streamable.StreamableOperatorInternals;
 import org.knime.ext.textprocessing.data.VectorHashingPortObject;
 import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
-import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier.DocumentHashingApplierNodeModel;
 
 /**
  * The {@code NodeModel} for the Document vector hashing node. This node model extends the
  * {@link AbstractDocumentHashingNodeModel} which contains the business logic of this node. This class is necessary
  * since this node has different input-/output-ports, configuration, execution and streaming handling compared to the
- * Document vector hashing applier node ({@link DocumentHashingApplierNodeModel}) which shares the same superclass. This
- * model is streamable.
+ * Document vector hashing applier node ({@code DocumentHashingApplierNodeModel}) which shares the same superclass. This
+ * node model is streamable.
  *
  * @author Tobias Koetter, Andisa Dewi and Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
 // TODO Julian: Make package scope + final (also the dialog and other utility classes)
-public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
+final class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
 
     /**
      * Default seed value
@@ -105,14 +104,16 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     private final SettingsModelIntegerBounded m_dimModel = DocumentHashingNodeDialog2.getDimModel();
 
     // TODO Julian: Should be final?
-    private SettingsModelInteger m_seedModel = DocumentHashingNodeDialog2.getSeedModel();
+    // Done
+    private final SettingsModelInteger m_seedModel = DocumentHashingNodeDialog2.getSeedModel();
 
     private final SettingsModelString m_vectValModel = DocumentHashingNodeDialog2.getVectorValueModel();
 
     private final SettingsModelString m_hashFuncModel = DocumentHashingNodeDialog2.getHashingMethod();
 
     // TODO Julian: NodeModels are usually (!) stateless (except for the settings); remove and calculate on-demand
-    private PortObjectSpec m_modelSpec;
+    // Done. PortObjectSpec creation happens on demand now.
+    //private PortObjectSpec m_modelSpec;
 
     /**
      * Creates a new instance of {@code}DocumentHashingNodeModel2} with one {@code BufferedDataTable} input port, one
@@ -120,7 +121,8 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
      * integer value is assigned as initial value of the seed.
      */
     // TODO make package scope only
-    public DocumentHashingNodeModel2() {
+    // Done
+    DocumentHashingNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
             PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false)}, 0, 0);
         m_seedModel.setIntValue(new Random().nextInt());
@@ -134,7 +136,9 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
         BufferedDataTable in = (BufferedDataTable)inObjects[0];
         ColumnRearranger r = createColumnRearranger(in.getDataTableSpec());
         BufferedDataTable table = exec.createColumnRearrangeTable(in, r, exec);
-        return new PortObject[]{table, new VectorHashingPortObject(m_modelSpec)};
+        return new PortObject[]{table,
+            new VectorHashingPortObject(new VectorHashingPortObjectSpec(m_dimModel.getIntValue(),
+                m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(), m_vectValModel.getStringValue()))};
     }
 
     /**
@@ -145,13 +149,22 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
         DataTableSpec in = (DataTableSpec)inSpecs[0];
         // set the specifications for vector space creation
         // TODO this is fishy? You have the members in this class and also in the abstract super class? Why?
-        setValues(m_dimModel.getIntValue(), m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(),
-            m_vectValModel.getStringValue());
+        // I am not really sure about this.
+        // The private members in the abstract super class have to be set, since different node models extend the
+        // abstract super class. This one sets the members based on the values defined in the NodeDialog
+        // and the DocumentVectorHashingApplier node sets the members based on the input model, so I thought
+        // it would be a good way, to create private members in the abstract super class which will
+        // be set in the specific subclasses afterwards via a setValues(...) method.
+        // I changed the private members from the abstract super class to protected now, to set the values directly.
+        // Is this the best way how to do it?
+        m_dim = m_dimModel.getIntValue();
+        m_seed = m_seedModel.getIntValue();
+        m_hashFunc = m_hashFuncModel.getStringValue();
+        m_vectVal = m_vectValModel.getStringValue();
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
-        m_modelSpec = new VectorHashingPortObjectSpec(m_dimModel.getIntValue(), m_seedModel.getIntValue(),
-            m_hashFuncModel.getStringValue(), m_vectValModel.getStringValue());
-        return new PortObjectSpec[]{out, m_modelSpec};
+        return new PortObjectSpec[]{out, new VectorHashingPortObjectSpec(m_dimModel.getIntValue(),
+            m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(), m_vectValModel.getStringValue())};
     }
 
     /**
@@ -183,8 +196,10 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
     @Override
     public void finishStreamableExecution(final StreamableOperatorInternals internals, final ExecutionContext exec,
         final PortOutput[] output) throws Exception {
-        // set the model output to provide streaming fucnctionality
-        ((PortObjectOutput)output[1]).setPortObject(new VectorHashingPortObject(m_modelSpec));
+        // set the model output to provide streaming functionality
+        ((PortObjectOutput)output[1])
+            .setPortObject(new VectorHashingPortObject(new VectorHashingPortObjectSpec(m_dimModel.getIntValue(),
+                m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(), m_vectValModel.getStringValue())));
     }
 
     /**
@@ -241,7 +256,7 @@ public class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel 
 
     @Override
     protected void reset() {
-        m_modelSpec = null;
+        // Nothing to do here...
     }
 
     @Override

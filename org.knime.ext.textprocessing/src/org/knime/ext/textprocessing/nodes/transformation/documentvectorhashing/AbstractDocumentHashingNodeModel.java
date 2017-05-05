@@ -30,14 +30,13 @@ import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier.DocumentHashingApplierNodeModel;
 import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
- * This class provides the business logic for {@link DocumentHashingNodeModel2} and {@link DocumentHashingApplierNodeModel}.
- * It also takes care of some shared node settings and handles the PortRoles.
+ * This class provides the business logic for {@code DocumentHashingNodeModel2} and
+ * {@code DocumentHashingApplierNodeModel}. It also takes care of some shared node settings and handles the PortRoles.
  *
  * @author Tobias Koetter, Andisa Dewi and Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
@@ -54,35 +53,49 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
      */
     public static final boolean DEFAULT_ASCOLLECTION = false;
 
-    // TODO Julian: remove this field?
-    private int m_documentColIndex = -1;
-
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
     private final SettingsModelString m_docCol = DocumentHashingNodeDialog2.getDocumentColModel();
 
     private final SettingsModelBoolean m_asCol = DocumentHashingNodeDialog2.getAsCollectionModel();
 
-    private int m_seed;
+    /**
+     * The seed. Can be set by {@code DocumentHashingNodeModel2} and {@code DocumentHashingApplierNodeModel}.
+     */
+    protected int m_seed;
 
-    private int m_dim;
+    /**
+     * The dimension of the vector. Can be set by {@code DocumentHashingNodeModel2} and
+     * {@code DocumentHashingApplierNodeModel}.
+     */
+    protected int m_dim;
 
-    private String m_hashFunc;
+    /**
+     * The hash function. Can be set by {@code DocumentHashingNodeModel2} and {@code DocumentHashingApplierNodeModel}.
+     */
+    protected String m_hashFunc;
 
-    private String m_vectVal;
+    /**
+     * The type of the value, stored in the vector cells. Can be set by {@code DocumentHashingNodeModel2} and
+     * {@code DocumentHashingApplierNodeModel}.
+     */
+    protected String m_vectVal;
 
     private InputPortRole[] m_inPortRoles;
 
     private OutputPortRole[] m_outPortRoles;
 
     /**
-     * @param inPortTypes
-     * @param outPortTypes
-     * @param streamableInportIdx
-     * @param streamableOutportIdx
+     * Creates a new instance of the {@code AbstractDocumentHashingNodeModel} with given (streamable) input/output port
+     * types. Also sets the roles for the ports.
+     *
+     * @param inPortTypes The input port types.
+     * @param outPortTypes The output port types.
+     * @param streamableInportIdx The index of the streamable input port.
+     * @param streamableOutportIdx The index of the streamable output port.
      */
-    public AbstractDocumentHashingNodeModel(final PortType[] inPortTypes,
-        final PortType[] outPortTypes, final int streamableInportIdx, final int streamableOutportIdx) {
+    public AbstractDocumentHashingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
+        final int streamableInportIdx, final int streamableOutportIdx) {
         super(inPortTypes, outPortTypes);
         m_inPortRoles = new InputPortRole[inPortTypes.length];
         m_outPortRoles = new OutputPortRole[outPortTypes.length];
@@ -101,8 +114,8 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        m_documentColIndex = spec.findColumnIndex(m_docCol.getStringValue());
-        if (m_documentColIndex < 0) {
+        int documentColIndex = spec.findColumnIndex(m_docCol.getStringValue());
+        if (documentColIndex < 0) {
             throw new InvalidSettingsException(
                 "Index of specified document column is not valid! " + "Check your settings!");
         }
@@ -264,21 +277,6 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
     @Override
     public OutputPortRole[] getOutputPortRoles() {
         return m_outPortRoles;
-    }
-
-    /**
-     * This method is used to set the vector creation specification.
-     *
-     * @param dim The dimension of the vector space.
-     * @param seed The random seed.
-     * @param hashFunc The hash function.
-     * @param vectVal The value type represented in the vector cells.
-     */
-    protected void setValues(final int dim, final int seed, final String hashFunc, final String vectVal) {
-        m_dim = dim;
-        m_seed = seed;
-        m_hashFunc = hashFunc;
-        m_vectVal = vectVal;
     }
 
     /**
