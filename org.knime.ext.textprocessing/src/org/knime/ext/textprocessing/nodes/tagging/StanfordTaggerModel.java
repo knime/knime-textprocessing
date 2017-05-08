@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,51 +44,61 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.02.2008 (Kilian Thiel): created
+ *   05.05.2017 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.stanford;
+package org.knime.ext.textprocessing.nodes.tagging;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
-import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.data.TagBuilder;
+import org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel;
 
 /**
- * Creates the dialog of the OscarTaggerNode with a checkbox component,
- * to specify whether recognized named entity terms should be set unmodifiable
- * or not.
+ * This interface has to be implemented to add Stanford part-of-speech or named entity recognition models to the KNIME
+ * Text Processing extension. It provides methods to return the model's name, file path, and {@link TagBuilder} that
+ * contains an enum with tags used by the specific model.<br>
+ * <br>
+ * To add another Stanford model for the Stanford (pos) tagger or the Stanford NE tagger node, create a class like the
+ * {@link English3ClassesDistsimModel}. and register it as an {@code org.knime.ext.textprocessing.StanfordTaggerModel}
+ * extension in the {@code plugin.xml}.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  */
-public class StanfordTaggerNodeDialog extends TaggerNodeSettingsPane {
+public interface StanfordTaggerModel {
 
     /**
-     * Creates and returns a
-     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
-     * containing the user settings of the specified tagger model to use.
+     * The name of the model. This name will be shown in the model selection dialog of the specific tagger nodes.
      *
-     * @return A <code>SettingsModelString</code> containing the tagger model
-     * to use.
+     * @return Returns the name of the model.
      */
-    public static SettingsModelString createTaggerModelModel() {
-        return new SettingsModelString(
-                StanfordTaggerConfigKeys.CFGKEY_MODEL,
-                StanfordTaggerNodeModel.DEF_MODEL);
-    }
+    public String getModelName();
 
     /**
-     * Creates a new instance of <code>StanfordTaggerNodeDialog</code> a drop
-     * down box to choose a tagger model to use.
+     * The path to the model file.
+     *
+     * @return Returns the path of the model.
      */
-    public StanfordTaggerNodeDialog() {
-        super();
-        createNewTab("Tagger options");
-        setSelected("Tagger options");
+    public String getModelPath();
 
-        Set<String> models = StanfordTaggerModelRegistry.getInstance().getPosTaggerModelMap().keySet();
-        addDialogComponent(new DialogComponentStringSelection(
-                createTaggerModelModel(), "Tagger model", models));
+    /**
+     * The {@link TagBuilder}, containing the tag set, providing the tags, that will be assigned by the specific model.
+     *
+     * @return Returns the TagBuilder.
+     */
+    public TagBuilder getTagBuilder();
+
+    /**
+     * Creates proper tags out of the given string and returns them.
+     * Override this method for special tag handling.
+     *
+     * @param tag The string to create a tag out of
+     * @return A list of tags build out of the given string
+     */
+    public default List<Tag> getTags(final String tag) {
+        List<Tag> tags = new ArrayList<>();
+        tags.add(getTagBuilder().buildTag(tag));
+        return tags;
     }
 }

@@ -61,6 +61,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
 import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
@@ -123,7 +124,7 @@ public class StanfordNlpNeTaggerNodeDialog extends TaggerNodeSettingsPane {
 
         setHorizontalPlacement(false);
 
-        SortedSet<String> models = new TreeSet<String>(StanfordNlpNeDocumentTagger.TAGGERMODELS.keySet());
+        SortedSet<String> models = new TreeSet<String>(StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap().keySet());
         addDialogComponent(new DialogComponentStringSelection(m_classifierModel, "Built-in tagger model", models));
         checkSettings();
     }

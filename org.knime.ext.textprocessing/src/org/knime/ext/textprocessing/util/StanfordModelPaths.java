@@ -48,6 +48,8 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
+import org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel;
 
 /**
  * Provides the paths to the models used by the Stanford POS library. The paths
@@ -59,7 +61,10 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * and the model paths cannot be created / provided.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use {@link StanfordTaggerModel} interface and extension point to provide Stanford tagger models instead
+ * of using static variables (e.g. {@link English3ClassesDistsimModel}.
  */
+@Deprecated
 public final class StanfordModelPaths {
     private static final StanfordModelPaths INSTANCE = new StanfordModelPaths();
 

@@ -50,19 +50,17 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
-import org.knime.ext.textprocessing.util.StanfordNeModelPaths;
 
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
@@ -71,71 +69,38 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
 
 /**
+ * The StanfordNLP NE tagger node adds named entity recognition (NER) tags to terms of documents. Here the Named entity
+ * tag set is used to define all kinds of tags, see {@link org.knime.ext.textprocessing.data.NamedEntityTag} for more
+ * details. The underlying tagger model which is used to choose the (hopefully) proper tags for all the terms is an
+ * external model of the Stanford framework, see (https://nlp.stanford.edu/software/CRF-NER.html) for more details.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
 
-    /**
-     * Contains the paths to the models.
-     */
-    private static final StanfordNeModelPaths PATHS = StanfordNeModelPaths.getStanfordNeModelPaths();
-
-    /**
-     * The tagger model names and their corresponding models.
-     */
-    static final HashMap<String, String> TAGGERMODELS = new HashMap<>();
-
     private AbstractSequenceClassifier<CoreLabel> m_tagger;
 
     private Tag m_tag;
 
-    static {
-        TAGGERMODELS.put("English 3 classes distsim", PATHS.getEnglishAll3ClassDistSimModelFile());
-        TAGGERMODELS.put("English 4 classes distsim", PATHS.getEnglishConll4ClassDistSimModelFile());
-        TAGGERMODELS.put("English 7 classes distsim", PATHS.getEnglishMuc7ClassDistSimModelFile());
-        TAGGERMODELS.put("English 3 classes no distsim", PATHS.getEnglishAll3ClassNoDistSimModelFile());
-        TAGGERMODELS.put("English 4 classes no distsim", PATHS.getEnglishConll4ClassNoDistSimModelFile());
-        TAGGERMODELS.put("English 7 classes no distsim", PATHS.getEnglishMuc7ClassNoDistSimModelFile());
-        TAGGERMODELS.put("English 3 classes no wiki caseless distsim",
-            PATHS.getEnglishNoWiki3ClassCaselessDistSimModelFile());
-        TAGGERMODELS.put("German dewac", PATHS.getGermanDewacModelFile());
-        TAGGERMODELS.put("German hgc", PATHS.getGermanHgcModelFile());
-        TAGGERMODELS.put("Spanish ancora distsim", PATHS.getSpanishAncoraDistSimModelFile());
-    }
-
-    /**
-     * This map stores tags used by the german and spanish stanford ner models and maps them to the tag naming used by
-     * KNIME.
-     */
-    private static final Map<String, String> tagDictionary = new HashMap<String, String>();
-
-    static {
-        tagDictionary.put("I-LOC", NamedEntityTag.LOCATION.getTag().getTagValue());
-        tagDictionary.put("LUG", NamedEntityTag.LOCATION.getTag().getTagValue());
-        tagDictionary.put("I-PER", NamedEntityTag.PERSON.getTag().getTagValue());
-        tagDictionary.put("PERS", NamedEntityTag.PERSON.getTag().getTagValue());
-        tagDictionary.put("I-ORG", NamedEntityTag.ORGANIZATION.getTag().getTagValue());
-        tagDictionary.put("ORG", NamedEntityTag.ORGANIZATION.getTag().getTagValue());
-    }
+    private StanfordTaggerModel m_model;
 
     /**
      * Creates a new instance of {@code StanfordNlpNeDocumentTagger}.
      *
      * @param setNeUnmodifiable The unmodifiable flag.
-     * @param model The model.
+     * @param modelName The model.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws ClassNotFoundException If the classifier could not be created from given path.
      * @throws IOException If the classifier could not be created from given path.
      */
-    public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String model, final String tokenizerName)
-        throws ClassNotFoundException, IOException {
+    public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String modelName,
+        final String tokenizerName) throws ClassNotFoundException, IOException {
         super(setNeUnmodifiable, tokenizerName);
-        if (!TAGGERMODELS.containsKey(model)) {
-            throw new IllegalArgumentException("Model \"" + model + "\" does not exist.");
+        if (!StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap().containsKey(modelName)) {
+            throw new IllegalArgumentException("Model \"" + modelName + "\" does not exist.");
         }
-        String path = TAGGERMODELS.get(model);
-        m_tagger = CRFClassifier.getClassifier(path);
+        m_model = StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap().get(modelName);
+        m_tagger = CRFClassifier.getClassifier(m_model.getModelPath());
     }
 
     /**
@@ -155,12 +120,12 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
      * {@inheritDoc}
      */
     @Override
-    protected List<Tag> getTags(String tag) {
-        List<Tag> tags = new ArrayList<Tag>(1);
+    protected List<Tag> getTags(final String tag) {
+        List<Tag> tags;
         if (m_tag == null) {
-            tag = normalizeTag(tag);
-            tags.add(NamedEntityTag.stringToTag(tag));
+            tags = m_model.getTags(tag);
         } else {
+            tags = new ArrayList<Tag>(1);
             tags.add(m_tag);
         }
         return tags;
@@ -192,21 +157,10 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * Normalizes tags that do not fit to the KNIME tag naming.
-     *
-     * @param The tag as a string.
-     * @return The normalized tag.
-     */
-    private static String normalizeTag(final String str) {
-        return tagDictionary.getOrDefault(str, str);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     protected void preprocess(final Document doc) {
         // no preprocessing required
-
     }
 }

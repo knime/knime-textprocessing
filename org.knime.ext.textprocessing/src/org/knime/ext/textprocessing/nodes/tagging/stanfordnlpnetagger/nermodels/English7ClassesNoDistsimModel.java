@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,51 +44,48 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.02.2008 (Kilian Thiel): created
+ *   05.05.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.stanford;
+package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels;
 
-import java.util.Set;
-
-import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
-import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
+import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.knime.ext.textprocessing.data.NamedEntityTag;
+import org.knime.ext.textprocessing.data.TagBuilder;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
 
 /**
- * Creates the dialog of the OscarTaggerNode with a checkbox component,
- * to specify whether recognized named entity terms should be set unmodifiable
- * or not.
+ * This class implements the {@link StanfordTaggerModel} interface to provide the "English 7 class no distsim"
+ * named-entity recognition model.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  */
-public class StanfordTaggerNodeDialog extends TaggerNodeSettingsPane {
+public class English7ClassesNoDistsimModel implements StanfordTaggerModel {
+
+    private static final String MODELNAME = "English 7 classes no distsim";
+
+    private static final String MODELPATH = "stanfordmodels/nermodels/english.muc.7class.nodistsim.crf.ser.gz";
 
     /**
-     * Creates and returns a
-     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
-     * containing the user settings of the specified tagger model to use.
-     *
-     * @return A <code>SettingsModelString</code> containing the tagger model
-     * to use.
+     * {@inheritDoc}
      */
-    public static SettingsModelString createTaggerModelModel() {
-        return new SettingsModelString(
-                StanfordTaggerConfigKeys.CFGKEY_MODEL,
-                StanfordTaggerNodeModel.DEF_MODEL);
+    @Override
+    public String getModelName() {
+        return MODELNAME;
     }
 
     /**
-     * Creates a new instance of <code>StanfordTaggerNodeDialog</code> a drop
-     * down box to choose a tagger model to use.
+     * {@inheritDoc}
      */
-    public StanfordTaggerNodeDialog() {
-        super();
-        createNewTab("Tagger options");
-        setSelected("Tagger options");
+    @Override
+    public String getModelPath() {
+        return TextprocessingCorePlugin.resolvePath(MODELPATH).getAbsolutePath();
+    }
 
-        Set<String> models = StanfordTaggerModelRegistry.getInstance().getPosTaggerModelMap().keySet();
-        addDialogComponent(new DialogComponentStringSelection(
-                createTaggerModelModel(), "Tagger model", models));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TagBuilder getTagBuilder() {
+        return NamedEntityTag.getDefault();
     }
 }

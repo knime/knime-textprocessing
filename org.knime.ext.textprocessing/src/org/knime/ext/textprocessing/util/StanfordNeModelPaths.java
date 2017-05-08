@@ -49,12 +49,17 @@
 package org.knime.ext.textprocessing.util;
 
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
+import org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel;
 
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
+ * @deprecated Use {@link StanfordTaggerModel} interface and extension point to provide Stanford tagger models instead
+ * of using static variables (e.g. {@link English3ClassesDistsimModel}.
  */
+@Deprecated
 public final class StanfordNeModelPaths {
     private static final StanfordNeModelPaths INSTANCE = new StanfordNeModelPaths();
 

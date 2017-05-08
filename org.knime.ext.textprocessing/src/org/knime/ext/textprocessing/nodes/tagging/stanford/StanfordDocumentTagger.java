@@ -53,16 +53,14 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.FrenchTreebankTag;
-import org.knime.ext.textprocessing.data.PartOfSpeechTag;
-import org.knime.ext.textprocessing.data.STTSPartOfSpeechTag;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
 import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
-import org.knime.ext.textprocessing.util.StanfordModelPaths;
 
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -79,34 +77,17 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 public class StanfordDocumentTagger extends AbstractDocumentTagger {
 
     /**
-     * Contains the paths to the models.
-     */
-    private static final StanfordModelPaths PATHS = StanfordModelPaths.getStanfordModelPaths();
-
-    /**
      * The tagger model names and their corresponding model file.
+     *
+     * @deprecated Use the {@link StanfordTaggerModelRegistry#getPosTaggerModelMap()} instead to get model names, file
+     *             path and {@code TagBuilder} of the specific model.
      */
+    @Deprecated
     public static final Hashtable<String, String> TAGGERMODELS = new Hashtable<>();
-
-    static {
-        TAGGERMODELS.put("English bidirectional", PATHS.getEnglishBidirectionalPosModelFile());
-        TAGGERMODELS.put("English left 3 words", PATHS.getEnglishLeft3WordsPosModelFile());
-        TAGGERMODELS.put("English left 3 words caseless", PATHS.getEnglishLeft3WordsCaselessPosModelFile());
-        TAGGERMODELS.put("German fast", PATHS.getGermanFastPosModelFile());
-        TAGGERMODELS.put("German hgc", PATHS.getGermanHgcPosModelFile());
-        TAGGERMODELS.put("German dewac", PATHS.getGermanDewacPosModelFile());
-        TAGGERMODELS.put("French", PATHS.getFrenchPosModelFile());
-    }
-
-    private enum Language {
-            ENGLISH, GERMAN, FRENCH, ARABIC;
-    }
 
     private MaxentTagger m_tagger;
 
-    private String m_modelName;
-
-    private Language m_lang;
+    private StanfordTaggerModel m_model;
 
     /**
      * Creates a new instance of StanfordDocumentTagger and loads internally the specified tagging model of the Stanford
@@ -114,30 +95,20 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      * are set to unmodifiable.
      *
      * @param setNeUnmodifiable If true all recognized terms are set unmodifiable.
-     * @param model The model to load and use.
+     * @param modelName The model to load and use.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws ClassNotFoundException If model cannot be found.
      * @throws IOException If model cannot be red.
      * @since 3.3
      */
-    public StanfordDocumentTagger(final boolean setNeUnmodifiable, final String model, final String tokenizerName)
+    public StanfordDocumentTagger(final boolean setNeUnmodifiable, final String modelName, final String tokenizerName)
         throws ClassNotFoundException, IOException {
         super(setNeUnmodifiable, tokenizerName);
-        if (!TAGGERMODELS.containsKey(model)) {
-            throw new IllegalArgumentException("Model \"" + model + "\" does not exists.");
+        if (!StanfordTaggerModelRegistry.getInstance().getPosTaggerModelMap().containsKey(modelName)) {
+            throw new IllegalArgumentException("Model \"" + modelName + "\" does not exists.");
         }
-        m_tagger = new MaxentTagger(TAGGERMODELS.get(model));
-        m_modelName = model;
-
-        if (m_modelName.contains("German")) {
-            m_lang = Language.GERMAN;
-        } else if (m_modelName.contains("English")) {
-            m_lang = Language.ENGLISH;
-        } else if (m_modelName.contains("French")) {
-            m_lang = Language.FRENCH;
-        } else {
-            throw new IllegalArgumentException("Language could not be specified from model!");
-        }
+        m_model = StanfordTaggerModelRegistry.getInstance().getPosTaggerModelMap().get(modelName);
+        m_tagger = new MaxentTagger(m_model.getModelPath());
     }
 
     /**
@@ -145,15 +116,7 @@ public class StanfordDocumentTagger extends AbstractDocumentTagger {
      */
     @Override
     protected List<Tag> getTags(final String tag) {
-        List<Tag> tags = new ArrayList<>();
-        if (m_lang.equals(Language.GERMAN)) {
-            tags.add(STTSPartOfSpeechTag.stringToTag(tag));
-        } else if (m_lang.equals(Language.FRENCH)) {
-            tags.add(FrenchTreebankTag.stringToTag(tag));
-        } else {
-            tags.add(PartOfSpeechTag.stringToTag(tag));
-        }
-        return tags;
+        return m_model.getTags(tag);
     }
 
     /**
