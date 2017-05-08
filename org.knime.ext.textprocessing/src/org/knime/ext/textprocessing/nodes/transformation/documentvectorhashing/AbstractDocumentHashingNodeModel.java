@@ -59,31 +59,19 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
 
     private final SettingsModelBoolean m_asCol = DocumentHashingNodeDialog2.getAsCollectionModel();
 
-    /**
-     * The seed. Can be set by {@code DocumentHashingNodeModel2} and {@code DocumentHashingApplierNodeModel}.
-     */
-    protected int m_seed;
-
-    /**
-     * The dimension of the vector. Can be set by {@code DocumentHashingNodeModel2} and
-     * {@code DocumentHashingApplierNodeModel}.
-     */
-    protected int m_dim;
-
-    /**
-     * The hash function. Can be set by {@code DocumentHashingNodeModel2} and {@code DocumentHashingApplierNodeModel}.
-     */
-    protected String m_hashFunc;
-
-    /**
-     * The type of the value, stored in the vector cells. Can be set by {@code DocumentHashingNodeModel2} and
-     * {@code DocumentHashingApplierNodeModel}.
-     */
-    protected String m_vectVal;
-
     private InputPortRole[] m_inPortRoles;
 
     private OutputPortRole[] m_outPortRoles;
+
+    // parameters used for columnRearrange. will be set by specific implementation of this node model
+    // DocumentHashingNodeModel2 or DocumentHashingApplierNodeModel
+    private int m_seed;
+
+    private int m_dim;
+
+    private String m_hashFunc;
+
+    private String m_vectVal;
 
     /**
      * Creates a new instance of the {@code AbstractDocumentHashingNodeModel} with given (streamable) input/output port
@@ -277,6 +265,21 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
     @Override
     public OutputPortRole[] getOutputPortRoles() {
         return m_outPortRoles;
+    }
+
+    /**
+     * Sets the parameters used for vector creation.
+     *
+     * @param dim The dimension of the vector to be created.
+     * @param seed The seed.
+     * @param hashFunc The hash function.
+     * @param vectVal The type of the vector value (binary, tf, idf)
+     */
+    protected void setValues(final int dim, final int seed, final String hashFunc, final String vectVal) {
+        m_seed = seed;
+        m_dim = dim;
+        m_hashFunc = hashFunc;
+        m_vectVal = vectVal;
     }
 
     /**

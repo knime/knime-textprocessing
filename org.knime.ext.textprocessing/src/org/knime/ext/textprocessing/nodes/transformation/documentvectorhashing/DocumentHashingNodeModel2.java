@@ -88,7 +88,6 @@ import org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec;
  * @author Tobias Koetter, Andisa Dewi and Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
-// TODO Julian: Make package scope + final (also the dialog and other utility classes)
 final class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
 
     /**
@@ -103,25 +102,17 @@ final class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
 
     private final SettingsModelIntegerBounded m_dimModel = DocumentHashingNodeDialog2.getDimModel();
 
-    // TODO Julian: Should be final?
-    // Done
     private final SettingsModelInteger m_seedModel = DocumentHashingNodeDialog2.getSeedModel();
 
     private final SettingsModelString m_vectValModel = DocumentHashingNodeDialog2.getVectorValueModel();
 
     private final SettingsModelString m_hashFuncModel = DocumentHashingNodeDialog2.getHashingMethod();
 
-    // TODO Julian: NodeModels are usually (!) stateless (except for the settings); remove and calculate on-demand
-    // Done. PortObjectSpec creation happens on demand now.
-    //private PortObjectSpec m_modelSpec;
-
     /**
      * Creates a new instance of {@code}DocumentHashingNodeModel2} with one {@code BufferedDataTable} input port, one
      * {@code BufferedDataTable} output port and one {@code VectorHashingPortObject} output port. For each node, a new
      * integer value is assigned as initial value of the seed.
      */
-    // TODO make package scope only
-    // Done
     DocumentHashingNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
             PortTypeRegistry.getInstance().getPortType(VectorHashingPortObject.class, false)}, 0, 0);
@@ -147,20 +138,9 @@ final class DocumentHashingNodeModel2 extends AbstractDocumentHashingNodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = (DataTableSpec)inSpecs[0];
-        // set the specifications for vector space creation
-        // TODO this is fishy? You have the members in this class and also in the abstract super class? Why?
-        // I am not really sure about this.
-        // The private members in the abstract super class have to be set, since different node models extend the
-        // abstract super class. This one sets the members based on the values defined in the NodeDialog
-        // and the DocumentVectorHashingApplier node sets the members based on the input model, so I thought
-        // it would be a good way, to create private members in the abstract super class which will
-        // be set in the specific subclasses afterwards via a setValues(...) method.
-        // I changed the private members from the abstract super class to protected now, to set the values directly.
-        // Is this the best way how to do it?
-        m_dim = m_dimModel.getIntValue();
-        m_seed = m_seedModel.getIntValue();
-        m_hashFunc = m_hashFuncModel.getStringValue();
-        m_vectVal = m_vectValModel.getStringValue();
+        // set parameter for vector creation
+        setValues(m_dimModel.getIntValue(), m_seedModel.getIntValue(), m_hashFuncModel.getStringValue(),
+            m_vectValModel.getStringValue());
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
         return new PortObjectSpec[]{out, new VectorHashingPortObjectSpec(m_dimModel.getIntValue(),

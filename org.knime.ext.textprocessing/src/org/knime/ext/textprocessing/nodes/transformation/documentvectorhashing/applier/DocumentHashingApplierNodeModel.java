@@ -109,11 +109,8 @@ final class DocumentHashingApplierNodeModel extends AbstractDocumentHashingNodeM
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = (DataTableSpec)inSpecs[1];
         VectorHashingPortObjectSpec modelSpec = (VectorHashingPortObjectSpec)inSpecs[0];
-        // set settings for vector creation
-        m_dim = modelSpec.getDimension();
-        m_seed = modelSpec.getSeed();
-        m_hashFunc = modelSpec.getHashFunc();
-        m_vectVal = modelSpec.getVectVal();
+        // set parameter for vector creation
+        setValues(modelSpec.getDimension(), modelSpec.getSeed(), modelSpec.getHashFunc(), modelSpec.getVectVal());
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
         return new PortObjectSpec[]{out};
