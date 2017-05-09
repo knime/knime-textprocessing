@@ -101,6 +101,21 @@ public class WordVectorParameterSettingsModels2
             case TRAINING_ITERATIONS:
                 return new SettingsModelIntegerBounded("training_iterations",
                     WordVectorLearnerParameter.DEFAULT_TRAINING_ITERATIONS, 0, Integer.MAX_VALUE);
+            case ELEMENTS_LEARNING_ALGO:
+                return new SettingsModelString("elements_learning_algo",
+                    WordVectorLearnerParameter.DEFAULT_ELEMENTS_LEARNING_ALGO);
+            case NEGATIVE_SAMPLING:
+                return new SettingsModelDoubleBounded("negative_sampling",
+                    WordVectorLearnerParameter.DEFAULT_NEGATIVE_SAMPLING, 0.0, Double.MAX_VALUE);
+            case SAMPLING:
+                return new SettingsModelDoubleBounded("sampling", WordVectorLearnerParameter.DEFAULT_SAMPLING, 0.0,
+                    Double.MAX_VALUE);
+            case SEQUENCE_LEARNING_ALGO:
+                return new SettingsModelString("sequence_learning_algo",
+                    WordVectorLearnerParameter.DEFAULT_SEQUENCE_LEARNING_ALGO);
+            case USE_HIERARCHICAL_SOFTMAX:
+                return new SettingsModelBoolean("use_hierarchical_softmax",
+                    WordVectorLearnerParameter.DEFAULT_USE_HIERARCHICAL_SOFTMAX);
             default:
                 throw new IllegalStateException("WordVectorParameter does not exist: " + enumerate.toString());
         }

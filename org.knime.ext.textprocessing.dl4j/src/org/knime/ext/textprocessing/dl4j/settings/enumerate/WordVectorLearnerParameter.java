@@ -74,6 +74,16 @@ public enum WordVectorLearnerParameter {
         BATCH_SIZE,
         /** Number of epochs to train. */
         EPOCHS,
+        /** Algorithm used to train element representations. */
+        ELEMENTS_LEARNING_ALGO,
+        /** Algorithm used to train sequence representations. */
+        SEQUENCE_LEARNING_ALGO,
+        /** Whether to use hierarchical softmax. */
+        USE_HIERARCHICAL_SOFTMAX,
+        /** Downsampling rate. */
+        SAMPLING,
+        /** Negative sampling rate. */
+        NEGATIVE_SAMPLING,
         /** Whether to skip rows containing missing cells. */
         SKIP_MISSING_CELLS;
 
@@ -81,6 +91,10 @@ public enum WordVectorLearnerParameter {
     public static final Double DEFAULT_MIN_LEARNING_RATE = 0.0001;
 
     public static final Double DEFAULT_LEARNING_RATE = 0.025;
+
+    public static final Double DEFAULT_SAMPLING = 0.001;
+
+    public static final int DEFAULT_NEGATIVE_SAMPLING = 5;
 
     public static final int DEFAULT_BATCH_SIZE = 10000;
 
@@ -98,5 +112,11 @@ public enum WordVectorLearnerParameter {
 
     public static final String DEFAULT_WORD_VECTOR_TRAININGS_MODE = "WORD2VEC";
 
+    public static final String DEFAULT_SEQUENCE_LEARNING_ALGO = "DBOW";
+
+    public static final String DEFAULT_ELEMENTS_LEARNING_ALGO = "CBOW";
+
     public static final boolean DEFAULT_USE_BASIC_PREPROCESSING = true;
+
+    public static final boolean DEFAULT_USE_HIERARCHICAL_SOFTMAX = false;
 }
