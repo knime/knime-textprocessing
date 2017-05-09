@@ -40,26 +40,23 @@
  * may freely choose the license terms applicable to such Node, including
  * when such Node is propagated with or for interoperation with KNIME.
  *******************************************************************************/
-package org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn;
+package org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.w2v;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * <code>NodeFactory</code> for the "WordVectorLearner" Node.
- *
- *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorLearnerNodeFactory2 extends NodeFactory<WordVectorLearnerNodeModel2> {
+public class Word2VecLearnerNodeFactory extends NodeFactory<Word2VecLearnerNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public WordVectorLearnerNodeModel2 createNodeModel() {
-        return new WordVectorLearnerNodeModel2();
+    public Word2VecLearnerNodeModel createNodeModel() {
+        return new Word2VecLearnerNodeModel();
     }
 
     /**
@@ -74,8 +71,8 @@ public class WordVectorLearnerNodeFactory2 extends NodeFactory<WordVectorLearner
      * {@inheritDoc}
      */
     @Override
-    public NodeView<WordVectorLearnerNodeModel2> createNodeView(final int viewIndex,
-        final WordVectorLearnerNodeModel2 nodeModel) {
+    public NodeView<Word2VecLearnerNodeModel> createNodeView(final int viewIndex,
+        final Word2VecLearnerNodeModel nodeModel) {
         return null;
     }
 
@@ -92,7 +89,7 @@ public class WordVectorLearnerNodeFactory2 extends NodeFactory<WordVectorLearner
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return new WordVectorLearnerNodeDialog2();
+        return new Word2VecLearnerNodeDialog();
     }
 
 }

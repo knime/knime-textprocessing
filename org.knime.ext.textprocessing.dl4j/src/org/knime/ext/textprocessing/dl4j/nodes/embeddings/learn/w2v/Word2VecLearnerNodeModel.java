@@ -40,16 +40,13 @@
  * may freely choose the license terms applicable to such Node, including
  * when such Node is propagated with or for interoperation with KNIME.
  *******************************************************************************/
-package org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn;
+package org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.w2v;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.Word2Vec;
-import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
@@ -61,34 +58,29 @@ import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.ext.dl4j.base.AbstractDLNodeModel;
-import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
-import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentIterator;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableSentenceIterator;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
+import org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.AbstractWordVectorLearnerNodeModel;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels2;
 
 /**
- * Node to learn a {@link WordVectors} model using either Wor2Vec or Doc2Vec using DL4J implementation. For details see:
- * http://deeplearning4j.org/word2vec
+ * Learner node for Word2Vec models.
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
+public class Word2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel {
 
     /* SettingsModels */
     private WordVectorParameterSettingsModels2 m_wordVecParameterSettings;
 
-    private WordVectorPortObjectSpec m_outputSpec;
-
     /**
      * Constructor for the node model.
      */
-    public WordVectorLearnerNodeModel2() {
+    public Word2VecLearnerNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{WordVectorFileStorePortObject.TYPE});
     }
 
@@ -99,102 +91,57 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
 
         TableUtils.checkForEmptyTable(table);
 
-        final WordVectorTrainingMode mode = WordVectorTrainingMode
-            .valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
-        final String labelColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.LABEL_COLUMN);
-        final String documentColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN);
-        WordVectors wordVectors = null;
+        final String documentColumnName =
+            m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN);
+        final String elementsAlgo =
+            m_wordVecParameterSettings.getString(WordVectorLearnerParameter.ELEMENTS_LEARNING_ALGO);
 
         // training parameters
-        final int trainingIterations = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.TRAINING_ITERATIONS);
+        final int trainingIterations =
+            m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.TRAINING_ITERATIONS);
         final int minWordFrequency =
             m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
         final int layerSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.LAYER_SIZE);
         final int seed = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.SEED);
         final double learningRate = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.LEARNING_RATE);
+        final double sampling = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.SAMPLING);
+        final double negativeSampling =
+            m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.NEGATIVE_SAMPLING);
         final double minLearningRate =
             m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
         final int windowSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.WINDOW_SIZE);
         final int epochs = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.EPOCHS);
         final int batchSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.BATCH_SIZE);
+
         final boolean skipMissing =
             m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
+        final boolean useHS =
+            m_wordVecParameterSettings.getBoolean(WordVectorLearnerParameter.USE_HIERARCHICAL_SOFTMAX);
 
-        // sentence tokenizer and preprocessing
         final TokenizerFactory t = new DefaultTokenizerFactory();
 
-        switch (mode) {
-            case DOC2VEC:
-                final LabelAwareIterator docIter = new BufferedDataTableLabelledDocumentIterator(table,
-                    documentColumnName, labelColumnName, skipMissing);
+        final SentenceIterator sentenceIter =
+            new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
 
-                // build doc2vec model
-                final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)
-                    .minLearningRate(minLearningRate).seed(seed).layerSize(layerSize).batchSize(batchSize)
-                    .windowSize(windowSize).minWordFrequency(minWordFrequency).iterations(trainingIterations)
-                    .epochs(epochs).iterate(docIter).trainElementsRepresentation(true).tokenizerFactory(t)
-                    .allowParallelTokenization(false).build();
+        // build word2vec model
+        final Word2Vec w2v =
+            new Word2Vec.Builder().learningRate(learningRate).minLearningRate(minLearningRate).seed(seed)
+                .layerSize(layerSize).batchSize(batchSize).windowSize(windowSize).minWordFrequency(minWordFrequency)
+                .iterations(trainingIterations).epochs(epochs).iterate(sentenceIter).tokenizerFactory(t)
+                .allowParallelTokenization(false).elementsLearningAlgorithm(parseElementsAlgo(elementsAlgo))
+                .useHierarchicSoftmax(useHS).negativeSample(negativeSampling).sampling(sampling).build();
 
-                d2v.fit();
-                wordVectors = d2v;
+        w2v.fit();
 
-                break;
-
-            case WORD2VEC:
-                final SentenceIterator sentenceIter =
-                    new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
-
-                // build word2vec model
-                final Word2Vec w2v = new Word2Vec.Builder().learningRate(learningRate).minLearningRate(minLearningRate)
-                    .seed(seed).layerSize(layerSize).batchSize(batchSize).windowSize(windowSize)
-                    .minWordFrequency(minWordFrequency).iterations(trainingIterations).epochs(epochs)
-                    .iterate(sentenceIter).tokenizerFactory(t).allowParallelTokenization(false).build();
-
-                w2v.fit();
-                wordVectors = w2v;
-
-                break;
-
-            default:
-                throw new InvalidSettingsException("No case defined for WordVectorTrainingMode: " + mode);
-        }
-
-        final WordVectorFileStorePortObject outPortObject = WordVectorFileStorePortObject.create(wordVectors,
-            m_outputSpec, exec.createFileStore(UUID.randomUUID().toString() + ""));
+        final WordVectorFileStorePortObject outPortObject = WordVectorFileStorePortObject.create(w2v, getOutputSpec(),
+            exec.createFileStore(UUID.randomUUID().toString() + ""));
         return new WordVectorFileStorePortObject[]{outPortObject};
     }
 
     @Override
     protected WordVectorPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        final DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
-
-        final WordVectorTrainingMode mode = WordVectorTrainingMode
-            .valueOf(m_wordVecParameterSettings.getString(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE));
-        final String labelColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.LABEL_COLUMN);
-        final String documentColumnName = m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN);
-
-        switch (mode) {
-            case DOC2VEC:
-                try {
-                    ConfigurationUtils.validateColumnSelection(tableSpec,
-                        new String[]{labelColumnName, documentColumnName});
-                } catch (final InvalidSettingsException e) {
-                    throw new InvalidSettingsException("Need to specify document and label column for " + mode);
-                }
-                break;
-            case WORD2VEC:
-                try {
-                    ConfigurationUtils.validateColumnSelection(tableSpec, documentColumnName);
-                } catch (final InvalidSettingsException e) {
-                    throw new InvalidSettingsException("Need to specify document column for " + mode);
-                }
-                break;
-            default:
-                throw new InvalidSettingsException("No case defined for WordVectorTrainingsMode: " + mode);
-        }
-
-        m_outputSpec = new WordVectorPortObjectSpec(mode);
-        return new WordVectorPortObjectSpec[]{m_outputSpec};
+        return configure((DataTableSpec)inSpecs[0], WordVectorTrainingMode.WORD2VEC,
+            m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN));
     }
 
     @Override
@@ -205,23 +152,20 @@ public class WordVectorLearnerNodeModel2 extends AbstractDLNodeModel {
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.SEED);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.BATCH_SIZE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.EPOCHS);
-        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LABEL_COLUMN);
-        // default training mode is Word2Vec so labels are not required by
-        // default
-        m_wordVecParameterSettings.getParameter(WordVectorLearnerParameter.LABEL_COLUMN).setEnabled(false);
-
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.DOCUMENT_COLUMN);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.LAYER_SIZE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_WORD_FREQUENCY);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WINDOW_SIZE);
-        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.WORD_VECTOR_TRAINING_MODE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.MIN_LEARNING_RATE);
         m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.SKIP_MISSING_CELLS);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.NEGATIVE_SAMPLING);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.SAMPLING);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.ELEMENTS_LEARNING_ALGO);
+        m_wordVecParameterSettings.setParameter(WordVectorLearnerParameter.USE_HIERARCHICAL_SOFTMAX);
 
         final List<SettingsModel> settings = new ArrayList<>();
         settings.addAll(m_wordVecParameterSettings.getAllInitializedSettings());
 
         return settings;
     }
-
 }

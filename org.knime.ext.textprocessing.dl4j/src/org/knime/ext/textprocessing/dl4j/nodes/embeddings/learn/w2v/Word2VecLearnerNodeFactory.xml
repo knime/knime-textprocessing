@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./learn.png" type="Learner" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Word2Vec Learner</name>
+    
+    <shortDescription>
+        Learn a Word2Vec model using documents.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>This node learns a Word2Vec model on unlabelled documents. The model will
+        only learn word representations (vector for each word), that can be extracted
+        using the Vocabulary Extractor Node.
+        For more information on Word Vectors see:
+        <a href="http://deeplearning4j.org/word2vec">http://deeplearning4j.org/word2vec</a>
+        </intro>
+     
+    <tab name="Data Options">   
+        <option name="Document Column">Column containing the Document or String to train on.</option>
+    </tab>     
+    <tab name="Learning Options">                
+        <option name="Learning Rate">The starting learning rate.</option>
+        <option name="Minimum Learning Rate">The minimum learning rate threshold. The learning rate will decay automatically over time.</option>
+        <option name="Layer Size">The length of the resulting word vectors.</option>
+        <option name="Batch Size">The number of words to use for each batch.</option>       
+        <option name="Seed">A seed value to use for training.</option>       
+        <option name="Number of Epochs">The number of epochs to train.</option>       
+        <option name="Number of Training Iterations">The number of updates done for each batch.</option>    
+        <option name="Context Window Size">Size of the context, meaning a window around each word to consider for learning.</option>        
+        <option name="Minimum Word Frequency">Minimum frequency of a word to appear in the corpus to be considered for learning. Words
+        with a lower frequency will not appear in the vocabulary contained in the Word Vector Model.</option>
+        <option name="Sampling Rate">Threshold for configuring which higher-frequency words are randomly downsampled;
+    	a useful range is (0, 1e-5)</option> 
+        <option name="Use Hierarchical Softmax?">Whether to use hierarchical softmax. If checked negative sampling will be disabled.</option>               
+        <option name="Negative Sampling Rate">The number of “noise words” that should be drawn.</option>
+       	<option name="Elements Learning Algorithm">The <a href="https://arxiv.org/pdf/1411.2738.pdf">algorithm</a> to use to learn 
+       	word representations.</option>  	
+        <option name="Skip missing cells?">Whether rows containing missing cells should be skipped or not. If missing cells should not
+        be skipped but the table contains missing cells the node will fail.</option>
+    </tab>     
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Data Table">Table containing Document or String column.</inPort>
+        <outPort index="0" name="Word Vector Model">Trained Doc2Vec Model</outPort>
+    </ports>    
+</knimeNode>
