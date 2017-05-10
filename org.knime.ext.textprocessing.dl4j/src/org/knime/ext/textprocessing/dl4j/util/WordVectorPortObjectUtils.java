@@ -299,7 +299,7 @@ public class WordVectorPortObjectUtils {
      * @return file containing stream content
      * @throws IOException
      */
-    private static File inputStreamToTmpFile(final InputStream is) throws IOException {
+    public static File inputStreamToTmpFile(final InputStream is) throws IOException {
         File tmpFile = FileUtil.createTempFile(UUID.randomUUID().toString(), null);
         FileUtils.copyInputStreamToFile(is, tmpFile);
         return tmpFile;

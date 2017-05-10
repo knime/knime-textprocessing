@@ -45,6 +45,7 @@ package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
@@ -122,19 +123,21 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
     protected WordVectorFileStorePortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
         final URL url = FileUtil.toURL(m_inFile.getStringValue());
-        final File file = FileUtil.getFileFromURL(url);
         WordVectors wv = null;
 
         if (m_isDl4jFormat) {
-            try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(file))) {
+            try (ZipInputStream zipIn = new ZipInputStream(url.openStream())) {
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
             } catch (Exception e) {
                 LOGGER.error("Error loading word vector model in KNIME format!", e);
                 throw e;
             }
         } else {
-            try {
-                wv = WordVectorSerializer.readWord2VecModel(file);
+            try(InputStream inStream = url.openStream()) {
+
+                File tmp = WordVectorPortObjectUtils.inputStreamToTmpFile(inStream);
+                wv = WordVectorSerializer.readWord2VecModel(tmp);
+                tmp.delete();
             } catch (Exception e) {
                 LOGGER.error("Error loading word vector model in external format! See node description for "
                     + "details about supported formats.", e);
