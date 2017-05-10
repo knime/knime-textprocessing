@@ -769,7 +769,7 @@
             hidden="false"
             name="VectorHashingPortObject"
             objectClass="org.knime.ext.textprocessing.data.VectorHashingPortObject"
-            objectSerializer="org.knime.ext.textprocessing.data.VectorHashingPortObject$Serializer"
+            objectSerializer="org.knime.ext.textprocessing.data.VectorHashingPortObject$VectorHashingPortObjectSerializer"
             specClass="org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec"
             specSerializer="org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec$Serializer">
       </portType>

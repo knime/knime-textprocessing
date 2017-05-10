@@ -48,13 +48,18 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.io.IOException;
+import java.util.Objects;
+
+import javax.swing.JComponent;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContentRO;
-import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObject;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortObjectZipInputStream;
+import org.knime.core.node.port.PortObjectZipOutputStream;
+import org.knime.core.node.util.CheckUtils;
 
 /**
  * The {@code VectorHashingPortObject} is used to transfer vector creation specifications from one Document vector
@@ -63,33 +68,36 @@ import org.knime.core.node.port.PortObjectSpec;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
  */
-public final class VectorHashingPortObject extends AbstractSimplePortObject {
+public final class VectorHashingPortObject implements PortObject {
 
-    private PortObjectSpec m_spec;
+    /** Serializer as required by extension point. */
+    public static final class VectorHashingPortObjectSerializer
+        extends PortObject.PortObjectSerializer<VectorHashingPortObject> {
 
-    /**
-     * The (empty) serializer. Values will be saved and loaded via
-     * {@link VectorHashingPortObject#load(ModelContentRO, PortObjectSpec, ExecutionMonitor)} and
-     * {@link VectorHashingPortObject#save(ModelContentWO, ExecutionMonitor)}.
-     *
-     * @author Julian Bunzel, KNIME.com, Berlin, Germany
-     */
-    public static final class Serializer extends AbstractSimplePortObjectSerializer<VectorHashingPortObject> {
-        // Nothing to do here...
+        @Override
+        public void savePortObject(final VectorHashingPortObject portObject, final PortObjectZipOutputStream out,
+            final ExecutionMonitor exec) throws IOException, CanceledExecutionException {
+        }
+
+        @Override
+        public VectorHashingPortObject loadPortObject(final PortObjectZipInputStream in, final PortObjectSpec spec,
+            final ExecutionMonitor exec) throws IOException, CanceledExecutionException {
+            CheckUtils.checkArgument(spec instanceof VectorHashingPortObjectSpec, "Spec not instance of '%s' but '%s'",
+                VectorHashingPortObjectSpec.class.getSimpleName(),
+                spec == null ? "<null>" : spec.getClass().getSimpleName());
+            return new VectorHashingPortObject((VectorHashingPortObjectSpec)spec);
+        }
+
     }
 
-    /**
-     * Empty constructor. Necessary for loading.
-     */
-    public VectorHashingPortObject() {
-    }
+    private final VectorHashingPortObjectSpec m_spec;
 
     /**
-     * TODO!
+     * New portobject based on the non-null spec.
      * @param spec
      */
-    public VectorHashingPortObject(final PortObjectSpec spec) {
-        m_spec = spec;
+    public VectorHashingPortObject(final VectorHashingPortObjectSpec spec) {
+        m_spec = CheckUtils.checkArgumentNotNull(spec);
     }
 
     /**
@@ -97,15 +105,14 @@ public final class VectorHashingPortObject extends AbstractSimplePortObject {
      */
     @Override
     public String getSummary() {
-        return "This VectorHashingPortObject contains dimension, seed, hashfunction and vectorvalue "
-            + "used to create document vectors.";
+        return String.format("Vector Hashing (%d dimensions)", m_spec.getDimension());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PortObjectSpec getSpec() {
+    public VectorHashingPortObjectSpec getSpec() {
         return m_spec;
     }
 
@@ -113,16 +120,29 @@ public final class VectorHashingPortObject extends AbstractSimplePortObject {
      * {@inheritDoc}
      */
     @Override
-    protected void save(final ModelContentWO model, final ExecutionMonitor exec) throws CanceledExecutionException {
+    public JComponent[] getViews() {
+        return new JComponent[] {};
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void load(final ModelContentRO model, final PortObjectSpec spec, final ExecutionMonitor exec)
-        throws InvalidSettingsException, CanceledExecutionException {
-        m_spec = spec;
+    public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof VectorHashingPortObject)) {
+            return false;
+        }
+        return Objects.equals(m_spec, ((VectorHashingPortObject)obj).m_spec);
+    }
+
+    @Override
+    public int hashCode() {
+        return m_spec.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return getSummary();
     }
 
 }

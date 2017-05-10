@@ -48,6 +48,10 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JScrollPane;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.ModelContentWO;
@@ -128,6 +132,43 @@ public final class VectorHashingPortObjectSpec extends AbstractSimplePortObjectS
      */
     public String getVectVal() {
         return m_vectVal;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JComponent[] getViews() {
+        StringBuilder htmlText = new StringBuilder();
+        htmlText.append("<html>\n");
+        htmlText.append("<head>\n");
+        htmlText.append("<style type=\"text/css\">\n");
+        htmlText.append("body {color:#333333;}");
+        htmlText.append("table {width: 100%;margin: 7px 0 7px 0;}");
+        htmlText.append("th {font-weight: bold;background-color: #aaccff;"
+                + "vertical-align: bottom;}");
+        htmlText.append("td {padding: 4px 10px 4px 10px;}");
+        htmlText.append("th {padding: 4px 10px 4px 10px;}");
+        htmlText.append(".left {text-align: left}");
+        htmlText.append(".right {text-align: right}");
+        htmlText.append(".numeric {text-align: right}");
+        htmlText.append(".odd {background-color:#ddeeff;}");
+        htmlText.append(".even {background-color:#ffffff;}");
+        htmlText.append("</style>\n");
+        htmlText.append("</head>\n");
+
+        htmlText.append("<body><table>\n");
+        htmlText.append("<tr><th class=\"left\">Parameter</th><th class=\"left\">Value</th></tr>\n");
+        htmlText.append("<tr class=\"odd\"><td>Dimensions</td><td>").append(m_dim).append("</td></tr>\n");
+        htmlText.append("<tr class=\"even\"><td>Seed</td><td>").append(m_seed).append("</td></tr>\n");
+        htmlText.append("<tr class=\"odd\"><td>Hash Function</td><td>").append(m_hashFunc).append("</td></tr>\n");
+        htmlText.append("<tr class=\"even\"><td>Vector Value</td><td>").append(m_vectVal).append("</td></tr>\n");
+        htmlText.append("</table></body></html>");
+        JEditorPane tablePane = new JEditorPane("text/html", "");
+        tablePane.setEditable(false);
+        tablePane.setText(htmlText.toString());
+
+        JComponent component = new JScrollPane(tablePane);
+        component.setName("Vector Hashing");
+        return new JComponent[] {component};
     }
 
     /**
