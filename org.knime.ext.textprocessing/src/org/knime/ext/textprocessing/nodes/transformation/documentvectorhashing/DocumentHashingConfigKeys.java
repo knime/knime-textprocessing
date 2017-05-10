@@ -51,8 +51,9 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
 /**
  *
  * @author Tobias Koetter and Andisa Dewi, KNIME.com, Berlin, Germany
+ * @noreference This class is not intended to be referenced by clients.
  */
-public class DocumentHashingConfigKeys {
+public final class DocumentHashingConfigKeys {
 
     private DocumentHashingConfigKeys() {
     }

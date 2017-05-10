@@ -61,8 +61,9 @@ import org.knime.core.node.port.PortObjectSpec;
  * hashing node to another.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
-public class VectorHashingPortObject extends AbstractSimplePortObject {
+public final class VectorHashingPortObject extends AbstractSimplePortObject {
 
     private PortObjectSpec m_spec;
 
