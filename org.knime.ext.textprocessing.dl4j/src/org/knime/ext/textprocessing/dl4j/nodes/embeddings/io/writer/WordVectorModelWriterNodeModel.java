@@ -105,6 +105,10 @@ public class WordVectorModelWriterNodeModel extends AbstractDLNodeModel {
         final URL url = FileUtil.toURL(m_outfile.getStringValue());
         final File file = FileUtil.getFileFromURL(url);
 
+        if (file == null) {
+            throw new IllegalArgumentException("WordVectorModels can only by written to local files.");
+        }
+
         try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(file))) {
             WordVectorPortObjectUtils.writeFileStorePortObject(port, zipOut);
         } catch (IOException e) {
