@@ -73,8 +73,8 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
 /**
  * Node to read word vector models in different formats: </br>
  * 1. KNIME - models saved by the corresponding word vector model writer </br>
- * 2. CSV - common CSV format, each row contains the word in the first column and the vector in the following columns.
- * The columns should be separated by whitespace. </br>
+ * 2. Text - common plain text format, each row contains the word in the first column and the vector in the following columns.
+ * The columns should be separated by single whitespace. Decimal separator is a dot. </br>
  * 3. Binary - e.g. Google news vectors
  *
  * @author David Kolb, KNIME.com GmbH
@@ -109,8 +109,6 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
             m_isDl4jFormat = true;
         } catch (final Exception e) {
             LOGGER.debug(e);
-            LOGGER.warn(
-                "Selected word vector model file seems not to be in KNIME format. CSV or Binary Word2Vector format is expected.");
             m_isDl4jFormat = false;
             //currently (0.8.0), WordVectorSerializer only supports Word2Vec for external models. Hence, only weights will be loaded.
             //See WordVectorSerializer.readWord2VecModel()
@@ -131,11 +129,17 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
             try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(file))) {
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
             } catch (Exception e) {
-                LOGGER.error("Error loading word vector model!", e);
+                LOGGER.error("Error loading word vector model in KNIME format!", e);
                 throw e;
             }
         } else {
-            wv = WordVectorSerializer.readWord2VecModel(file);
+            try {
+                wv = WordVectorSerializer.readWord2VecModel(file);
+            } catch (Exception e) {
+                LOGGER.error("Error loading word vector model in external format! See node description for "
+                    + "details about supported formats.", e);
+                throw e;
+            }
         }
 
         return new WordVectorFileStorePortObject[]{WordVectorFileStorePortObject.create(wv, m_outSpec,
