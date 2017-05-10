@@ -118,11 +118,9 @@ final class HashingFunctionFactory {
         try {
             hashInstance = hash.getClass().newInstance();
         } catch (InstantiationException e) {
-            LOGGER.error("New HashingFunction instance " + hash.getClass().toString() + " could not be created!");
-            LOGGER.error(e.getMessage());
+            LOGGER.error("New HashingFunction instance " + hash.getClass().toString() + " could not be created!", e);
         } catch (IllegalAccessException e) {
-            LOGGER.error("Empty Consructor of " + hash.getClass().toString() + " is not accessible.");
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Empty Constructor of " + hash.getClass().toString() + " is not accessible.", e);
         }
 
         return hashInstance;
@@ -161,14 +159,14 @@ final class HashingFunctionFactory {
                         }
                     }
                 } catch (final Throwable t) {
-                    LOGGER.error("Problems during initialization of " + operator + "'.)");
+                    LOGGER.error("Problems during initialization of " + operator + "'.)", t);
                     if (decl != null) {
-                        LOGGER.error("Extension " + decl + " ignored.", t);
+                        LOGGER.error("Extension " + decl + " ignored.");
                     }
                 }
             }
         } catch (final Exception e) {
-            LOGGER.error("Exception while registering hashing function extensions");
+            LOGGER.error("Exception while registering hashing function extensions", e);
         }
     }
 
