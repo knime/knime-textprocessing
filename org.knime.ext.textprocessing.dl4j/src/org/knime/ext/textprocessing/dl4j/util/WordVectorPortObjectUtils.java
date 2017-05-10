@@ -52,6 +52,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
@@ -178,7 +179,7 @@ public class WordVectorPortObjectUtils {
 
         while ((entry = in.getNextEntry()) != null) {
             if (entry.getName().matches("word_vector_trainings_mode")) {
-                final String read = readStringFromZipStream(in);
+                final String read = IOUtils.toString(in, "UTF-8");
                 mode = WordVectorTrainingMode.valueOf(read);
             }
         }
@@ -277,18 +278,6 @@ public class WordVectorPortObjectUtils {
             throw new IllegalStateException(
                 "No serialization method defined for WordVectors of type: " + wordVectors.getClass().getSimpleName());
         }
-    }
-
-    private static String readStringFromZipStream(final ZipInputStream in) throws IOException {
-        final StringBuilder stringBuilder = new StringBuilder();
-        final byte[] byteBuffer = new byte[1024];
-        int currentRead = 0;
-
-        while ((currentRead = in.read(byteBuffer, 0, 1024)) >= 0) {
-            stringBuilder.append(new String(byteBuffer, 0, currentRead));
-        }
-
-        return stringBuilder.toString();
     }
 
     /**

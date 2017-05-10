@@ -48,7 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipInputStream;
@@ -134,7 +134,6 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
             }
         } else {
             try(InputStream inStream = url.openStream()) {
-
                 File tmp = WordVectorPortObjectUtils.inputStreamToTmpFile(inStream);
                 wv = WordVectorSerializer.readWord2VecModel(tmp);
                 tmp.delete();
@@ -151,12 +150,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
 
     @Override
     protected List<SettingsModel> initSettingsModels() {
-        m_inFile = WordVectorModelReaderNodeDialog.createFileModel();
-
-        final List<SettingsModel> settings = new ArrayList<>();
-        settings.add(m_inFile);
-
-        return settings;
+        return Collections.singletonList(m_inFile = WordVectorModelReaderNodeDialog.createFileModel());
     }
 
     /**
