@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -57,6 +58,7 @@ import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
@@ -151,8 +153,10 @@ public class WordVectorPortObjectUtils {
                     case WORD2VEC:
                         /* Need to copy stream to temp file because API does not support Word2VecModel reading
                          * with InputStreams. */
-                        File tmpFile = inputStreamToTmpFile(in, "w2v_model");
-                        return WordVectorSerializer.readWord2VecModel(tmpFile);
+                        File tmp = inputStreamToTmpFile(in);
+                        Word2Vec model = WordVectorSerializer.readWord2VecModel(tmp);
+                        tmp.delete();
+                        return model;
                     default:
                         break;
                 }
@@ -292,13 +296,11 @@ public class WordVectorPortObjectUtils {
      * name must be at least three characters long. The temp file will be deleted when the virtual machine terminates.
      *
      * @param is stream to copy
-     * @param tmpFileName name to use for the temp file, must be at least three characters long
      * @return file containing stream content
      * @throws IOException
      */
-    private static File inputStreamToTmpFile(final InputStream is, final String tmpFileName) throws IOException {
-        File tmpFile = File.createTempFile(tmpFileName, null);
-        tmpFile.deleteOnExit();
+    private static File inputStreamToTmpFile(final InputStream is) throws IOException {
+        File tmpFile = FileUtil.createTempFile(UUID.randomUUID().toString(), null);
         FileUtils.copyInputStreamToFile(is, tmpFile);
         return tmpFile;
     }
