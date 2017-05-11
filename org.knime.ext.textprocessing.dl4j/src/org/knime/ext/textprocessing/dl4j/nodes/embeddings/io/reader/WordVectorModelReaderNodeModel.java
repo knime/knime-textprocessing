@@ -45,13 +45,16 @@ package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.knime.core.node.ExecutionContext;
@@ -119,6 +122,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
         return new WordVectorPortObjectSpec[]{m_outSpec};
     }
 
+    @SuppressWarnings("null")
     @Override
     protected WordVectorFileStorePortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
@@ -133,12 +137,26 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
                 throw e;
             }
         } else {
+            File localCopy = null;
+            boolean hasBeenCopied = false;
             try {
-                wv = WordVectorSerializer.readWord2VecModel(ResolverUtil.resolveURItoLocalOrTempFile(url.toURI()));
+                URI uri = url.toURI();
+                if (Arrays.asList("knime", "file").contains(url.getProtocol())) {
+                    localCopy = ResolverUtil.resolveURItoLocalOrTempFile(uri);
+                } else {
+                    localCopy = FileUtil.createTempFile("download", ".bin");
+                    FileUtils.copyURLToFile(url, localCopy);
+                    hasBeenCopied = true;
+                }
+                wv = WordVectorSerializer.readWord2VecModel(localCopy);
             } catch (Exception e) {
                 LOGGER.error("Error loading word vector model in external format! See node description for "
                     + "details about supported formats.", e);
                 throw e;
+            } finally {
+                if (hasBeenCopied) {
+                    localCopy.delete();
+                }
             }
         }
 
