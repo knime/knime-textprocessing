@@ -24,7 +24,8 @@
 		<a href="https://github.com/3Top/word2vec-api#where-to-get-a-pretrained-models">here</a>.
         </intro>
              
-        <option name="Selected File">The file containing the word vector model to read.</option>
+        <option name="Selected File">The file path or URL (supports 'knime://', 'file://', 'http://' and 'https://' protocols) to the WordVector 
+        model.</option>
       
     </fullDescription>
     

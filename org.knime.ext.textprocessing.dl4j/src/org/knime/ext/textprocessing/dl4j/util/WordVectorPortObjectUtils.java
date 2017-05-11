@@ -45,6 +45,7 @@ package org.knime.ext.textprocessing.dl4j.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -136,7 +137,8 @@ public class WordVectorPortObjectUtils {
     }
 
     /**
-     * Reads {@link WordVectors} from specified {@link ZipInputStream}.
+     * Reads {@link WordVectors} from the specified {@link ZipInputStream}. The method expects the ZipInputStream to
+     * contain an ZipEntry with name "word_vectors", which contains the WordVector model to load.
      *
      * @param in stream to read from
      * @param mode the type of WordVector model to expect
@@ -154,16 +156,46 @@ public class WordVectorPortObjectUtils {
                     case WORD2VEC:
                         /* Need to copy stream to temp file because API does not support Word2VecModel reading
                          * with InputStreams. */
-                        File tmp = inputStreamToTmpFile(in);
+                        File tmp = copyInputStreamToTmpFile(in);
                         Word2Vec model = WordVectorSerializer.readWord2VecModel(tmp);
                         tmp.delete();
                         return model;
                     default:
-                        break;
+                        throw new IllegalStateException(
+                            "No deserialization method defined for WordVectors of type: " + mode);
                 }
             }
         }
-        throw new IllegalStateException("No deserialization method defined for WordVectors of type: " + mode);
+        throw new IllegalArgumentException(
+            "WordVectors entry not found. ZipInputStream seems not to contain ZipEntry " + "with name 'word_vectors'!");
+    }
+
+    /**
+     * Reads {@link WordVectors} from the specified {@link URL}.
+     *
+     * @param url the URL to read from
+     * @param mode the type of WordVector model to expect
+     * @return {@link WordVectors} loaded from URL
+     * @throws IOException
+     */
+    public static WordVectors loadWordVectors(final URL url, final WordVectorTrainingMode mode) throws IOException {
+        switch (mode) {
+            case DOC2VEC:
+                return WordVectorSerializer.readParagraphVectors(url.openStream());
+            case WORD2VEC:
+                File wvFile;
+                try { // try resolve to local file
+                    wvFile = FileUtil.getFileFromURL(url);
+                    return WordVectorSerializer.readWord2VecModel(wvFile);
+                } catch (IllegalArgumentException e) { // non local file
+                    wvFile = copyURLToTmpFile(url);
+                    Word2Vec model = WordVectorSerializer.readWord2VecModel(wvFile);
+                    wvFile.delete();
+                    return model;
+                }
+            default:
+                throw new IllegalStateException("No deserialization method defined for WordVectors of type: " + mode);
+        }
     }
 
     /**
@@ -250,7 +282,8 @@ public class WordVectorPortObjectUtils {
      * @param out
      * @throws IOException
      */
-    public static void writeFileStorePortObject(final WordVectorFileStorePortObject port, final ZipOutputStream out) throws IOException{
+    public static void writeFileStorePortObject(final WordVectorFileStorePortObject port, final ZipOutputStream out)
+        throws IOException {
         WordVectorPortObjectSpec spec = (WordVectorPortObjectSpec)port.getSpec();
         saveSpecOnly(spec, out);
         writeWordVectors(port.getWordVectors(), out);
@@ -281,23 +314,34 @@ public class WordVectorPortObjectUtils {
     }
 
     /**
-     * Copies the content of the specified InputStream to a temp file using the specified file name as prefix. The file
-     * name must be at least three characters long. The temp file will be deleted when the virtual machine terminates.
+     * Copies the content of the specified InputStream to a temp file.
      *
      * @param is stream to copy
-     * @return file containing stream content
+     * @return file pointing to stream content
      * @throws IOException
      */
-    public static File inputStreamToTmpFile(final InputStream is) throws IOException {
+    public static File copyInputStreamToTmpFile(final InputStream is) throws IOException {
         File tmpFile = FileUtil.createTempFile(UUID.randomUUID().toString(), null);
         FileUtils.copyInputStreamToFile(is, tmpFile);
         return tmpFile;
     }
 
     /**
-     * Converts wordVectors to {@link Word2Vec}. Sets {@link WeightLookupTable} and {@link VocabCache}.
-     * Depending on specified word vector type this may lead to information loss. E.g. labels for
-     * {@link ParagraphVectors}.
+     * Copies the content of the specified URL to a temp file.
+     *
+     * @param url
+     * @return file pointing to URL content
+     * @throws IOException
+     */
+    public static File copyURLToTmpFile(final URL url) throws IOException {
+        File tmpFile = FileUtil.createTempFile(UUID.randomUUID().toString(), null);
+        FileUtils.copyURLToFile(url, tmpFile);
+        return tmpFile;
+    }
+
+    /**
+     * Converts wordVectors to {@link Word2Vec}. Sets {@link WeightLookupTable} and {@link VocabCache}. Depending on
+     * specified word vector type this may lead to information loss. E.g. labels for {@link ParagraphVectors}.
      *
      * @param wordVectors
      * @return Word2Vec containing vocab and lookup table

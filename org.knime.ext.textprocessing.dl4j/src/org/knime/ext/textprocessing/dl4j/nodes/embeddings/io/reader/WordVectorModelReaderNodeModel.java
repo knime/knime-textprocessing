@@ -42,20 +42,14 @@
  *******************************************************************************/
 package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.FileUtils;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -67,7 +61,6 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.core.util.pathresolve.ResolverUtil;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
@@ -77,8 +70,8 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
 /**
  * Node to read word vector models in different formats: </br>
  * 1. KNIME - models saved by the corresponding word vector model writer </br>
- * 2. Text - common plain text format, each row contains the word in the first column and the vector in the following columns.
- * The columns should be separated by single whitespace. Decimal separator is a dot. </br>
+ * 2. Text - common plain text format, each row contains the word in the first column and the vector in the following
+ * columns. The columns should be separated by single whitespace. Decimal separator is a dot. </br>
  * 3. Binary - e.g. Google news vectors
  *
  * @author David Kolb, KNIME.com GmbH
@@ -122,7 +115,6 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
         return new WordVectorPortObjectSpec[]{m_outSpec};
     }
 
-    @SuppressWarnings("null")
     @Override
     protected WordVectorFileStorePortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
@@ -132,31 +124,22 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
         if (m_isDl4jFormat) {
             try (ZipInputStream zipIn = new ZipInputStream(url.openStream())) {
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
+            } catch (IOException e) {
+                LOGGER.error("IO Error loading model in KNIME format from specified location!", e);
+                throw e;
             } catch (Exception e) {
                 LOGGER.error("Error loading word vector model in KNIME format!", e);
-                throw e;
+                throw new RuntimeException("DL4J error message: " + e.getMessage(), e);
             }
         } else {
-            File localCopy = null;
-            boolean hasBeenCopied = false;
             try {
-                URI uri = url.toURI();
-                if (Arrays.asList("knime", "file").contains(url.getProtocol())) {
-                    localCopy = ResolverUtil.resolveURItoLocalOrTempFile(uri);
-                } else {
-                    localCopy = FileUtil.createTempFile("download", ".bin");
-                    FileUtils.copyURLToFile(url, localCopy);
-                    hasBeenCopied = true;
-                }
-                wv = WordVectorSerializer.readWord2VecModel(localCopy);
-            } catch (Exception e) {
-                LOGGER.error("Error loading word vector model in external format! See node description for "
-                    + "details about supported formats.", e);
+                wv = WordVectorPortObjectUtils.loadWordVectors(url, WordVectorTrainingMode.WORD2VEC);
+            } catch (IOException e) {
+                LOGGER.error("IO Error loading model in external format from specified location!", e);
                 throw e;
-            } finally {
-                if (hasBeenCopied) {
-                    localCopy.delete();
-                }
+            } catch (Exception e) {
+                LOGGER.error("Error loading word vector model in external format!", e);
+                throw new RuntimeException("DL4J error message: " + e.getMessage(), e);
             }
         }
 
@@ -179,11 +162,10 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
      */
     private WordVectorPortObjectSpec loadSpec() throws InvalidPathException, IOException {
         final URL url = FileUtil.toURL(m_inFile.getStringValue());
-        final File file = FileUtil.getFileFromURL(url);
 
         WordVectorPortObjectSpec spec = null;
 
-        try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(file))) {
+        try (ZipInputStream zipIn = new ZipInputStream(url.openStream())) {
             spec = WordVectorPortObjectUtils.loadSpecFromZip(zipIn);
         } catch (IOException e) {
             LOGGER.debug("Error loading word vector model specification!", e);
