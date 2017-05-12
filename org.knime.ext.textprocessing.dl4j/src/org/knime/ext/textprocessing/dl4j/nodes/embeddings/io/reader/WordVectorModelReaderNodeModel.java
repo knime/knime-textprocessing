@@ -51,6 +51,7 @@ import java.util.UUID;
 import java.util.zip.ZipInputStream;
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
+import org.knime.core.data.util.CancellableReportingInputStream;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
@@ -122,7 +123,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
         WordVectors wv = null;
 
         if (m_isDl4jFormat) {
-            try (ZipInputStream zipIn = new ZipInputStream(url.openStream())) {
+            try (ZipInputStream zipIn = new ZipInputStream(new CancellableReportingInputStream(url.openStream(), exec))) {
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
             } catch (IOException e) {
                 LOGGER.error("IO Error loading model in KNIME format from specified location!", e);
