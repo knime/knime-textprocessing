@@ -124,6 +124,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
 
         if (m_isDl4jFormat) {
             try (ZipInputStream zipIn = new ZipInputStream(new CancellableReportingInputStream(url.openStream(), exec))) {
+                exec.setMessage("Reading model in KNIME format ...");
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
             } catch (IOException e) {
                 LOGGER.error("IO Error loading model in KNIME format from specified location!", e);
@@ -134,6 +135,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
             }
         } else {
             try {
+                exec.setMessage("Reading model in external format ...");
                 wv = WordVectorPortObjectUtils.loadWordVectors(url, WordVectorTrainingMode.WORD2VEC);
             } catch (IOException e) {
                 LOGGER.error("IO Error loading model in external format from specified location!", e);
@@ -144,6 +146,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
             }
         }
 
+        exec.setMessage("Caching model ...");
         return new WordVectorFileStorePortObject[]{WordVectorFileStorePortObject.create(wv, m_outSpec,
             exec.createFileStore(UUID.randomUUID().toString() + ""))};
     }
