@@ -157,9 +157,19 @@ public class WordVectorPortObjectUtils {
                     case WORD2VEC:
                         /* Need to copy stream to temp file because API does not support Word2VecModel reading
                          * with InputStreams. */
-                        File tmp = copyInputStreamToTmpFile(in);
-                        Word2Vec model = WordVectorSerializer.readWord2VecModel(tmp);
-                        tmp.delete();
+                        Word2Vec model = null;
+                        File tmp = null;
+                        try {
+                            tmp = copyInputStreamToTmpFile(in);
+                            model = WordVectorSerializer.readWord2VecModel(tmp);
+                        } catch (Exception e) {
+                            throw e;
+                        } finally {
+                            if (tmp != null && tmp.exists()) {
+                                tmp.delete();
+                            }
+                        }
+
                         return model;
                     default:
                         throw new IllegalStateException(
