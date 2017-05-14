@@ -44,6 +44,7 @@ package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -147,6 +148,10 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
                 exec.setMessage("Reading model in KNIME format ...");
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
             } catch (IOException e) {
+                if (e instanceof ClosedByInterruptException) {
+                    exec.checkCanceled();
+                    throw e;
+                }
                 LOGGER.error("IO Error loading model in KNIME format from specified location!", e);
                 throw e;
             } catch (Exception e) {
