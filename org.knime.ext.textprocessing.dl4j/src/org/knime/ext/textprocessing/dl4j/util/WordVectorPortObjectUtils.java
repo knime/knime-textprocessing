@@ -45,6 +45,7 @@ package org.knime.ext.textprocessing.dl4j.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -177,22 +178,29 @@ public class WordVectorPortObjectUtils {
      * @param mode the type of WordVector model to expect
      * @return {@link WordVectors} loaded from URL
      * @throws IOException
+     * @throws URISyntaxException
      */
-    public static WordVectors loadWordVectors(final URL url, final WordVectorTrainingMode mode) throws IOException {
+    public static WordVectors loadWordVectors(final URL url, final WordVectorTrainingMode mode)
+        throws IOException, URISyntaxException {
         switch (mode) {
             case DOC2VEC:
                 return WordVectorSerializer.readParagraphVectors(url.openStream());
             case WORD2VEC:
-                File wvFile;
-                try { // try resolve to local file
-                    wvFile = FileUtil.getFileFromURL(url);
+                boolean isLocalFile = FileUtil.resolveToPath(url) != null;
+                File wvFile = null;
+                try {
+                    wvFile = isLocalFile ? FileUtil.getFileFromURL(url) : copyURLToTmpFile(url);
                     return WordVectorSerializer.readWord2VecModel(wvFile);
-                } catch (IllegalArgumentException e) { // non local file
-                    wvFile = copyURLToTmpFile(url);
-                    Word2Vec model = WordVectorSerializer.readWord2VecModel(wvFile);
-                    wvFile.delete();
-                    return model;
+                } catch (Exception e) {
+                    // error is handled outside
+                    throw e;
+                } finally {
+                    // file has been temporarily downloaded
+                    if (!isLocalFile && wvFile != null) {
+                        wvFile.delete();
+                    }
                 }
+
             default:
                 throw new IllegalStateException("No deserialization method defined for WordVectors of type: " + mode);
         }
