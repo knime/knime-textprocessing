@@ -44,12 +44,13 @@ package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.InvalidPathException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.knime.core.data.util.CancellableReportingInputStream;
 import org.knime.core.node.ExecutionContext;
@@ -85,7 +86,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
 
     private WordVectorPortObjectSpec m_outSpec;
 
-    private boolean m_isDl4jFormat;
+    private boolean m_isKNIMEFormat;
 
     /**
      * Constructor for class WordVectorModelReaderNodeModel.
@@ -96,6 +97,7 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
 
     @Override
     protected WordVectorPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+
         final String warning = CheckUtils.checkSourceFile(m_inFile.getStringValue());
         if (warning != null) {
             LOGGER.warn(warning);
@@ -103,14 +105,31 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
 
         //if spec can't be loaded we assume that the selected format is non-KNIME
         try {
-            m_outSpec = loadSpec();
-            m_isDl4jFormat = true;
+            final URL url = FileUtil.toURL(m_inFile.getStringValue());
+            try (ZipInputStream zipIn = new ZipInputStream(url.openStream())) {
+                WordVectorTrainingMode mode = null;
+
+                ZipEntry entry;
+                while ((entry = zipIn.getNextEntry()) != null) {
+                    if (entry.getName().matches("word_vector_trainings_mode")) {
+                        final String read = IOUtils.toString(zipIn, "UTF-8");
+                        mode = WordVectorTrainingMode.valueOf(read);
+                    }
+                }
+                // if we found a mode in our file, we saved the model ourselves.
+                m_isKNIMEFormat = mode != null;
+
+                if (!m_isKNIMEFormat) {
+                    //currently (0.8.0), WordVectorSerializer only supports Word2Vec for external models. Hence, only weights will be loaded.
+                    //See WordVectorSerializer.readWord2VecModel()
+                    mode = WordVectorTrainingMode.WORD2VEC;
+                }
+                m_outSpec = new WordVectorPortObjectSpec(mode);
+            }
         } catch (final Exception e) {
-            LOGGER.debug(e);
-            m_isDl4jFormat = false;
-            //currently (0.8.0), WordVectorSerializer only supports Word2Vec for external models. Hence, only weights will be loaded.
-            //See WordVectorSerializer.readWord2VecModel()
-            m_outSpec = new WordVectorPortObjectSpec(WordVectorTrainingMode.WORD2VEC);
+            m_outSpec = null;
+            LOGGER.error("Error reading input file");
+            throw new InvalidSettingsException(e);
         }
 
         return new WordVectorPortObjectSpec[]{m_outSpec};
@@ -122,8 +141,9 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
         final URL url = FileUtil.toURL(m_inFile.getStringValue());
         WordVectors wv = null;
 
-        if (m_isDl4jFormat) {
-            try (ZipInputStream zipIn = new ZipInputStream(new CancellableReportingInputStream(url.openStream(), exec))) {
+        if (m_isKNIMEFormat) {
+            try (ZipInputStream zipIn =
+                new ZipInputStream(new CancellableReportingInputStream(url.openStream(), exec))) {
                 exec.setMessage("Reading model in KNIME format ...");
                 wv = WordVectorPortObjectUtils.loadWordVectors(zipIn, m_outSpec.getWordVectorTrainingsMode());
             } catch (IOException e) {
@@ -155,28 +175,4 @@ public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
     protected List<SettingsModel> initSettingsModels() {
         return Collections.singletonList(m_inFile = WordVectorModelReaderNodeDialog.createFileModel());
     }
-
-    /**
-     * Helper method to load only spec.
-     *
-     * @return the loaded spec
-     * @throws InvalidPathException
-     * @throws IOException
-     * @throws Exception
-     */
-    private WordVectorPortObjectSpec loadSpec() throws InvalidPathException, IOException {
-        final URL url = FileUtil.toURL(m_inFile.getStringValue());
-
-        WordVectorPortObjectSpec spec = null;
-
-        try (ZipInputStream zipIn = new ZipInputStream(url.openStream())) {
-            spec = WordVectorPortObjectUtils.loadSpecFromZip(zipIn);
-        } catch (IOException e) {
-            LOGGER.debug("Error loading word vector model specification!", e);
-            throw e;
-        }
-
-        return spec;
-    }
-
 }

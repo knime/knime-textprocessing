@@ -54,7 +54,6 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
@@ -106,21 +105,6 @@ public class WordVectorPortObjectUtils {
         if (writePortObject && writeSpec) {
             savePortObjectAndSpec(portObject, spec, outStream);
         }
-    }
-
-    /**
-     * Reads {@link WordVectorPortObjectSpec} from specified {@link ZipInputStream}.
-     *
-     * @param inStream stream to read from
-     * @return WordVectorPortObjectSpec
-     * @throws IOException
-     */
-    public static WordVectorPortObjectSpec loadSpecFromZip(final ZipInputStream inStream) throws IOException {
-        WordVectorTrainingMode mode = loadTrainingsMode(inStream);
-        if (mode == null) {
-            throw new IOException("Error loading word vector training mode!");
-        }
-        return new WordVectorPortObjectSpec(mode);
     }
 
     /**
@@ -214,26 +198,6 @@ public class WordVectorPortObjectUtils {
             default:
                 throw new IllegalStateException("No deserialization method defined for WordVectors of type: " + mode);
         }
-    }
-
-    /**
-     * Reads {@link WordVectorTrainingMode} from specified {@link ZipInputStream}.
-     *
-     * @param in stream to read from
-     * @return {@link WordVectorTrainingMode} loaded from stream
-     * @throws IOException
-     */
-    public static WordVectorTrainingMode loadTrainingsMode(final ZipInputStream in) throws IOException {
-        ZipEntry entry;
-        WordVectorTrainingMode mode = null;
-
-        while ((entry = in.getNextEntry()) != null) {
-            if (entry.getName().matches("word_vector_trainings_mode")) {
-                final String read = IOUtils.toString(in, "UTF-8");
-                mode = WordVectorTrainingMode.valueOf(read);
-            }
-        }
-        return mode;
     }
 
     /**
