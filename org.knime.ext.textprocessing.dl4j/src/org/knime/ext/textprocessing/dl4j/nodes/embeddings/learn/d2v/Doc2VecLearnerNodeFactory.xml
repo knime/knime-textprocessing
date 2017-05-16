@@ -3,20 +3,20 @@
     <name>Doc2Vec Learner</name>
     
     <shortDescription>
-        Learn a Doc2Vec model using labelled documents.
+        Train a Doc2Vec model using labelled documents.
     </shortDescription>
     
     <fullDescription>
-        <intro>This node learns a Doc2Vec (Paragraph Vectors) model on labelled documents. The model will learn
+        <intro>This node trains a Doc2Vec (Paragraph Vectors) model on labelled documents. The model will learn
         sequence representations (vector for each label) as well as word representations (vector for each word), that can be extracted
         using the Vocabulary Extractor Node.
-        For more information on Word Vectors see:
+        For more information on Word Vectors in general see:
         <a href="http://deeplearning4j.org/word2vec">http://deeplearning4j.org/word2vec</a>
         </intro>
      
     <tab name="Data Options">   
     	<option name="Document Column">Column containing the Document or String to train on.</option>
-    	<option name="Label Column">String column containing labels for Documents.</option>       
+    	<option name="Label Column">String column containing labels for documents.</option>       
     </tab>     
     <tab name="Learning Options">                
         <option name="Learning Rate">The starting learning rate.</option>
@@ -30,7 +30,7 @@
         <option name="Minimum Word Frequency">Minimum frequency of a word to appear in the corpus to be considered for learning. Words
         with a lower frequency will not appear in the vocabulary contained in the Word Vector Model.</option>
         <option name="Sampling Rate">Threshold for configuring which higher-frequency words are randomly downsampled;
-    	a useful range is (0, 1e-5)</option> 
+    	a useful range is (0, 1e-5).</option> 
         <option name="Use Hierarchical Softmax?">Whether to use hierarchical softmax. If checked negative sampling will be disabled.</option>               
         <option name="Negative Sampling Rate">The number of “noise words” that should be drawn.</option>       
        	<option name="Sequence Learning Algorithm">The <a href="https://arxiv.org/pdf/1405.4053v2.pdf">algorithm</a> to use to learn 
@@ -42,6 +42,6 @@
     
     <ports>
         <inPort index="0" name="Data Table">Table containing Document or String columns.</inPort>
-        <outPort index="0" name="Word Vector Model">Trained Doc2Vec Model</outPort>
+        <outPort index="0" name="Word Vector Model">Trained Doc2Vec Model.</outPort>
     </ports>    
 </knimeNode>

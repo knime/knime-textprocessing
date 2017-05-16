@@ -3,14 +3,14 @@
     <name>Word2Vec Learner</name>
     
     <shortDescription>
-        Learn a Word2Vec model using documents.
+        Train a Word2Vec model using documents.
     </shortDescription>
     
     <fullDescription>
-        <intro>This node learns a Word2Vec model on unlabelled documents. The model will
+        <intro>This node trains a Word2Vec model on unlabelled documents. The model will
         only learn word representations (vector for each word), that can be extracted
         using the Vocabulary Extractor Node.
-        For more information on Word Vectors see:
+        For more information on Word Vectors in general see:
         <a href="http://deeplearning4j.org/word2vec">http://deeplearning4j.org/word2vec</a>
         </intro>
      
@@ -29,7 +29,7 @@
         <option name="Minimum Word Frequency">Minimum frequency of a word to appear in the corpus to be considered for learning. Words
         with a lower frequency will not appear in the vocabulary contained in the Word Vector Model.</option>
         <option name="Sampling Rate">Threshold for configuring which higher-frequency words are randomly downsampled;
-    	a useful range is (0, 1e-5)</option> 
+    	a useful range is (0, 1e-5).</option> 
         <option name="Use Hierarchical Softmax?">Whether to use hierarchical softmax. If checked negative sampling will be disabled.</option>               
         <option name="Negative Sampling Rate">The number of “noise words” that should be drawn.</option>
        	<option name="Elements Learning Algorithm">The <a href="https://arxiv.org/pdf/1411.2738.pdf">algorithm</a> to use to learn 
@@ -41,6 +41,6 @@
     
     <ports>
         <inPort index="0" name="Data Table">Table containing Document or String column.</inPort>
-        <outPort index="0" name="Word Vector Model">Trained Doc2Vec Model</outPort>
+        <outPort index="0" name="Word Vector Model">Trained Doc2Vec Model.</outPort>
     </ports>    
 </knimeNode>
