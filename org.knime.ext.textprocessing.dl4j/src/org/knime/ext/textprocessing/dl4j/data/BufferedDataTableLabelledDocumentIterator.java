@@ -64,7 +64,7 @@ import org.knime.ext.dl4j.base.util.TableUtils;
  */
 public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIterator {
 
-    private final BufferedDataTable m_table;
+    private BufferedDataTable m_table;
 
     private CloseableRowIterator m_tableIterator;
 
@@ -72,9 +72,9 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
 
     private final int m_labelColumnIndex;
 
-    private final LabelsSource m_labelsSource;
+    private LabelsSource m_labelsSource;
 
-    private final List<String> m_labels;
+    private List<String> m_labels;
 
     private int m_nonEmptyRowCounter = 0;
 
@@ -128,7 +128,6 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
         } else {
             return m_tableIterator.hasNext();
         }
-
     }
 
     /**
@@ -254,5 +253,17 @@ public class BufferedDataTableLabelledDocumentIterator implements LabelAwareIter
     @Override
     public void shutdown() {
         // nothing to do here
+    }
+
+    /**
+     * Close this iterator.
+     */
+    public void close() {
+        m_tableIterator.close();
+        m_tableIterator = null;
+        m_table = null;
+        m_labelsSource = null;
+        m_labels.clear();
+        m_labels = null;
     }
 }

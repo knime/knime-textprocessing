@@ -64,7 +64,7 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
     // the logger instance
     private static final NodeLogger logger = NodeLogger.getLogger(BufferedDataTableSentenceIterator.class);
 
-    private final BufferedDataTable m_table;
+    private BufferedDataTable m_table;
 
     private CloseableRowIterator m_tableIterator;
 
@@ -205,5 +205,14 @@ public class BufferedDataTableSentenceIterator implements SentenceIterator {
     @Override
     public void setPreProcessor(final SentencePreProcessor preProcessor) {
         throw new UnsupportedOperationException("Method setPreProcessor not available in " + this.getClass().getName());
+    }
+
+    /**
+     * Close this iterator.
+     */
+    public void close() {
+        m_tableIterator.close();
+        m_tableIterator = null;
+        m_table = null;
     }
 }

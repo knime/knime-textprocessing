@@ -51,7 +51,6 @@ import org.deeplearning4j.models.embeddings.learning.impl.sequence.DBOW;
 import org.deeplearning4j.models.embeddings.learning.impl.sequence.DM;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.VocabWord;
-import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.knime.core.data.DataTableSpec;
@@ -128,7 +127,7 @@ public class Doc2VecLearnerNodeModel extends AbstractDLNodeModel {
 
         final TokenizerFactory t = new DefaultTokenizerFactory();
 
-        final LabelAwareIterator docIter =
+        final BufferedDataTableLabelledDocumentIterator docIter =
             new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName, skipMissing);
 
         // build doc2vec model
@@ -140,10 +139,11 @@ public class Doc2VecLearnerNodeModel extends AbstractDLNodeModel {
             .negativeSample(negativeSampling).sampling(sampling).build();
 
         d2v.fit();
+        docIter.close();
 
         final WordVectorFileStorePortObject outPortObject =
             WordVectorFileStorePortObject.create(d2v, new WordVectorPortObjectSpec(WordVectorTrainingMode.DOC2VEC),
-                exec.createFileStore(UUID.randomUUID().toString() + ""));
+                exec.createFileStore(UUID.randomUUID().toString()));
         return new WordVectorFileStorePortObject[]{outPortObject};
     }
 

@@ -51,7 +51,6 @@ import org.deeplearning4j.models.embeddings.learning.impl.elements.CBOW;
 import org.deeplearning4j.models.embeddings.learning.impl.elements.SkipGram;
 import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.models.word2vec.Word2Vec;
-import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.knime.core.data.DataTableSpec;
@@ -125,7 +124,7 @@ public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
 
         final TokenizerFactory t = new DefaultTokenizerFactory();
 
-        final SentenceIterator sentenceIter =
+        final BufferedDataTableSentenceIterator sentenceIter =
             new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
 
         // build word2vec model
@@ -137,6 +136,7 @@ public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
                 .useHierarchicSoftmax(useHS).negativeSample(negativeSampling).sampling(sampling).build();
 
         w2v.fit();
+        sentenceIter.close();
 
         final WordVectorFileStorePortObject outPortObject =
             WordVectorFileStorePortObject.create(w2v, new WordVectorPortObjectSpec(WordVectorTrainingMode.WORD2VEC),
