@@ -46,7 +46,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.deeplearning4j.models.embeddings.learning.SequenceLearningAlgorithm;
+import org.deeplearning4j.models.embeddings.learning.impl.sequence.DBOW;
+import org.deeplearning4j.models.embeddings.learning.impl.sequence.DM;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
+import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.text.documentiterator.LabelAwareIterator;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
@@ -58,11 +62,12 @@ import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.ext.dl4j.base.AbstractDLNodeModel;
+import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableLabelledDocumentIterator;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
-import org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.AbstractWordVectorLearnerNodeModel;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.d2v.dialog.Doc2VecDataParametersComponentGroup;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
@@ -73,7 +78,7 @@ import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettin
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class Doc2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel {
+public class Doc2VecLearnerNodeModel extends AbstractDLNodeModel {
 
     /* SettingsModels */
     private WordVectorParameterSettingsModels2 m_wordVecParameterSettings;
@@ -136,8 +141,9 @@ public class Doc2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel 
 
         d2v.fit();
 
-        final WordVectorFileStorePortObject outPortObject = WordVectorFileStorePortObject.create(d2v, getOutputSpec(),
-            exec.createFileStore(UUID.randomUUID().toString() + ""));
+        final WordVectorFileStorePortObject outPortObject =
+            WordVectorFileStorePortObject.create(d2v, new WordVectorPortObjectSpec(WordVectorTrainingMode.DOC2VEC),
+                exec.createFileStore(UUID.randomUUID().toString() + ""));
         return new WordVectorFileStorePortObject[]{outPortObject};
     }
 
@@ -148,7 +154,9 @@ public class Doc2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel 
 
         Doc2VecDataParametersComponentGroup.checkDoc2VecColumnSelection(docColName, labelColName);
 
-        return configure((DataTableSpec)inSpecs[0], WordVectorTrainingMode.DOC2VEC, docColName, labelColName);
+        ConfigurationUtils.validateColumnSelection((DataTableSpec)inSpecs[0], new String[]{docColName, labelColName});
+
+        return new WordVectorPortObjectSpec[]{new WordVectorPortObjectSpec(WordVectorTrainingMode.DOC2VEC)};
     }
 
     @Override
@@ -175,5 +183,24 @@ public class Doc2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel 
         settings.addAll(m_wordVecParameterSettings.getAllInitializedSettings());
 
         return settings;
+    }
+
+    /**
+     * Parse the string representation of an
+     * {@link org.knime.ext.textprocessing.dl4j.settings.enumerate.SequenceLearningAlgorithm} and returns the
+     * corresponding DL4J object.
+     *
+     * @param rep
+     * @return DL4J object of sequence algo corresponding to specified string representation
+     */
+    protected SequenceLearningAlgorithm<VocabWord> parseSequenceAlgo(final String rep) {
+        switch (org.knime.ext.textprocessing.dl4j.settings.enumerate.SequenceLearningAlgorithm.valueOf(rep)) {
+            case DBOW:
+                return new DBOW<VocabWord>();
+            case DM:
+                return new DM<VocabWord>();
+            default:
+                throw new IllegalArgumentException("No case defined for SequenceLearningAlgorithm: " + rep);
+        }
     }
 }

@@ -46,6 +46,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.deeplearning4j.models.embeddings.learning.ElementsLearningAlgorithm;
+import org.deeplearning4j.models.embeddings.learning.impl.elements.CBOW;
+import org.deeplearning4j.models.embeddings.learning.impl.elements.SkipGram;
+import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
@@ -58,11 +62,12 @@ import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.ext.dl4j.base.AbstractDLNodeModel;
+import org.knime.ext.dl4j.base.util.ConfigurationUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
 import org.knime.ext.textprocessing.dl4j.data.BufferedDataTableSentenceIterator;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
-import org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.AbstractWordVectorLearnerNodeModel;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorLearnerParameter;
 import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMode;
 import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettingsModels2;
@@ -72,7 +77,7 @@ import org.knime.ext.textprocessing.dl4j.settings.impl.WordVectorParameterSettin
  *
  * @author David Kolb, KNIME.com GmbH
  */
-public class Word2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel {
+public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
 
     /* SettingsModels */
     private WordVectorParameterSettingsModels2 m_wordVecParameterSettings;
@@ -133,15 +138,19 @@ public class Word2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel
 
         w2v.fit();
 
-        final WordVectorFileStorePortObject outPortObject = WordVectorFileStorePortObject.create(w2v, getOutputSpec(),
-            exec.createFileStore(UUID.randomUUID().toString() + ""));
+        final WordVectorFileStorePortObject outPortObject =
+            WordVectorFileStorePortObject.create(w2v, new WordVectorPortObjectSpec(WordVectorTrainingMode.WORD2VEC),
+                exec.createFileStore(UUID.randomUUID().toString()));
         return new WordVectorFileStorePortObject[]{outPortObject};
     }
 
     @Override
     protected WordVectorPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        return configure((DataTableSpec)inSpecs[0], WordVectorTrainingMode.WORD2VEC,
+
+        ConfigurationUtils.validateColumnSelection((DataTableSpec)inSpecs[0],
             m_wordVecParameterSettings.getString(WordVectorLearnerParameter.DOCUMENT_COLUMN));
+
+        return new WordVectorPortObjectSpec[]{new WordVectorPortObjectSpec(WordVectorTrainingMode.WORD2VEC)};
     }
 
     @Override
@@ -167,5 +176,24 @@ public class Word2VecLearnerNodeModel extends AbstractWordVectorLearnerNodeModel
         settings.addAll(m_wordVecParameterSettings.getAllInitializedSettings());
 
         return settings;
+    }
+
+    /**
+     * Parse the string representation of an
+     * {@link org.knime.ext.textprocessing.dl4j.settings.enumerate.ElementsLearningAlgorithm} and returns the
+     * corresponding DL4J object.
+     *
+     * @param rep
+     * @return DL4J object of elements algo corresponding to specified string representation
+     */
+    protected ElementsLearningAlgorithm<VocabWord> parseElementsAlgo(final String rep) {
+        switch (org.knime.ext.textprocessing.dl4j.settings.enumerate.ElementsLearningAlgorithm.valueOf(rep)) {
+            case CBOW:
+                return new CBOW<VocabWord>();
+            case SKIP_GRAM:
+                return new SkipGram<VocabWord>();
+            default:
+                throw new IllegalArgumentException("No case defined for ElementsLearningAlgorithm: " + rep);
+        }
     }
 }
