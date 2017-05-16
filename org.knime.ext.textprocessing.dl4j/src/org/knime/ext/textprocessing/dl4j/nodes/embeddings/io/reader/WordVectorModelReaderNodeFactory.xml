@@ -17,15 +17,23 @@
 		Decimal separator: dot
 		</li>	
 		<li><b>Binary</b> - Compressed or uncompressed binary model like the well known 
-		<a href="https://code.google.com/archive/p/word2vec/">Google News Vectors</a> model.</li>
+		Google News Vectors model (file ending should be .bin.gz).</li>
 		</ul>
 		Note that for external model formats (Text or Binary) only Word2Vec models are supported. Some 
-		compatible pretrained Word2Vec models can be found 
-		<a href="https://github.com/3Top/word2vec-api#where-to-get-a-pretrained-models">here</a>.
+		compatible pretrained Word2Vec models are the following:
+		<ul>
+			<li><a href="https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit">Google News Vectors</a><br/>
+			Note: Very large model, may take some time to read.
+			</li>	
+			
+			<li><a href="https://nlp.stanford.edu/projects/glove/">GloVe</a><br/>
+			Note: These models are in text format and need to be extracted first.
+			</li>	
+		</ul>		
         </intro>
              
         <option name="Selected File">The file path or URL (supports 'knime://', 'file://', 'http://' and 'https://' protocols) to the WordVector 
-        model.</option>
+        model.</option>          
       
     </fullDescription>
     
