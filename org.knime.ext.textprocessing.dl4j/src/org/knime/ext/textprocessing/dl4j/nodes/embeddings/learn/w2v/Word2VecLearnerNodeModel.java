@@ -186,7 +186,7 @@ public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
      * @param rep
      * @return DL4J object of elements algo corresponding to specified string representation
      */
-    protected ElementsLearningAlgorithm<VocabWord> parseElementsAlgo(final String rep) {
+    private ElementsLearningAlgorithm<VocabWord> parseElementsAlgo(final String rep) {
         switch (org.knime.ext.textprocessing.dl4j.settings.enumerate.ElementsLearningAlgorithm.valueOf(rep)) {
             case CBOW:
                 return new CBOW<VocabWord>();

@@ -193,7 +193,7 @@ public class Doc2VecLearnerNodeModel extends AbstractDLNodeModel {
      * @param rep
      * @return DL4J object of sequence algo corresponding to specified string representation
      */
-    protected SequenceLearningAlgorithm<VocabWord> parseSequenceAlgo(final String rep) {
+    private SequenceLearningAlgorithm<VocabWord> parseSequenceAlgo(final String rep) {
         switch (org.knime.ext.textprocessing.dl4j.settings.enumerate.SequenceLearningAlgorithm.valueOf(rep)) {
             case DBOW:
                 return new DBOW<VocabWord>();
