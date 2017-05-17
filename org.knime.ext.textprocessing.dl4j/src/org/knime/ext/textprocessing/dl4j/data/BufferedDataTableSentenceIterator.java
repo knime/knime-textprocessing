@@ -48,7 +48,6 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.NodeLogger;
 import org.knime.ext.dl4j.base.exception.DataCellConversionException;
 import org.knime.ext.dl4j.base.util.ConverterUtils;
 import org.knime.ext.dl4j.base.util.TableUtils;
@@ -60,9 +59,6 @@ import org.knime.ext.dl4j.base.util.TableUtils;
  * @author David Kolb, KNIME.com GmbH
  */
 public class BufferedDataTableSentenceIterator implements SentenceIterator {
-
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger.getLogger(BufferedDataTableSentenceIterator.class);
 
     private BufferedDataTable m_table;
 
