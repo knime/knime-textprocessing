@@ -65,6 +65,7 @@ import org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.
  * extension in the {@code plugin.xml}.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.4
  */
 public interface StanfordTaggerModel {
 
