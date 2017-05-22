@@ -781,22 +781,13 @@
             TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpEnglishWordTokenizerFactory">
       </TokenizerFactory>
       <TokenizerFactory
-            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizerFactory">
-      </TokenizerFactory>
-      <TokenizerFactory
             TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpSimpleTokenizerFactory">
       </TokenizerFactory>
       <TokenizerFactory
             TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpPTBTokenizerFactory">
       </TokenizerFactory>
       <TokenizerFactory
-            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizerFactory">
-      </TokenizerFactory>
-      <TokenizerFactory
             TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpWhitespaceTokenizerFactory">
-      </TokenizerFactory>
-      <TokenizerFactory
-            TokenizerFactory="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpChineseTokenizerFactory">
       </TokenizerFactory>
    </extension>
    <extension
@@ -817,30 +808,6 @@
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishLeft3WordsModel"
             Type="Part-Of-Speech"
             name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishLeft3WordsModel"
-            type="Part-Of-Speech">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.FrenchModel"
-            Type="Part-Of-Speech"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.FrenchModel"
-            type="Part-Of-Speech">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.GermanHgcModel"
-            Type="Part-Of-Speech"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.GermanHgcModel"
-            type="Part-Of-Speech">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.GermanDewacModel"
-            Type="Part-Of-Speech"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.GermanDewacModel"
-            type="Part-Of-Speech">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.GermanFastModel"
-            Type="Part-Of-Speech"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.GermanFastModel"
             type="Part-Of-Speech">
       </StanfordTaggerModel>
       <StanfordTaggerModel
@@ -883,24 +850,6 @@
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel"
             Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel"
-            type="Named Entity Recognition">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.GermanDewacModel"
-            Type="Named Entity Recognition"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.GermanDewacModel"
-            type="Named Entity Recognition">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.GermanHgcModel"
-            Type="Named Entity Recognition"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.GermanHgcModel"
-            type="Named Entity Recognition">
-      </StanfordTaggerModel>
-      <StanfordTaggerModel
-            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.SpanishAncoraDistsimModel"
-            Type="Named Entity Recognition"
-            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.SpanishAncoraDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
    </extension>

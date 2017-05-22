@@ -37,3 +37,8 @@ org.knime.ext.textprocessing/resources/stanfordmodels/** filter=lfs diff=lfs mer
 org.knime.ext.textprocessing/resources/opennlpmodels/** filter=lfs diff=lfs merge=lfs -text
 org.knime.ext.textprocessing.models/stanfordmodels/** filter=lfs diff=lfs merge=lfs -text
 org.knime.ext.textprocessing.models/opennlpmodels/** filter=lfs diff=lfs merge=lfs -text
+org.knime.ext.textprocessing.language.chinese/models/stanfordmodels/** filter=lfs diff=lfs merge=lfs -text
+org.knime.ext.textprocessing.language.german/models/stanfordmodels/** filter=lfs diff=lfs merge=lfs -text
+org.knime.ext.textprocessing.language.spanish/models/stanfordmodels/** filter=lfs diff=lfs merge=lfs -text
+org.knime.ext.textprocessing.language.french/models/stanfordmodels/** filter=lfs diff=lfs merge=lfs -text
+
