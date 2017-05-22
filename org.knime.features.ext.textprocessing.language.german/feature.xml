@@ -7,8 +7,7 @@
       plugin="org.knime.ext.textprocessing.language.german">
 
    <description url="http://tech.knime.org/knime-labs">
-      This feature contains natural language processing models for
-Germam.
+      This feature contains natural language processing models for German.
    </description>
 
    <copyright url="http://www.example.com/copyright">
