@@ -21,7 +21,13 @@ Bundle-ClassPath: knime-textprocessing.jar,
  lib/stanford-corenlp-3.6.0.jar
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
-Export-Package: org.knime.ext.textprocessing,
+Export-Package: edu.stanford.nlp.ie,
+ edu.stanford.nlp.ie.crf,
+ edu.stanford.nlp.international.spanish.process,
+ edu.stanford.nlp.ling,
+ edu.stanford.nlp.process,
+ opennlp.tools.tokenize,
+ org.knime.ext.textprocessing,
  org.knime.ext.textprocessing.data,
  org.knime.ext.textprocessing.nodes.frequencies,
  org.knime.ext.textprocessing.nodes.frequencies.filter,
