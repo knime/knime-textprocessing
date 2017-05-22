@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.ext.textprocessing.StanfordTaggerModel">
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanDewacModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanDewacModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanHgcModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanHgcModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanFastModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanFastModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanDewacModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanDewacModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanHgcModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanHgcModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+   </extension>
+   <extension
+         point="org.knime.ext.textprocessing.TokenizerFactory">
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.language.german.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizerFactory">
+      </TokenizerFactory>
+   </extension>
+
+</plugin>

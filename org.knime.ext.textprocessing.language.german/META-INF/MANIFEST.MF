@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing German Language Pack
+Bundle-SymbolicName: org.knime.ext.textprocessing.language.german;singleton:=true
+Bundle-Version: 3.4.0.qualifier
+Bundle-Activator: org.knime.ext.textprocessing.language.german.TextprocessingGermanLanguagePack
+Bundle-Vendor: KNIME GmbH, Konstanz, Germany
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.knime.core;bundle-version="3.4.0",
+ org.knime.ext.textprocessing;bundle-version="3.4.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: knime-textprocessing-german.jar
+Export-Package: org.knime.ext.textprocessing.language.german,
+ org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels,
+ org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels,
+ org.knime.ext.textprocessing.language.german.nodes.tokenization.tokenizer.word
