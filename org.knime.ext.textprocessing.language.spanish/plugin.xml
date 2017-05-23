@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.ext.textprocessing.StanfordTaggerModel">
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanfordnlpnetagger.nermodels.SpanishAncoraDistsimModel"
+            name="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanfordnlpnetagger.nermodels.SpanishAncoraDistsimModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+   </extension>
+   <extension
+         point="org.knime.ext.textprocessing.TokenizerFactory">
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.language.spanish.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizerFactory">
+      </TokenizerFactory>
+   </extension>
+
+</plugin>
