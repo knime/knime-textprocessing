@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.ext.textprocessing.StanfordTaggerModel">
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.french.nodes.tagging.stanford.posmodels.FrenchModel"
+            name="org.knime.ext.textprocessing.french.nodes.tagging.stanford.posmodels.FrenchModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+   </extension>
+
+</plugin>
