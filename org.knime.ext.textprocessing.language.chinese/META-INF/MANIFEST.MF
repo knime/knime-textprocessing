@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing Chinese Language Pack
+Bundle-SymbolicName: org.knime.ext.textprocessing.language.chinese;singleton:=true
+Bundle-Version: 3.4.0.qualifier
+Bundle-Activator: org.knime.ext.textprocessing.language.chinese.TextprocessingChineseLanguagePack
+Bundle-Vendor: KNIME GmbH, Konstanz, Germany
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.knime.core;bundle-version="3.4.0",
+ org.knime.ext.textprocessing;bundle-version="3.4.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: org.knime.ext.textprocessing.language.chinese,
+ org.knime.ext.textprocessing.language.chinese.nodes.tokenization.tokenizer.word
+Bundle-ClassPath: knime-textprocessing-chinese.jar
