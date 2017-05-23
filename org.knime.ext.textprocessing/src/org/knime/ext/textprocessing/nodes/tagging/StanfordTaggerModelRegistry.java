@@ -66,6 +66,7 @@ import com.google.common.collect.ImmutableMap;
  * in the extension point has to be added.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.4
  */
 public class StanfordTaggerModelRegistry {
 
