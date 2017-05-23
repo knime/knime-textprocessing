@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.ext.textprocessing.TokenizerFactory">
+      <TokenizerFactory
+            TokenizerFactory="org.knime.ext.textprocessing.language.chinese.nodes.tokenization.tokenizer.word.StanfordNlpChineseTokenizerFactory">
+      </TokenizerFactory>
+   </extension>
+
+</plugin>
