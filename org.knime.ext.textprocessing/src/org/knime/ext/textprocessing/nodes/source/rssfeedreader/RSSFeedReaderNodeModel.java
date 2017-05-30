@@ -75,6 +75,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.ThreadPool;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 
 /**
  *
@@ -249,6 +251,13 @@ class RSSFeedReaderNodeModel extends NodeModel {
                     this.setWarningMessage("Guessing url string column \"" + inSpec.getColumnSpec(i).getName() + "\".");
                     break;
                 }
+            }
+        }
+
+        // check if specific tokenizer is installed
+        if (m_createDocColumn.getBooleanValue()) {
+            if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerModel.getStringValue())) {
+                throw new MissingTokenizerException(m_tokenizerModel.getStringValue());
             }
         }
 

@@ -64,6 +64,8 @@ import org.knime.core.node.streamable.InputPortRole;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacer;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -120,6 +122,10 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        // check if specific tokenizer is installed
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerModel.getStringValue())) {
+            throw new MissingTokenizerException(m_tokenizerModel.getStringValue());
+        }
         if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizerModel.getStringValue())) {
             setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
         }

@@ -56,13 +56,15 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.MissingTaggerModelException;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
- * The node model of the POS (part of speech) tagger. Extends
- * {@link org.knime.core.node.NodeModel} and provides methods to configure and
- * execute the node.
+ * The node model of the POS (part of speech) tagger. Extends {@link org.knime.core.node.NodeModel} and provides methods
+ * to configure and execute the node.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -73,12 +75,11 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      */
     public static final String DEF_MODEL = "English left 3 words";
 
-    private SettingsModelString m_taggerModelModel =
-        StanfordTaggerNodeDialog.createTaggerModelModel();
+    private SettingsModelString m_taggerModelModel = StanfordTaggerNodeDialog.createTaggerModelModel();
 
     /**
-     * Creates new instance of <code>StanfordTaggerNodeModel</code> which adds
-     * part of speech tags to terms of documents.
+     * Creates new instance of <code>StanfordTaggerNodeModel</code> which adds part of speech tags to terms of
+     * documents.
      */
     public StanfordTaggerNodeModel() {
         super();
@@ -86,6 +87,22 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+
+        // check if tagger model exists in current installation
+        if (!StanfordTaggerModelRegistry.getInstance().getPosTaggerModelMap()
+            .containsKey(m_taggerModelModel.getStringValue())) {
+            throw new MissingTaggerModelException(m_taggerModelModel.getStringValue());
+        }
+
+        return super.configure(inSpecs);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @since 2.9
      */
     @Override
@@ -97,9 +114,8 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // empty ...
     }
 
@@ -107,9 +123,8 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // empty ...
     }
 
@@ -117,14 +132,14 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void reset() { }
+    protected void reset() {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_taggerModelModel.loadSettingsFrom(settings);
     }
@@ -142,8 +157,7 @@ public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_taggerModelModel.validateSettings(settings);
     }

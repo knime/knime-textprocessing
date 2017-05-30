@@ -72,6 +72,8 @@ import org.knime.ext.textprocessing.data.NERModelPortObjectSpec;
 import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.MissingTaggerModelException;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
@@ -158,6 +160,14 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
             m_hasModelInput = false;
         }
         checkInputModel();
+
+        // check if tagger model exists in current installation
+        if (!m_hasModelInput || !m_useInportModel.getBooleanValue()) {
+            if (!StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap()
+                .containsKey(m_classifierModel.getStringValue())) {
+                throw new MissingTaggerModelException(m_classifierModel.getStringValue());
+            }
+        }
     }
 
     /**

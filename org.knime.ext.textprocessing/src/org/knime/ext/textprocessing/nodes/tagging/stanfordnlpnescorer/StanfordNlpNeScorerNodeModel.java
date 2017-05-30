@@ -96,6 +96,8 @@ import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
@@ -164,6 +166,11 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
             }
         } else if (colIndex >= 0) {
             m_docColumnName = m_docColumnModel.getStringValue();
+        }
+
+        // check if specific tokenizer is installed
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerName)) {
+            throw new MissingTokenizerException(m_tokenizerName);
         }
 
         //check tokenizer settings from incoming document column
