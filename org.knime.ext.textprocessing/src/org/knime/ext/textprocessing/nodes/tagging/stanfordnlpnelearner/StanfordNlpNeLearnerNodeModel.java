@@ -86,6 +86,8 @@ import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import com.google.common.io.Files;
@@ -263,7 +265,12 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
             m_docColumnName = m_docColumnModel.getStringValue();
         }
 
-        //check tokenizer settings from incoming document column
+        // check if specific tokenizer is installed
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizer.getStringValue())) {
+            throw new MissingTokenizerException(m_tokenizer.getStringValue());
+        }
+
+        // check tokenizer settings from incoming document column
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
         if (!dataTableSpecVerifier.verifyTokenizer(colIndex, m_tokenizer.getStringValue())) {
             setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());

@@ -79,6 +79,8 @@ import org.knime.core.node.streamable.PortInput;
 import org.knime.core.node.streamable.PortObjectInput;
 import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.StreamableOperator;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -197,6 +199,11 @@ public abstract class StreamableTaggerNodeModel extends NodeModel implements Doc
         checkInputDataTableSpecs(inDataTableSpecs);
         checkInputPortSpecs(inSpecs);
         checkDocColTokenizerSettings(inDataTableSpecs);
+
+        // check if specific tokenizer is installed
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizer.getStringValue())) {
+            throw new MissingTokenizerException(m_tokenizer.getStringValue());
+        }
 
         DataTableSpec in = inDataTableSpecs[0];
         ColumnRearranger r = createColumnRearranger(in);

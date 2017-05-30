@@ -15,6 +15,9 @@ import org.osgi.framework.FrameworkUtil;
 
 /**
  * The activator class controls the plug-in life cycle
+ *
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
 public class TextprocessingChineseLanguagePack extends AbstractUIPlugin {
 

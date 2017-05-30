@@ -72,6 +72,8 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
@@ -115,35 +117,25 @@ public class DocumentGrabberNodeModel extends NodeModel {
      */
     static final String QUERYCOL_NAME = "Query";
 
-    private SettingsModelString m_queryModel =
-        DocumentGrabberNodeDialog.getQueryModel();
+    private SettingsModelString m_queryModel = DocumentGrabberNodeDialog.getQueryModel();
 
-    private SettingsModelIntegerBounded m_maxResultsModel =
-        DocumentGrabberNodeDialog.getMaxResultsModel();
+    private SettingsModelIntegerBounded m_maxResultsModel = DocumentGrabberNodeDialog.getMaxResultsModel();
 
-    private SettingsModelString m_dataBaseModel =
-        DocumentGrabberNodeDialog.getDataBaseModel();
+    private SettingsModelString m_dataBaseModel = DocumentGrabberNodeDialog.getDataBaseModel();
 
-    private SettingsModelBoolean m_deleteFilesModel =
-        DocumentGrabberNodeDialog.getDeleteFilesModel();
+    private SettingsModelBoolean m_deleteFilesModel = DocumentGrabberNodeDialog.getDeleteFilesModel();
 
-    private SettingsModelString m_directoryModel =
-        DocumentGrabberNodeDialog.getDirectoryModel();
+    private SettingsModelString m_directoryModel = DocumentGrabberNodeDialog.getDirectoryModel();
 
-    private SettingsModelString m_categoryModel =
-        DocumentGrabberNodeDialog.getDocumentCategoryModel();
+    private SettingsModelString m_categoryModel = DocumentGrabberNodeDialog.getDocumentCategoryModel();
 
-    private SettingsModelString m_typeModel =
-        DocumentGrabberNodeDialog.getDocumentTypeModel();
+    private SettingsModelString m_typeModel = DocumentGrabberNodeDialog.getDocumentTypeModel();
 
-    private SettingsModelBoolean m_extractMetaInfoSettingsModel =
-        DocumentGrabberNodeDialog.getExtractMetaInfoModel();
+    private SettingsModelBoolean m_extractMetaInfoSettingsModel = DocumentGrabberNodeDialog.getExtractMetaInfoModel();
 
-    private SettingsModelBoolean m_appendQueryColumnModel =
-            DocumentGrabberNodeDialog.getAppendQueryColumnModel();
+    private SettingsModelBoolean m_appendQueryColumnModel = DocumentGrabberNodeDialog.getAppendQueryColumnModel();
 
-    private SettingsModelString m_tokenizerModel =
-            DocumentGrabberNodeDialog.getTokenizerModel();
+    private SettingsModelString m_tokenizerModel = DocumentGrabberNodeDialog.getTokenizerModel();
 
     private DocumentDataTableBuilder m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
 
@@ -158,9 +150,14 @@ public class DocumentGrabberNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
+
+        // check if specific tokenizer is installed
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerModel.getStringValue())) {
+            throw new MissingTokenizerException(m_tokenizerModel.getStringValue());
+        }
+
         return new DataTableSpec[]{createColumnRearranger(m_dtBuilder.createDataTableSpec()).createSpec()};
     }
 
@@ -168,8 +165,8 @@ public class DocumentGrabberNodeModel extends NodeModel {
         // check target directory
         File dir = new File(m_directoryModel.getStringValue());
         if (!dir.exists() || !dir.isDirectory() || !dir.canWrite()) {
-            throw new InvalidSettingsException("Directory " + m_directoryModel.getStringValue()
-                + " cannot be accessed.");
+            throw new InvalidSettingsException(
+                "Directory " + m_directoryModel.getStringValue() + " cannot be accessed.");
         }
 
         ColumnRearranger cR = new ColumnRearranger(dataSpec);
@@ -183,8 +180,8 @@ public class DocumentGrabberNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         DocumentGrabber grabber = DocumentGrabberFactory.getInstance().getGrabber(m_dataBaseModel.getStringValue());
 
         try {
@@ -200,8 +197,8 @@ public class DocumentGrabberNodeModel extends NodeModel {
 
                     ((AbstractDocumentGrabber)grabber).setDeleteFiles(delete);
                     ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
-                    ((AbstractDocumentGrabber)grabber).setExtractMetaInfo(m_extractMetaInfoSettingsModel
-                        .getBooleanValue());
+                    ((AbstractDocumentGrabber)grabber)
+                        .setExtractMetaInfo(m_extractMetaInfoSettingsModel.getBooleanValue());
                     ((AbstractDocumentGrabber)grabber).setTokenizerName(m_tokenizerModel.getStringValue());
                     ((AbstractDocumentGrabber)grabber).setExec(exec);
                 }
@@ -223,8 +220,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
         }
     }
 
-    private class InternalDocumentParsedEventListener implements
-    DocumentParsedEventListener {
+    private class InternalDocumentParsedEventListener implements DocumentParsedEventListener {
         /**
          * {@inheritDoc}
          */
@@ -246,9 +242,9 @@ public class DocumentGrabberNodeModel extends NodeModel {
     protected void reset() {
         try {
             m_dtBuilder.getAndCloseDataTable();
-        } catch (Exception e) { /* Do noting just try */ }
+        } catch (Exception e) {
+            /* Do noting just try */ }
     }
-
 
     /**
      * {@inheritDoc}
@@ -271,8 +267,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_queryModel.validateSettings(settings);
         m_categoryModel.validateSettings(settings);
         m_dataBaseModel.validateSettings(settings);
@@ -298,8 +293,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_queryModel.loadSettingsFrom(settings);
         m_categoryModel.loadSettingsFrom(settings);
         m_dataBaseModel.loadSettingsFrom(settings);
@@ -320,14 +314,12 @@ public class DocumentGrabberNodeModel extends NodeModel {
         }
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -335,12 +327,10 @@ public class DocumentGrabberNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-
 
     private class QueryStringCellFactory extends AbstractCellFactory {
 

@@ -78,6 +78,8 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 
 /**
@@ -196,6 +198,12 @@ public class DocumentParserNodeModel extends NodeModel {
         if (!f.isDirectory() || !f.exists() || !f.canRead()) {
             throw new InvalidSettingsException("Selected directory: " + dir + " is not valid!");
         }
+
+        // check if specific tokenizer is installed
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerModel.getStringValue())) {
+            throw new MissingTokenizerException(m_tokenizerModel.getStringValue());
+        }
+
         m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
