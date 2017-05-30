@@ -853,4 +853,10 @@
             type="Named Entity Recognition">
       </StanfordTaggerModel>
    </extension>
+   <extension
+         point="org.knime.ext.textprocessing.TagSet">
+      <TagSet
+            TagBuilder="org.knime.ext.textprocessing.data.AncoraSpanishTreebankTag">
+      </TagSet>
+   </extension>
 </plugin>
