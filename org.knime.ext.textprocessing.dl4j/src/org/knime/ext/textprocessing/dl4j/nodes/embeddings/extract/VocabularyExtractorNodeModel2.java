@@ -226,4 +226,13 @@ public class VocabularyExtractorNodeModel2 extends AbstractDLNodeModel {
 
         return portSpecs;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() {
+        m_progressCounter = 0.0;
+        super.reset();
+    }
 }
