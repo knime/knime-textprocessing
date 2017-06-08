@@ -8,6 +8,16 @@
             name="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanfordnlpnetagger.nermodels.SpanishAncoraDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanford.posmodels.SpanishModel"
+            name="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanford.posmodels.SpanishModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanford.posmodels.SpanishDistsimModel"
+            name="org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanford.posmodels.SpanishDistsimModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TokenizerFactory">
