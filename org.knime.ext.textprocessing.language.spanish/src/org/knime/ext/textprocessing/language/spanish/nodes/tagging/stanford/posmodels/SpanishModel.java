@@ -16,7 +16,7 @@ public class SpanishModel implements StanfordTaggerModel {
 
 	private static final String MODELNAME = "Spanish";
 
-	private static final String MODELPATH = "models/stanfordmodels/pos/spanish.tagger";
+	private static final String MODELPATH = "models/stanfordmodels/posmodels/spanish.tagger";
 
 	/**
 	 * {@inheritDoc}

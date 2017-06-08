@@ -16,7 +16,7 @@ public class SpanishDistsimModel implements StanfordTaggerModel {
 
 	private static final String MODELNAME = "Spanish distsim";
 	
-	private static final String MODELPATH = "models/stanfordmodels/pos/spanish-distsim.tagger";
+	private static final String MODELPATH = "models/stanfordmodels/posmodels/spanish-distsim.tagger";
 	
 	/**
 	 * {@inheritDoc}

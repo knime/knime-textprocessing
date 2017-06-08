@@ -241,7 +241,7 @@ public enum AncoraSpanishTreebankTagSet {
     /**
      * The constant for Spanish Ancora Treebank tag types.
      */
-    public static final String TAG_TYPE = "AnCora";
+    public static final String TAG_TYPE = "ANCORA";
 
     /**
      * Creates new instance of {@code SimplifiedSpanishTreebankTag} and
