@@ -94,6 +94,14 @@ public class StanfordNlpNeTaggerNodeDialog extends TaggerNodeSettingsPane {
             StanfordNlpNeTaggerNodeModel.DEF_STANFORDNLPMODEL);
     }
 
+    /**
+     * @return Returns a SettingModelBoolean for combining multi-words.
+     */
+    public static SettingsModelBoolean createCombineMultiWordsModel() {
+        return new SettingsModelBoolean(StanfordNlpNeTaggerConfigKeys.CFGKEY_COMBINE_MULTIWORDS,
+            StanfordNlpNeTaggerNodeModel.DEFAULT_COMBINE_MULTIWORDS);
+    }
+
     // create member variables for the settings models
 
     private SettingsModelBoolean m_useInportModel;
@@ -124,7 +132,10 @@ public class StanfordNlpNeTaggerNodeDialog extends TaggerNodeSettingsPane {
 
         setHorizontalPlacement(false);
 
-        SortedSet<String> models = new TreeSet<String>(StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap().keySet());
+        addDialogComponent(new DialogComponentBoolean(createCombineMultiWordsModel(), "Combine multi-words"));
+
+        SortedSet<String> models =
+            new TreeSet<String>(StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap().keySet());
         addDialogComponent(new DialogComponentStringSelection(m_classifierModel, "Built-in tagger model", models));
         checkSettings();
     }

@@ -33,6 +33,9 @@
         <option name="Use model from input port">
             If checked, the model from second input port will be included.
         </option>
+		<option name="Combine multi-words">
+            If checked, consecutive words with the same tag will be combined.
+        </option>
         <option name="Built-in tagger model">
             Built-in StanfordNLP tagger models. Choose one, if you do not have an external model. For more information visit the
             <a href="http://nlp.stanford.edu/software/CRF-NER.html#Models">StanfordNLP model description</a>): <br/>

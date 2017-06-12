@@ -77,4 +77,9 @@ public class StanfordNlpNeTaggerConfigKeys {
      */
     static final String CFGKEY_USE_INPORT_MODEL = "Use model from input port";
 
+    /**
+     * The configuration key for combining successive terms with same tag.
+     */
+    static final String CFGKEY_COMBINE_MULTIWORDS = "Combine multi-words";
+
 }

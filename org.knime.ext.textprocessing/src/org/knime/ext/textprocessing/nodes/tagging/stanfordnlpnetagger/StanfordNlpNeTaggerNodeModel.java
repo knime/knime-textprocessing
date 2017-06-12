@@ -59,6 +59,7 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
@@ -81,6 +82,8 @@ import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 
 /**
+ * The {@link NodeModel} for the {@link StanfordNlpNeTaggerNodeModel}. This node extends the
+ * {@link StreamableTaggerNodeModel}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
@@ -101,6 +104,11 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
      */
     static final boolean DEF_USE_INPORT_MODEL = false;
 
+    /**
+     * The default key for combining successive terms with same tag.
+     */
+    static final boolean DEFAULT_COMBINE_MULTIWORDS = false;
+
     // the settings models
 
     private SettingsModelString m_classifierModel = StanfordNlpNeTaggerNodeDialog.createStanfordNeModelModel();
@@ -108,6 +116,8 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
     private SettingsModelBoolean m_unmodifiableModel = StanfordNlpNeTaggerNodeDialog.createSetUnmodifiableModel();
 
     private SettingsModelBoolean m_useInportModel = StanfordNlpNeTaggerNodeDialog.createUseInportModelModel();
+
+    private SettingsModelBoolean m_combineMultiWords = StanfordNlpNeTaggerNodeDialog.createCombineMultiWordsModel();
 
     // initialize member variables for port object and its information
 
@@ -171,9 +181,7 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
     }
 
     /**
-     * @param inPortObjects
-     * @param exec
-     * @throws Exception
+     * {@inheritDoc}
      */
     @Override
     protected final void prepareTagger(final PortObject[] inPortObjects, final ExecutionContext exec) throws Exception {
@@ -201,12 +209,12 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
         final DocumentTagger tagger;
         final String modelName;
         if (m_useInportModel.isEnabled() && m_useInportModel.getBooleanValue()) {
-            tagger = new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(), m_inputModel, m_tag,
-                getTokenizerName());
+            tagger = new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(),
+                m_combineMultiWords.getBooleanValue(), m_inputModel, m_tag, getTokenizerName());
         } else {
             modelName = m_classifierModel.getStringValue();
-            tagger =
-                new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(), modelName, getTokenizerName());
+            tagger = new StanfordNlpNeDocumentTagger(m_unmodifiableModel.getBooleanValue(),
+                m_combineMultiWords.getBooleanValue(), modelName, getTokenizerName());
         }
         return tagger;
     }
@@ -245,6 +253,7 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
         m_classifierModel.saveSettingsTo(settings);
         m_unmodifiableModel.saveSettingsTo(settings);
         m_useInportModel.saveSettingsTo(settings);
+        m_combineMultiWords.saveSettingsTo(settings);
     }
 
     /**
@@ -256,6 +265,10 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
         m_classifierModel.loadSettingsFrom(settings);
         m_unmodifiableModel.loadSettingsFrom(settings);
         m_useInportModel.loadSettingsFrom(settings);
+        // check settings model key for backwards compatibility
+        if (settings.containsKey(m_combineMultiWords.getConfigName())) {
+            m_combineMultiWords.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -267,6 +280,10 @@ public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {
         m_classifierModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
         m_useInportModel.validateSettings(settings);
+        // check settings model key for backwards compatibility
+        if (settings.containsKey(m_combineMultiWords.getConfigName())) {
+            m_combineMultiWords.validateSettings(settings);
+        }
 
         checkInputModel();
 
