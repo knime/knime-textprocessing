@@ -46,8 +46,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -58,15 +60,19 @@ import org.knime.core.data.filestore.FileStore;
 import org.knime.core.data.filestore.FileStorePortObject;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.ModelContent;
+import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortObjectZipInputStream;
 import org.knime.core.node.port.PortObjectZipOutputStream;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
+import org.knime.ext.dl4j.base.cache.MemoryAlertAwareGuavaCache;
 import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
 
 /**
- * Port Object for Word Vector Models using File Store.
+ * Port Object for Word Vector Models using File Store and model caching.
  *
  * @author David Kolb, KNIME.com GmbH
  */
@@ -107,9 +113,16 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
 
     private static final String SUMMARY = "Word Vector Model";
 
+    private static final String CFG_MODELKEY = "model_key";
+
     private WordVectorPortObjectSpec m_spec;
 
-    private WeakReference<WordVectors> m_modelRef;
+    private UUID m_modelKey;
+
+    /**
+     * Cache to store word vector models.
+     */
+    private static MemoryAlertAwareGuavaCache m_modelCache = MemoryAlertAwareGuavaCache.getInstance();
 
     /**
      * Factory method to create a WordVectorFileStorePortObject. This will serialize the contained WordVectors model.
@@ -138,7 +151,8 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
         final FileStore fileStore) {
         super(Collections.singletonList(fileStore));
         m_spec = spec;
-        m_modelRef = new WeakReference<WordVectors>(wordVectors);
+        m_modelKey = UUID.randomUUID();
+        m_modelCache.put(m_modelKey, wordVectors);
     }
 
     /** Framework constructor, not to be used by node code. */
@@ -167,10 +181,16 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
      * @return a WordVectorsModel
      */
     public synchronized WordVectors getWordVectors() {
-        WordVectors wvModel = m_modelRef.get();
-        if (wvModel == null) {
-            wvModel = deserialize();
-            m_modelRef = new WeakReference<WordVectors>(wvModel);
+        WordVectors wvModel = null;
+        try {
+            wvModel = m_modelCache.get(m_modelKey, new Callable<WordVectors>() {
+                @Override
+                public WordVectors call() {
+                    return deserialize();
+                }
+            });
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Error retrieving word vector model from cache!", e);
         }
         return wvModel;
     }
@@ -183,13 +203,36 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
         return null;
     }
 
-    private void save(final PortObjectZipOutputStream out, final ExecutionMonitor exec) {
-        // nothing to do here, this port object only contains a WordVector model
+    /**
+     * Save the cache key for this model.
+     *
+     * @param out
+     * @param exec
+     * @throws IOException
+     */
+    private void save(final PortObjectZipOutputStream out, final ExecutionMonitor exec) throws IOException {
+        ModelContent mc = new ModelContent("");
+        mc.addString(CFG_MODELKEY, m_modelKey.toString());
+        mc.saveToXML(out);
     }
 
-    private void load(final PortObjectZipInputStream in, final PortObjectSpec spec, final ExecutionMonitor exec) {
+    /**
+     * Restore the cache key for this model.
+     *
+     * @param in
+     * @param spec
+     * @param exec
+     * @throws IOException
+     */
+    private void load(final PortObjectZipInputStream in, final PortObjectSpec spec, final ExecutionMonitor exec)
+        throws IOException {
         m_spec = (WordVectorPortObjectSpec)spec;
-        m_modelRef = new WeakReference<WordVectors>(null);
+        ModelContentRO mc = ModelContent.loadFromXML(in);
+        try {
+            m_modelKey = UUID.fromString(mc.getString(CFG_MODELKEY));
+        } catch (InvalidSettingsException e) {
+            throw new IOException("Unable to restore meta information: " + e.getMessage(), e);
+        }
     }
 
     private WordVectors deserialize() {
@@ -210,4 +253,12 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        m_modelCache.remove(m_modelKey);
+        super.finalize();
+    }
 }
