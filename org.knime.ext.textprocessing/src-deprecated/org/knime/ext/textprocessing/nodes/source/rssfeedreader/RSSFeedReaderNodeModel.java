@@ -81,7 +81,9 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @deprecated Use {@link RSSFeedReaderNodeModel2} instead.
  */
+@Deprecated
 class RSSFeedReaderNodeModel extends NodeModel {
     static final NodeLogger LOGGER = NodeLogger.getLogger(RSSFeedReaderNodeModel.class);
 

@@ -93,7 +93,9 @@ import com.rometools.rome.io.SyndFeedInput;
  * The {@code RSSFeedReaderDataTableCreator} creates the DataCells from the URLs. It is also used as joiner class to collect
  * all FeedReaderResults.
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @deprecated Use {@link RSSFeedReaderDataTableCreator2} instead.
  */
+@Deprecated
 class RSSFeedReaderDataTableCreator {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(RSSFeedReaderDataTableCreator.class);

@@ -51,6 +51,8 @@ package org.knime.ext.textprocessing.nodes.source.rssfeedreader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -61,10 +63,10 @@ import javax.xml.stream.XMLStreamException;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
-import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.filestore.FileStoreFactory;
+import org.knime.core.data.time.localdatetime.LocalDateTimeCellFactory;
 import org.knime.core.data.xml.XMLCellFactory;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
@@ -82,13 +84,15 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
 
 /**
- * Creates an FeedEntryResult object containing the information parsed from the specific feed entry and creates an array
- * of DataCells that will be used for row generation in the {@code RSSFeedReaderDataTableCreator}.
+ * Creates a {@code FeedEntryResult2} object containing the information parsed from the specific feed entry and creates
+ * an array of DataCells that will be used for row generation in the {@code RSSFeedReaderDataTableCreator2}.
+ *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
-class FeedEntryResult {
+class FeedEntryResult2 {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(FeedEntryResult.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(FeedEntryResult2.class);
 
     private String m_feedURL = null;
 
@@ -106,20 +110,20 @@ class FeedEntryResult {
 
     private int m_responseCode = -2;
 
-    private boolean m_createDocCol = RSSFeedReaderNodeModel.DEF_CREATE_DOC_COLUMN;
+    private boolean m_createDocCol = RSSFeedReaderNodeModel2.DEF_CREATE_DOC_COLUMN;
 
-    private boolean m_createXMLCol = RSSFeedReaderNodeModel.DEF_CREATE_XML_COLUMN;
+    private boolean m_createXMLCol = RSSFeedReaderNodeModel2.DEF_CREATE_XML_COLUMN;
 
-    private boolean m_createHttpColumn = RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN;
+    private boolean m_createHttpColumn = RSSFeedReaderNodeModel2.DEF_GET_HTTP_RESPONSE_CODE_COLUMN;
 
     private String m_tokenizerName;
 
     private final TextContainerDataCellFactory m_documentCellFac;
 
     /**
-     * Creates a new instance of {@code FeedEntryResult}.
+     * Creates a new instance of {@code FeedEntryResult2}.
      */
-    FeedEntryResult(final String feedUrl, final int responseCode, final boolean docCol, final boolean xmlCol,
+    FeedEntryResult2(final String feedUrl, final int responseCode, final boolean docCol, final boolean xmlCol,
         final boolean httpResponseCol, final String tokenizerName, final FileStoreFactory fileStoreFactory) {
         m_feedURL = feedUrl;
         m_responseCode = responseCode;
@@ -253,8 +257,8 @@ class FeedEntryResult {
         if (m_publicationDate != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(m_publicationDate);
-            cell = new DateAndTimeCell(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH),
-                cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
+            LocalDateTime dateAndTime = LocalDateTime.ofInstant(cal.toInstant(), ZoneId.systemDefault());
+            cell = LocalDateTimeCellFactory.create(dateAndTime);
         }
         return cell;
     }

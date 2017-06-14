@@ -53,16 +53,18 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * The {@link NodeFactory} for the RSS Feed Reader node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.4
  */
-public class RSSFeedReaderNodeFactory extends NodeFactory<RSSFeedReaderNodeModel> {
+public class RSSFeedReaderNodeFactory2 extends NodeFactory<RSSFeedReaderNodeModel2> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public RSSFeedReaderNodeModel createNodeModel() {
-        return new RSSFeedReaderNodeModel();
+    public RSSFeedReaderNodeModel2 createNodeModel() {
+        return new RSSFeedReaderNodeModel2();
     }
 
     /**
@@ -77,8 +79,8 @@ public class RSSFeedReaderNodeFactory extends NodeFactory<RSSFeedReaderNodeModel
      * {@inheritDoc}
      */
     @Override
-    public NodeView<RSSFeedReaderNodeModel> createNodeView(final int viewIndex,
-        final RSSFeedReaderNodeModel nodeModel) {
+    public NodeView<RSSFeedReaderNodeModel2> createNodeView(final int viewIndex,
+        final RSSFeedReaderNodeModel2 nodeModel) {
         return null;
     }
 

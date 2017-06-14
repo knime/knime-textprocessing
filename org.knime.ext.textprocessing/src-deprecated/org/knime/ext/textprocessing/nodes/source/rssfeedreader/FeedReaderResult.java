@@ -62,7 +62,9 @@ import com.rometools.rome.feed.synd.SyndFeed;
  * The {@code FeedReaderResult} collects a list of {@code FeedEntryResult}s containing all the results that could have been
  * parsed from the specific feed.
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @deprecated Use {@link FeedReaderResult2} instead.
  */
+@Deprecated
 class FeedReaderResult {
 
     private List<FeedEntryResult> m_entryResults = new LinkedList<>();
