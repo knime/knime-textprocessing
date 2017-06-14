@@ -86,7 +86,7 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
 
     private boolean m_combineMultiWords;
 
-    private static final String WHITESPACE = " ";
+    private static final String TOKEN_SEPARATOR = " ";
 
     /**
      * Creates a new instance of {@code StanfordNlpNeDocumentTagger}.
@@ -127,29 +127,29 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
     }
 
     /**
-     * Creates a new instance of {@code StanfordNlpNeDocumentTagger}.
+     * Creates a new instance of {@code StanfordNlpNeDocumentTagger}. The combination of multi-words is set to
+     * {@code false} by default.
      *
      * @param setNeUnmodifiable The unmodifiable flag.
      * @param modelName The model.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws ClassNotFoundException If the classifier could not be created from given path.
      * @throws IOException If the classifier could not be created from given path.
-     * @deprecated Use {@link #StanfordNlpNeDocumentTagger(boolean, boolean, String, String) instead.}
      */
-    @Deprecated
     public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final String modelName,
         final String tokenizerName) throws ClassNotFoundException, IOException {
         this(setNeUnmodifiable, false, modelName, tokenizerName);
     }
 
     /**
+     * Creates a new instance of {@code StanfordNlpNeDocumentTagger}. The combination of multi-words is set to
+     * {@code false} by default.
+     *
      * @param setNeUnmodifiable The unmodifiable flag.
      * @param crf The CRFClassifer.
      * @param tag The used tag.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
-     * @deprecated Use {@link #StanfordNlpNeDocumentTagger(boolean, boolean, CRFClassifier, Tag, String) instead.}
      */
-    @Deprecated
     public StanfordNlpNeDocumentTagger(final boolean setNeUnmodifiable, final CRFClassifier<CoreLabel> crf,
         final Tag tag, final String tokenizerName) {
         this(setNeUnmodifiable, false, crf, tag, tokenizerName);
@@ -203,14 +203,14 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
                             String prevValue = previousCl.getString(CoreAnnotations.ValueAnnotation.class);
                             String currentValue = tw.getString(CoreAnnotations.ValueAnnotation.class);
                             CoreLabel combinedCl = tw;
-                            combinedCl.setValue(prevValue + WHITESPACE + currentValue);
+                            combinedCl.setValue(prevValue + TOKEN_SEPARATOR + currentValue);
                             previousCl = combinedCl;
                         } else {
                             addTaggedEntity(taggedEntities, previousCl);
                             previousCl = tw;
                         }
                         // add tagged entity if tagged term is the last one of the sentence
-                        if (count == taggedWords.size()-1) {
+                        if (count == taggedWords.size() - 1) {
                             addTaggedEntity(taggedEntities, previousCl);
                         }
                     }
