@@ -48,6 +48,9 @@
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +61,11 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
+import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.filestore.FileStoreFactory;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
@@ -84,6 +91,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StringsToDocumentCellFactory.class);
 
+    // standard date pattern for strings to document node
     private static final Pattern DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})-([\\d]{4})");
 
     private final StringsToDocumentConfig m_config;
@@ -228,11 +236,11 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
                     // component are empty return an empty string.
                 } else if (auhorsCell.isMissing()
                     && (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty())) {
-		            docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
+                    docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
                 }
 
             }
-        } else if(!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()){
+        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()) {
             // if no check box is set to use authors name from column, if both dialog components name are empty
             // return an empty string otherwise return "-" + the one specified.
             docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
@@ -273,33 +281,38 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         // set document type
         docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_config.getDocType()));
 
-        String dateStr = m_config.getPublicationDate();
+        // set publication date
         if (m_config.getUsePubDateColumn()) {
             if (m_config.getPubDateStringIndex() >= 0) {
                 final DataCell pubDateCell = row.getCell(m_config.getPubDateStringIndex());
-                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(StringValue.class)) {
-                    dateStr = ((StringValue)pubDateCell).getStringValue();
-                } else {
-                    dateStr = m_config.getPublicationDate();
+                if (!pubDateCell.isMissing()) {
+                    // new LocalDateTime type
+                    if (pubDateCell.getType().isCompatible(LocalDateTimeValue.class)) {
+                        LocalDateTime dateTime = ((LocalDateTimeValue)pubDateCell).getLocalDateTime();
+                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonthValue(),
+                            dateTime.getDayOfMonth());
+                        // new LocalDate type
+                    } else if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {
+                        LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
+                        setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+                        // new ZonedLocalDate type
+                    } else if (pubDateCell.getType().isCompatible(ZonedDateTimeValue.class)) {
+                        ZonedDateTime dateTime = ((ZonedDateTimeValue)pubDateCell).getZonedDateTime();
+                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonthValue(),
+                            dateTime.getDayOfMonth());
+                        // old DateAndTime type
+                    } else if (pubDateCell.getType().isCompatible(DateAndTimeValue.class)) {
+                        DateAndTimeValue dateTime = ((DateAndTimeValue)pubDateCell);
+                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonth() + 1,
+                            dateTime.getDayOfMonth());
+                    } else if (pubDateCell.getType().isCompatible(StringValue.class)) {
+                        extractAndSetPublicationDate(((StringValue)pubDateCell).getStringValue(), docBuilder);
+                    }
                 }
             }
+        } else {
+            extractAndSetPublicationDate(m_config.getPublicationDate(), docBuilder);
         }
-        if(!dateStr.isEmpty()){
-            final Matcher m = DATE_PATTERN.matcher(dateStr);
-            if (m.matches()) {
-                final int day = Integer.parseInt(m.group(1));
-                final int month = Integer.parseInt(m.group(2));
-                final int year = Integer.parseInt(m.group(3));
-
-                try {
-                    docBuilder.setPublicationDate(new PublicationDate(year, month, day));
-                } catch (ParseException e) {
-                    LOGGER.info("Publication date could not be set!");
-                }
-            }
-        }
-
-
         DataCellCache dataCellCache = getDataCellCache();
         return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
     }
@@ -314,6 +327,24 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         super.afterProcessing();
         if (m_cacheCreated) {
             getDataCellCache().close();
+        }
+    }
+
+    // extracts and sets the date if incoming date information is a String
+    private void extractAndSetPublicationDate(final String dateStr, final DocumentBuilder docBuilder) {
+        final Matcher m = DATE_PATTERN.matcher(dateStr);
+        if (m.matches()) {
+            setPublicationDate(docBuilder, Integer.parseInt(m.group(3)), Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(1)));
+        }
+    }
+
+    // sets the publication date to the document builder
+    private void setPublicationDate(final DocumentBuilder docBuilder, final int year, final int month, final int day) {
+        try {
+            docBuilder.setPublicationDate(new PublicationDate(year, month, day));
+        } catch (ParseException e) {
+            LOGGER.info("Publication date could not be set!");
         }
     }
 }
