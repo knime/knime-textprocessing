@@ -73,7 +73,9 @@ import org.knime.ext.textprocessing.data.PublicationDate;
 /**
  *
  * @author Tobias Koetter, University of Konstanz
+ * @deprecated Use {@link DocumentDataExtractor2} instead.
  */
+@Deprecated
 public enum DocumentDataExtractor {
 
     /**Returns the title of a document.*/

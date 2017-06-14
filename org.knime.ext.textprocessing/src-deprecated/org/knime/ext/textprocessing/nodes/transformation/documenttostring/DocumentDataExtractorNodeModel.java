@@ -48,6 +48,8 @@
 
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
+import java.io.File;
+
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -63,9 +65,6 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-
-import java.io.File;
-
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 
@@ -73,7 +72,9 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * {@link NodeModel} implementation of the DocumentDataExtractor node.
  *
  * @author Tobias Koetter, University of Konstanz
+ * @deprecated Use {@link DocumentDataExtractorNodeModel2} instead.
  */
+@Deprecated
 public class DocumentDataExtractorNodeModel extends NodeModel {
 
     private final SettingsModelString m_documentCol = getDocumentColConfigObj();

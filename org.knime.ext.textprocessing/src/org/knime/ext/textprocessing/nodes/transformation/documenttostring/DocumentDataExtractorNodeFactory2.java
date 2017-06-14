@@ -56,9 +56,10 @@ import org.knime.core.node.NodeView;
  * The NodeFactory implementation of the DocumentDataExtractor node.
  *
  * @author Tobias Koetter, University of Konstanz
+ * @since 3.4
  */
-public class DocumentDataExtractorNodeFactory
-    extends NodeFactory<DocumentDataExtractorNodeModel> {
+public class DocumentDataExtractorNodeFactory2
+    extends NodeFactory<DocumentDataExtractorNodeModel2> {
 
     /**
      * {@inheritDoc}
@@ -72,17 +73,17 @@ public class DocumentDataExtractorNodeFactory
      * {@inheritDoc}
      */
     @Override
-    public DocumentDataExtractorNodeModel createNodeModel() {
-        return new DocumentDataExtractorNodeModel();
+    public DocumentDataExtractorNodeModel2 createNodeModel() {
+        return new DocumentDataExtractorNodeModel2();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentDataExtractorNodeModel> createNodeView(
+    public NodeView<DocumentDataExtractorNodeModel2> createNodeView(
             final int viewIndex,
-            final DocumentDataExtractorNodeModel nodeModel) {
+            final DocumentDataExtractorNodeModel2 nodeModel) {
         return null;
     }
 

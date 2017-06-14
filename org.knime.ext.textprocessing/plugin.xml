@@ -281,8 +281,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractorNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractorNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
@@ -606,6 +606,10 @@
             category-path="/labs/textprocessing/transformation"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.applier.DocumentHashingApplierNodeFactory">
+      </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractorNodeFactory2">
       </node>
    </extension>
    <extension

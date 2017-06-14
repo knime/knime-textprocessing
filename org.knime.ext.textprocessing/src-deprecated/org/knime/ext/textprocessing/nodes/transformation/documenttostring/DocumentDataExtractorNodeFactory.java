@@ -48,91 +48,60 @@
 
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataRow;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.container.CellFactory;
-import org.knime.core.node.ExecutionMonitor;
-
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 
 /**
- * The {@link CellFactory} implementation of the DocumentDataExtractor node
- * that creates a cell for each selected document property.
+ * The NodeFactory implementation of the DocumentDataExtractor node.
  *
  * @author Tobias Koetter, University of Konstanz
+ * @deprecated Use {@link DocumentDataExtractorNodeFactory2} instead.
  */
-public class DocumentDataExtractorCellFactory implements CellFactory {
+@Deprecated
+public class DocumentDataExtractorNodeFactory
+    extends NodeFactory<DocumentDataExtractorNodeModel> {
 
-    private final DocumentDataExtractor[] m_extractors;
-    private final int m_docColIdx;
-    private final DataColumnSpec[] m_columnSpecs;
-
-    /**Constructor for class DocumentExtractorCellFactory.
-     * @param docColIdx the index of the document column
-     * @param columnSpecs the {@link DataColumnSpec}s to return in the same
-     * order as the extractors
-     * @param extractors the {@link DocumentDataExtractor}s to use
+    /**
+     * {@inheritDoc}
      */
-    public DocumentDataExtractorCellFactory(final int docColIdx,
-            final DataColumnSpec[] columnSpecs,
-            final DocumentDataExtractor[] extractors) {
-        if (columnSpecs == null || columnSpecs.length < 1) {
-            throw new NullPointerException(
-                    "column specs must not be empty");
-        }
-        if (docColIdx < 0) {
-            throw new IllegalArgumentException("Invalid document column");
-        }
-        if (extractors == null || extractors.length < 1) {
-            throw new IllegalArgumentException("extractors must not be empty");
-        }
-        if (columnSpecs.length != extractors.length) {
-            throw new IllegalArgumentException(
-                    "Column specs and extractors must have the same sice");
-        }
-        m_columnSpecs = columnSpecs;
-        m_docColIdx = docColIdx;
-        m_extractors = extractors;
-
+    @Override
+    protected DocumentDataExtractorNodeDialog createNodeDialogPane() {
+        return new DocumentDataExtractorNodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DataCell[] getCells(final DataRow row) {
-        final DataCell cell = row.getCell(m_docColIdx);
-        Document doc = null;
-        if (cell instanceof DocumentValue) {
-            final DocumentValue docCell = (DocumentValue)cell;
-            doc = docCell.getDocument();
-        } else {
-            throw new IllegalStateException("Invalid column type");
-        }
-        final DataCell[] cells = new DataCell[m_extractors.length];
-        for (int i = 0, length = m_extractors.length; i < length; i++) {
-            cells[i] = m_extractors[i].getValue(doc);
-        }
-        return cells;
+    public DocumentDataExtractorNodeModel createNodeModel() {
+        return new DocumentDataExtractorNodeModel();
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public DataColumnSpec[] getColumnSpecs() {
-        return m_columnSpecs;
+    public NodeView<DocumentDataExtractorNodeModel> createNodeView(
+            final int viewIndex,
+            final DocumentDataExtractorNodeModel nodeModel) {
+        return null;
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setProgress(final int curRowNr, final int rowCount,
-            final RowKey lastKey, final ExecutionMonitor exec) {
-        exec.setProgress(1.0 / rowCount * curRowNr,
-                "Processing row " + curRowNr + " of " + rowCount);
+    protected int getNrNodeViews() {
+        return 0;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
 }
