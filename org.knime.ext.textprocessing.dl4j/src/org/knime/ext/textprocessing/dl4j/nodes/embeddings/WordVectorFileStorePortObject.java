@@ -256,7 +256,7 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
      */
     @Override
     protected void finalize() throws Throwable {
-        CACHE.remove(m_modelKey);
         super.finalize();
+        CACHE.remove(m_modelKey);
     }
 }
