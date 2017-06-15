@@ -135,6 +135,10 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
     public static WordVectorFileStorePortObject create(final WordVectors wordVectors,
         final WordVectorPortObjectSpec spec, final FileStore fileStore) {
         WordVectorFileStorePortObject obj = new WordVectorFileStorePortObject(wordVectors, spec, fileStore);
+        // FIXME (later): We could wait with serialization until requested by KNIME.
+        // Also it would be of benefit for very  large models to _not_ be stored within KNIME,
+        // rather we could keep a reference to the original model and load the model as needed from this reference.
+        // Users should be able to select behavior in reader.
         serialize(wordVectors, fileStore);
         return obj;
     }
