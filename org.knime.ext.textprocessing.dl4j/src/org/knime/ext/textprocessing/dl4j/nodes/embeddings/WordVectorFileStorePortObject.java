@@ -111,6 +111,11 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
      */
     public static final PortType TYPE = PortTypeRegistry.getInstance().getPortType(WordVectorFileStorePortObject.class);
 
+    /**
+     * Cache to store word vector models.
+     */
+    private final static MemoryAlertAwareGuavaCache CACHE = MemoryAlertAwareGuavaCache.getInstance();
+
     private static final String SUMMARY = "Word Vector Model";
 
     private static final String CFG_MODELKEY = "model_key";
@@ -118,11 +123,6 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
     private WordVectorPortObjectSpec m_spec;
 
     private UUID m_modelKey;
-
-    /**
-     * Cache to store word vector models.
-     */
-    private static MemoryAlertAwareGuavaCache m_modelCache = MemoryAlertAwareGuavaCache.getInstance();
 
     /**
      * Factory method to create a WordVectorFileStorePortObject. This will serialize the contained WordVectors model.
@@ -152,7 +152,7 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
         super(Collections.singletonList(fileStore));
         m_spec = spec;
         m_modelKey = UUID.randomUUID();
-        m_modelCache.put(m_modelKey, wordVectors);
+        CACHE.put(m_modelKey, wordVectors);
     }
 
     /** Framework constructor, not to be used by node code. */
@@ -183,7 +183,7 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
     public synchronized WordVectors getWordVectors() {
         WordVectors wvModel = null;
         try {
-            wvModel = m_modelCache.get(m_modelKey, new Callable<WordVectors>() {
+            wvModel = CACHE.get(m_modelKey, new Callable<WordVectors>() {
                 @Override
                 public WordVectors call() {
                     return deserialize();
@@ -258,7 +258,7 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
      */
     @Override
     protected void finalize() throws Throwable {
-        m_modelCache.remove(m_modelKey);
+        CACHE.remove(m_modelKey);
         super.finalize();
     }
 }
