@@ -181,9 +181,8 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
      * @return a WordVectorsModel
      */
     public synchronized WordVectors getWordVectors() {
-        WordVectors wvModel = null;
         try {
-            wvModel = CACHE.get(m_modelKey, new Callable<WordVectors>() {
+           return CACHE.get(m_modelKey, new Callable<WordVectors>() {
                 @Override
                 public WordVectors call() {
                     return deserialize();
@@ -192,7 +191,6 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
         } catch (ExecutionException e) {
             throw new IllegalStateException("Error retrieving word vector model from cache!", e);
         }
-        return wvModel;
     }
 
     /**
