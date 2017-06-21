@@ -77,14 +77,14 @@
             level-id="embeddings"
             locked="true"
             name="Word Embeddings"
-            path="/labs/deeplearning/">
+            path="/labs/deeplearning/dl4j/">
       </category>
       <category
             icon="res/icons/missing.gif"
             level-id="io"
             locked="true"
             name="I/O"
-            path="/labs/deeplearning/embeddings/">
+            path="/labs/deeplearning/dl4j/embeddings/">
       </category>
    </extension>
    <extension
