@@ -4,49 +4,49 @@
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.w2v.Word2VecLearnerNodeFactory">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.d2v.Doc2VecLearnerNodeFactory">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings/io"
+            category-path="/labs/deeplearning/dl4j/embeddings/io"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.writer.WordVectorModelWriterNodeFactory">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings/io"
+            category-path="/labs/deeplearning/dl4j/embeddings/io"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader.WordVectorModelReaderNodeFactory">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory2">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory2">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply.WordVectorApplyNodeFactory">
       </node>
       
       <!-- Deprecated nodes -->
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.extract.VocabularyExtractorNodeFactory">
       </node>
       <node
-            category-path="/labs/deeplearning/embeddings"
+            category-path="/labs/deeplearning/dl4j/embeddings"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.learn.WordVectorLearnerNodeFactory">
       </node>
