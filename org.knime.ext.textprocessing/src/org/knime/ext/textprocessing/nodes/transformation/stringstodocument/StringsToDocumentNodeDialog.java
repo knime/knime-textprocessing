@@ -54,6 +54,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.StringValue;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -344,7 +347,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         m_pubDateModelCombo = getPubDateColumnModel();
         m_usePubDateColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0, StringValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0,
+            StringValue.class, LocalDateValue.class, LocalDateTimeValue.class, ZonedDateTimeValue.class));
         closeCurrentGroup();
 
         createNewGroup("Processes");

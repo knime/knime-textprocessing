@@ -60,8 +60,12 @@ import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -441,31 +445,32 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
         if (settingsNotConfigured()) {
             for (int i = 0; i < columns.length; i++) {
                 String column = columns[i];
+                DataType type = dataTableSpec.getColumnSpec(column).getType();
                 if (column.equalsIgnoreCase(DocumentDataExtractor.TITLE.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    && type.isCompatible(StringValue.class)) {
                     m_titleColModel.setStringValue(column);
                 }
                 if (column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    && type.isCompatible(StringValue.class)) {
                     m_sourceColumnModel.setStringValue(column);
                 }
                 if (column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    && type.isCompatible(StringValue.class)) {
                     m_authorsColModel.setStringValue(column);
                 }
                 if (column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    && type.isCompatible(StringValue.class)) {
                     m_catColumnModel.setStringValue(column);
                 }
                 if (column.equalsIgnoreCase(DocumentDataExtractor.TEXT.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)) {
+                    && type.isCompatible(StringValue.class)) {
                     m_fulltextColModel.setStringValue(column);
                 }
                 if(column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)){
+                    && (type.isCompatible(StringValue.class) || type.isCompatible(LocalDateTimeValue.class)
+                            || type.isCompatible(LocalDateValue.class)
+                            || type.isCompatible(ZonedDateTimeValue.class))) {
                     m_pubDateColModel.setStringValue(column);
-
-
                 }
             }
         }
