@@ -315,15 +315,15 @@ public enum DocumentDataExtractor2 {
                     return DataType.getMissingCell();
                 }
                 String dateAsString = date.toString();
-                if (dateAsString.length() != 10) {
+                if (dateAsString.length() < 10) {
                     String[] ymd = dateAsString.split("-");
-                    while (ymd[0].length() != 4) {
+                    while (ymd[0].length() < 4) {
                         ymd[0] = "0" + ymd[0];
                     }
-                    while (ymd[1].length() != 2) {
+                    while (ymd[1].length() < 2) {
                         ymd[1] = "0" + ymd[1];
                     }
-                    while (ymd[2].length() != 2) {
+                    while (ymd[2].length() < 2) {
                         ymd[2] = "0" + ymd[2];
                     }
                     return LocalDateCellFactory.create(ymd[0] + "-" + ymd[1] + "-" + ymd[2]);
