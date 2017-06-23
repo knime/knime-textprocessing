@@ -76,7 +76,7 @@
         </option>
         <option name="Use publication date from column">
             If checked, the string value of the specified column will be used as document publication date.
-            This node also allows the Date columns as an input columns.
+            This node also allows Date columns as an input columns.
         </option>
         <option name="Publication date column">
             The column containing the string which is used as publication date. (if "Use publication date from column" 

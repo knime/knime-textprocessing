@@ -72,6 +72,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ColumnFilter;
+import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -392,6 +393,16 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         }
     }
 
+    /**
+     * This {@link ColumnFilter} is used for the {@link DialogComponentColumnNameSelection} to select columns that
+     * contain date information. It includes columns that are compatible to the new {@link LocalDateValue} and
+     * {@link StringValue} (for backwards compatibility). Since {@link Document}s can handle dates but no time, other
+     * date & time types like {@link LocalDateTimeValue} are excluded by this ColumnFilter implementation to prevent
+     * unwanted erasure of additional time information as decided in AP-7461. To use columns with other date & time
+     * types the user has to convert them to date columns.
+     *
+     * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+     */
     private class StringAndLocalDateValueColumnFilter implements ColumnFilter {
 
         /**
