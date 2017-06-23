@@ -53,9 +53,14 @@ import java.util.stream.Collectors;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.date.DateAndTimeValue;
+import org.knime.core.data.time.duration.DurationValue;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.localtime.LocalTimeValue;
+import org.knime.core.data.time.period.PeriodValue;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -66,6 +71,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.util.ColumnFilter;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -93,13 +99,13 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
             StringsToDocumentConfig.DEF_AUTHORS_SPLITCHAR);
     }
 
-    static final SettingsModelString getAuthorFirstNameModel(){
+    static final SettingsModelString getAuthorFirstNameModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
             StringsToDocumentConfig.DEF_AUTHOR_NAMES);
 
     }
 
-    static final SettingsModelString getAuthorLastNameModel(){
+    static final SettingsModelString getAuthorLastNameModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
             StringsToDocumentConfig.DEF_AUTHOR_NAMES);
 
@@ -146,8 +152,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the document
-     *         publication date.
+     * @return Creates and returns an instance of {@SettingsModelString} specifying the document publication date.
      */
     static final SettingsModelString getPubDatModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATE,
@@ -197,7 +202,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
      * @return Creates and return an instance of{@SettingModelBoolean} specifying whether a column is used for
      *         publication dates or not
      */
-    static final SettingsModelBoolean getUsePubDateColumnModel(){
+    static final SettingsModelBoolean getUsePubDateColumnModel() {
         return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_PUBDATECOLUMN,
             StringsToDocumentConfig.DEF_USE_PUBDATECOLUMN);
     }
@@ -221,7 +226,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
      * @return Creates and returns an instance of{@SettingsModellString} specifying the column which has to be used as
      *         publication date
      */
-    static final SettingsModelString getPubDateColumnModel(){
+    static final SettingsModelString getPubDateColumnModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATECOL, "");
 
     }
@@ -329,8 +334,8 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         m_docCatModelCombo = getCategoryColumnModel();
         m_useCatColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_useCatColumnModel, "Use categories from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_docCatModelCombo, "Document category column",
-            0, StringValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_docCatModelCombo, "Document category column", 0,
+            StringValue.class));
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
@@ -348,7 +353,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         m_usePubDateColumnModel.addChangeListener(new UsageChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0,
-            StringValue.class, LocalDateValue.class, LocalDateTimeValue.class, ZonedDateTimeValue.class));
+            new StringAndLocalDateValueColumnFilter()));
         closeCurrentGroup();
 
         createNewGroup("Processes");
@@ -358,7 +363,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
 
         createNewGroup("Tokenization");
         Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
-                .map(e -> e.getKey()).collect(Collectors.toList());
+            .map(e -> e.getKey()).collect(Collectors.toList());
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
         closeCurrentGroup();
     }
@@ -387,5 +392,40 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         }
     }
 
+    private class StringAndLocalDateValueColumnFilter implements ColumnFilter {
+
+        /**
+         * {@inheritDoc}
+         */
+        @SuppressWarnings("deprecation")
+        @Override
+        public boolean includeColumn(final DataColumnSpec colSpec) {
+            if (colSpec == null) {
+                throw new NullPointerException("Column specification must not be null");
+            }
+            if (colSpec.getType().isCompatible(LocalDateValue.class)) {
+                return true;
+            } else if (colSpec.getType().isCompatible(StringValue.class)
+                && !(colSpec.getType().isCompatible(LocalDateTimeValue.class)
+                    || colSpec.getType().isCompatible(ZonedDateTimeValue.class)
+                    || colSpec.getType().isCompatible(LocalTimeValue.class)
+                    || colSpec.getType().isCompatible(DurationValue.class)
+                    || colSpec.getType().isCompatible(PeriodValue.class)
+                    || colSpec.getType().isCompatible(DateAndTimeValue.class))) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String allFilteredMsg() {
+            return "No column in spec is compatible to \"" + StringValue.class.getSimpleName() + "\" or \""
+                + LocalDateValue.class.getSimpleName() + "\".";
+        }
+
+    }
 
 }

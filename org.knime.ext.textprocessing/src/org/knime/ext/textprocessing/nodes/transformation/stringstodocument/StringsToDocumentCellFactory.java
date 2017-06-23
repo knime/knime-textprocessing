@@ -49,8 +49,6 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,11 +59,8 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
-import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.data.time.localdate.LocalDateValue;
-import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
-import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
@@ -286,25 +281,10 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
             if (m_config.getPubDateStringIndex() >= 0) {
                 final DataCell pubDateCell = row.getCell(m_config.getPubDateStringIndex());
                 if (!pubDateCell.isMissing()) {
-                    // new LocalDateTime type
-                    if (pubDateCell.getType().isCompatible(LocalDateTimeValue.class)) {
-                        LocalDateTime dateTime = ((LocalDateTimeValue)pubDateCell).getLocalDateTime();
-                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonthValue(),
-                            dateTime.getDayOfMonth());
-                        // new LocalDate type
-                    } else if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {
+                    // new LocalDate type
+                    if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {
                         LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
                         setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-                        // new ZonedLocalDate type
-                    } else if (pubDateCell.getType().isCompatible(ZonedDateTimeValue.class)) {
-                        ZonedDateTime dateTime = ((ZonedDateTimeValue)pubDateCell).getZonedDateTime();
-                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonthValue(),
-                            dateTime.getDayOfMonth());
-                        // old DateAndTime type
-                    } else if (pubDateCell.getType().isCompatible(DateAndTimeValue.class)) {
-                        DateAndTimeValue dateTime = ((DateAndTimeValue)pubDateCell);
-                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonth() + 1,
-                            dateTime.getDayOfMonth());
                     } else if (pubDateCell.getType().isCompatible(StringValue.class)) {
                         extractAndSetPublicationDate(((StringValue)pubDateCell).getStringValue(), docBuilder);
                     }
