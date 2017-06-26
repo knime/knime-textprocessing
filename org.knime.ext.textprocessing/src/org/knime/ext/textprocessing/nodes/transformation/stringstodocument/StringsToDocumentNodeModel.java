@@ -63,9 +63,8 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.time.localdate.LocalDateValue;
-import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
-import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -78,7 +77,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
+import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor2;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -440,36 +439,36 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * @param dataTableSpec
      * @since 3.3
      */
+    @SuppressWarnings("deprecation")
     protected void doSmartDialogSelection(final DataTableSpec dataTableSpec) {
         String[] columns = dataTableSpec.getColumnNames();
         if (settingsNotConfigured()) {
             for (int i = 0; i < columns.length; i++) {
                 String column = columns[i];
                 DataType type = dataTableSpec.getColumnSpec(column).getType();
-                if (column.equalsIgnoreCase(DocumentDataExtractor.TITLE.getName())
+                if (column.equalsIgnoreCase(DocumentDataExtractor2.TITLE.getName())
                     && type.isCompatible(StringValue.class)) {
                     m_titleColModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
+                if (column.equalsIgnoreCase(DocumentDataExtractor2.SOURCE.getName())
                     && type.isCompatible(StringValue.class)) {
                     m_sourceColumnModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
+                if (column.equalsIgnoreCase(DocumentDataExtractor2.AUTHOR.getName())
                     && type.isCompatible(StringValue.class)) {
                     m_authorsColModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
+                if (column.equalsIgnoreCase(DocumentDataExtractor2.CATEGORY.getName())
                     && type.isCompatible(StringValue.class)) {
                     m_catColumnModel.setStringValue(column);
                 }
-                if (column.equalsIgnoreCase(DocumentDataExtractor.TEXT.getName())
+                if (column.equalsIgnoreCase(DocumentDataExtractor2.TEXT.getName())
                     && type.isCompatible(StringValue.class)) {
                     m_fulltextColModel.setStringValue(column);
                 }
-                if(column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
-                    && (type.isCompatible(StringValue.class) || type.isCompatible(LocalDateTimeValue.class)
-                            || type.isCompatible(LocalDateValue.class)
-                            || type.isCompatible(ZonedDateTimeValue.class))) {
+                if(column.equalsIgnoreCase(DocumentDataExtractor2.PUB_DATE.getName())
+                    && (type.isCompatible(StringValue.class) || type.isCompatible(LocalDateValue.class)
+                            || type.isCompatible(DateAndTimeValue.class))) {
                     m_pubDateColModel.setStringValue(column);
                 }
             }
