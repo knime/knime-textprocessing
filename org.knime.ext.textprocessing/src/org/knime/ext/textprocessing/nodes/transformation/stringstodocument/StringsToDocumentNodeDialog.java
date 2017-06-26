@@ -55,6 +55,7 @@ import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.time.duration.DurationValue;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
@@ -407,12 +408,15 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
+        @SuppressWarnings("deprecation")
         @Override
         public boolean includeColumn(final DataColumnSpec colSpec) {
             if (colSpec == null) {
                 throw new NullPointerException("Column specification must not be null");
             }
             if (colSpec.getType().isCompatible(LocalDateValue.class)) {
+                return true;
+            } else if (colSpec.getType().isCompatible(DateAndTimeValue.class)) {
                 return true;
             } else if (colSpec.getType().isCompatible(StringValue.class)
                 && !(colSpec.getType().isCompatible(LocalDateTimeValue.class)
