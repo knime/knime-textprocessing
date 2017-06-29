@@ -209,7 +209,7 @@
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            deprecated="true"
+            deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory">
       </node>
       <node
