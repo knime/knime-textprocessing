@@ -49,6 +49,7 @@
 package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,8 +61,10 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
+import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.filestore.FileStoreFactory;
+import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
@@ -83,6 +86,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
+@SuppressWarnings("deprecation")
 class DocumentDataAssignerCellFactory extends AbstractCellFactory {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentDataAssignerCellFactory.class);
@@ -198,13 +202,23 @@ class DocumentDataAssignerCellFactory extends AbstractCellFactory {
             docBuilder.setDocumentType(DocumentType.stringToDocumentType(m_conf.getDocType()));
 
             // set publication date
-            if (m_conf.getPubDateColumnIndex() < 0) {
-                setPublicationDate(m_conf.getDocPubDate(), docBuilder);
-            } else {
-                DataCell pubDateCell = row.getCell(m_conf.getPubDateColumnIndex());
-                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(StringValue.class)) {
-                    setPublicationDate(((StringCell)pubDateCell).getStringValue(), docBuilder);
+            if (m_conf.getPubDateColumnIndex() >= 0) {
+                final DataCell pubDateCell = row.getCell(m_conf.getPubDateColumnIndex());
+                if (!pubDateCell.isMissing()) {
+                    // new LocalDate type
+                    if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {
+                        LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
+                        setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+                    } else if (pubDateCell.getType().isCompatible(DateAndTimeValue.class)) {
+                        DateAndTimeValue dateTime = ((DateAndTimeValue)pubDateCell);
+                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonth() + 1,
+                            dateTime.getDayOfMonth());
+                    } else if (pubDateCell.getType().isCompatible(StringValue.class)) {
+                        extractAndSetPublicationDate(((StringValue)pubDateCell).getStringValue(), docBuilder);
+                    }
                 }
+            } else {
+                extractAndSetPublicationDate(m_conf.getDocPubDate(), docBuilder);
             }
 
             // return new data cell
@@ -217,26 +231,21 @@ class DocumentDataAssignerCellFactory extends AbstractCellFactory {
 
     }
 
-    /**
-     * Sets the publication date to the DocumentBuilder and checks if it is valid.
-     *
-     * @param str The publication date: "dd-MM-yyyy"
-     * @param docBuilder The {@code DocumentBuilder}.
-     */
-    private void setPublicationDate(final String str, final DocumentBuilder docBuilder) {
-        if (!str.isEmpty()) {
-            Matcher m = DATE_PATTERN.matcher(str);
-            if (m.matches()) {
-                final int day = Integer.parseInt(m.group(1));
-                final int month = Integer.parseInt(m.group(2));
-                final int year = Integer.parseInt(m.group(3));
+    // extracts and sets the date if incoming date information is a String
+    private void extractAndSetPublicationDate(final String dateStr, final DocumentBuilder docBuilder) {
+        final Matcher m = DATE_PATTERN.matcher(dateStr);
+        if (m.matches()) {
+            setPublicationDate(docBuilder, Integer.parseInt(m.group(3)), Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(1)));
+        }
+    }
 
-                try {
-                    docBuilder.setPublicationDate(new PublicationDate(year, month, day));
-                } catch (ParseException e) {
-                    LOGGER.info("Publication date could not be set!");
-                }
-            }
+    // sets the publication date to the document builder
+    private void setPublicationDate(final DocumentBuilder docBuilder, final int year, final int month, final int day) {
+        try {
+            docBuilder.setPublicationDate(new PublicationDate(year, month, day));
+        } catch (ParseException e) {
+            LOGGER.info("Publication date could not be set!");
         }
     }
 

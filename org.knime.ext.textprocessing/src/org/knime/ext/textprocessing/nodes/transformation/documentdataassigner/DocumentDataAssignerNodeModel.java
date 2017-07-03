@@ -167,7 +167,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
             conf.setDocPubDate(m_pubDateModel.getStringValue());
         }
 
-        // set documnent type information
+        // set document type information
         conf.setDocType(m_typeModel.getStringValue());
 
         // create new document column based on the config, cellfactory and column specs.
