@@ -61,7 +61,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeDialog.ReplaceOrAppend;
-import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor;
+import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor2;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -294,26 +294,26 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
                     && m_docColumnModel.getStringValue().isEmpty()) {
                     m_docColumnModel.setStringValue(column);
                 }
-                if ((column.equalsIgnoreCase(DocumentDataExtractor.SOURCE.getName())
-                    || column.toLowerCase().contains(DocumentDataExtractor.SOURCE.getName().toLowerCase()))
+                if ((column.equalsIgnoreCase(DocumentDataExtractor2.SOURCE.getName())
+                    || column.toLowerCase().contains(DocumentDataExtractor2.SOURCE.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_sourceColModel.getStringValue().isEmpty()) {
                     m_sourceColModel.setStringValue(column);
                 }
-                if ((column.equalsIgnoreCase(DocumentDataExtractor.AUTHOR.getName())
-                    || column.toLowerCase().contains(DocumentDataExtractor.AUTHOR.getName().toLowerCase()))
+                if ((column.equalsIgnoreCase(DocumentDataExtractor2.AUTHOR.getName())
+                    || column.toLowerCase().contains(DocumentDataExtractor2.AUTHOR.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_authorsColModel.getStringValue().isEmpty()) {
                     m_authorsColModel.setStringValue(column);
                 }
-                if ((column.equalsIgnoreCase(DocumentDataExtractor.CATEGORY.getName())
-                    || column.toLowerCase().contains(DocumentDataExtractor.CATEGORY.getName().toLowerCase()))
+                if ((column.equalsIgnoreCase(DocumentDataExtractor2.CATEGORY.getName())
+                    || column.toLowerCase().contains(DocumentDataExtractor2.CATEGORY.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_categoryColModel.getStringValue().isEmpty()) {
                     m_categoryColModel.setStringValue(column);
                 }
-                if ((column.equalsIgnoreCase(DocumentDataExtractor.PUB_DATE.getName())
-                    || column.toLowerCase().contains(DocumentDataExtractor.PUB_DATE.getName().toLowerCase()))
+                if ((column.equalsIgnoreCase(DocumentDataExtractor2.PUB_DATE.getName())
+                    || column.toLowerCase().contains(DocumentDataExtractor2.PUB_DATE.getName().toLowerCase()))
                     && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
                     && m_pubDateColModel.getStringValue().isEmpty()) {
                     m_pubDateColModel.setStringValue(column);
