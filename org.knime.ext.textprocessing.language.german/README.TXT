@@ -11,14 +11,12 @@ StanfordNLP German POS Models
 - German Dewac (3.6.0)
 - German fast (3.6.0)
 - German hgc (3.6.0)
-Homepage: https://nlp.stanford.edu/software/tagger.html
-Copyright (c) 2004 - 2017 Stanford
+https://nlp.stanford.edu/software/tagger.html
 StanfordNLP POS tagger is released under the GPL license (http://www.gnu.org/licenses/gpl-2.0.html).
 
 
 StanfordNLP German NER Models 
 - German Dewac (3.6.0)
 - German hgc (3.6.0)
-Homepage: https://nlp.stanford.edu/software/tagger.html
-Copyright (c) 2006 - 2017 Stanford
+https://nlp.stanford.edu/software/tagger.html
 StanfordNLP NER tagger is released under the GPL license (http://www.gnu.org/licenses/gpl-2.0.html).

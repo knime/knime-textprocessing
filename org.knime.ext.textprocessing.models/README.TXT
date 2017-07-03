@@ -15,17 +15,14 @@ StanfordNLP English POS Models
 - English 7 Class Distsim (3.6.0)
 - English 7 Class No distsim (3.6.0)
 - English 3 Class No wiki caseless distsim (3.7.0)
-Homepage: https://nlp.stanford.edu/software/tagger.html
-Copyright (c) 2004 - 2017 Stanford
+https://nlp.stanford.edu/software/tagger.html
 StanfordNLP POS tagger is released under the GPL license (http://www.gnu.org/licenses/gpl-2.0.html).
-
 
 StanfordNLP English NER Models 
 - English bidirectional distsim (3.6.0)
 - English Caseless left 3 words distsim (3.6.0)
 - English left 3 words distsim (3.6.0)
-Homepage: https://nlp.stanford.edu/software/tagger.html
-Copyright (c) 2006 - 2017 Stanford
+https://nlp.stanford.edu/software/tagger.html
 StanfordNLP NER tagger is released under the GPL license (http://www.gnu.org/licenses/gpl-2.0.html).
 
 OpenNLP Models
@@ -39,5 +36,5 @@ OpenNLP Models
 - POS Model (1.6.0)
 - Sentence detection model (1.6.0)
 - English Tokenizer (1.6.0)
-Homepage: https://opennlp.apache.org/
+https://opennlp.apache.org/
 OpenNLP is licensed under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0).

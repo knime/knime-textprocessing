@@ -1,4 +1,4 @@
-This plugin project provides functionality and models for French language as an extension for KNIME.
+This plugin project provides functionality and models for Chinese language as an extension for KNIME.
 
 It is released under the General Public License (GPL) (see the file 
 LICENSE.TXT, which should be located in the same directory as this file). 
@@ -7,7 +7,6 @@ contact@knime.org
 
 This plugin uses models from other projects:
 
-StanfordNLP French POS Model (3.6.0)
-Homepage: https://nlp.stanford.edu/software/tagger.html
-Copyright (c) 2004 - 2017 Stanford
-StanfordNLP POS tagger is released under the GPL license (http://www.gnu.org/licenses/gpl-2.0.html).
+StanfordNLP Chinese Word Segmenter (3.7.0)
+https://nlp.stanford.edu/software/segmenter.shtml
+StanfordNLP Chinese Word Segmenter is released under the GPL license (http://www.gnu.org/licenses/gpl-2.0.html).
