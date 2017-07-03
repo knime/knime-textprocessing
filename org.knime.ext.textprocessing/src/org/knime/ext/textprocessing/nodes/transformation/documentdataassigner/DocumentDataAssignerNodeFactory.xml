@@ -64,7 +64,7 @@
         <option name="Publication date column">
             The column containing the string which is used as publication date. (if "Use publication date from column" 
             is checked, otherwise the current date from "Publication date" field is set as date). The date has to be
-            formatted like "dd-mm-yyy".
+            formatted like "dd-mm-yyy". This option also provides support for Date columns.
         </option>
         <option name="Replace document column">
         	If checked, the incoming document column will be replaced by the processed document column. Otherwise, the 
