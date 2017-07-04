@@ -54,17 +54,13 @@
         <option name="Publication date">
             The publication date which is set to all documents (if 
             "Use publication date from column" is not checked).
-            The date has to be formatted like "dd-mm-yyy". Two digits
-            to specify the day, two to specify the month and four to
-            specify the year. The specified date has to be a valid date.
         </option>
         <option name="Use publication date from column">
-            If checked, the string value of the specified column will be used as document publication date.
+            If checked, the Date value of the specified column will be used as document publication date.
         </option>
         <option name="Publication date column">
-            The column containing the string which is used as publication date. (if "Use publication date from column" 
-            is checked, otherwise the current date from "Publication date" field is set as date). The date has to be
-            formatted like "dd-mm-yyy". This option also provides support for Date columns.
+            The date column containing the publication date. (if "Use publication date from column" 
+            is checked, otherwise the current date from "Date" field is set as date).
         </option>
         <option name="Replace document column">
         	If checked, the incoming document column will be replaced by the processed document column. Otherwise, the 

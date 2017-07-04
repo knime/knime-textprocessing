@@ -53,6 +53,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -65,6 +66,7 @@ import org.knime.ext.textprocessing.nodes.transformation.documenttostring.Docume
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
+import org.knime.time.util.SettingsModelDateTime;
 
 /**
  * The node model for the Document Data Assigner. This node sets meta information like authors, source, category, type
@@ -98,7 +100,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
 
     private SettingsModelString m_categoryModel = DocumentDataAssignerNodeDialog.getCategoryModel();
 
-    private SettingsModelString m_pubDateModel = DocumentDataAssignerNodeDialog.getPubDateModel();
+    private SettingsModelDateTime m_pubDateModel = DocumentDataAssignerNodeDialog.getPubDateModel();
 
     private SettingsModelString m_typeModel = DocumentDataAssignerNodeDialog.getTypeModel();
 
@@ -162,9 +164,13 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
 
         // set publication date information
         if (m_usePubDateColModel.getBooleanValue()) {
-            conf.setPubDateColumnIndex(spec.findColumnIndex(m_pubDateColModel.getStringValue()));
+            if (spec.findColumnIndex(m_pubDateColModel.getStringValue()) >= 0) {
+                conf.setPubDateColumnIndex(spec.findColumnIndex(m_pubDateColModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("No date column selected.");
+            }
         } else {
-            conf.setDocPubDate(m_pubDateModel.getStringValue());
+            conf.setDocPubDate(m_pubDateModel.getLocalDate());
         }
 
         // set document type information
@@ -314,7 +320,7 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
                 }
                 if ((column.equalsIgnoreCase(DocumentDataExtractor2.PUB_DATE.getName())
                     || column.toLowerCase().contains(DocumentDataExtractor2.PUB_DATE.getName().toLowerCase()))
-                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(StringValue.class)
+                    && dataTableSpec.getColumnSpec(column).getType().isCompatible(LocalDateValue.class)
                     && m_pubDateColModel.getStringValue().isEmpty()) {
                     m_pubDateColModel.setStringValue(column);
                 }

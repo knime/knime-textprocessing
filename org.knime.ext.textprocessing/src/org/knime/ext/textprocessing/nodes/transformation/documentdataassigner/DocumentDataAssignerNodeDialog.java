@@ -54,14 +54,8 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.time.duration.DurationValue;
 import org.knime.core.data.time.localdate.LocalDateValue;
-import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
-import org.knime.core.data.time.localtime.LocalTimeValue;
-import org.knime.core.data.time.period.PeriodValue;
-import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
@@ -71,10 +65,11 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
-import org.knime.core.node.util.ColumnFilter;
-import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.time.util.DialogComponentDateTimeSelection;
+import org.knime.time.util.DialogComponentDateTimeSelection.DisplayOption;
+import org.knime.time.util.SettingsModelDateTime;
 
 /**
  * The node dialog for the Document Data Assigner.
@@ -189,9 +184,9 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns an instance of {@SettingsModelString} containing the publication date.
      */
-    static final SettingsModelString getPubDateModel() {
-        return new SettingsModelString(DocumentDataAssignerConfigKeys.CFGKEY_PUBDATE,
-            DocumentDataAssignerConfig.DEF_DOCUMENT_PUBDATE);
+    static final SettingsModelDateTime getPubDateModel() {
+        return new SettingsModelDateTime(DocumentDataAssignerConfigKeys.CFGKEY_PUBDATE,
+            DocumentDataAssignerConfig.DEF_DOCUMENT_PUBDATE, null, null);
     }
 
     /**
@@ -226,7 +221,7 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_useCategoryColumnModel = getUseCategoryColumnModel();
 
-    private SettingsModelString m_pubDateModel = getPubDateModel();
+    private SettingsModelDateTime m_pubDateModel = getPubDateModel();
 
     private SettingsModelBoolean m_usePubDateColumnModel = getUsePubDateColumnModel();
 
@@ -277,20 +272,20 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
-        // dialog for type and date
+        // dialog for type
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document type", types));
-        DialogComponentString dcs = new DialogComponentString(m_pubDateModel, "Publication date (dd-mm-yyyy)");
-        dcs.setToolTipText("Date has to be specified like \"dd-mm-yyyy!\"");
-        addDialogComponent(dcs);
 
         // dialog for publication date
+        DialogComponentDateTimeSelection dcs = new DialogComponentDateTimeSelection(m_pubDateModel,
+            null, DisplayOption.SHOW_DATE_ONLY);
+        addDialogComponent(dcs);
         setHorizontalPlacement(true);
         m_usePubDateColumnModel.addChangeListener(new ChangeStateListener());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateColumnModel, "Publication date column", 0,
-            new StringAndLocalDateValueColumnFilter()));
+            false, LocalDateValue.class));
         closeCurrentGroup();
 
         // dialog for output column settings
@@ -402,50 +397,6 @@ public class DocumentDataAssignerNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public boolean isDefault() {
             return this.equals(ReplaceOrAppend.getDefault());
-        }
-
-    }
-
-    /**
-     * This {@link ColumnFilter} is used for the {@link DialogComponentColumnNameSelection} to select columns that
-     * contain date information. It includes columns that are compatible to the new {@link LocalDateValue} and
-     * {@link StringValue} (for backwards compatibility). Since {@link Document}s can handle dates but no time, other
-     * date & time types like {@link LocalDateTimeValue} are excluded by this ColumnFilter implementation to prevent
-     * unwanted erasure of additional time information. To use columns with other date & time
-     * types the user has to convert them to date columns.
-     *
-     * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
-     */
-    private class StringAndLocalDateValueColumnFilter implements ColumnFilter {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean includeColumn(final DataColumnSpec colSpec) {
-            if (colSpec == null) {
-                throw new NullPointerException("Column specification must not be null");
-            }
-            if (colSpec.getType().isCompatible(LocalDateValue.class)) {
-                return true;
-            } else if (colSpec.getType().isCompatible(StringValue.class)
-                && !(colSpec.getType().isCompatible(LocalDateTimeValue.class)
-                    || colSpec.getType().isCompatible(ZonedDateTimeValue.class)
-                    || colSpec.getType().isCompatible(LocalTimeValue.class)
-                    || colSpec.getType().isCompatible(DurationValue.class)
-                    || colSpec.getType().isCompatible(PeriodValue.class))) {
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String allFilteredMsg() {
-            return "No column in spec is compatible to \"" + StringValue.class.getSimpleName() + "\" or \""
-                + LocalDateValue.class.getSimpleName() + "\".";
         }
 
     }

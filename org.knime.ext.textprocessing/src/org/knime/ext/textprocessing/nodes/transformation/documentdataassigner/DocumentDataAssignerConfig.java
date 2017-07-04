@@ -48,8 +48,9 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentdataassigner;
 
+import java.time.LocalDate;
+
 import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeDialog.ReplaceOrAppend;
 
 /**
@@ -62,7 +63,7 @@ class DocumentDataAssignerConfig {
     // default values for setting models.
 
     /** The default publication date. */
-    static final String DEF_DOCUMENT_PUBDATE = PublicationDate.getToday();
+    static final LocalDate DEF_DOCUMENT_PUBDATE = LocalDate.now();
 
     /** The default string for the document source. */
     static final String DEF_DOCUMENT_SOURCE = "";
@@ -101,7 +102,7 @@ class DocumentDataAssignerConfig {
      */
 
     /** The publication date used for creating a new document. */
-    private String m_docPubDate = DEF_DOCUMENT_PUBDATE;
+    private LocalDate m_docPubDate = DEF_DOCUMENT_PUBDATE;
 
     /** The document source used for creating a new document. */
     private String m_docSource = DEF_DOCUMENT_SOURCE;
@@ -204,14 +205,14 @@ class DocumentDataAssignerConfig {
     /**
      * @return The publication date.
      */
-    String getDocPubDate() {
+    LocalDate getDocPubDate() {
         return m_docPubDate;
     }
 
     /**
      * @param docPubDate Sets the publication date.
      */
-    void setDocPubDate(final String docPubDate) {
+    void setDocPubDate(final LocalDate docPubDate) {
         this.m_docPubDate = docPubDate;
     }
 
