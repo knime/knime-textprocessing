@@ -200,10 +200,8 @@ class DocumentDataAssignerCellFactory extends AbstractCellFactory {
                 final DataCell pubDateCell = row.getCell(m_conf.getPubDateColumnIndex());
                 if (!pubDateCell.isMissing()) {
                     // new LocalDate type
-                    if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {
-                        LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
-                        setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-                    }
+                    LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
+                    setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
                 }
             } else {
                 LocalDate date = m_conf.getDocPubDate();
@@ -225,7 +223,7 @@ class DocumentDataAssignerCellFactory extends AbstractCellFactory {
         try {
             docBuilder.setPublicationDate(new PublicationDate(year, month, day));
         } catch (ParseException e) {
-            LOGGER.info("Publication date could not be set!");
+            throw new RuntimeException(e);
         }
     }
 
