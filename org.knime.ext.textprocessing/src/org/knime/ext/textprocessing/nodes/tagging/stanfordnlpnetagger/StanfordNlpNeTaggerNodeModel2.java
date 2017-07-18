@@ -106,7 +106,7 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
     /**
      * The default key for combining successive terms with same tag.
      */
-    static final boolean DEFAULT_COMBINE_MULTIWORDS = false;
+    static final boolean DEFAULT_COMBINE_MULTIWORDS = true;
 
     // the settings models
 
