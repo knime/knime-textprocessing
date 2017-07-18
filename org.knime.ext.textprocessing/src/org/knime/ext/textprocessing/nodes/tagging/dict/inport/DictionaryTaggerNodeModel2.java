@@ -57,8 +57,8 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2;
 
 /**
- * The node model of the Dictionary Tagger node. Extends {@link AbstractDictionaryTaggerModel2}
- * and provides methods to create the specific document tagger.
+ * The node model of the Dictionary Tagger node. Extends {@link AbstractDictionaryTaggerModel2} and provides methods to
+ * create the specific document tagger.
  *
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
@@ -67,15 +67,13 @@ class DictionaryTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
 
     /**
      * The default value of the exact match setting.
-     *
-     * @since 2.8
      */
     static final boolean DEFAULT_EXACTMATCH = true;
 
     private SettingsModelBoolean m_exactMatchModel = DictionaryTaggerNodeDialog2.createExactMatchModel();
 
     /**
-     * Creates a new instance of {@code DictionaryTaggerNodeModel} with two table in ports and one out port.
+     * Creates a new instance of {@code DictionaryTaggerNodeModel2} with two table in ports and one out port.
      */
     DictionaryTaggerNodeModel2() {
         super();
@@ -106,10 +104,7 @@ class DictionaryTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
      */
     @Override
     protected void loadValidatedSettingsFromInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // added in 2.7.4, only load settings if key is contained in settings (for backwards compatibility)
-        if (settings.containsKey(m_exactMatchModel.getConfigName())) {
-            m_exactMatchModel.loadSettingsFrom(settings);
-        }
+        m_exactMatchModel.loadSettingsFrom(settings);
     }
 
     /*
@@ -131,9 +126,6 @@ class DictionaryTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
      */
     @Override
     protected void validateSettingsInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // added in 2.7.4, only validate settings if key is contained in settings (for backwards compatibility)
-        if (settings.containsKey(m_exactMatchModel.getConfigName())) {
-            m_exactMatchModel.validateSettings(settings);
-        }
+        m_exactMatchModel.validateSettings(settings);
     }
 }

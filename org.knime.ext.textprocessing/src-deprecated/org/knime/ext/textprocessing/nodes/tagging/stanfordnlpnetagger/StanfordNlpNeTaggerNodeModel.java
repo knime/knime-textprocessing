@@ -86,7 +86,7 @@ import edu.stanford.nlp.ling.CoreLabel;
  * {@link StreamableTaggerNodeModel}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @deprecated Use {@link StanfordNlpNeTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class StanfordNlpNeTaggerNodeModel extends StreamableTaggerNodeModel {

@@ -53,7 +53,7 @@ import org.knime.core.node.NodeView;
 
 /**
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link OpennlpNerTaggerNodeFactory2} instead.
+ * @deprecated Use custom node factory instead.
  */
 @Deprecated
 public class OpennlpNerTaggerNodeFactory

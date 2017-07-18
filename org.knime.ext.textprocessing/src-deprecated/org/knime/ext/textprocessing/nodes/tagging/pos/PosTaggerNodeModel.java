@@ -64,7 +64,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeMo
  * execute the node.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link PosTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class PosTaggerNodeModel extends StreamableFunctionTaggerNodeModel {

@@ -51,7 +51,7 @@ package org.knime.ext.textprocessing.nodes.tagging.dict;
  * Provides the configuration keys of the dictionary tagger node.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link DictionaryTaggerConfigKeys2} instead.
+ * @deprecated Use custom set of config keys instead.
  */
 @Deprecated
 public final class DictionaryTaggerConfigKeys {

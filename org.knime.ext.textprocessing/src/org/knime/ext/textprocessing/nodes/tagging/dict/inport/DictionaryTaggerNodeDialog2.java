@@ -75,7 +75,6 @@ class DictionaryTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
      * @return Creates and returns a {@link SettingsModelBoolean} containing the
      *         flag specifying whether the search for named entities have to be via exact match or contains match or
      *         not.
-     * @since 2.8
      */
     static final SettingsModelBoolean createExactMatchModel() {
         return new SettingsModelBoolean(DictionaryTaggerConfigKeys2.CFGKEY_EXACTMATCH,

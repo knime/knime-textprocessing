@@ -59,7 +59,6 @@ final class DictionaryTaggerConfigKeys2 {
 
     /**
      * The configuration key of unmodifiable flag of terms.
-     * @since 2.8
      */
     static final String CFGKEY_EXACTMATCH = "ExactMatch";
 }

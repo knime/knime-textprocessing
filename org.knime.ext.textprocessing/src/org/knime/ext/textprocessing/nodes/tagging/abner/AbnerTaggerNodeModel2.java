@@ -67,7 +67,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeMo
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
-public class AbnerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
+class AbnerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
 
     /**
      * The default value of the terms unmodifiable flag.
@@ -92,8 +92,6 @@ public class AbnerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
 
     /**
      * {@inheritDoc}
-     *
-     * @since 2.9
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
@@ -116,7 +114,7 @@ public class AbnerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
-        m_setUnmodifiableModel.validateSettings(settings);
+        m_setUnmodifiableModel.loadSettingsFrom(settings);
         m_abnerTaggingModel.loadSettingsFrom(settings);
     }
 

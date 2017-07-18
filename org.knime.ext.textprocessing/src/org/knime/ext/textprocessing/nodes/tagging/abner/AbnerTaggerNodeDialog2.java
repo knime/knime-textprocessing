@@ -72,7 +72,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
  * @author Kilian Thiel, University of Konstanz
  * @since 3.5
  */
-public class AbnerTaggerNodeDialog2 extends DefaultNodeSettingsPane {
+class AbnerTaggerNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
      * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the user

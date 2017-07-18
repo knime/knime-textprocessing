@@ -102,29 +102,21 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
 
     /**
      * Default number of threads to use for parallel tagging.
-     *
-     * @since 3.5
      */
     static final int DEFAULT_NUMBER_OF_THREADS = 1;
 
     /**
      * Default number of threads to use for parallel tagging.
-     *
-     * @since 3.5
      */
     static final int MAX_NUMBER_OF_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
 
     /**
      * The default setting for replacing the documents with the tagged documents.
-     *
-     * @since 3.5
      */
     static final boolean DEF_REPLACE = true;
 
     /**
      * The default name of the new, tagged document column.
-     *
-     * @since 3.5
      */
     static final String DEF_NEW_DOCUMENT_COL = "Tagged Document";
 
@@ -179,7 +171,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      *
      * @param portTypes The input port types.
      * @param roles The input port roles.
-     * @since 3.3
      */
     public StreamableTaggerNodeModel2(final PortType[] portTypes, final InputPortRole[] roles) {
         this(portTypes, roles, new PortType[]{BufferedDataTable.TYPE});
@@ -191,7 +182,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @param inPortTypes The input port types.
      * @param roles The input port roles.
      * @param outPortTypes The output port types.
-     * @since 3.3
      */
     public StreamableTaggerNodeModel2(final PortType[] inPortTypes, final InputPortRole[] roles,
         final PortType[] outPortTypes) {
@@ -247,6 +237,8 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         DataTableSpec in = inDataTableSpecs[0];
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
+
+        checkSettings();
         return new DataTableSpec[]{out};
     }
 
@@ -264,7 +256,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      *
      * @param inSpecs Specs of the input ports.
      * @throws InvalidSettingsException If settings or specs of input ports are invalid.
-     * @since 3.3
      */
     protected void checkInputPortSpecs(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
     }
@@ -273,7 +264,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * Method to check tokenizer settings from incoming document column.
      *
      * @param inSpecs Specs of the input data tables.
-     * @since 3.3
      */
     private void checkDocColTokenizerSettings(final DataTableSpec[] inSpecs) {
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
@@ -300,7 +290,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @param inObjects Input port objects.
      * @param exec The execution context of the node.
      * @throws Exception If tagger cannot be prepared.
-     * @since 3.3
      */
     protected void prepareTagger(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         List<BufferedDataTable> bufferedDataTables = new LinkedList<>();
@@ -321,7 +310,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @param in the input data table spec.
      * @return A new instance of column rearranger to create output data table
      * @throws InvalidSettingsException If tagger instance cannot be created.
-     * @since 3.1
      */
     protected final ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(in);
@@ -345,6 +333,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
                     }
                     count++;
                 }
+                setWarningMessage("Auto guessing: Using column '" + documentCol + "' as document column");
             }
             m_documentColModel.setStringValue(documentCol);
             docColName = m_documentColModel.getStringValue();
@@ -439,7 +428,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
 
     /**
      * @return the maximum number of parallel threads to use for tagging.
-     * @since 3.1
      */
     protected int getMaxNumberOfParallelThreads() {
         return m_numberOfThreadsModel.getIntValue();
@@ -447,7 +435,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
 
     /**
      * @return The name of the tokenizer used for word tokenization.
-     * @since 3.3
      */
     protected String getTokenizerName() {
         return m_tokenizer.getStringValue();
@@ -478,22 +465,14 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // only load settings if settings contain key of SettingsModel (for backwards compatibility)
+        // don't call if method if key is not available (needed since abner tagger does not use this setting)
         if (settings.containsKey(m_numberOfThreadsModel.getKey())) {
             m_numberOfThreadsModel.loadSettingsFrom(settings);
         }
-        if (settings.containsKey(m_tokenizer.getKey())) {
-            m_tokenizer.loadSettingsFrom(settings);
-        }
-        if (settings.containsKey(m_documentColModel.getKey())) {
-            m_documentColModel.loadSettingsFrom(settings);
-        }
-        if (settings.containsKey(m_replaceOldDocModel.getConfigName())) {
-            m_replaceOldDocModel.loadSettingsFrom(settings);
-        }
-        if (settings.containsKey(m_newDocumentColModel.getKey())) {
-            m_newDocumentColModel.loadSettingsFrom(settings);
-        }
+        m_tokenizer.loadSettingsFrom(settings);
+        m_documentColModel.loadSettingsFrom(settings);
+        m_replaceOldDocModel.loadSettingsFrom(settings);
+        m_newDocumentColModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -513,21 +492,21 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // only validate settings if settings contain key of SettingsModel (for backwards compatibility)
+        // don't call if method if key is not available (needed since abner tagger does not use this setting)
         if (settings.containsKey(m_numberOfThreadsModel.getKey())) {
             m_numberOfThreadsModel.validateSettings(settings);
         }
-        if (settings.containsKey(m_tokenizer.getKey())) {
-            m_tokenizer.validateSettings(settings);
-        }
-        if (settings.containsKey(m_documentColModel.getKey())) {
-            m_documentColModel.validateSettings(settings);
-        }
-        if (settings.containsKey(m_replaceOldDocModel.getConfigName())) {
-            m_replaceOldDocModel.validateSettings(settings);
-        }
-        if (settings.containsKey(m_newDocumentColModel.getKey())) {
-            m_newDocumentColModel.validateSettings(settings);
+        m_tokenizer.validateSettings(settings);
+        m_documentColModel.validateSettings(settings);
+        m_replaceOldDocModel.validateSettings(settings);
+        m_newDocumentColModel.validateSettings(settings);
+    }
+
+    private void checkSettings() {
+        if (m_replaceOldDocModel.getBooleanValue()) {
+            m_newDocumentColModel.setEnabled(false);
+        } else {
+            m_newDocumentColModel.setEnabled(true);
         }
     }
 
@@ -537,11 +516,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            if (m_replaceOldDocModel.getBooleanValue()) {
-                m_newDocumentColModel.setEnabled(false);
-            } else {
-                m_newDocumentColModel.setEnabled(true);
-            }
+            checkSettings();
         }
     }
 }

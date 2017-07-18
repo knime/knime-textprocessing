@@ -10,7 +10,7 @@
             tag. Therefore the Penn Treebank tag set is used, for details
             see (http://www.cis.upenn.edu/~treebank). The underlying tagger 
             model deciding what tag to assign to which term is a
-            model of the opennlp framework version 1.5.2
+            model of the opennlp framework version 1.6.0
             (see for http://opennlp.apache.org/documentation.html details).
         </intro>
  		<tab name="General options">

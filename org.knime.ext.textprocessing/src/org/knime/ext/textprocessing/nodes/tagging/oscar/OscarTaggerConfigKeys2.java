@@ -55,7 +55,8 @@ package org.knime.ext.textprocessing.nodes.tagging.oscar;
  */
 final class OscarTaggerConfigKeys2 {
 
-    private OscarTaggerConfigKeys2() { }
+    private OscarTaggerConfigKeys2() {
+    }
 
     /**
      * The configuration key of unmodifiable flag of terms.

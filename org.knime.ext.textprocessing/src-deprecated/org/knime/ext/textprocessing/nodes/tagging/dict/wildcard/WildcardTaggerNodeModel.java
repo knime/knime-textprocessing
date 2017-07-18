@@ -65,7 +65,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerM
 /**
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
- * @deprecated Use {@link WildcardTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class WildcardTaggerNodeModel extends AbstractDictionaryTaggerModel {

@@ -50,11 +50,7 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -91,40 +87,8 @@ class OpenNlpNerNodeDialog2 extends TaggerNodeSettingsPane2 {
     }
 
     /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the user
-     * settings whether a dictionary is used or not.
-     *
-     * @return A {@code SettingsModelBoolean} containing the dictionary flag.
-     */
-    static SettingsModelBoolean createUseDictModel() {
-        return new SettingsModelBoolean(OpenNlpTaggerConfigKeys2.CFGKEY_USE_DICT,
-            OpennlpNerTaggerNodeModel2.DEFAULT_USE_DICT);
-    }
-
-    /**
-     * @return Creates and returns a {@code SettingsModelString} containing the file name of the dictionary file.
-     */
-    static SettingsModelString createDictFileModel() {
-        return new SettingsModelString(OpenNlpTaggerConfigKeys2.CFGKEY_DICTFILE,
-            OpennlpNerTaggerNodeModel2.DEFAULT_DICT_FILENAME);
-    }
-
-    /**
-     * @return Creates and returns a {@code SettingsModelString} containing the file name of the model file.
-     * @since 2.7
-     */
-    static SettingsModelString createModelFileModel() {
-        return new SettingsModelString(OpenNlpTaggerConfigKeys2.CFGKEY_MODELFILE,
-            OpennlpNerTaggerNodeModel2.DEFAULT_MODEL_FILENAME);
-    }
-
-    private SettingsModelBoolean m_useDictFileModel;
-
-    private SettingsModelString m_modelFileModel;
-
-    /**
-     * Creates a new instance of {@code OpenNlpNerNodeDialog2} providing a checkbox enabling the user to specify
-     * whether terms representing named entities have to be set unmodifiable or not.
+     * Creates a new instance of {@code OpenNlpNerNodeDialog2} providing a checkbox enabling the user to specify whether
+     * terms representing named entities have to be set unmodifiable or not.
      */
     OpenNlpNerNodeDialog2() {
         super();
@@ -138,35 +102,5 @@ class OpenNlpNerNodeDialog2 extends TaggerNodeSettingsPane2 {
             modelNames.add(name);
         }
         addDialogComponent(new DialogComponentStringSelection(createOpenNlpModelModel(), "OpenNlp model", modelNames));
-
-        m_useDictFileModel = createUseDictModel();
-        m_useDictFileModel.addChangeListener(new SettingsChangeListener());
-        addDialogComponent(new DialogComponentBoolean(m_useDictFileModel, "Use external OpenNLP model file"));
-
-        m_modelFileModel = createModelFileModel();
-        addDialogComponent(
-            new DialogComponentFileChooser(m_modelFileModel, OpenNlpNerNodeDialog2.class.toString(), "bin"));
-
-        checkSettings();
-    }
-
-    private final class SettingsChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent arg0) {
-            checkSettings();
-        }
-
-    }
-
-    private void checkSettings() {
-        if (m_useDictFileModel.getBooleanValue()) {
-            m_modelFileModel.setEnabled(true);
-        } else {
-            m_modelFileModel.setEnabled(false);
-        }
     }
 }

@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerM
 /**
  *
  * @author thiel, University of Konstanz
- * @deprecated Use {@link DictionaryTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class DictionaryTaggerNodeModel extends AbstractDictionaryTaggerModel {

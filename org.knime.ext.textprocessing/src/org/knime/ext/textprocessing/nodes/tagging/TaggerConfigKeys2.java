@@ -70,19 +70,16 @@ final class TaggerConfigKeys2 {
 
     /**
      * The configuration key for appending the incoming document.
-     * @since 3.4
      */
     static final String CFG_KEY_REPLACE_DOC = "Replace Document";
 
     /**
      * The configuration key for the new document column name
-     * @since 3.4
      */
     static final String CFG_KEY_NEW_DOCUMENT_COL = "New Document Column Name";
 
     /**
      * The configuration key for the column containing the documents to process.
-     * @since 3.4
      */
     static final String CFG_KEY_DOCUMENT_COL = "Document Column";
 }

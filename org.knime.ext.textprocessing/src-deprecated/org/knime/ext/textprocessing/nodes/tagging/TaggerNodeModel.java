@@ -70,7 +70,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
- * @deprecated use {@link StreamableTaggerNodeModel} instead, which supports streaming.
+ * @deprecated use {@link StreamableTaggerNodeModel2} instead, which supports streaming.
  */
 @Deprecated
 public abstract class TaggerNodeModel extends NodeModel implements DocumentTaggerFactory {

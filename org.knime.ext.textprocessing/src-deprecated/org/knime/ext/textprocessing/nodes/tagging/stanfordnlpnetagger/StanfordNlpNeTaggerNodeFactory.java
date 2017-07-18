@@ -55,7 +55,7 @@ import org.knime.core.node.NodeView;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @deprecated Use {@link StanfordNlpNeTaggerNodeFactory2} instead.
+ * @deprecated Use custom node factory instead.
  */
 @Deprecated
 public class StanfordNlpNeTaggerNodeFactory extends NodeFactory<StanfordNlpNeTaggerNodeModel> {

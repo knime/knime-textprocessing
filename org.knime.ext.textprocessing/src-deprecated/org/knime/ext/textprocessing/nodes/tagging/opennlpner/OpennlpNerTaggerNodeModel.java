@@ -65,7 +65,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeMo
 
 /**
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link OpennlpNerTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class OpennlpNerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {

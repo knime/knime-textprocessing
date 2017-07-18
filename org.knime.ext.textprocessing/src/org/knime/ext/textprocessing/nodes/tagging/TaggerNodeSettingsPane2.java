@@ -88,7 +88,6 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
      * Creates and returns the settings model, storing the name of the word tokenizer.
      *
      * @return The settings model with the name of the word tokenizer.
-     * @since 3.3
      */
     public static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(TaggerConfigKeys2.CFGKEY_TOKENIZER,
@@ -98,7 +97,6 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns the boolean settings model which contains the flag if the old documents have to be
      *         replaced by the tagged documents or if they will be appended.
-     * @since 3.5
      */
     public static SettingsModelBoolean getReplaceDocumentModel() {
         return new SettingsModelBoolean(TaggerConfigKeys2.CFG_KEY_REPLACE_DOC, StreamableTaggerNodeModel2.DEF_REPLACE);
@@ -107,7 +105,6 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns the string settings model containing the name of the column with the documents to
      *         tag.
-     * @since 3.5
      */
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(TaggerConfigKeys2.CFG_KEY_DOCUMENT_COL, "");
@@ -116,7 +113,6 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
     /**
      * @return Creates and returns the string settings model containing the name of the column with the new, tagged
      *         documents.
-     * @since 3.5
      */
     public static SettingsModelString getNewDocumentColumnModel() {
         return new SettingsModelString(TaggerConfigKeys2.CFG_KEY_NEW_DOCUMENT_COL,
@@ -160,6 +156,15 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(
             new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel tagging processes", 1));
+        checkSettings();
+    }
+
+    private void checkSettings() {
+        if (m_replaceDocModel.getBooleanValue()) {
+            m_newDocumentColModel.setEnabled(false);
+        } else {
+            m_newDocumentColModel.setEnabled(true);
+        }
     }
 
     private final class ColumnHandlingListener implements ChangeListener {
@@ -168,11 +173,7 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            if (m_replaceDocModel.getBooleanValue()) {
-                m_newDocumentColModel.setEnabled(false);
-            } else {
-                m_newDocumentColModel.setEnabled(true);
-            }
+            checkSettings();
         }
     }
 }

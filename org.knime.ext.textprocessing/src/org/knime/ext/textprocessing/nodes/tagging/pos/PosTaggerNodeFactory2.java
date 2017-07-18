@@ -53,8 +53,8 @@ import org.knime.core.node.NodeView;
 import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the POS tagger node,
- * provides methods to create the model and the dialog instance.
+ * The {@link org.knime.core.node.NodeFactory} of the POS tagger node, provides methods to create the model and the
+ * dialog instance.
  *
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
@@ -81,8 +81,7 @@ public class PosTaggerNodeFactory2 extends NodeFactory<PosTaggerNodeModel2> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<PosTaggerNodeModel2> createNodeView(final int index,
-            final PosTaggerNodeModel2 model) {
+    public NodeView<PosTaggerNodeModel2> createNodeView(final int index, final PosTaggerNodeModel2 model) {
         return null;
     }
 

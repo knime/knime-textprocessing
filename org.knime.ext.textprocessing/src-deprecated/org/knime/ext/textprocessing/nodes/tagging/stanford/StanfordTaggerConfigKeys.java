@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.tagging.stanford;
 /**
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link StanfordTaggerConfigKeys2} instead.
+ * @deprecated Use custom set of config keys instead.
  */
 @Deprecated
 public final class StanfordTaggerConfigKeys {

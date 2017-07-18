@@ -52,7 +52,7 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.wildcard;
  *
  * @author Kilian Thiel, University of Konstanz
  * @since 2.8
- * @deprecated Use {@link WildcardTaggerConfigKeys2} instead.
+ * @deprecated Use custom set of config keys instead.
  **/
 @Deprecated
 public final class WildcardTaggerConfigKeys {

@@ -54,7 +54,7 @@ import org.knime.core.node.NodeView;
 /**
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
- * @deprecated Use {@link WildcardTaggerNodeFactory2} instead.
+ * @deprecated Use custom node factory instead.
  */
 @Deprecated
 public class WildcardTaggerNodeFactory extends NodeFactory<WildcardTaggerNodeModel> {

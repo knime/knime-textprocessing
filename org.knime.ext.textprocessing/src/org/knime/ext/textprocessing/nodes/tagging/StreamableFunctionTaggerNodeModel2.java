@@ -58,9 +58,8 @@ import org.knime.core.node.streamable.StreamableFunction;
 import org.knime.core.node.streamable.StreamableFunctionProducer;
 
 /**
- *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
- * @since 3.4
+ * @since 3.5
  */
 public abstract class StreamableFunctionTaggerNodeModel2 extends StreamableTaggerNodeModel2
     implements StreamableFunctionProducer {

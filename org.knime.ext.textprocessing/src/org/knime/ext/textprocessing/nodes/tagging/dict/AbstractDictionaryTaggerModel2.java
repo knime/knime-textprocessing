@@ -73,6 +73,9 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel2;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
+ * This abstract class provides common functionality for {@code DictionaryTaggerNodeModel2} and
+ * {@code WildcardTaggerNodeModel2}.
+ *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 3.5
  */
@@ -110,7 +113,8 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
 
     private Set<String> m_dictionary;
 
-    private SettingsModelBoolean m_setUnmodifiableModel = CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
+    private SettingsModelBoolean m_setUnmodifiableModel =
+        CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
 
     private SettingsModelString m_tagModel = CommonDictionaryTaggerSettingModels.createTagModel();
 
@@ -120,9 +124,8 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
 
     private SettingsModelString m_columnModel = CommonDictionaryTaggerSettingModels.createColumnModel();
 
-
     /**
-     * Creates a new instance of <code>DictionaryTaggerNodeModel</code> with two table in ports and one out port.
+     * Creates a new instance of {@code AbstractDictionaryTaggerModel2} with two table in ports and one out port.
      */
     public AbstractDictionaryTaggerModel2() {
         super(2, new InputPortRole[]{InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
@@ -133,7 +136,6 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
      *
      * @param inSpecs The specs of the input data tables.
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
-     * @since 2.9
      */
     @Override
     protected final void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
@@ -147,7 +149,6 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
      * @param inData Input data tables.
      * @param exec The execution context of the node.
      * @throws Exception If tagger cannot be prepared.
-     * @since 2.9
      */
     @Override
     protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
@@ -175,8 +176,6 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
 
     /**
      * {@inheritDoc}
-     *
-     * @since 2.9
      */
     @Override
     public final DocumentTagger createTagger() throws Exception {

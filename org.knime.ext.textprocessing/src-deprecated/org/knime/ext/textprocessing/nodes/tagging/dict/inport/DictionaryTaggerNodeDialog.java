@@ -66,7 +66,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerM
  * The dialog class of the dictionary named entity recognizer node.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link DictionaryTaggerNodeDialog2} instead.
+ * @deprecated Use custom node dialog instead.
  */
 @Deprecated
 public class DictionaryTaggerNodeDialog extends TaggerNodeSettingsPane {

@@ -56,7 +56,7 @@ import org.knime.core.node.NodeView;
  * provides methods to create the model and the dialog instance.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link StanfordTaggerNodeFactory2} instead.
+ * @deprecated Use custom node factory instead.
  */
 @Deprecated
 public class StanfordTaggerNodeFactory extends

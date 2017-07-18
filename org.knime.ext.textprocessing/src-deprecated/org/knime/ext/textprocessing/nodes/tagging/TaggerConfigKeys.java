@@ -52,7 +52,7 @@ package org.knime.ext.textprocessing.nodes.tagging;
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
- * @deprecated Use {@link TaggerConfigKeys2} instead.
+ * @deprecated Use custom set of config keys instead.
  */
 @Deprecated
 final class TaggerConfigKeys {

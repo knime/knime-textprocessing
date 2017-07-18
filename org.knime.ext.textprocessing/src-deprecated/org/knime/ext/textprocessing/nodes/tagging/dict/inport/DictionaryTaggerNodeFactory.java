@@ -55,7 +55,7 @@ import org.knime.core.node.NodeView;
  * The factory class of the dictionary based named entity recognizer node.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link DictionaryTaggerNodeFactory2} instead.
+ * @deprecated Use custom node factory instead.
  */
 @Deprecated
 public class DictionaryTaggerNodeFactory extends

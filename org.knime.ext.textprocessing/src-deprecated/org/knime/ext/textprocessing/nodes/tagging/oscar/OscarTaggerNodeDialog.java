@@ -57,7 +57,7 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
  * or not.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link OscarTaggerNodeDialog2} instead.
+ * @deprecated Use custom node dialog instead.
  */
 @Deprecated
 public class OscarTaggerNodeDialog extends TaggerNodeSettingsPane {

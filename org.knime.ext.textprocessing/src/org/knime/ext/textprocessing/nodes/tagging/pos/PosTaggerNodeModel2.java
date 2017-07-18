@@ -76,8 +76,6 @@ class PosTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
 
     /**
      * {@inheritDoc}
-     *
-     * @since 2.9
      */
     @Override
     public DocumentTagger createTagger() throws Exception {

@@ -62,7 +62,7 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link OpenNlpNerNodeDialog2} instead.
+ * @deprecated Use custom node dialog instead.
  */
 @Deprecated
 public class OpenNlpNerNodeDialog extends TaggerNodeSettingsPane {

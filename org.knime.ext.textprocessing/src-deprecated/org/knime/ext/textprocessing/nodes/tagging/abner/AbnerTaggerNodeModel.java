@@ -65,7 +65,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeMo
  * {@link org.knime.core.node.NodeModel} and provides methods to configure and execute the node.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link AbnerTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class AbnerTaggerNodeModel extends StreamableFunctionTaggerNodeModel {

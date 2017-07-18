@@ -55,8 +55,8 @@ import org.knime.core.node.NodeView;
  * The {@link org.knime.core.node.NodeFactory} of the Stanford tagger node, provides methods to create the model and the
  * dialog instance.
  *
- * @author Kilian Thiel, University of Konstanz
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
 public class StanfordTaggerNodeFactory2 extends NodeFactory<StanfordTaggerNodeModel2> {
 

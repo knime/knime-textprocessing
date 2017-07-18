@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.tagging.oscar;
 /**
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link OscarTaggerConfigKeys2} instead.
+ * @deprecated Use custom set of config keys instead.
  */
 @Deprecated
 public final class OscarTaggerConfigKeys {

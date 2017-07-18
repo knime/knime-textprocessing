@@ -50,9 +50,6 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -82,62 +79,24 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      */
     static final String DEF_OPENNLPMODEL = OpenNlpModelFactory.getInstance().getDefaultName();
 
-    /**
-     * The default value for the dictionary flag.
-     */
-    static final boolean DEFAULT_USE_DICT = false;
-
-    /**
-     * The default dictionary file location.
-     */
-    static final String DEFAULT_DICT_FILENAME = System.getProperty("user.home");
-
-    /**
-     * The default model file location.
-     *
-     * @since 2.7
-     */
-    static final String DEFAULT_MODEL_FILENAME = System.getProperty("user.home");
-
     private SettingsModelBoolean m_unmodifiableModel = OpenNlpNerNodeDialog2.createSetUnmodifiableModel();
 
     private SettingsModelString m_modelNameModel = OpenNlpNerNodeDialog2.createOpenNlpModelModel();
-
-    private SettingsModelBoolean m_useDictFileModel = OpenNlpNerNodeDialog2.createUseDictModel();
-
-    private SettingsModelString m_modelFileModel = OpenNlpNerNodeDialog2.createModelFileModel();
 
     /**
      * Creates new instance of {@code OpennlpNerTaggerNodeModel2}.
      */
     OpennlpNerTaggerNodeModel2() {
         super();
-        m_useDictFileModel.addChangeListener(new SettingsChangeListener());
-        checkSettings();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @since 2.9
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        final DocumentTagger tagger;
-
-        final String modelFileName;
-        if (m_useDictFileModel.getBooleanValue()) {
-            modelFileName = m_modelFileModel.getStringValue();
-            tagger = new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(),
-                m_modelNameModel.getStringValue(), modelFileName, getTokenizerName());
-
-        } else {
-            tagger = new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(),
-                OpenNlpModelFactory.getInstance().getModelByName(m_modelNameModel.getStringValue()),
-                getTokenizerName());
-        }
-
-        return tagger;
+        return new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(),
+            OpenNlpModelFactory.getInstance().getModelByName(m_modelNameModel.getStringValue()), getTokenizerName());
     }
 
     /**
@@ -155,8 +114,6 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
         super.loadValidatedSettingsFrom(settings);
         m_unmodifiableModel.loadSettingsFrom(settings);
         m_modelNameModel.loadSettingsFrom(settings);
-        m_useDictFileModel.loadSettingsFrom(settings);
-        m_modelFileModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -167,8 +124,6 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
         super.saveSettingsTo(settings);
         m_modelNameModel.saveSettingsTo(settings);
         m_unmodifiableModel.saveSettingsTo(settings);
-        m_useDictFileModel.saveSettingsTo(settings);
-        m_modelFileModel.saveSettingsTo(settings);
     }
 
     /**
@@ -179,19 +134,6 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
         super.validateSettings(settings);
         m_modelNameModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
-        m_useDictFileModel.validateSettings(settings);
-        m_modelFileModel.validateSettings(settings);
-
-        boolean useDictFile =
-            ((SettingsModelBoolean)m_useDictFileModel.createCloneWithValidatedValue(settings)).getBooleanValue();
-        if (useDictFile) {
-            String file =
-                ((SettingsModelString)m_modelFileModel.createCloneWithValidatedValue(settings)).getStringValue();
-            File f = new File(file);
-            if (!f.isFile() || !f.exists() || !f.canRead()) {
-                throw new InvalidSettingsException("Selected model file: " + file + " is not valid!");
-            }
-        }
     }
 
     /**
@@ -210,25 +152,5 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // Nothing to do ...
-    }
-
-    private final class SettingsChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent arg0) {
-            checkSettings();
-        }
-
-    }
-
-    private void checkSettings() {
-        if (m_useDictFileModel.getBooleanValue()) {
-            m_modelFileModel.setEnabled(true);
-        } else {
-            m_modelFileModel.setEnabled(false);
-        }
     }
 }

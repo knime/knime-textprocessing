@@ -82,8 +82,7 @@ import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 
 /**
- * The {@link NodeModel} for the StanfordNLP NE tagger node. This node extends the
- * {@link StreamableTaggerNodeModel2}.
+ * The {@link NodeModel} for the StanfordNLP NE tagger node. This node extends the {@link StreamableTaggerNodeModel2}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
@@ -265,10 +264,7 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
         m_classifierModel.loadSettingsFrom(settings);
         m_unmodifiableModel.loadSettingsFrom(settings);
         m_useInportModel.loadSettingsFrom(settings);
-        // check settings model key for backwards compatibility
-        if (settings.containsKey(m_combineMultiWords.getConfigName())) {
-            m_combineMultiWords.loadSettingsFrom(settings);
-        }
+        m_combineMultiWords.loadSettingsFrom(settings);
     }
 
     /**
@@ -280,13 +276,8 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
         m_classifierModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
         m_useInportModel.validateSettings(settings);
-        // check settings model key for backwards compatibility
-        if (settings.containsKey(m_combineMultiWords.getConfigName())) {
-            m_combineMultiWords.validateSettings(settings);
-        }
-
+        m_combineMultiWords.validateSettings(settings);
         checkInputModel();
-
     }
 
     private void checkInputModel() throws InvalidSettingsException {

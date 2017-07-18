@@ -66,7 +66,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNo
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.8
- * @deprecated Use {@link WildcardTaggerNodeDialog2} instead.
+ * @deprecated Use custom node dialog instead.
  */
 @Deprecated
 public class WildcardTaggerNodeDialog extends TaggerNodeSettingsPane {

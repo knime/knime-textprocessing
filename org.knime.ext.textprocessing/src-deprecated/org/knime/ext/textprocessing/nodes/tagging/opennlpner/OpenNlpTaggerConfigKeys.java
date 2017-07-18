@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 /**
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link OpenNlpTaggerConfigKeys2} instead.
+ * @deprecated Use custom set of config keys instead.
  */
 @Deprecated
 public final class OpenNlpTaggerConfigKeys {

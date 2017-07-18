@@ -50,14 +50,13 @@ package org.knime.ext.textprocessing.nodes.tagging.dict;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
-import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeFactory2;
 
 /**
  * The factory class of the dictionary based named entity recognizer node.
  *
  * @author Kilian Thiel, University of Konstanz
  *
- * @deprecated Use {@link DictionaryTaggerNodeFactory2} instead.
+ * @deprecated Use custom node factory instead.
  */
 @Deprecated
 public class DictionaryTaggerNodeFactory extends

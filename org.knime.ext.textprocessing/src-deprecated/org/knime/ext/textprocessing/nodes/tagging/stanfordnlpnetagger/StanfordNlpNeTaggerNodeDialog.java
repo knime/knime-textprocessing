@@ -67,7 +67,7 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 /**
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @deprecated Use {@link StanfordNlpNeTaggerNodeDialog2} instead.
+ * @deprecated Use custom node dialog instead.
  */
 @Deprecated
 public class StanfordNlpNeTaggerNodeDialog extends TaggerNodeSettingsPane {

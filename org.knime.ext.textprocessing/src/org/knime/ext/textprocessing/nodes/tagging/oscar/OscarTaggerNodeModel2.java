@@ -84,8 +84,6 @@ class OscarTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
 
     /**
      * {@inheritDoc}
-     *
-     * @since 2.9
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
@@ -98,7 +96,7 @@ class OscarTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
-        m_setUnmodifiableModel.validateSettings(settings);
+        m_setUnmodifiableModel.loadSettingsFrom(settings);
     }
 
     /**

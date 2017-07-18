@@ -55,7 +55,8 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
  */
 final class OpenNlpTaggerConfigKeys2 {
 
-    private OpenNlpTaggerConfigKeys2() { }
+    private OpenNlpTaggerConfigKeys2() {
+    }
 
     /**
      * The configuration key of unmodifiable flag of terms.
@@ -79,7 +80,6 @@ final class OpenNlpTaggerConfigKeys2 {
 
     /**
      * The configuration key for the model file.
-     * @since 2.7
      */
     static final String CFGKEY_MODELFILE = "Model File";
 }

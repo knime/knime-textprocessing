@@ -67,7 +67,7 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeMo
  * to configure and execute the node.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link StanfordTaggerNodeModel2} instead.
+ * @deprecated Use custom node model instead.
  */
 @Deprecated
 public class StanfordTaggerNodeModel extends StreamableFunctionTaggerNodeModel {

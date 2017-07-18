@@ -64,7 +64,7 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * should be set unmodifiable or not.
  *
  * @author Kilian Thiel, University of Konstanz
- * @deprecated Use {@link AbnerTaggerNodeDialog2} instead.
+ * @deprecated Use custom node dialog instead.
  */
 @Deprecated
 public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
