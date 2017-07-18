@@ -103,13 +103,13 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
@@ -204,8 +204,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
@@ -314,8 +314,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/misc"
@@ -351,8 +351,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
@@ -367,8 +367,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
@@ -442,8 +442,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/mining"
@@ -584,7 +584,7 @@
       </node>
       <node
             category-path="/labs/textprocessing/tagging"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory">
       </node>
       <node
@@ -615,6 +615,46 @@
             category-path="/labs/textprocessing/io"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.source.rssfeedreader.RSSFeedReaderNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.WildcardTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.oscar.OscarTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.pos.PosTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanford.StanfordTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory2">
       </node>
    </extension>
    <extension

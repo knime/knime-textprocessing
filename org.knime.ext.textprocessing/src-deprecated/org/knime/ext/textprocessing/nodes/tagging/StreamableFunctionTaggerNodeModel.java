@@ -44,27 +44,55 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   16.11.2015 (Kilian): created
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.StreamableFunction;
+import org.knime.core.node.streamable.StreamableFunctionProducer;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com, Berlin, Germany
+ * @since 3.1
+ * @deprecated Use {@link StreamableFunctionTaggerNodeModel2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public abstract class StreamableFunctionTaggerNodeModel extends StreamableTaggerNodeModel
+    implements StreamableFunctionProducer {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * {@inheritDoc}
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
+        // empty implementation, must not be overwritten by NodeModels that extend from
+        // StreamableFunctionPreprocessingNodeModel, since it cannot be called.
     }
 
+    /**
+     * Method to prepare tagger instance before it can be applied. This method can be overwritten to apply
+     * preprocessing routines before creating a tagger.
+     *
+     * @param inSpecs the specs of the input port objects.
+     * @throws InvalidSettingsException If settings or specs are invalid.
+     */
+    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException { }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final StreamableFunction createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
+        throws InvalidSettingsException {
+        preparePreprocessing(inSpecs);
+        DataTableSpec in = (DataTableSpec)inSpecs[0];
+        return createColumnRearranger(in).createStreamableFunction();
+    }
 }

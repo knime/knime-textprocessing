@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,49 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   30.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
-
-import org.knime.core.node.InvalidSettingsException;
+package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * Provides the configuration keys of the dictionary tagger node.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use {@link DictionaryTaggerConfigKeys2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public final class DictionaryTaggerConfigKeys {
+
+    private DictionaryTaggerConfigKeys() { }
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * The configuration key of the column to use as dictionary.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
-    }
+    public static final String CFGKEY_DICT_COL = "Dictionary Column";
 
+    /**
+     * The configuration key of the tag to use.
+     */
+    public static final String CFGKEY_TAG = "Tag";
+
+    /**
+     * The configuration key of the tag type to use.
+     */
+    public static final String CFGKEY_TAG_TYPE = "TagType";
+
+    /**
+     * The configuration key of the case sensitive setting.
+     */
+    public static final String CFGKEY_CASE_SENSITIVE = "CS";
+
+    /**
+     * The configuration key of unmodifiable flag of terms.
+     */
+    public static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
+
+    /**
+     * The configuration key of unmodifiable flag of terms.
+     * @since 2.8
+     */
+    public static final String CFGKEY_EXACTMATCH = "ExactMatch";
 }

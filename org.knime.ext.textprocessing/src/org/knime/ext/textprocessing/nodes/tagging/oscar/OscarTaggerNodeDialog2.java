@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,43 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   28.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.oscar;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * Creates the dialog of the OscarTaggerNode with a checkbox component, to specify whether recognized named entity terms
+ * should be set unmodifiable or not.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+class OscarTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the user
+     * settings whether terms representing named entities have to be set unmodifiable or not.
+     *
+     * @return A {@code SettingsModelBoolean} containing the terms unmodifiable flag.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    static SettingsModelBoolean createSetUnmodifiableModel() {
+        return new SettingsModelBoolean(OscarTaggerConfigKeys2.CFGKEY_UNMODIFIABLE,
+            OscarTaggerNodeModel2.DEFAULT_UNMODIFIABLE);
     }
 
+    /**
+     * Creates a new instance of {@code OscarTaggerNodeDialog2} providing a checkbox enabling the user to specify
+     * whether terms representing named entities have to be set unmodifiable or not.
+     */
+    OscarTaggerNodeDialog2() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
+        addDialogComponent(new DialogComponentBoolean(createSetUnmodifiableModel(), "Set named entities unmodifiable"));
+    }
 }

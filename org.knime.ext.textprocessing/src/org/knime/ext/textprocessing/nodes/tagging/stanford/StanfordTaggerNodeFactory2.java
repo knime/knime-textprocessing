@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,60 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   22.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.stanford;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * The {@link org.knime.core.node.NodeFactory} of the Stanford tagger node, provides methods to create the model and the
+ * dialog instance.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @author Kilian Thiel, University of Konstanz
  * @since 3.4
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+public class StanfordTaggerNodeFactory2 extends NodeFactory<StanfordTaggerNodeModel2> {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * {@inheritDoc}
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new StanfordTaggerNodeDialog2();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StanfordTaggerNodeModel2 createNodeModel() {
+        return new StanfordTaggerNodeModel2();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<StanfordTaggerNodeModel2> createNodeView(final int index, final StanfordTaggerNodeModel2 model) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 }

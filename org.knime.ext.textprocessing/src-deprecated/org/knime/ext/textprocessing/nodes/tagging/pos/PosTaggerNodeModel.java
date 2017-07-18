@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,95 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   22.02.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.pos;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * The node model of the POS (part of speech) tagger. Extends
+ * {@link org.knime.core.node.NodeModel} and provides methods to configure and
+ * execute the node.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use {@link PosTaggerNodeModel2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public class PosTaggerNodeModel extends StreamableFunctionTaggerNodeModel {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * Creates new instance of <code>PosTaggerNodeModel</code> which adds
+     * part of speech tags to terms of documents.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    public PosTaggerNodeModel() {
+        super();
     }
 
+    /**
+     * {@inheritDoc}
+     * @since 2.9
+     */
+    @Override
+    public DocumentTagger createTagger() throws Exception {
+        return new PosDocumentTagger(false, getTokenizerName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() { }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        super.validateSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+    }
 }

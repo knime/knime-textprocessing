@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Dictionary tagger</name>
+    <shortDescription>Assigns specified tags values of specified tag types 
+        to terms specified in a dictionary column.
+    </shortDescription>
+    <fullDescription>
+        <intro> 
+            This node recognizes named entities specified in a dictionary column 
+            and assigns a specified tag value and type. Optionally the 
+            recognized named entity terms can be set unmodifiable, meaning that 
+            the terms are not modified or filtered afterwards by any following 
+            node.
+        </intro>
+        
+        <tab name="Tagger options">
+        <option name="Dictionary column">
+            Specifies the dictionary column containing the terms to search for. 
+        </option>
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+        <option name="Case sensitive">
+            If checked, case sensitive named entity recognition will be applied,
+            otherwise not. 
+        </option>
+        <option name="Exact match">
+            If checked, terms are tagged as as named entities only if they match
+            exactly with an entity to find. Otherwise terms are tagged if they
+            contain the entity string.
+        </option>
+        <option name="Tag type">
+            Specifies the tag type of which tag values can be chosen.
+        </option>
+        <option name="Tag value">
+            Specifies the tag value to use for tagging recognized named entities.
+        </option>
+        </tab>
+        
+        <tab name="General options">
+        <option name="Number of maximal parallel tagging processes">
+            Defines the maximal number of parallel threads that are used for tagging. Please note, that for each thread
+            a tagging model will be loaded into memory. If this value is set to a number greater than 1, make sure that
+            enough heap space is available, in order to be able to load the models. If you are not sure how much heap is 
+            available for KNIME, leave the number to 1.
+        </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
+        </tab>            
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>
+        <inPort name="Dictionary input table" index="1">The input table
+        containing the dictionary column.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

@@ -44,27 +44,61 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   30.06.2016 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @deprecated Use {@link StanfordNlpNeTaggerNodeFactory2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public class StanfordNlpNeTaggerNodeFactory extends NodeFactory<StanfordNlpNeTaggerNodeModel> {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * {@inheritDoc}
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    public StanfordNlpNeTaggerNodeModel createNodeModel() {
+        return new StanfordNlpNeTaggerNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<StanfordNlpNeTaggerNodeModel> createNodeView(final int viewIndex,
+        final StanfordNlpNeTaggerNodeModel nodeModel) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new StanfordNlpNeTaggerNodeDialog();
     }
 
 }

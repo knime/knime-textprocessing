@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,61 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   30.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * The factory class of the dictionary based named entity recognizer node.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+public class DictionaryTaggerNodeFactory2 extends
+NodeFactory<DictionaryTaggerNodeModel2> {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * {@inheritDoc}
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new DictionaryTaggerNodeDialog2();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DictionaryTaggerNodeModel2 createNodeModel() {
+        return new DictionaryTaggerNodeModel2();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<DictionaryTaggerNodeModel2> createNodeView(final int index,
+            final DictionaryTaggerNodeModel2 model) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 }

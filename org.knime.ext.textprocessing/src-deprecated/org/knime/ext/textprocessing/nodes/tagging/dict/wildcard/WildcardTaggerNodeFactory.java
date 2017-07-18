@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,28 +42,61 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   30.05.2017 (Julian): created
+ * Created on 05.05.2013 by Kilian Thiel
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.dict.wildcard;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
- *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.8
+ * @deprecated Use {@link WildcardTaggerNodeFactory2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public class WildcardTaggerNodeFactory extends NodeFactory<WildcardTaggerNodeModel> {
 
-    /**
-     * @param name The name of the tagger model that could not be found.
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#createNodeModel()
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    public WildcardTaggerNodeModel createNodeModel() {
+        return new WildcardTaggerNodeModel();
     }
 
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#getNrNodeViews()
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#hasDialog()
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#createNodeDialogPane()
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new WildcardTaggerNodeDialog();
+    }
+
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#createNodeView(int, org.knime.core.node.NodeModel)
+     */
+    @Override
+    public NodeView<WildcardTaggerNodeModel> createNodeView(final int viewIndex,
+                                                            final WildcardTaggerNodeModel nodeModel) {
+        return null;
+    }
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Oscar tagger</name>
+    <shortDescription>Assigns chemical named entity tags to terms.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            Assigns chemical named entity tags to terms which are recognized
+            by the OSCAR chemical named entity recognizer framework version 4.1.2
+            (see https://bitbucket.org/wwmm/oscar4/overview for details).
+            As tags the default named entity types of the OSCAR framework
+            are used (see http://apidoc.ch.cam.ac.uk/oscar4-4.0.1/).
+            The OSCAR tag filter is afterwards able to filter the 
+            assigned tags.
+        </intro>
+        <tab name="Tagger options">
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+        </tab>
+        <tab name="General options">
+        <option name="Number of maximal parallel tagging processes">
+            Defines the maximal number of parallel threads that are used for tagging. Please note, that for each thread
+            a tagging model will be loaded into memory. If this value is set to a number greater than 1, make sure that
+            enough heap space is available, in order to be able to load the models. If you are not sure how much heap is 
+            available for KNIME, leave the number to 1.
+        </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
+        </tab>            
+    </fullDescription>
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

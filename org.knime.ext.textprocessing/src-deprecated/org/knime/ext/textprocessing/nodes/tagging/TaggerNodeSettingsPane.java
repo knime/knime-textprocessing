@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,28 +42,63 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   30.05.2017 (Julian): created
+ * Created on 25.11.2013 by Kilian Thiel
  */
+
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import org.knime.core.node.InvalidSettingsException;
+import java.util.Collection;
+
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane} which provides additionally a tab
+ * containing a number input to specify the number of threads to use for parallel tagging.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 2.9
+ * @deprecated Use {@link TaggerNodeSettingsPane2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public class TaggerNodeSettingsPane extends DefaultNodeSettingsPane {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * Creates and returns the settings model, storing the number of maximal parallel threads for tagging.
+     * @return The settings model with number of maximal parallel threads.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
+        return new SettingsModelIntegerBounded(
+            TaggerConfigKeys.CFGKEY_NUMBER_OF_THREADS, TaggerNodeModel.DEFAULT_NUMBER_OF_THREADS, 1,
+            TaggerNodeModel.MAX_NUMBER_OF_THREADS);
     }
 
+    /**
+     * Creates and returns the settings model, storing the name of the word tokenizer.
+     * @return The settings model with the name of the word tokenizer.
+     * @since 3.3
+     */
+    public static final SettingsModelString getTokenizerModel() {
+        return new SettingsModelString(TaggerConfigKeys.CFGKEY_TOKENIZER,
+            TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
+     * Creates new instance of {@code TaggerNodeSettingsPane}.
+     */
+    public TaggerNodeSettingsPane() {
+        removeTab("Options");
+        createNewTabAt("General options", 1);
+
+        addDialogComponent(new DialogComponentNumber(getNumberOfThreadsModel(),
+            "Number of maximal parallel tagging processes", 1));
+
+        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
+    }
 }

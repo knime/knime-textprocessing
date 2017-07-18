@@ -1,7 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *
- *  Copyright by KNIME GmbH, Konstanz, Germany
+s *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,27 +43,34 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   28.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
-
-import org.knime.core.node.InvalidSettingsException;
+package org.knime.ext.textprocessing.nodes.tagging.abner;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use {@link AbnerTaggerConfigKeys2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public final class AbnerTaggerConfigKeys {
+
+    private AbnerTaggerConfigKeys() { }
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * The configuration key of unmodifiable flag of terms.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
-    }
+    public static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
+
+    /**
+     * The configuration key for the ABNER tagging model.
+     */
+    public static final String CFGKEY_MODEL = "ABNER Model";
+
+    /**
+     * The configuration key for the word tokenizer.
+     * @since 3.3
+     */
+    public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
 
 }

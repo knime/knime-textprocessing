@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Abner tagger</name>
+    <shortDescription>Assigns biomedical named entity tags to terms.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node recognizes biomedical named entities, such as genes, 
+            proteins or cells and assigns tags to the corresponding terms like 
+            "PROTEIN", "RNA", "DNA", "CELL LINE" or "CELL TYPE". Furthermore 
+            it can be specified that found named entities are marked as 
+            unmodifiable, meaning that they are not going to be modified by any 
+            node afterwards. As underlying named entity recognition software 
+            ABNER (A Biomedical named entity recognizer) was used. For more 
+            details see: http://pages.cs.wisc.edu/~bsettles/abner/.
+        </intro>
+        <tab name="General options">
+        <option name="Document column">
+            The column containing the documents to tag.
+        </option>
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new tagged documents. Otherwise the tagged
+            documents will be appended as new column. 
+        </option>
+        <option name="Append column">
+            The name of the new appended column, containing the tagged documents.            
+        </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
+        </tab>
+        <tab name="Tagger Options">
+        <option name="Set named entities unmodifiable">
+            Sets recognized named entity terms unmodifiable.
+        </option>
+        <option name="ABNER model">
+            Specifies the ABNER model to use. The <i>Biocreative</i> model 
+            recognizes proteins only, the <i>NLPBA</i> model 
+            recognizes cells, dna and rna lines as well.
+        </option>
+        </tab>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

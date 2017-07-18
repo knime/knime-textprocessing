@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -41,30 +40,63 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
+ * -------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   28.09.2009 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
- *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use {@link OpennlpNerTaggerNodeFactory2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public class OpennlpNerTaggerNodeFactory
+extends NodeFactory<OpennlpNerTaggerNodeModel> {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * {@inheritDoc}
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new OpenNlpNerNodeDialog();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OpennlpNerTaggerNodeModel createNodeModel() {
+        return new OpennlpNerTaggerNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<OpennlpNerTaggerNodeModel> createNodeView(
+            final int viewIndex, final OpennlpNerTaggerNodeModel nodeModel) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 }

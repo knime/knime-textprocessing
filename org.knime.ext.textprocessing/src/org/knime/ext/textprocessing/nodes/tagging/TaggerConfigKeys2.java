@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,28 +42,47 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   30.05.2017 (Julian): created
+ * Created on 25.11.2013 by Kilian Thiel
  */
+
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import org.knime.core.node.InvalidSettingsException;
-
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * Config keys for all tagger nodes.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+final class TaggerConfigKeys2 {
 
-    /**
-     * @param name The name of the tagger model that could not be found.
-     */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    private TaggerConfigKeys2() {
     }
 
+    /**
+     * The config key for the number of threads for parallel tagging.
+     */
+    static final String CFGKEY_NUMBER_OF_THREADS = "Number of threads";
+
+    /**
+     * The config key for the name of the word tokenizer.
+     */
+    static final String CFGKEY_TOKENIZER = "Word tokenizer";
+
+    /**
+     * The configuration key for appending the incoming document.
+     * @since 3.4
+     */
+    static final String CFG_KEY_REPLACE_DOC = "Replace Document";
+
+    /**
+     * The configuration key for the new document column name
+     * @since 3.4
+     */
+    static final String CFG_KEY_NEW_DOCUMENT_COL = "New Document Column Name";
+
+    /**
+     * The configuration key for the column containing the documents to process.
+     * @since 3.4
+     */
+    static final String CFG_KEY_DOCUMENT_COL = "Document Column";
 }

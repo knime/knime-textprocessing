@@ -40,77 +40,107 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *   06.10.2011 (thiel): created
+ *   28.02.2008 (Kilian Thiel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.oscar;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
-import org.knime.ext.textprocessing.data.Document;
-import org.knime.ext.textprocessing.data.OscarChemDefaultTag;
-import org.knime.ext.textprocessing.data.Sentence;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
-
-import uk.ac.cam.ch.wwmm.oscar.Oscar;
-import uk.ac.cam.ch.wwmm.oscar.document.NamedEntity;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel2;
 
 /**
+ * The node model of the Oscar chemical named entity tagger. Extends {@link org.knime.core.node.NodeModel} and provides
+ * methods to configure and execute the node.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 3.5
  */
-public class OscarDocumentTagger extends AbstractDocumentTagger {
-
-    private Oscar m_oscar;
+class OscarTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
 
     /**
-     * Creates a new instance of {@code OscarDocumentTagger} with given flag specifying if recognized named
-     * entities is set unmodifiable. The Oscar lib is used for chemical named entity recognition.
+     * The default value of the terms unmodifiable flag.
+     */
+    static final boolean DEFAULT_UNMODIFIABLE = true;
+
+    private SettingsModelBoolean m_setUnmodifiableModel = OscarTaggerNodeDialog2.createSetUnmodifiableModel();
+
+    /**
+     * Creates a new instance of {@code OscarTaggerNodeModel2} with one table in and one out port.
+     */
+    OscarTaggerNodeModel2() {
+        super();
+    }
+
+    /**
+     * {@inheritDoc}
      *
-     * @param setNeUnmodifiable The unmodifiable flag to set.
-     * @param tokenizerName The name of the tokenizer used for word tokenization.
-     * @since 3.3
+     * @since 2.9
      */
-    public OscarDocumentTagger(final boolean setNeUnmodifiable, final String tokenizerName) {
-        super(setNeUnmodifiable, tokenizerName);
-        m_oscar = new Oscar();
+    @Override
+    public DocumentTagger createTagger() throws Exception {
+        return new OscarDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), getTokenizerName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected List<Tag> getTags(final String tag) {
-        List<Tag> tags = new ArrayList<Tag>();
-        tags.add(OscarChemDefaultTag.stringToTag(tag));
-        return tags;
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
+        m_setUnmodifiableModel.validateSettings(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected List<TaggedEntity> tagEntities(final Sentence sentence) {
-        String sentenceStr = sentence.getText();
-        List<NamedEntity> entities = m_oscar.findNamedEntities(sentenceStr);
-
-        List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>(entities.size());
-        for (NamedEntity ent : entities) {
-            taggedEntities.add(new TaggedEntity(ent.getSurface(), ent.getType().getName()));
-        }
-        return taggedEntities;
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
+        m_setUnmodifiableModel.saveSettingsTo(settings);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void preprocess(final Document doc) {
-        // Nothing to do ...
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.validateSettings(settings);
+        m_setUnmodifiableModel.validateSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+        // empty ...
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+        // empty ...
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void reset() {
     }
 }

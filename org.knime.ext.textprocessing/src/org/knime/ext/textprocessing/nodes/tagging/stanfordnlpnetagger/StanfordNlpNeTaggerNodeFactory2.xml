@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Predictor">
+    <name>StanfordNLP NE tagger</name>
+    <shortDescription>Assigns named entity tags to terms. 
+        Suitable for English, German and Spanish texts.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            <p>
+            This node assigns a named entity tag to each term of a document.
+			It is applicable for English, German and Spanish texts. The 
+            built-in tagger models are models created by the Stanford NLP group:<br/>
+            <a href="http://nlp.stanford.edu/software/">http://nlp.stanford.edu/software/</a>.<br/>
+            You can use the StanfordNLP NE Learner to create your own model based on untagged documents and a dictionary
+            and forward the model to the second input port of this node.
+            If there is no input model, the "use model from input port" option will be deactivated.
+            The other way around, if there is a model at the input port and the optionis activated, the StanfordNLP
+            model selection will be disabled. 
+            </p>
+            <p>
+            <b>Note:</b> The provided tagger models vary in memory consumption and processing speed. 
+            Especially the distsim models have an increased runtime,
+            but mostly a better performance as well. There are also models without distributional similarity features.
+            For the usage of these models it is recommended to run KNIME with at least 2GB of heap space. 
+            To increase the head space, change the -Xmx setting in the knime.ini file. 
+            </p>
+        </intro>
+        <tab name="General options">
+        <option name="Document column">
+            The column containing the documents to tag.
+        </option>
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new tagged documents. Otherwise the tagged
+            documents will be appended as new column. 
+        </option>
+        <option name="Append column">
+            The name of the new appended column, containing the tagged documents.            
+        </option>
+        <option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+        </option>
+		<option name="Number of maximal parallel tagging processes">
+            Defines the maximal number of parallel threads that are used for tagging. Please note, that for each thread
+            a tagging model will be loaded into memory. If this value is set to a number greater than 1, make sure that
+            enough heap space is available, in order to be able to load the models. If you are not sure how much heap is 
+            available for KNIME, leave the number to 1.
+        </option>
+        </tab>
+        <tab name="Tagger Options">
+        <option name="Unmodifiable flag">
+            The unmodifiable flag.
+        </option>
+        <option name="Use model from input port">
+            If checked, the model from second input port will be included.
+        </option>
+		<option name="Combine multi-words">
+            If checked, consecutive words with the same tag will be combined.
+        </option>
+        <option name="Built-in tagger model">
+            Built-in StanfordNLP tagger models. Choose one, if you do not have an external model. For more information visit the
+            <a href="http://nlp.stanford.edu/software/CRF-NER.html#Models">StanfordNLP model description</a>): <br/>
+            <ul>
+                <li> English all 3 class (distsim): Location, Person, Organization </li>
+                <li> English conll 4 class (distsim): Location, Person, Organization, Misc </li>
+                <li> English muc 7 class (distsim): Location, Person, Organization, Money, Percent, Date, Time </li>
+                <li> English nowiki 3 class caseless (distsim): Location, Person, Organization </li>
+                <li> English all 3 class (nodistsim): Location, Person, Organization </li>
+                <li> English conll 4 class (nodistsim):  Location, Person, Organization, Misc </li>
+                <li> English muc 7 class (nodistsim): Location, Person, Organization, Money, Percent, Date, Time </li>
+                <li> German dewac (created by Faruqui and Pado) </li>
+                <li> German hgc (created by Faruqui and Pado) </li>
+                <li> Spanish ancora </li>             
+            </ul>
+        </option>
+        </tab>        
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <inPort name="Model input" index="1">The input port object
+        containing the StanfordNLP NE model, the used dictionary and the used tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

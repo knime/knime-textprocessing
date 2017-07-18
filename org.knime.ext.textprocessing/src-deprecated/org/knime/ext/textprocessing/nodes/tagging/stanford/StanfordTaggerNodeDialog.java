@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,53 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   28.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.stanford;
 
-import org.knime.core.node.InvalidSettingsException;
+import java.util.Set;
+
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * Creates the dialog of the OscarTaggerNode with a checkbox component,
+ * to specify whether recognized named entity terms should be set unmodifiable
+ * or not.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, University of Konstanz
+ * @deprecated {@link StanfordTaggerNodeDialog2} instead.
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+@Deprecated
+public class StanfordTaggerNodeDialog extends TaggerNodeSettingsPane {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * Creates and returns a
+     * {@link org.knime.core.node.defaultnodesettings.SettingsModelString}
+     * containing the user settings of the specified tagger model to use.
+     *
+     * @return A <code>SettingsModelString</code> containing the tagger model
+     * to use.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    public static SettingsModelString createTaggerModelModel() {
+        return new SettingsModelString(
+                StanfordTaggerConfigKeys.CFGKEY_MODEL,
+                StanfordTaggerNodeModel.DEF_MODEL);
     }
 
+    /**
+     * Creates a new instance of <code>StanfordTaggerNodeDialog</code> a drop
+     * down box to choose a tagger model to use.
+     */
+    public StanfordTaggerNodeDialog() {
+        super();
+        createNewTab("Tagger options");
+        setSelected("Tagger options");
+
+        Set<String> models = StanfordTaggerModelRegistry.getInstance().getPosTaggerModelMap().keySet();
+        addDialogComponent(new DialogComponentStringSelection(
+                createTaggerModelModel(), "Tagger model", models));
+    }
 }

@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,27 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   30.04.2008 (thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
-
-import org.knime.core.node.InvalidSettingsException;
+package org.knime.ext.textprocessing.nodes.tagging.dict.wildcard;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * Provides the configuration keys of the wildcard tagger node.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+final class WildcardTaggerConfigKeys2 {
+
+    private WildcardTaggerConfigKeys2() { }
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * The configuration key of the single/multi term option.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
-    }
+    static final String CFGKEY_MATCHING_LEVEL = "Matching level";
 
+    /**
+     * The configuration key of the regex/wildcard option.
+     */
+    static final String CFGKEY_MATCHING_METHOD = "Matching method";
 }

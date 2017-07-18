@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,22 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   28.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
-
-import org.knime.core.node.InvalidSettingsException;
+package org.knime.ext.textprocessing.nodes.tagging.oscar;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * The configuration keys of the Oscar tagger node.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+final class OscarTaggerConfigKeys2 {
+
+    private OscarTaggerConfigKeys2() { }
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * The configuration key of unmodifiable flag of terms.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
-    }
-
+    static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
 }

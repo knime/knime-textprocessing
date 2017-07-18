@@ -49,6 +49,7 @@
 package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger;
 
 /**
+ * The configuration keys of the StanfordNLP NE tagger node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */

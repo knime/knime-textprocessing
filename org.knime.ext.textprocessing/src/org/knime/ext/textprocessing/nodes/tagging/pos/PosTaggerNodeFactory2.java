@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -44,27 +43,62 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   22.02.2008 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.pos;
 
-import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * The {@link org.knime.core.node.NodeFactory} of the POS tagger node,
+ * provides methods to create the model and the dialog instance.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+public class PosTaggerNodeFactory2 extends NodeFactory<PosTaggerNodeModel2> {
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * {@inheritDoc}
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new TaggerNodeSettingsPane2();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PosTaggerNodeModel2 createNodeModel() {
+        return new PosTaggerNodeModel2();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<PosTaggerNodeModel2> createNodeView(final int index,
+            final PosTaggerNodeModel2 model) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 }

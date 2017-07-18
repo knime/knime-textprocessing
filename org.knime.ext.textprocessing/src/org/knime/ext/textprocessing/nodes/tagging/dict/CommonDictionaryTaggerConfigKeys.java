@@ -44,27 +44,43 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.05.2017 (Julian): created
+ *   17.07.2017 (Julian): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
-
-import org.knime.core.node.InvalidSettingsException;
+package org.knime.ext.textprocessing.nodes.tagging.dict;
 
 /**
- * This exception is thrown if the specific tagger model could not be found.
+ * Provides configuration keys used by different dictionary tagger implementations.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.4
+ * @since 3.5
  */
-@SuppressWarnings("serial")
-public class MissingTaggerModelException extends InvalidSettingsException {
+class CommonDictionaryTaggerConfigKeys {
+
+    private CommonDictionaryTaggerConfigKeys() { }
 
     /**
-     * @param name The name of the tagger model that could not be found.
+     * The configuration key of the column to use as dictionary.
      */
-    public MissingTaggerModelException(final String name) {
-        super("Tagger model \"" + name + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
-    }
+    static final String CFGKEY_DICT_COL = "Dictionary Column";
+
+    /**
+     * The configuration key of the tag to use.
+     */
+    static final String CFGKEY_TAG = "Tag";
+
+    /**
+     * The configuration key of the tag type to use.
+     */
+    static final String CFGKEY_TAG_TYPE = "TagType";
+
+    /**
+     * The configuration key of the case sensitive setting.
+     */
+    static final String CFGKEY_CASE_SENSITIVE = "CS";
+
+    /**
+     * The configuration key of unmodifiable flag of terms.
+     */
+    static final String CFGKEY_UNMODIFIABLE = "SetUnmodifiable";
 
 }
