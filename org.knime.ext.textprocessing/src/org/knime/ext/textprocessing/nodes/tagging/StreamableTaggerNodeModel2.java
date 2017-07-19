@@ -415,7 +415,10 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
                         || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
                         inData[i] = null;
                     } else {
-                        inData[i] = ((PortObjectInput)inputs[i]).getPortObject();
+                        // added null check, if nondistributed/nonstreamable inport is optional and has no data
+                        if (inputs[i] != null) {
+                            inData[i] = ((PortObjectInput)inputs[i]).getPortObject();
+                        }
                     }
                 }
 
