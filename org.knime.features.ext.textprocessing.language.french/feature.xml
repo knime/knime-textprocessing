@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.language.french"
       label="KNIME Textprocessing French Language Pack"
-      version="3.4.0.qualifier"
+      version="3.5.0.qualifier"
       provider-name="KNIME GmbH, Konstanz, Germany"
       plugin="org.knime.ext.textprocessing.language.french">
 
