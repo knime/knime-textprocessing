@@ -61,8 +61,10 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 public class CommonDictionaryTaggerSettingModels {
 
     /**
-     * @return Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
-     *         name of the column to use as dictionary column.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
+     * name of the column to use as dictionary column.
+     *
+     * @return A {@code SettingsModelString} containing the name of the column to use as dictionary column.
      */
     public static final SettingsModelString createColumnModel() {
         return new SettingsModelString(CommonDictionaryTaggerConfigKeys.CFGKEY_DICT_COL, "");
@@ -80,8 +82,10 @@ public class CommonDictionaryTaggerSettingModels {
     }
 
     /**
-     * @return Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the
-     *         flag specifying whether the search for named entities have to be done case sensitive or not.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the
+     * flag specifying whether the search for named entities have to be done case sensitive or not.
+     *
+     * @return A {@code SettingsModelBoolean} containing the value of the case sensitivity flag.
      */
     public static final SettingsModelBoolean createCaseSensitiveModel() {
         return new SettingsModelBoolean(CommonDictionaryTaggerConfigKeys.CFGKEY_CASE_SENSITIVE,
@@ -89,8 +93,10 @@ public class CommonDictionaryTaggerSettingModels {
     }
 
     /**
-     * @return Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
-     *         tag type to assign to each found named entity.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
+     * tag type to assign to each found named entity.
+     *
+     * @return A {@code SettingsModelString} containing the tag type to assign to each found named entity.
      */
     public static final SettingsModelString createTagTypeModel() {
         return new SettingsModelString(CommonDictionaryTaggerConfigKeys.CFGKEY_TAG_TYPE,
@@ -98,8 +104,10 @@ public class CommonDictionaryTaggerSettingModels {
     }
 
     /**
-     * @return Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
-     *         tag to assign to each found named entity.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
+     * tag to assign to each found named entity.
+     *
+     * @return A {@code SettingsModelString} containing the tag to assign to each found name entity.
      */
     public static final SettingsModelString createTagModel() {
         return new SettingsModelString(CommonDictionaryTaggerConfigKeys.CFGKEY_TAG,

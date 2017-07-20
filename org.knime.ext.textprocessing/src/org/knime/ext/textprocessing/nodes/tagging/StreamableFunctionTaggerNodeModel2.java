@@ -58,6 +58,9 @@ import org.knime.core.node.streamable.StreamableFunction;
 import org.knime.core.node.streamable.StreamableFunctionProducer;
 
 /**
+ * Super class to provide simplified streamable operator for tagger node classes. This model extends the
+ * {@link StreamableTaggerNodeModel2} and implements the {@link StreamableFunctionProducer}.
+ *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.5
  */
@@ -86,8 +89,8 @@ public abstract class StreamableFunctionTaggerNodeModel2 extends StreamableTagge
      * {@inheritDoc}
      */
     @Override
-    public final StreamableFunction createStreamableOperator(final PartitionInfo partitionInfo, final PortObjectSpec[] inSpecs)
-        throws InvalidSettingsException {
+    public final StreamableFunction createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         preparePreprocessing(inSpecs);
         DataTableSpec in = (DataTableSpec)inSpecs[0];
         return createColumnRearranger(in).createStreamableFunction();

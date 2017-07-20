@@ -76,7 +76,7 @@ class StanfordTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      */
     static final String DEF_MODEL = "English left 3 words";
 
-    private SettingsModelString m_taggerModelModel = StanfordTaggerNodeDialog2.createTaggerModelModel();
+    private final SettingsModelString m_taggerModelModel = StanfordTaggerNodeDialog2.createTaggerModelModel();
 
     /**
      * Creates new instance of {@code StanfordTaggerNodeModel2} which adds part of speech tags to terms of documents.

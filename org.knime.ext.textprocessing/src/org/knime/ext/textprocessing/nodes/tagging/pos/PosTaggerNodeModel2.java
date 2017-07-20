@@ -52,9 +52,6 @@ import java.io.IOException;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel2;
 
@@ -86,31 +83,8 @@ class PosTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadValidatedSettingsFrom(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void reset() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
-        super.saveSettingsTo(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.validateSettings(settings);
+        // Nothing to do here...
     }
 
     /**
@@ -119,7 +93,7 @@ class PosTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-
+        // Nothing to do here...
     }
 
     /**
@@ -128,5 +102,6 @@ class PosTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
+        // Nothing to do here...
     }
 }

@@ -79,9 +79,9 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      */
     static final String DEF_OPENNLPMODEL = OpenNlpModelFactory.getInstance().getDefaultName();
 
-    private SettingsModelBoolean m_unmodifiableModel = OpenNlpNerNodeDialog2.createSetUnmodifiableModel();
+    private final SettingsModelBoolean m_unmodifiableModel = OpenNlpNerNodeDialog2.createSetUnmodifiableModel();
 
-    private SettingsModelString m_modelNameModel = OpenNlpNerNodeDialog2.createOpenNlpModelModel();
+    private final SettingsModelString m_modelNameModel = OpenNlpNerNodeDialog2.createOpenNlpModelModel();
 
     /**
      * Creates new instance of {@code OpennlpNerTaggerNodeModel2}.

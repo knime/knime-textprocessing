@@ -49,13 +49,8 @@ package org.knime.ext.textprocessing.nodes.tagging;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
@@ -67,7 +62,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -106,11 +100,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
     static final int DEFAULT_NUMBER_OF_THREADS = 1;
 
     /**
-     * Default number of threads to use for parallel tagging.
-     */
-    static final int MAX_NUMBER_OF_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
-
-    /**
      * The default setting for replacing the documents with the tagged documents.
      */
     static final boolean DEF_REPLACE = true;
@@ -121,19 +110,20 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
     static final String DEF_NEW_DOCUMENT_COL = "Tagged Document";
 
     /** The settings model storing the number of threads to use for tagging. */
-    private SettingsModelIntegerBounded m_numberOfThreadsModel = TaggerNodeSettingsPane2.getNumberOfThreadsModel();
+    private final SettingsModelIntegerBounded m_numberOfThreadsModel =
+        TaggerNodeSettingsPane2.getNumberOfThreadsModel();
 
     /** The settings model storing the name of the tokenizer for word tokenization. */
-    private SettingsModelString m_tokenizer = TaggerNodeSettingsPane2.getTokenizerModel();
+    private final SettingsModelString m_tokenizer = TaggerNodeSettingsPane2.getTokenizerModel();
 
     /** The settings model storing the name of the selected document column. */
-    private SettingsModelString m_documentColModel = TaggerNodeSettingsPane2.getDocumentColumnModel();
+    private final SettingsModelString m_documentColModel = TaggerNodeSettingsPane2.getDocumentColumnModel();
 
     /** The settings model storing the name of the new, appended column. */
-    private SettingsModelString m_newDocumentColModel = TaggerNodeSettingsPane2.getNewDocumentColumnModel();
+    private final SettingsModelString m_newDocumentColModel = TaggerNodeSettingsPane2.getNewDocumentColumnModel();
 
     /** The settings model storing the boolean value for the document column replacement option. */
-    private SettingsModelBoolean m_replaceOldDocModel = TaggerNodeSettingsPane2.getReplaceDocumentModel();
+    private final SettingsModelBoolean m_replaceOldDocModel = TaggerNodeSettingsPane2.getReplaceDocumentModel();
 
     private InputPortRole[] m_roles;
 
@@ -163,7 +153,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
             m_roles[i] = roles[i - 1];
         }
 
-        m_replaceOldDocModel.addChangeListener(new ColumnHandlingListener());
+        m_replaceOldDocModel.addChangeListener(e -> checkSettings());
     }
 
     /**
@@ -197,7 +187,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
             m_roles[i] = roles[i - 1];
         }
 
-        m_replaceOldDocModel.addChangeListener(new ColumnHandlingListener());
+        m_replaceOldDocModel.addChangeListener(e -> checkSettings());
     }
 
     /**
@@ -217,13 +207,9 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        List<DataTableSpec> dataTableSpecs = new LinkedList<>();
-        for (PortObjectSpec pospec : inSpecs) {
-            if (pospec instanceof DataTableSpec) {
-                dataTableSpecs.add((DataTableSpec)pospec);
-            }
-        }
-        DataTableSpec[] inDataTableSpecs = dataTableSpecs.toArray(new DataTableSpec[]{});
+
+        DataTableSpec[] inDataTableSpecs = Arrays.stream(inSpecs).filter(spec -> spec instanceof DataTableSpec)
+            .map(spec -> (DataTableSpec)spec).toArray(DataTableSpec[]::new);
 
         checkInputDataTableSpecs(inDataTableSpecs);
         checkInputPortSpecs(inSpecs);
@@ -292,15 +278,9 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @throws Exception If tagger cannot be prepared.
      */
     protected void prepareTagger(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        List<BufferedDataTable> bufferedDataTables = new LinkedList<>();
-        for (PortObject po : inObjects) {
-            if (po instanceof BufferedDataTable) {
-                bufferedDataTables.add((BufferedDataTable)po);
-            } else {
-                bufferedDataTables.add(null);
-            }
-        }
-        BufferedDataTable[] inData = bufferedDataTables.toArray(new BufferedDataTable[]{});
+        BufferedDataTable[] inData =
+            Arrays.stream(inObjects).map(po -> po instanceof BufferedDataTable ? (BufferedDataTable)po : null)
+                .toArray(BufferedDataTable[]::new);
         prepareTagger(inData, exec);
     }
 
@@ -342,8 +322,8 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         // check selected document column
         int docColIndex = in.findColumnIndex(docColName);
         if (docColIndex < 0) {
-            throw new InvalidSettingsException("Selected document column \"" + m_documentColModel.getStringValue()
-                + "\" could not be found in the input data table.");
+            throw new InvalidSettingsException(
+                "Selected document column \"" + docColName + "\" could not be found in the input data table.");
         }
 
         // check new column name
@@ -358,20 +338,19 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         }
 
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        Map<String, String> props = new HashMap<String, String>();
         DataColumnSpecCreator docColSpecCreator = new DataColumnSpecCreator(newColName, docFactory.getDataType());
-        props.put(DocumentDataTableBuilder.WORD_TOKENIZER_KEY, m_tokenizer.getStringValue());
-        docColSpecCreator.setProperties(new DataColumnProperties(props));
+        docColSpecCreator.setProperties(new DataColumnProperties(
+            Collections.singletonMap(DocumentDataTableBuilder.WORD_TOKENIZER_KEY, m_tokenizer.getStringValue())));
         DataColumnSpec docCol = docColSpecCreator.createSpec();
 
-        final int maxNumberOfParalleThreads;
+        final int maxNumberOfParallelThreads;
         if (getMaxNumberOfParallelThreads() <= 0) {
-            maxNumberOfParalleThreads = 1;
+            maxNumberOfParallelThreads = 1;
         } else {
-            maxNumberOfParalleThreads = getMaxNumberOfParallelThreads();
+            maxNumberOfParallelThreads = getMaxNumberOfParallelThreads();
         }
 
-        final TaggerCellFactory cellFac = new TaggerCellFactory(this, docColIndex, docCol, maxNumberOfParalleThreads);
+        final TaggerCellFactory cellFac = new TaggerCellFactory(this, docColIndex, docCol, maxNumberOfParallelThreads);
         final ColumnRearranger rearranger = new ColumnRearranger(in);
         // replace or append
         if (m_replaceOldDocModel.getBooleanValue()) {
@@ -510,16 +489,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
             m_newDocumentColModel.setEnabled(false);
         } else {
             m_newDocumentColModel.setEnabled(true);
-        }
-    }
-
-    private final class ColumnHandlingListener implements ChangeListener {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkSettings();
         }
     }
 }

@@ -70,7 +70,7 @@ class DictionaryTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
      */
     static final boolean DEFAULT_EXACTMATCH = true;
 
-    private SettingsModelBoolean m_exactMatchModel = DictionaryTaggerNodeDialog2.createExactMatchModel();
+    private final SettingsModelBoolean m_exactMatchModel = DictionaryTaggerNodeDialog2.createExactMatchModel();
 
     /**
      * Creates a new instance of {@code DictionaryTaggerNodeModel2} with two table in ports and one out port.
@@ -96,33 +96,24 @@ class DictionaryTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
         // Nothing to do ...
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2#loadValidatedSettingsFromInternal
-     * (org.knime.core.node.NodeSettingsRO)
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void loadValidatedSettingsFromInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_exactMatchModel.loadSettingsFrom(settings);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2#saveSettingsToInternal(org.knime
-     * .core.node.NodeSettingsWO)
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void saveSettingsToInternal(final NodeSettingsWO settings) {
         m_exactMatchModel.saveSettingsTo(settings);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2#validateSettingsInternal(org.knime
-     * .core.node.NodeSettingsRO)
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void validateSettingsInternal(final NodeSettingsRO settings) throws InvalidSettingsException {

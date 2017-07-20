@@ -51,9 +51,6 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -73,7 +70,9 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
 class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
     /**
-     * @return Returns a {@link SettingsModelBoolean} for the unmodifiable flag.
+     * Creates and returns a {@link SettingsModelBoolean} containing the value for the unmodifiable flag.
+     *
+     * @return Returns a {@code SettingsModelBoolean} for the unmodifiable flag.
      */
     static SettingsModelBoolean createSetUnmodifiableModel() {
         return new SettingsModelBoolean(StanfordNlpNeTaggerConfigKeys.CFGKEY_UNMODIFIABLE,
@@ -81,7 +80,9 @@ class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
     }
 
     /**
-     * @return Returns a {@link SettingsModelBoolean} for the own model flag.
+     * Creates and returns a {@link SettingsModelBoolean} for the inport model flag.
+     *
+     * @return Returns a {@code SettingsModelBoolean} for the inport model flag.
      */
     static SettingsModelBoolean createUseInportModelModel() {
         return new SettingsModelBoolean(StanfordNlpNeTaggerConfigKeys.CFGKEY_USE_INPORT_MODEL,
@@ -89,7 +90,9 @@ class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
     }
 
     /**
-     * @return Returns a {@link SettingsModelString} for the available StanfordNLP NE models
+     * Creates and returns a {@link SettingsModelString} which stores the name of the selected StanfordNLP NE model.
+     *
+     * @return Returns a {@code SettingsModelString} for the available StanfordNLP NE models.
      */
     static SettingsModelString createStanfordNeModelModel() {
         return new SettingsModelString(StanfordNlpNeTaggerConfigKeys.CFGKEY_STANFORDNLPMODEL,
@@ -97,7 +100,9 @@ class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
     }
 
     /**
-     * @return Returns a {@link SettingsModelBoolean} for combining multi-words.
+     * Creates and returns a {@link SettingsModelBoolean} for the combining multi-words flag.
+     *
+     * @return Returns a {@code SettingsModelBoolean} for combining multi-words.
      */
     static SettingsModelBoolean createCombineMultiWordsModel() {
         return new SettingsModelBoolean(StanfordNlpNeTaggerConfigKeys.CFGKEY_COMBINE_MULTIWORDS,
@@ -106,11 +111,11 @@ class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
     // create member variables for the settings models
 
-    private SettingsModelBoolean m_useInportModel;
+    private final SettingsModelBoolean m_useInportModel;
 
-    private SettingsModelString m_classifierModel;
+    private final SettingsModelString m_classifierModel;
 
-    private SettingsModelBoolean m_unmodifiableModel;
+    private final SettingsModelBoolean m_unmodifiableModel;
 
     private boolean m_hasModelInput;
 
@@ -124,7 +129,7 @@ class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
         m_unmodifiableModel = createSetUnmodifiableModel();
         m_useInportModel = createUseInportModelModel();
-        m_useInportModel.addChangeListener(new InternalChangeListener());
+        m_useInportModel.addChangeListener(e -> checkSettings());
         m_classifierModel = createStanfordNeModelModel();
 
         addDialogComponent(new DialogComponentBoolean(m_unmodifiableModel, "Set named entities unmodifiable"));
@@ -149,33 +154,8 @@ class StanfordNlpNeTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
-
-        if (specs[1] != null) {
-            m_hasModelInput = true;
-        } else if (specs[1] == null) {
-            m_hasModelInput = false;
-        }
-
+        m_hasModelInput = (specs[1] != null);
         checkInputModel();
-    }
-
-    private final class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-
-            // disable string selection if own model flag is checked
-            // disable validation check box if own model flag is unchecked
-            if (m_useInportModel.isEnabled() && m_useInportModel.getBooleanValue()) {
-                m_classifierModel.setEnabled(false);
-            } else if (!m_useInportModel.getBooleanValue()) {
-                m_classifierModel.setEnabled(true);
-            }
-            checkSettings();
-        }
     }
 
     private void checkSettings() {

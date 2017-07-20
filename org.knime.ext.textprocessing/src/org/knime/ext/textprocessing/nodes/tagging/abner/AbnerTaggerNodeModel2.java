@@ -79,9 +79,9 @@ class AbnerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      */
     static final String DEF_ABNERMODEL = AbnerDocumentTagger.MODEL_BIOCREATIVE;
 
-    private SettingsModelBoolean m_setUnmodifiableModel = AbnerTaggerNodeDialog2.createSetUnmodifiableModel();
+    private final SettingsModelBoolean m_setUnmodifiableModel = AbnerTaggerNodeDialog2.createSetUnmodifiableModel();
 
-    private SettingsModelString m_abnerTaggingModel = AbnerTaggerNodeDialog2.createAbnerModelModel();
+    private final SettingsModelString m_abnerTaggingModel = AbnerTaggerNodeDialog2.createAbnerModelModel();
 
     /**
      * Creates a new instance of {@code AbnerTaggerNodeModel2} with one table in and one out port.

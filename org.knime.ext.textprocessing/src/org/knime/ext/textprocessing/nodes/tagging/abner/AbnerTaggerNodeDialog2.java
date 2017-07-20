@@ -51,9 +51,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -120,7 +117,8 @@ class AbnerTaggerNodeDialog2 extends DefaultNodeSettingsPane {
 
         DialogComponentBoolean replaceComp = new DialogComponentBoolean(m_replaceDocModel, "Replace column");
         replaceComp.setToolTipText("Replace selected document column.");
-        m_replaceDocModel.addChangeListener(new ColumnHandlingListener());
+        m_replaceDocModel
+            .addChangeListener(e -> m_newDocumentColModel.setEnabled(!m_replaceDocModel.getBooleanValue()));
         addDialogComponent(replaceComp);
 
         DialogComponentString newDocColNameComp =
@@ -143,19 +141,5 @@ class AbnerTaggerNodeDialog2 extends DefaultNodeSettingsPane {
         modelNames.add(AbnerDocumentTagger.MODEL_NLPBA);
         addDialogComponent(new DialogComponentStringSelection(createAbnerModelModel(), "ABNER model", modelNames));
 
-    }
-
-    private final class ColumnHandlingListener implements ChangeListener {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            if (m_replaceDocModel.getBooleanValue()) {
-                m_newDocumentColModel.setEnabled(false);
-            } else {
-                m_newDocumentColModel.setEnabled(true);
-            }
-        }
     }
 }

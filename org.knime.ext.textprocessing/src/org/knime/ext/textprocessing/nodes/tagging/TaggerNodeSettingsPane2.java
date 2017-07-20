@@ -49,9 +49,7 @@ package org.knime.ext.textprocessing.nodes.tagging;
 
 import java.util.Collection;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -81,7 +79,7 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
      */
     static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
         return new SettingsModelIntegerBounded(TaggerConfigKeys2.CFGKEY_NUMBER_OF_THREADS,
-            StreamableTaggerNodeModel2.DEFAULT_NUMBER_OF_THREADS, 1, StreamableTaggerNodeModel2.MAX_NUMBER_OF_THREADS);
+            StreamableTaggerNodeModel2.DEFAULT_NUMBER_OF_THREADS, 1, KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
     }
 
     /**
@@ -141,7 +139,7 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
 
         DialogComponentBoolean replaceComp = new DialogComponentBoolean(m_replaceDocModel, "Replace column");
         replaceComp.setToolTipText("Replace selected document column");
-        m_replaceDocModel.addChangeListener(new ColumnHandlingListener());
+        m_replaceDocModel.addChangeListener(e -> checkSettings());
         addDialogComponent(replaceComp);
 
         DialogComponentString newDocColNameComp =
@@ -164,16 +162,6 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
             m_newDocumentColModel.setEnabled(false);
         } else {
             m_newDocumentColModel.setEnabled(true);
-        }
-    }
-
-    private final class ColumnHandlingListener implements ChangeListener {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkSettings();
         }
     }
 }

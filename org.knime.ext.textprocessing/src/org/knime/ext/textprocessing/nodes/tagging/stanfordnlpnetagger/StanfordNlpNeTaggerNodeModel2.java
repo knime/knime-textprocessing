@@ -51,9 +51,6 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -110,17 +107,17 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
 
     // the settings models
 
-    private SettingsModelString m_classifierModel = StanfordNlpNeTaggerNodeDialog2.createStanfordNeModelModel();
+    private final SettingsModelString m_classifierModel = StanfordNlpNeTaggerNodeDialog2.createStanfordNeModelModel();
 
-    private SettingsModelBoolean m_unmodifiableModel = StanfordNlpNeTaggerNodeDialog2.createSetUnmodifiableModel();
+    private final SettingsModelBoolean m_unmodifiableModel = StanfordNlpNeTaggerNodeDialog2.createSetUnmodifiableModel();
 
-    private SettingsModelBoolean m_useInportModel = StanfordNlpNeTaggerNodeDialog2.createUseInportModelModel();
+    private final SettingsModelBoolean m_useInportModel = StanfordNlpNeTaggerNodeDialog2.createUseInportModelModel();
 
-    private SettingsModelBoolean m_combineMultiWords = StanfordNlpNeTaggerNodeDialog2.createCombineMultiWordsModel();
+    private final SettingsModelBoolean m_combineMultiWords = StanfordNlpNeTaggerNodeDialog2.createCombineMultiWordsModel();
 
     // initialize member variables for port object and its information
 
-    private StanfordNERModelPortObject m_inputModelPortObject;
+    private boolean m_hasModelInput = false;
 
     private CRFClassifier<CoreLabel> m_inputModel;
 
@@ -137,10 +134,8 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
                 PortTypeRegistry.getInstance().getPortType(StanfordNERModelPortObject.class, true)},
             new InputPortRole[]{InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
 
-        m_useInportModel.addChangeListener(new InternalChangeListener());
+        m_useInportModel.addChangeListener(e -> checkSettings());
     }
-
-    private boolean m_hasModelInput = false;
 
     /**
      * {@inheritDoc}
@@ -158,24 +153,20 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
                     setWarningMessage("Tokenization of input model (" + tokenizer
                         + ") differs to selected tokenization (" + getTokenizerName() + ").");
                 }
-            } else {
-                if (!getTokenizerName().equals(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER)) {
-                    setWarningMessage(
-                        "Tokenization of input model (" + TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER
-                            + ") differs to selected tokenization (" + getTokenizerName() + ").");
-                }
+            } else if (!getTokenizerName().equals(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER)) {
+                setWarningMessage(
+                    "Tokenization of input model (" + TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER
+                        + ") differs to selected tokenization (" + getTokenizerName() + ").");
             }
-        } else if (inSpecs[1] == null) {
+        } else {
             m_hasModelInput = false;
         }
         checkInputModel();
 
         // check if tagger model exists in current installation
-        if (!m_hasModelInput || !m_useInportModel.getBooleanValue()) {
-            if (!StanfordTaggerModelRegistry.getInstance().getNerTaggerModelMap()
-                .containsKey(m_classifierModel.getStringValue())) {
-                throw new MissingTaggerModelException(m_classifierModel.getStringValue());
-            }
+        if ((!m_hasModelInput || !m_useInportModel.getBooleanValue()) && (!StanfordTaggerModelRegistry.getInstance()
+            .getNerTaggerModelMap().containsKey(m_classifierModel.getStringValue()))) {
+            throw new MissingTaggerModelException(m_classifierModel.getStringValue());
         }
     }
 
@@ -187,15 +178,15 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
         if (inPortObjects[1] != null) {
             m_useInportModel.setEnabled(true);
 
-        } else if (inPortObjects[1] == null) {
+        } else {
             m_useInportModel.setBooleanValue(false);
             m_useInportModel.setEnabled(false);
         }
         // get the port object, model, the dictionary and the tag to build the model, if needed
         if (m_useInportModel.getBooleanValue()) {
-            m_inputModelPortObject = (StanfordNERModelPortObject)inPortObjects[1];
-            m_inputModel = m_inputModelPortObject.getNERModel();
-            m_tag = m_inputModelPortObject.getTag();
+            StanfordNERModelPortObject inputModelPortObject = (StanfordNERModelPortObject)inPortObjects[1];
+            m_inputModel = inputModelPortObject.getNERModel();
+            m_tag = inputModelPortObject.getTag();
         }
     }
 
@@ -293,25 +284,6 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
             m_useInportModel.setEnabled(false);
         } else {
             m_useInportModel.setEnabled(true);
-        }
-    }
-
-    private final class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-
-            // disable string selection if own model flag is checked
-            // disable validation check box if own model flag is unchecked
-            if (m_useInportModel.getBooleanValue()) {
-                m_classifierModel.setEnabled(false);
-            } else if (!m_useInportModel.getBooleanValue()) {
-                m_classifierModel.setEnabled(true);
-            }
-            checkSettings();
         }
     }
 

@@ -47,11 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
 
-import java.util.List;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -72,14 +67,20 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSet
 class DictionaryTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
     /**
-     * @return Creates and returns a {@link SettingsModelBoolean} containing the
-     *         flag specifying whether the search for named entities have to be via exact match or contains match or
-     *         not.
+     * Creates and returns a {@link SettingsModelBoolean} containing the flag specifying whether the search for named
+     * entities have to be via exact match or contains match or not.
+     *
+     * @return A {@code SettingsModelBoolean} containing the flag specifying whether the search for named entities have
+     *         to be via exact match or contains match or not.
      */
     static final SettingsModelBoolean createExactMatchModel() {
         return new SettingsModelBoolean(DictionaryTaggerConfigKeys2.CFGKEY_EXACTMATCH,
             DictionaryTaggerNodeModel2.DEFAULT_EXACTMATCH);
     }
+
+    private final DialogComponentStringSelection m_tagSelection;
+
+    private final SettingsModelString m_tagtypemodel;
 
     /**
      * Creates a new instance of {@code DictionaryTaggerNodeDialog2}.
@@ -106,37 +107,17 @@ class DictionaryTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
         setHorizontalPlacement(false);
 
-        // tag type model
+        // tag type model & tag list
         m_tagtypemodel = CommonDictionaryTaggerSettingModels.createTagTypeModel();
-        m_tagtypemodel.addChangeListener(new InternalChangeListener());
-
-        // tag list
-        String selectedTagType = m_tagtypemodel.getStringValue();
-        List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
-        m_tagSelection =
-            new DialogComponentStringSelection(CommonDictionaryTaggerSettingModels.createTagModel(), "Tag value", tags);
+        m_tagSelection = new DialogComponentStringSelection(CommonDictionaryTaggerSettingModels.createTagModel(),
+            "Tag value", TagFactory.getInstance().getTagSetByType(m_tagtypemodel.getStringValue()).asStringList());
+        m_tagtypemodel.addChangeListener(e -> m_tagSelection.replaceListItems(
+            TagFactory.getInstance().getTagSetByType(m_tagtypemodel.getStringValue()).asStringList(), ""));
 
         this.setHorizontalPlacement(true);
         addDialogComponent(
             new DialogComponentStringSelection(m_tagtypemodel, "Tag type", TagFactory.getInstance().getTagTypes()));
 
         addDialogComponent(m_tagSelection);
-    }
-
-    private DialogComponentStringSelection m_tagSelection;
-
-    private SettingsModelString m_tagtypemodel;
-
-    private final class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            String selectedTagType = m_tagtypemodel.getStringValue();
-            List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
-            m_tagSelection.replaceListItems(tags, "");
-        }
     }
 }

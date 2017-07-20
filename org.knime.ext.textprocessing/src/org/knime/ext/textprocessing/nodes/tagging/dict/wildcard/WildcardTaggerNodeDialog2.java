@@ -46,11 +46,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.wildcard;
 
-import java.util.List;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
@@ -71,8 +66,9 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSet
 class WildcardTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
     /**
-     * @return Creates and returns a {@link SettingsModelString} containing the
-     *         matching level to use (single or multi term).
+     * Creates and returns a {@link SettingsModelString} containing the matching level to use (single or multi term).
+     *
+     * @return A {@code SettingsModelString} containing the matching level to use.
      */
     static final SettingsModelString createMatchingLevelModel() {
         return new SettingsModelString(WildcardTaggerConfigKeys2.CFGKEY_MATCHING_LEVEL,
@@ -80,13 +76,18 @@ class WildcardTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
     }
 
     /**
-     * @return Creates and returns a {@link SettingsModelString} containing the
-     *         matching method to use (wildcard or regex).
+     * Creates and returns a {@link SettingsModelString} containing the matching method to use (wildcard or regex).
+     *
+     * @return A {@code SettingsModelString} containing the matching method to use.
      */
     static final SettingsModelString createMatchingMethodModel() {
         return new SettingsModelString(WildcardTaggerConfigKeys2.CFGKEY_MATCHING_METHOD,
             WildcardTaggerNodeModel2.DEF_MATCHINGMETHOD);
     }
+
+    private final DialogComponentStringSelection m_tagSelection;
+
+    private final SettingsModelString m_tagtypemodel;
 
     /**
      * Creates a new instance of {@code WildcardTaggerNodeDialog2}.
@@ -97,8 +98,9 @@ class WildcardTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
         createNewTab("Tagger options");
         setSelected("Tagger options");
 
-        addDialogComponent(new DialogComponentColumnNameSelection(CommonDictionaryTaggerSettingModels.createColumnModel(),
-            "Expression column", AbstractDictionaryTaggerModel2.DICT_TABLE_INDEX, StringValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(CommonDictionaryTaggerSettingModels.createColumnModel(),
+                "Expression column", AbstractDictionaryTaggerModel2.DICT_TABLE_INDEX, StringValue.class));
 
         setHorizontalPlacement(true);
 
@@ -118,37 +120,17 @@ class WildcardTaggerNodeDialog2 extends TaggerNodeSettingsPane2 {
             new DialogComponentButtonGroup(createMatchingLevelModel(), false, "Matching level", new String[]{
                 WildcardTaggerNodeModel2.SINGLETERM_MATCHINGLEVEL, WildcardTaggerNodeModel2.MULTITERM_MATCHINGLEVEL}));
 
-        // tag type model
+        // tag type model & tag list
         m_tagtypemodel = CommonDictionaryTaggerSettingModels.createTagTypeModel();
-        m_tagtypemodel.addChangeListener(new InternalChangeListener());
-
-        // tag list
-        String selectedTagType = m_tagtypemodel.getStringValue();
-        List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
-        m_tagSelection =
-            new DialogComponentStringSelection(CommonDictionaryTaggerSettingModels.createTagModel(), "Tag value", tags);
+        m_tagSelection = new DialogComponentStringSelection(CommonDictionaryTaggerSettingModels.createTagModel(),
+            "Tag value", TagFactory.getInstance().getTagSetByType(m_tagtypemodel.getStringValue()).asStringList());
+        m_tagtypemodel.addChangeListener(e -> m_tagSelection.replaceListItems(
+            TagFactory.getInstance().getTagSetByType(m_tagtypemodel.getStringValue()).asStringList(), ""));
 
         this.setHorizontalPlacement(true);
         addDialogComponent(
             new DialogComponentStringSelection(m_tagtypemodel, "Tag type", TagFactory.getInstance().getTagTypes()));
 
         addDialogComponent(m_tagSelection);
-    }
-
-    private DialogComponentStringSelection m_tagSelection;
-
-    private SettingsModelString m_tagtypemodel;
-
-    private final class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            String selectedTagType = m_tagtypemodel.getStringValue();
-            List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
-            m_tagSelection.replaceListItems(tags, "");
-        }
     }
 }

@@ -105,17 +105,12 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
 
     private final SettingsModelString m_matchingMethodModel = WildcardTaggerNodeDialog2.createMatchingMethodModel();
 
-    private Pattern createPattern(final String str) throws PatternSyntaxException {
-        String regexStr = str;
-        Pattern p = null;
-
+    private Pattern createPattern(final String regexStr) throws PatternSyntaxException {
         if (!getCaseSensitiveSetting()) {
-            p = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
+            return Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
         } else {
-            p = Pattern.compile(regexStr);
+            return Pattern.compile(regexStr);
         }
-
-        return p;
     }
 
     /**
@@ -138,9 +133,6 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
 
             try {
                 p = createPattern(str);
-                if (p != null) {
-                    pattern.add(p);
-                }
             } catch (PatternSyntaxException e) {
                 invalidPattern.add(str);
             } finally {
@@ -151,11 +143,11 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
         }
 
         // prepare warning msg if invalid pattern have been detected
-        if (invalidPattern.size() > 0) {
+        if (!invalidPattern.isEmpty()) {
             final StringBuilder invalidPatternMsg = new StringBuilder();
             int count = 0;
             for (String ip : invalidPattern) {
-                if (invalidPatternMsg.length() > 0) {
+                if (!invalidPatternMsg.toString().isEmpty()) {
                     invalidPatternMsg.append(", ");
                 }
                 invalidPatternMsg.append(ip);
@@ -169,7 +161,7 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
                 invalidPatternMsg.append(", ...");
             }
 
-            this.setWarningMessage("Found " + invalidPattern.size() + " invalid pattern in dictionary ["
+            this.setWarningMessage("Found " + invalidPattern.size() + " invalid pattern(s) in dictionary ["
                     + invalidPatternMsg.toString() + "]!");
         }
 
@@ -183,11 +175,8 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2#saveSettingsToInternal(org.knime
-     * .core.node.NodeSettingsWO)
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void saveSettingsToInternal(final NodeSettingsWO settings) {
@@ -195,11 +184,8 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
         m_matchingMethodModel.saveSettingsTo(settings);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2#validateSettingsInternal(org.knime
-     * .core.node.NodeSettingsRO)
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void validateSettingsInternal(final NodeSettingsRO settings) throws InvalidSettingsException {
@@ -207,11 +193,8 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
         m_matchingMethodModel.validateSettings(settings);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2#loadValidatedSettingsFromInternal
-     * (org.knime.core.node.NodeSettingsRO)
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void loadValidatedSettingsFromInternal(final NodeSettingsRO settings) throws InvalidSettingsException {

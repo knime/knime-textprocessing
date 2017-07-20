@@ -47,9 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
@@ -97,10 +94,7 @@ class OpenNlpNerNodeDialog2 extends TaggerNodeSettingsPane2 {
 
         addDialogComponent(new DialogComponentBoolean(createSetUnmodifiableModel(), "Set named entities unmodifiable"));
 
-        List<String> modelNames = new ArrayList<String>();
-        for (String name : OpenNlpModelFactory.getInstance().getModelNames()) {
-            modelNames.add(name);
-        }
-        addDialogComponent(new DialogComponentStringSelection(createOpenNlpModelModel(), "OpenNlp model", modelNames));
+        addDialogComponent(new DialogComponentStringSelection(createOpenNlpModelModel(), "OpenNlp model",
+            OpenNlpModelFactory.getInstance().getModelNames()));
     }
 }

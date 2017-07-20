@@ -53,7 +53,6 @@ import java.util.Set;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -111,24 +110,25 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
      */
     public static final int DATA_TABLE_INDEX = 0;
 
-    private Set<String> m_dictionary;
+    private final Set<String> m_dictionary;
 
-    private SettingsModelBoolean m_setUnmodifiableModel =
+    private final SettingsModelBoolean m_setUnmodifiableModel =
         CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
 
-    private SettingsModelString m_tagModel = CommonDictionaryTaggerSettingModels.createTagModel();
+    private final SettingsModelString m_tagModel = CommonDictionaryTaggerSettingModels.createTagModel();
 
-    private SettingsModelString m_tagTypeModel = CommonDictionaryTaggerSettingModels.createTagTypeModel();
+    private final SettingsModelString m_tagTypeModel = CommonDictionaryTaggerSettingModels.createTagTypeModel();
 
-    private SettingsModelBoolean m_caseSensitiveModel = CommonDictionaryTaggerSettingModels.createCaseSensitiveModel();
+    private final SettingsModelBoolean m_caseSensitiveModel = CommonDictionaryTaggerSettingModels.createCaseSensitiveModel();
 
-    private SettingsModelString m_columnModel = CommonDictionaryTaggerSettingModels.createColumnModel();
+    private final SettingsModelString m_columnModel = CommonDictionaryTaggerSettingModels.createColumnModel();
 
     /**
      * Creates a new instance of {@code AbstractDictionaryTaggerModel2} with two table in ports and one out port.
      */
     public AbstractDictionaryTaggerModel2() {
         super(2, new InputPortRole[]{InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
+        m_dictionary = new LinkedHashSet<String>();
     }
 
     /**
@@ -155,13 +155,15 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
         // Read table with dictionary
         final int dictIndex =
             inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(m_columnModel.getStringValue());
-        m_dictionary = new LinkedHashSet<String>();
-        final RowIterator it = inData[DICT_TABLE_INDEX].iterator();
-        while (it.hasNext()) {
-            final DataRow row = it.next();
-            if (!row.getCell(dictIndex).isMissing()) {
-                m_dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+        if (dictIndex >= 0) {
+            for (DataRow row : inData[DICT_TABLE_INDEX]) {
+                if (!row.getCell(dictIndex).isMissing()) {
+                    m_dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+                }
             }
+        } else {
+            throw new InvalidSettingsException(
+                "Could not find dictionary column '" + m_columnModel.getStringValue() + "' in input table.");
         }
     }
 
@@ -183,20 +185,26 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
     }
 
     /**
-     * @return The unmodifiable setting.
+     * Returns the value of stored in the "set unmodifiable" settings model.
+     *
+     * @return The value of the unmodifiable settings model.
      */
     protected boolean getUnmodifiableSetting() {
         return m_setUnmodifiableModel.getBooleanValue();
     }
 
     /**
-     * @return The case sensitive setting.
+     * Returns the value of stored in the "set unmodifiable" settings model.
+     *
+     * @return The value of the case sensitivity settings model.
      */
     protected boolean getCaseSensitiveSetting() {
         return m_caseSensitiveModel.getBooleanValue();
     }
 
     /**
+     * Returns the tag build of tag type and tag value settings model.
+     *
      * @return The tag to set.
      */
     protected Tag getTagSetting() {
