@@ -109,11 +109,13 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
 
     private final SettingsModelString m_classifierModel = StanfordNlpNeTaggerNodeDialog2.createStanfordNeModelModel();
 
-    private final SettingsModelBoolean m_unmodifiableModel = StanfordNlpNeTaggerNodeDialog2.createSetUnmodifiableModel();
+    private final SettingsModelBoolean m_unmodifiableModel =
+        StanfordNlpNeTaggerNodeDialog2.createSetUnmodifiableModel();
 
     private final SettingsModelBoolean m_useInportModel = StanfordNlpNeTaggerNodeDialog2.createUseInportModelModel();
 
-    private final SettingsModelBoolean m_combineMultiWords = StanfordNlpNeTaggerNodeDialog2.createCombineMultiWordsModel();
+    private final SettingsModelBoolean m_combineMultiWords =
+        StanfordNlpNeTaggerNodeDialog2.createCombineMultiWordsModel();
 
     // initialize member variables for port object and its information
 

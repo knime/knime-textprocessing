@@ -61,10 +61,9 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.dict.AbstractDictionaryTaggerModel2;
 
-
 /**
- * The node model of the Wildcard Tagger node. Extends {@link AbstractDictionaryTaggerModel2}
- * and provides methods to create the specific document tagger.
+ * The node model of the Wildcard Tagger node. Extends {@link AbstractDictionaryTaggerModel2} and provides methods to
+ * create the specific document tagger.
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 3.5
@@ -162,16 +161,16 @@ class WildcardTaggerNodeModel2 extends AbstractDictionaryTaggerModel2 {
             }
 
             this.setWarningMessage("Found " + invalidPattern.size() + " invalid pattern(s) in dictionary ["
-                    + invalidPatternMsg.toString() + "]!");
+                + invalidPatternMsg.toString() + "]!");
         }
 
         // create single or multi term tagger
         if (m_matchingLevelModel.getStringValue().equals(SINGLETERM_MATCHINGLEVEL)) {
             return new SingleTermRegexDocumentTagger(getUnmodifiableSetting(), pattern, getTagSetting(),
-                                                    getCaseSensitiveSetting(), getTokenizerName());
+                getCaseSensitiveSetting(), getTokenizerName());
         } else {
             return new MultiTermRegexDocumentTagger(getUnmodifiableSetting(), pattern, getTagSetting(),
-                                                 getCaseSensitiveSetting(), getTokenizerName());
+                getCaseSensitiveSetting(), getTokenizerName());
         }
     }
 

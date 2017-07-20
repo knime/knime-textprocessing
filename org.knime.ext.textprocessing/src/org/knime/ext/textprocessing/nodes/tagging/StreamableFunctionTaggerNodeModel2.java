@@ -77,13 +77,14 @@ public abstract class StreamableFunctionTaggerNodeModel2 extends StreamableTagge
     }
 
     /**
-     * Method to prepare tagger instance before it can be applied. This method can be overwritten to apply
-     * preprocessing routines before creating a tagger.
+     * Method to prepare tagger instance before it can be applied. This method can be overwritten to apply preprocessing
+     * routines before creating a tagger.
      *
      * @param inSpecs the specs of the input port objects.
      * @throws InvalidSettingsException If settings or specs are invalid.
      */
-    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException { }
+    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+    }
 
     /**
      * {@inheritDoc}

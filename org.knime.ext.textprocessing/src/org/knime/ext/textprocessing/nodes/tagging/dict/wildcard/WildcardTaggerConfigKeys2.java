@@ -55,7 +55,8 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.wildcard;
  */
 final class WildcardTaggerConfigKeys2 {
 
-    private WildcardTaggerConfigKeys2() { }
+    private WildcardTaggerConfigKeys2() {
+    }
 
     /**
      * The configuration key of the single/multi term option.

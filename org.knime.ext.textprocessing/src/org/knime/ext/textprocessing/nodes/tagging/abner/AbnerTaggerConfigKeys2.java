@@ -55,7 +55,8 @@ package org.knime.ext.textprocessing.nodes.tagging.abner;
  */
 final class AbnerTaggerConfigKeys2 {
 
-    private AbnerTaggerConfigKeys2() { }
+    private AbnerTaggerConfigKeys2() {
+    }
 
     /**
      * The configuration key of unmodifiable flag of terms.

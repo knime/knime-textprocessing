@@ -52,8 +52,8 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * The {@link org.knime.core.node.NodeFactory} of the Abner tagger node,
- * provides methods to create the model and the dialog instance.
+ * The {@link org.knime.core.node.NodeFactory} of the Abner tagger node, provides methods to create the model and the
+ * dialog instance.
  *
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
@@ -80,8 +80,7 @@ public class AbnerTaggerNodeFactory2 extends NodeFactory<AbnerTaggerNodeModel2> 
      * {@inheritDoc}
      */
     @Override
-    public NodeView<AbnerTaggerNodeModel2> createNodeView(
-            final int index, final AbnerTaggerNodeModel2 model) {
+    public NodeView<AbnerTaggerNodeModel2> createNodeView(final int index, final AbnerTaggerNodeModel2 model) {
         return null;
     }
 

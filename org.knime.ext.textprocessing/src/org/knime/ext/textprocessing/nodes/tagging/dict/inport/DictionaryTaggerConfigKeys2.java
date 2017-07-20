@@ -55,7 +55,8 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.inport;
  */
 final class DictionaryTaggerConfigKeys2 {
 
-    private DictionaryTaggerConfigKeys2() { }
+    private DictionaryTaggerConfigKeys2() {
+    }
 
     /**
      * The configuration key of unmodifiable flag of terms.

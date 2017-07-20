@@ -57,8 +57,7 @@ import org.knime.core.node.NodeView;
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
-public class DictionaryTaggerNodeFactory2 extends
-NodeFactory<DictionaryTaggerNodeModel2> {
+public class DictionaryTaggerNodeFactory2 extends NodeFactory<DictionaryTaggerNodeModel2> {
 
     /**
      * {@inheritDoc}
@@ -81,7 +80,7 @@ NodeFactory<DictionaryTaggerNodeModel2> {
      */
     @Override
     public NodeView<DictionaryTaggerNodeModel2> createNodeView(final int index,
-            final DictionaryTaggerNodeModel2 model) {
+        final DictionaryTaggerNodeModel2 model) {
         return null;
     }
 

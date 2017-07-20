@@ -56,7 +56,8 @@ package org.knime.ext.textprocessing.nodes.tagging.dict;
  */
 class CommonDictionaryTaggerConfigKeys {
 
-    private CommonDictionaryTaggerConfigKeys() { }
+    private CommonDictionaryTaggerConfigKeys() {
+    }
 
     /**
      * The configuration key of the column to use as dictionary.

@@ -119,7 +119,8 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
 
     private final SettingsModelString m_tagTypeModel = CommonDictionaryTaggerSettingModels.createTagTypeModel();
 
-    private final SettingsModelBoolean m_caseSensitiveModel = CommonDictionaryTaggerSettingModels.createCaseSensitiveModel();
+    private final SettingsModelBoolean m_caseSensitiveModel =
+        CommonDictionaryTaggerSettingModels.createCaseSensitiveModel();
 
     private final SettingsModelString m_columnModel = CommonDictionaryTaggerSettingModels.createColumnModel();
 

@@ -50,7 +50,6 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
-
 /**
  * The factory class of the dictionary wildcard tagger node.
  *

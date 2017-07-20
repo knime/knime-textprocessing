@@ -61,8 +61,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 public class CommonDictionaryTaggerSettingModels {
 
     /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
-     * name of the column to use as dictionary column.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the name of
+     * the column to use as dictionary column.
      *
      * @return A {@code SettingsModelString} containing the name of the column to use as dictionary column.
      */
@@ -82,8 +82,8 @@ public class CommonDictionaryTaggerSettingModels {
     }
 
     /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the
-     * flag specifying whether the search for named entities have to be done case sensitive or not.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the flag
+     * specifying whether the search for named entities have to be done case sensitive or not.
      *
      * @return A {@code SettingsModelBoolean} containing the value of the case sensitivity flag.
      */
@@ -93,8 +93,8 @@ public class CommonDictionaryTaggerSettingModels {
     }
 
     /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
-     * tag type to assign to each found named entity.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the tag type
+     * to assign to each found named entity.
      *
      * @return A {@code SettingsModelString} containing the tag type to assign to each found named entity.
      */
@@ -104,8 +104,8 @@ public class CommonDictionaryTaggerSettingModels {
     }
 
     /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the
-     * tag to assign to each found named entity.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the tag to
+     * assign to each found named entity.
      *
      * @return A {@code SettingsModelString} containing the tag to assign to each found name entity.
      */
