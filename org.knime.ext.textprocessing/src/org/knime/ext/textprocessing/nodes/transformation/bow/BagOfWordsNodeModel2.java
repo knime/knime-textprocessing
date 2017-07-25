@@ -79,7 +79,6 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell2;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -246,7 +245,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
 
         // create term column spec
         DataColumnSpecCreator terms =
-            new DataColumnSpecCreator(CommonColumnNames.DEF_TERM_COLNAME, m_termFac.getDataType());
+            new DataColumnSpecCreator(m_termColModel.getStringValue(), m_termFac.getDataType());
 
         // create new data table with selected columns and term column
         return new DataTableSpec(new DataTableSpec(includedColumnSpecs), new DataTableSpec(terms.createSpec()));
