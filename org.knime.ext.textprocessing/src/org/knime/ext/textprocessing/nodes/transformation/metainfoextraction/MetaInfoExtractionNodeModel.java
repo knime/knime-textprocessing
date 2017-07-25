@@ -79,7 +79,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentMetaInfo;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -104,7 +104,6 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
      */
     public static final boolean DEF_ONLYMETAKEYS = false;
 
-
     private SettingsModelString m_docColModel = MetaInfoExtractionNodeDialog.createDocColModel();
 
     private SettingsModelBoolean m_appendDocsModel = MetaInfoExtractionNodeDialog.createAppendDocsModel();
@@ -114,7 +113,6 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
     private SettingsModelBoolean m_metaKeysOnlyModel = MetaInfoExtractionNodeDialog.createKeysOnlyModel();
 
     private SettingsModelString m_metaKeysModel = MetaInfoExtractionNodeDialog.createKeysModel();
-
 
     /**
      * Constructor of {@link MetaInfoExtractionNodeModel}.
@@ -137,25 +135,25 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
     }
 
     private DataTableSpec createDataTableSpec() {
-       List<DataColumnSpec> colSpecs = new ArrayList<DataColumnSpec>();
+        List<DataColumnSpec> colSpecs = new ArrayList<DataColumnSpec>();
 
-       if (m_appendDocsModel.getBooleanValue()) {
-           DataColumnSpecCreator docColCreator = new DataColumnSpecCreator(
-               BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME, DocumentCell.TYPE);
-           colSpecs.add(docColCreator.createSpec());
-       }
-       DataColumnSpecCreator keyColCreator = new DataColumnSpecCreator("Key", StringCell.TYPE);
-       colSpecs.add(keyColCreator.createSpec());
+        if (m_appendDocsModel.getBooleanValue()) {
+            DataColumnSpecCreator docColCreator =
+                new DataColumnSpecCreator(CommonColumnNames.DEF_DOCUMENT_COLNAME, DocumentCell.TYPE);
+            colSpecs.add(docColCreator.createSpec());
+        }
+        DataColumnSpecCreator keyColCreator = new DataColumnSpecCreator("Key", StringCell.TYPE);
+        colSpecs.add(keyColCreator.createSpec());
 
-       DataColumnSpecCreator valueColCreator = new DataColumnSpecCreator("Value", StringCell.TYPE);
-       colSpecs.add(valueColCreator.createSpec());
+        DataColumnSpecCreator valueColCreator = new DataColumnSpecCreator("Value", StringCell.TYPE);
+        colSpecs.add(valueColCreator.createSpec());
 
-       return new DataTableSpec(colSpecs.toArray(new DataColumnSpec[]{}));
+        return new DataTableSpec(colSpecs.toArray(new DataColumnSpec[]{}));
     }
 
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-            throws Exception {
+        throws Exception {
 
         boolean distinctDocs = m_distinctDocsModel.getBooleanValue();
         boolean keysOnly = m_metaKeysOnlyModel.getBooleanValue();
@@ -277,8 +275,8 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -286,8 +284,8 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }

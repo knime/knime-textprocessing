@@ -53,7 +53,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys;
 import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeDialog;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -67,7 +67,7 @@ public class DocumentViewer2NodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString getDocumentColumnModel() {
         return new SettingsModelString(DocumentViewerConfigKeys.CFG_KEY_DOCUMENT_COL,
-            BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+            CommonColumnNames.DEF_DOCUMENT_COLNAME);
     }
 
     /**

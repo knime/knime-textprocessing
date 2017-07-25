@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   08.08.2008 (thiel): created
  */
@@ -51,24 +51,23 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class FrequenciesNodeSettingsPane extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns the string settings model containing
-     * the name of the column with the documents to compute the frequencies.
+     * @return Creates and returns the string settings model containing the name of the column with the documents to
+     *         compute the frequencies.
      */
     public static SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(
-                FrequenciesConfigKeys.CFG_KEY_DOCUMENT_COL,
-                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(FrequenciesConfigKeys.CFG_KEY_DOCUMENT_COL,
+            CommonColumnNames.DEF_DOCUMENT_COLNAME);
     }
-    
+
     /**
      * Creates new instance of <code>FrequenciesNodeSettingsPane</code>.
      */
@@ -76,12 +75,10 @@ public class FrequenciesNodeSettingsPane extends DefaultNodeSettingsPane {
     public FrequenciesNodeSettingsPane() {
         removeTab("Options");
         createNewTabAt("Document Col", 1);
-        
-        DialogComponentColumnNameSelection comp1 = 
-            new DialogComponentColumnNameSelection(getDocumentColumnModel(), 
-                    "Document column", 0, DocumentValue.class);
-        comp1.setToolTipText(
-                "Column has to contain documents to compute frequiency of!");
-        addDialogComponent(comp1);        
+
+        DialogComponentColumnNameSelection comp1 =
+            new DialogComponentColumnNameSelection(getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
+        comp1.setToolTipText("Column has to contain documents to compute frequiency of!");
+        addDialogComponent(comp1);
     }
 }

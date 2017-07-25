@@ -93,7 +93,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -122,7 +122,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
     /**
      * The default document column to use.
      */
-    public static final String DEFAULT_DOCUMENT_COLNAME = BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME;
+    public static final String DEFAULT_DOCUMENT_COLNAME = CommonColumnNames.DEF_ORIG_DOCUMENT_COLNAME;
 
     /**
      * The default value to ignore tags.

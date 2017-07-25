@@ -87,23 +87,21 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeDialog;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * The model of the document vector node, creates a document feature vector
- * for each document. As features all term of the given bag of words are used.
- * As vector values, a column can be specified or bit vectors can be created.
+ * The model of the document vector node, creates a document feature vector for each document. As features all term of
+ * the given bag of words are used. As vector values, a column can be specified or bit vectors can be created.
  *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermVectorNodeModel extends NodeModel {
 
     /**
-     * The default setting of the creation of bit vectors. By default bit
-     * vectors are created (<code>true</code>).
+     * The default setting of the creation of bit vectors. By default bit vectors are created (<code>true</code>).
      */
     public static final boolean DEFAULT_BOOLEAN = true;
 
@@ -125,8 +123,7 @@ public class TermVectorNodeModel extends NodeModel {
     /**
      * Default name of column containing the terms.
      */
-    public static final String DEFAULT_DOCUMENT_COLNAME = BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME;
-
+    public static final String DEFAULT_DOCUMENT_COLNAME = CommonColumnNames.DEF_ORIG_DOCUMENT_COLNAME;
 
     private int m_documentColIndex = -1;
 
@@ -177,8 +174,8 @@ public class TermVectorNodeModel extends NodeModel {
 
         m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
         if (m_documentColIndex < 0) {
-            throw new InvalidSettingsException("Index of specified document column is not valid! "
-                + "Check your settings!");
+            throw new InvalidSettingsException(
+                "Index of specified document column is not valid! " + "Check your settings!");
         }
     }
 
@@ -206,7 +203,7 @@ public class TermVectorNodeModel extends NodeModel {
         // Sort the data table first by term
         final List<String> colList = new ArrayList<String>();
         colList.add(inData[0].getDataTableSpec().getColumnSpec(m_termColIndex).getName());
-        final boolean [] sortAsc = new boolean[colList.size()];
+        final boolean[] sortAsc = new boolean[colList.size()];
         sortAsc[0] = true;
         final SortedTable sortedTable = new SortedTable(inData[0], colList, sortAsc, exec);
 
@@ -251,9 +248,8 @@ public class TermVectorNodeModel extends NodeModel {
             // if current term is not equals last term, create new feature
             // vector for last term
             if (lastTerm != null) {
-                final boolean equals =
-                    m_ignoreTagsModel.getBooleanValue() ? currTerm.equalsWordsOnly(lastTerm) : currTerm
-                        .equals(lastTerm);
+                final boolean equals = m_ignoreTagsModel.getBooleanValue() ? currTerm.equalsWordsOnly(lastTerm)
+                    : currTerm.equals(lastTerm);
                 if (!equals) {
                     // add old feature vector to table
                     DataRow newRow;
@@ -288,7 +284,6 @@ public class TermVectorNodeModel extends NodeModel {
         return new BufferedDataTable[]{dc.getTable()};
     }
 
-
     private long m_rowKeyNr = 1;
 
     private DataRow createDataRowAsCollection(final Term term, final List<DoubleCell> featureVector) {
@@ -319,13 +314,12 @@ public class TermVectorNodeModel extends NodeModel {
 
         // add document column
         DataColumnSpecCreator columnSpecCreator =
-            new DataColumnSpecCreator(BagOfWordsDataTableBuilder.DEF_TERM_COLNAME, m_termFac.getDataType());
+            new DataColumnSpecCreator(CommonColumnNames.DEF_TERM_COLNAME, m_termFac.getDataType());
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         // add feature vector columns
-        columnSpecCreator =
-            new DataColumnSpecCreator(BagOfWordsDataTableBuilder.DEF_TERM_VECTOR_COLNAME,
-                ListCell.getCollectionType(DoubleCell.TYPE));
+        columnSpecCreator = new DataColumnSpecCreator(CommonColumnNames.DEF_TERM_VECTOR_COLNAME,
+            ListCell.getCollectionType(DoubleCell.TYPE));
 
         if (featureIndexTable != null) {
             final String[] featureNames = new String[featureIndexTable.size()];
@@ -419,8 +413,7 @@ public class TermVectorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
         m_ignoreTagsModel.loadSettingsFrom(settings);
@@ -444,8 +437,7 @@ public class TermVectorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
         m_ignoreTagsModel.validateSettings(settings);
@@ -453,14 +445,12 @@ public class TermVectorNodeModel extends NodeModel {
         m_asCollectionModel.validateSettings(settings);
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -468,12 +458,10 @@ public class TermVectorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-
 
     private void checkUncheck() {
         if (m_booleanModel.getBooleanValue()) {

@@ -89,24 +89,22 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * The model of the document vector node, creates a document feature vector
- * for each document. As features all term of the given bag of words are used.
- * As vector values, a column can be specified or bit vectors can be created.
+ * The model of the document vector node, creates a document feature vector for each document. As features all term of
+ * the given bag of words are used. As vector values, a column can be specified or bit vectors can be created.
  *
  * @author Kilian Thiel, University of Konstanz
  */
 public class DocumentVectorNodeModel extends NodeModel {
 
     /**
-     * The default setting of the creation of bit vectors. By default bit
-     * vectors are created (<code>true</code>).
+     * The default setting of the creation of bit vectors. By default bit vectors are created (<code>true</code>).
      */
     public static final boolean DEFAULT_BOOLEAN = true;
 
@@ -118,8 +116,7 @@ public class DocumentVectorNodeModel extends NodeModel {
     /**
      * The default document column to use.
      */
-    public static final String DEFAULT_DOCUMENT_COLNAME =
-        BagOfWordsDataTableBuilder.DEF_ORIG_DOCUMENT_COLNAME;
+    public static final String DEFAULT_DOCUMENT_COLNAME = CommonColumnNames.DEF_ORIG_DOCUMENT_COLNAME;
 
     /**
      * The default value to ignore tags.
@@ -146,7 +143,6 @@ public class DocumentVectorNodeModel extends NodeModel {
     private SettingsModelBoolean m_ignoreTags = DocumentVectorNodeDialog.getIgnoreTagsModel();
 
     private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog.getAsCollectionModel();
-
 
     /**
      * Creates a new instance of <code>DocumentVectorNodeModel</code>.
@@ -180,8 +176,8 @@ public class DocumentVectorNodeModel extends NodeModel {
 
         m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
         if (m_documentColIndex < 0) {
-            throw new InvalidSettingsException("Index of specified document column is not valid! "
-                + "Check your settings!");
+            throw new InvalidSettingsException(
+                "Index of specified document column is not valid! " + "Check your settings!");
         }
     }
 
@@ -215,7 +211,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         exec.setProgress("Sorting input table");
         final List<String> colList = new ArrayList<String>();
         colList.add(m_documentColModel.getStringValue());
-        boolean [] sortAsc = new boolean[]{true};
+        boolean[] sortAsc = new boolean[]{true};
         BufferedDataTable sortedTable = new SortedTable(inData[0], colList, sortAsc, exec).getBufferedDataTable();
 
         // hash table holding an index for each feature
@@ -231,7 +227,7 @@ public class DocumentVectorNodeModel extends NodeModel {
             final DataCell termCell = row.getCell(m_termColIndex);
             final DataCell docCell = row.getCell(m_documentColIndex);
             // if the term or document is missing, then skip the row
-            if(termCell.isMissing() || docCell.isMissing()){
+            if (termCell.isMissing() || docCell.isMissing()) {
                 continue;
             }
             final Term t = ((TermValue)termCell).getTermValue();
@@ -280,11 +276,12 @@ public class DocumentVectorNodeModel extends NodeModel {
             double currValue = 1;
             if (colIndex > -1) {
                 DataCell cell = row.getCell(colIndex);
-             // if the value is missing, set it to 0
-                if(cell.isMissing()){
+                // if the value is missing, set it to 0
+                if (cell.isMissing()) {
                     currValue = 0;
-                    setWarningMessage(row.getKey().getString() + " has a missing TF value. The value will be set to 0...");
-                }else{
+                    setWarningMessage(
+                        row.getKey().getString() + " has a missing TF value. The value will be set to 0...");
+                } else {
                     currValue = ((DoubleValue)cell).getDoubleValue();
                 }
             }
@@ -337,13 +334,11 @@ public class DocumentVectorNodeModel extends NodeModel {
         return new BufferedDataTable[]{dc.getTable()};
     }
 
-
     private long m_rowKeyNr = 0;
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
-    private DataRow createDataRowAsCollection(final Document doc,
-            final List<DoubleCell> featureVector) {
+    private DataRow createDataRowAsCollection(final Document doc, final List<DoubleCell> featureVector) {
         final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
         m_rowKeyNr++;
         final DataCell docCell = m_documentCellFac.createDataCell(doc);
@@ -352,8 +347,7 @@ public class DocumentVectorNodeModel extends NodeModel {
         return new DefaultRow(rowKey, new DataCell[]{docCell, vectorCell});
     }
 
-    private DataRow createDataRowAsColumns(final Document doc,
-            final List<DoubleCell> featureVector) {
+    private DataRow createDataRowAsColumns(final Document doc, final List<DoubleCell> featureVector) {
         final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
         m_rowKeyNr++;
         final DataCell[] cells = new DataCell[featureVector.size() + 1];
@@ -375,9 +369,8 @@ public class DocumentVectorNodeModel extends NodeModel {
         columnSpecs[0] = columnSpecCreator.createSpec();
 
         // add feature vector columns
-        columnSpecCreator =
-            new DataColumnSpecCreator(DocumentDataTableBuilder.DEF_DOCUMENT_VECTOR_COLNAME,
-                ListCell.getCollectionType(DoubleCell.TYPE));
+        columnSpecCreator = new DataColumnSpecCreator(DocumentDataTableBuilder.DEF_DOCUMENT_VECTOR_COLNAME,
+            ListCell.getCollectionType(DoubleCell.TYPE));
         if (featureIndexTable != null) {
             String[] featureNames = new String[featureIndexTable.size()];
 
@@ -434,8 +427,7 @@ public class DocumentVectorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
         m_documentColModel.loadSettingsFrom(settings);
@@ -459,8 +451,7 @@ public class DocumentVectorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
         m_documentColModel.validateSettings(settings);
@@ -468,14 +459,12 @@ public class DocumentVectorNodeModel extends NodeModel {
         m_asCollectionModel.validateSettings(settings);
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -483,12 +472,10 @@ public class DocumentVectorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-
 
     private void checkUncheck() {
         if (m_booleanModel.getBooleanValue()) {

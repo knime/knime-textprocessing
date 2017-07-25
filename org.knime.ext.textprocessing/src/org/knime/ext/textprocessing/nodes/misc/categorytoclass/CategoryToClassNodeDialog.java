@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   18.11.2008 (thiel): created
  */
@@ -51,32 +51,29 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class CategoryToClassNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns new instance of 
-     * <code>SettingsModelString</code> containing the name of the document
-     * column to use.
+     * @return Creates and returns new instance of <code>SettingsModelString</code> containing the name of the document
+     *         column to use.
      */
     public static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(
-                CategoryToClassConfigKeys.CFG_KEY_DOCUMENT_COL, 
-                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(CategoryToClassConfigKeys.CFG_KEY_DOCUMENT_COL,
+            CommonColumnNames.DEF_DOCUMENT_COLNAME);
     }
-    
+
     /**
      * Creates new instance if <code>CategoryToClassNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
     public CategoryToClassNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                getDocumentColModel(), "Document column", 0, 
-                DocumentValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 0, DocumentValue.class));
     }
 }

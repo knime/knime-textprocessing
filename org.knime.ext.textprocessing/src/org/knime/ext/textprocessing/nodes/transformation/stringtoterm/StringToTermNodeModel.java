@@ -65,7 +65,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -79,11 +79,9 @@ public class StringToTermNodeModel extends NodeModel {
     /**
      * The name of the term column to append.
      */
-    static final String TERM_COLNAME =
-        BagOfWordsDataTableBuilder.DEF_TERM_COLNAME;
+    static final String TERM_COLNAME = CommonColumnNames.DEF_TERM_COLNAME;
 
-    private SettingsModelString m_stringColModel =
-        StringToTermNodeDialog.getStringColModel();
+    private SettingsModelString m_stringColModel = StringToTermNodeDialog.getStringColModel();
 
     private int m_stringColIndex = -1;
 
@@ -98,8 +96,7 @@ public class StringToTermNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec spec = inSpecs[0];
 
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
@@ -111,8 +108,7 @@ public class StringToTermNodeModel extends NodeModel {
             for (int i = 0; i < spec.getNumColumns(); i++) {
                 if (spec.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
                     colIndex = i;
-                    this.setWarningMessage("Guessing string column \""
-                            + spec.getColumnSpec(i).getName() + "\".");
+                    this.setWarningMessage("Guessing string column \"" + spec.getColumnSpec(i).getName() + "\".");
                     break;
                 }
             }
@@ -131,24 +127,20 @@ public class StringToTermNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
 
         BufferedDataTable bfd = inData[0];
 
         CellFactory fac = new TermCellFactory(m_stringColIndex, bfd.getDataTableSpec());
-        ColumnRearranger rearranger = new ColumnRearranger(
-                bfd.getDataTableSpec());
+        ColumnRearranger rearranger = new ColumnRearranger(bfd.getDataTableSpec());
         rearranger.append(fac);
 
-        return new BufferedDataTable[]{exec.createColumnRearrangeTable(
-                bfd, rearranger, exec)};
+        return new BufferedDataTable[]{exec.createColumnRearrangeTable(bfd, rearranger, exec)};
     }
 
-    private static final DataTableSpec createDataTableSpec(
-            final DataTableSpec inSpec) {
-        return new DataTableSpec(inSpec,
-                new DataTableSpec(getTermColumnSpec(inSpec)));
+    private static final DataTableSpec createDataTableSpec(final DataTableSpec inSpec) {
+        return new DataTableSpec(inSpec, new DataTableSpec(getTermColumnSpec(inSpec)));
     }
 
     /**
@@ -173,8 +165,7 @@ public class StringToTermNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_stringColModel.loadSettingsFrom(settings);
     }
 
@@ -190,20 +181,16 @@ public class StringToTermNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_stringColModel.validateSettings(settings);
     }
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -211,9 +198,8 @@ public class StringToTermNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }

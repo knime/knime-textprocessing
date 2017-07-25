@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.08.2008 (thiel): created
  */
@@ -51,31 +51,28 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermToStringNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of 
-     * <code>SettingsModelString</code> specifying the column which has to
-     * be used as title column.
+     * @return Creates and returns an instance of <code>SettingsModelString</code> specifying the column which has to be
+     *         used as title column.
      */
     public static final SettingsModelString getTermColModel() {
-        return new SettingsModelString(
-                TermToStringConfigKeys.CFGKEY_TERMCOL, 
-                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME);
+        return new SettingsModelString(TermToStringConfigKeys.CFGKEY_TERMCOL, CommonColumnNames.DEF_TERM_COLNAME);
     }
-    
+
     /**
      * Creates a new instance of <code>TermToStringNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
     public TermToStringNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                getTermColModel(), "Term Column", 0, TermValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getTermColModel(), "Term Column", 0, TermValue.class));
     }
 }

@@ -50,7 +50,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
@@ -62,7 +62,7 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString createDocumentColumnModel() {
         return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_DOCCOL,
-                                       BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+            CommonColumnNames.DEF_DOCUMENT_COLNAME);
     }
 
     /**
@@ -70,7 +70,7 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString createKeyColumnModel() {
         return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_KEYCOL,
-                                       MetaInfoInsertionNodeModel.DEF_KEYCOL);
+            MetaInfoInsertionNodeModel.DEF_KEYCOL);
     }
 
     /**
@@ -78,7 +78,7 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString createValueColumnModel() {
         return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_VALUECOL,
-                                       MetaInfoInsertionNodeModel.DEF_VALUECOL);
+            MetaInfoInsertionNodeModel.DEF_VALUECOL);
     }
 
     /**
@@ -86,7 +86,7 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelBoolean createKeepKeyValColsModel() {
         return new SettingsModelBoolean(MetaInfoInsertionConfigKeys.CFGKEY_KEEPKEYVALCOLS,
-                                        MetaInfoInsertionNodeModel.DEF_KEEPKEYVALCOLS);
+            MetaInfoInsertionNodeModel.DEF_KEEPKEYVALCOLS);
     }
 
     /**
@@ -95,15 +95,15 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public MetaInfoInsertionNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(createDocumentColumnModel(), "Document column", 0,
-                                                                  StringValue.class));
+            StringValue.class));
 
         setHorizontalPlacement(true);
 
-        addDialogComponent(new DialogComponentColumnNameSelection(createKeyColumnModel(), "Key column", 0,
-                                                                  StringValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(createKeyColumnModel(), "Key column", 0, StringValue.class));
 
-        addDialogComponent(new DialogComponentColumnNameSelection(createValueColumnModel(), "Value column", 0,
-                                                                  StringValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(createValueColumnModel(), "Value column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
 

@@ -53,7 +53,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -63,67 +63,63 @@ import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 public class NGramNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * Creates and returns the settings model, storing the N value for
-     * ngram creation.
+     * Creates and returns the settings model, storing the N value for ngram creation.
+     *
      * @return The settings model with the N value.
      */
     static final SettingsModelIntegerBounded getNModel() {
-        return new SettingsModelIntegerBounded(NGramConfigKeys.N,
-            NGramNodeModel.DEF_N, NGramNodeModel.MIN_N, NGramNodeModel.MAX_N);
+        return new SettingsModelIntegerBounded(NGramConfigKeys.N, NGramNodeModel.DEF_N, NGramNodeModel.MIN_N,
+            NGramNodeModel.MAX_N);
     }
 
     /**
-     * Creates and returns the settings model, storing the n gram type value for
-     * n gram creation.
+     * Creates and returns the settings model, storing the n gram type value for n gram creation.
+     *
      * @return The settings model with the n gram type.
      */
     static final SettingsModelString getNGramTypeModel() {
-        return new SettingsModelString(NGramConfigKeys.NGRAM_TYPE,
-            NGramNodeModel.WORD_NGRAM_TYPE);
+        return new SettingsModelString(NGramConfigKeys.NGRAM_TYPE, NGramNodeModel.WORD_NGRAM_TYPE);
     }
 
     /**
-     * Creates and returns the settings model, storing the output table type
-     * of the n gram creation, which can be a bag of words or a frequency table.
+     * Creates and returns the settings model, storing the output table type of the n gram creation, which can be a bag
+     * of words or a frequency table.
+     *
      * @return The settings model with the n gram output table type.
      */
     static final SettingsModelString getNGramOutputTableModel() {
-        return new SettingsModelString(NGramConfigKeys.NGRAM_OUTPUT,
-            NGramNodeModel.FREQUENCY_NGRAM_OUTPUT);
+        return new SettingsModelString(NGramConfigKeys.NGRAM_OUTPUT, NGramNodeModel.FREQUENCY_NGRAM_OUTPUT);
     }
 
     /**
-     * Creates and returns the settings model, storing the column of the input
-     * table, containing the documents to process.
+     * Creates and returns the settings model, storing the column of the input table, containing the documents to
+     * process.
+     *
      * @return The settings model with input document column.
      */
     static final SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(NGramConfigKeys.DOCUMENT_INPUT_COL,
-            BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(NGramConfigKeys.DOCUMENT_INPUT_COL, CommonColumnNames.DEF_DOCUMENT_COLNAME);
     }
 
     /**
-     * Creates and returns the settings model, storing the number of maximal
-     * parallel threads running.
+     * Creates and returns the settings model, storing the number of maximal parallel threads running.
+     *
      * @return The settings model with number of maximal parallel threads.
      */
     static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
-        return new SettingsModelIntegerBounded(
-            NGramConfigKeys.NUMBER_OF_THREADS, NGramNodeModel.DEF_THREADS,
+        return new SettingsModelIntegerBounded(NGramConfigKeys.NUMBER_OF_THREADS, NGramNodeModel.DEF_THREADS,
             NGramNodeModel.MIN_THREADS, NGramNodeModel.MAX_THREADS);
     }
 
     /**
-     * Creates and returns the settings model, storing the chunk size per
-     * thread.
+     * Creates and returns the settings model, storing the chunk size per thread.
+     *
      * @return The settings model with chunk size per thread.
      */
     static final SettingsModelIntegerBounded getChunkSizeModel() {
-        return new SettingsModelIntegerBounded(
-            NGramConfigKeys.CHUNK_SIZE, NGramNodeModel.DEF_CHUNK_SIZE,
+        return new SettingsModelIntegerBounded(NGramConfigKeys.CHUNK_SIZE, NGramNodeModel.DEF_CHUNK_SIZE,
             NGramNodeModel.MIN_CHUNK_SIZE, NGramNodeModel.MAX_CHUNK_SIZE);
     }
-
 
     /**
      * Creates new instance of <code>NGramNodeDialog</code>.
@@ -134,32 +130,27 @@ public class NGramNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentNumber(getNModel(), "N", 1));
 
-        addDialogComponent(new DialogComponentButtonGroup(getNGramTypeModel(),
-            false, "NGram type", new String[]{NGramNodeModel.WORD_NGRAM_TYPE,
-            NGramNodeModel.CHAR_NGRAM_TYPE}));
+        addDialogComponent(new DialogComponentButtonGroup(getNGramTypeModel(), false, "NGram type",
+            new String[]{NGramNodeModel.WORD_NGRAM_TYPE, NGramNodeModel.CHAR_NGRAM_TYPE}));
 
         closeCurrentGroup();
 
         createNewGroup("Input / Output settings");
 
-        addDialogComponent(new DialogComponentColumnNameSelection(
-            getDocumentColumnModel(), "Document column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(getDocumentColumnModel(), "Document column", 0,
             DocumentValue.class));
 
-        addDialogComponent(new DialogComponentButtonGroup(
-            getNGramOutputTableModel(), false, "Output table", new String[]{
-                NGramNodeModel.FREQUENCY_NGRAM_OUTPUT,
-                NGramNodeModel.BOW_NGRAM_OUTPUT}));
+        addDialogComponent(new DialogComponentButtonGroup(getNGramOutputTableModel(), false, "Output table",
+            new String[]{NGramNodeModel.FREQUENCY_NGRAM_OUTPUT, NGramNodeModel.BOW_NGRAM_OUTPUT}));
 
         closeCurrentGroup();
 
         createNewGroup("Processes");
 
-        addDialogComponent(new DialogComponentNumber(getNumberOfThreadsModel(),
-            "Number of maximal parallel processes", 1));
+        addDialogComponent(
+            new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel processes", 1));
 
-        addDialogComponent(new DialogComponentNumber(getChunkSizeModel(),
-            "Number of documents per process", 100));
+        addDialogComponent(new DialogComponentNumber(getChunkSizeModel(), "Number of documents per process", 100));
 
         closeCurrentGroup();
     }

@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   17.03.2009 (thiel): created
  */
@@ -54,7 +54,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -63,49 +63,39 @@ import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
 public class TagToStringNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return A new instance of <code>SettingsModelStringArray</code>
-     * containing the specified tag types to use.
+     * @return A new instance of <code>SettingsModelStringArray</code> containing the specified tag types to use.
      */
     public static SettingsModelStringArray getTagTypesModel() {
-        return new SettingsModelStringArray(
-                TagToStringConfigKeys.CFG_KEY_TAG_TYPES,
-                new String[]{TagToStringNodeModel.DEFAULT_TAG_TYPE});
+        return new SettingsModelStringArray(TagToStringConfigKeys.CFG_KEY_TAG_TYPES,
+            new String[]{TagToStringNodeModel.DEFAULT_TAG_TYPE});
     }
-    
+
     /**
-     * @return A new instance of <code>SettingsModelString</code>
-     * containing the specified term column.
+     * @return A new instance of <code>SettingsModelString</code> containing the specified term column.
      */
     public static SettingsModelString getTermColModel() {
-        return new SettingsModelString(TagToStringConfigKeys.CFG_KEY_TERM_COL,
-                BagOfWordsDataTableBuilder.DEF_TERM_COLNAME);
+        return new SettingsModelString(TagToStringConfigKeys.CFG_KEY_TERM_COL, CommonColumnNames.DEF_TERM_COLNAME);
     }
-    
+
     /**
-     * @return A new instance of <code>SettingsModelString</code>
-     * containing the specified missinn tag value.
+     * @return A new instance of <code>SettingsModelString</code> containing the specified missinn tag value.
      */
     public static SettingsModelString getMissingTagModel() {
-        return new SettingsModelString(
-                TagToStringConfigKeys.CFG_KEY_MISSING_TAG_STRING,
-                TagToStringNodeModel.DEFAULT_MISSING_VALUE);
+        return new SettingsModelString(TagToStringConfigKeys.CFG_KEY_MISSING_TAG_STRING,
+            TagToStringNodeModel.DEFAULT_MISSING_VALUE);
     }
-    
+
     /**
-     * Creates a new instance of <code>TagToStringNodeDialog</code>, providing
-     * the dialog components.
+     * Creates a new instance of <code>TagToStringNodeDialog</code>, providing the dialog components.
      */
     @SuppressWarnings("unchecked")
     public TagToStringNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                getTermColModel(), "Term column", 0, TermValue.class));
-        
-        String[] allTagTypes = 
-            TagToStringNodeModel.ALL_TAG_TYPES.toArray(new String[0]);
-        addDialogComponent(new DialogComponentStringListSelection(
-                getTagTypesModel(), "Tag types", allTagTypes));
-        
-        addDialogComponent(new DialogComponentString(
-                getMissingTagModel(), "Missing tag value", false, 15));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getTermColModel(), "Term column", 0, TermValue.class));
+
+        String[] allTagTypes = TagToStringNodeModel.ALL_TAG_TYPES.toArray(new String[0]);
+        addDialogComponent(new DialogComponentStringListSelection(getTagTypesModel(), "Tag types", allTagTypes));
+
+        addDialogComponent(new DialogComponentString(getMissingTagModel(), "Missing tag value", false, 15));
     }
 }

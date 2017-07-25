@@ -56,7 +56,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentMultiLineString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -70,7 +70,7 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString createDocColModel() {
         return new SettingsModelString(MetaInfoExtractionConfigKeys.CFGKEY_DOCCOL,
-                BagOfWordsDataTableBuilder.DEF_DOCUMENT_COLNAME);
+            CommonColumnNames.DEF_DOCUMENT_COLNAME);
     }
 
     /**
@@ -78,7 +78,7 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelBoolean createAppendDocsModel() {
         return new SettingsModelBoolean(MetaInfoExtractionConfigKeys.CFGKEY_APPENDDOCS,
-                MetaInfoExtractionNodeModel.DEF_APPENDDOCS);
+            MetaInfoExtractionNodeModel.DEF_APPENDDOCS);
     }
 
     /**
@@ -86,7 +86,7 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelBoolean createDistinctDocsModel() {
         return new SettingsModelBoolean(MetaInfoExtractionConfigKeys.CFGKEY_DISTINCTDOCS,
-                MetaInfoExtractionNodeModel.DEF_DISTINCTDOCS);
+            MetaInfoExtractionNodeModel.DEF_DISTINCTDOCS);
     }
 
     /**
@@ -94,7 +94,7 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelBoolean createKeysOnlyModel() {
         return new SettingsModelBoolean(MetaInfoExtractionConfigKeys.CFGKEY_KEYSONLY,
-                MetaInfoExtractionNodeModel.DEF_ONLYMETAKEYS);
+            MetaInfoExtractionNodeModel.DEF_ONLYMETAKEYS);
     }
 
     /**
@@ -114,8 +114,8 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public MetaInfoExtractionNodeDialog() {
 
-        addDialogComponent(new DialogComponentColumnNameSelection(createDocColModel(), "Document column", 0,
-                                                                  DocumentValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(createDocColModel(), "Document column", 0, DocumentValue.class));
 
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentBoolean(createAppendDocsModel(), "Append documents"));
@@ -126,8 +126,8 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
         m_keysOnlyModel.addChangeListener(new MetaInfoDialogChangeListener());
         addDialogComponent(new DialogComponentBoolean(m_keysOnlyModel, "Extract only meta info for specified keys"));
 
-        addDialogComponent(new DialogComponentMultiLineString(m_keysModel, "Meta info keys (comma separated)", false,
-            4, 2));
+        addDialogComponent(
+            new DialogComponentMultiLineString(m_keysModel, "Meta info keys (comma separated)", false, 4, 2));
 
         enableDialogs();
     }
