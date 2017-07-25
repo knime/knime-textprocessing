@@ -12,6 +12,15 @@
             document. A row represents a tupel of a term contained in the
             related document. 
         </intro>
+        <option name="Document column">
+            Select the document column that is used for creating the bag of words.
+    	</option>
+    	<option name="Term column">
+            The name of the term column to be created.
+    	</option>
+    	<option name="Column Selection">
+			Move the columns of interest into the "Include" list.
+		</option>
     </fullDescription>
         
     <ports>

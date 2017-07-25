@@ -113,8 +113,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/preprocessing"
@@ -660,6 +660,11 @@
             category-path="/labs/textprocessing/transformation"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory2">
       </node>
    </extension>
    <extension

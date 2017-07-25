@@ -71,7 +71,9 @@ import org.knime.ext.textprocessing.data.Term;
  * {@link org.knime.ext.textprocessing.data.Term}s.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public final class BagOfWordsDataTableBuilder implements DataTableBuilder {
 
     /**
