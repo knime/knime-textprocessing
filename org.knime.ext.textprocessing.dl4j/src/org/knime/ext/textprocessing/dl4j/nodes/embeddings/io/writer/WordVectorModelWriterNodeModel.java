@@ -62,8 +62,8 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.dl4j.base.AbstractDLNodeModel;
-import org.knime.ext.dl4j.base.DLModelPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
+import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec;
 import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
 
 /**
@@ -120,12 +120,12 @@ public class WordVectorModelWriterNodeModel extends AbstractDLNodeModel {
     }
 
     @Override
-    protected DLModelPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+    protected WordVectorPortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         final String warning =
             CheckUtils.checkDestinationFile(m_outfile.getStringValue(), m_overwrite.getBooleanValue());
         if (warning != null) {
             LOGGER.warn(warning);
         }
-        return new DLModelPortObjectSpec[]{};
+        return new WordVectorPortObjectSpec[]{};
     }
 }
