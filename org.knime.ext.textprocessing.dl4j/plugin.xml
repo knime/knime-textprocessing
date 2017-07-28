@@ -54,8 +54,8 @@
    <extension
          point="org.knime.core.PortType">
       <portType
-            hidden="false"
-            name="org.knime.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject"
+            hidden="true"
+            name="Word Vector Model (deprecated)"
             objectClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject"
             objectSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject$Serializer"
             specClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec"
@@ -63,7 +63,7 @@
       </portType>
       <portType
             hidden="false"
-            name="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject"
+            name="Word Vector Model"
             objectClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject"
             objectSerializer="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject$Serializer"
             specClass="org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObjectSpec"
