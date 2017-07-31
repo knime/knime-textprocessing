@@ -154,7 +154,7 @@ public final class DocumentBufferedFileStoreDataCellFactory implements TextConta
                     m_cellsInFileStore = 0;
                 }
             } catch (IOException e) {
-                LOGGER.error("Could not create DocumentBufferedFileStoreCell for document: " + doc.getUUID(), e);
+                LOGGER.error("Could not store document in cell: " + doc.getTitle(), e);
             }
         }
         return dc;
