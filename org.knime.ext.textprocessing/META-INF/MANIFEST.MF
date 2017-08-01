@@ -6,19 +6,16 @@ Bundle-Version: 3.5.0.qualifier
 Bundle-ClassPath: knime-textprocessing.jar,
  lib/abner.jar,
  lib/Snowball.jar,
- lib/json.jar,
- lib/dom4j-1.6.1.jar,
- lib/stax-api-1.0.1.jar,
- lib/xmlbeans-2.3.0.jar,
  lib/mallet/mallet.jar,
  lib/mallet/mallet-deps.jar,
  lib/opennlp-tools-1.6.0.jar,
- lib/pdfbox-app-2.0.0.jar,
  lib/jsoup-1.9.2.jar,
- lib/guava-19.0.jar,
  lib/oscar4-all-4.1.2-with-dependencies.jar,
- lib/streaminer-1.2.jar,
- lib/stanford-corenlp-3.6.0.jar
+ lib/stanford-corenlp-3.6.0.jar,
+ lib/json.jar,
+ lib/stax-api-1.0.1.jar,
+ lib/pdfbox-app-2.0.0.jar,
+ lib/streaminer-1.2.jar
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Export-Package: edu.stanford.nlp.ie,
@@ -98,6 +95,10 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  org.apache.tika.app;bundle-version="[1.14.0,2.0.0)",
  org.knime.core.data.uritype;bundle-version="[3.0.0,4.0.0)",
  com.rometools.rome;bundle-version="[1.7.0,2.0.0)",
- org.knime.time;bundle-version="[3.4.0,4.0.0)"
+ org.knime.time;bundle-version="[3.4.0,4.0.0)",
+ org.dom4j;bundle-version="1.6.1",
+ com.google.guava;bundle-version="19.0.0",
+ org.apache.commons.logging;bundle-version="1.1.1",
+ org.slf4j.api;bundle-version="1.7.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
