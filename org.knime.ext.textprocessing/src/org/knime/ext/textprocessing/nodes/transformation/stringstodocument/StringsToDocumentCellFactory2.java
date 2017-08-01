@@ -83,14 +83,14 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
-public class StringsToDocumentCellFactory extends AbstractCellFactory {
+public class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(StringsToDocumentCellFactory.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(StringsToDocumentCellFactory2.class);
 
     // standard date pattern for strings to document node
     private static final Pattern DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})-([\\d]{4})");
 
-    private final StringsToDocumentConfig m_config;
+    private final StringsToDocumentConfig2 m_config;
 
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 
@@ -100,23 +100,6 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
-     * Creates new instance of {@StringsToDocumentCellFactory} with given configuration.
-     *
-     * @param config The configuration how to build a document.
-     * @param newColSpecs The specs of the new columns that are created.
-     * @param numberOfThreads The number of parallel threads to use.
-     * @throws IllegalArgumentException If given configuration is {@null}.
-     * @since 3.1
-     * @deprecated Use {@link #StringsToDocumentCellFactory(StringsToDocumentConfig, DataColumnSpec[], int, String)} for
-     *             tokenizer selection.
-     */
-    @Deprecated
-    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
-        final int numberOfThreads) throws IllegalArgumentException {
-        this(config, newColSpecs, numberOfThreads, TextprocessingPreferenceInitializer.tokenizerName());
-    }
-
-    /**
      * Creates new instance of <code>StringsToDocumentCellFactory</code> with given configuration.
      *
      * @param config The configuration how to build a document.
@@ -124,9 +107,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
      * @param numberOfThreads The number of parallel threads to use.
      * @param tokenizerName The tokenizer used for wordTokenization.
      * @throws IllegalArgumentException If given configuration is <code>null</code>.
-     * @since 3.3
      */
-    public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
+    public StringsToDocumentCellFactory2(final StringsToDocumentConfig2 config, final DataColumnSpec[] newColSpecs,
         final int numberOfThreads, final String tokenizerName) throws IllegalArgumentException {
         super(newColSpecs);
 
@@ -178,8 +160,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         // Set title
         String title = m_config.getDocTitle();
         if (m_config.getUseTitleColumn()) {
-            if (m_config.getTitleStringIndex() >= 0) {
-                final DataCell titleCell = row.getCell(m_config.getTitleStringIndex());
+            if (m_config.getTitleColumnIndex() >= 0) {
+                final DataCell titleCell = row.getCell(m_config.getTitleColumnIndex());
                 if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
                     title = ((StringValue)titleCell).getStringValue();
                 } else {
@@ -193,8 +175,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         }
 
         //Set fulltext
-        if (m_config.getFulltextStringIndex() >= 0) {
-            final DataCell textCell = row.getCell(m_config.getFulltextStringIndex());
+        if (m_config.getFulltextColumnIndex() >= 0) {
+            final DataCell textCell = row.getCell(m_config.getFulltextColumnIndex());
             String fulltext = "";
             if (!textCell.isMissing() && textCell.getType().isCompatible(StringValue.class)) {
                 fulltext = ((StringValue)textCell).getStringValue();
@@ -204,10 +186,10 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
         // Set authors
         if (m_config.getUseAuthorsColumn()) {
-            if (m_config.getAuthorsStringIndex() >= 0) {
-                final DataCell auhorsCell = row.getCell(m_config.getAuthorsStringIndex());
-                if (!auhorsCell.isMissing() && auhorsCell.getType().isCompatible(StringValue.class)) {
-                    final String authors = ((StringValue)auhorsCell).getStringValue();
+            if (m_config.getAuthorsColumnIndex() >= 0) {
+                final DataCell authorsCell = row.getCell(m_config.getAuthorsColumnIndex());
+                if (!authorsCell.isMissing() && authorsCell.getType().isCompatible(StringValue.class)) {
+                    final String authors = ((StringValue)authorsCell).getStringValue();
                     final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
                     for (String author : authorsArr) {
                         String firstName = m_config.getAuthorFirstName();
@@ -231,7 +213,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
                     // If check box is set to use author names from column
                     // if author first/last name is not specified and both first and last name in the node dialog
                     // component are empty return an empty string.
-                } else if (auhorsCell.isMissing()
+                } else if (authorsCell.isMissing()
                     && (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty())) {
                     docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
                 }
@@ -246,8 +228,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         // set document source
         String docSource = m_config.getDocSource();
         if (m_config.getUseSourceColumn()) {
-            if (m_config.getSourceStringIndex() >= 0) {
-                final DataCell sourceCell = row.getCell(m_config.getSourceStringIndex());
+            if (m_config.getSourceColumnIndex() >= 0) {
+                final DataCell sourceCell = row.getCell(m_config.getSourceColumnIndex());
                 if (!sourceCell.isMissing() && sourceCell.getType().isCompatible(StringValue.class)) {
                     docSource = ((StringValue)sourceCell).getStringValue();
                 } else {
@@ -262,8 +244,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
         // set document category
         String docCat = m_config.getDocCat();
         if (m_config.getUseCatColumn()) {
-            if (m_config.getCategoryStringIndex() >= 0) {
-                final DataCell catCell = row.getCell(m_config.getCategoryStringIndex());
+            if (m_config.getCategoryColumnIndex() >= 0) {
+                final DataCell catCell = row.getCell(m_config.getCategoryColumnIndex());
                 if (!catCell.isMissing() && catCell.getType().isCompatible(StringValue.class)) {
                     docCat = ((StringValue)catCell).getStringValue();
                 } else {
@@ -280,8 +262,8 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
 
         // set publication date
         if (m_config.getUsePubDateColumn()) {
-            if (m_config.getPubDateStringIndex() >= 0) {
-                final DataCell pubDateCell = row.getCell(m_config.getPubDateStringIndex());
+            if (m_config.getPubDateColumnIndex() >= 0) {
+                final DataCell pubDateCell = row.getCell(m_config.getPubDateColumnIndex());
                 if (!pubDateCell.isMissing()) {
                     // new LocalDate type
                     if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {

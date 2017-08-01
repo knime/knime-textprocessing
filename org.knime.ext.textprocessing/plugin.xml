@@ -234,8 +234,8 @@
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory">
       </node>
       <node
             category-path="/labs/textprocessing/misc"
@@ -655,6 +655,11 @@
             category-path="/labs/textprocessing/tagging"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.StanfordNlpNeTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentNodeFactory2">
       </node>
    </extension>
    <extension

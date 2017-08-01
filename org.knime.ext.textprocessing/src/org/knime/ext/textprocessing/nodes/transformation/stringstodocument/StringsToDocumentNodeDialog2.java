@@ -50,9 +50,6 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.date.DateAndTimeValue;
@@ -62,6 +59,7 @@ import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
 import org.knime.core.data.time.localtime.LocalTimeValue;
 import org.knime.core.data.time.period.PeriodValue;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -80,177 +78,228 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
 /**
  * Provides the dialog for the String to Document node with all necessary dialog components.
  *
- * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @author Hermann Azong & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.5
  */
-public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
+class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
-     *         authors column.
+     * Creates and returns a {@link SettingsModelString} specifying the column which has to be used as authors column.
+     *
+     * @return The {@code SettingsModelString} specifying the author's column.
      */
     static final SettingsModelString getAuthorsStringModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHORSCOL, "");
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_AUTHORSCOL, "");
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the separator string.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the string that separates authors.
+     *
+     * @return The {@code SettingsModelString} specifying the separator string.
      */
     static final SettingsModelString getAuthorSplitStringModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHORSPLIT_STR,
-            StringsToDocumentConfig.DEF_AUTHORS_SPLITCHAR);
-    }
-
-    static final SettingsModelString getAuthorFirstNameModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHOR_FIRST_NAME,
-            StringsToDocumentConfig.DEF_AUTHOR_NAMES);
-
-    }
-
-    static final SettingsModelString getAuthorLastNameModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_AUTHOR_LAST_NAME,
-            StringsToDocumentConfig.DEF_AUTHOR_NAMES);
-
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_AUTHORSPLIT_STR,
+            StringsToDocumentConfig2.DEF_AUTHORS_SPLITCHAR);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
-     *         title column.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the author's first name.
+     *
+     * @return The {@code SettingsModelString} specifying the author's first name.
+     */
+    static final SettingsModelString getAuthorFirstNameModel() {
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_AUTHOR_FIRST_NAME,
+            StringsToDocumentConfig2.DEF_AUTHOR_NAMES);
+    }
+
+    /**
+     * Creates and returns an instance of {@link SettingsModelString} specifying the author's last name.
+     *
+     * @return The {@code SettingsModelString} specifying the author's last name.
+     */
+    static final SettingsModelString getAuthorLastNameModel() {
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_AUTHOR_LAST_NAME,
+            StringsToDocumentConfig2.DEF_AUTHOR_NAMES);
+    }
+
+    /**
+     * Creates and returns an instance of {@link SettingsModelString} specifying the column which has to be used as
+     * title column.
+     *
+     * @return The {@code SettingsModelString} specifying the column which has to be used as title column.
      */
     static final SettingsModelString getTitleStringModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TITLECOL, "");
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_TITLECOL, "");
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column which has to be used as
-     *         full text column.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the column which has to be used as full
+     * text column.
+     *
+     * @return The {@code SettingsModelString} specifying the column which has to be used as full text column.
      */
     static final SettingsModelString getTextStringModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TEXTCOL, "");
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_TEXTCOL, "");
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the document source.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the document source.
+     *
+     * @return The {@code SettingsModelString} specifying the document source.
      */
     static final SettingsModelString getDocSourceModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_DOCSOURCE,
-            StringsToDocumentConfig.DEF_DOCUMENT_SOURCE);
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_DOCSOURCE,
+            StringsToDocumentConfig2.DEF_DOCUMENT_SOURCE);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the document category.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the document category.
+     *
+     * @return The {@code SettingsModelString} specifying the document category.
      */
     static final SettingsModelString getDocCategoryModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_DOCCAT,
-            StringsToDocumentConfig.DEF_DOCUMENT_CATEGORY);
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_DOCCAT,
+            StringsToDocumentConfig2.DEF_DOCUMENT_CATEGORY);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the document type.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the document type.
+     *
+     * @return The {@code SettingsModelString} specifying the document type.
      */
     static final SettingsModelString getTypeModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_DOCTYPE,
-            StringsToDocumentConfig.DEF_DOCUMENT_TYPE);
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_DOCTYPE,
+            StringsToDocumentConfig2.DEF_DOCUMENT_TYPE);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the document publication date.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the document publication date.
+     *
+     * @return The {@code SettingsModelString} specifying the document publication date.
      */
     static final SettingsModelString getPubDatModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATE,
-            StringsToDocumentConfig.DEF_DOCUMENT_PUBDATE);
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_PUBDATE,
+            StringsToDocumentConfig2.DEF_DOCUMENT_PUBDATE);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used for
-     *         category values or not.
+     * Creates and returns an instance of {@link SettingsModelString} specifying whether a column is used for category
+     * values or not.
+     *
+     * @return The {@code SettingsModelString} specifying whether a column is used for category values or not.
      */
     static final SettingsModelBoolean getUseCategoryColumnModel() {
-        return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_CATCOLUMN,
-            StringsToDocumentConfig.DEF_USE_CATCOLUMN);
+        return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_CATCOLUMN,
+            StringsToDocumentConfig2.DEF_USE_CATCOLUMN);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelBoolean} specifying whether a column is used for source
-     *         values or not.
+     * Creates and returns an instance of {@link SettingsModelString} specifying whether a column is used for source
+     * values or not.
+     *
+     * @return The {@code SettingsModelString} specifying whether a column is used for source values or not.
      */
     static final SettingsModelBoolean getUseSourceColumnModel() {
-        return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_SOURCECOLUMN,
-            StringsToDocumentConfig.DEF_USE_SOURCECOLUMN);
+        return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_SOURCECOLUMN,
+            StringsToDocumentConfig2.DEF_USE_SOURCECOLUMN);
     }
 
     /**
+     * Creates and return an instance of {@link SettingsModelBoolean} specifying whether a column is used for title
+     * values or not
      *
-     * @return Creates and return an instance of{@SettingModelBoolean} specifying whether a column is used for title
-     *         values or not
+     * @return The {@code SettingsModelBoolean} specifying whether a column is used for title values or not
      */
     static final SettingsModelBoolean getUseTitleColumnModel() {
-        return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_TITLECOLUMN,
-            StringsToDocumentConfig.DEF_USE_TITLECOLUMN);
+        return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_TITLECOLUMN,
+            StringsToDocumentConfig2.DEF_USE_TITLECOLUMN);
     }
 
     /**
+     * Creates and return an instance of {@link SettingsModelBoolean} specifying whether a column is used for authors
+     * values or not
      *
-     * @return Creates and return an instance of{@SettingModelBoolean} specifying whether a column is used for authors
-     *         values or not
+     * @return The {@code SettingsModelBoolean} specifying whether a column is used for authors values or not
      */
     static final SettingsModelBoolean getUseAuthorsColumnModel() {
-        return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_AUTHORSCOLUMN,
-            StringsToDocumentConfig.DEF_USE_AUTHORSCOLUMN);
+        return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_AUTHORSCOLUMN,
+            StringsToDocumentConfig2.DEF_USE_AUTHORSCOLUMN);
     }
 
     /**
+     * Creates and return an instance of {@link SettingsModelBoolean} specifying whether a column is used for
+     * publication dates or not
      *
-     * @return Creates and return an instance of{@SettingModelBoolean} specifying whether a column is used for
-     *         publication dates or not
+     * @return The {@code SettingsModelBoolean} specifying whether a column is used for publication dates or not
      */
     static final SettingsModelBoolean getUsePubDateColumnModel() {
-        return new SettingsModelBoolean(StringsToDocumentConfigKeys.CFGKEY_USE_PUBDATECOLUMN,
-            StringsToDocumentConfig.DEF_USE_PUBDATECOLUMN);
+        return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_PUBDATECOLUMN,
+            StringsToDocumentConfig2.DEF_USE_PUBDATECOLUMN);
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the category values.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the column with the category values.
+     *
+     * @return The {@code SettingsModelString} specifying the column with the category values.
      */
     static final SettingsModelString getCategoryColumnModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_CATCOLUMN, "");
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_CATCOLUMN, "");
     }
 
     /**
-     * @return Creates and returns an instance of {@SettingsModelString} specifying the column with the source values.
+     * Creates and returns an instance of {@link SettingsModelString} specifying the column with the source values.
+     *
+     * @return The {@code SettingsModelString} specifying the column with the source values.
      */
     static final SettingsModelString getSourceColumnModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_SOURCECOLUMN, "");
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_SOURCECOLUMN, "");
     }
 
     /**
+     * Creates and returns an instance of {@link SettingsModelString} specifying the column which has to be used as
+     * publication date
      *
-     * @return Creates and returns an instance of{@SettingsModellString} specifying the column which has to be used as
-     *         publication date
+     * @return The {@code SettingsModelString} specifying the column which has to be used as publication date
      */
     static final SettingsModelString getPubDateColumnModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_PUBDATECOL, "");
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_PUBDATECOL, "");
 
     }
 
     /**
-     * Creates and returns the settings model, storing the number of maximal parallel threads running.
+     * Creates and returns an instance of {@link SettingsModelIntegerBounded}, storing the number of maximal parallel
+     * threads running.
      *
-     * @return The settings model with number of maximal parallel threads.
+     * @return The {@code SettingsModelIntegerBounded} with number of maximal parallel threads.
      */
     static final SettingsModelIntegerBounded getNumberOfThreadsModel() {
-        return new SettingsModelIntegerBounded(StringsToDocumentConfigKeys.CFGKEY_THREADS,
-            StringsToDocumentNodeModel.DEF_THREADS, StringsToDocumentNodeModel.MIN_THREADS,
-            StringsToDocumentNodeModel.MAX_THREADS);
+        return new SettingsModelIntegerBounded(StringsToDocumentConfigKeys2.CFGKEY_THREADS,
+            Math.max(1,
+                Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
+                    (int)Math.ceil(Runtime.getRuntime().availableProcessors()))),
+            StringsToDocumentConfig2.MIN_THREADS, KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
     }
 
     /**
-     * Creates and returns the settings model, storing the name of the tokenizer used for word tokenization.
+     * Creates and returns an instance of {@link SettingsModelString}, storing the name of the tokenizer used for word
+     * tokenization.
      *
-     * @return The settings model with name of word tokenizer.
+     * @return The {@code SettingsModelString} storing the name of the word tokenizer.
      */
     static final SettingsModelString getTokenizerModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TOKENIZER,
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_TOKENIZER,
             TextprocessingPreferenceInitializer.tokenizerName());
+    }
+
+    /**
+     * Creates and returns an instance of {@link SettingsModelString}, storing the name of the document column to be
+     * created.
+     *
+     * @return The {@code SettingsModelString} storing the name of the document column.
+     */
+    static final SettingsModelString getDocumentColumnModel() {
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_DOCCOLUMN,
+            StringsToDocumentConfig2.DEF_DOC_COLUMN);
     }
 
     private SettingsModelString m_docCategoryModel;
@@ -279,17 +328,19 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_useAuthorsColumnModel;
 
+    private SettingsModelString m_docColModel;
+
     /**
      * Creates a new instance of {@StringsToDocumentNodeDialog}.
      */
     @SuppressWarnings("unchecked")
-    public StringsToDocumentNodeDialog() {
+    public StringsToDocumentNodeDialog2() {
 
         createNewGroup("Text");
         setHorizontalPlacement(true);
         m_useTitleColumnModel = getUseTitleColumnModel();
         m_docTitleModelCombo = getTitleStringModel();
-        m_useTitleColumnModel.addChangeListener(new UsageChangeListener());
+        m_useTitleColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
         addDialogComponent(
             new DialogComponentColumnNameSelection(m_docTitleModelCombo, "Title column", 0, StringValue.class));
@@ -298,7 +349,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_useAuthorsColumnModel = getUseAuthorsColumnModel();
         m_docAuthorModelCombo = getAuthorsStringModel();
-        m_useAuthorsColumnModel.addChangeListener(new UsageChangeListener());
+        m_useAuthorsColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
             new DialogComponentColumnNameSelection(m_docAuthorModelCombo, "Authors column", 0, StringValue.class));
@@ -322,7 +373,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_useSourceColumnModel = getUseSourceColumnModel();
         m_docSourceModelCombo = getSourceColumnModel();
-        m_useSourceColumnModel.addChangeListener(new UsageChangeListener());
+        m_useSourceColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useSourceColumnModel, "Use sources from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_docSourceModelCombo, "Document source column", 0,
             StringValue.class));
@@ -333,7 +384,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_useCatColumnModel = getUseCategoryColumnModel();
         m_docCatModelCombo = getCategoryColumnModel();
-        m_useCatColumnModel.addChangeListener(new UsageChangeListener());
+        m_useCatColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useCatColumnModel, "Use categories from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_docCatModelCombo, "Document category column", 0,
             StringValue.class));
@@ -351,10 +402,18 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_usePubDateColumnModel = getUsePubDateColumnModel();
         m_pubDateModelCombo = getPubDateColumnModel();
-        m_usePubDateColumnModel.addChangeListener(new UsageChangeListener());
+        m_usePubDateColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0,
             new StringAndLocalDateValueColumnFilter()));
+        closeCurrentGroup();
+
+        createNewGroup("Column");
+        m_docColModel = getDocumentColumnModel();
+        DialogComponentString docComp = new DialogComponentString(m_docColModel, "Document column:");
+        docComp.setToolTipText("Name of the new document column");
+        addDialogComponent(docComp);
+        setHorizontalPlacement(false);
         closeCurrentGroup();
 
         createNewGroup("Processes");
@@ -369,28 +428,15 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         closeCurrentGroup();
     }
 
-    /**
-     * Enables and disables text fields of document source and category.
-     *
-     * @author Kilian Thiel, KNIME.com, Berlin, Germany
-     */
-    class UsageChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
-            m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
-            m_docSourceModelCombo.setEnabled(m_useSourceColumnModel.getBooleanValue());
-            m_docCatModelCombo.setEnabled(m_useCatColumnModel.getBooleanValue());
-            m_docTitleModelCombo.setEnabled(m_useTitleColumnModel.getBooleanValue());
-            m_docAuthorModelCombo.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
-            m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
-            m_pubDateModelCombo.setEnabled(m_usePubDateColumnModel.getBooleanValue());
-
-        }
+    private void stateChanged() {
+        m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
+        m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
+        m_docSourceModelCombo.setEnabled(m_useSourceColumnModel.getBooleanValue());
+        m_docCatModelCombo.setEnabled(m_useCatColumnModel.getBooleanValue());
+        m_docTitleModelCombo.setEnabled(m_useTitleColumnModel.getBooleanValue());
+        m_docAuthorModelCombo.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+        m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
+        m_pubDateModelCombo.setEnabled(m_usePubDateColumnModel.getBooleanValue());
     }
 
     /**
@@ -403,12 +449,12 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
      *
      * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
      */
+    // TODO: probably not necessary anymore (only take localdatevalue.class as input for pubdate column?)
     private class StringAndLocalDateValueColumnFilter implements ColumnFilter {
 
         /**
          * {@inheritDoc}
          */
-        @SuppressWarnings("deprecation")
         @Override
         public boolean includeColumn(final DataColumnSpec colSpec) {
             if (colSpec == null) {

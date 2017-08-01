@@ -50,7 +50,9 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 /**
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @deprecated
  */
+@Deprecated
 public final class StringsToDocumentConfigKeys {
 
     private StringsToDocumentConfigKeys() {

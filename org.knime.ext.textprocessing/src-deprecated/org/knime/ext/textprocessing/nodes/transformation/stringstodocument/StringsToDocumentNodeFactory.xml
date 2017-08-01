@@ -5,7 +5,7 @@
     <shortDescription>Converts the specified strings to documents.
     </shortDescription>
     <fullDescription>
-        <intro>
+        <intro> 
             Converts the specified strings to documents. For each row a document
             will be created and attached to that row. The strings of the
             specified columns will be used as title, authors, and 

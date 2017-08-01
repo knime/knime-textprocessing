@@ -55,7 +55,9 @@ import org.knime.ext.textprocessing.data.PublicationDate;
  * full text column, publication date, document source, category, and type.
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @deprecated
  */
+@Deprecated
 public class StringsToDocumentConfig {
 
     /**

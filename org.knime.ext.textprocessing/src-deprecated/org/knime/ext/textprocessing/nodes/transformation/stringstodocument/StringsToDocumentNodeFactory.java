@@ -54,7 +54,9 @@ import org.knime.core.node.NodeView;
 /**
  *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class StringsToDocumentNodeFactory extends NodeFactory<StringsToDocumentNodeModel> {
 
     /**
