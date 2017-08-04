@@ -51,6 +51,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.time.duration.DurationValue;
@@ -59,7 +60,11 @@ import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
 import org.knime.core.data.time.localtime.LocalTimeValue;
 import org.knime.core.data.time.period.PeriodValue;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -69,6 +74,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnFilter;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentType;
@@ -330,6 +336,8 @@ class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_docColModel;
 
+    private DataTableSpec m_spec;
+
     /**
      * Creates a new instance of {@StringsToDocumentNodeDialog}.
      */
@@ -484,6 +492,30 @@ class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
                 + LocalDateValue.class.getSimpleName() + "\".";
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+        throws NotConfigurableException {
+        m_spec = (DataTableSpec)specs[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        if (m_spec.containsName(m_docColModel.getStringValue().trim())) {
+            throw new InvalidSettingsException("Can't create new column \"" + m_docColModel.getStringValue()
+            + "\" as input spec already contains such column!");
+        }
+        if (m_docColModel.getStringValue() == null || m_docColModel.getStringValue().trim().isEmpty()) {
+            throw new InvalidSettingsException("Can't create new column! Column name cannot be empty or null!");
+        }
+        super.saveAdditionalSettingsTo(settings);
     }
 
 }

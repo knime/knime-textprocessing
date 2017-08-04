@@ -216,9 +216,12 @@ class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeModel {
         conf.setUsePubDateColumn(m_usePubDateColumnModel.getBooleanValue());
 
         // New document column
-        if (spec.containsName(m_docColumnModel.getStringValue())) {
+        if (spec.containsName(m_docColumnModel.getStringValue().trim())) {
             throw new InvalidSettingsException("Can't create new column \"" + m_docColumnModel.getStringValue()
-                + "\" as input spec already contains such column!");
+            + "\" as input spec already contains such column!");
+        }
+        if (m_docColumnModel.getStringValue() == null || m_docColumnModel.getStringValue().trim().isEmpty()) {
+            throw new InvalidSettingsException("Can't create new column! Column name cannot be empty or null!");
         }
 
         StringsToDocumentCellFactory2 cellFac = new StringsToDocumentCellFactory2(conf, createNewColSpecs(),
