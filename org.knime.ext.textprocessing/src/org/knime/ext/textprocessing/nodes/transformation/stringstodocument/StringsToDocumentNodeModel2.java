@@ -221,7 +221,7 @@ class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeModel {
             + "\" as input spec already contains such column!");
         }
         if (m_docColumnModel.getStringValue() == null || m_docColumnModel.getStringValue().trim().isEmpty()) {
-            throw new InvalidSettingsException("Can't create new column! Column name cannot be empty or null!");
+            throw new InvalidSettingsException("Can't create new column! Column name can't be empty!");
         }
 
         StringsToDocumentCellFactory2 cellFac = new StringsToDocumentCellFactory2(conf, createNewColSpecs(),
