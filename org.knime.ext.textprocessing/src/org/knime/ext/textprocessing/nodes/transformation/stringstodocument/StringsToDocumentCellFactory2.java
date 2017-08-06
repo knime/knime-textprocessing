@@ -83,7 +83,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Hermann Azong, KNIME.com, Berlin, Germany
  */
-public class StringsToDocumentCellFactory2 extends AbstractCellFactory {
+final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StringsToDocumentCellFactory2.class);
 

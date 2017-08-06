@@ -88,7 +88,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * @author Hermann Azong & Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.5
  */
-class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeModel {
+final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeModel {
 
     private final SettingsModelString m_titleColModel = StringsToDocumentNodeDialog2.getTitleStringModel();
 

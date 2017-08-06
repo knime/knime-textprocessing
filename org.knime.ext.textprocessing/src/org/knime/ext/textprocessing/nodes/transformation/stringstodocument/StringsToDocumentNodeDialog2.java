@@ -87,7 +87,7 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Hermann Azong & Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.5
  */
-class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
+final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
      * Creates and returns a {@link SettingsModelString} specifying the column which has to be used as authors column.
