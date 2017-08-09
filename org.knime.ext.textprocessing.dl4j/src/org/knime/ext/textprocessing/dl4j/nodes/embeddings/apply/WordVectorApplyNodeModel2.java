@@ -43,14 +43,11 @@
 package org.knime.ext.textprocessing.dl4j.nodes.embeddings.apply;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
@@ -110,7 +107,9 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
 
     private DataTableSpec m_outputSpec;
 
-    private final Set<String> m_unknownWords = new HashSet<>();
+    private int m_unknownWordsCtr = 0;
+
+    private int m_totalWordsCtr = 0;
 
     WordVectorApplyNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE, WordVectorFileStorePortObject.TYPE},
@@ -146,7 +145,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
     }
 
     private DataRow processRow(final DataRow row, final int documentColumnIndex, final WordVectors wordVectors)
-        throws DataCellConversionException {
+        throws DataCellConversionException, IllegalStateException {
 
         final List<DataCell> cells = TableUtils.toListOfCells(row);
         final DataCell cell = row.getCell(documentColumnIndex);
@@ -154,12 +153,28 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
         final String document = ConverterUtils.convertDataCellToJava(cell, String.class);
         ListCell convertedDocument;
 
+        final Tokenizer t = new DefaultTokenizerFactory().create(document);
+
+        final List<String> matchingTokens = new ArrayList<String>();
+        for (final String token : t.getTokens()) {
+            if (wordVectors.hasWord(token)) {
+                matchingTokens.add(token);
+            } else {
+                m_unknownWordsCtr++;
+            }
+            m_totalWordsCtr++;
+        }
+
+        if (matchingTokens.size() == 0) {
+            throw new IllegalStateException("No tokens in row " + row.getKey() + " match the vocabulary!");
+        }
+
         if (m_calculateMean.getBooleanValue()) {
-            final INDArray documentMeanVector = calculateDocumentMean(wordVectors, document);
+            final INDArray documentMeanVector = calculateDocumentMean(wordVectors, matchingTokens);
             convertedDocument =
                 CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
         } else {
-            convertedDocument = replaceWordsByWordVector(wordVectors, document);
+            convertedDocument = replaceWordsByWordVector(wordVectors, matchingTokens);
         }
 
         cells.add(convertedDocument);
@@ -185,8 +200,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
                 RowInput rowInput = (RowInput)inputs[0];
                 RowOutput rowOutput = (RowOutput)outputs[0];
 
-                final int documentColumnIndex =
-                    tableSpec.findColumnIndex(m_documentColumn.getStringValue());
+                final int documentColumnIndex = tableSpec.findColumnIndex(m_documentColumn.getStringValue());
 
                 DataRow row;
                 while ((row = rowInput.poll()) != null) {
@@ -276,20 +290,12 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
      * @param document the document to use
      * @return {@link ListCell} of {@link ListCell}c of {@link DoubleCell}s containing converted words
      */
-    private ListCell replaceWordsByWordVector(final WordVectors wordVec, final String document) {
-        final TokenizerFactory tokenizerFac = new DefaultTokenizerFactory();
-
-        final Tokenizer t = tokenizerFac.create(document);
+    private ListCell replaceWordsByWordVector(final WordVectors wordVec, final List<String> tokens) {
         final List<ListCell> listCells = new ArrayList<ListCell>();
 
-        while (t.hasMoreTokens()) {
-            final String word = t.nextToken();
-            if (!word.isEmpty()) {
-                if (wordVec.hasWord(word)) {
-                    listCells.add(wordToListCell(wordVec, word));
-                } else {
-                    m_unknownWords.add(word);
-                }
+        for (String token : tokens) {
+            if (!token.isEmpty()) {
+                listCells.add(wordToListCell(wordVec, token));
             }
         }
         return CollectionCellFactory.createListCell(listCells);
@@ -302,31 +308,14 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
      * @param document the document for which the mean should be calculated
      * @return {@link INDArray} containing the mean vector of the document
      */
-    private INDArray calculateDocumentMean(final WordVectors wordVec, final String document) {
-        final TokenizerFactory tokenizerFac = new DefaultTokenizerFactory();
-
-        final Tokenizer t = tokenizerFac.create(document);
-        final List<String> tokens = t.getTokens();
-
-        int numberOfWordsMatchingWithVoc = 0;
-        for (final String token : tokens) {
-            if (wordVec.hasWord(token)) {
-                numberOfWordsMatchingWithVoc++;
-            }
-        }
-
-        final INDArray documentWordVectors =
-            Nd4j.create(numberOfWordsMatchingWithVoc, wordVec.lookupTable().layerSize());
+    private INDArray calculateDocumentMean(final WordVectors wordVec, final List<String> tokens) {
+        final INDArray documentWordVectors = Nd4j.create(tokens.size(), wordVec.lookupTable().layerSize());
 
         int i = 0;
         for (final String token : tokens) {
             if (!token.isEmpty()) {
-                if (wordVec.hasWord(token)) {
-                    documentWordVectors.putRow(i, wordVec.getWordVectorMatrix(token));
-                    i++;
-                } else {
-                    m_unknownWords.add(token);
-                }
+                documentWordVectors.putRow(i, wordVec.getWordVectorMatrix(token));
+                i++;
             }
         }
         final INDArray documentMeanVector = documentWordVectors.mean(0);
@@ -335,12 +324,14 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
 
     @Override
     protected void reset() {
-        m_unknownWords.clear();
+        m_unknownWordsCtr = 0;
+        m_totalWordsCtr = 0;
     }
 
     private void logUnkownWords() {
-        if (!m_unknownWords.isEmpty()) {
-            logger.warn(m_unknownWords.size() + " words are not contained in the WordVector vocabulary.");
+        if (m_unknownWordsCtr > 0 && m_totalWordsCtr > 0) {
+            logger.warn(
+                m_unknownWordsCtr / (double)m_totalWordsCtr + "% of words in input could not be found in input vocabulary.");
         }
     }
 
