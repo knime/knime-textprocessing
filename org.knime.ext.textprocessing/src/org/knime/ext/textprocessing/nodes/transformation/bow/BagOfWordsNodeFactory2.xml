@@ -7,10 +7,9 @@
     <fullDescription>
         <intro>
             This node creates a bag of words (BoW) of a set of documents.
-            A BoW consists of at least two columns, one containing the
-            documents and one containing the terms occurring in the corresponding 
-            document. A row represents a tupel of a term contained in the
-            related document. 
+            A BoW consists of at least one columns containing the terms occurring in the corresponding document. 
+            All term related columns like the document column can be selected in the node dialog and will be copied
+            to the output table.
         </intro>
         <option name="Document column">
             Select the document column that is used for creating the bag of words.
@@ -19,7 +18,8 @@
             The name of the term column to be created.
     	</option>
     	<option name="Column Selection">
-			Move the columns of interest into the "Include" list.
+			Selected columns will be copied to the output table. Columns, that are not selected will not appear in
+			the output table.
 		</option>
     </fullDescription>
         
