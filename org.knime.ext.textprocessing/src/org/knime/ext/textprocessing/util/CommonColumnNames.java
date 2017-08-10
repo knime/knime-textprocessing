@@ -49,11 +49,12 @@
 package org.knime.ext.textprocessing.util;
 
 /**
+ * Commonly used column names.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
-public class CommonColumnNames {
+public final class CommonColumnNames {
 
     /**
      * The default document column name in bow data tables.
