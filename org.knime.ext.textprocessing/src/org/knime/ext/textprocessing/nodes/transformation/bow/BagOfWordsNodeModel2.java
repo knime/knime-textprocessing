@@ -126,20 +126,35 @@ class BagOfWordsNodeModel2 extends NodeModel {
         // verify that the incoming DataTableSpec contains at least one Document column
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
+        int numberOfDocCols = verifier.getNumDocumentCells();
 
-        // if only one document cell is available use it as doc column
-        if (verifier.verifyDocumentCell(false)) {
-            m_documentColIndex = verifier.getDocumentCellIndex();
-            m_docColModel.setStringValue(spec.getColumnSpec(m_documentColIndex).getName());
-
-            // if there are more than one document columns available check settings
-        } else {
-            final String docColName = m_docColModel.getStringValue();
-            m_documentColIndex = spec.findColumnIndex(docColName);
-            if (m_documentColIndex < 0) {
-                throw new InvalidSettingsException(
-                    "Document column '" + docColName + "' does not exist in input table.");
+        String docColName = m_docColModel.getStringValue();
+        // if not is not configured
+        if (docColName.isEmpty()) {
+            // select the only document column if there is only one document column
+            if (numberOfDocCols == 1) {
+                m_documentColIndex = verifier.getDocumentCellIndex();
+                docColName = spec.getColumnSpec(m_documentColIndex).getName();
+                m_docColModel.setStringValue(docColName);
+                // select the first document column if there are more than one document columns
+            } else {
+                int count = 0;
+                while (docColName.isEmpty()) {
+                    if (spec.getColumnSpec(count).getType().isCompatible(DocumentValue.class)) {
+                        docColName = spec.getColumnSpec(count).getName();
+                        m_documentColIndex = count;
+                        m_docColModel.setStringValue(docColName);
+                    }
+                    count++;
+                }
+                setWarningMessage("Auto guessing: Using column '" + docColName + "' as document column");
             }
+        } else if (spec.getColumnSpec(docColName) != null
+            && spec.getColumnSpec(docColName).getType().isCompatible(DocumentValue.class)) {
+            m_documentColIndex = spec.findColumnIndex(docColName);
+            // throw exception if column spec could not be found or is not a document column
+        } else {
+            throw new InvalidSettingsException("Document column '" + docColName + "' does not exist in input table.");
         }
 
         // check if there already is a column named like the specified term column name
@@ -286,7 +301,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
      */
     @Override
     protected void reset() {
-        m_rowId = 1;
+        m_rowId = 0;
     }
 
     /**
