@@ -74,8 +74,7 @@ final class BagOfWordsNodeDialog2 extends DefaultNodeSettingsPane {
      * @return {@code SettingsModelString} containing the name of the document column.
      */
     static final SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(BagOfWordsConfigKeys2.CFG_KEY_DOCUMENT_COL,
-            CommonColumnNames.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(BagOfWordsConfigKeys2.CFG_KEY_DOCUMENT_COL, "");
     }
 
     /**
@@ -101,9 +100,10 @@ final class BagOfWordsNodeDialog2 extends DefaultNodeSettingsPane {
     /**
      * Constructor for class {@link BagOfWordsNodeDialog2}.
      */
+    @SuppressWarnings("unchecked")
     BagOfWordsNodeDialog2() {
-        @SuppressWarnings("unchecked")
 
+        setHorizontalPlacement(true);
         // document col to create bow from
         final DialogComponentColumnNameSelection docColSelectionComp =
             new DialogComponentColumnNameSelection(getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
@@ -115,6 +115,7 @@ final class BagOfWordsNodeDialog2 extends DefaultNodeSettingsPane {
         termColStringComp.setToolTipText("Name of the term column to be created");
         addDialogComponent(termColStringComp);
 
+        setHorizontalPlacement(false);
         // column filter component to select output columns
         addDialogComponent(new DialogComponentColumnFilter2(getColumnSelectionModel(), 0));
     }
