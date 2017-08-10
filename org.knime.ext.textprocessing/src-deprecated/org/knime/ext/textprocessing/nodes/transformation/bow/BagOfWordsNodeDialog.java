@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
 import javax.swing.event.ChangeListener;
+
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -61,7 +62,9 @@ import org.knime.ext.textprocessing.util.BagOfWordsDataTableBuilder;
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
+ * @deprecated Use custom node dialog instead.
  */
+@Deprecated
 public final class BagOfWordsNodeDialog extends DefaultNodeSettingsPane {
 
     /**

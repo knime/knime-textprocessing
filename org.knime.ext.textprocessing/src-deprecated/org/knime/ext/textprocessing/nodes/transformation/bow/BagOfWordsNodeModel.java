@@ -96,7 +96,9 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * contained in the document.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use custom node model instead.
  */
+@Deprecated
 public class BagOfWordsNodeModel extends NodeModel {
 
     /**

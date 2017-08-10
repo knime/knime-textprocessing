@@ -51,7 +51,9 @@ package org.knime.ext.textprocessing.nodes.transformation.bow;
  *
  * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
  * @since 2.9
+ * @deprecated Use custom set of config keys instead.
  */
+@Deprecated
 public final class BagOfWordsConfigKeys {
 
     private BagOfWordsConfigKeys() { }
