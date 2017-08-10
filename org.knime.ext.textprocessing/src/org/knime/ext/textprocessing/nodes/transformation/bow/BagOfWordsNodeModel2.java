@@ -54,6 +54,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -100,8 +101,6 @@ class BagOfWordsNodeModel2 extends NodeModel {
     private final SettingsModelString m_termColModel = BagOfWordsNodeDialog2.getTermColumnModel();
 
     private final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
-
-    private long m_rowId = 0;
 
     private int m_documentColIndex = -1;
 
@@ -154,14 +153,14 @@ class BagOfWordsNodeModel2 extends NodeModel {
             m_documentColIndex = spec.findColumnIndex(docColName);
             // throw exception if column spec could not be found or is not a document column
         } else {
-            throw new InvalidSettingsException("Document column '" + docColName + "' does not exist in input table.");
+            throw new InvalidSettingsException(
+                "Column '" + docColName + "' does not exist in input table or is not a Document column.");
         }
 
         // check if there already is a column named like the specified term column name
-        for (String colName : spec.getColumnNames()) {
-            if (colName.equals(m_termColModel.getStringValue())) {
-                throw new InvalidSettingsException("Column name '" + colName + "' already exists in input table.");
-            }
+        if (spec.findColumnIndex(m_termColModel.getStringValue()) >= 0) {
+            throw new InvalidSettingsException(
+                "Column name '" + m_termColModel.getStringValue() + "' already exists in input table.");
         }
     }
 
@@ -182,6 +181,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
 
         final long rowCount = inData[0].size();
         long currRow = 1;
+        AtomicLong rowId = new AtomicLong(0);
         final RowIterator it = inData[0].iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
@@ -201,7 +201,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
                 Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
                 Set<Term> terms = setOfTerms(doc);
                 if (!processedDocUUIDs.contains(doc.getUUID())) {
-                    addToBOW(terms, additionalCells, bdc);
+                    addToBOW(terms, additionalCells, bdc, rowId);
                     processedDocUUIDs.add(doc.getUUID());
                 }
             } else {
@@ -221,9 +221,10 @@ class BagOfWordsNodeModel2 extends NodeModel {
         return new BufferedDataTable[]{bdc.getTable()};
     }
 
-    private void addToBOW(final Set<Term> terms, final DataCell[] additionalCells, final BufferedDataContainer bdc) {
+    private void addToBOW(final Set<Term> terms, final DataCell[] additionalCells, final BufferedDataContainer bdc,
+        final AtomicLong rowId) {
         for (Term t : terms) {
-            final RowKey key = RowKey.createRowKey(m_rowId);
+            final RowKey key = RowKey.createRowKey(rowId.getAndIncrement());
             final DataCell tc = m_termFac.createDataCell(t);
             // create new datacell array and add selected columns and term column
             DataCell[] newDataCells = new DataCell[bdc.getTableSpec().getNumColumns()];
@@ -232,7 +233,6 @@ class BagOfWordsNodeModel2 extends NodeModel {
             }
             newDataCells[newDataCells.length - 1] = tc;
             bdc.addRowToTable(new DefaultRow(key, newDataCells));
-            m_rowId++;
         }
     }
 
@@ -301,7 +301,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
      */
     @Override
     protected void reset() {
-        m_rowId = 0;
+        //Nothing to do here...
     }
 
     /**
