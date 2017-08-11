@@ -456,7 +456,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
      */
     @Override
     public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        if (m_spec.containsName(m_docColModel.getStringValue().trim())) {
+        if (m_docColModel.getStringValue() != null && m_spec.containsName(m_docColModel.getStringValue().trim())) {
             throw new InvalidSettingsException("Can't create new column \"" + m_docColModel.getStringValue()
             + "\" as input spec already contains such column!");
         }
