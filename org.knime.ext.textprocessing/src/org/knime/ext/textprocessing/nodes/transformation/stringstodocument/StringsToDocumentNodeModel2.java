@@ -62,7 +62,6 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
-import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -401,8 +400,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
                     m_fulltextColModel.setStringValue(column);
                 }
                 if (column.equalsIgnoreCase(DocumentDataExtractor2.PUB_DATE.getName())
-                    && (type.isCompatible(StringValue.class) || type.isCompatible(LocalDateValue.class)
-                        || type.isCompatible(DateAndTimeValue.class))) {
+                    && type.isCompatible(LocalDateValue.class)) {
                     m_pubDateColModel.setStringValue(column);
                 }
             }

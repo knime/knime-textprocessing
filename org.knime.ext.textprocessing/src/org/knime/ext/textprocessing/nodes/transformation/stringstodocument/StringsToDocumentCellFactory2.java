@@ -59,7 +59,6 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
-import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.node.NodeLogger;
@@ -264,18 +263,9 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         if (m_config.getUsePubDateColumn()) {
             if (m_config.getPubDateColumnIndex() >= 0) {
                 final DataCell pubDateCell = row.getCell(m_config.getPubDateColumnIndex());
-                if (!pubDateCell.isMissing()) {
-                    // new LocalDate type
-                    if (pubDateCell.getType().isCompatible(LocalDateValue.class)) {
-                        LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
-                        setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-                    } else if (pubDateCell.getType().isCompatible(DateAndTimeValue.class)) {
-                        DateAndTimeValue dateTime = ((DateAndTimeValue)pubDateCell);
-                        setPublicationDate(docBuilder, dateTime.getYear(), dateTime.getMonth() + 1,
-                            dateTime.getDayOfMonth());
-                    } else if (pubDateCell.getType().isCompatible(StringValue.class)) {
-                        extractAndSetPublicationDate(((StringValue)pubDateCell).getStringValue(), docBuilder);
-                    }
+                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(LocalDateValue.class)) {
+                    LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
+                    setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
                 }
             }
         } else {
