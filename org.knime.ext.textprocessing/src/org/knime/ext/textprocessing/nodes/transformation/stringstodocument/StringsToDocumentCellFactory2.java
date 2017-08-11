@@ -49,8 +49,6 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
@@ -85,9 +83,6 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StringsToDocumentCellFactory2.class);
-
-    // standard date pattern for strings to document node
-    private static final Pattern DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})-([\\d]{4})");
 
     private final StringsToDocumentConfig2 m_config;
 
@@ -151,7 +146,6 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("deprecation")
     @Override
     public DataCell[] getCells(final DataRow row) {
         final DocumentBuilder docBuilder = new DocumentBuilder(m_tokenizerName);
@@ -269,7 +263,8 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
                 }
             }
         } else {
-            extractAndSetPublicationDate(m_config.getPublicationDate(), docBuilder);
+            LocalDate date = m_config.getPublicationDate();
+            setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
         }
         DataCellCache dataCellCache = getDataCellCache();
         return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
@@ -285,15 +280,6 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         super.afterProcessing();
         if (m_cacheCreated) {
             getDataCellCache().close();
-        }
-    }
-
-    // extracts and sets the date if incoming date information is a String
-    private void extractAndSetPublicationDate(final String dateStr, final DocumentBuilder docBuilder) {
-        final Matcher m = DATE_PATTERN.matcher(dateStr);
-        if (m.matches()) {
-            setPublicationDate(docBuilder, Integer.parseInt(m.group(3)), Integer.parseInt(m.group(2)),
-                Integer.parseInt(m.group(1)));
         }
     }
 

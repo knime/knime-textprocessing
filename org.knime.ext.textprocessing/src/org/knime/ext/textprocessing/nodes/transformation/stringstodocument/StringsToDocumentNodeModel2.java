@@ -49,11 +49,7 @@ package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
@@ -79,6 +75,7 @@ import org.knime.ext.textprocessing.nodes.transformation.documenttostring.Docume
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
+import org.knime.time.util.SettingsModelDateTime;
 
 /**
  * The {@link NodeModel} for the Strings To Document node. This class extends the
@@ -107,7 +104,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
 
     private final SettingsModelString m_docTypeModel = StringsToDocumentNodeDialog2.getTypeModel();
 
-    private final SettingsModelString m_pubDateModel = StringsToDocumentNodeDialog2.getPubDatModel();
+    private final SettingsModelDateTime m_pubDateModel = StringsToDocumentNodeDialog2.getPubDateModel();
 
     private final SettingsModelString m_pubDateColModel = StringsToDocumentNodeDialog2.getPubDateColumnModel();
 
@@ -210,7 +207,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         conf.setDocType(m_docTypeModel.getStringValue());
 
         // Publication Date
-        conf.setPublicationDate(m_pubDateModel.getStringValue());
+        conf.setPublicationDate(m_pubDateModel.getLocalDate());
         conf.setPubDateColumnIndex(spec.findColumnIndex(m_pubDateColModel.getStringValue()));
         conf.setUsePubDateColumn(m_usePubDateColumnModel.getBooleanValue());
 
@@ -322,26 +319,6 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         m_usePubDateColumnModel.validateSettings(settings);
         m_tokenizerModel.validateSettings(settings);
         m_docColumnModel.validateSettings(settings);
-
-        String pubDate = ((SettingsModelString)m_pubDateModel.createCloneWithValidatedValue(settings)).getStringValue();
-
-        if (!pubDate.isEmpty()) {
-            Pattern p = Pattern.compile("(\\d){2}-(\\d){2}-(\\d){4}");
-            Matcher m = p.matcher(pubDate);
-            if (!m.matches()) {
-                throw new InvalidSettingsException("Publicationdate is not formatted properly (dd-mm-yyyy)!");
-            }
-
-            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-            df.setLenient(false);
-            try {
-                df.parse(pubDate);
-            } catch (ParseException e) {
-                throw new InvalidSettingsException("Specified date is not valid!\n" + e.getMessage());
-            }
-
-        }
-
     }
 
     /**

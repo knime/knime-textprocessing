@@ -71,6 +71,9 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.time.util.DialogComponentDateTimeSelection;
+import org.knime.time.util.DialogComponentDateTimeSelection.DisplayOption;
+import org.knime.time.util.SettingsModelDateTime;
 
 /**
  * Provides the dialog for the String to Document node with all necessary dialog components.
@@ -170,13 +173,13 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * Creates and returns an instance of {@link SettingsModelString} specifying the document publication date.
+     * Creates and returns an instance of {@link SettingsModelDateTime} specifying the document publication date.
      *
-     * @return The {@code SettingsModelString} specifying the document publication date.
+     * @return The {@code SettingsModelDateTime} specifying the document publication date.
      */
-    static final SettingsModelString getPubDatModel() {
-        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_PUBDATE,
-            StringsToDocumentConfig2.DEF_DOCUMENT_PUBDATE);
+    static final SettingsModelDateTime getPubDateModel() {
+        return new SettingsModelDateTime(StringsToDocumentConfigKeys2.CFGKEY_PUBDATE,
+            StringsToDocumentConfig2.DEF_DOCUMENT_PUBDATE, null, null);
     }
 
     /**
@@ -301,7 +304,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_docCategoryModel;
 
-    private SettingsModelString m_pubDateModel;
+    private SettingsModelDateTime m_pubDateModel;
 
     private SettingsModelString m_docTitleModelCombo;
 
@@ -393,19 +396,20 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document type", types));
-        m_pubDateModel = getPubDatModel();
-        DialogComponentString dcs = new DialogComponentString(m_pubDateModel, "Publication date (dd-mm-yyyy)");
-        dcs.setToolTipText("Date has to be specified like \"dd-mm-yyyy!\"");
-        addDialogComponent(dcs);
         // Pub Date
-        setHorizontalPlacement(true);
-        m_usePubDateColumnModel = getUsePubDateColumnModel();
+        m_pubDateModel = getPubDateModel();
         m_pubDateModelCombo = getPubDateColumnModel();
+        m_usePubDateColumnModel = getUsePubDateColumnModel();
+        DialogComponentDateTimeSelection dcs = new DialogComponentDateTimeSelection(m_pubDateModel,
+            null, DisplayOption.SHOW_DATE_ONLY);
+        addDialogComponent(dcs);
+        setHorizontalPlacement(true);
         m_usePubDateColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0,
-            LocalDateValue.class));
+            false, LocalDateValue.class));
         closeCurrentGroup();
+
 
         createNewGroup("Column");
         m_docColModel = getDocumentColumnModel();

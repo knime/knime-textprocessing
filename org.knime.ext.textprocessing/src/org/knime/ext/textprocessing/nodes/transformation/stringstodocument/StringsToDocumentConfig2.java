@@ -47,8 +47,9 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
+import java.time.LocalDate;
+
 import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.data.PublicationDate;
 
 /**
  * Holds all necessary variables needed to build a document out of a data row, like certain indices for title, author or
@@ -62,7 +63,7 @@ class StringsToDocumentConfig2 {
     /**
      * The default publication date.
      */
-    static final String DEF_DOCUMENT_PUBDATE = PublicationDate.getToday();
+    static final LocalDate DEF_DOCUMENT_PUBDATE = LocalDate.now();
 
     /**
      * The default document title.
@@ -167,7 +168,7 @@ class StringsToDocumentConfig2 {
 
     private String m_docType = DEF_DOCUMENT_TYPE;
 
-    private String m_publicationDate = DEF_DOCUMENT_PUBDATE;
+    private LocalDate m_publicationDate = DEF_DOCUMENT_PUBDATE;
 
     // getter and setter for document title members
     boolean getUseTitleColumn() {
@@ -312,11 +313,11 @@ class StringsToDocumentConfig2 {
         this.m_usePubDateColumn = usePubDateColumn;
     }
 
-    String getPublicationDate() {
+    LocalDate getPublicationDate() {
         return m_publicationDate;
     }
 
-    void setPublicationDate(final String publicationDate) {
+    void setPublicationDate(final LocalDate publicationDate) {
         m_publicationDate = publicationDate;
     }
 
