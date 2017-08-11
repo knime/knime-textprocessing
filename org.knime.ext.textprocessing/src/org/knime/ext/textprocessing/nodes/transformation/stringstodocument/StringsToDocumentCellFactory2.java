@@ -151,103 +151,69 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         final DocumentBuilder docBuilder = new DocumentBuilder(m_tokenizerName);
 
         // Set title
-        String title = m_config.getDocTitle();
         if (m_config.getUseTitleColumn()) {
-            if (m_config.getTitleColumnIndex() >= 0) {
-                final DataCell titleCell = row.getCell(m_config.getTitleColumnIndex());
-                if (!titleCell.isMissing() && titleCell.getType().isCompatible(StringValue.class)) {
-                    title = ((StringValue)titleCell).getStringValue();
-                } else {
-                    title = "";
-                }
-                docBuilder.addTitle(title);
+            final DataCell titleCell = row.getCell(m_config.getTitleColumnIndex());
+            if (!titleCell.isMissing()) {
+                docBuilder.addTitle(((StringValue)titleCell).getStringValue());
             }
         } else {
-            title = row.getKey().toString();
-            docBuilder.addTitle(title);
+            docBuilder.addTitle(row.getKey().toString());
         }
 
         //Set fulltext
-        if (m_config.getFulltextColumnIndex() >= 0) {
-            final DataCell textCell = row.getCell(m_config.getFulltextColumnIndex());
-            String fulltext = "";
-            if (!textCell.isMissing() && textCell.getType().isCompatible(StringValue.class)) {
-                fulltext = ((StringValue)textCell).getStringValue();
-            }
-            docBuilder.addSection(fulltext, SectionAnnotation.UNKNOWN);
+        final DataCell textCell = row.getCell(m_config.getFulltextColumnIndex());
+        if (!textCell.isMissing()) {
+            docBuilder.addSection(((StringValue)textCell).getStringValue(), SectionAnnotation.UNKNOWN);
         }
 
         // Set authors
         if (m_config.getUseAuthorsColumn()) {
-            if (m_config.getAuthorsColumnIndex() >= 0) {
-                final DataCell authorsCell = row.getCell(m_config.getAuthorsColumnIndex());
-                if (!authorsCell.isMissing() && authorsCell.getType().isCompatible(StringValue.class)) {
-                    final String authors = ((StringValue)authorsCell).getStringValue();
-                    final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
-                    for (String author : authorsArr) {
-                        String firstName = m_config.getAuthorFirstName();
-                        String lastName = m_config.getAuthorLastName();
+            final DataCell authorsCell = row.getCell(m_config.getAuthorsColumnIndex());
+            if (!authorsCell.isMissing()) {
+                final String authors = ((StringValue)authorsCell).getStringValue();
+                final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
+                for (String author : authorsArr) {
+                    String firstName = "";
+                    String lastName = "";
 
-                        final String[] names = author.split(" ");
-                        if (names.length > 1) {
-                            final StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < names.length - 1; i++) {
-                                sb.append(names[i]);
-                                sb.append(" ");
-                            }
-                            firstName = sb.toString();
-                            lastName = names[names.length - 1];
-                        } else if (names.length == 1) {
-                            lastName = names[0];
+                    final String[] names = author.split(" ");
+                    if (names.length > 1) {
+                        final StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < names.length - 1; i++) {
+                            sb.append(names[i]);
+                            sb.append(" ");
                         }
-
-                        docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+                        firstName = sb.toString();
+                        lastName = names[names.length - 1];
+                    } else if (names.length == 1) {
+                        lastName = names[0];
                     }
-                    // If check box is set to use author names from column
-                    // if author first/last name is not specified and both first and last name in the node dialog
-                    // component are empty return an empty string.
-                } else if (authorsCell.isMissing()
-                    && (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty())) {
-                    docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
-                }
 
+                    docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+                }
             }
-        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()) {
-            // if no check box is set to use authors name from column, if both dialog components name are empty
-            // return an empty string otherwise return "-" + the one specified.
+        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()){
             docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
         }
 
         // set document source
-        String docSource = m_config.getDocSource();
         if (m_config.getUseSourceColumn()) {
-            if (m_config.getSourceColumnIndex() >= 0) {
-                final DataCell sourceCell = row.getCell(m_config.getSourceColumnIndex());
-                if (!sourceCell.isMissing() && sourceCell.getType().isCompatible(StringValue.class)) {
-                    docSource = ((StringValue)sourceCell).getStringValue();
-                } else {
-                    docSource = "";
-                }
+            final DataCell sourceCell = row.getCell(m_config.getSourceColumnIndex());
+            if (!sourceCell.isMissing()) {
+                docBuilder.addDocumentSource(new DocumentSource(((StringValue)sourceCell).getStringValue()));
             }
-        }
-        if (docSource.length() > 0) {
-            docBuilder.addDocumentSource(new DocumentSource(docSource));
+        } else if (m_config.getDocSource().length() > 0){
+            docBuilder.addDocumentSource(new DocumentSource(m_config.getDocSource()));
         }
 
         // set document category
-        String docCat = m_config.getDocCat();
         if (m_config.getUseCatColumn()) {
-            if (m_config.getCategoryColumnIndex() >= 0) {
-                final DataCell catCell = row.getCell(m_config.getCategoryColumnIndex());
-                if (!catCell.isMissing() && catCell.getType().isCompatible(StringValue.class)) {
-                    docCat = ((StringValue)catCell).getStringValue();
-                } else {
-                    docCat = "";
-                }
+            final DataCell catCell = row.getCell(m_config.getCategoryColumnIndex());
+            if (!catCell.isMissing()) {
+                docBuilder.addDocumentCategory(new DocumentCategory(((StringValue)catCell).getStringValue()));
             }
-        }
-        if (docCat.length() > 0) {
-            docBuilder.addDocumentCategory(new DocumentCategory(docCat));
+        } else if (m_config.getDocCat().length() > 0) {
+            docBuilder.addDocumentCategory(new DocumentCategory(m_config.getDocCat()));
         }
 
         // set document type
@@ -255,19 +221,17 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
         // set publication date
         if (m_config.getUsePubDateColumn()) {
-            if (m_config.getPubDateColumnIndex() >= 0) {
-                final DataCell pubDateCell = row.getCell(m_config.getPubDateColumnIndex());
-                if (!pubDateCell.isMissing() && pubDateCell.getType().isCompatible(LocalDateValue.class)) {
-                    LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
-                    setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-                }
+            final DataCell pubDateCell = row.getCell(m_config.getPubDateColumnIndex());
+            if (!pubDateCell.isMissing()) {
+                LocalDate date = ((LocalDateValue)pubDateCell).getLocalDate();
+                setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
             }
         } else {
             LocalDate date = m_config.getPublicationDate();
             setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
         }
-        DataCellCache dataCellCache = getDataCellCache();
-        return new DataCell[]{dataCellCache.getInstance(docBuilder.createDocument())};
+
+        return new DataCell[]{getDataCellCache().getInstance(docBuilder.createDocument())};
     }
 
     /**
