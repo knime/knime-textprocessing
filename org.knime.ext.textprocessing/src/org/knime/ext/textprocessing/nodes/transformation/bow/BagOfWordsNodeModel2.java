@@ -137,22 +137,21 @@ class BagOfWordsNodeModel2 extends NodeModel {
                 m_docColModel.setStringValue(docColName);
                 // select the first document column if there are more than one document columns
             } else {
-                int count = 0;
-                while (docColName.isEmpty()) {
-                    if (spec.getColumnSpec(count).getType().isCompatible(DocumentValue.class)) {
-                        docColName = spec.getColumnSpec(count).getName();
-                        m_documentColIndex = count;
+                for (int i = 0; i < spec.getNumColumns(); i++) {
+                    if (spec.getColumnSpec(i).getType().isCompatible(DocumentValue.class)) {
+                        docColName = spec.getColumnSpec(i).getName();
+                        m_documentColIndex = i;
                         m_docColModel.setStringValue(docColName);
+                        break;
                     }
-                    count++;
                 }
                 setWarningMessage("Auto guessing: Using column '" + docColName + "' as document column");
             }
         } else if (spec.getColumnSpec(docColName) != null
             && spec.getColumnSpec(docColName).getType().isCompatible(DocumentValue.class)) {
             m_documentColIndex = spec.findColumnIndex(docColName);
-            // throw exception if column spec could not be found or is not a document column
         } else {
+            // throw exception if column spec could not be found or is not a document column
             throw new InvalidSettingsException(
                 "Column '" + docColName + "' does not exist in input table or is not a Document column.");
         }
