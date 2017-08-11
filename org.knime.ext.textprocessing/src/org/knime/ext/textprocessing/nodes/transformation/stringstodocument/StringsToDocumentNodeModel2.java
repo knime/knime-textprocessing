@@ -169,52 +169,120 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         StringsToDocumentConfig2 conf = new StringsToDocumentConfig2();
 
         // Title
-        if (!m_titleColModel.getStringValue().isEmpty()) {
-            conf.setDocTitle(m_titleColModel.getStringValue());
-        }
-        conf.setTitleColumnIndex(spec.findColumnIndex(m_titleColModel.getStringValue()));
         conf.setUseTitleColumn(m_useTitleColumnModel.getBooleanValue());
+        if (m_titleColModel.getStringValue() != null && !m_titleColModel.getStringValue().isEmpty()) {
+            if (spec.containsName(m_titleColModel.getStringValue())
+                && spec.getColumnSpec(m_titleColModel.getStringValue()).getType().isCompatible(StringValue.class)) {
+                conf.setDocTitle(m_titleColModel.getStringValue());
+                conf.setTitleColumnIndex(spec.findColumnIndex(m_titleColModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("Column '" + m_titleColModel.getStringValue()
+                    + "' does not exist in input table or does not contain a String value.");
+            }
+        } else if (m_useTitleColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Name of selected title column can't be empty.");
+        }
 
         // Fulltext
-        conf.setFulltextColumnIndex(spec.findColumnIndex(m_fulltextColModel.getStringValue()));
+        if (m_fulltextColModel.getStringValue() != null && !m_fulltextColModel.getStringValue().isEmpty()) {
+            if (spec.containsName(m_fulltextColModel.getStringValue())
+                && spec.getColumnSpec(m_fulltextColModel.getStringValue()).getType().isCompatible(StringValue.class)) {
+                conf.setFulltextColumnIndex(spec.findColumnIndex(m_fulltextColModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("Column '" + m_fulltextColModel.getStringValue()
+                    + "' does not exist in input table or does not contain a String value.");
+            }
+        } else {
+            throw new InvalidSettingsException("Name of selected full text column can't be empty.");
+        }
 
         // Author names
-        conf.setAuthorsColumnIndex(spec.findColumnIndex(m_authorsColModel.getStringValue()));
         conf.setUseAuthorsColumn(m_useAuthorsColumnModel.getBooleanValue());
+        if (m_authorsColModel.getStringValue() != null && !m_authorsColModel.getStringValue().isEmpty()) {
+            if (spec.containsName(m_authorsColModel.getStringValue())
+                && spec.getColumnSpec(m_authorsColModel.getStringValue()).getType().isCompatible(StringValue.class)) {
+                conf.setAuthorsColumnIndex(spec.findColumnIndex(m_authorsColModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("Column '" + m_authorsColModel.getStringValue()
+                    + "' does not exist in input table or does not contain a String value.");
+            }
+        } else if (m_useAuthorsColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Name of selected author column can't be empty.");
+        }
+        //TODO: Check: what exactly are those used for? Maybe empty check needed
         conf.setAuthorFirstName(m_authorFirstNameModel.getStringValue());
         conf.setAuthorLastName(m_authorLastNameModel.getStringValue());
 
         // Author name separator
-        if (!m_authorNameSeparator.getStringValue().isEmpty()) {
+        if (m_authorNameSeparator.getStringValue() != null
+            && !m_authorNameSeparator.getStringValue().trim().isEmpty()) {
             conf.setAuthorsSplitChar(m_authorNameSeparator.getStringValue());
+        } else if (m_useAuthorsColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Seperation string cannot be empty.");
         }
 
         // Document source
-        if (!m_docSourceModel.getStringValue().isEmpty()) {
-            conf.setDocSource(m_docSourceModel.getStringValue());
-        }
-        conf.setSourceColumnIndex(spec.findColumnIndex(m_sourceColumnModel.getStringValue()));
         conf.setUseSourceColumn(m_useSourceColumnModel.getBooleanValue());
+        if (m_sourceColumnModel.getStringValue() != null && !m_sourceColumnModel.getStringValue().isEmpty()) {
+            if (spec.containsName(m_sourceColumnModel.getStringValue())
+                && spec.getColumnSpec(m_sourceColumnModel.getStringValue()).getType().isCompatible(StringValue.class)) {
+                conf.setSourceColumnIndex(spec.findColumnIndex(m_sourceColumnModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("Column '" + m_sourceColumnModel.getStringValue()
+                    + "' does not exist in input table or does not contain a String value.");
+            }
+        } else if (m_useSourceColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Name of selected source column can't be empty.");
+        }
+        conf.setDocSource(m_docSourceModel.getStringValue());
 
         // Document category
-        if (!m_docCategoryModel.getStringValue().isEmpty()) {
-            conf.setDocCat(m_docCategoryModel.getStringValue());
-        }
-        conf.setCategoryColumnIndex(spec.findColumnIndex(m_catColumnModel.getStringValue()));
         conf.setUseCatColumn(m_useCatColumnModel.getBooleanValue());
+        if (m_catColumnModel.getStringValue() != null && !m_catColumnModel.getStringValue().isEmpty()) {
+            if (spec.containsName(m_catColumnModel.getStringValue())
+                && spec.getColumnSpec(m_catColumnModel.getStringValue()).getType().isCompatible(StringValue.class)) {
+                conf.setCategoryColumnIndex(spec.findColumnIndex(m_catColumnModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("Column '" + m_catColumnModel.getStringValue()
+                    + "' does not exist in input table or does not contain a String value.");
+            }
+        } else if (m_useCatColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Name of selected category column can't be empty.");
+        }
+        conf.setDocCat(m_docCategoryModel.getStringValue());
 
         // Document type
-        conf.setDocType(m_docTypeModel.getStringValue());
+        if (m_docTypeModel.getStringValue() != null && !m_docTypeModel.getStringValue().isEmpty()) {
+            conf.setDocType(m_docTypeModel.getStringValue());
+        } else {
+            throw new InvalidSettingsException("Name of document type can't be empty.");
+        }
 
         // Publication Date
-        conf.setPublicationDate(m_pubDateModel.getLocalDate());
-        conf.setPubDateColumnIndex(spec.findColumnIndex(m_pubDateColModel.getStringValue()));
         conf.setUsePubDateColumn(m_usePubDateColumnModel.getBooleanValue());
+        if (m_pubDateColModel.getStringValue() != null && !m_pubDateColModel.getStringValue().isEmpty()) {
+            if (spec.containsName(m_pubDateColModel.getStringValue()) && spec
+                .getColumnSpec(m_pubDateColModel.getStringValue()).getType().isCompatible(LocalDateValue.class)) {
+                conf.setPubDateColumnIndex(spec.findColumnIndex(m_pubDateColModel.getStringValue()));
+            } else {
+                throw new InvalidSettingsException("Column '" + m_pubDateColModel.getStringValue()
+                    + "' does not exist in input table or does not contain a LocalDate value.");
+            }
+        } else if (m_usePubDateColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Name of selected publication date column can't be empty.");
+        }
+
+        if (m_pubDateModel.getLocalDate() != null) {
+            conf.setPublicationDate(m_pubDateModel.getLocalDate());
+        } else if (!m_usePubDateColumnModel.getBooleanValue()) {
+            throw new InvalidSettingsException("Publication date can't be empty.");
+        }
+
 
         // New document column
-        if (spec.containsName(m_docColumnModel.getStringValue().trim())) {
-            throw new InvalidSettingsException("Can't create new column \"" + m_docColumnModel.getStringValue()
-            + "\" as input spec already contains such column!");
+        if (m_docColumnModel.getStringValue() != null && spec.containsName(m_docColumnModel.getStringValue().trim())) {
+            throw new InvalidSettingsException("Can't create new column '" + m_docColumnModel.getStringValue()
+            + "' as input spec already contains such column!");
         }
         if (m_docColumnModel.getStringValue() == null || m_docColumnModel.getStringValue().trim().isEmpty()) {
             throw new InvalidSettingsException("Can't create new column! Column name can't be empty!");
