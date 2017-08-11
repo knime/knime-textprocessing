@@ -130,45 +130,43 @@ class StringsToDocumentConfig2 {
      */
     static final int MIN_THREADS = 1;
 
-    //TODO: do not initialize members, to avoid setting default values in some cases (see ticket AP-7730/AP-7493)
+    private int m_titleColumnIndex;
 
-    private int m_titleColumnIndex = -1;
+    private int m_fulltextColumnIndex;
 
-    private int m_fulltextColumnIndex = -1;
+    private int m_authorColumnIndex;
 
-    private int m_authorColumnIndex = -1;
+    private int m_categoryColumnIndex;
 
-    private int m_categoryColumnIndex = -1;
+    private int m_sourceColumnIndex;
 
-    private int m_sourceColumnIndex = -1;
+    private int m_pubDateColumnIndex;
 
-    private int m_pubDateColumnIndex = -1;
+    private boolean m_useTitleColumn;
 
-    private boolean m_useTitleColumn = DEF_USE_TITLECOLUMN;
+    private boolean m_useAuthorsColumn;
 
-    private boolean m_useAuthorsColumn = DEF_USE_AUTHORSCOLUMN;
+    private boolean m_useCatColumn;
 
-    private boolean m_useCatColumn = DEF_USE_CATCOLUMN;
+    private boolean m_useSourceColumn;
 
-    private boolean m_useSourceColumn = DEF_USE_SOURCECOLUMN;
+    private boolean m_usePubDateColumn;
 
-    private boolean m_usePubDateColumn = DEF_USE_PUBDATECOLUMN;
+    private String m_docTitle;
 
-    private String m_docTitle = DEF_DOCUMENT_TITLE;
+    private String m_authorFirstName;
 
-    private String m_authorFirstName = DEF_AUTHOR_NAMES;
+    private String m_authorLastName;
 
-    private String m_authorLastName = DEF_AUTHOR_NAMES;
+    private String m_authorsSplitChar;
 
-    private String m_authorsSplitChar = DEF_AUTHORS_SPLITCHAR;
+    private String m_docSource;
 
-    private String m_docSource = DEF_DOCUMENT_SOURCE;
+    private String m_docCat;
 
-    private String m_docCat = DEF_DOCUMENT_CATEGORY;
+    private String m_docType;
 
-    private String m_docType = DEF_DOCUMENT_TYPE;
-
-    private LocalDate m_publicationDate = DEF_DOCUMENT_PUBDATE;
+    private LocalDate m_publicationDate;
 
     // getter and setter for document title members
     boolean getUseTitleColumn() {
