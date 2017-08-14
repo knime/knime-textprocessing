@@ -49,11 +49,9 @@ package org.knime.ext.textprocessing.nodes.transformation.bow;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.core.data.DataCell;
@@ -174,7 +172,6 @@ class BagOfWordsNodeModel2 extends NodeModel {
 
         // prepare data container
         final BufferedDataContainer bdc = exec.createDataContainer(createDataTableSpec(inputSpec));
-        final Set<UUID> processedDocUUIDs = new HashSet<UUID>();
 
         DataCell docCell = null;
 
@@ -198,11 +195,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
             // if cell is not missing
             if (!docCell.isMissing()) {
                 Document doc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
-                Set<Term> terms = setOfTerms(doc);
-                if (!processedDocUUIDs.contains(doc.getUUID())) {
-                    addToBOW(terms, additionalCells, bdc, rowId);
-                    processedDocUUIDs.add(doc.getUUID());
-                }
+                addToBOW(setOfTerms(doc), additionalCells, bdc, rowId);
             } else {
                 // set warning message
                 setWarningMessage(
