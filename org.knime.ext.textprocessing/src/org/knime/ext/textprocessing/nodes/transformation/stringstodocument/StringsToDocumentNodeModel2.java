@@ -258,7 +258,8 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         }
 
         // Publication Date
-        conf.setUsePubDateColumn(m_usePubDateColumnModel.getBooleanValue());
+        m_usePubDateColumnModel.setEnabled(spec.containsCompatibleType(LocalDateValue.class));
+        conf.setUsePubDateColumn(m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled());
         if (m_pubDateColModel.getStringValue() != null && !m_pubDateColModel.getStringValue().isEmpty()) {
             if (spec.containsName(m_pubDateColModel.getStringValue()) && spec
                 .getColumnSpec(m_pubDateColModel.getStringValue()).getType().isCompatible(LocalDateValue.class)) {
@@ -267,7 +268,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
                 throw new InvalidSettingsException("Column '" + m_pubDateColModel.getStringValue()
                     + "' does not exist in input table or does not contain a LocalDate value.");
             }
-        } else if (m_usePubDateColumnModel.getBooleanValue()) {
+        } else if (m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled()) {
             throw new InvalidSettingsException("Name of selected publication date column can't be empty.");
         }
 
@@ -293,6 +294,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         rearranger.append(cellFac);
 
+        modelStateChanged();
         return rearranger;
     }
 
@@ -413,8 +415,8 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         m_catColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
         m_titleColModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
         m_authorsColModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
-        m_pubDateColModel.setEnabled(m_usePubDateColumnModel.getBooleanValue());
-        m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
+        m_pubDateColModel.setEnabled(m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled());
+        m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue() || !m_usePubDateColumnModel.isEnabled());
     }
 
     private void doSmartDialogSelection(final DataTableSpec dataTableSpec) {

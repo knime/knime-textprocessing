@@ -425,8 +425,9 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         m_docCatColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
         m_docTitleColumnModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
         m_docAuthorColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
-        m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
-        m_pubDateColumnModel.setEnabled(m_usePubDateColumnModel.getBooleanValue());
+        m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue() || !m_usePubDateColumnModel.isEnabled());
+        m_pubDateColumnModel
+            .setEnabled(m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled());
     }
 
     /**
@@ -436,6 +437,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
         m_spec = (DataTableSpec)specs[0];
+        m_usePubDateColumnModel.setEnabled(m_spec.containsCompatibleType(LocalDateValue.class));
     }
 
     /**
