@@ -388,8 +388,8 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document type", types));
-        DialogComponentDateTimeSelection dcs = new DialogComponentDateTimeSelection(m_pubDateModel,
-            null, DisplayOption.SHOW_DATE_ONLY);
+        DialogComponentDateTimeSelection dcs =
+            new DialogComponentDateTimeSelection(m_pubDateModel, null, DisplayOption.SHOW_DATE_ONLY);
         addDialogComponent(dcs);
         setHorizontalPlacement(true);
         m_usePubDateColumnModel.addChangeListener(e -> stateChanged());
@@ -447,7 +447,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         if (m_docColModel.getStringValue() != null && m_spec.containsName(m_docColModel.getStringValue().trim())) {
             throw new InvalidSettingsException("Can't create new column \"" + m_docColModel.getStringValue()
-            + "\" as input spec already contains such column!");
+                + "\" as input spec already contains such column!");
         }
         if (m_docColModel.getStringValue() == null || m_docColModel.getStringValue().trim().isEmpty()) {
             throw new InvalidSettingsException("Can't create new column! Column name can't be empty!");

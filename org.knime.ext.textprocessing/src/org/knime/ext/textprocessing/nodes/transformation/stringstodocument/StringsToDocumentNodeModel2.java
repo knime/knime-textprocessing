@@ -277,11 +277,10 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
             throw new InvalidSettingsException("Publication date can't be empty.");
         }
 
-
         // New document column
         if (m_docColumnModel.getStringValue() != null && spec.containsName(m_docColumnModel.getStringValue().trim())) {
             throw new InvalidSettingsException("Can't create new column '" + m_docColumnModel.getStringValue()
-            + "' as input spec already contains such column!");
+                + "' as input spec already contains such column!");
         }
         if (m_docColumnModel.getStringValue() == null || m_docColumnModel.getStringValue().trim().isEmpty()) {
             throw new InvalidSettingsException("Can't create new column! Column name can't be empty!");

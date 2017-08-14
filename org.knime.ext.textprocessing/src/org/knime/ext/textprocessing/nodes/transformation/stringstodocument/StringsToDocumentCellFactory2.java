@@ -193,7 +193,7 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
                     docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
                 }
             }
-        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()){
+        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()) {
             docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
         }
 
@@ -203,7 +203,7 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
             if (!sourceCell.isMissing()) {
                 docBuilder.addDocumentSource(new DocumentSource(((StringValue)sourceCell).getStringValue()));
             }
-        } else if (m_config.getDocSource().length() > 0){
+        } else if (m_config.getDocSource().length() > 0) {
             docBuilder.addDocumentSource(new DocumentSource(m_config.getDocSource()));
         }
 

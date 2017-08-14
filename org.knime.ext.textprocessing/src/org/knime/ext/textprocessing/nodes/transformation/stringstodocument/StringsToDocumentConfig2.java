@@ -311,7 +311,6 @@ class StringsToDocumentConfig2 {
 
     int getPubDateColumnIndex() {
         return m_pubDateColumnIndex;
-
     }
 
     void setPubDateColumnIndex(final int pubDateColumnIndex) {
