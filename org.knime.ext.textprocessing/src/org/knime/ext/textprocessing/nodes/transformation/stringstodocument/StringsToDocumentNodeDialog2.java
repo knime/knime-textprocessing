@@ -302,35 +302,35 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
             StringsToDocumentConfig2.DEF_DOC_COLUMN);
     }
 
-    private SettingsModelString m_docCategoryModel;
+    private SettingsModelString m_docCategoryModel = getDocCategoryModel();
 
-    private SettingsModelDateTime m_pubDateModel;
+    private SettingsModelDateTime m_pubDateModel = getPubDateModel();
 
-    private SettingsModelString m_docTitleModelCombo;
+    private SettingsModelString m_docTitleModelCombo = getTitleStringModel();
 
-    private SettingsModelString m_docAuthorModelCombo;
+    private SettingsModelString m_docAuthorModelCombo = getAuthorsStringModel();
 
-    private SettingsModelString m_docSourceModel;
+    private SettingsModelString m_docSourceModel = getDocSourceModel();
 
-    private SettingsModelString m_docSourceModelCombo;
+    private SettingsModelString m_docSourceModelCombo = getSourceColumnModel();
 
-    private SettingsModelString m_docCatModelCombo;
+    private SettingsModelString m_docCatModelCombo = getCategoryColumnModel();
 
-    private SettingsModelString m_pubDateModelCombo;
+    private SettingsModelString m_pubDateModelCombo = getPubDateColumnModel();
 
-    private SettingsModelBoolean m_useCatColumnModel;
+    private SettingsModelBoolean m_useCatColumnModel = getUseCategoryColumnModel();
 
-    private SettingsModelBoolean m_useSourceColumnModel;
+    private SettingsModelBoolean m_useSourceColumnModel = getUseSourceColumnModel();
 
-    private SettingsModelBoolean m_useTitleColumnModel;
+    private SettingsModelBoolean m_useTitleColumnModel = getUseTitleColumnModel();
 
-    private SettingsModelBoolean m_usePubDateColumnModel;
+    private SettingsModelBoolean m_usePubDateColumnModel = getUsePubDateColumnModel();
 
-    private SettingsModelBoolean m_useAuthorsColumnModel;
+    private SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
 
-    private SettingsModelString m_docColModel;
+    private SettingsModelString m_docColModel = getDocumentColumnModel();
 
-    private SettingsModelString m_authorsSplitString;
+    private SettingsModelString m_authorsSplitString = getAuthorSplitStringModel();
 
     private DataTableSpec m_spec;
 
@@ -342,8 +342,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
         createNewGroup("Text");
         setHorizontalPlacement(true);
-        m_useTitleColumnModel = getUseTitleColumnModel();
-        m_docTitleModelCombo = getTitleStringModel();
         m_useTitleColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
         addDialogComponent(
@@ -351,8 +349,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        m_useAuthorsColumnModel = getUseAuthorsColumnModel();
-        m_docAuthorModelCombo = getAuthorsStringModel();
         m_useAuthorsColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
@@ -360,7 +356,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        m_authorsSplitString = getAuthorSplitStringModel();
         addDialogComponent(new DialogComponentString(m_authorsSplitString, "Author names separator"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
@@ -369,26 +364,20 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
         addDialogComponent(
             new DialogComponentColumnNameSelection(getTextStringModel(), "Full text", 0, StringValue.class));
-
         closeCurrentGroup();
+
         createNewGroup("Source and Category");
-        m_docSourceModel = getDocSourceModel();
         addDialogComponent(new DialogComponentString(m_docSourceModel, "Document source"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        m_useSourceColumnModel = getUseSourceColumnModel();
-        m_docSourceModelCombo = getSourceColumnModel();
         m_useSourceColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useSourceColumnModel, "Use sources from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_docSourceModelCombo, "Document source column", 0,
             StringValue.class));
         setHorizontalPlacement(false);
 
-        m_docCategoryModel = getDocCategoryModel();
         addDialogComponent(new DialogComponentString(m_docCategoryModel, "Document category"));
         setHorizontalPlacement(true);
-        m_useCatColumnModel = getUseCategoryColumnModel();
-        m_docCatModelCombo = getCategoryColumnModel();
         m_useCatColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useCatColumnModel, "Use categories from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_docCatModelCombo, "Document category column", 0,
@@ -399,10 +388,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         createNewGroup("Type and Date");
         String[] types = DocumentType.asStringList().toArray(new String[0]);
         addDialogComponent(new DialogComponentStringSelection(getTypeModel(), "Document type", types));
-        // Pub Date
-        m_pubDateModel = getPubDateModel();
-        m_pubDateModelCombo = getPubDateColumnModel();
-        m_usePubDateColumnModel = getUsePubDateColumnModel();
         DialogComponentDateTimeSelection dcs = new DialogComponentDateTimeSelection(m_pubDateModel,
             null, DisplayOption.SHOW_DATE_ONLY);
         addDialogComponent(dcs);
@@ -412,7 +397,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0,
             false, LocalDateValue.class));
         closeCurrentGroup();
-
 
         createNewGroup("Column");
         m_docColModel = getDocumentColumnModel();
