@@ -330,6 +330,8 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_docColModel;
 
+    private SettingsModelString m_authorsSplitString;
+
     private DataTableSpec m_spec;
 
     /**
@@ -358,7 +360,8 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getAuthorSplitStringModel(), "Author names separator"));
+        m_authorsSplitString = getAuthorSplitStringModel();
+        addDialogComponent(new DialogComponentString(m_authorsSplitString, "Author names separator"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         addDialogComponent(new DialogComponentString(getAuthorFirstNameModel(), "Default author first name"));
@@ -462,6 +465,9 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         }
         if (m_docColModel.getStringValue() == null || m_docColModel.getStringValue().trim().isEmpty()) {
             throw new InvalidSettingsException("Can't create new column! Column name can't be empty!");
+        }
+        if (m_useAuthorsColumnModel.getBooleanValue() && m_authorsSplitString.getStringValue().trim().isEmpty()) {
+            throw new InvalidSettingsException("Seperation string can't be empty!");
         }
         super.saveAdditionalSettingsTo(settings);
     }
