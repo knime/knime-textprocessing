@@ -183,10 +183,10 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * Creates and returns an instance of {@link SettingsModelString} specifying whether a column is used for category
+     * Creates and returns an instance of {@link SettingsModelBoolean} specifying whether a column is used for category
      * values or not.
      *
-     * @return The {@code SettingsModelString} specifying whether a column is used for category values or not.
+     * @return The {@code SettingsModelBoolean} specifying whether a column is used for category values or not.
      */
     static final SettingsModelBoolean getUseCategoryColumnModel() {
         return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_CATCOLUMN,
@@ -194,10 +194,10 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * Creates and returns an instance of {@link SettingsModelString} specifying whether a column is used for source
+     * Creates and returns an instance of {@link SettingsModelBoolean} specifying whether a column is used for source
      * values or not.
      *
-     * @return The {@code SettingsModelString} specifying whether a column is used for source values or not.
+     * @return The {@code SettingsModelBoolean} specifying whether a column is used for source values or not.
      */
     static final SettingsModelBoolean getUseSourceColumnModel() {
         return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_SOURCECOLUMN,
@@ -306,17 +306,17 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelDateTime m_pubDateModel = getPubDateModel();
 
-    private SettingsModelString m_docTitleModelCombo = getTitleStringModel();
+    private SettingsModelString m_docTitleColumnModel = getTitleStringModel();
 
-    private SettingsModelString m_docAuthorModelCombo = getAuthorsStringModel();
+    private SettingsModelString m_docAuthorColumnModel = getAuthorsStringModel();
 
     private SettingsModelString m_docSourceModel = getDocSourceModel();
 
-    private SettingsModelString m_docSourceModelCombo = getSourceColumnModel();
+    private SettingsModelString m_docSourceColumnModel = getSourceColumnModel();
 
-    private SettingsModelString m_docCatModelCombo = getCategoryColumnModel();
+    private SettingsModelString m_docCatColumnModel = getCategoryColumnModel();
 
-    private SettingsModelString m_pubDateModelCombo = getPubDateColumnModel();
+    private SettingsModelString m_pubDateColumnModel = getPubDateColumnModel();
 
     private SettingsModelBoolean m_useCatColumnModel = getUseCategoryColumnModel();
 
@@ -345,14 +345,14 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         m_useTitleColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(m_docTitleModelCombo, "Title column", 0, StringValue.class));
+            new DialogComponentColumnNameSelection(m_docTitleColumnModel, "Title column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
         m_useAuthorsColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(m_docAuthorModelCombo, "Authors column", 0, StringValue.class));
+            new DialogComponentColumnNameSelection(m_docAuthorColumnModel, "Authors column", 0, StringValue.class));
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
@@ -372,7 +372,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_useSourceColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useSourceColumnModel, "Use sources from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_docSourceModelCombo, "Document source column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(m_docSourceColumnModel, "Document source column", 0,
             StringValue.class));
         setHorizontalPlacement(false);
 
@@ -380,7 +380,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_useCatColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_useCatColumnModel, "Use categories from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_docCatModelCombo, "Document category column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(m_docCatColumnModel, "Document category column", 0,
             StringValue.class));
         setHorizontalPlacement(false);
         closeCurrentGroup();
@@ -394,7 +394,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(true);
         m_usePubDateColumnModel.addChangeListener(e -> stateChanged());
         addDialogComponent(new DialogComponentBoolean(m_usePubDateColumnModel, "Use publication date from column"));
-        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateModelCombo, "Publication date column", 0,
+        addDialogComponent(new DialogComponentColumnNameSelection(m_pubDateColumnModel, "Publication date column", 0,
             false, LocalDateValue.class));
         closeCurrentGroup();
 
@@ -421,12 +421,12 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     private void stateChanged() {
         m_docCategoryModel.setEnabled(!m_useCatColumnModel.getBooleanValue());
         m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
-        m_docSourceModelCombo.setEnabled(m_useSourceColumnModel.getBooleanValue());
-        m_docCatModelCombo.setEnabled(m_useCatColumnModel.getBooleanValue());
-        m_docTitleModelCombo.setEnabled(m_useTitleColumnModel.getBooleanValue());
-        m_docAuthorModelCombo.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
+        m_docSourceColumnModel.setEnabled(m_useSourceColumnModel.getBooleanValue());
+        m_docCatColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
+        m_docTitleColumnModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
+        m_docAuthorColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue());
-        m_pubDateModelCombo.setEnabled(m_usePubDateColumnModel.getBooleanValue());
+        m_pubDateColumnModel.setEnabled(m_usePubDateColumnModel.getBooleanValue());
     }
 
     /**
