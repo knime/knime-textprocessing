@@ -155,10 +155,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
         }
 
         // check if there already is a column named like the specified term column name
-        if (spec.findColumnIndex(m_termColModel.getStringValue()) >= 0) {
-            throw new InvalidSettingsException(
-                "Column name '" + m_termColModel.getStringValue() + "' already exists in input table.");
-        }
+        BagOfWordsNodeDialog2.checkIncludes(m_colFilterModel, spec, m_termColModel.getStringValue());
     }
 
     /**

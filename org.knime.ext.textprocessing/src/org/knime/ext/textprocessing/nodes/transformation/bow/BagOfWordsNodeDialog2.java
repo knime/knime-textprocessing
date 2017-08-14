@@ -47,7 +47,15 @@
 
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialog;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter2;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -97,6 +105,12 @@ final class BagOfWordsNodeDialog2 extends DefaultNodeSettingsPane {
         return new SettingsModelString(BagOfWordsConfigKeys2.CFG_KEY_TERM_COL, CommonColumnNames.DEF_TERM_COLNAME);
     }
 
+    private DataTableSpec m_spec;
+
+    private SettingsModelString m_termColumnModel = getTermColumnModel();
+
+    private SettingsModelColumnFilter2 m_colSelectionModel = getColumnSelectionModel();
+
     /**
      * Constructor for class {@link BagOfWordsNodeDialog2}.
      */
@@ -111,13 +125,46 @@ final class BagOfWordsNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(docColSelectionComp);
 
         // string component to define term column name
-        final DialogComponentString termColStringComp = new DialogComponentString(getTermColumnModel(), "Term column");
+        final DialogComponentString termColStringComp = new DialogComponentString(m_termColumnModel, "Term column");
         termColStringComp.setToolTipText("Name of the term column to be created");
         addDialogComponent(termColStringComp);
 
         setHorizontalPlacement(false);
         // column filter component to select output columns
-        addDialogComponent(new DialogComponentColumnFilter2(getColumnSelectionModel(), 0));
+        addDialogComponent(new DialogComponentColumnFilter2(m_colSelectionModel, 0));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        m_spec = specs[0];
+        super.loadAdditionalSettingsFrom(settings, specs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        super.saveAdditionalSettingsTo(settings);
+        if (checkIncludes(m_colSelectionModel, m_spec, m_termColumnModel.getStringValue())) {
+            throw new InvalidSettingsException("Can't create new column \"" + m_termColumnModel.getStringValue()
+            + "\" as input spec already contains column named " + m_termColumnModel.getStringValue() + "!");
+        }
+        if (m_termColumnModel.getStringValue() == null || m_termColumnModel.getStringValue().trim().isEmpty()) {
+            throw new InvalidSettingsException("Can't create new term column! Column name can't be empty!");
+        }
+    }
+
+    static boolean checkIncludes(final SettingsModelColumnFilter2 colFilter, final DataTableSpec spec, final String colName) {
+        List<String> includes = Arrays.asList(colFilter.applyTo(spec).getIncludes());
+        if (includes.contains(colName.trim())) {
+            return true;
+        }
+        return false;
     }
 
 }
