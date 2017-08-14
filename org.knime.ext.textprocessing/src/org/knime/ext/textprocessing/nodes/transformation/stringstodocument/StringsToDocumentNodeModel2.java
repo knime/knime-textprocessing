@@ -209,7 +209,6 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         } else if (m_useAuthorsColumnModel.getBooleanValue()) {
             throw new InvalidSettingsException("Name of selected author column can't be empty.");
         }
-        //TODO: Check: what exactly are those used for? Maybe empty check needed
         conf.setAuthorFirstName(m_authorFirstNameModel.getStringValue());
         conf.setAuthorLastName(m_authorLastNameModel.getStringValue());
 

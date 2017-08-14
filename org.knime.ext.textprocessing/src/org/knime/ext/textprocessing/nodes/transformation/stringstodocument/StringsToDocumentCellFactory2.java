@@ -57,6 +57,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
+import org.knime.core.data.container.CellFactory;
 import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.node.NodeLogger;
@@ -75,10 +76,11 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
- * A {@CellFactory} to build a document for each data row. The given {@StringsToDocumentConfig} instance specifies which
- * columns of the row to use as title, text authors, etc.
+ * A {@link CellFactory} implementation to build a document for each data row. The given
+ * {@code StringsToDocumentConfig2} instance specifies which columns of the row to use as title, text authors, etc.
  *
- * @author Hermann Azong, KNIME.com, Berlin, Germany
+ * @author Hermann Azong & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.5
  */
 final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
@@ -90,17 +92,16 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
     private boolean m_cacheCreated = false;
 
-    // initializing the old standard word tokenizer for backwards compatibility
     private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
-     * Creates new instance of <code>StringsToDocumentCellFactory</code> with given configuration.
+     * Creates new instance of {@code StringsToDocumentCellFactory2} with given configuration.
      *
      * @param config The configuration how to build a document.
      * @param newColSpecs The specs of the new columns that are created.
      * @param numberOfThreads The number of parallel threads to use.
-     * @param tokenizerName The tokenizer used for wordTokenization.
-     * @throws IllegalArgumentException If given configuration is <code>null</code>.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @throws IllegalArgumentException If given configuration is {@code null}.
      */
     public StringsToDocumentCellFactory2(final StringsToDocumentConfig2 config, final DataColumnSpec[] newColSpecs,
         final int numberOfThreads, final String tokenizerName) throws IllegalArgumentException {
@@ -231,13 +232,12 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
             setPublicationDate(docBuilder, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
         }
 
+        // return datacells cells
         return new DataCell[]{getDataCellCache().getInstance(docBuilder.createDocument())};
     }
 
     /**
      * Closes data cell cache.
-     *
-     * @since 2.8
      */
     @Override
     public void afterProcessing() {

@@ -54,7 +54,7 @@ import org.knime.core.node.NodeView;
 /**
  * The {@link NodeFactory} of the Strings To Document node.
  *
- * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
+ * @author Kilian Thiel & Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
 public class StringsToDocumentNodeFactory2 extends NodeFactory<StringsToDocumentNodeModel2> {
