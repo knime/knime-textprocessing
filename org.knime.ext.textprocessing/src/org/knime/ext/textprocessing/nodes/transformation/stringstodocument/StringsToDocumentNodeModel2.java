@@ -173,7 +173,6 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         if (m_titleColModel.getStringValue() != null && !m_titleColModel.getStringValue().isEmpty()) {
             if (spec.containsName(m_titleColModel.getStringValue())
                 && spec.getColumnSpec(m_titleColModel.getStringValue()).getType().isCompatible(StringValue.class)) {
-                conf.setDocTitle(m_titleColModel.getStringValue());
                 conf.setTitleColumnIndex(spec.findColumnIndex(m_titleColModel.getStringValue()));
             } else {
                 throw new InvalidSettingsException("Column '" + m_titleColModel.getStringValue()

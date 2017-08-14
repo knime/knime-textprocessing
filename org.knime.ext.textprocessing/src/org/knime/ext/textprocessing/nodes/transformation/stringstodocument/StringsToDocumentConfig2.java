@@ -152,8 +152,6 @@ class StringsToDocumentConfig2 {
 
     private boolean m_usePubDateColumn;
 
-    private String m_docTitle;
-
     private String m_authorFirstName;
 
     private String m_authorLastName;
@@ -175,14 +173,6 @@ class StringsToDocumentConfig2 {
 
     void setUseTitleColumn(final boolean useTitleColumn) {
         this.m_useTitleColumn = useTitleColumn;
-    }
-
-    String getDocTitle() {
-        return m_docTitle;
-    }
-
-    void setDocTitle(final String docTitle) {
-        this.m_docTitle = docTitle;
     }
 
     int getTitleColumnIndex() {
