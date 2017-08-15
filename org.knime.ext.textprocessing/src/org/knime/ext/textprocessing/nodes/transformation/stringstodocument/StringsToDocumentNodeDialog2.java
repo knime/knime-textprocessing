@@ -60,6 +60,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
@@ -68,6 +69,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.util.ButtonGroupEnumInterface;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -302,6 +304,17 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
             StringsToDocumentConfig2.DEF_DOC_COLUMN);
     }
 
+    /**
+     * Creates and returns an instance of {@link SettingsModelString}, storing the name of the title to be set if the
+     * title column setting is not used.
+     *
+     * @return The {@code SettingsModelString} storing the name of the title.
+     */
+    static final SettingsModelString getTitleModeModel() {
+        return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_TITLEMODE,
+            StringsToDocumentConfig2.DEF_TITLEMODE);
+    }
+
     private SettingsModelString m_docCategoryModel = getDocCategoryModel();
 
     private SettingsModelDateTime m_pubDateModel = getPubDateModel();
@@ -332,6 +345,8 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelString m_authorsSplitString = getAuthorSplitStringModel();
 
+    private SettingsModelString m_titleModeModel = getTitleModeModel();
+
     private DataTableSpec m_spec;
 
     /**
@@ -346,6 +361,15 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
         addDialogComponent(
             new DialogComponentColumnNameSelection(m_docTitleColumnModel, "Title column", 0, StringValue.class));
+
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        ButtonGroupEnumInterface[] titleModes = new ButtonGroupEnumInterface[2];
+        titleModes[0] =
+            new TitleModeButtonGroup("Row ID", true, "Sets row ID as title", StringsToDocumentConfig2.TITLEMODE_ROWID);
+        titleModes[1] = new TitleModeButtonGroup("Empty string", false, "Sets empty string as title",
+            StringsToDocumentConfig2.TITLEMODE_EMPTY_STRING);
+        addDialogComponent(new DialogComponentButtonGroup(m_titleModeModel, null, false, titleModes));
 
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
@@ -428,6 +452,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue() || !m_usePubDateColumnModel.isEnabled());
         m_pubDateColumnModel
             .setEnabled(m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled());
+        m_titleModeModel.setEnabled(!m_useTitleColumnModel.getBooleanValue());
     }
 
     /**
@@ -456,6 +481,56 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
             throw new InvalidSettingsException("Seperation string can't be empty!");
         }
         super.saveAdditionalSettingsTo(settings);
+    }
+
+    private final class TitleModeButtonGroup implements ButtonGroupEnumInterface {
+        private String m_text;
+
+        private String m_tooltip;
+
+        private boolean m_default;
+
+        private String m_command;
+
+        private TitleModeButtonGroup(final String text, final boolean isDefault, final String toolTip,
+            final String command) {
+            m_text = text;
+            m_tooltip = toolTip;
+            m_default = isDefault;
+            m_command = command;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getActionCommand() {
+            return m_command;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getText() {
+            return m_text;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getToolTip() {
+            return m_tooltip;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDefault() {
+            return m_default;
+        }
     }
 
 }

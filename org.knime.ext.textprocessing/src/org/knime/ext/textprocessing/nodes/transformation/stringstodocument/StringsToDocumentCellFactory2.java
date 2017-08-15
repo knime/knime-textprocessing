@@ -157,7 +157,7 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
             if (!titleCell.isMissing()) {
                 docBuilder.addTitle(((StringValue)titleCell).getStringValue());
             }
-        } else {
+        } else if (m_config.getTitleMode().contentEquals(StringsToDocumentConfig2.TITLEMODE_ROWID)) {
             docBuilder.addTitle(row.getKey().toString());
         }
 

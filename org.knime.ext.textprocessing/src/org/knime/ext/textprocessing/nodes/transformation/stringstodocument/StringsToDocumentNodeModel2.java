@@ -130,6 +130,8 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
 
     private final SettingsModelString m_docColumnModel = StringsToDocumentNodeDialog2.getDocumentColumnModel();
 
+    private final SettingsModelString m_titleModeModel = StringsToDocumentNodeDialog2.getTitleModeModel();
+
     /**
      * Creates new instance of {@code StringsToDocumentNodeModel2}.
      */
@@ -181,6 +183,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         } else if (m_useTitleColumnModel.getBooleanValue()) {
             throw new InvalidSettingsException("Name of selected title column can't be empty.");
         }
+        conf.setTitleMode(m_titleModeModel.getStringValue());
 
         // Fulltext
         if (m_fulltextColModel.getStringValue() != null && !m_fulltextColModel.getStringValue().isEmpty()) {
@@ -330,6 +333,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         m_usePubDateColumnModel.loadSettingsFrom(settings);
         m_tokenizerModel.loadSettingsFrom(settings);
         m_docColumnModel.loadSettingsFrom(settings);
+        m_titleModeModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -358,6 +362,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         m_authorLastNameModel.saveSettingsTo(settings);
         m_tokenizerModel.saveSettingsTo(settings);
         m_docColumnModel.saveSettingsTo(settings);
+        m_titleModeModel.saveSettingsTo(settings);
     }
 
     /**
@@ -386,6 +391,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         m_usePubDateColumnModel.validateSettings(settings);
         m_tokenizerModel.validateSettings(settings);
         m_docColumnModel.validateSettings(settings);
+        m_titleModeModel.validateSettings(settings);
     }
 
     /**
@@ -415,6 +421,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
         m_authorsColModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         m_pubDateColModel.setEnabled(m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled());
         m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue() || !m_usePubDateColumnModel.isEnabled());
+        m_titleModeModel.setEnabled(!m_useTitleColumnModel.getBooleanValue());
     }
 
     private void doSmartDialogSelection(final DataTableSpec dataTableSpec) {

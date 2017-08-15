@@ -130,6 +130,21 @@ class StringsToDocumentConfig2 {
      */
     static final int MIN_THREADS = 1;
 
+    /**
+     * The key for the set row id as title setting.
+     */
+    static final String TITLEMODE_ROWID = "Row ID";
+
+    /**
+     * The key for the set empty string as title setting.
+     */
+    static final String TITLEMODE_EMPTY_STRING = "Empty string";
+
+    /**
+     * The default value title mode setting.
+     */
+    static final String DEF_TITLEMODE = TITLEMODE_ROWID;
+
     private int m_titleColumnIndex;
 
     private int m_fulltextColumnIndex;
@@ -166,6 +181,8 @@ class StringsToDocumentConfig2 {
 
     private LocalDate m_publicationDate;
 
+    private String m_titleMode;
+
     // getter and setter for document title members
     boolean getUseTitleColumn() {
         return m_useTitleColumn;
@@ -181,6 +198,14 @@ class StringsToDocumentConfig2 {
 
     void setTitleColumnIndex(final int titleColumnIndex) {
         m_titleColumnIndex = titleColumnIndex;
+    }
+
+    void setTitleMode(final String titleMode) {
+        m_titleMode = titleMode;
+    }
+
+    String getTitleMode() {
+        return m_titleMode;
     }
 
     // getter and setter for author members

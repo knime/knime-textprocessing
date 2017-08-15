@@ -162,4 +162,9 @@ final class StringsToDocumentConfigKeys2 {
      * The configuration key of the document column name.
      */
     static final String CFGKEY_DOCCOLUMN = "Document column";
+
+    /**
+     * The configuration key of the title mode setting.
+     */
+    static final String CFGKEY_TITLEMODE = "Title mode";
 }
