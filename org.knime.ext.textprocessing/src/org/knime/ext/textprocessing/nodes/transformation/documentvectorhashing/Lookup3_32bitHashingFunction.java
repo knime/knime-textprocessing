@@ -48,10 +48,10 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing;
 
-import org.streaminer.util.hash.Lookup3Hash;
+import org.apache.solr.common.util.Hash;
 
 /**
- * An implementation of lookup3 32 bits hash function {@link org.streaminer.util.hash.Lookup3Hash}
+ * An implementation of lookup3 32 bits hash function {@link org.apache.solr.common.util.Hash}
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  * @since 3.3
@@ -70,7 +70,7 @@ public class Lookup3_32bitHashingFunction implements HashingFunction {
      */
     @Override
     public int hash(final String term, final int seed) {
-        return Lookup3Hash.lookup3ycs(term.subSequence(0, term.length()), 0, term.length(), seed);
+        return Hash.lookup3ycs(term.subSequence(0, term.length()), 0, term.length(), seed);
     }
 
     /**
