@@ -141,9 +141,14 @@ class StringsToDocumentConfig2 {
     static final String TITLEMODE_EMPTY_STRING = "Empty string";
 
     /**
+     * The key for the set column content as title setting.
+     */
+    static final String TITLEMODE_COLUMN = "Column";
+
+    /**
      * The default value title mode setting.
      */
-    static final String DEF_TITLEMODE = TITLEMODE_ROWID;
+    static final String DEF_TITLEMODE = TITLEMODE_COLUMN;
 
     private int m_titleColumnIndex;
 

@@ -207,17 +207,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * Creates and return an instance of {@link SettingsModelBoolean} specifying whether a column is used for title
-     * values or not
-     *
-     * @return The {@code SettingsModelBoolean} specifying whether a column is used for title values or not
-     */
-    static final SettingsModelBoolean getUseTitleColumnModel() {
-        return new SettingsModelBoolean(StringsToDocumentConfigKeys2.CFGKEY_USE_TITLECOLUMN,
-            StringsToDocumentConfig2.DEF_USE_TITLECOLUMN);
-    }
-
-    /**
      * Creates and return an instance of {@link SettingsModelBoolean} specifying whether a column is used for authors
      * values or not
      *
@@ -335,8 +324,6 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_useSourceColumnModel = getUseSourceColumnModel();
 
-    private SettingsModelBoolean m_useTitleColumnModel = getUseTitleColumnModel();
-
     private SettingsModelBoolean m_usePubDateColumnModel = getUsePubDateColumnModel();
 
     private SettingsModelBoolean m_useAuthorsColumnModel = getUseAuthorsColumnModel();
@@ -355,42 +342,26 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public StringsToDocumentNodeDialog2() {
 
-        createNewGroup("Text");
-        setHorizontalPlacement(true);
-        m_useTitleColumnModel.addChangeListener(e -> stateChanged());
-        addDialogComponent(new DialogComponentBoolean(m_useTitleColumnModel, "Use title from column"));
-        addDialogComponent(
-            new DialogComponentColumnNameSelection(m_docTitleColumnModel, "Title column", 0, StringValue.class));
-
-        setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
-        ButtonGroupEnumInterface[] titleModes = new ButtonGroupEnumInterface[2];
-        titleModes[0] =
-            new TitleModeButtonGroup("Row ID", true, "Sets row ID as title", StringsToDocumentConfig2.TITLEMODE_ROWID);
-        titleModes[1] = new TitleModeButtonGroup("Empty string", false, "Sets empty string as title",
+        createNewGroup("Title");
+        ButtonGroupEnumInterface[] titleModes = new ButtonGroupEnumInterface[3];
+        m_titleModeModel.addChangeListener(e -> stateChanged());
+        titleModes[0] = new TitleModeButtonGroup("Column", true, "Sets title from title column",
+            StringsToDocumentConfig2.TITLEMODE_COLUMN);
+        titleModes[1] =
+            new TitleModeButtonGroup("Row ID", false, "Sets row ID as title", StringsToDocumentConfig2.TITLEMODE_ROWID);
+        titleModes[2] = new TitleModeButtonGroup("Empty string", false, "Sets empty string as title",
             StringsToDocumentConfig2.TITLEMODE_EMPTY_STRING);
         addDialogComponent(new DialogComponentButtonGroup(m_titleModeModel, null, false, titleModes));
-
         setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
-        m_useAuthorsColumnModel.addChangeListener(e -> stateChanged());
-        addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
         addDialogComponent(
-            new DialogComponentColumnNameSelection(m_docAuthorColumnModel, "Authors column", 0, StringValue.class));
-
-        setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(m_authorsSplitString, "Author names separator"));
-        setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getAuthorFirstNameModel(), "Default author first name"));
-        addDialogComponent(new DialogComponentString(getAuthorLastNameModel(), "Default author last name"));
-        setHorizontalPlacement(false);
+            new DialogComponentColumnNameSelection(m_docTitleColumnModel, "Title column", 0, StringValue.class));
+        closeCurrentGroup();
+        createNewGroup("Text");
         addDialogComponent(
             new DialogComponentColumnNameSelection(getTextStringModel(), "Full text", 0, StringValue.class));
         closeCurrentGroup();
 
-        createNewGroup("Source and Category");
+        createNewGroup("Meta Information");
         addDialogComponent(new DialogComponentString(m_docSourceModel, "Document source"));
         setHorizontalPlacement(false);
         setHorizontalPlacement(true);
@@ -406,6 +377,20 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(m_useCatColumnModel, "Use categories from column"));
         addDialogComponent(new DialogComponentColumnNameSelection(m_docCatColumnModel, "Document category column", 0,
             StringValue.class));
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        m_useAuthorsColumnModel.addChangeListener(e -> stateChanged());
+        addDialogComponent(new DialogComponentBoolean(m_useAuthorsColumnModel, "Use authors from column"));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(m_docAuthorColumnModel, "Authors column", 0, StringValue.class));
+
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentString(m_authorsSplitString, "Author names separator"));
+        setHorizontalPlacement(false);
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentString(getAuthorFirstNameModel(), "Default author first name"));
+        addDialogComponent(new DialogComponentString(getAuthorLastNameModel(), "Default author last name"));
         setHorizontalPlacement(false);
         closeCurrentGroup();
 
@@ -440,6 +425,8 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
             .map(e -> e.getKey()).collect(Collectors.toList());
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
         closeCurrentGroup();
+
+        stateChanged();
     }
 
     private void stateChanged() {
@@ -447,12 +434,12 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
         m_docSourceModel.setEnabled(!m_useSourceColumnModel.getBooleanValue());
         m_docSourceColumnModel.setEnabled(m_useSourceColumnModel.getBooleanValue());
         m_docCatColumnModel.setEnabled(m_useCatColumnModel.getBooleanValue());
-        m_docTitleColumnModel.setEnabled(m_useTitleColumnModel.getBooleanValue());
+        m_docTitleColumnModel
+            .setEnabled(m_titleModeModel.getStringValue().equals(StringsToDocumentConfig2.TITLEMODE_COLUMN));
         m_docAuthorColumnModel.setEnabled(m_useAuthorsColumnModel.getBooleanValue());
         m_pubDateModel.setEnabled(!m_usePubDateColumnModel.getBooleanValue() || !m_usePubDateColumnModel.isEnabled());
         m_pubDateColumnModel
             .setEnabled(m_usePubDateColumnModel.getBooleanValue() && m_usePubDateColumnModel.isEnabled());
-        m_titleModeModel.setEnabled(!m_useTitleColumnModel.getBooleanValue());
     }
 
     /**

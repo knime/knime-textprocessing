@@ -64,11 +64,6 @@ final class StringsToDocumentConfigKeys2 {
     static final String CFGKEY_TITLECOL = "TitleCol";
 
     /**
-     * The configuration key of the "use title column" setting.
-     */
-    static final String CFGKEY_USE_TITLECOLUMN = "useTitleColumn";
-
-    /**
      * The configuration key of the text column.
      */
     static final String CFGKEY_TEXTCOL = "TextCol";
