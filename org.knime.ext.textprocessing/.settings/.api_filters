@@ -1,43 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.ext.textprocessing" version="2">
-    <resource path="META-INF/MANIFEST.MF">
-        <filter id="923795461">
-            <message_arguments>
-                <message_argument value="3.1.0"/>
-                <message_argument value="3.0.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="923795461">
-            <message_arguments>
-                <message_argument value="3.4.0"/>
-                <message_argument value="3.3.1"/>
-            </message_arguments>
-        </filter>
-        <filter id="923795461">
-            <message_arguments>
-                <message_argument value="3.5.0"/>
-                <message_argument value="3.4.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="924844039">
-            <message_arguments>
-                <message_argument value="2.10.1"/>
-                <message_argument value="2.10.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="924844039">
-            <message_arguments>
-                <message_argument value="3.3.0"/>
-                <message_argument value="3.3.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="924844039">
-            <message_arguments>
-                <message_argument value="3.3.1"/>
-                <message_argument value="3.3.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
     <resource path="META-INF/MANIFEST.MF" type="edu.stanford.nlp.ling.AbstractCoreLabel">
         <filter id="403984517">
             <message_arguments>
@@ -62,68 +24,6 @@
                 <message_argument value="opennlp.tools.tokenize.TokenizerEvaluationMonitor"/>
                 <message_argument value="opennlp.tools.util.eval.EvaluationMonitor"/>
                 <message_argument value="correctlyClassified(T, T)"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.TextprocessingStartup">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.TextprocessingStartup"/>
-                <message_argument value="org.knime.ext.textprocessing_3.2.0"/>
-            </message_arguments>
-        </filter>
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.TextprocessingStartup"/>
-                <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilter">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.tagfilter.TagFilter"/>
-                <message_argument value="org.knime.ext.textprocessing_3.1.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSentenceTokenizer">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSentenceTokenizer"/>
-                <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizer">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizer"/>
-                <message_argument value="org.knime.ext.textprocessing_3.4.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizerFactory">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.OpenNlpGermanWordTokenizerFactory"/>
-                <message_argument value="org.knime.ext.textprocessing_3.4.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizer">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizer"/>
-                <message_argument value="org.knime.ext.textprocessing_3.4.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizerFactory">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.tokenizer.word.StanfordNlpSpanishTokenizerFactory"/>
-                <message_argument value="org.knime.ext.textprocessing_3.4.0"/>
             </message_arguments>
         </filter>
     </resource>
