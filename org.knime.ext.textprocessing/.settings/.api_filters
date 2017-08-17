@@ -13,6 +13,12 @@
                 <message_argument value="3.3.1"/>
             </message_arguments>
         </filter>
+        <filter id="923795461">
+            <message_arguments>
+                <message_argument value="3.5.0"/>
+                <message_argument value="3.4.0"/>
+            </message_arguments>
+        </filter>
         <filter id="924844039">
             <message_arguments>
                 <message_argument value="2.10.1"/>
@@ -29,6 +35,33 @@
             <message_arguments>
                 <message_argument value="3.3.1"/>
                 <message_argument value="3.3.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="edu.stanford.nlp.ling.AbstractCoreLabel">
+        <filter id="403984517">
+            <message_arguments>
+                <message_argument value="edu.stanford.nlp.ling.AbstractCoreLabel"/>
+                <message_argument value="edu.stanford.nlp.util.TypesafeMap"/>
+                <message_argument value="has(Class&lt;? extends TypesafeMap.Key&lt;VALUE&gt;&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="edu.stanford.nlp.process.TokenizerFactory">
+        <filter id="403984517">
+            <message_arguments>
+                <message_argument value="edu.stanford.nlp.process.TokenizerFactory"/>
+                <message_argument value="edu.stanford.nlp.objectbank.IteratorFromReaderFactory"/>
+                <message_argument value="getIterator(Reader)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="META-INF/MANIFEST.MF" type="opennlp.tools.tokenize.TokenizerEvaluationMonitor">
+        <filter id="403984517">
+            <message_arguments>
+                <message_argument value="opennlp.tools.tokenize.TokenizerEvaluationMonitor"/>
+                <message_argument value="opennlp.tools.util.eval.EvaluationMonitor"/>
+                <message_argument value="correctlyClassified(T, T)"/>
             </message_arguments>
         </filter>
     </resource>
@@ -58,14 +91,6 @@
         <filter id="305324134">
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpSentenceTokenizer"/>
-                <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpWordTokenizer">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.OpenNlpWordTokenizer"/>
                 <message_argument value="org.knime.ext.textprocessing_3.3.0"/>
             </message_arguments>
         </filter>
@@ -742,14 +767,6 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/knime/ext/textprocessing/nodes/tagging/dict/DictionaryDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryDocumentTagger">
-        <filter id="338722907">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryDocumentTagger"/>
-                <message_argument value="DictionaryDocumentTagger(boolean, Set&lt;String&gt;, Tag, boolean)"/>
-            </message_arguments>
-        </filter>
-    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/tagging/opennlpner/OpennlpNerDocumentTagger.java" type="org.knime.ext.textprocessing.nodes.tagging.opennlpner.OpennlpNerDocumentTagger">
         <filter id="338722907">
             <message_arguments>
@@ -803,20 +820,6 @@
             <message_arguments>
                 <message_argument value="org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory"/>
                 <message_argument value="getMaxPoolSize()"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/ext/textprocessing/nodes/transformation/stringstodocument/StringsToDocumentCellFactory.java" type="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory">
-        <filter id="338722907">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory"/>
-                <message_argument value="StringsToDocumentCellFactory(StringsToDocumentConfig, ExecutionContext, DataColumnSpec[], int)"/>
-            </message_arguments>
-        </filter>
-        <filter id="338792546">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.transformation.stringstodocument.StringsToDocumentCellFactory"/>
-                <message_argument value="closeCache()"/>
             </message_arguments>
         </filter>
     </resource>
