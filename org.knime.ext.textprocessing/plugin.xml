@@ -853,61 +853,51 @@
          point="org.knime.ext.textprocessing.StanfordTaggerModel">
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishBidirectionalModel"
-            Type="Part-Of-Speech"
             name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishBidirectionalModel"
             type="Part-Of-Speech">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishLeft3WordsCaselessModel"
-            Type="Part-Of-Speech"
             name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishLeft3WordsCaselessModel"
             type="Part-Of-Speech">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishLeft3WordsModel"
-            Type="Part-Of-Speech"
             name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishLeft3WordsModel"
             type="Part-Of-Speech">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English7ClassesNoDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English7ClassesNoDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English7ClassesDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English7ClassesDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English4ClassesNoDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English4ClassesNoDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesNoWikiCaselessDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesNoWikiCaselessDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English4ClassesDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English4ClassesDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesNoDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesNoDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
       <StanfordTaggerModel
             StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel"
-            Type="Named Entity Recognition"
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
