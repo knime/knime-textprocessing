@@ -8,7 +8,8 @@ Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.knime.core;bundle-version="3.4.0",
- org.knime.ext.textprocessing;bundle-version="3.4.0"
+ org.knime.ext.textprocessing;bundle-version="3.4.0",
+ org.apache.pdfbox.fontbox;bundle-version="2.0.7"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: knime-textprocessing-french.jar
