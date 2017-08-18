@@ -151,8 +151,8 @@ final class BagOfWordsNodeDialog2 extends DefaultNodeSettingsPane {
     public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         super.saveAdditionalSettingsTo(settings);
         if (checkIncludes(m_colSelectionModel, m_spec, m_termColumnModel.getStringValue())) {
-            throw new InvalidSettingsException("Can't create new column \"" + m_termColumnModel.getStringValue()
-            + "\" as input spec already contains column named " + m_termColumnModel.getStringValue() + "!");
+            throw new InvalidSettingsException("Can't create new column '" + m_termColumnModel.getStringValue()
+            + "' as input spec already contains column named '" + m_termColumnModel.getStringValue() + "'!");
         }
         if (m_termColumnModel.getStringValue() == null || m_termColumnModel.getStringValue().trim().isEmpty()) {
             throw new InvalidSettingsException("Can't create new term column! Column name can't be empty!");
