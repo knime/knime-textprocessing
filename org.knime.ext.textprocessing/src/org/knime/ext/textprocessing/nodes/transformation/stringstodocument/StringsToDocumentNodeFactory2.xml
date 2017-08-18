@@ -12,32 +12,13 @@
             full text. Furthermore the defined category, source, type, and
             date will be set.
         </intro>
-        <option name="Use title from column">
-            If checked, the string values of the specified column will be used
-            as title.
-        </option>
         <option name="Title">
+            The selection to define whether to set the content of a column, the row ids or empty strings as title.
+        </option>
+        <option name="Title column">
             The column containing the string which is used as title. (if "Use title from column" is checked, otherwise a default title will be generated).
         </option>
-        <option name="Use author(s) from column">
-            If checked, the string values of the specified column will be used
-            as author(s).
-        </option>
-        <option name="Authors">
-            The column containing the string which is split up
-            and used as author names. (if "Use authors from column" is checked, otherwise the values of the labels 
-            "Default author first name" and "Default author last name" will be set as author names).
-        </option>
-        <option name="Author name separator">
-            The string separating the author names.
-        </option>
-        <option name="Default author first name">
-            The default author first name if author first name is missing.
-        </option>
-                <option name="Default author last name">
-            The default author last name if author last name is missing.
-        </option>
-                <option name="Full text">
+        <option name="Full text">
             The column containing the string which is used as text.
         </option>
         <option name="Document source">
@@ -64,24 +45,38 @@
             The column containing the string used as category. No category is 
             set for missing values.
         </option>
+        <option name="Use author(s) from column">
+            If checked, the string values of the specified column will be used
+            as author(s).
+        </option>
+        <option name="Authors column">
+            The column containing the author's names as a string which is split by the separation string.
+            The string contained in the specified columns should follow this pattern: 
+            FirstName LastName, FirstName LastName, ... (comma as separation string)
+            Second names will be appended to the first name.            
+        </option>
+        <option name="Author name separator">
+            The string separating the author names contained in the authors column.
+        </option>
+        <option name="Default author first name">
+            The default author first name if "use author(s) from column" is unchecked.
+        </option>
+                <option name="Default author last name">
+            The default author last name if "use author(s) from column" is unchecked.
+        </option>
         <option name="Document type">
             The type which is set to all documents.
         </option>
-        <option name="Publication date">
+        <option name="Date">
             The publication date as which is set to all documents (if 
             "Use publication date from column" is not checked).
-            The date has to be formatted like "dd-mm-yyy". Two digits
-            to specify the day, two to specify the month and four to
-            specify the year. The specified date has to be a valid date.
         </option>
         <option name="Use publication date from column">
-            If checked, the string value of the specified column will be used as document publication date.
-            This node also allows Date columns as an input columns.
+            If checked, the date value of the specified column will be used as document publication date.
         </option>
         <option name="Publication date column">
-            The column containing the string which is used as publication date. (if "Use publication date from column" 
-            is checked, otherwise the current date from "Publication date" field is set as date). The date has to be
-            formatted like "dd-mm-yyy".
+            The column containing the date which is used as publication date. (if "Use publication date from column" 
+            is checked, otherwise the current date from "Publication date" field is set as date).
         </option>
         <option name="Document column">
             Specify the name of the document column to be created.
