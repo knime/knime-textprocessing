@@ -217,7 +217,7 @@ final class StringsToDocumentNodeModel2 extends SimpleStreamableFunctionNodeMode
             && !m_authorNameSeparator.getStringValue().trim().isEmpty()) {
             conf.setAuthorsSplitChar(m_authorNameSeparator.getStringValue());
         } else if (m_useAuthorsColumnModel.getBooleanValue()) {
-            throw new InvalidSettingsException("Seperation string cannot be empty.");
+            throw new InvalidSettingsException("Separation string cannot be empty.");
         }
 
         // Document source
