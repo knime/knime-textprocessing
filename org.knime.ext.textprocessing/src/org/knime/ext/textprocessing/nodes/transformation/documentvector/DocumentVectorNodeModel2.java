@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -285,6 +286,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         List<DoubleCell> featureVector = initFeatureVector(featureIndexTable.size());
 
         long numberOfRows = sortedTable.size();
+        AtomicLong rowid = new AtomicLong(0);
         int currRow = 1;
         it = sortedTable.iterator();
         while (it.hasNext()) {
@@ -320,9 +322,9 @@ class DocumentVectorNodeModel2 extends NodeModel {
 
                 DataRow newRow;
                 if (m_asCollectionModel.getBooleanValue()) {
-                    newRow = createDataRowAsCollection(lastDoc, featureVector);
+                    newRow = createDataRowAsCollection(lastDoc, featureVector, rowid.getAndIncrement());
                 } else {
-                    newRow = createDataRowAsColumns(lastDoc, featureVector);
+                    newRow = createDataRowAsColumns(lastDoc, featureVector, rowid.getAndIncrement());
                 }
                 dc.addRowToTable(newRow);
                 // create new feature vector
@@ -344,9 +346,9 @@ class DocumentVectorNodeModel2 extends NodeModel {
             if (currRow == numberOfRows) {
                 DataRow newRow;
                 if (m_asCollectionModel.getBooleanValue()) {
-                    newRow = createDataRowAsCollection(currDoc, featureVector);
+                    newRow = createDataRowAsCollection(currDoc, featureVector, rowid.getAndIncrement());
                 } else {
-                    newRow = createDataRowAsColumns(currDoc, featureVector);
+                    newRow = createDataRowAsColumns(currDoc, featureVector, rowid.getAndIncrement());
                 }
                 dc.addRowToTable(newRow);
             }
@@ -365,22 +367,20 @@ class DocumentVectorNodeModel2 extends NodeModel {
                     m_documentColModel.getStringValue(), m_asCollectionModel.getBooleanValue(), featureColumnNames))};
     }
 
-    private long m_rowKeyNr = 0;
-
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
-    private DataRow createDataRowAsCollection(final Document doc, final List<DoubleCell> featureVector) {
-        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
-        m_rowKeyNr++;
+    private DataRow createDataRowAsCollection(final Document doc, final List<DoubleCell> featureVector,
+        final long rowKeyNr) {
+        final RowKey rowKey = RowKey.createRowKey(rowKeyNr);
         final DataCell docCell = m_documentCellFac.createDataCell(doc);
         final DataCell vectorCell = CollectionCellFactory.createSparseListCell(featureVector, DEFAULT_CELL);
 
         return new DefaultRow(rowKey, new DataCell[]{docCell, vectorCell});
     }
 
-    private DataRow createDataRowAsColumns(final Document doc, final List<DoubleCell> featureVector) {
-        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
-        m_rowKeyNr++;
+    private DataRow createDataRowAsColumns(final Document doc, final List<DoubleCell> featureVector,
+        final long rowKeyNr) {
+        final RowKey rowKey = RowKey.createRowKey(rowKeyNr);
         final DataCell[] cells = new DataCell[featureVector.size() + 1];
         cells[0] = m_documentCellFac.createDataCell(doc);
         for (int i = 0; i < cells.length - 1; i++) {
