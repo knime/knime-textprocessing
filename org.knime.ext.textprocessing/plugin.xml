@@ -833,6 +833,14 @@
             specClass="org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec"
             specSerializer="org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec$Serializer">
       </portType>
+      <portType
+            hidden="false"
+            name="DocumentVectorPortObject"
+            objectClass="org.knime.ext.textprocessing.data.DocumentVectorPortObject"
+            objectSerializer="org.knime.ext.textprocessing.data.DocumentVectorPortObject$DocumentVectorPortObjectSerializer"
+            specClass="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec"
+            specSerializer="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec$Serializer">
+      </portType>
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TokenizerFactory">
