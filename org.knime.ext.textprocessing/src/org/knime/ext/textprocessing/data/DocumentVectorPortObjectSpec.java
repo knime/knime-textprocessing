@@ -173,7 +173,7 @@ public class DocumentVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
         htmlText.append("<tr class=\"odd\"><td>Vector Value</td><td>").append(m_vectorValue).append("</td></tr>\n");
         htmlText.append("<tr class=\"even\"><td>As Collection Cell</td><td>").append(m_asCollectionCell)
             .append("</td></tr>\n");
-        htmlText.append("<tr class=\"even\"><td>Feature Space Columns</td><td>")
+        htmlText.append("<tr class=\"odd\"><td>Feature Space Columns</td><td>")
             .append(String.join(", ", m_featureSpaceColumns)).append("</td></tr>\n");
         htmlText.append("</table></body></html>");
         JEditorPane tablePane = new JEditorPane("text/html", "");
