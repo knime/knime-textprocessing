@@ -88,9 +88,12 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.util.UniqueNameGenerator;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.DocumentVectorPortObject;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
@@ -156,7 +159,10 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
      * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
      */
     DocumentVectorAdapterNodeModel2() {
-        super(2, 1);
+        super(
+            new PortType[]{BufferedDataTable.TYPE,
+                PortTypeRegistry.getInstance().getPortType(DocumentVectorPortObject.class, false)},
+            new PortType[]{BufferedDataTable.TYPE});
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_booleanModel.addChangeListener(new InternalChangeListener());
         checkUncheck();
