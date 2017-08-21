@@ -61,15 +61,16 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 /**
  * Provides the dialog of the document vector node.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian Thiel & Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
 class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of
-     * <code>SettingsModelBoolean</code> specifying if a bitvector have to
-     * be created or not.
+     * Creates and returns an instance of {@link SettingsModelBoolean} specifying if a bitvector
+     * has to be created or not.
+     *
+     * @return A {@code SettingsModelBoolean} specifying if a bitvector has to be created or not.
      */
     static final SettingsModelBoolean getBooleanModel() {
         return new SettingsModelBoolean(DocumentVectorConfigKeys2.CFGKEY_BOOLEAN,
@@ -77,9 +78,10 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of
-     * <code>SettingsModelBoolean</code> specifying if a collection cell has
+     * Creates and returns an instance of {@link SettingsModelBoolean} specifying if a collection cell has
      * to be created or not.
+     *
+     * @return A {@code SettingsModelBoolean} specifying if a collection cell has to be created or not.
      */
     static final SettingsModelBoolean getAsCollectionModel() {
         return new SettingsModelBoolean(
@@ -88,9 +90,10 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns an instance of
-     * <code>SettingsModelString</code> containing the name of the column with
+     * Creates and returns an instance of {@link SettingsModelString} containing the name of the column with
      * the vector values to use.
+     *
+     * @return A {@code SettingsModelString} containing the name of the column with the vector values to use.
      */
     static final SettingsModelString getColumnModel() {
         return new SettingsModelString(
@@ -99,18 +102,19 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * @return Creates and returns a new instance of
-     * <code>SettingsModelString</code> containing the name of the document
-     * column.
+     * Creates and returns a new instance of {@link SettingsModelString} containing the name of the document column.
+     *
+     * @return A {@code SettingsModelString} containing the name of the document column.
      */
     static final SettingsModelString getDocumentColModel() {
         return new SettingsModelString(DocumentVectorConfigKeys2.CFGKEY_DOC_COL, "");
     }
 
     /**
-     * @return Creates and returns a new instance of
-     * <code>SettingsModelBoolean</code> specifying whether tags will be ignored
+     * Creates and returns a new instance of {@link SettingsModelBoolean} specifying whether tags will be ignored
      * or not.
+     *
+     * @return A {@code SettingsModelBoolean} specifying whether tags will be ignored or not.
      */
     static final SettingsModelBoolean getIgnoreTagsModel() {
         return new SettingsModelBoolean(
@@ -118,13 +122,12 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
                 DocumentVectorNodeModel2.DEFAULT_IGNORE_TAGS);
     }
 
-
     private SettingsModelString m_columnModel;
 
     private SettingsModelBoolean m_booleanModel;
 
     /**
-     * Creates a new instance of <code>DocumentVectorNodeDialog</code>.
+     * Creates a new instance of {@code DocumentVectorNodeDialog2}.
      */
     @SuppressWarnings("unchecked")
     DocumentVectorNodeDialog2() {

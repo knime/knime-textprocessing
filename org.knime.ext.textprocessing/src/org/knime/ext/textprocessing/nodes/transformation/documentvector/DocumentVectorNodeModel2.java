@@ -104,13 +104,13 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * The model of the document vector node, creates a document feature vector for each document. As features all term of
  * the given bag of words are used. As vector values, a column can be specified or bit vectors can be created.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian Thiel & Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
 class DocumentVectorNodeModel2 extends NodeModel {
 
     /**
-     * The default setting of the creation of bit vectors. By default bit vectors are created (<code>true</code>).
+     * The default setting of the creation of bit vectors. By default bit vectors are created ({@code true}).
      */
     static final boolean DEFAULT_BOOLEAN = true;
 
@@ -146,7 +146,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
     private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog2.getAsCollectionModel();
 
     /**
-     * Creates a new instance of <code>DocumentVectorNodeModel</code>.
+     * Creates a new instance of {@code DocumentVectorNodeModel}.
      */
     DocumentVectorNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,

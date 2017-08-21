@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 /**
  * Provides the configuration keys for the document vector node.
  *
- * @author Kilian Thiel, University of Konstanz
+ * @author Kilian Thiel & Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
 final class DocumentVectorConfigKeys2 {
