@@ -47,9 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -140,7 +137,7 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
         m_columnModel = getColumnModel();
         m_booleanModel = getBooleanModel();
-        m_booleanModel.addChangeListener(new InternalChangeListener());
+        m_booleanModel.addChangeListener(e -> checkUncheck());
 
         addDialogComponent(new DialogComponentBoolean(
                 m_booleanModel, "Bitvector"));
@@ -159,23 +156,6 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
             m_columnModel.setEnabled(false);
         } else {
             m_columnModel.setEnabled(true);
-        }
-    }
-
-    /**
-     * Listens to changed and enables / disables the model of the column
-     * selection drop down box.
-     *
-     * @author Kilian Thiel, University of Konstanz
-     */
-    class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkUncheck();
         }
     }
 }

@@ -57,9 +57,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -153,7 +150,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
             PortTypeRegistry.getInstance().getPortType(DocumentVectorPortObject.class, false)});
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        m_booleanModel.addChangeListener(new InternalChangeListener());
+        m_booleanModel.addChangeListener(e -> checkUncheck());
         checkUncheck();
     }
 
@@ -513,21 +510,6 @@ class DocumentVectorNodeModel2 extends NodeModel {
             m_colModel.setEnabled(false);
         } else {
             m_colModel.setEnabled(true);
-        }
-    }
-
-    /**
-     *
-     * @author Kilian Thiel, University of Konstanz
-     */
-    class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkUncheck();
         }
     }
 }
