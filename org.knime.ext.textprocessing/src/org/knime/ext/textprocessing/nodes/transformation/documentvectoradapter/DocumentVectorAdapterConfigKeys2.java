@@ -59,30 +59,30 @@ final class DocumentVectorAdapterConfigKeys2 {
     /**
      * The configuration key of the boolean value setting.
      */
-    public static final String CFGKEY_BOOLEAN = "Boolean";
+    static final String CFGKEY_BOOLEAN = "Boolean";
 
     /**
      * The configuration key of the column value setting.
      */
-    public static final String CFGKEY_VALUE_COL = "ValueCol";
+    static final String CFGKEY_VALUE_COL = "ValueCol";
 
     /**
      * The configuration key of the column containing the documents.
      */
-    public static final String CFGKEY_DOC_COL = "DocumentCol";
+     static final String CFGKEY_DOC_COL = "DocumentCol";
 
     /**
      * The configuration key of the ignore tags flag.
      */
-    public static final String CFGKEY_IGNORE_TAGS = "ignoreTags";
+    static final String CFGKEY_IGNORE_TAGS = "ignoreTags";
 
     /**
      * The configuration key of the as_collection flag.
      */
-    public static final String CFGKEY_ASCOLLECTION = "asCollection";
+    static final String CFGKEY_ASCOLLECTION = "asCollection";
 
     /**
      * The configuration key of the selected feature columns.
      */
-    public static final String CFGKEY_VECTOR_COLUMNS = "featureColumns";
+    static final String CFGKEY_VECTOR_COLUMNS = "featureColumns";
 }

@@ -107,32 +107,32 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class DocumentVectorAdapterNodeModel2 extends NodeModel {
+class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     /**
      * The default setting of the creation of bit vectors. By default bit vectors are created (<code>true</code>).
      */
-    public static final boolean DEFAULT_BOOLEAN = true;
+    static final boolean DEFAULT_BOOLEAN = true;
 
     /**
      * The default column to use.
      */
-    public static final String DEFAULT_COL = "";
+    static final String DEFAULT_COL = "";
 
     /**
      * The default document column to use.
      */
-    public static final String DEFAULT_DOCUMENT_COLNAME = CommonColumnNames.DEF_ORIG_DOCUMENT_COLNAME;
+    static final String DEFAULT_DOCUMENT_COLNAME = CommonColumnNames.DEF_ORIG_DOCUMENT_COLNAME;
 
     /**
      * The default value to ignore tags.
      */
-    public static final boolean DEFAULT_IGNORE_TAGS = true;
+    static final boolean DEFAULT_IGNORE_TAGS = true;
 
     /**
      * The default value to the as collection flag.
      */
-    public static final boolean DEFAULT_ASCOLLECTION = false;
+    static final boolean DEFAULT_ASCOLLECTION = false;
 
     private final TextContainerDataCellFactory m_documentCellFac;
 
@@ -155,7 +155,7 @@ public class DocumentVectorAdapterNodeModel2 extends NodeModel {
     /**
      * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
      */
-    public DocumentVectorAdapterNodeModel2() {
+    DocumentVectorAdapterNodeModel2() {
         super(2, 1);
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_booleanModel.addChangeListener(new InternalChangeListener());
