@@ -107,7 +107,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class DocumentVectorAdapterNodeModel extends NodeModel {
+public class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     /**
      * The default setting of the creation of bit vectors. By default bit vectors are created (<code>true</code>).
@@ -155,7 +155,7 @@ public class DocumentVectorAdapterNodeModel extends NodeModel {
     /**
      * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
      */
-    public DocumentVectorAdapterNodeModel() {
+    public DocumentVectorAdapterNodeModel2() {
         super(2, 1);
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_booleanModel.addChangeListener(new InternalChangeListener());

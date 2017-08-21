@@ -66,7 +66,7 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class DocumentVectorAdapterNodeDialog extends DefaultNodeSettingsPane {
+public class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
     static final SettingsModelBoolean getBooleanModel() {
         return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys.CFGKEY_BOOLEAN,
@@ -106,7 +106,7 @@ public class DocumentVectorAdapterNodeDialog extends DefaultNodeSettingsPane {
      * Creates a new instance of <code>DocumentVectorAdapterNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
-    public DocumentVectorAdapterNodeDialog() {
+    public DocumentVectorAdapterNodeDialog2() {
 
         createNewGroup("Document vector settings");
         addDialogComponent(

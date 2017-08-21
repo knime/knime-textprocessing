@@ -48,55 +48,41 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-
 /**
- * The factory of the document vector adapter node.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class DocumentVectorAdapterNodeFactory extends NodeFactory<DocumentVectorAdapterNodeModel> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentVectorAdapterNodeDialog();
+final class DocumentVectorAdapterConfigKeys2 {
+    private DocumentVectorAdapterConfigKeys2() {
     }
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the boolean value setting.
      */
-    @Override
-    public DocumentVectorAdapterNodeModel createNodeModel() {
-        return new DocumentVectorAdapterNodeModel();
-    }
+    public static final String CFGKEY_BOOLEAN = "Boolean";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the column value setting.
      */
-    @Override
-    public NodeView<DocumentVectorAdapterNodeModel> createNodeView(final int index,
-        final DocumentVectorAdapterNodeModel model) {
-        return null;
-    }
+    public static final String CFGKEY_VALUE_COL = "ValueCol";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the column containing the documents.
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
+    public static final String CFGKEY_DOC_COL = "DocumentCol";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the ignore tags flag.
      */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFGKEY_IGNORE_TAGS = "ignoreTags";
+
+    /**
+     * The configuration key of the as_collection flag.
+     */
+    public static final String CFGKEY_ASCOLLECTION = "asCollection";
+
+    /**
+     * The configuration key of the selected feature columns.
+     */
+    public static final String CFGKEY_VECTOR_COLUMNS = "featureColumns";
 }
