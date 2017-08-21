@@ -63,14 +63,14 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
+class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
      * @return Creates and returns an instance of
      * <code>SettingsModelBoolean</code> specifying if a bitvector have to
      * be created or not.
      */
-    public static final SettingsModelBoolean getBooleanModel() {
+    static final SettingsModelBoolean getBooleanModel() {
         return new SettingsModelBoolean(DocumentVectorConfigKeys2.CFGKEY_BOOLEAN,
                 DocumentVectorNodeModel2.DEFAULT_BOOLEAN);
     }
@@ -80,7 +80,7 @@ public class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      * <code>SettingsModelBoolean</code> specifying if a collection cell has
      * to be created or not.
      */
-    public static final SettingsModelBoolean getAsCollectionModel() {
+    static final SettingsModelBoolean getAsCollectionModel() {
         return new SettingsModelBoolean(
                 DocumentVectorConfigKeys2.CFGKEY_ASCOLLECTION,
                 DocumentVectorNodeModel2.DEFAULT_ASCOLLECTION);
@@ -91,7 +91,7 @@ public class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      * <code>SettingsModelString</code> containing the name of the column with
      * the vector values to use.
      */
-    public static final SettingsModelString getColumnModel() {
+    static final SettingsModelString getColumnModel() {
         return new SettingsModelString(
                 DocumentVectorConfigKeys2.CFGKEY_VALUE_COL,
                 DocumentVectorNodeModel2.DEFAULT_COL);
@@ -102,7 +102,7 @@ public class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      * <code>SettingsModelString</code> containing the name of the document
      * column.
      */
-    public static final SettingsModelString getDocumentColModel() {
+    static final SettingsModelString getDocumentColModel() {
         return new SettingsModelString(DocumentVectorConfigKeys2.CFGKEY_DOC_COL,
                 DocumentVectorNodeModel2.DEFAULT_DOCUMENT_COLNAME);
     }
@@ -112,7 +112,7 @@ public class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      * <code>SettingsModelBoolean</code> specifying whether tags will be ignored
      * or not.
      */
-    public static final SettingsModelBoolean getIgnoreTagsModel() {
+    static final SettingsModelBoolean getIgnoreTagsModel() {
         return new SettingsModelBoolean(
                 DocumentVectorConfigKeys2.CFGKEY_IGNORE_TAGS,
                 DocumentVectorNodeModel2.DEFAULT_IGNORE_TAGS);
@@ -127,7 +127,7 @@ public class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      * Creates a new instance of <code>DocumentVectorNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
-    public DocumentVectorNodeDialog2() {
+    DocumentVectorNodeDialog2() {
         addDialogComponent(new DialogComponentColumnNameSelection(
                 getDocumentColModel(), "Document column", 0,
                 DocumentValue.class));

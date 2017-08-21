@@ -52,32 +52,32 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvector;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public final class DocumentVectorConfigKeys2 {
+final class DocumentVectorConfigKeys2 {
 
     private DocumentVectorConfigKeys2() { }
 
     /**
      * The configuration key of the boolean value setting.
      */
-    public static final String CFGKEY_BOOLEAN = "Boolean";
+    static final String CFGKEY_BOOLEAN = "Boolean";
 
     /**
      * The configuration key of the column value setting.
      */
-    public static final String CFGKEY_VALUE_COL = "Value_Col";
+    static final String CFGKEY_VALUE_COL = "Value_Col";
 
     /**
      * The configuration key of the column containing the documents.
      */
-    public static final String CFGKEY_DOC_COL = "Document_Col";
+    static final String CFGKEY_DOC_COL = "Document_Col";
 
     /**
      * The configuration key of the ignore tags flag.
      */
-    public static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";
+    static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";
 
     /**
      * The configuration key of the as_collection flag.
      */
-    public static final String CFGKEY_ASCOLLECTION = "As_Collection";
+    static final String CFGKEY_ASCOLLECTION = "As_Collection";
 }
