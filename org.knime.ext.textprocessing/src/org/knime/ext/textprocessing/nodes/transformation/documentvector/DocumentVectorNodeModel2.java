@@ -134,15 +134,15 @@ public class DocumentVectorNodeModel2 extends NodeModel {
 
     private int m_termColIndex = -1;
 
-    private SettingsModelString m_colModel = DocumentVectorNodeDialog.getColumnModel();
+    private SettingsModelString m_colModel = DocumentVectorNodeDialog2.getColumnModel();
 
-    private SettingsModelBoolean m_booleanModel = DocumentVectorNodeDialog.getBooleanModel();
+    private SettingsModelBoolean m_booleanModel = DocumentVectorNodeDialog2.getBooleanModel();
 
-    private SettingsModelString m_documentColModel = DocumentVectorNodeDialog.getDocumentColModel();
+    private SettingsModelString m_documentColModel = DocumentVectorNodeDialog2.getDocumentColModel();
 
-    private SettingsModelBoolean m_ignoreTags = DocumentVectorNodeDialog.getIgnoreTagsModel();
+    private SettingsModelBoolean m_ignoreTags = DocumentVectorNodeDialog2.getIgnoreTagsModel();
 
-    private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog.getAsCollectionModel();
+    private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog2.getAsCollectionModel();
 
     /**
      * Creates a new instance of <code>DocumentVectorNodeModel</code>.

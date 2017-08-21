@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   07.05.2008 (thiel): created
  */
@@ -53,34 +53,34 @@ import org.knime.core.node.NodeView;
 
 /**
  * The factory of the document vector node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentVectorNodeFactory2 extends 
-NodeFactory<DocumentVectorNodeModel> {
+public class DocumentVectorNodeFactory2 extends
+NodeFactory<DocumentVectorNodeModel2> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentVectorNodeDialog();
+        return new DocumentVectorNodeDialog2();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DocumentVectorNodeModel createNodeModel() {
-        return new DocumentVectorNodeModel();
+    public DocumentVectorNodeModel2 createNodeModel() {
+        return new DocumentVectorNodeModel2();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentVectorNodeModel> createNodeView(final int index, 
-            final DocumentVectorNodeModel model) {
+    public NodeView<DocumentVectorNodeModel2> createNodeView(final int index,
+            final DocumentVectorNodeModel2 model) {
         return null;
     }
 
