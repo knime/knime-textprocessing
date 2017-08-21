@@ -81,7 +81,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  com.rometools.rome;bundle-version="[1.7.0,2.0.0)",
  org.knime.time;bundle-version="[3.4.0,4.0.0)",
  org.dom4j;bundle-version="[1.6.1,2.0.0)",
- com.google.guava;bundle-version="[19.0.0,19.0.0]",
+ com.google.guava;bundle-version="[19.0.0,25.0.0]",
  org.apache.commons.logging;bundle-version="[1.2.0,2.0.0]",
  org.slf4j.api;bundle-version="[1.7.2,2.0.0)",
  org.apache.commons.io;bundle-version="[2.5.0,3.0.0)",
@@ -104,7 +104,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  uk.ac.cam.ch.wwmm.oscar.4-api;bundle-version="[4.2.2,4.3.0)",
  org.json;bundle-version="20140107.0.0",
  org.apache.solr.solrj;bundle-version="[6.6.0,7.0.0)",
- org.apache.pdfbox.fontbox;bundle-version="2.0.7",
- nu.xom;bundle-version="1.2.10"
+ org.apache.pdfbox.fontbox;bundle-version="[2.0.7,3.0.0)",
+ nu.xom;bundle-version="[1.2.10,3.0.0)",
+ dk.brics.automaton;bundle-version="1.11.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
