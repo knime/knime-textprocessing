@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   06.05.2008 (thiel): created
  */
@@ -60,13 +60,15 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
  * Provides the dialog of the document vector node.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use custom node dialog instead.
  */
+@Deprecated
 public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelBoolean</code> specifying if a bitvector have to
      * be created or not.
      */
@@ -74,9 +76,9 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelBoolean(DocumentVectorConfigKeys.CFGKEY_BOOLEAN,
                 DocumentVectorNodeModel.DEFAULT_BOOLEAN);
     }
-    
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelBoolean</code> specifying if a collection cell has
      * to be created or not.
      */
@@ -84,10 +86,10 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelBoolean(
                 DocumentVectorConfigKeys.CFGKEY_ASCOLLECTION,
                 DocumentVectorNodeModel.DEFAULT_ASCOLLECTION);
-    }    
-    
+    }
+
     /**
-     * @return Creates and returns an instance of 
+     * @return Creates and returns an instance of
      * <code>SettingsModelString</code> containing the name of the column with
      * the vector values to use.
      */
@@ -96,19 +98,19 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
                 DocumentVectorConfigKeys.CFGKEY_VALUE_COL,
                 DocumentVectorNodeModel.DEFAULT_COL);
     }
-    
+
     /**
-     * @return Creates and returns a new instance of 
+     * @return Creates and returns a new instance of
      * <code>SettingsModelString</code> containing the name of the document
-     * column. 
+     * column.
      */
     public static final SettingsModelString getDocumentColModel() {
         return new SettingsModelString(DocumentVectorConfigKeys.CFGKEY_DOC_COL,
                 DocumentVectorNodeModel.DEFAULT_DOCUMENT_COLNAME);
     }
-    
+
     /**
-     * @return Creates and returns a new instance of 
+     * @return Creates and returns a new instance of
      * <code>SettingsModelBoolean</code> specifying whether tags will be ignored
      * or not.
      */
@@ -117,40 +119,40 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
                 DocumentVectorConfigKeys.CFGKEY_IGNORE_TAGS,
                 DocumentVectorNodeModel.DEFAULT_IGNORE_TAGS);
     }
-    
-    
+
+
     private SettingsModelString m_columnModel;
-    
+
     private SettingsModelBoolean m_booleanModel;
-    
+
     /**
      * Creates a new instance of <code>DocumentVectorNodeDialog</code>.
      */
     @SuppressWarnings("unchecked")
     public DocumentVectorNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
-                getDocumentColModel(), "Document column", 0, 
+                getDocumentColModel(), "Document column", 0,
                 DocumentValue.class));
-        
+
         addDialogComponent(new DialogComponentBoolean(
-                getIgnoreTagsModel(), "Ignore tags"));        
-        
+                getIgnoreTagsModel(), "Ignore tags"));
+
         m_columnModel = getColumnModel();
         m_booleanModel = getBooleanModel();
         m_booleanModel.addChangeListener(new InternalChangeListener());
-        
+
         addDialogComponent(new DialogComponentBoolean(
                 m_booleanModel, "Bitvector"));
-        
+
         addDialogComponent(new DialogComponentColumnNameSelection(
                 m_columnModel, "Vector value", 0, DoubleValue.class));
-                
-        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), 
+
+        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(),
                 "As collection cell"));
-        
+
         checkUncheck();
     }
-    
+
     private void checkUncheck() {
         if (m_booleanModel.getBooleanValue()) {
             m_columnModel.setEnabled(false);
@@ -158,11 +160,11 @@ public class DocumentVectorNodeDialog extends DefaultNodeSettingsPane {
             m_columnModel.setEnabled(true);
         }
     }
-    
+
     /**
-     * Listens to changed and enables / disables the model of the column 
+     * Listens to changed and enables / disables the model of the column
      * selection drop down box.
-     * 
+     *
      * @author Kilian Thiel, University of Konstanz
      */
     class InternalChangeListener implements ChangeListener {

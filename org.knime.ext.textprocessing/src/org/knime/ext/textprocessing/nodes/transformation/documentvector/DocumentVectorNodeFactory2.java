@@ -43,41 +43,60 @@
  * ---------------------------------------------------------------------
  * 
  * History
- *   06.05.2008 (thiel): created
+ *   07.05.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+
 /**
- * Provides the configuration keys for the document vector node.
+ * The factory of the document vector node.
  * 
  * @author Kilian Thiel, University of Konstanz
  */
-public final class DocumentVectorConfigKeys {
+public class DocumentVectorNodeFactory2 extends 
+NodeFactory<DocumentVectorNodeModel> {
 
-    private DocumentVectorConfigKeys() { }
-    
     /**
-     * The configuration key of the boolean value setting.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_BOOLEAN = "Boolean";
-    
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new DocumentVectorNodeDialog();
+    }
+
     /**
-     * The configuration key of the column value setting.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_VALUE_COL = "Value_Col";
-    
+    @Override
+    public DocumentVectorNodeModel createNodeModel() {
+        return new DocumentVectorNodeModel();
+    }
+
     /**
-     * The configuration key of the column containing the documents.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_DOC_COL = "Document_Col";
-    
+    @Override
+    public NodeView<DocumentVectorNodeModel> createNodeView(final int index, 
+            final DocumentVectorNodeModel model) {
+        return null;
+    }
+
     /**
-     * The configuration key of the ignore tags flag.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";
-    
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
     /**
-     * The configuration key of the as_collection flag.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_ASCOLLECTION = "As_Collection";  
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 }

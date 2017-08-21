@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcVectors.png" type="Manipulator">
+    <name>Document vector</name>
+    <shortDescription>Creates a document vector for each document.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node creates a document vector for each document representing
+            it in the terms space. The values of the feature vectors can be 
+            specified as boolean values or as values of a specified column 
+            i.e. an tf*idf column. The dimension of the vectors will be the
+            number of distinct terms in the BoW.
+        </intro>
+        <option name="Document column">
+             The column containing the documents to use.
+        </option>
+        <option name="Ignore tags">
+             If checked tags are ignored when comparing terms.
+        </option>
+        <option name="Bitvector">
+             If checked a bitvector will be created indicating whether a 
+             certain term is contained in a document or not.
+        </option>
+        <option name="Vector value">
+             If Bitvector setting is not checked it is possible to specify the
+             column to use as feature vector values. The column can i.e. contain
+             tf*idf values which are than used as values of the feature vector.
+             Be aware that you have to compute these values before using this
+             node. To do so i.e. the frequency calculation nodes can be used.
+        </option>
+        <option name="As collection cell">
+             If checked all vector entries will be stored in a collection cell
+             consisting of double cells. The cells are ordered, the ordering
+             is specified in the data table spec. If not checked all double
+             cells will be stored in corresponding columns. The advantage 
+             of the column representation is that most of the regular algorithms
+             in KNIME can be applied. The disadvantage is (which is on the 
+             other hand the advantage of the collection representation) that
+             processing of subsequent nodes will be slowed down, due to the many
+             columns that will be created (dependent on the input data of 
+             course).
+        </option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the bag of words.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the documents with the related document vectors.</outPort>
+    </ports>
+</knimeNode>

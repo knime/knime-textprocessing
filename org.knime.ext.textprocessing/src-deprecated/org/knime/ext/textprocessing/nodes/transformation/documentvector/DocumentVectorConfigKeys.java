@@ -41,62 +41,45 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
- *   07.05.2008 (thiel): created
+ *   06.05.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-
 /**
- * The factory of the document vector node.
- * 
+ * Provides the configuration keys for the document vector node.
+ *
  * @author Kilian Thiel, University of Konstanz
+ * @deprecated Use custom set of config keys instead.
  */
-public class DocumentVectorNodeFactory extends 
-NodeFactory<DocumentVectorNodeModel> {
+@Deprecated
+public final class DocumentVectorConfigKeys {
+
+    private DocumentVectorConfigKeys() { }
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the boolean value setting.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentVectorNodeDialog();
-    }
+    public static final String CFGKEY_BOOLEAN = "Boolean";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the column value setting.
      */
-    @Override
-    public DocumentVectorNodeModel createNodeModel() {
-        return new DocumentVectorNodeModel();
-    }
+    public static final String CFGKEY_VALUE_COL = "Value_Col";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the column containing the documents.
      */
-    @Override
-    public NodeView<DocumentVectorNodeModel> createNodeView(final int index, 
-            final DocumentVectorNodeModel model) {
-        return null;
-    }
+    public static final String CFGKEY_DOC_COL = "Document_Col";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the ignore tags flag.
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
+    public static final String CFGKEY_IGNORE_TAGS = "Ignore_Tags";
 
     /**
-     * {@inheritDoc}
+     * The configuration key of the as_collection flag.
      */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+    public static final String CFGKEY_ASCOLLECTION = "As_Collection";
 }
