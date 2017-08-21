@@ -209,7 +209,7 @@
       </node>
       <node
             category-path="/labs/textprocessing/transformation"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory">
       </node>
       <node
@@ -665,6 +665,11 @@
             category-path="/labs/textprocessing/transformation"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.bow.BagOfWordsNodeFactory2">
+      </node>
+      <node
+            category-path="/labs/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeFactory2">
       </node>
    </extension>
    <extension
