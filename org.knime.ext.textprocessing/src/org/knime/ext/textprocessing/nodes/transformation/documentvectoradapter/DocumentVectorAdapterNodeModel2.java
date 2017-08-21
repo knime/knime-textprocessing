@@ -140,17 +140,17 @@ public class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     private int m_termColIndex = -1;
 
-    private SettingsModelString m_colModel = DocumentVectorAdapterNodeDialog.getColumnModel();
+    private SettingsModelString m_colModel = DocumentVectorAdapterNodeDialog2.getColumnModel();
 
-    private SettingsModelBoolean m_booleanModel = DocumentVectorAdapterNodeDialog.getBooleanModel();
+    private SettingsModelBoolean m_booleanModel = DocumentVectorAdapterNodeDialog2.getBooleanModel();
 
-    private SettingsModelString m_documentColModel = DocumentVectorAdapterNodeDialog.getDocumentColModel();
+    private SettingsModelString m_documentColModel = DocumentVectorAdapterNodeDialog2.getDocumentColModel();
 
-    private SettingsModelBoolean m_ignoreTags = DocumentVectorAdapterNodeDialog.getIgnoreTagsModel();
+    private SettingsModelBoolean m_ignoreTags = DocumentVectorAdapterNodeDialog2.getIgnoreTagsModel();
 
-    private SettingsModelBoolean m_asCollectionModel = DocumentVectorAdapterNodeDialog.getAsCollectionModel();
+    private SettingsModelBoolean m_asCollectionModel = DocumentVectorAdapterNodeDialog2.getAsCollectionModel();
 
-    private SettingsModelColumnFilter2 m_vectorColsModel = DocumentVectorAdapterNodeDialog.getVectorColumnsModel();
+    private SettingsModelColumnFilter2 m_vectorColsModel = DocumentVectorAdapterNodeDialog2.getVectorColumnsModel();
 
     /**
      * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.

@@ -57,30 +57,30 @@ import org.knime.core.node.NodeView;
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
-public class DocumentVectorAdapterNodeFactory2 extends NodeFactory<DocumentVectorAdapterNodeModel> {
+public class DocumentVectorAdapterNodeFactory2 extends NodeFactory<DocumentVectorAdapterNodeModel2> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DocumentVectorAdapterNodeDialog();
+        return new DocumentVectorAdapterNodeDialog2();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DocumentVectorAdapterNodeModel createNodeModel() {
-        return new DocumentVectorAdapterNodeModel();
+    public DocumentVectorAdapterNodeModel2 createNodeModel() {
+        return new DocumentVectorAdapterNodeModel2();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentVectorAdapterNodeModel> createNodeView(final int index,
-        final DocumentVectorAdapterNodeModel model) {
+    public NodeView<DocumentVectorAdapterNodeModel2> createNodeView(final int index,
+        final DocumentVectorAdapterNodeModel2 model) {
         return null;
     }
 

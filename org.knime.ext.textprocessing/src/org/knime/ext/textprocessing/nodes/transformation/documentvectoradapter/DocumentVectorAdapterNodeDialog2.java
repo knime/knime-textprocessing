@@ -69,33 +69,33 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 public class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
     static final SettingsModelBoolean getBooleanModel() {
-        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys.CFGKEY_BOOLEAN,
-            DocumentVectorAdapterNodeModel.DEFAULT_BOOLEAN);
+        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys2.CFGKEY_BOOLEAN,
+            DocumentVectorAdapterNodeModel2.DEFAULT_BOOLEAN);
     }
 
     static final SettingsModelBoolean getAsCollectionModel() {
-        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys.CFGKEY_ASCOLLECTION,
-            DocumentVectorAdapterNodeModel.DEFAULT_ASCOLLECTION);
+        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys2.CFGKEY_ASCOLLECTION,
+            DocumentVectorAdapterNodeModel2.DEFAULT_ASCOLLECTION);
     }
 
     static final SettingsModelString getColumnModel() {
-        return new SettingsModelString(DocumentVectorAdapterConfigKeys.CFGKEY_VALUE_COL,
-            DocumentVectorAdapterNodeModel.DEFAULT_COL);
+        return new SettingsModelString(DocumentVectorAdapterConfigKeys2.CFGKEY_VALUE_COL,
+            DocumentVectorAdapterNodeModel2.DEFAULT_COL);
     }
 
     static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(DocumentVectorAdapterConfigKeys.CFGKEY_DOC_COL,
-            DocumentVectorAdapterNodeModel.DEFAULT_DOCUMENT_COLNAME);
+        return new SettingsModelString(DocumentVectorAdapterConfigKeys2.CFGKEY_DOC_COL,
+            DocumentVectorAdapterNodeModel2.DEFAULT_DOCUMENT_COLNAME);
     }
 
     static final SettingsModelBoolean getIgnoreTagsModel() {
-        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys.CFGKEY_IGNORE_TAGS,
-            DocumentVectorAdapterNodeModel.DEFAULT_IGNORE_TAGS);
+        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys2.CFGKEY_IGNORE_TAGS,
+            DocumentVectorAdapterNodeModel2.DEFAULT_IGNORE_TAGS);
     }
 
     @SuppressWarnings("unchecked")
     static SettingsModelColumnFilter2 getVectorColumnsModel() {
-        return new SettingsModelColumnFilter2(DocumentVectorAdapterConfigKeys.CFGKEY_VECTOR_COLUMNS, DoubleValue.class);
+        return new SettingsModelColumnFilter2(DocumentVectorAdapterConfigKeys2.CFGKEY_VECTOR_COLUMNS, DoubleValue.class);
     }
 
     private SettingsModelString m_columnModel;
