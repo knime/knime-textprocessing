@@ -104,8 +104,7 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      * column.
      */
     static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(DocumentVectorConfigKeys2.CFGKEY_DOC_COL,
-                DocumentVectorNodeModel2.DEFAULT_DOCUMENT_COLNAME);
+        return new SettingsModelString(DocumentVectorConfigKeys2.CFGKEY_DOC_COL, "");
     }
 
     /**

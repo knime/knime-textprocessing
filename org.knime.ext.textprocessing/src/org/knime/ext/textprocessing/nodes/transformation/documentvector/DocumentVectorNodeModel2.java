@@ -95,7 +95,6 @@ import org.knime.ext.textprocessing.data.DocumentVectorPortObject;
 import org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -119,11 +118,6 @@ class DocumentVectorNodeModel2 extends NodeModel {
      * The default column to use.
      */
     static final String DEFAULT_COL = "";
-
-    /**
-     * The default document column to use.
-     */
-    static final String DEFAULT_DOCUMENT_COLNAME = CommonColumnNames.DEF_ORIG_DOCUMENT_COLNAME;
 
     /**
      * The default value to ignore tags.
@@ -181,12 +175,35 @@ class DocumentVectorNodeModel2 extends NodeModel {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        m_termColIndex = verifier.getTermCellIndex();
+        int numberOfDocumentCols = verifier.getNumDocumentCells();
 
-        m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
+        m_termColIndex = verifier.getTermCellIndex();
+        String docColumn = m_documentColModel.getStringValue();
+
+        if (docColumn.isEmpty()) {
+            String documentCol = null;
+            // only one document col available
+            if (numberOfDocumentCols == 1) {
+                documentCol = spec.getColumnSpec(verifier.getDocumentCellIndex()).getName();
+                // multiple document columns available
+            } else if (numberOfDocumentCols > 1) {
+                // take first document column
+                for (String colName : spec.getColumnNames()) {
+                    if (spec.getColumnSpec(colName).getType().isCompatible(DocumentValue.class)) {
+                        documentCol = colName;
+                    }
+                    break;
+                }
+                setWarningMessage("Auto guessing: Using column '" + documentCol + "' as document column");
+            }
+            m_documentColModel.setStringValue(documentCol);
+            docColumn = documentCol;
+        }
+
+        m_documentColIndex = spec.findColumnIndex(docColumn);
         if (m_documentColIndex < 0) {
             throw new InvalidSettingsException(
-                "Index of specified document column is not valid! " + "Check your settings!");
+                "Selected document column \"" + docColumn + "\" could not be found in the input data table.");
         }
     }
 
