@@ -191,8 +191,8 @@ class DocumentVectorNodeModel2 extends NodeModel {
                 for (String colName : spec.getColumnNames()) {
                     if (spec.getColumnSpec(colName).getType().isCompatible(DocumentValue.class)) {
                         documentCol = colName;
+                        break;
                     }
-                    break;
                 }
                 setWarningMessage("Auto guessing: Using column '" + documentCol + "' as document column");
             }
