@@ -85,6 +85,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.util.UniqueNameGenerator;
@@ -165,14 +166,15 @@ class DocumentVectorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        checkDataTableSpec(inSpecs[0]);
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        checkDataTableSpec((DataTableSpec)inSpecs[0]);
 
         DataTableSpec spec = null;
         if (m_asCollectionModel.getBooleanValue()) {
             spec = createDataTableSpecAsCollection(null);
         }
-        return new DataTableSpec[]{spec};
+
+        return new PortObjectSpec[]{spec, null};
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
@@ -337,12 +339,13 @@ class DocumentVectorNodeModel2 extends NodeModel {
         }
 
         dc.close();
+        String[] featureColumnNames = featureIndexTable.keySet().toArray(new String[featureIndexTable.keySet().size()]);
         featureIndexTable.clear();
 
         return new PortObject[]{dc.getTable(),
-            new DocumentVectorPortObject(new DocumentVectorPortObjectSpec(m_ignoreTags.getBooleanValue(),
-                m_booleanModel.getBooleanValue(), m_documentColModel.getStringValue(),
-                m_asCollectionModel.getBooleanValue(), featureIndexTable.keySet().toArray(new String[0])))};
+            new DocumentVectorPortObject(
+                new DocumentVectorPortObjectSpec(ignoreTags, m_booleanModel.getBooleanValue(),
+                    m_documentColModel.getStringValue(), m_asCollectionModel.getBooleanValue(), featureColumnNames))};
     }
 
     private long m_rowKeyNr = 0;
