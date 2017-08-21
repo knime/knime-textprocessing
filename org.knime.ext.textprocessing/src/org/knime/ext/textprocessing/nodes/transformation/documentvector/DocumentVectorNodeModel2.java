@@ -100,6 +100,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * the given bag of words are used. As vector values, a column can be specified or bit vectors can be created.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 3.5
  */
 class DocumentVectorNodeModel2 extends NodeModel {
 

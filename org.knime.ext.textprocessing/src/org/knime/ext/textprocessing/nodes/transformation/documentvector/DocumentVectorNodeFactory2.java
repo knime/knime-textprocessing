@@ -55,6 +55,7 @@ import org.knime.core.node.NodeView;
  * The factory of the document vector node.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 3.5
  */
 public class DocumentVectorNodeFactory2 extends
 NodeFactory<DocumentVectorNodeModel2> {

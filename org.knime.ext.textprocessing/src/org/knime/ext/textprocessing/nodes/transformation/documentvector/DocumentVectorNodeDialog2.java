@@ -62,6 +62,7 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * Provides the dialog of the document vector node.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @since 3.5
  */
 class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
