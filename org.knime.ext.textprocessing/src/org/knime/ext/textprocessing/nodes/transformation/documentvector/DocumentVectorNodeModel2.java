@@ -84,9 +84,14 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.PortTypeRegistry;
 import org.knime.core.util.UniqueNameGenerator;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.DocumentVectorPortObject;
+import org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
@@ -149,7 +154,8 @@ class DocumentVectorNodeModel2 extends NodeModel {
      * Creates a new instance of <code>DocumentVectorNodeModel</code>.
      */
     DocumentVectorNodeModel2() {
-        super(1, 1);
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
+            PortTypeRegistry.getInstance().getPortType(DocumentVectorPortObject.class, false)});
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_booleanModel.addChangeListener(new InternalChangeListener());
         checkUncheck();
@@ -186,14 +192,15 @@ class DocumentVectorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec)
         throws Exception {
-        checkDataTableSpec(inData[0].getDataTableSpec());
+        BufferedDataTable dataTable = (BufferedDataTable)inData[0];
+        checkDataTableSpec(dataTable.getDataTableSpec());
 
         final boolean ignoreTags = m_ignoreTags.getBooleanValue();
 
         // document column index.
-        m_documentColIndex = inData[0].getSpec().findColumnIndex(m_documentColModel.getStringValue());
+        m_documentColIndex = dataTable.getSpec().findColumnIndex(m_documentColModel.getStringValue());
 
         m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
 
@@ -202,7 +209,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         // specified !
         if (!m_booleanModel.getBooleanValue()) {
             final String colName = m_colModel.getStringValue();
-            colIndex = inData[0].getDataTableSpec().findColumnIndex(colName);
+            colIndex = dataTable.getDataTableSpec().findColumnIndex(colName);
             if (colIndex < 0) {
                 throw new InvalidSettingsException("No valid column selected!");
             }
@@ -213,7 +220,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         final List<String> colList = new ArrayList<String>();
         colList.add(m_documentColModel.getStringValue());
         boolean[] sortAsc = new boolean[]{true};
-        BufferedDataTable sortedTable = new SortedTable(inData[0], colList, sortAsc, exec).getBufferedDataTable();
+        BufferedDataTable sortedTable = new SortedTable(dataTable, colList, sortAsc, exec).getBufferedDataTable();
 
         // hash table holding an index for each feature
         final Map<String, Integer> featureIndexTable = new HashMap<String, Integer>();
@@ -332,7 +339,10 @@ class DocumentVectorNodeModel2 extends NodeModel {
         dc.close();
         featureIndexTable.clear();
 
-        return new BufferedDataTable[]{dc.getTable()};
+        return new PortObject[]{dc.getTable(),
+            new DocumentVectorPortObject(new DocumentVectorPortObjectSpec(m_ignoreTags.getBooleanValue(),
+                m_booleanModel.getBooleanValue(), m_documentColModel.getStringValue(),
+                m_asCollectionModel.getBooleanValue(), featureIndexTable.keySet().toArray(new String[0])))};
     }
 
     private long m_rowKeyNr = 0;
