@@ -85,4 +85,9 @@ final class DocumentVectorAdapterConfigKeys2 {
      * The configuration key of the selected feature columns.
      */
     static final String CFGKEY_VECTOR_COLUMNS = "featureColumns";
+
+    /**
+     * The configuration key of the 'use settings from model port' flag.
+     */
+    static final String CFGKEY_USE_MODEL_SETTINGS = "useModelPortSettings";
 }

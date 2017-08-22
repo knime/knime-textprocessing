@@ -48,9 +48,6 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NotConfigurableException;
@@ -100,9 +97,19 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         return new SettingsModelFilterString(DocumentVectorAdapterConfigKeys2.CFGKEY_VECTOR_COLUMNS);
     }
 
-    private SettingsModelString m_columnModel;
+    static SettingsModelBoolean getUseModelSettings() {
+        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys2.CFGKEY_USE_MODEL_SETTINGS, true);
+    }
 
-    private SettingsModelBoolean m_booleanModel;
+    private SettingsModelString m_columnModel = getColumnModel();
+
+    private SettingsModelBoolean m_booleanModel = getBooleanModel();
+
+    private SettingsModelBoolean m_useModelPortSettingsModel = getUseModelSettings();
+
+    private SettingsModelBoolean m_ignoreTagsModel = getIgnoreTagsModel();
+
+    private SettingsModelBoolean m_asCollectionCell = getAsCollectionModel();
 
     private DialogComponentStringFilter m_stringFilterComponent;
 
@@ -116,28 +123,35 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         addDialogComponent(
             new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 0, DocumentValue.class));
 
-        addDialogComponent(new DialogComponentBoolean(getIgnoreTagsModel(), "Ignore tags"));
+        m_useModelPortSettingsModel.addChangeListener(e -> checkUncheck());
 
-        m_columnModel = getColumnModel();
-        m_booleanModel = getBooleanModel();
-        m_booleanModel.addChangeListener(new InternalChangeListener());
+        addDialogComponent(new DialogComponentBoolean(m_useModelPortSettingsModel, "Use settings from model"));
+
+        addDialogComponent(new DialogComponentBoolean(m_ignoreTagsModel, "Ignore tags"));
+
+        m_booleanModel.addChangeListener(e -> checkUncheck());
 
         addDialogComponent(new DialogComponentBoolean(m_booleanModel, "Bitvector"));
 
         addDialogComponent(new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 0, DoubleValue.class));
 
-        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
+        addDialogComponent(new DialogComponentBoolean(m_asCollectionCell, "As collection cell"));
         closeCurrentGroup();
-
         checkUncheck();
 
         createNewTab("Feature Column Selection");
         m_stringFilterComponent = new DialogComponentStringFilter(getVectorColumnsModel(), new String[]{}, false);
+
         addDialogComponent(m_stringFilterComponent);
     }
 
     private void checkUncheck() {
-        if (m_booleanModel.getBooleanValue()) {
+        m_columnModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+        m_booleanModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+        m_ignoreTagsModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+        m_asCollectionCell.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+
+        if (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue()) {
             m_columnModel.setEnabled(false);
         } else {
             m_columnModel.setEnabled(true);
@@ -157,21 +171,6 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
             m_stringFilterComponent.updateComponent();
         }
         super.loadAdditionalSettingsFrom(settings, specs);
-    }
-
-    /**
-     * Listens to changed and enables / disables the model of the column selection drop down box.
-     *
-     */
-    class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkUncheck();
-        }
     }
 
 }
