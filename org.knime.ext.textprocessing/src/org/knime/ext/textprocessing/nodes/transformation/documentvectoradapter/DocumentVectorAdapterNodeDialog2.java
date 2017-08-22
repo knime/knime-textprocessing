@@ -52,14 +52,17 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.DoubleValue;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter2;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec;
 
 /**
  * Provides the dialog of the document vector adapter node.
@@ -93,14 +96,15 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
             DocumentVectorAdapterNodeModel2.DEFAULT_IGNORE_TAGS);
     }
 
-    @SuppressWarnings("unchecked")
-    static SettingsModelColumnFilter2 getVectorColumnsModel() {
-        return new SettingsModelColumnFilter2(DocumentVectorAdapterConfigKeys2.CFGKEY_VECTOR_COLUMNS, DoubleValue.class);
+    static SettingsModelFilterString getVectorColumnsModel() {
+        return new SettingsModelFilterString(DocumentVectorAdapterConfigKeys2.CFGKEY_VECTOR_COLUMNS);
     }
 
     private SettingsModelString m_columnModel;
 
     private SettingsModelBoolean m_booleanModel;
+
+    private DialogComponentStringFilter m_stringFilterComponent;
 
     /**
      * Creates a new instance of <code>DocumentVectorAdapterNodeDialog</code>.
@@ -128,7 +132,8 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         checkUncheck();
 
         createNewTab("Feature Column Selection");
-        addDialogComponent(new DialogComponentColumnFilter2(getVectorColumnsModel(), 1));
+        m_stringFilterComponent = new DialogComponentStringFilter(getVectorColumnsModel(), new String[]{}, false);
+        addDialogComponent(m_stringFilterComponent);
     }
 
     private void checkUncheck() {
@@ -137,6 +142,21 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         } else {
             m_columnModel.setEnabled(true);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+        throws NotConfigurableException {
+        if (!(specs[1] instanceof DocumentVectorPortObjectSpec)) {
+            throw new NotConfigurableException("No model or wrong model connected to model port!");
+        } else {
+            m_stringFilterComponent.setAllColumns(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());
+            m_stringFilterComponent.updateComponent();
+        }
+        super.loadAdditionalSettingsFrom(settings, specs);
     }
 
     /**
