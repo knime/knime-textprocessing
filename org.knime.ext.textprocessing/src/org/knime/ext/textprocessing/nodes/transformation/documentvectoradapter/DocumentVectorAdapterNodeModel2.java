@@ -57,9 +57,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -138,8 +135,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     private int m_termColIndex = -1;
 
-    private boolean m_nodeConfigured = false;
-
     private SettingsModelString m_colModel = DocumentVectorAdapterNodeDialog2.getColumnModel();
 
     private SettingsModelBoolean m_booleanModel = DocumentVectorAdapterNodeDialog2.getBooleanModel();
@@ -152,6 +147,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     private SettingsModelFilterString m_vectorColsModel = DocumentVectorAdapterNodeDialog2.getVectorColumnsModel();
 
+    private SettingsModelBoolean m_useSettingsFromModelPortModel =
+        DocumentVectorAdapterNodeDialog2.getUseModelSettings();
+
     /**
      * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
      */
@@ -161,7 +159,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
                 PortTypeRegistry.getInstance().getPortType(DocumentVectorPortObject.class, false)},
             new PortType[]{BufferedDataTable.TYPE});
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        m_booleanModel.addChangeListener(new InternalChangeListener());
+        m_booleanModel.addChangeListener(e -> checkUncheck());
+        m_useSettingsFromModelPortModel.addChangeListener(e -> checkUncheck());
         checkUncheck();
     }
 
@@ -172,15 +171,18 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec dataTableSpec = (DataTableSpec)inSpecs[0];
         checkDataTableSpec(dataTableSpec);
-        if (!(inSpecs[1] instanceof DocumentVectorPortObjectSpec)) {
-            throw new InvalidSettingsException("No model or wrong model connected!");
-        }
-        if (!m_nodeConfigured) {
-            setValuesFromModel(dataTableSpec, (DocumentVectorPortObjectSpec)inSpecs[1]);
+
+        DocumentVectorPortObjectSpec modelSpec = null;
+        if (inSpecs[1] instanceof DocumentVectorPortObjectSpec && !inSpecs[1].equals(null)) {
+            modelSpec = (DocumentVectorPortObjectSpec)inSpecs[1];
+            m_vectorColsModel.setIncludeList(modelSpec.getFeatureSpaceColumns());
+        } else {
+            throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
         }
 
         DataTableSpec spec = null;
-        if (m_asCollectionModel.getBooleanValue()) {
+        if ((m_asCollectionModel.isEnabled() && m_asCollectionModel.getBooleanValue())
+            || (m_useSettingsFromModelPortModel.getBooleanValue() && modelSpec.getCollectionCellSetting())) {
             spec = createDataTableSpecAsCollection(null);
         }
         return new DataTableSpec[]{spec};
@@ -224,13 +226,19 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         }
     }
 
-    private final void setValuesFromModel(final DataTableSpec spec, final DocumentVectorPortObjectSpec modelSpec) {
-        m_booleanModel.setBooleanValue(modelSpec.getBitVectorSetting());
-        m_ignoreTags.setBooleanValue(modelSpec.getIgnoreTagsSetting());
-        m_colModel.setStringValue(modelSpec.getVectorValueColumnName());
-        m_asCollectionModel.setBooleanValue(modelSpec.getCollectionCellSetting());
-        m_vectorColsModel.setIncludeList(modelSpec.getFeatureSpaceColumns());
-        m_nodeConfigured = true;
+    private final void setSettings(boolean ignoreTags, boolean useBitvector,
+        String vectorValueColumn, boolean asCollectionCell, final DocumentVectorPortObjectSpec modelSpec) {
+        if (m_useSettingsFromModelPortModel.getBooleanValue()) {
+            useBitvector = modelSpec.getBitVectorSetting();
+            ignoreTags = modelSpec.getIgnoreTagsSetting();
+            vectorValueColumn = modelSpec.getVectorValueColumnName();
+            asCollectionCell = modelSpec.getCollectionCellSetting();
+        } else {
+            useBitvector = m_booleanModel.getBooleanValue();
+            ignoreTags = m_ignoreTags.getBooleanValue();
+            vectorValueColumn = m_colModel.getStringValue();
+            asCollectionCell = m_asCollectionModel.getBooleanValue();
+        }
     }
 
     /**
@@ -243,11 +251,12 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         DocumentVectorPortObjectSpec modelSpec = ((DocumentVectorPortObject)inData[1]).getSpec();
 
         checkDataTableSpec(dataTableSpec);
-        if (!m_nodeConfigured) {
-            setValuesFromModel(dataTableSpec, modelSpec);
-        }
 
-        final boolean ignoreTags = m_ignoreTags.getBooleanValue();
+        final boolean ignoreTags = false;
+        final boolean useBitvector = false;
+        final String vectorValueColumn = null;
+        final boolean asCollectionCell = false;
+        setSettings(ignoreTags, useBitvector, vectorValueColumn, asCollectionCell, modelSpec);
 
         // document column index.
         m_documentColIndex = dataTableSpec.findColumnIndex(m_documentColModel.getStringValue());
@@ -257,7 +266,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
         // specified !
-        if (!m_booleanModel.getBooleanValue()) {
+        if (!useBitvector) {
             final String colName = m_colModel.getStringValue();
             colIndex = dataTableSpec.findColumnIndex(colName);
             if (colIndex < 0) {
@@ -324,7 +333,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         // second go through data table to create feature vectors
         exec.setProgress("Creating feature vectors");
         BufferedDataContainer dc;
-        if (m_asCollectionModel.getBooleanValue()) {
+        if (asCollectionCell) {
             dc = exec.createDataContainer(createDataTableSpecAsCollection(featureIndexTable));
         } else {
             dc = exec.createDataContainer(createDataTableSpecAsColumns(featureIndexTable));
@@ -367,7 +376,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
                 // add old feature vector to table
 
                 DataRow newRow;
-                if (m_asCollectionModel.getBooleanValue()) {
+                if (asCollectionCell) {
                     newRow = createDataRowAsCollection(lastDoc, featureVector);
                 } else {
                     newRow = createDataRowAsColumns(lastDoc, featureVector);
@@ -393,7 +402,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             // if last row, add feature vector to table
             if (currRow == numberOfRows) {
                 DataRow newRow;
-                if (m_asCollectionModel.getBooleanValue()) {
+                if (asCollectionCell) {
                     newRow = createDataRowAsCollection(currDoc, featureVector);
                 } else {
                     newRow = createDataRowAsColumns(currDoc, featureVector);
@@ -502,6 +511,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_ignoreTags.loadSettingsFrom(settings);
         m_asCollectionModel.loadSettingsFrom(settings);
         m_vectorColsModel.loadSettingsFrom(settings);
+        m_useSettingsFromModelPortModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -515,6 +525,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_ignoreTags.saveSettingsTo(settings);
         m_asCollectionModel.saveSettingsTo(settings);
         m_vectorColsModel.saveSettingsTo(settings);
+        m_useSettingsFromModelPortModel.saveSettingsTo(settings);
     }
 
     /**
@@ -528,6 +539,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_ignoreTags.validateSettings(settings);
         m_asCollectionModel.validateSettings(settings);
         m_vectorColsModel.validateSettings(settings);
+        m_useSettingsFromModelPortModel.validateSettings(settings);
     }
 
     /**
@@ -557,21 +569,15 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     }
 
     private void checkUncheck() {
-        if (m_booleanModel.getBooleanValue()) {
+        m_booleanModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
+        m_ignoreTags.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
+        m_asCollectionModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
+
+        if (m_useSettingsFromModelPortModel.getBooleanValue()
+            || (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue())) {
             m_colModel.setEnabled(false);
         } else {
             m_colModel.setEnabled(true);
-        }
-    }
-
-    class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            checkUncheck();
         }
     }
 }

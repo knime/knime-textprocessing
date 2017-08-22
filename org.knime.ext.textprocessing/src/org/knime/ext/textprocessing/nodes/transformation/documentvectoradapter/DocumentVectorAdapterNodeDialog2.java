@@ -145,12 +145,12 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     private void checkUncheck() {
-        m_columnModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_booleanModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_ignoreTagsModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_asCollectionCell.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
 
-        if (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue()) {
+        if (m_useModelPortSettingsModel.getBooleanValue()
+            || (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue())) {
             m_columnModel.setEnabled(false);
         } else {
             m_columnModel.setEnabled(true);
