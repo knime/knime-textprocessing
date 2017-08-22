@@ -84,8 +84,7 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(DocumentVectorAdapterConfigKeys2.CFGKEY_DOC_COL,
-            DocumentVectorAdapterNodeModel2.DEFAULT_DOCUMENT_COLNAME);
+        return new SettingsModelString(DocumentVectorAdapterConfigKeys2.CFGKEY_DOC_COL, "");
     }
 
     static final SettingsModelBoolean getIgnoreTagsModel() {
