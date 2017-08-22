@@ -112,8 +112,7 @@ public class Doc2VecLearnerNodeModel extends AbstractDLNodeModel {
         final int seed = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.SEED);
         final double learningRate = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.LEARNING_RATE);
         final double sampling = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.SAMPLING);
-        final double negativeSampling =
-            m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.NEGATIVE_SAMPLING);
+        double negativeSampling = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.NEGATIVE_SAMPLING);
         final double minLearningRate =
             m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
         final int windowSize = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.WINDOW_SIZE);
@@ -129,6 +128,11 @@ public class Doc2VecLearnerNodeModel extends AbstractDLNodeModel {
 
         final BufferedDataTableLabelledDocumentIterator docIter =
             new BufferedDataTableLabelledDocumentIterator(table, documentColumnName, labelColumnName, skipMissing);
+
+        // Either hierarchical softmax or negative sampling should be used at the same time.
+        if (useHS) {
+            negativeSampling = 0.0;
+        }
 
         // build doc2vec model
         final ParagraphVectors d2v = new ParagraphVectors.Builder().learningRate(learningRate)

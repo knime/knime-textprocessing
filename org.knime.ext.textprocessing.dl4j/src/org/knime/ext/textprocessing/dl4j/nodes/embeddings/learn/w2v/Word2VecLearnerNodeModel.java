@@ -109,7 +109,7 @@ public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
         final int seed = m_wordVecParameterSettings.getInteger(WordVectorLearnerParameter.SEED);
         final double learningRate = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.LEARNING_RATE);
         final double sampling = m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.SAMPLING);
-        final double negativeSampling =
+        double negativeSampling =
             m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.NEGATIVE_SAMPLING);
         final double minLearningRate =
             m_wordVecParameterSettings.getDouble(WordVectorLearnerParameter.MIN_LEARNING_RATE);
@@ -126,6 +126,11 @@ public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
 
         final BufferedDataTableSentenceIterator sentenceIter =
             new BufferedDataTableSentenceIterator(table, documentColumnName, skipMissing);
+
+        // Either hierarchical softmax or negative sampling should be used at the same time.
+        if (useHS) {
+            negativeSampling = 0.0;
+        }
 
         // build word2vec model
         final Word2Vec w2v =
