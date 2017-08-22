@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
@@ -343,6 +344,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         List<DoubleCell> featureVector = initFeatureVector(featureIndexTable.size());
 
         long numberOfRows = sortedTable.size();
+        AtomicLong rowid = new AtomicLong(0);
         int currRow = 1;
         it = sortedTable.iterator();
         while (it.hasNext()) {
@@ -377,9 +379,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
                 DataRow newRow;
                 if (asCollectionCell) {
-                    newRow = createDataRowAsCollection(lastDoc, featureVector);
+                    newRow = createDataRowAsCollection(lastDoc, featureVector, rowid.getAndIncrement());
                 } else {
-                    newRow = createDataRowAsColumns(lastDoc, featureVector);
+                    newRow = createDataRowAsColumns(lastDoc, featureVector, rowid.getAndIncrement());
                 }
                 dc.addRowToTable(newRow);
                 // create new feature vector
@@ -403,9 +405,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             if (currRow == numberOfRows) {
                 DataRow newRow;
                 if (asCollectionCell) {
-                    newRow = createDataRowAsCollection(currDoc, featureVector);
+                    newRow = createDataRowAsCollection(currDoc, featureVector, rowid.getAndIncrement());
                 } else {
-                    newRow = createDataRowAsColumns(currDoc, featureVector);
+                    newRow = createDataRowAsColumns(currDoc, featureVector, rowid.getAndIncrement());
                 }
                 dc.addRowToTable(newRow);
             }
@@ -419,22 +421,19 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         return new BufferedDataTable[]{dc.getTable()};
     }
 
-    private long m_rowKeyNr = 0;
-
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 
-    private DataRow createDataRowAsCollection(final Document doc, final List<DoubleCell> featureVector) {
-        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
-        m_rowKeyNr++;
+    private DataRow createDataRowAsCollection(final Document doc, final List<DoubleCell> featureVector,
+        final long rowid) {
+        final RowKey rowKey = RowKey.createRowKey(rowid);
         final DataCell docCell = m_documentCellFac.createDataCell(doc);
         final DataCell vectorCell = CollectionCellFactory.createSparseListCell(featureVector, DEFAULT_CELL);
 
         return new DefaultRow(rowKey, new DataCell[]{docCell, vectorCell});
     }
 
-    private DataRow createDataRowAsColumns(final Document doc, final List<DoubleCell> featureVector) {
-        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
-        m_rowKeyNr++;
+    private DataRow createDataRowAsColumns(final Document doc, final List<DoubleCell> featureVector, final long rowid) {
+        final RowKey rowKey = RowKey.createRowKey(rowid);
         final DataCell[] cells = new DataCell[featureVector.size() + 1];
         cells[0] = m_documentCellFac.createDataCell(doc);
         for (int i = 0; i < cells.length - 1; i++) {
