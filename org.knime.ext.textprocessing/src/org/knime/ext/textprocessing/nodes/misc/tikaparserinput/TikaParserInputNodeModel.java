@@ -48,7 +48,9 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.tikaparserinput;
 
-import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,6 +71,7 @@ import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
 import org.knime.core.node.streamable.RowInput;
 import org.knime.core.node.util.CheckUtils;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.AbstractTikaNodeModel;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
 
@@ -173,10 +176,12 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
      *
      * @throws InvalidSettingsException
      * @throws InterruptedException
+     * @throws MalformedURLException
+     * @throws InvalidPathException
      */
     @Override
-    protected Iterable<File> readInput(final RowInput input) throws InvalidSettingsException, InterruptedException {
-        List<File> files = new ArrayList<File>();
+    protected Iterable<URL> readInput(final RowInput input) throws InvalidSettingsException, InterruptedException, InvalidPathException, MalformedURLException {
+        List<URL> files = new ArrayList<URL>();
         int colIndex = input.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
         CheckUtils.checkSetting(colIndex >= 0, "no such column \"%s\"", m_colModel.getStringValue());
         DataRow row;
@@ -192,7 +197,7 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
             } else {
                 url = ((StringValue)cell).getStringValue();
             }
-            files.add(getFile(url, false));
+            files.add(FileUtil.toURL(url));
         }
         return files;
     }

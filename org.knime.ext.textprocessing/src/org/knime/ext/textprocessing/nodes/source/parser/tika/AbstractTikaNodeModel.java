@@ -188,7 +188,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
      * @return iterable list of parsable files
      * @throws Exception InvalidSettingsException, InterruptedException
      */
-    protected abstract Iterable<File> readInput(final RowInput input) throws Exception;
+    protected abstract Iterable<URL> readInput(final RowInput input) throws Exception;
 
     /**
      * {@inheritDoc}
@@ -224,12 +224,12 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                 int rowKeyOne = 0;
                 int rowKeyTwo = 0;
 
-                Iterable<File> files = readInput(isSourceNode() ? null : (RowInput)inputs[0]);
+                Iterable<URL> urls = readInput(isSourceNode() ? null : (RowInput)inputs[0]);
                 int count = 1;
-                for (File file : files) {
+                for (URL url : urls) {
                     String errorMsg = "";
 
-                    if (file == null) {
+                    if (url == null) {
                         errorMsg = "Missing cell. Cannot locate file path";
                         rowOutput1.push(TikaParser.setMissingRow(outputColumnsOne, "", rowKeyOne, errorMsg,
                             m_errorColNameModel.getStringValue()));
@@ -249,12 +249,12 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     }
                     tikaParser.setExtractInlineImages(inlineImage);
 
-                    List<DataCell[]> datacells = tikaParser.parse(file, attachmentDir);
+                    List<DataCell[]> datacells = tikaParser.parse(url, attachmentDir);
                     duplicateFiles = tikaParser.getDuplicates();
                     errorMsg = tikaParser.getErrorMsg();
-                    if (datacells.isEmpty()) {
+                    if (datacells == null || datacells.isEmpty()) {
                         if (!errorMsg.isEmpty()) {
-                            setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
+                            setWarningMessage(errorMsg + ": " + TikaParser.getPath(url));
                             error = true;
                         }
                         continue; // skipped files
@@ -265,7 +265,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     rowKeyOne++;
 
                     if (!errorMsg.isEmpty()) {
-                        setWarningMessage(errorMsg + ": " + file.getAbsolutePath());
+                        setWarningMessage(errorMsg + ": " + TikaParser.getPath(url));
                         error = true;
                         continue;
                     }
@@ -278,7 +278,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     }
 
                     exec.checkCanceled();
-                    int filesSize = Iterables.size(files);
+                    int filesSize = Iterables.size(urls);
                     exec.setProgress(count / (double)filesSize, "Parsing file " + count + " of " + filesSize);
                 }
 
@@ -468,11 +468,16 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         File f = null;
         try {
             // first try if file string is an URL (files in drop dir come as URLs)
-            final URL url = new URL(file);
+            final URL url = FileUtil.toURL(file);
             f = FileUtil.getFileFromURL(url);
         } catch (MalformedURLException e) {
             // if no URL try string as path to file
             f = new File(file);
+        }
+
+        // for remote dir
+        if (f == null) {
+            return f;
         }
 
         if (dir && (!f.isDirectory() || !f.exists() || !f.canRead())) {
