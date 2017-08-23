@@ -49,9 +49,12 @@
 package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -59,7 +62,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.RowInput;
-import org.knime.ext.textprocessing.nodes.source.parser.FileCollector;
+import org.knime.core.util.FileUtil;
 
 /**
  * The node model of the Tika Parser node. This model extends
@@ -112,24 +115,36 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
         m_ignoreHiddenFilesModel.loadSettingsFrom(settings);
     }
 
-    /**
-     * @param validTypes
-     * @param ext the file type (ext or mime)
-     * @return the list of files to be parsed (only for Tika source node)
-     * @throws InvalidSettingsException
-     */
-    private List<File> getListOfFiles(final List<String> validTypes, final boolean ext)
-        throws InvalidSettingsException {
-        File dir = getFile(m_pathModel.getStringValue(), true);
-        boolean recursive = m_recursiveModel.getBooleanValue();
-        boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
-        FileCollector fc;
-        if (ext) {
-            fc = new FileCollector(dir, validTypes, recursive, ignoreHiddenFiles);
-        } else {
-            fc = new FileCollector(dir, new ArrayList<String>(), recursive, ignoreHiddenFiles);
+    private boolean filterExt(final List<String> exts, final URL s) {
+        if (exts.size() == 0) {
+            return true;
         }
-        return fc.getFiles();
+
+        for (final String ext : exts) {
+            if (s.getFile().toLowerCase().endsWith("." + ext)) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    private boolean filterLocalFiles(final URL s) {
+        try {
+            String url = URLDecoder.decode(s.getPath(), "UTF-8");
+            File file = getFile(url, false);
+            if (file != null) {
+                if (m_ignoreHiddenFilesModel.getBooleanValue() && file.isHidden()) {
+                    return false;
+                }
+                if (!file.isFile() || file.isDirectory()) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -138,10 +153,21 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
      * @throws InvalidSettingsException
      */
     @Override
-    protected Iterable<File> readInput(final RowInput input) throws InvalidSettingsException {
+    protected Iterable<URL> readInput(final RowInput input) throws InvalidSettingsException {
         boolean ext = getTypesModel().getStringValue().equals(TikaParserConfig.EXT_TYPE);
-        List<File> files = getListOfFiles(getFilterModel().getIncludeList(), ext);
-        return files.stream().filter(f -> ext || f.isFile()).collect(Collectors.toList());
+        boolean recursive = m_recursiveModel.getBooleanValue();
+        try {
+            URL url = FileUtil.toURL(m_pathModel.getStringValue());
+            Path localPath = FileUtil.resolveToPath(url);
+            if (localPath == null && !url.getProtocol().equalsIgnoreCase("knime")) {
+                throw new InvalidSettingsException("Reading from remote directories is not supported.");
+            }
+            return ext ? FileUtil.listFiles(url,
+                u -> filterExt(getFilterModel().getIncludeList(), u) && filterLocalFiles(u), recursive)
+                : FileUtil.listFiles(url, u -> filterLocalFiles(u), recursive);
+        } catch (IOException | URISyntaxException e) {
+            throw new InvalidSettingsException("Directory path cannot be accessed!");
+        }
     }
 
 }

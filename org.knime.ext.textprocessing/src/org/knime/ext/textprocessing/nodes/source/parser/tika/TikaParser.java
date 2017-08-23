@@ -50,9 +50,11 @@ package org.knime.ext.textprocessing.nodes.source.parser.tika;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -75,6 +77,7 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.PasswordProvider;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
+import org.eclipse.core.runtime.CoreException;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
@@ -82,6 +85,7 @@ import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig.TikaColumnKeys;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -138,12 +142,13 @@ public class TikaParser {
      * This method parses a file and creates a list of DataCell arrays containing the parsed information and its
      * attachments.
      *
-     * @param file the file to be parsed
+     * @param url the file to be parsed
      * @param attachmentDir the directory where any attachments should be stored
      * @return a list of data cells (index 0 should contain cells for the first output port, the rest for the second
      *         output port
+     * @throws UnsupportedEncodingException
      */
-    public List<DataCell[]> parse(final File file, final File attachmentDir) {
+    public List<DataCell[]> parse(final URL url, final File attachmentDir) throws UnsupportedEncodingException {
         String mime_type = "-";
         List<DataCell[]> result = new ArrayList<DataCell[]>();
 
@@ -152,54 +157,85 @@ public class TikaParser {
         pdfConfig.setSortByPosition(true);
         m_context.set(PDFParserConfig.class, pdfConfig);
 
-        if (!m_sourceNode && !file.isFile() && file.canRead()) {
-            m_errorMsg = "File might be a directory";
-            result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
-            return result;
+        File localFile;
+        try {
+            localFile = FileUtil.getFileFromURL(url);
+        } catch (Exception e) {
+            localFile = null;
+        }
+
+        if (localFile != null) {
+            boolean isDir = !localFile.isFile();
+            boolean canRead = localFile.canRead();
+            if (!m_sourceNode && isDir && canRead) {
+                m_errorMsg = "File might be a directory";
+                if (!m_sourceNode) {
+                    result.add(createMissingRow(url, m_errorMsg));
+                    return result;
+                } else {
+                    return null;
+                }
+            }
         }
 
         if (!m_sourceNode && m_extBoolean) {
-            if (!m_validTypes.contains(FilenameUtils.getExtension(file.getName()).toLowerCase())) {
+            if (!m_validTypes.contains(FilenameUtils.getExtension(url.getFile()).toLowerCase())) { //getName
                 m_errorMsg = "File doesn't match any selected extension(s)";
-                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                result.add(createMissingRow(url, m_errorMsg));
                 return result;
             }
         }
 
-        if (!file.canRead()) {
-            m_errorMsg = "Unreadable file";
-            if (!m_sourceNode || m_extBoolean) {
-                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
-            } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
-            return result;
+        if (localFile != null) {
+            if (!localFile.canRead()) { // can read
+                m_errorMsg = "Unreadable file";
+                if (!m_sourceNode || m_extBoolean) {
+                    result.add(createMissingRow(url, m_errorMsg));
+                } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
+                return result;
+            }
         }
 
         if (m_authBoolean) {
             setPasswordToContext();
         }
 
-        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, file.getName());
+        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, url.getFile()); //getName
 
-        try (BufferedInputStream str = new BufferedInputStream(new FileInputStream(file.getPath()))) {
+        try (BufferedInputStream str = new BufferedInputStream(FileUtil.openStreamWithTimeout(url))) {
             mime_type = m_parser.getDetector().detect(str, m_metadata).toString();
         } catch (FileNotFoundException e) {
             m_errorMsg = "Could not find file";
             if (!m_sourceNode || m_extBoolean) {
-                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                result.add(createMissingRow(url, m_errorMsg));
             } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
             return result;
         } catch (IOException e) {
-            m_errorMsg = "Unable to determine the MIME-type";
-            if (!m_sourceNode || m_extBoolean) {
-                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
-            } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
+            if (isMountpointRelative(url) && e.getCause() instanceof CoreException) {
+                m_errorMsg = e.getCause().getMessage();
+                result.add(createMissingRow(url, m_errorMsg));
+            } else {
+                m_errorMsg = "Unable to determine the MIME-type";
+                if (!m_sourceNode || m_extBoolean) {
+                    result.add(createMissingRow(url, m_errorMsg));
+                } // else, it's a source node and MIME type, the file should be ignored but give a warning on console --> return empty list
+            }
+            return result;
+        } catch (UnsupportedOperationException e) {
+            if (isMountpointRelative(url)) {
+                m_errorMsg =
+                    "Unable to access files on server " + url.getHost() + ". Please make sure you are logged in.";
+            } else {
+                m_errorMsg = e.getMessage();
+            }
+            result.add(createMissingRow(url, m_errorMsg));
             return result;
         }
 
         if (mime_type.equals(MediaType.OCTET_STREAM.toString())) {
             if (m_extBoolean) {
                 m_errorMsg = "Could not detect/parse file";
-                result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                result.add(createMissingRow(url, m_errorMsg));
                 return result;
             }
         }
@@ -207,7 +243,7 @@ public class TikaParser {
             if (!m_validTypes.contains(mime_type)) {
                 if (!m_sourceNode) {
                     m_errorMsg = "File doesn't match any selected MIME-type(s)";
-                    result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+                    result.add(createMissingRow(url, m_errorMsg));
                 } // for source node, skip if mime type is not in the list of input mime types --> return empty list
                 return result;
             }
@@ -215,15 +251,15 @@ public class TikaParser {
 
         try {
             if (attachmentDir != null) {
-                try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
+                try (TikaInputStream stream = TikaInputStream.get(FileUtil.openStreamWithTimeout(url));) {
                     EmbeddedFilesExtractor ex = new EmbeddedFilesExtractor();
                     ex.setContext(m_context);
                     ex.setDuplicateFilesList(m_duplicates);
                     ex.setExtractInlineImages(m_extractInlineImages);
-                    ex.extract(stream, attachmentDir.toPath(), file.getName());
+                    ex.extract(stream, attachmentDir.toPath(), url.getFile()); //getName
                     if (ex.hasError()) {
                         m_errorMsg = "Could not write embedded files to the output directory";
-                        LOGGER.error(m_errorMsg + ": " + file.getAbsolutePath());
+                        LOGGER.error(m_errorMsg + ": " + url.getPath());
                     }
                     m_metadata = ex.getMetadata();
                     m_handler = ex.getHandler();
@@ -231,24 +267,24 @@ public class TikaParser {
                     DataCell[] cellsTwo = {};
                     for (Entry<String, String> entry : ex.getOutputFiles().entrySet()) {
                         cellsTwo = new DataCell[TikaParserConfig.OUTPUT_TWO_COL_NAMES.length];
-                        cellsTwo[0] = new StringCell(file.getAbsolutePath());
+                        cellsTwo[0] = new StringCell(getPath(url));
                         cellsTwo[1] = new StringCell(entry.getKey());
                         cellsTwo[2] = new StringCell(entry.getValue());
                         result.add(cellsTwo);
                     }
                 }
             } else {
-                try (TikaInputStream stream = TikaInputStream.get(file.toPath());) {
+                try (TikaInputStream stream = TikaInputStream.get(url);) {
                     m_parser.parse(stream, m_handler, m_metadata, m_context);
                 }
             }
         } catch (EncryptedDocumentException e) {
             m_errorMsg = "Could not parse encrypted file, invalid password";
-            result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            result.add(createMissingRow(url, m_errorMsg));
             return result;
         } catch (IOException | SAXException | TikaException e) {
             m_errorMsg = "Could not parse file, it might be broken";
-            result.add(createMissingRow(file.getAbsolutePath(), m_errorMsg));
+            result.add(createMissingRow(url, m_errorMsg));
             return result;
         }
 
@@ -257,7 +293,7 @@ public class TikaParser {
             String colName = m_outputColumnsOne.get(j);
             Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
             if (prop == null && colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                cellsOne[j] = new StringCell(file.getAbsolutePath());
+                cellsOne[j] = new StringCell(getPath(url));
             } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
                 if (mime_type.equals("-")) {
                     cellsOne[j] = DataType.getMissingCell();
@@ -281,6 +317,12 @@ public class TikaParser {
         return result;
     }
 
+    private boolean isMountpointRelative(final URL url) {
+        final String host = url.getHost();
+        return url.getProtocol().equals("knime") && !host.equals("knime.workflow") && !host.equals("knime.mountpoint")
+            && !host.equals("knime.node");
+    }
+
     private void setPasswordToContext() {
         m_context.set(PasswordProvider.class, new PasswordProvider() {
             @Override
@@ -290,7 +332,8 @@ public class TikaParser {
         });
     }
 
-    private DataCell[] createMissingRow(final String file, final String errorMsg) {
+    private DataCell[] createMissingRow(final URL url, final String errorMsg) throws UnsupportedEncodingException {
+        String file = getPath(url);
         int outputSize = m_outputColumnsOne.size();
         DataCell[] cells = new DataCell[outputSize];
         for (int j = 0; j < outputSize; j++) {
@@ -304,6 +347,19 @@ public class TikaParser {
             }
         }
         return cells;
+    }
+
+    /**
+     * @param url the URL
+     * @return the complete path of the URL
+     * @throws UnsupportedEncodingException if the URL cannot be decoded
+     */
+    public static String getPath(final URL url) throws UnsupportedEncodingException {
+        String res = URLDecoder.decode(url.getPath(), "UTF-8");
+        if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("knime")) {
+            return url.getProtocol() + "://" + url.getHost() + res;
+        }
+        return res;
     }
 
     /**
