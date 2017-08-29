@@ -151,6 +151,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private SettingsModelBoolean m_useSettingsFromModelPortModel =
         DocumentVectorAdapterNodeDialog2.getUseModelSettings();
 
+    private DocumentVectorPortObjectSpec m_previousSpec = null;
+
     /**
      * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
      */
@@ -176,7 +178,11 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         DocumentVectorPortObjectSpec modelSpec = null;
         if (inSpecs[1] instanceof DocumentVectorPortObjectSpec && !inSpecs[1].equals(null)) {
             modelSpec = (DocumentVectorPortObjectSpec)inSpecs[1];
-            m_vectorColsModel.setIncludeList(modelSpec.getFeatureSpaceColumns());
+            if (!modelSpec.equals(m_previousSpec)
+                || (m_vectorColsModel.getExcludeList().isEmpty() && m_vectorColsModel.getIncludeList().isEmpty())) {
+                m_vectorColsModel.setIncludeList(modelSpec.getFeatureSpaceColumns());
+            }
+            m_previousSpec = modelSpec;
         } else {
             throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
         }
@@ -227,21 +233,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         }
     }
 
-    private final void setSettings(boolean ignoreTags, boolean useBitvector,
-        String vectorValueColumn, boolean asCollectionCell, final DocumentVectorPortObjectSpec modelSpec) {
-        if (m_useSettingsFromModelPortModel.getBooleanValue()) {
-            useBitvector = modelSpec.getBitVectorSetting();
-            ignoreTags = modelSpec.getIgnoreTagsSetting();
-            vectorValueColumn = modelSpec.getVectorValueColumnName();
-            asCollectionCell = modelSpec.getCollectionCellSetting();
-        } else {
-            useBitvector = m_booleanModel.getBooleanValue();
-            ignoreTags = m_ignoreTags.getBooleanValue();
-            vectorValueColumn = m_colModel.getStringValue();
-            asCollectionCell = m_asCollectionModel.getBooleanValue();
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -253,11 +244,17 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
         checkDataTableSpec(dataTableSpec);
 
-        final boolean ignoreTags = false;
-        final boolean useBitvector = false;
-        final String vectorValueColumn = null;
-        final boolean asCollectionCell = false;
-        setSettings(ignoreTags, useBitvector, vectorValueColumn, asCollectionCell, modelSpec);
+        boolean useBitvector = m_booleanModel.getBooleanValue();
+        boolean ignoreTags = m_ignoreTags.getBooleanValue();
+        String vectorValueColumn = m_colModel.getStringValue();
+        boolean asCollectionCell = m_asCollectionModel.getBooleanValue();
+
+        if (m_useSettingsFromModelPortModel.getBooleanValue()) {
+            useBitvector = modelSpec.getBitVectorSetting();
+            ignoreTags = modelSpec.getIgnoreTagsSetting();
+            vectorValueColumn = modelSpec.getVectorValueColumnName();
+            asCollectionCell = modelSpec.getCollectionCellSetting();
+        }
 
         // document column index.
         m_documentColIndex = dataTableSpec.findColumnIndex(m_documentColModel.getStringValue());
@@ -268,7 +265,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         // Check if no valid column selected, the use of boolean values is
         // specified !
         if (!useBitvector) {
-            final String colName = m_colModel.getStringValue();
+            final String colName = vectorValueColumn;
             colIndex = dataTableSpec.findColumnIndex(colName);
             if (colIndex < 0) {
                 throw new InvalidSettingsException("No valid value column selected!");
