@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcVectors.png" type="Manipulator">
-    <name>Document vector</name>
+    <name>Document Vector</name>
     <shortDescription>Creates a document vector for each document.
     </shortDescription>
     <fullDescription>
@@ -48,5 +48,7 @@
         containing the bag of words.</inPort>    
         <outPort name="Documents output table" index="0">An output table
         containing the documents with the related document vectors.</outPort>
+        <outPort name="Model output" index="1">A model containing node settings as well as 
+        column names of the term feature space.</outPort>
     </ports>
 </knimeNode>
