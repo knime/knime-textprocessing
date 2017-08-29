@@ -110,6 +110,8 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_asCollectionCell = getAsCollectionModel();
 
+    private SettingsModelFilterString m_vectorColsModel = getVectorColumnsModel();
+
     private DialogComponentStringFilter m_stringFilterComponent;
 
     /**
@@ -139,7 +141,7 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         checkUncheck();
 
         createNewTab("Feature Column Selection");
-        m_stringFilterComponent = new DialogComponentStringFilter(getVectorColumnsModel(), new String[]{}, false);
+        m_stringFilterComponent = new DialogComponentStringFilter(m_vectorColsModel, new String[]{}, false);
 
         addDialogComponent(m_stringFilterComponent);
     }
@@ -163,13 +165,15 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     @Override
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
+        super.loadAdditionalSettingsFrom(settings, specs);
         if (!(specs[1] instanceof DocumentVectorPortObjectSpec)) {
             throw new NotConfigurableException("No model or wrong model connected to model port!");
-        } else {
+        } else if (specs[1] != null) {
             m_stringFilterComponent.setAllColumns(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());
+            if (m_vectorColsModel.getExcludeList().isEmpty() && m_vectorColsModel.getIncludeList().isEmpty()) {
+                m_vectorColsModel.setIncludeList(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());
+            }
             m_stringFilterComponent.updateComponent();
         }
-        super.loadAdditionalSettingsFrom(settings, specs);
     }
-
 }
