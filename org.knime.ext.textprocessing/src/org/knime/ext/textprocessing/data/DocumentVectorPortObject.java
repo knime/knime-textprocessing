@@ -63,7 +63,9 @@ import org.knime.core.node.util.CheckUtils;
 
 /**
  * The {@code DocumentVectorPortObject} is used to transfer vector creation specifications, as well as name of feature
- * space column names from Document Vector node to the Document Vector Adapter node.
+ * space column names from Document Vector node to the Document Vector Adapter node. The
+ * {@code DocumentVectorPortObject} contains the {@code DocumentVectorPortObjecSpec} that holds all the necessary
+ * information.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.5

@@ -66,6 +66,16 @@ import org.knime.core.node.port.AbstractSimplePortObjectSpec;
  */
 public class DocumentVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
 
+    private static String IGNORE_TAGS = "ignoreTags";
+
+    private static String BITVECTOR = "bitVector";
+
+    private static String VECTOR_VALUE = "vectorValue";
+
+    private static String AS_COLLECTION_CELL = "asCollectionCell";
+
+    private static String FEATURE_SPACE_COLUMNS = "featureSpaceColumns";
+
     private boolean m_ignoreTags;
 
     private boolean m_bitVector;
@@ -93,8 +103,8 @@ public class DocumentVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
     }
 
     /**
-     * Creates a new instance of {@code DocumentVectorPortObjectSpec} that contains information about vector creation
-     * of Document Vector node, as well as feature space column names.
+     * Creates a new instance of {@code DocumentVectorPortObjectSpec} that contains information about vector creation of
+     * Document Vector node, as well as feature space column names.
      *
      * @param ignoreTags The boolean value of the ignore tags setting.
      * @param bitVector The boolean value of the bitvector setting.
@@ -202,11 +212,11 @@ public class DocumentVectorPortObjectSpec extends AbstractSimplePortObjectSpec {
      */
     @Override
     protected void load(final ModelContentRO model) throws InvalidSettingsException {
-        m_ignoreTags = model.getBoolean("ignoreTags");
-        m_bitVector = model.getBoolean("bitVector");
-        m_vectorValue = model.getString("vectorValue");
-        m_asCollectionCell = model.getBoolean("asCollectionCell");
-        m_featureSpaceColumns = model.getStringArray("featureSpaceColumns");
+        m_ignoreTags = model.getBoolean(IGNORE_TAGS);
+        m_bitVector = model.getBoolean(BITVECTOR);
+        m_vectorValue = model.getString(VECTOR_VALUE);
+        m_asCollectionCell = model.getBoolean(AS_COLLECTION_CELL);
+        m_featureSpaceColumns = model.getStringArray(FEATURE_SPACE_COLUMNS);
     }
 
 }
