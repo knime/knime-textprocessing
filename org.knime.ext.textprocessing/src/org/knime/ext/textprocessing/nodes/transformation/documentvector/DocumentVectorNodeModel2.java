@@ -209,8 +209,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec)
-        throws Exception {
+    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec) throws Exception {
         BufferedDataTable dataTable = (BufferedDataTable)inData[0];
         checkDataTableSpec(dataTable.getDataTableSpec());
 
@@ -359,9 +358,8 @@ class DocumentVectorNodeModel2 extends NodeModel {
         featureIndexTable.clear();
 
         return new PortObject[]{dc.getTable(),
-            new DocumentVectorPortObject(
-                new DocumentVectorPortObjectSpec(ignoreTags, m_booleanModel.getBooleanValue(),
-                    m_colModel.getStringValue(), m_asCollectionModel.getBooleanValue(), featureColumnNames))};
+            new DocumentVectorPortObject(new DocumentVectorPortObjectSpec(ignoreTags, m_booleanModel.getBooleanValue(),
+                m_colModel.getStringValue(), m_asCollectionModel.getBooleanValue(), featureColumnNames))};
     }
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);

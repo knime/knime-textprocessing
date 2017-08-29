@@ -55,7 +55,8 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvector;
  */
 final class DocumentVectorConfigKeys2 {
 
-    private DocumentVectorConfigKeys2() { }
+    private DocumentVectorConfigKeys2() {
+    }
 
     /**
      * The configuration key of the boolean value setting.

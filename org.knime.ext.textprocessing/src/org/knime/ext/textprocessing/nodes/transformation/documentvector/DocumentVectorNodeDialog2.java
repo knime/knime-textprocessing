@@ -64,38 +64,36 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
     /**
-     * Creates and returns an instance of {@link SettingsModelBoolean} specifying if a bitvector
-     * has to be created or not.
+     * Creates and returns an instance of {@link SettingsModelBoolean} specifying if a bitvector has to be created or
+     * not.
      *
      * @return A {@code SettingsModelBoolean} specifying if a bitvector has to be created or not.
      */
     static final SettingsModelBoolean getBooleanModel() {
         return new SettingsModelBoolean(DocumentVectorConfigKeys2.CFGKEY_BOOLEAN,
-                DocumentVectorNodeModel2.DEFAULT_BOOLEAN);
+            DocumentVectorNodeModel2.DEFAULT_BOOLEAN);
     }
 
     /**
-     * Creates and returns an instance of {@link SettingsModelBoolean} specifying if a collection cell has
-     * to be created or not.
+     * Creates and returns an instance of {@link SettingsModelBoolean} specifying if a collection cell has to be created
+     * or not.
      *
      * @return A {@code SettingsModelBoolean} specifying if a collection cell has to be created or not.
      */
     static final SettingsModelBoolean getAsCollectionModel() {
-        return new SettingsModelBoolean(
-                DocumentVectorConfigKeys2.CFGKEY_ASCOLLECTION,
-                DocumentVectorNodeModel2.DEFAULT_ASCOLLECTION);
+        return new SettingsModelBoolean(DocumentVectorConfigKeys2.CFGKEY_ASCOLLECTION,
+            DocumentVectorNodeModel2.DEFAULT_ASCOLLECTION);
     }
 
     /**
-     * Creates and returns an instance of {@link SettingsModelString} containing the name of the column with
-     * the vector values to use.
+     * Creates and returns an instance of {@link SettingsModelString} containing the name of the column with the vector
+     * values to use.
      *
      * @return A {@code SettingsModelString} containing the name of the column with the vector values to use.
      */
     static final SettingsModelString getColumnModel() {
-        return new SettingsModelString(
-                DocumentVectorConfigKeys2.CFGKEY_VALUE_COL,
-                DocumentVectorNodeModel2.DEFAULT_COL);
+        return new SettingsModelString(DocumentVectorConfigKeys2.CFGKEY_VALUE_COL,
+            DocumentVectorNodeModel2.DEFAULT_COL);
     }
 
     /**
@@ -108,15 +106,14 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     /**
-     * Creates and returns a new instance of {@link SettingsModelBoolean} specifying whether tags will be ignored
-     * or not.
+     * Creates and returns a new instance of {@link SettingsModelBoolean} specifying whether tags will be ignored or
+     * not.
      *
      * @return A {@code SettingsModelBoolean} specifying whether tags will be ignored or not.
      */
     static final SettingsModelBoolean getIgnoreTagsModel() {
-        return new SettingsModelBoolean(
-                DocumentVectorConfigKeys2.CFGKEY_IGNORE_TAGS,
-                DocumentVectorNodeModel2.DEFAULT_IGNORE_TAGS);
+        return new SettingsModelBoolean(DocumentVectorConfigKeys2.CFGKEY_IGNORE_TAGS,
+            DocumentVectorNodeModel2.DEFAULT_IGNORE_TAGS);
     }
 
     private SettingsModelString m_columnModel;
@@ -128,25 +125,20 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     DocumentVectorNodeDialog2() {
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                getDocumentColModel(), "Document column", 0,
-                DocumentValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 0, DocumentValue.class));
 
-        addDialogComponent(new DialogComponentBoolean(
-                getIgnoreTagsModel(), "Ignore tags"));
+        addDialogComponent(new DialogComponentBoolean(getIgnoreTagsModel(), "Ignore tags"));
 
         m_columnModel = getColumnModel();
         m_booleanModel = getBooleanModel();
         m_booleanModel.addChangeListener(e -> checkUncheck());
 
-        addDialogComponent(new DialogComponentBoolean(
-                m_booleanModel, "Bitvector"));
+        addDialogComponent(new DialogComponentBoolean(m_booleanModel, "Bitvector"));
 
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                m_columnModel, "Vector value", 0, DoubleValue.class));
+        addDialogComponent(new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 0, DoubleValue.class));
 
-        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(),
-                "As collection cell"));
+        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
 
         checkUncheck();
     }

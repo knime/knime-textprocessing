@@ -57,8 +57,7 @@ import org.knime.core.node.NodeView;
  * @author Kilian Thiel & Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
-public class DocumentVectorNodeFactory2 extends
-NodeFactory<DocumentVectorNodeModel2> {
+public class DocumentVectorNodeFactory2 extends NodeFactory<DocumentVectorNodeModel2> {
 
     /**
      * {@inheritDoc}
@@ -80,8 +79,7 @@ NodeFactory<DocumentVectorNodeModel2> {
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DocumentVectorNodeModel2> createNodeView(final int index,
-            final DocumentVectorNodeModel2 model) {
+    public NodeView<DocumentVectorNodeModel2> createNodeView(final int index, final DocumentVectorNodeModel2 model) {
         return null;
     }
 
