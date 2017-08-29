@@ -144,7 +144,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
     private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog2.getAsCollectionModel();
 
     /**
-     * Creates a new instance of {@code DocumentVectorNodeModel}.
+     * Creates a new instance of {@code DocumentVectorNodeModel2}.
      */
     DocumentVectorNodeModel2() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE,
