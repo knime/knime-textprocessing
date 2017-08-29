@@ -106,12 +106,12 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * filtered based on the reference table in the second input. This node returns a document feature vector with the same
  * features as the ones in the reference table.
  *
- * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
  */
 class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     /**
-     * The default setting of the creation of bit vectors. By default bit vectors are created (<code>true</code>).
+     * The default setting of the creation of bit vectors. By default bit vectors are created ({@code true}).
      */
     static final boolean DEFAULT_BOOLEAN = true;
 
@@ -154,7 +154,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private DocumentVectorPortObjectSpec m_previousSpec = null;
 
     /**
-     * Creates a new instance of <code>DocumentVectorAdapterNodeModel</code>.
+     * Creates a new instance of {@code DocumentVectorAdapterNodeModel}.
      */
     DocumentVectorAdapterNodeModel2() {
         super(

@@ -64,7 +64,7 @@ import org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec;
 /**
  * Provides the dialog of the document vector adapter node.
  *
- * @author Andisa Dewi, KNIME.com, Berlin, Germany
+ * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
  */
 class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
@@ -115,7 +115,7 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     private DialogComponentStringFilter m_stringFilterComponent;
 
     /**
-     * Creates a new instance of <code>DocumentVectorAdapterNodeDialog</code>.
+     * Creates a new instance of {@code DocumentVectorAdapterNodeDialog2}.
      */
     @SuppressWarnings("unchecked")
     DocumentVectorAdapterNodeDialog2() {
@@ -166,9 +166,11 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
+        // throw exception if no or a wrong model is connected to the model port
         if (!(specs[1] instanceof DocumentVectorPortObjectSpec)) {
             throw new NotConfigurableException("No model or wrong model connected to model port!");
         } else if (specs[1] != null) {
+            // set existing columns and set includes if they haven't been set before
             m_stringFilterComponent.setAllColumns(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());
             if (m_vectorColsModel.getExcludeList().isEmpty() && m_vectorColsModel.getIncludeList().isEmpty()) {
                 m_vectorColsModel.setIncludeList(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());

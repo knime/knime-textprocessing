@@ -61,8 +61,10 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.filter.StringFilterPanel;
 
 /**
+ * A string twin list with include and exclude list.
  *
- * @author Julian
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.5
  */
 public class DialogComponentStringFilter extends DialogComponent {
 
@@ -75,9 +77,10 @@ public class DialogComponentStringFilter extends DialogComponent {
     private List<String> m_excludes;
 
     /**
-     * @param model
-     * @param columnNames
-     * @param showSelectionListsOnly
+     * @param model The {@code SettingsModelFilterString} storing include and exclude lists.
+     * @param columnNames A String array containing the column names as Strings.
+     * @param showSelectionListsOnly If true, the panel shows no additional options like search box,
+     * force-include-option, etc.
      */
     public DialogComponentStringFilter(final SettingsModelFilterString model, final String[] columnNames,
         final boolean showSelectionListsOnly) {
@@ -112,28 +115,36 @@ public class DialogComponentStringFilter extends DialogComponent {
     }
 
     /**
-     * @return list of available columns
+     * Returns a String array containing the column names.
+     *
+     * @return Array of available columns names.
      */
     public String[] getAllColumns() {
         return m_allColumns;
     }
 
     /**
-     * @param allColumns list of available types to be set
+     * Method to set the column names
+     *
+     * @param allColumns String array of available column names
      */
     public void setAllColumns(final String[] allColumns) {
         m_allColumns = allColumns;
     }
 
     /**
-     * @return the m_excludes
+     * Returns the includes list.
+     *
+     * @return The includes list.
      */
     public List<String> getIncludesList() {
         return m_includes;
     }
 
     /**
-     * @return the m_excludes
+     * Returns the excludes list.
+     *
+     * @return The excludes list.
      */
     public List<String> getExcludesList() {
         return m_excludes;
