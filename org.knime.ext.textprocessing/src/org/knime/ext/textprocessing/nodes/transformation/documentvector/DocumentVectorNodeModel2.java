@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -240,7 +240,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         BufferedDataTable sortedTable = new SortedTable(dataTable, colList, sortAsc, exec).getBufferedDataTable();
 
         // hash table holding an index for each feature
-        final Map<String, Integer> featureIndexTable = new HashMap<String, Integer>();
+        final Map<String, Integer> featureIndexTable = new LinkedHashMap<String, Integer>();
 
         // first go through data table to collect the features
         exec.setProgress("Collecting features");
@@ -361,7 +361,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         return new PortObject[]{dc.getTable(),
             new DocumentVectorPortObject(
                 new DocumentVectorPortObjectSpec(ignoreTags, m_booleanModel.getBooleanValue(),
-                    m_documentColModel.getStringValue(), m_asCollectionModel.getBooleanValue(), featureColumnNames))};
+                    m_colModel.getStringValue(), m_asCollectionModel.getBooleanValue(), featureColumnNames))};
     }
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
