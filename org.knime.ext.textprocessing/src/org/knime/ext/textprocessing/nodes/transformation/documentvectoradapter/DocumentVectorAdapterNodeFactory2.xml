@@ -12,19 +12,17 @@
 			it
 			in the
 			terms space, exactly as the normal document vector node. The
-			difference is that this node takes two data tables as input:
+			difference is that this node takes one data table and one Document Vector model as input:
 			<br />
 			1. Table containing the bag-of-words terms
 			<br />
-			2. Table containing the
-			reference document vector
+			2. Document Vector model containing names of feature space columns and node settings
 			<br />
 			<br />
 			The terms from the first input will be converted into document
 			vectors using the vector from the second input as the reference.
-			Features that appear in first table, but not in the reference table
-			will be filtered out, and features that appear in the reference
-			table, but not
+			Features that appear in first table, but not in the model input 
+			will be filtered out, and features that appear in model input, but not
 			in the first table will be added to the output vector
 			and their values will be set to 0.
 			<br />
@@ -41,6 +39,9 @@
 		<tab name="Option">
 			<option name="Document column">
 				The column containing the documents to use.
+			</option>
+			<option name="Use settings from model">
+				If checked, settings contained in the input model will be used.
 			</option>
 			<option name="Ignore tags">
 				If checked tags are ignored when comparing terms.
@@ -83,7 +84,7 @@
 		</tab>
 		<tab name="Feature Column Selection">
 			<option name="Feature Column Selection">
-				Selects all columns from the reference table
+				Selects all column names from the model input
 				containing features that should appear in the output document vector.
 			</option>
 		</tab>
@@ -93,12 +94,12 @@
 		<inPort name="Documents input table" index="0">The input table
 			containing the bag of words.
 		</inPort>
-		<inPort name="Document vector input table" index="1">The input
-			reference table containing the reference document vector.
+		<inPort name="Document vector model input" index="1">The input
+			model containing the node settings and column names of the term features space.
 		</inPort>
 		<outPort name="Documents output table" index="0">An output table
 			containing the documents with the corresponding document vectors,
-			whose terms are identical to the ones in the reference document vector.
+			whose terms are identical to the ones in the model.
 		</outPort>
 	</ports>
 </knimeNode>
