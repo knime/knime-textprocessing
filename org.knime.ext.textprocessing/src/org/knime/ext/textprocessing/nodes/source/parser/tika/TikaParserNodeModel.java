@@ -52,7 +52,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -131,8 +130,7 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
 
     private boolean filterLocalFiles(final URL s) {
         try {
-            String url = URLDecoder.decode(s.getPath(), "UTF-8");
-            File file = getFile(url, false);
+            final File file = FileUtil.getFileFromURL(s);
             if (file != null) {
                 if (m_ignoreHiddenFilesModel.getBooleanValue() && file.isHidden()) {
                     return false;
