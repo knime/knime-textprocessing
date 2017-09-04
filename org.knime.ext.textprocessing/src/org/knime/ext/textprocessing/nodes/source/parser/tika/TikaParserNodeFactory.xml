@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="../../../../icons/TextProcSource.png" type="Source">
+<knimeNode icon="../../../../icons/TikaParser.png" type="Source">
 	<name>Tika Parser</name>
 	<shortDescription>
 		Tika Parser parses all kinds of file format supported
