@@ -87,11 +87,6 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         return new SettingsModelString(DocumentVectorAdapterConfigKeys2.CFGKEY_DOC_COL, "");
     }
 
-    static final SettingsModelBoolean getIgnoreTagsModel() {
-        return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys2.CFGKEY_IGNORE_TAGS,
-            DocumentVectorAdapterNodeModel2.DEFAULT_IGNORE_TAGS);
-    }
-
     static SettingsModelFilterString getVectorColumnsModel() {
         return new SettingsModelFilterString(DocumentVectorAdapterConfigKeys2.CFGKEY_VECTOR_COLUMNS);
     }
@@ -105,8 +100,6 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     private SettingsModelBoolean m_booleanModel = getBooleanModel();
 
     private SettingsModelBoolean m_useModelPortSettingsModel = getUseModelSettings();
-
-    private SettingsModelBoolean m_ignoreTagsModel = getIgnoreTagsModel();
 
     private SettingsModelBoolean m_asCollectionCell = getAsCollectionModel();
 
@@ -128,8 +121,6 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(m_useModelPortSettingsModel, "Use settings from model"));
 
-        addDialogComponent(new DialogComponentBoolean(m_ignoreTagsModel, "Ignore tags"));
-
         m_booleanModel.addChangeListener(e -> checkUncheck());
 
         addDialogComponent(new DialogComponentBoolean(m_booleanModel, "Bitvector"));
@@ -148,7 +139,6 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
     private void checkUncheck() {
         m_booleanModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
-        m_ignoreTagsModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_asCollectionCell.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
 
         if (m_useModelPortSettingsModel.getBooleanValue()

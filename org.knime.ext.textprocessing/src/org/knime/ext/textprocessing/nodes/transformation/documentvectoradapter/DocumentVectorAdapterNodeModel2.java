@@ -121,11 +121,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     static final String DEFAULT_COL = "";
 
     /**
-     * The default value to ignore tags.
-     */
-    static final boolean DEFAULT_IGNORE_TAGS = true;
-
-    /**
      * The default value to the as collection flag.
      */
     static final boolean DEFAULT_ASCOLLECTION = false;
@@ -141,8 +136,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private SettingsModelBoolean m_booleanModel = DocumentVectorAdapterNodeDialog2.getBooleanModel();
 
     private SettingsModelString m_documentColModel = DocumentVectorAdapterNodeDialog2.getDocumentColModel();
-
-    private SettingsModelBoolean m_ignoreTags = DocumentVectorAdapterNodeDialog2.getIgnoreTagsModel();
 
     private SettingsModelBoolean m_asCollectionModel = DocumentVectorAdapterNodeDialog2.getAsCollectionModel();
 
@@ -245,13 +238,12 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         checkDataTableSpec(dataTableSpec);
 
         boolean useBitvector = m_booleanModel.getBooleanValue();
-        boolean ignoreTags = m_ignoreTags.getBooleanValue();
+        boolean ignoreTags = modelSpec.getIgnoreTagsSetting();
         String vectorValueColumn = m_colModel.getStringValue();
         boolean asCollectionCell = m_asCollectionModel.getBooleanValue();
 
         if (m_useSettingsFromModelPortModel.getBooleanValue()) {
             useBitvector = modelSpec.getBitVectorSetting();
-            ignoreTags = modelSpec.getIgnoreTagsSetting();
             vectorValueColumn = modelSpec.getVectorValueColumnName();
             asCollectionCell = modelSpec.getCollectionCellSetting();
         }
@@ -504,7 +496,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_booleanModel.loadSettingsFrom(settings);
         m_colModel.loadSettingsFrom(settings);
         m_documentColModel.loadSettingsFrom(settings);
-        m_ignoreTags.loadSettingsFrom(settings);
         m_asCollectionModel.loadSettingsFrom(settings);
         m_vectorColsModel.loadSettingsFrom(settings);
         m_useSettingsFromModelPortModel.loadSettingsFrom(settings);
@@ -518,7 +509,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_colModel.saveSettingsTo(settings);
         m_booleanModel.saveSettingsTo(settings);
         m_documentColModel.saveSettingsTo(settings);
-        m_ignoreTags.saveSettingsTo(settings);
         m_asCollectionModel.saveSettingsTo(settings);
         m_vectorColsModel.saveSettingsTo(settings);
         m_useSettingsFromModelPortModel.saveSettingsTo(settings);
@@ -532,7 +522,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_colModel.validateSettings(settings);
         m_booleanModel.validateSettings(settings);
         m_documentColModel.validateSettings(settings);
-        m_ignoreTags.validateSettings(settings);
         m_asCollectionModel.validateSettings(settings);
         m_vectorColsModel.validateSettings(settings);
         m_useSettingsFromModelPortModel.validateSettings(settings);
@@ -566,7 +555,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     private void checkUncheck() {
         m_booleanModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
-        m_ignoreTags.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
         m_asCollectionModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
 
         if (m_useSettingsFromModelPortModel.getBooleanValue()

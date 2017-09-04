@@ -73,11 +73,6 @@ final class DocumentVectorAdapterConfigKeys2 {
      static final String CFGKEY_DOC_COL = "DocumentCol";
 
     /**
-     * The configuration key of the ignore tags flag.
-     */
-    static final String CFGKEY_IGNORE_TAGS = "ignoreTags";
-
-    /**
      * The configuration key of the as_collection flag.
      */
     static final String CFGKEY_ASCOLLECTION = "asCollection";
