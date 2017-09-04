@@ -113,14 +113,16 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     DocumentVectorAdapterNodeDialog2() {
 
-        createNewGroup("Document vector settings");
+        createNewGroup("General settings");
         addDialogComponent(
             new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 0, DocumentValue.class));
 
         m_useModelPortSettingsModel.addChangeListener(e -> checkUncheck());
 
         addDialogComponent(new DialogComponentBoolean(m_useModelPortSettingsModel, "Use settings from model"));
+        closeCurrentGroup();
 
+        createNewGroup("Document vector settings");
         m_booleanModel.addChangeListener(e -> checkUncheck());
 
         addDialogComponent(new DialogComponentBoolean(m_booleanModel, "Bitvector"));
@@ -129,17 +131,19 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(m_asCollectionCell, "As collection cell"));
         closeCurrentGroup();
-        checkUncheck();
 
-        createNewTab("Feature Column Selection");
+        createNewGroup("Feature Column Selection");
         m_stringFilterComponent = new DialogComponentStringFilter(m_vectorColsModel, new String[]{}, false);
-
         addDialogComponent(m_stringFilterComponent);
+        closeCurrentGroup();
+        checkUncheck();
     }
 
     private void checkUncheck() {
         m_booleanModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_asCollectionCell.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+        m_vectorColsModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+        m_stringFilterComponent.setEnabledComponents(!m_useModelPortSettingsModel.getBooleanValue());
 
         if (m_useModelPortSettingsModel.getBooleanValue()
             || (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue())) {

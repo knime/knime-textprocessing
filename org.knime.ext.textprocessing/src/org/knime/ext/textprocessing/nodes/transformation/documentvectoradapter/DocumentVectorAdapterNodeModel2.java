@@ -556,6 +556,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private void checkUncheck() {
         m_booleanModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
         m_asCollectionModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
+        m_vectorColsModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
 
         if (m_useSettingsFromModelPortModel.getBooleanValue()
             || (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue())) {
