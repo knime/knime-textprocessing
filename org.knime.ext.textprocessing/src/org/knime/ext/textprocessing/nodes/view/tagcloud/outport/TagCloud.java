@@ -98,7 +98,7 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
     private int m_typeoftagcloud;
 
     private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(TagCloudNodeModel.class);
+        NodeLogger.getLogger(TagCloud.class);
 
     /**
      * initializes the TagCloud.
