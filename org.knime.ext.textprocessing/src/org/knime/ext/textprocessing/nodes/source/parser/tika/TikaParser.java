@@ -52,7 +52,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -146,9 +146,10 @@ public class TikaParser {
      * @param attachmentDir the directory where any attachments should be stored
      * @return a list of data cells (index 0 should contain cells for the first output port, the rest for the second
      *         output port
-     * @throws UnsupportedEncodingException
+     * @throws URISyntaxException
+     * @throws IOException
      */
-    public List<DataCell[]> parse(final URL url, final File attachmentDir) throws UnsupportedEncodingException {
+    public List<DataCell[]> parse(final URL url, final File attachmentDir) throws IOException, URISyntaxException {
         String mime_type = "-";
         List<DataCell[]> result = new ArrayList<DataCell[]>();
 
@@ -256,7 +257,7 @@ public class TikaParser {
                     ex.setContext(m_context);
                     ex.setDuplicateFilesList(m_duplicates);
                     ex.setExtractInlineImages(m_extractInlineImages);
-                    ex.extract(stream, attachmentDir.toPath(), url.getFile()); //getName
+                    ex.extract(stream, attachmentDir.toPath(), FilenameUtils.getName(url.getPath())); //getName
                     if (ex.hasError()) {
                         m_errorMsg = "Could not write embedded files to the output directory";
                         LOGGER.error(m_errorMsg + ": " + url.getPath());
@@ -332,7 +333,7 @@ public class TikaParser {
         });
     }
 
-    private DataCell[] createMissingRow(final URL url, final String errorMsg) throws UnsupportedEncodingException {
+    private DataCell[] createMissingRow(final URL url, final String errorMsg) throws IOException, URISyntaxException {
         String file = getPath(url);
         int outputSize = m_outputColumnsOne.size();
         DataCell[] cells = new DataCell[outputSize];
@@ -352,14 +353,16 @@ public class TikaParser {
     /**
      * @param url the URL
      * @return the complete path of the URL
-     * @throws UnsupportedEncodingException if the URL cannot be decoded
+     * @throws URISyntaxException
+     * @throws IOException
      */
-    public static String getPath(final URL url) throws UnsupportedEncodingException {
+    public static String getPath(final URL url) throws IOException, URISyntaxException {
         String res = URLDecoder.decode(url.getPath(), "UTF-8");
-        if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("knime")) {
+        if (url.getProtocol().startsWith("http")) {
             return url.getProtocol() + "://" + url.getHost() + res;
+        } else {
+            return FileUtil.resolveToPath(url).toString();
         }
-        return res;
     }
 
     /**
