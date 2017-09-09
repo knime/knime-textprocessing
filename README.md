@@ -1,4 +1,4 @@
-# ![Image](https://www.knime.org/files/knime_logo_github_40x40.png) KNIME® - Text Processing Integration
+# ![Image](https://www.knime.com/files/knime_logo_github_40x40_4layers.png) KNIME® - Text Processing Integration
 
 [KNIME Analytics Platform - Text Processing Integration](https://tech.knime.org/knime-text-processing) is designed to read, enrich, manipulate, and extract textual data, and transform it into numerical representations, such as document or term vectors. Once numerical vectors are created, regular KNIME nodes can be applied, for example, for predictive modeling, clustering analysis, or visualization.
 
