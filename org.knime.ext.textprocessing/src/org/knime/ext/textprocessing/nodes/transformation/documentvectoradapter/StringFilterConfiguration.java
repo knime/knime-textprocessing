@@ -54,8 +54,10 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.util.filter.NameFilterConfiguration;
 
 /**
+ * Configuration class for the DialogComponentStringFilter.
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
 public class StringFilterConfiguration extends NameFilterConfiguration {
 
@@ -64,8 +66,8 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
      */
     public static class StringFilterResult extends FilterResult {
         /**
-         * @param filter
-         * @param includeMissing
+         * @param filter The filter result.
+         * @param includeMissing If missing values should be included.
          */
         public StringFilterResult(final FilterResult filter, final boolean includeMissing) {
             super(filter.getIncludes(), filter.getExcludes(), filter.getRemovedFromIncludes(),
@@ -73,11 +75,11 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
         }
 
         /**
-         * @param incls
-         * @param excls
-         * @param removedFromIncludes
-         * @param removedFromExcludes
-         * @param includeMissing
+         * @param incls included elements
+         * @param excls excluded elements
+         * @param removedFromIncludes see {@link #getRemovedFromIncludes()}
+         * @param removedFromExcludes see {@link #getRemovedFromExcludes()}
+         * @param includeMissing whether missing values should be included
          */
         public StringFilterResult(final String[] incls, final String[] excls, final String[] removedFromIncludes,
             final String[] removedFromExcludes, final boolean includeMissing) {
@@ -98,7 +100,7 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
     }
 
     /**
-     * @param configRootName
+     * @param configRootName The name of the configuration.
      */
     public StringFilterConfiguration(final String configRootName) {
         super(configRootName);
@@ -106,8 +108,8 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
     }
 
     /**
-     * @param settings
-     * @param names
+     * @param settings The node settings.
+     * @param names The column names.
      */
     public void loadConfigurationForDialog(final NodeSettingsRO settings, final String[] names) {
         super.loadConfigurationInDialog(settings, names);
@@ -147,13 +149,15 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
 
     /** {@inheritDoc} */
     @Override
-    protected NameFilterConfiguration clone() {
+    protected StringFilterConfiguration clone() {
         StringFilterConfiguration clone = (StringFilterConfiguration)super.clone();
         return clone;
     }
 
     /**
-     * @return the pattern config
+     * Creates and returns a new {@code StringPatternFilterConfiguration}.
+     *
+     * @return The pattern configuration.
      */
     @Override
     protected StringPatternFilterConfiguration createPatternConfig() {

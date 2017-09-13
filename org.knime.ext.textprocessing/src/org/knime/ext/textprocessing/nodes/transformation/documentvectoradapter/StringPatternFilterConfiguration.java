@@ -55,8 +55,10 @@ import org.knime.core.node.util.filter.PatternFilterConfiguration;
 import org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter.StringFilterConfiguration.StringFilterResult;
 
 /**
+ * {@code StringPatternFilterConfiguration} class used for {@code StringFilterConfiguration}.
  *
- * @author Julian
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.5
  */
 public class StringPatternFilterConfiguration extends PatternFilterConfiguration {
 

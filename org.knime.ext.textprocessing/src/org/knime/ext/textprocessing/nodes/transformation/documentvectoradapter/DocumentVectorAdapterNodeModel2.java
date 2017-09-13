@@ -108,6 +108,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * features as the ones in the reference table.
  *
  * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.5
  */
 class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
@@ -148,7 +149,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private String[] m_previousFeatureColumns = null;
 
     /**
-     * Creates a new instance of {@code DocumentVectorAdapterNodeModel}.
+     * Creates a new instance of {@code DocumentVectorAdapterNodeModel2}.
      */
     DocumentVectorAdapterNodeModel2() {
         super(
@@ -169,6 +170,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         DataTableSpec dataTableSpec = (DataTableSpec)inSpecs[0];
         checkDataTableSpec(dataTableSpec);
 
+        // check if valid model is connected
         DocumentVectorPortObjectSpec modelSpec = null;
         if (inSpecs[1] instanceof DocumentVectorPortObjectSpec && !inSpecs[1].equals(null)) {
             modelSpec = (DocumentVectorPortObjectSpec)inSpecs[1];
@@ -176,12 +178,14 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
         }
 
+        // create spec if collection flag is checked
         DataTableSpec spec = null;
         if ((m_asCollectionModel.isEnabled() && m_asCollectionModel.getBooleanValue())
             || (m_useSettingsFromModelPortModel.getBooleanValue() && modelSpec.getCollectionCellSetting())) {
             spec = createDataTableSpecAsCollection(null);
         }
 
+        // check if vector value model is in the incoming datatable
         if (m_useSettingsFromModelPortModel.getBooleanValue()) {
             int vectorValueColumnIndex = dataTableSpec.findColumnIndex(modelSpec.getVectorValueColumnName());
             if (vectorValueColumnIndex < 0) {
@@ -196,12 +200,14 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             }
         }
 
+        // check if column space from input model has changed
+        // throw exception in case
         if (m_previousFeatureColumns == null || m_useSettingsFromModelPortModel.getBooleanValue()) {
             m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
         } else if (!Arrays.equals(modelSpec.getFeatureSpaceColumns(), m_previousFeatureColumns)
             && !m_useSettingsFromModelPortModel.getBooleanValue()) {
             m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
-            throw new InvalidSettingsException("Input model has changed! Please configure node.");
+            throw new InvalidSettingsException("Input model has changed! Please configure node!");
         }
 
         return new DataTableSpec[]{spec};
@@ -260,6 +266,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         boolean asCollectionCell = m_asCollectionModel.getBooleanValue();
         List<String> includedCols = m_vectorColsModel.getIncludeList();
 
+        // set model values if 'use settings from model port' is checked, otherwise keep values from dialog.
         if (m_useSettingsFromModelPortModel.getBooleanValue()) {
             useBitvector = modelSpec.getBitVectorSetting();
             vectorValueColumn = modelSpec.getVectorValueColumnName();
@@ -552,7 +559,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-
+     // Nothing to do here...
     }
 
     /**
@@ -561,7 +568,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-
+     // Nothing to do here...
     }
 
     /**
@@ -569,7 +576,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
      */
     @Override
     protected void reset() {
-
+        // Nothing to do here...
     }
 
     private void checkUncheck() {

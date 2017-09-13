@@ -202,15 +202,15 @@ public class DialogComponentStringFilter extends DialogComponent {
     }
 
     /**
-     * @param config
+     * @param config The StringFilterConfiguration which should contain the settings.
      */
     protected void saveConfiguration(final StringFilterConfiguration config) {
         m_stringFilterPanel.saveConfiguration(config);
     }
 
     /**
-     * @param config
-     * @param names
+     * @param config The StringFilterConfiguration which contains the settings.
+     * @param names The column names.
      */
     protected void loadConfiguration(final StringFilterConfiguration config, final String[] names) {
         m_stringFilterPanel.loadConfiguration(config, names);
