@@ -49,7 +49,9 @@
 package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 
 import org.knime.core.data.DoubleValue;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -95,6 +97,9 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         return new SettingsModelBoolean(DocumentVectorAdapterConfigKeys2.CFGKEY_USE_MODEL_SETTINGS, true);
     }
 
+    /** Config key for filter configuration. */
+    static final String CFG_CONFIGROOTNAME = "filter config";
+
     private SettingsModelString m_columnModel = getColumnModel();
 
     private SettingsModelBoolean m_booleanModel = getBooleanModel();
@@ -134,6 +139,7 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
         createNewGroup("Feature Column Selection");
         m_stringFilterComponent = new DialogComponentStringFilter(m_vectorColsModel, new String[]{}, false);
+
         addDialogComponent(m_stringFilterComponent);
         closeCurrentGroup();
         checkUncheck();
@@ -157,19 +163,35 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
      * {@inheritDoc}
      */
     @Override
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        super.saveAdditionalSettingsTo(settings);
+        StringFilterConfiguration config = new StringFilterConfiguration(CFG_CONFIGROOTNAME);
+        m_stringFilterComponent.saveConfiguration(config);
+        config.saveConfiguration(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
+        DocumentVectorPortObjectSpec modelSpec = (DocumentVectorPortObjectSpec)specs[1];
         // throw exception if no or a wrong model is connected to the model port
-        if (!(specs[1] instanceof DocumentVectorPortObjectSpec)) {
+        if (!(specs[1] instanceof DocumentVectorPortObjectSpec) || specs[1] == null) {
             throw new NotConfigurableException("No model or wrong model connected to model port!");
-        } else if (specs[1] != null) {
-            // set existing columns and set includes if they haven't been set before
-            m_stringFilterComponent.setAllColumns(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());
-            if (m_vectorColsModel.getExcludeList().isEmpty() && m_vectorColsModel.getIncludeList().isEmpty()) {
-                m_vectorColsModel.setIncludeList(((DocumentVectorPortObjectSpec)specs[1]).getFeatureSpaceColumns());
-            }
-            m_stringFilterComponent.updateComponent();
         }
+        StringFilterConfiguration config = new StringFilterConfiguration(CFG_CONFIGROOTNAME);
+        if (!settings.containsKey(CFG_CONFIGROOTNAME)) {
+            config.loadDefaults(modelSpec.getFeatureSpaceColumns(), true);
+        } else {
+            config.loadConfigurationForDialog(settings, modelSpec.getFeatureSpaceColumns());
+        }
+        m_stringFilterComponent.loadConfiguration(config, modelSpec.getFeatureSpaceColumns());
+
+
+        // set existing columns and set includes if they haven't been set before
+        // m_stringFilterComponent.loadConfiguration(config, modelSpec.getFeatureSpaceColumns());
     }
 }
