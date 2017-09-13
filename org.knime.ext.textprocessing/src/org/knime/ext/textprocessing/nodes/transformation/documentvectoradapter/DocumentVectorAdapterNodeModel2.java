@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,11 +172,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         DocumentVectorPortObjectSpec modelSpec = null;
         if (inSpecs[1] instanceof DocumentVectorPortObjectSpec && !inSpecs[1].equals(null)) {
             modelSpec = (DocumentVectorPortObjectSpec)inSpecs[1];
-            if (!modelSpec.equals(m_previousSpec)
-                || (m_vectorColsModel.getExcludeList().isEmpty() && m_vectorColsModel.getIncludeList().isEmpty())) {
-                m_vectorColsModel.setIncludeList(modelSpec.getFeatureSpaceColumns());
-            }
-            m_previousSpec = modelSpec;
         } else {
             throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
         }
@@ -185,11 +181,32 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             || (m_useSettingsFromModelPortModel.getBooleanValue() && modelSpec.getCollectionCellSetting())) {
             spec = createDataTableSpecAsCollection(null);
         }
+
+        if (m_useSettingsFromModelPortModel.getBooleanValue()) {
+            int vectorValueColumnIndex = dataTableSpec.findColumnIndex(modelSpec.getVectorValueColumnName());
+            if (vectorValueColumnIndex < 0) {
+                throw new InvalidSettingsException("Vector value column \"" + modelSpec.getVectorValueColumnName()
+                    + "\" from input model could not be found in the input data table.");
+            }
+        } else if ((!m_useSettingsFromModelPortModel.getBooleanValue() || !m_booleanModel.getBooleanValue())) {
+            int vectorValueColumnIndex = dataTableSpec.findColumnIndex(m_colModel.getStringValue());
+            if (vectorValueColumnIndex < 0) {
+                throw new InvalidSettingsException("Vector value column \"" + m_colModel.getStringValue()
+                    + "\" could not be found in the input data table.");
+            }
+        }
+
+        if (m_previousSpec == null || m_useSettingsFromModelPortModel.getBooleanValue()) {
+            m_previousSpec = modelSpec;
+        } else if (!modelSpec.equals(m_previousSpec) && !m_useSettingsFromModelPortModel.getBooleanValue()) {
+            m_previousSpec = modelSpec;
+            throw new InvalidSettingsException("Input model has changed! Please configure node.");
+        }
+
         return new DataTableSpec[]{spec};
     }
 
-    private final void checkDataTableSpec(final DataTableSpec spec)
-        throws InvalidSettingsException {
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyMinimumNumberCells(1, true);
@@ -230,8 +247,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec)
-        throws Exception {
+    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec) throws Exception {
         DataTableSpec dataTableSpec = ((BufferedDataTable)inData[0]).getDataTableSpec();
         DocumentVectorPortObjectSpec modelSpec = ((DocumentVectorPortObject)inData[1]).getSpec();
 
@@ -241,11 +257,13 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         boolean ignoreTags = modelSpec.getIgnoreTagsSetting();
         String vectorValueColumn = m_colModel.getStringValue();
         boolean asCollectionCell = m_asCollectionModel.getBooleanValue();
+        List<String> includedCols = m_vectorColsModel.getIncludeList();
 
         if (m_useSettingsFromModelPortModel.getBooleanValue()) {
             useBitvector = modelSpec.getBitVectorSetting();
             vectorValueColumn = modelSpec.getVectorValueColumnName();
             asCollectionCell = modelSpec.getCollectionCellSetting();
+            includedCols = Arrays.asList(modelSpec.getFeatureSpaceColumns());
         }
 
         // document column index.
@@ -266,7 +284,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
         // Get all terms from reference table
         exec.setProgress("Collecting all terms from the reference table");
-        List<String> includedCols = m_vectorColsModel.getIncludeList();
         if (includedCols.size() == 0) {
             setWarningMessage("No feature columns selected: No document vector will be created.");
         }
@@ -277,7 +294,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         final List<String> colList = new ArrayList<String>();
         colList.add(m_documentColModel.getStringValue());
         boolean[] sortAsc = new boolean[]{true};
-        BufferedDataTable sortedTable = new SortedTable((BufferedDataTable)inData[0], colList, sortAsc, exec).getBufferedDataTable();
+        BufferedDataTable sortedTable =
+            new SortedTable((BufferedDataTable)inData[0], colList, sortAsc, exec).getBufferedDataTable();
 
         // hash table holding an index for each feature
         final Map<String, Integer> featureIndexTable = new HashMap<String, Integer>();
@@ -565,4 +583,5 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             m_colModel.setEnabled(true);
         }
     }
+
 }
