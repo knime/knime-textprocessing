@@ -145,7 +145,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private SettingsModelBoolean m_useSettingsFromModelPortModel =
         DocumentVectorAdapterNodeDialog2.getUseModelSettings();
 
-    private DocumentVectorPortObjectSpec m_previousSpec = null;
+    private String[] m_previousFeatureColumns = null;
 
     /**
      * Creates a new instance of {@code DocumentVectorAdapterNodeModel}.
@@ -196,10 +196,11 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             }
         }
 
-        if (m_previousSpec == null || m_useSettingsFromModelPortModel.getBooleanValue()) {
-            m_previousSpec = modelSpec;
-        } else if (!modelSpec.equals(m_previousSpec) && !m_useSettingsFromModelPortModel.getBooleanValue()) {
-            m_previousSpec = modelSpec;
+        if (m_previousFeatureColumns == null || m_useSettingsFromModelPortModel.getBooleanValue()) {
+            m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
+        } else if (!Arrays.equals(modelSpec.getFeatureSpaceColumns(), m_previousFeatureColumns)
+            && !m_useSettingsFromModelPortModel.getBooleanValue()) {
+            m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
             throw new InvalidSettingsException("Input model has changed! Please configure node.");
         }
 
