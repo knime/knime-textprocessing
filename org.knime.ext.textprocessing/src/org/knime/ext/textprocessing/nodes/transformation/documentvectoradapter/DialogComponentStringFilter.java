@@ -49,8 +49,7 @@
 package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.knime.core.node.InvalidSettingsException;
@@ -72,15 +71,17 @@ public class DialogComponentStringFilter extends DialogComponent {
 
     private String[] m_allColumns;
 
-    private List<String> m_includes;
+    private Set<String> m_includes;
 
-    private List<String> m_excludes;
+    private Set<String> m_excludes;
+
+    static final String CFG_CONFIGROOTNAME = "filter config";
 
     /**
      * @param model The {@code SettingsModelFilterString} storing include and exclude lists.
      * @param columnNames A String array containing the column names as Strings.
      * @param showSelectionListsOnly If true, the panel shows no additional options like search box,
-     * force-include-option, etc.
+     *            force-include-option, etc.
      */
     public DialogComponentStringFilter(final SettingsModelFilterString model, final String[] columnNames,
         final boolean showSelectionListsOnly) {
@@ -88,7 +89,6 @@ public class DialogComponentStringFilter extends DialogComponent {
         initLists();
         m_allColumns = columnNames;
         m_stringFilterPanel = new StringFilterPanel(showSelectionListsOnly);
-        m_stringFilterPanel.update(model.getIncludeList(), model.getExcludeList(), m_allColumns);
         getComponentPanel().setLayout(new BorderLayout());
         getComponentPanel().add(m_stringFilterPanel);
 
@@ -103,15 +103,15 @@ public class DialogComponentStringFilter extends DialogComponent {
      */
     private void updateModel() {
         final SettingsModelFilterString filterModel = (SettingsModelFilterString)getModel();
-        final Set<String> inclList = m_stringFilterPanel.getIncludedNamesAsSet();
-        final Set<String> exclList = m_stringFilterPanel.getExcludedNamesAsSet();
+        m_includes = m_stringFilterPanel.getIncludedNamesAsSet();
+        m_excludes = m_stringFilterPanel.getExcludedNamesAsSet();
+        filterModel.setNewValues(m_includes, m_excludes, false);
 
-        filterModel.setNewValues(inclList, exclList, false);
     }
 
     private void initLists() {
-        m_excludes = new ArrayList<String>();
-        m_includes = new ArrayList<String>();
+        m_excludes = new HashSet<String>();
+        m_includes = new HashSet<String>();
     }
 
     /**
@@ -137,7 +137,7 @@ public class DialogComponentStringFilter extends DialogComponent {
      *
      * @return The includes list.
      */
-    public List<String> getIncludesList() {
+    public Set<String> getIncludesList() {
         return m_includes;
     }
 
@@ -146,7 +146,7 @@ public class DialogComponentStringFilter extends DialogComponent {
      *
      * @return The excludes list.
      */
-    public List<String> getExcludesList() {
+    public Set<String> getExcludesList() {
         return m_excludes;
     }
 
@@ -192,7 +192,34 @@ public class DialogComponentStringFilter extends DialogComponent {
     @Override
     protected void updateComponent() {
         final SettingsModelFilterString filterModel = (SettingsModelFilterString)getModel();
-        m_stringFilterPanel.update(filterModel.getIncludeList(), filterModel.getExcludeList(), m_allColumns);
+        m_includes = new HashSet<String>(filterModel.getIncludeList());
+        m_excludes = new HashSet<String>(filterModel.getExcludeList());
+        m_stringFilterPanel.update(filterModel.getIncludeList(), filterModel.getExcludeList(),
+            m_allColumns);
+        StringFilterConfiguration config = new StringFilterConfiguration(CFG_CONFIGROOTNAME);
+        m_stringFilterPanel.saveConfiguration(config);
+        m_stringFilterPanel.setEnabled(filterModel.isEnabled());
+    }
+
+    /**
+     * @param config
+     */
+    protected void saveConfiguration(final StringFilterConfiguration config) {
+        m_stringFilterPanel.saveConfiguration(config);
+    }
+
+    /**
+     * @param config
+     * @param names
+     */
+    protected void loadConfiguration(final StringFilterConfiguration config, final String[] names) {
+        m_stringFilterPanel.loadConfiguration(config, names);
+        m_allColumns = names;
+        m_includes = m_stringFilterPanel.getIncludeList();
+        m_excludes = m_stringFilterPanel.getExcludeList();
+
+        updateModel();
+        updateComponent();
     }
 
 }
