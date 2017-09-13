@@ -93,8 +93,9 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
          * @param removedFromExcludes see {@link #getRemovedFromExcludes()}
          * @param includeMissing whether missing values should be included
          */
-        public StringFilterResult(final List<String> incls, final List<String> excls, final List<String> removedFromIncludes,
-            final List<String> removedFromExcludes, final boolean includeMissing) {
+        public StringFilterResult(final List<String> incls, final List<String> excls,
+            final List<String> removedFromIncludes, final List<String> removedFromExcludes,
+            final boolean includeMissing) {
             super(incls, excls, removedFromIncludes, removedFromExcludes);
         }
     }
@@ -163,6 +164,5 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
     protected StringPatternFilterConfiguration createPatternConfig() {
         return new StringPatternFilterConfiguration();
     }
-
 
 }

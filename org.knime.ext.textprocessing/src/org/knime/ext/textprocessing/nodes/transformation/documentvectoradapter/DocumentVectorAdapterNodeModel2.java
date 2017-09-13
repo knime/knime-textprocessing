@@ -559,7 +559,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-     // Nothing to do here...
+        // Nothing to do here...
     }
 
     /**
@@ -568,7 +568,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-     // Nothing to do here...
+        // Nothing to do here...
     }
 
     /**

@@ -71,7 +71,7 @@ final class DocumentVectorAdapterConfigKeys2 {
     /**
      * The configuration key of the column containing the documents.
      */
-     static final String CFGKEY_DOC_COL = "DocumentCol";
+    static final String CFGKEY_DOC_COL = "DocumentCol";
 
     /**
      * The configuration key of the as_collection flag.

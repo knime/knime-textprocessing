@@ -184,7 +184,7 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
         }
         StringFilterConfiguration config = new StringFilterConfiguration(CFG_CONFIGROOTNAME);
         if (!settings.containsKey(CFG_CONFIGROOTNAME)) {
-         // set existing columns and set includes if they haven't been set before
+            // set existing columns and set includes if they haven't been set before
             config.loadDefaults(modelSpec.getFeatureSpaceColumns(), true);
         } else {
             config.loadConfigurationForDialog(settings, modelSpec.getFeatureSpaceColumns());

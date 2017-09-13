@@ -194,8 +194,7 @@ public class DialogComponentStringFilter extends DialogComponent {
         final SettingsModelFilterString filterModel = (SettingsModelFilterString)getModel();
         m_includes = new HashSet<String>(filterModel.getIncludeList());
         m_excludes = new HashSet<String>(filterModel.getExcludeList());
-        m_stringFilterPanel.update(filterModel.getIncludeList(), filterModel.getExcludeList(),
-            m_allColumns);
+        m_stringFilterPanel.update(filterModel.getIncludeList(), filterModel.getExcludeList(), m_allColumns);
         StringFilterConfiguration config = new StringFilterConfiguration(CFG_CONFIGROOTNAME);
         m_stringFilterPanel.saveConfiguration(config);
         m_stringFilterPanel.setEnabled(filterModel.isEnabled());
