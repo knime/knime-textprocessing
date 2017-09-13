@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcVectors.png" type="Manipulator">
-	<name>Document Vector Adapter</name>
+	<name>Document Vector Applier</name>
 	<shortDescription>Creates a document vector for each document, whose
 		features are identical as the ones in the reference table.
 	</shortDescription>
@@ -36,15 +36,13 @@
 			terms in the
 			BoW.
 		</intro>
-		<tab name="Option">
+		<tab name="Options">
 			<option name="Document column">
 				The column containing the documents to use.
 			</option>
 			<option name="Use settings from model">
 				If checked, settings contained in the input model will be used.
-			</option>
-			<option name="Ignore tags">
-				If checked tags are ignored when comparing terms.
+				Note: The settings contained in the input model will node change settings in the node dialog.
 			</option>
 			<option name="Bitvector">
 				If checked a bitvector will be created indicating
@@ -81,11 +79,9 @@
 				will be created (dependent on the input data of
 				course).
 			</option>
-		</tab>
-		<tab name="Feature Column Selection">
 			<option name="Feature Column Selection">
-				Selects all column names from the model input
-				containing features that should appear in the output document vector.
+				Selects all feature column names from the model input
+				that should appear in the output document vector.
 			</option>
 		</tab>
 	</fullDescription>
@@ -95,7 +91,7 @@
 			containing the bag of words.
 		</inPort>
 		<inPort name="Document vector model input" index="1">The input
-			model containing the node settings and column names of the term features space.
+			model containing the node settings and column names of the term feature space.
 		</inPort>
 		<outPort name="Documents output table" index="0">An output table
 			containing the documents with the corresponding document vectors,
