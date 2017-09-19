@@ -54,7 +54,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -334,13 +334,12 @@ public class TikaParser {
     }
 
     private DataCell[] createMissingRow(final URL url, final String errorMsg) throws IOException, URISyntaxException {
-        String file = getPath(url);
         int outputSize = m_outputColumnsOne.size();
         DataCell[] cells = new DataCell[outputSize];
         for (int j = 0; j < outputSize; j++) {
             String colName = m_outputColumnsOne.get(j);
             if (colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                cells[j] = new StringCell(file);
+                cells[j] = new StringCell(getPath(url));
             } else if (colName.equals(m_errorColName)) {
                 cells[j] = new StringCell(errorMsg);
             } else {
@@ -357,11 +356,11 @@ public class TikaParser {
      * @throws IOException
      */
     public static String getPath(final URL url) throws IOException, URISyntaxException {
-        String res = URLDecoder.decode(url.getPath(), "UTF-8");
-        if (url.getProtocol().startsWith("http")) {
-            return url.getProtocol() + "://" + url.getHost() + res;
+        Path path = FileUtil.resolveToPath(url);
+        if (path == null) {
+            return url.toString();
         } else {
-            return FileUtil.resolveToPath(url).toString();
+            return path.toString();
         }
     }
 
