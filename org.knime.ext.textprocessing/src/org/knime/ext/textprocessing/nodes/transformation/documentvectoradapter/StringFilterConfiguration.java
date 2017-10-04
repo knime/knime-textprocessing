@@ -135,39 +135,8 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String[] getIncludeList() {
-        return super.getIncludeList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String[] getExcludeList() {
-        return super.getExcludeList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void loadDefaults(final String[] names, final boolean includeByDefault) {
         super.loadDefaults(names, includeByDefault);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadDefaults(final String[] includes, final String[] excludes, final EnforceOption enforceOption) {
-        super.loadDefaults(includes, excludes, enforceOption);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected StringFilterConfiguration clone() {
-        StringFilterConfiguration clone = (StringFilterConfiguration)super.clone();
-        return clone;
     }
 
     /**

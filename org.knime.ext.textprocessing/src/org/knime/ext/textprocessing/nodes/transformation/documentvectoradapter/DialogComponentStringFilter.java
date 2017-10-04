@@ -118,42 +118,6 @@ public class DialogComponentStringFilter extends DialogComponent {
     }
 
     /**
-     * Returns a String array containing the column names.
-     *
-     * @return Array of available columns names.
-     */
-    public String[] getAllColumns() {
-        return m_allColumns;
-    }
-
-    /**
-     * Method to set the column names
-     *
-     * @param allColumns String array of available column names
-     */
-    public void setAllColumns(final String[] allColumns) {
-        m_allColumns = allColumns;
-    }
-
-    /**
-     * Returns the includes list.
-     *
-     * @return The includes list.
-     */
-    public Set<String> getIncludesList() {
-        return m_includes;
-    }
-
-    /**
-     * Returns the excludes list.
-     *
-     * @return The excludes list.
-     */
-    public Set<String> getExcludesList() {
-        return m_excludes;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
