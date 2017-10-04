@@ -100,17 +100,17 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     /** Config key for filter configuration. */
     private static final String CFG_CONFIGROOTNAME = "filter config";
 
-    private SettingsModelString m_columnModel = getColumnModel();
+    private final SettingsModelString m_columnModel = getColumnModel();
 
-    private SettingsModelBoolean m_booleanModel = getBooleanModel();
+    private final SettingsModelBoolean m_booleanModel = getBooleanModel();
 
-    private SettingsModelBoolean m_useModelPortSettingsModel = getUseModelSettings();
+    private final SettingsModelBoolean m_useModelPortSettingsModel = getUseModelSettings();
 
-    private SettingsModelBoolean m_asCollectionCell = getAsCollectionModel();
+    private final SettingsModelBoolean m_asCollectionCell = getAsCollectionModel();
 
-    private SettingsModelFilterString m_vectorColsModel = getVectorColumnsModel();
+    private final SettingsModelFilterString m_vectorColsModel = getVectorColumnsModel();
 
-    private DialogComponentStringFilter m_stringFilterComponent;
+    private final DialogComponentStringFilter m_stringFilterComponent;
 
     /**
      * Creates a new instance of {@code DocumentVectorAdapterNodeDialog2}.

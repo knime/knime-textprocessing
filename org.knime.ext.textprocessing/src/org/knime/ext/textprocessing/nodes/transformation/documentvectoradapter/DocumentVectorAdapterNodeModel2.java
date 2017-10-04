@@ -134,17 +134,18 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     private int m_termColIndex = -1;
 
-    private SettingsModelString m_colModel = DocumentVectorAdapterNodeDialog2.getColumnModel();
+    private final SettingsModelString m_colModel = DocumentVectorAdapterNodeDialog2.getColumnModel();
 
-    private SettingsModelBoolean m_booleanModel = DocumentVectorAdapterNodeDialog2.getBooleanModel();
+    private final SettingsModelBoolean m_booleanModel = DocumentVectorAdapterNodeDialog2.getBooleanModel();
 
-    private SettingsModelString m_documentColModel = DocumentVectorAdapterNodeDialog2.getDocumentColModel();
+    private final SettingsModelString m_documentColModel = DocumentVectorAdapterNodeDialog2.getDocumentColModel();
 
-    private SettingsModelBoolean m_asCollectionModel = DocumentVectorAdapterNodeDialog2.getAsCollectionModel();
+    private final SettingsModelBoolean m_asCollectionModel = DocumentVectorAdapterNodeDialog2.getAsCollectionModel();
 
-    private SettingsModelFilterString m_vectorColsModel = DocumentVectorAdapterNodeDialog2.getVectorColumnsModel();
+    private final SettingsModelFilterString m_vectorColsModel =
+        DocumentVectorAdapterNodeDialog2.getVectorColumnsModel();
 
-    private SettingsModelBoolean m_useSettingsFromModelPortModel =
+    private final SettingsModelBoolean m_useSettingsFromModelPortModel =
         DocumentVectorAdapterNodeDialog2.getUseModelSettings();
 
     private String[] m_previousFeatureColumns = null;
