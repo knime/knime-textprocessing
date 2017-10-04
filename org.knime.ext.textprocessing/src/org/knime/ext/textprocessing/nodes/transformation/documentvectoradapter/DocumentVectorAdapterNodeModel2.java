@@ -57,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
@@ -174,7 +173,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
         // check if valid model is connected
         DocumentVectorPortObjectSpec modelSpec = null;
-        if (inSpecs[1] instanceof DocumentVectorPortObjectSpec && !inSpecs[1].equals(null)) {
+        if (inSpecs[1] instanceof DocumentVectorPortObjectSpec) {
             modelSpec = (DocumentVectorPortObjectSpec)inSpecs[1];
         } else {
             throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
@@ -226,23 +225,22 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         String docColumn = m_documentColModel.getStringValue();
 
         if (docColumn.isEmpty()) {
-            String documentCol = null;
+            docColumn = null;
             // only one document col available
             if (numberOfDocumentCols == 1) {
-                documentCol = spec.getColumnSpec(verifier.getDocumentCellIndex()).getName();
+                docColumn = spec.getColumnSpec(verifier.getDocumentCellIndex()).getName();
                 // multiple document columns available
             } else if (numberOfDocumentCols > 1) {
                 // take first document column
                 for (String colName : spec.getColumnNames()) {
                     if (spec.getColumnSpec(colName).getType().isCompatible(DocumentValue.class)) {
-                        documentCol = colName;
+                        docColumn = colName;
                         break;
                     }
                 }
-                setWarningMessage("Auto guessing: Using column '" + documentCol + "' as document column");
+                setWarningMessage("Auto guessing: Using column '" + docColumn + "' as document column");
             }
-            m_documentColModel.setStringValue(documentCol);
-            docColumn = documentCol;
+            m_documentColModel.setStringValue(docColumn);
         }
 
         m_documentColIndex = spec.findColumnIndex(docColumn);
@@ -287,14 +285,11 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         if (!useBitvector) {
             final String colName = vectorValueColumn;
             colIndex = dataTableSpec.findColumnIndex(colName);
-            if (colIndex < 0) {
-                throw new InvalidSettingsException("No valid value column selected!");
-            }
         }
 
         // Get all terms from reference table
         exec.setProgress("Collecting all terms from the reference table");
-        if (includedCols.size() == 0) {
+        if (includedCols.isEmpty()) {
             setWarningMessage("No feature columns selected: No document vector will be created.");
         }
         List<String> refTerms = includedCols;
@@ -303,7 +298,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         exec.setProgress("Sorting input table");
         final List<String> colList = new ArrayList<String>();
         colList.add(m_documentColModel.getStringValue());
-        boolean[] sortAsc = new boolean[]{true};
+        boolean[] sortAsc = {true};
         BufferedDataTable sortedTable =
             new SortedTable((BufferedDataTable)inData[0], colList, sortAsc, exec).getBufferedDataTable();
 
@@ -332,11 +327,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             } else {
                 key = t.toString();
             }
-            if (refTerms.contains(key)) {
-                if (key != null && !featureIndexTable.containsKey(key)) {
+            if (refTerms.contains(key) && !featureIndexTable.containsKey(key)) {
                     featureIndexTable.put(key, currIndex);
                     currIndex++;
-                }
             }
         }
 
@@ -361,17 +354,26 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         List<DoubleCell> featureVector = initFeatureVector(featureIndexTable.size());
 
         long numberOfRows = sortedTable.size();
-        AtomicLong rowid = new AtomicLong(0);
+        long rowid = 0;
         int currRow = 1;
         it = sortedTable.iterator();
-        while (it.hasNext()) {
+        for (DataRow row : sortedTable) {
             exec.checkCanceled();
-            final DataRow row = it.next();
             final DataCell termCell = row.getCell(m_termColIndex);
             final DataCell docCell = row.getCell(m_documentColIndex);
             // if the term or document is missing, then skip the row
             if (termCell.isMissing() || docCell.isMissing()) {
                 setWarningMessage(row.getKey() + " has missing term/document. This row will be ignored...");
+                // add last feature vector to table if last row has missing term/document
+                if (currRow == numberOfRows) {
+                    DataRow newRow;
+                    if (asCollectionCell) {
+                        newRow = createDataRowAsCollection(lastDoc, featureVector, rowid++);
+                    } else {
+                        newRow = createDataRowAsColumns(lastDoc, featureVector, rowid++);
+                    }
+                    dc.addRowToTable(newRow);
+                }
                 numberOfRows -= 1;
                 continue;
             }
@@ -396,9 +398,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
                 DataRow newRow;
                 if (asCollectionCell) {
-                    newRow = createDataRowAsCollection(lastDoc, featureVector, rowid.getAndIncrement());
+                    newRow = createDataRowAsCollection(lastDoc, featureVector, rowid++);
                 } else {
-                    newRow = createDataRowAsColumns(lastDoc, featureVector, rowid.getAndIncrement());
+                    newRow = createDataRowAsColumns(lastDoc, featureVector, rowid++);
                 }
                 dc.addRowToTable(newRow);
                 // create new feature vector
@@ -407,7 +409,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
             // add new term at certain index to feature vector
             String key = "";
-            // if tags have o be ignored
+            // if tags have to be ignored
             if (ignoreTags) {
                 key = currTerm.getText();
             } else {
@@ -422,9 +424,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
             if (currRow == numberOfRows) {
                 DataRow newRow;
                 if (asCollectionCell) {
-                    newRow = createDataRowAsCollection(currDoc, featureVector, rowid.getAndIncrement());
+                    newRow = createDataRowAsCollection(currDoc, featureVector, rowid++);
                 } else {
-                    newRow = createDataRowAsColumns(currDoc, featureVector, rowid.getAndIncrement());
+                    newRow = createDataRowAsColumns(currDoc, featureVector, rowid++);
                 }
                 dc.addRowToTable(newRow);
             }
