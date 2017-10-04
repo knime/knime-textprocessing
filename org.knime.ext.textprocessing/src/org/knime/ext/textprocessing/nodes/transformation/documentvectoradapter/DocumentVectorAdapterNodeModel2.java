@@ -104,10 +104,11 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 /**
  * The model of the document vector adapter node. This node creates a document feature vector for each document exactly
  * as the normal document vector node. It has two inputs, the first one is the input table, whose features are to be
- * filtered based on the reference table in the second input. This node returns a document feature vector with the same
- * features as the ones in the reference table.
+ * filtered based on the reference column names stored in the model of the second input.
+ * This node returns a document feature vector with the features stored in the input model or the features selected
+ * in the node dialog.
  *
- * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Andisa Dewi & Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
 class DocumentVectorAdapterNodeModel2 extends NodeModel {

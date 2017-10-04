@@ -55,7 +55,7 @@ import org.knime.core.node.NodeView;
 /**
  * The factory of the document vector adapter node.
  *
- * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Andisa Dewi & Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
 public class DocumentVectorAdapterNodeFactory2 extends NodeFactory<DocumentVectorAdapterNodeModel2> {

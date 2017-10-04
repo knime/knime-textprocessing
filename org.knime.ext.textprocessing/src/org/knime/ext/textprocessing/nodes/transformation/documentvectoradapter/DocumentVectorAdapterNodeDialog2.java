@@ -66,7 +66,7 @@ import org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec;
 /**
  * Provides the dialog of the document vector adapter node.
  *
- * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Andisa Dewi & Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
 class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 

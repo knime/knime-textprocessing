@@ -62,7 +62,7 @@ import org.knime.core.node.util.filter.StringFilterPanel;
 /**
  * A string twin list with include and exclude list.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
 public class DialogComponentStringFilter extends DialogComponent {
@@ -78,6 +78,9 @@ public class DialogComponentStringFilter extends DialogComponent {
     static final String CFG_CONFIGROOTNAME = "filter config";
 
     /**
+     * Creates a new instance of {@code DialogComponentStringFilter} that provides a string twin list with include and
+     * exclude list.
+     *
      * @param model The {@code SettingsModelFilterString} storing include and exclude lists.
      * @param columnNames A String array containing the column names as Strings.
      * @param showSelectionListsOnly If true, the panel shows no additional options like search box,

@@ -102,6 +102,8 @@ public class StringPatternFilterConfiguration extends PatternFilterConfiguration
     }
 
     /**
+     * Returns a boolean value whether missing values will be included or not.
+     *
      * @return whether Missing Values will be included
      */
     boolean isIncludeMissing() {
@@ -109,7 +111,9 @@ public class StringPatternFilterConfiguration extends PatternFilterConfiguration
     }
 
     /**
-     * @param caseSensitive the caseSensitive to set
+     * Sets if missing values should be included or not.
+     *
+     * @param includeMissing the includeMissing to set
      */
     void setIncludeMissing(final boolean includeMissing) {
         m_includeMissing = includeMissing;

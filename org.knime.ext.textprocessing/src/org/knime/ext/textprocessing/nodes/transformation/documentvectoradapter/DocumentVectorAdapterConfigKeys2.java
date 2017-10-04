@@ -51,7 +51,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 /**
  * The configuration keys for the Document Vector Adapter node.
  *
- * @author Andisa Dewi & Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Andisa Dewi & Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
 final class DocumentVectorAdapterConfigKeys2 {

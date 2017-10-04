@@ -56,16 +56,21 @@ import org.knime.core.node.util.filter.NameFilterConfiguration;
 /**
  * Configuration class for the DialogComponentStringFilter.
  *
- * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
 public class StringFilterConfiguration extends NameFilterConfiguration {
 
     /**
-     * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+     * The {@code StringFilterResult} stores included and excluded Strings as well as Strings that have
+     * been removed from the included or excluded String array, respectively.
+     *
+     * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
      */
     public static class StringFilterResult extends FilterResult {
         /**
+         * Creates a new instance of {@code StringFilterResult} based on a {@code FilterResult}.
+         *
          * @param filter The filter result.
          * @param includeMissing If missing values should be included.
          */
@@ -75,6 +80,9 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
         }
 
         /**
+         * Creates a new instance of {@code StringFilterResult} based on String arrays that contain included and
+         * excluded Strings as well as Strings that have been removed from the included and excluded String arrays.
+         *
          * @param incls included elements
          * @param excls excluded elements
          * @param removedFromIncludes see {@link #getRemovedFromIncludes()}
@@ -87,6 +95,9 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
         }
 
         /**
+         * Creates a new instance of {@code StringFilterResult} based on lists that contain included and
+         * excluded Strings as well as list of Strings that have been removed from the included and excluded lists.
+         *
          * @param incls list of included elements
          * @param excls list of excluded elements
          * @param removedFromIncludes see {@link #getRemovedFromIncludes()}
@@ -101,6 +112,8 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
     }
 
     /**
+     * Creates a new instance of {@code StringFilterConfiguration}.
+     *
      * @param configRootName The name of the configuration.
      */
     public StringFilterConfiguration(final String configRootName) {
@@ -109,6 +122,8 @@ public class StringFilterConfiguration extends NameFilterConfiguration {
     }
 
     /**
+     * Loads the configuration to use it in the node dialog.
+     *
      * @param settings The node settings.
      * @param names The column names.
      */
