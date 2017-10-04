@@ -49,6 +49,8 @@ package org.knime.ext.textprocessing.nodes.source.grabber;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.InvalidPathException;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -68,6 +70,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
@@ -163,11 +166,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
 
     private ColumnRearranger createColumnRearranger(final DataTableSpec dataSpec) throws InvalidSettingsException {
         // check target directory
-        File dir = new File(m_directoryModel.getStringValue());
-        if (!dir.exists() || !dir.isDirectory() || !dir.canWrite()) {
-            throw new InvalidSettingsException(
-                "Directory " + m_directoryModel.getStringValue() + " cannot be accessed.");
-        }
+        getFile(m_directoryModel.getStringValue());
 
         ColumnRearranger cR = new ColumnRearranger(dataSpec);
         if (m_appendQueryColumnModel.getBooleanValue()) {
@@ -193,10 +192,11 @@ public class DocumentGrabberNodeModel extends NodeModel {
 
                 if (grabber instanceof AbstractDocumentGrabber) {
                     boolean delete = m_deleteFilesModel.getBooleanValue();
-                    DocumentCategory cat = new DocumentCategory(m_categoryModel.getStringValue());
-
+                    if (!m_categoryModel.getStringValue().isEmpty()) {
+                        DocumentCategory cat = new DocumentCategory(m_categoryModel.getStringValue());
+                        ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
+                    }
                     ((AbstractDocumentGrabber)grabber).setDeleteFiles(delete);
-                    ((AbstractDocumentGrabber)grabber).setDocumentCategory(cat);
                     ((AbstractDocumentGrabber)grabber)
                         .setExtractMetaInfo(m_extractMetaInfoSettingsModel.getBooleanValue());
                     ((AbstractDocumentGrabber)grabber).setTokenizerName(m_tokenizerModel.getStringValue());
@@ -205,7 +205,7 @@ public class DocumentGrabberNodeModel extends NodeModel {
 
                 grabber.removeAllDocumentParsedListener();
                 grabber.addDocumentParsedListener(new InternalDocumentParsedEventListener());
-                grabber.fetchAndParseDocuments(new File(m_directoryModel.getStringValue()), query);
+                grabber.fetchAndParseDocuments(FileUtil.getFileFromURL(FileUtil.toURL(m_directoryModel.getStringValue())), query);
             }
 
             BufferedDataTable docTable = m_dtBuilder.getAndCloseDataTable();
@@ -217,6 +217,24 @@ public class DocumentGrabberNodeModel extends NodeModel {
             return new BufferedDataTable[]{docTable};
         } finally {
             m_dtBuilder.closeCache();
+        }
+    }
+
+    static final File getFile(final String dir) throws InvalidSettingsException {
+        try {
+            File directoryPath = FileUtil.getFileFromURL(FileUtil.toURL(dir));
+
+            if (!directoryPath.isDirectory()) {
+                throw new InvalidSettingsException("Selected directory: " + dir + " is not a directory!");
+            } else if (!directoryPath.canWrite()) {
+                throw new InvalidSettingsException("Selected directory: " + dir + " is not writable!");
+            } else if (directoryPath.listFiles().length > 0) {
+                throw new InvalidSettingsException("Selected directory: " + dir + " is not empty!");
+            }
+
+            return directoryPath;
+        } catch (InvalidPathException | MalformedURLException e) {
+            throw new InvalidSettingsException("Invalid directory path!");
         }
     }
 

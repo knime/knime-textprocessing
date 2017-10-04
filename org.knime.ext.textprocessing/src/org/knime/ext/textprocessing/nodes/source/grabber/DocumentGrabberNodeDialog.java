@@ -49,7 +49,6 @@ package org.knime.ext.textprocessing.nodes.source.grabber;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -176,7 +175,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
      */
     public DocumentGrabberNodeDialog() {
 
-        createNewGroup("Query and databse settings");
+        createNewGroup("Query and database settings");
 
         m_queryModel = getQueryModel();
         addDialogComponent(new DialogComponentMultiLineString(m_queryModel, "Query: "));
@@ -233,18 +232,8 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
     public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         super.saveAdditionalSettingsTo(settings);
 
-        String dir = m_directoryModel.getStringValue();
-        File f = new File(dir);
-        if (!f.isDirectory()) {
-            throw new InvalidSettingsException("Selected directory: " + dir + " is not a directory!");
-        } else if (!f.exists()) {
-            throw new InvalidSettingsException("Selected directory: " + dir + " does not exist!");
-        } else if (!f.canWrite()) {
-            throw new InvalidSettingsException("Selected directory: " + dir + " is not writable!");
-        } else if (f.listFiles().length > 0) {
-            throw new InvalidSettingsException("Selected directory: " + dir + " is not empty!");
-        }
-
+        // check the validity of the directory path
+        DocumentGrabberNodeModel.getFile(m_directoryModel.getStringValue());
     }
 
     /**
