@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -85,6 +86,7 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
@@ -344,6 +346,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
             // iterate through rows if column with correct name has been found
             if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnName)) {
                 int counter = 0;
+                Set<String> countMultiWordTerms = new HashSet<String>();
                 for (DataRow row : docDataInput) {
                     //set progress bar
                     counter++;
@@ -363,13 +366,33 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                             String termTextWithWsSuffix = t.getTextWithWsSuffix();
                             if (knownEntitiesStringSet.contains(termText)
                                 || knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
-                                sentenceFileWriter.println(termText + "\t" + m_tagValueModel.getStringValue());
+                                if (t.getWords().size() > 1) {
+                                    // multi-word terms should not be written in one line in the training file
+                                    countMultiWordTerms.add(t.getText());
+
+                                    // so skip it by splitting the term and writing each word in one line
+                                    for (Word w : t.getWords()) {
+                                        sentenceFileWriter.println(w.getText() + "\tO");
+                                    }
+                                } else {
+                                    sentenceFileWriter.println(termText + "\t" + m_tagValueModel.getStringValue());
+                                }
                             } else if (!knownEntitiesStringSet.contains(termText)
                                 || !knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
                                 sentenceFileWriter.println(termText + "\tO");
                             }
                         }
                     }
+                }
+                // give a warning message if there is any multi-word term in the dictionary
+                if (!countMultiWordTerms.isEmpty()) {
+                    String multiWordMessage = "";
+                    if (countMultiWordTerms.size() > 1) {
+                        multiWordMessage = countMultiWordTerms.size() + " entities are skipped because they contain more than one word.";
+                    } else {
+                        multiWordMessage = "The entity \"" + countMultiWordTerms.iterator().next() + "\" is skipped because it contains more than one word.";
+                    }
+                    setWarningMessage(multiWordMessage);
                 }
             }
         }
