@@ -15,7 +15,8 @@
 			</p>
 			<p><i>/%KNIMEWORKSPACE%/%WORKFLOW%/StanfordNLP NE Learner(##)/port_1/object/portobject.zip</i></p>
             <p>
-            You can select the document column and the dictionary column to train your model with. There is also a tab
+            You can select the document column and the dictionary column to train your model with. Note that the dictionary should 
+            contain only one-word entities, otherwise they will be skipped. There is also a tab
             in the dialog to specify the learner properties. Currently, there are only a few options, since the amount of
             parameters is pretty huge. So please contact us, if there are important/highly used parameters,
             we should integrate!
