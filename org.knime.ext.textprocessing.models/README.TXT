@@ -3,7 +3,7 @@ This plugin project provides functionality and models for English language as ex
 It is released under the General Public License (GPL) (see the file 
 LICENSE.TXT, which should be located in the same directory as this file). 
 If you didn't receive a copy of the license file, please contact us: 
-contact@knime.org
+contact@knime.com
 
 This plugin uses models from other projects:
 
