@@ -79,6 +79,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentMetaInfo;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -88,6 +89,11 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  * @since 2.8
  */
 public final class MetaInfoExtractionNodeModel extends NodeModel {
+
+    /**
+     * Default setting for document column name.
+     */
+    public static final String DEF_DOCCOL = "";
 
     /**
      * Default setting for appending documents.
@@ -125,13 +131,17 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
 
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        DataTableSpec spec = inSpecs[0];
+        checkDataTableSpec(inSpecs[0]);
+        return new DataTableSpec[]{createDataTableSpec()};
+    }
 
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         // check input spec
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        return new DataTableSpec[]{createDataTableSpec()};
+        // use ColumnSelectionVerifier to check column validity (AP-7489)
+        ColumnSelectionVerifier.verifyColumn(m_docColModel, spec, DocumentValue.class, null).ifPresent(msg -> setWarningMessage(msg));
     }
 
     private DataTableSpec createDataTableSpec() {
@@ -154,7 +164,8 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-
+        DataTableSpec spec = inData[0].getDataTableSpec();
+        checkDataTableSpec(spec);
         boolean distinctDocs = m_distinctDocsModel.getBooleanValue();
         boolean keysOnly = m_metaKeysOnlyModel.getBooleanValue();
         String keys = m_metaKeysModel.getStringValue();
@@ -165,7 +176,7 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
             }
         }
 
-        int docColIndx = inData[0].getDataTableSpec().findColumnIndex(m_docColModel.getStringValue());
+        int docColIndx = spec.findColumnIndex(m_docColModel.getStringValue());
 
         final BufferedDataContainer bdc = exec.createDataContainer(createDataTableSpec());
         final Set<UUID> processedDocs = new HashSet<UUID>();
@@ -242,7 +253,7 @@ public final class MetaInfoExtractionNodeModel extends NodeModel {
         m_distinctDocsModel.loadSettingsFrom(settings);
         m_metaKeysModel.loadSettingsFrom(settings);
         m_metaKeysOnlyModel.loadSettingsFrom(settings);
-        m_docColModel.validateSettings(settings);
+        m_docColModel.loadSettingsFrom(settings);
     }
 
     private void enableDialogs() {

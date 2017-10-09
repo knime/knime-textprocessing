@@ -56,7 +56,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentMultiLineString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -70,7 +69,7 @@ public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString createDocColModel() {
         return new SettingsModelString(MetaInfoExtractionConfigKeys.CFGKEY_DOCCOL,
-            CommonColumnNames.DEF_DOCUMENT_COLNAME);
+            MetaInfoExtractionNodeModel.DEF_DOCCOL);
     }
 
     /**
