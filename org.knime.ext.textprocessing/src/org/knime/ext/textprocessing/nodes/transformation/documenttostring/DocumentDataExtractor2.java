@@ -49,6 +49,7 @@
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -314,21 +315,7 @@ public enum DocumentDataExtractor2 {
                 if (date == null || (date.getYear() == 0 && date.getMonth() == 0 && date.getDay() == 0)) {
                     return DataType.getMissingCell();
                 }
-                String dateAsString = date.toString();
-                if (dateAsString.length() < 10) {
-                    String[] ymd = dateAsString.split("-");
-                    while (ymd[0].length() < 4) {
-                        ymd[0] = "0" + ymd[0];
-                    }
-                    while (ymd[1].length() < 2) {
-                        ymd[1] = "0" + ymd[1];
-                    }
-                    while (ymd[2].length() < 2) {
-                        ymd[2] = "0" + ymd[2];
-                    }
-                    return LocalDateCellFactory.create(ymd[0] + "-" + ymd[1] + "-" + ymd[2]);
-                }
-                return LocalDateCellFactory.create(date.toString());
+                return LocalDateCellFactory.create(pubDateToLocalDate(date));
             }
         }),
         /** Returns the file path of a document. */
@@ -475,5 +462,21 @@ public enum DocumentDataExtractor2 {
             }
         }
         return extractors;
+    }
+
+    // convert Document's PublicationDate to new LocalDate
+    private static LocalDate pubDateToLocalDate(final PublicationDate pubDate) {
+        int dayOfMonth = pubDate.getDay();
+        int month = pubDate.getMonth();
+        int year = pubDate.getYear();
+
+        if (dayOfMonth == 0) {
+            dayOfMonth = 1;
+        }
+        if (month == 0) {
+            month = 1;
+        }
+
+        return LocalDate.of(year, month, dayOfMonth);
     }
 }
