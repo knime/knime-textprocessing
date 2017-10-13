@@ -332,11 +332,11 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         }
         final DataColumnSpec docColSpec = spec.getColumnSpec(m_docCol.getStringValue());
         if (docColSpec == null) {
-            throw new IllegalArgumentException("Selected column with name "
+            throw new InvalidSettingsException("Selected column with name "
                     + m_docCol.getStringValue() + " not found in input table");
         }
         if (!docColSpec.getType().isCompatible(DocumentValue.class)) {
-            throw new IllegalArgumentException("Selected column with name "
+            throw new InvalidSettingsException("Selected column with name "
                         + m_docCol.getStringValue() + " does not contain documents");
         }
         final ColumnRearranger docTopCR = createDocumentTopicColumnRearranger(spec, m_noOfTopics.getIntValue(), null,
