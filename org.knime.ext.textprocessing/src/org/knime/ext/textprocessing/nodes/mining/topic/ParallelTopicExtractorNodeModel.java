@@ -339,7 +339,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
             throw new IllegalArgumentException("Selected column with name "
                         + m_docCol.getStringValue() + " does not contain documents");
         }
-        final ColumnRearranger docTopCR = createDocumentTopicColumnRearranger(spec, m_noOfTopics.getIntValue(), null);
+        final ColumnRearranger docTopCR = createDocumentTopicColumnRearranger(spec, m_noOfTopics.getIntValue(), null,
+            spec.findColumnIndex(m_docCol.getStringValue()));
         return new DataTableSpec[] {docTopCR.createSpec(), createTopicTableSpec(), createDetailedTableSpec()};
     }
 
@@ -385,7 +386,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         ParallelTopicModel.logger.removeHandler(myLogHandler);
         exec.setMessage("Writing tables");
         exec.checkCanceled();
-        final ColumnRearranger dtcr = createDocumentTopicColumnRearranger(table.getDataTableSpec(), noOfTopics, model);
+        final ColumnRearranger dtcr =
+            createDocumentTopicColumnRearranger(table.getDataTableSpec(), noOfTopics, model, colIdx);
         final BufferedDataTable docTopicTable =
                 exec.createColumnRearrangeTable(table, dtcr, exec.createSubProgress(0.025));
         // The data alphabet maps word IDs to strings
@@ -397,8 +399,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
     }
 
     private ColumnRearranger createDocumentTopicColumnRearranger(final DataTableSpec inputSpec, final int noOfTopics,
-        final ParallelTopicModel model) {
-        final DocumentTopicCellFactory dtcf = new DocumentTopicCellFactory(noOfTopics);
+        final ParallelTopicModel model, final int colIdx) {
+        final DocumentTopicCellFactory dtcf = new DocumentTopicCellFactory(noOfTopics, colIdx);
         if (model != null) {
             dtcf.setTopicModel(model);
         }

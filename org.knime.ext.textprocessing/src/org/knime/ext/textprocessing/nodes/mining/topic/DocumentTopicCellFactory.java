@@ -53,6 +53,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.data.def.DoubleCell;
@@ -74,13 +75,15 @@ public class DocumentTopicCellFactory implements CellFactory {
     private final int m_noOfTopics;
     private ParallelTopicModel m_model;
     private int m_docIdx = 0;
+    private final int m_colIdx;
 
     /**
      * @param noOfTopics the number of topic columns to create
-     *
+     * @param colIdx the index of the document column
      */
-    public DocumentTopicCellFactory(final int noOfTopics) {
+    public DocumentTopicCellFactory(final int noOfTopics, final int colIdx) {
         m_noOfTopics = noOfTopics;
+        m_colIdx = colIdx;
     }
 
     /**
@@ -95,17 +98,25 @@ public class DocumentTopicCellFactory implements CellFactory {
         double maxProb = 0;
         int maxTopicIdx = 0;
         for (int idx = 0; idx < m_noOfTopics; idx++) {
-            // Estimate the topic distribution of the first document, given the current Gibbs state.
-            final double[] topicDistribution = m_model.getTopicProbabilities(m_docIdx);
-            final double topicProb = topicDistribution[idx];
-            if (topicProb > maxProb) {
-                maxProb = topicProb;
-                maxTopicIdx = idx;
+            if (row.getCell(m_colIdx).isMissing()) {
+                cells[idx] = DataType.getMissingCell();
+            } else {
+                // Estimate the topic distribution of the first document, given the current Gibbs state.
+                final double[] topicDistribution = m_model.getTopicProbabilities(m_docIdx);
+                final double topicProb = topicDistribution[idx];
+                if (topicProb > maxProb) {
+                    maxProb = topicProb;
+                    maxTopicIdx = idx;
+                }
+                cells[idx] = new DoubleCell(topicProb);
             }
-            cells[idx] = new DoubleCell(topicProb);
         }
-        cells[cells.length - 1] = new StringCell(TOPIC_PREFIX + maxTopicIdx);
-        m_docIdx++;
+        if (row.getCell(m_colIdx).isMissing()) {
+            cells[cells.length - 1] = DataType.getMissingCell();
+        } else {
+            cells[cells.length - 1] = new StringCell(TOPIC_PREFIX + maxTopicIdx);
+            m_docIdx++;
+        }
         return cells;
     }
 
