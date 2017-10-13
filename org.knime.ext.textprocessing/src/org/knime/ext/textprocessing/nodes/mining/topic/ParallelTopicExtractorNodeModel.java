@@ -88,6 +88,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.mallet.Document2FeatureSequencePipe;
 import org.knime.ext.textprocessing.util.mallet.DocumentInstanceIterator;
 
@@ -314,6 +315,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec spec = inSpecs[0];
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
         if (spec == null) {
             return null;
         }
