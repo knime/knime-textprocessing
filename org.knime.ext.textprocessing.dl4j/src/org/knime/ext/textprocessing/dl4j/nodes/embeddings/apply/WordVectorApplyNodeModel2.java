@@ -53,6 +53,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.ListCell;
@@ -166,19 +167,17 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
         }
 
         if (matchingTokens.size() == 0) {
-            throw new IllegalStateException("No tokens in row " + row.getKey() + " match the vocabulary!");
-        }
-
-        if (m_calculateMean.getBooleanValue()) {
-            final INDArray documentMeanVector = calculateDocumentMean(wordVectors, matchingTokens);
-            convertedDocument =
-                CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
+            cells.add(new MissingCell("No tokens in row " + row.getKey() + " match the vocabulary!"));
         } else {
-            convertedDocument = replaceWordsByWordVector(wordVectors, matchingTokens);
+            if (m_calculateMean.getBooleanValue()) {
+                final INDArray documentMeanVector = calculateDocumentMean(wordVectors, matchingTokens);
+                convertedDocument =
+                        CollectionCellFactory.createListCell(NDArrayUtils.toListOfDoubleCells(documentMeanVector));
+            } else {
+                convertedDocument = replaceWordsByWordVector(wordVectors, matchingTokens);
+            }
+            cells.add(convertedDocument);
         }
-
-        cells.add(convertedDocument);
-
         return new DefaultRow(row.getKey(), cells);
     }
 
