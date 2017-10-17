@@ -92,7 +92,7 @@ public class WordVectorApplyNodeFactory2 extends NodeFactory<WordVectorApplyNode
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return new WordVectorApplyNodeDialog();
+        return new WordVectorApplyNodeDialog2();
     }
 
 }

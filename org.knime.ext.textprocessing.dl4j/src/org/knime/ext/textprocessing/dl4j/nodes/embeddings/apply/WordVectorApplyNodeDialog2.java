@@ -65,9 +65,9 @@ final class WordVectorApplyNodeDialog2 extends DefaultNodeSettingsPane {
     protected WordVectorApplyNodeDialog2() {
         addDialogComponent(
             new DialogComponentColumnNameSelection(WordVectorApplyNodeModel2.createDocumentColumnSettings(),
-                "Document Column:", 0, true, StringValue.class, DocumentValue.class));
+                "Text Column:", 0, true, StringValue.class, DocumentValue.class));
 
         addDialogComponent(new DialogComponentBoolean(WordVectorApplyNodeModel2.createCalculateMeanSettings(),
-            "Calculate Document Mean Vector?"));
+            "Calculate Mean Vector?"));
     }
 }
