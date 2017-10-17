@@ -8,16 +8,24 @@
     
     <fullDescription>
         <intro>This node applies a Word Vector Model to Documents or Strings, meaning that every
-        word contained in the text will be replaced by the corresponding Word Vector if the word
+        word contained in the text (tokenized by whitespace) will be replaced by the corresponding Word Vector if the word
         is available in the Word Vector dictionary. This will result in a list of Word Vectors. 
-        If specified the node calculates the mean of these vectors resulting in a single representation
+        If specified, the node calculates the mean of these vectors resulting in a single representation
         of the input.</intro>
         
         
-        <option name="Document Column">
-        The column containing the text where the Word Vector Model should be applied to.
+        <option name="Text Column">
+        The column containing the text where the Word Vector Model should be applied to. The text will we tokenized by whitespace.
+        Depending on the type of the input the node will use the following as input: <br/>
+        <ul>
+				<li>String: the String will be directly used</li>
+				<li>Document: The Document Full Text will be appended to the Document Title separated by a whitespace.<br/>
+				E.g. a Document with Title: 'Doc A' and Full Text: 'This is a test' <br/>
+				will result in the following text:
+				'Doc A This is a test'</li>				
+		</ul>
         </option>
-        <option name="Calculate Document Mean Vector?">
+        <option name="Calculate Mean Vector?">
         Whether to calculate the mean of the word vectors.
         </option>
         
