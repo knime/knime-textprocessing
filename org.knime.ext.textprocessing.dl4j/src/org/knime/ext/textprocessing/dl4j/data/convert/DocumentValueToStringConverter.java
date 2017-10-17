@@ -48,12 +48,16 @@
  */
 package org.knime.ext.textprocessing.dl4j.data.convert;
 
+import java.util.StringTokenizer;
+
 import org.knime.ext.dl4j.base.data.convert.extension.BaseDL4JConverter;
+import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
- * DL4JConverter that converts a DocumentValue to a singleton double[]. For conversion the DocumentBodyText will be
- * returned.
+ * DL4JConverter that converts a DocumentValue to a String. <br/><br/>
+ * The resulting String will be constructed the following way:<br/>
+ * <i>Document.Title + " " + Document.DocumentBodyText</i>
  *
  * @author David Kolb, KNIME.com GmbH
  */
@@ -66,10 +70,17 @@ public class DocumentValueToStringConverter extends BaseDL4JConverter<DocumentVa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <br/><br/>
+     *
+     * The resulting String will be constructed the following way:<br/>
+     * <i>Document.Title + " " + Document.DocumentBodyText</i> <br/><br/>
+     *
+     * The space is added because we currently tokenize by whitespace.
+     * See: {@link StringTokenizer}
      */
     @Override
     public String convert(final DocumentValue source) throws Exception {
-        return source.getDocument().getDocumentBodyText();
+        Document doc = source.getDocument();
+        return doc.getTitle() + " " + doc.getDocumentBodyText();
     }
 }
