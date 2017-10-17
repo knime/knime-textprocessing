@@ -330,7 +330,7 @@ final class WordVectorApplyNodeModel2 extends AbstractDLNodeModel {
     private void logUnkownWords() {
         if (m_unknownWordsCtr > 0 && m_totalWordsCtr > 0) {
             logger.warn(
-                m_unknownWordsCtr / (double)m_totalWordsCtr + "% of words in input could not be found in input vocabulary.");
+                (m_unknownWordsCtr / (double)m_totalWordsCtr)*100 + "% of words in input could not be found in input vocabulary.");
         }
     }
 
