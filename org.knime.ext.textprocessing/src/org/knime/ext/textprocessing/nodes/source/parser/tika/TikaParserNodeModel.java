@@ -55,6 +55,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -115,17 +116,13 @@ final class TikaParserNodeModel extends AbstractTikaNodeModel {
     }
 
     private boolean filterExt(final List<String> exts, final URL s) {
-        if (exts.size() == 0) {
-            return true;
-        }
-
+        final String fileExt = FilenameUtils.getExtension(s.getFile());
         for (final String ext : exts) {
-            if (s.getFile().toLowerCase().endsWith("." + ext)) {
+            if (fileExt.equalsIgnoreCase(ext)) {
                 return true;
             }
         }
         return false;
-
     }
 
     private boolean filterLocalFiles(final URL s) {

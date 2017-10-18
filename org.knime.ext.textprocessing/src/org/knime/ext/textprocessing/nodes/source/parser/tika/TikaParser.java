@@ -180,7 +180,7 @@ public class TikaParser {
         }
 
         if (!m_sourceNode && m_extBoolean) {
-            if (!m_validTypes.contains(FilenameUtils.getExtension(url.getFile()).toLowerCase())) { //getName
+            if (!m_validTypes.contains(FilenameUtils.getExtension(getPath(url)).toLowerCase())) { //getName
                 m_errorMsg = "File doesn't match any selected extension(s)";
                 result.add(createMissingRow(url, m_errorMsg));
                 return result;
@@ -201,7 +201,7 @@ public class TikaParser {
             setPasswordToContext();
         }
 
-        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, url.getFile()); //getName
+        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, FilenameUtils.getName(getPath(url))); //getName
 
         try (BufferedInputStream str = new BufferedInputStream(FileUtil.openStreamWithTimeout(url))) {
             mime_type = m_parser.getDetector().detect(str, m_metadata).toString();
@@ -257,10 +257,10 @@ public class TikaParser {
                     ex.setContext(m_context);
                     ex.setDuplicateFilesList(m_duplicates);
                     ex.setExtractInlineImages(m_extractInlineImages);
-                    ex.extract(stream, attachmentDir.toPath(), FilenameUtils.getName(url.getPath())); //getName
+                    ex.extract(stream, attachmentDir.toPath(), FilenameUtils.getName(getPath(url))); //getName
                     if (ex.hasError()) {
                         m_errorMsg = "Could not write embedded files to the output directory";
-                        LOGGER.error(m_errorMsg + ": " + url.getPath());
+                        LOGGER.error(m_errorMsg + ": " + getPath(url));
                     }
                     m_metadata = ex.getMetadata();
                     m_handler = ex.getHandler();
@@ -275,7 +275,7 @@ public class TikaParser {
                     }
                 }
             } else {
-                try (TikaInputStream stream = TikaInputStream.get(url);) {
+                try (TikaInputStream stream = TikaInputStream.get(FileUtil.openStreamWithTimeout(url));) {
                     m_parser.parse(stream, m_handler, m_metadata, m_context);
                 }
             }
