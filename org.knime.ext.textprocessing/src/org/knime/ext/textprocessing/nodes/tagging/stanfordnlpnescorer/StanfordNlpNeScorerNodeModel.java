@@ -155,6 +155,8 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec spec = (DataTableSpec)inSpecs[0];
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
         NERModelPortObjectSpec modelSpec = (NERModelPortObjectSpec)inSpecs[1];
         // guessing the document column
         int colIndex = spec.findColumnIndex(m_docColumnModel.getStringValue());
