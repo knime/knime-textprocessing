@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -95,6 +96,7 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
@@ -169,8 +171,8 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         }
 
         // check if specific tokenizer is installed
-        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerName)) {
-            throw new MissingTokenizerException(m_tokenizerName);
+        if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(modelSpec.getTokenizerName())) {
+            throw new MissingTokenizerException(modelSpec.getTokenizerName());
         }
 
         //check tokenizer settings from incoming document column
@@ -219,12 +221,15 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         File m_annotatedTestFile = new File(m_annotatedTestFilePath);
         PrintWriter sentenceFileWriter = new PrintWriter(m_annotatedTestFile, "UTF-8");
 
+        int missingValueCounter = 0;
+
         // tag documents and transform sentences to strings while tagged terms get StanfordNLP annotation
         // iterate through columns
         for (int i = 0; i < docTableSpec.getNumColumns(); i++) {
             // iterate through rows if column with correct name has been found
             if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnName)) {
                 int counter = 0;
+                Set<String> countMultiWordTerms = new HashSet<String>();
                 for (DataRow row : docDataInput) {
                     //set progress bar
                     counter++;
@@ -232,24 +237,43 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
                     exec.setProgress(progress, "Preparing documents for validation");
                     exec.checkCanceled();
 
-                    Document doc = ((DocumentValue)row.getCell(i)).getDocument();
-                    Document taggedDoc = tagger.tag(doc);
-                    Iterator<Sentence> si = taggedDoc.sentenceIterator();
-                    while (si.hasNext()) {
-                        Sentence s = si.next();
-                        List<Term> termList = s.getTerms();
-                        Iterator<Term> ti = termList.iterator();
-                        while (ti.hasNext()) {
-                            Term t = ti.next();
-                            String termText = t.getText();
-                            String termTextWithWsSuffix = t.getTextWithWsSuffix();
-                            if (m_usedDict.contains(termText) || m_usedDict.contains(termTextWithWsSuffix)) {
-                                sentenceFileWriter.println(termText + "\t" + m_tag.getTagValue());
-                            } else if (!m_usedDict.contains(termText) || !m_usedDict.contains(termTextWithWsSuffix)) {
-                                sentenceFileWriter.println(termText + "\tO");
+                    if (!row.getCell(i).isMissing() && row.getCell(i).getType().isCompatible(DocumentValue.class)) {
+                        Document doc = ((DocumentValue)row.getCell(i)).getDocument();
+                        Document taggedDoc = tagger.tag(doc);
+                        Iterator<Sentence> si = taggedDoc.sentenceIterator();
+                        while (si.hasNext()) {
+                            Sentence s = si.next();
+                            List<Term> termList = s.getTerms();
+                            Iterator<Term> ti = termList.iterator();
+                            while (ti.hasNext()) {
+                                Term t = ti.next();
+                                String termText = t.getText();
+                                String termTextWithWsSuffix = t.getTextWithWsSuffix();
+                                if (m_usedDict.contains(termText) || m_usedDict.contains(termTextWithWsSuffix)) {
+                                    if (t.getWords().size() > 1) {
+                                        // multi-word terms should not be written in one line in the training file
+                                        countMultiWordTerms.add(t.getText());
+
+                                        // so skip it by splitting the term and writing each word in one line
+                                        for (Word w : t.getWords()) {
+                                            sentenceFileWriter.println(w.getText() + "\t" + m_tag.getTagValue());
+                                        }
+                                    } else {
+                                        sentenceFileWriter.println(termText + "\t" + m_tag.getTagValue());
+                                    }
+                                } else if (!m_usedDict.contains(termText) || !m_usedDict.contains(termTextWithWsSuffix)) {
+                                    sentenceFileWriter.println(termText + "\tO");
+                                }
                             }
                         }
+                    } else {
+                        if (++missingValueCounter == 1) {
+                            setWarningMessage(missingValueCounter + " row has been ignored due to missing value.");
+                        } else if (missingValueCounter > 1) {
+                            setWarningMessage(missingValueCounter + " rows have been ignored due to missing values.");
+                        }
                     }
+
                 }
             }
         }
@@ -301,10 +325,12 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
             }
 
             if (!canParseModelQuality) {
-                LOGGER.error("Could not read quality measures of model validation.");
+                LOGGER.error("Could not parse quality measures of model validation.");
+                setWarningMessage("Could not parse quality measures of model validation.");
             }
         } catch (NumberFormatException e) {
             LOGGER.error("Could not parse quality measures of model validation.");
+            setWarningMessage("Could not parse quality measures of model validation.");
         }
         accTable.addRowToTable(stats);
 
