@@ -54,7 +54,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -74,7 +73,7 @@ public class TagToStringNodeDialog extends DefaultNodeSettingsPane {
      * @return A new instance of <code>SettingsModelString</code> containing the specified term column.
      */
     public static SettingsModelString getTermColModel() {
-        return new SettingsModelString(TagToStringConfigKeys.CFG_KEY_TERM_COL, CommonColumnNames.DEF_TERM_COLNAME);
+        return new SettingsModelString(TagToStringConfigKeys.CFG_KEY_TERM_COL, "");
     }
 
     /**

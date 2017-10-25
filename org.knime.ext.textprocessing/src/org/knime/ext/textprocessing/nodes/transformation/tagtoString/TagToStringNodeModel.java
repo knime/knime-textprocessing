@@ -71,6 +71,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.PartOfSpeechTag;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -123,18 +124,8 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[0]);
-        verifier.verifyMinimumTermCells(1, true);
-
-        m_termColIndex = inSpecs[0].findColumnIndex(
-                m_termColModel.getStringValue());
-        if (m_termColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified term column is not valid! "
-                    + "Check your settings!");
-        }
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        checkDataTableSpec(inSpecs[0]);
 
         List<String> tagTypes = new ArrayList<String>();
         for (String tagType : m_tagTypesModel.getStringArrayValue()) {
@@ -144,6 +135,38 @@ public class TagToStringNodeModel extends NodeModel {
         return new DataTableSpec[]{new DataTableSpec(inSpecs[0],
                                    new DataTableSpec(getDataTableSpec(
                                            tagTypes, inSpecs[0])))};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumTermCells(1, true);
+        int numOfTermCols = verifier.getNumTermCells();
+
+        // the node should only auto-guess column at the beginning (AP-7489)
+        String termCol = m_termColModel.getStringValue();
+        if (termCol.isEmpty()) {
+            String newTermCol = null;
+            if (numOfTermCols == 1) {
+                newTermCol = spec.getColumnSpec(verifier.getTermCellIndex()).getName();
+            } else if (numOfTermCols > 1) {
+                for (String colName : spec.getColumnNames()) {
+                    if (spec.getColumnSpec(colName).getType().isCompatible(TermValue.class)) {
+                        newTermCol = colName;
+                        break;
+                    }
+                }
+                setWarningMessage("Auto guessing: Using column '" + newTermCol + "' as term column");
+            }
+            m_termColModel.setStringValue(newTermCol);
+            termCol = newTermCol;
+        }
+        m_termColIndex = spec.findColumnIndex(termCol);
+
+        if (m_termColIndex < 0) {
+            throw new InvalidSettingsException(
+                "Selected term column \"" + termCol + "\" could not be found in the input data table.");
+        }
     }
 
     /**
@@ -170,10 +193,9 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
-        m_termColIndex = inData[0].getDataTableSpec().findColumnIndex(
-                m_termColModel.getStringValue());
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
+        checkDataTableSpec(inData[0].getDataTableSpec());
 
         List<String> tagTypes = new ArrayList<String>();
         for (String tagType : m_tagTypesModel.getStringArrayValue()) {
