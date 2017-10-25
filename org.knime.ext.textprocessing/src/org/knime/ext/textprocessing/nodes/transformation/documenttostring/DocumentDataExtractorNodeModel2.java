@@ -66,7 +66,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.DocumentValue;
-
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  * {@link NodeModel} implementation of the DocumentDataExtractor node.
@@ -104,28 +104,37 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
         if (extractors == null || extractors.length < 1) {
             setWarningMessage("No data extractors selected");
         }
+        checkDataTableSpec(inSpecs[0]);
+
+        m_extractorColumnSpecs = createColumnSpecs(inSpecs[0], extractors);
+        final DataTableSpec resultSpec = createSpec(inSpecs[0], m_extractorColumnSpecs);
+        return new DataTableSpec[]{resultSpec};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
+
+        // the node should only auto-guess column at the beginning (AP-7489)
         final String colName = m_documentCol.getStringValue();
-        final DataTableSpec inSpec = inSpecs[0];
         if (colName == null) {
             //pre select the first document column
-            for (final DataColumnSpec colSpec : inSpec) {
+            for (final DataColumnSpec colSpec : spec) {
                 if (colSpec.getType().isCompatible(DocumentValue.class)) {
                     m_documentCol.setStringValue(colSpec.getName());
+                    setWarningMessage("Auto guessing: Using column '" + colSpec.getName() + "' as document column");
                     break;
                 }
             }
         } else {
             //check if the selected column name is available
-            final int columnIndex = inSpec.findColumnIndex(colName);
+            final int columnIndex = spec.findColumnIndex(colName);
             if (columnIndex < 0) {
-                throw new InvalidSettingsException("Invalid column name: "
-                        + colName);
+                throw new InvalidSettingsException(
+                    "Selected document column \"" + colName + "\" could not be found in the input data table.");
             }
         }
-        m_extractorColumnSpecs = createColumnSpecs(inSpecs[0], extractors);
-        final DataTableSpec resultSpec =
-            createSpec(inSpecs[0], m_extractorColumnSpecs);
-        return new DataTableSpec[] {resultSpec};
     }
 
     /**
@@ -139,11 +148,9 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
         }
         final BufferedDataTable table = inData[0];
         final DataTableSpec inSpec = table.getSpec();
-        final int docColIdx =
-            inSpec.findColumnIndex(m_documentCol.getStringValue());
-        if (docColIdx < 0) {
-            throw new InvalidSettingsException("Invalid document column");
-        }
+        checkDataTableSpec(inSpec);
+        final int docColIdx = inSpec.findColumnIndex(m_documentCol.getStringValue());
+
         final DocumentDataExtractor2[] extractors =
             DocumentDataExtractor2.getExctractor(
                     m_extractorNames.getStringArrayValue());
