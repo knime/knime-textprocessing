@@ -98,29 +98,41 @@ public class StringToTermNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec spec = inSpecs[0];
+        checkDataTableSpec(spec);
 
+        return new DataTableSpec[]{createDataTableSpec(spec)};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumStringCells(1, true);
+        int numOfStringCols = verifier.getNumberStringCells();
 
-        // checking specified string col and guessing first available string col if no col ist set.
-        int colIndex = spec.findColumnIndex(m_stringColModel.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < spec.getNumColumns(); i++) {
-                if (spec.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
-                    colIndex = i;
-                    this.setWarningMessage("Guessing string column \"" + spec.getColumnSpec(i).getName() + "\".");
-                    break;
+        // the node should only auto-guess column at the beginning (AP-7489)
+        String stringCol = m_stringColModel.getStringValue();
+        if (stringCol.isEmpty()) {
+            String newStringtCol = null;
+            if (numOfStringCols == 1) {
+                newStringtCol = spec.getColumnSpec(verifier.getStringCellIndex()).getName();
+            } else if (numOfStringCols > 1) {
+                for (String colName : spec.getColumnNames()) {
+                    if (spec.getColumnSpec(colName).getType().isCompatible(StringValue.class)) {
+                        newStringtCol = colName;
+                        break;
+                    }
                 }
+                setWarningMessage("Auto guessing: Using column '" + newStringtCol + "' as string column");
             }
+            m_stringColModel.setStringValue(newStringtCol);
+            stringCol = newStringtCol;
         }
-        // if guess was not successful (no string col available), throw error
-        if (colIndex < 0) {
-            throw new InvalidSettingsException("Input table contains no string columns!");
-        }
-        // otherwise set string column index
-        m_stringColIndex = colIndex;
+        m_stringColIndex = spec.findColumnIndex(stringCol);
 
-        return new DataTableSpec[]{createDataTableSpec(inSpecs[0])};
+        if (m_stringColIndex < 0) {
+            throw new InvalidSettingsException(
+                "Selected string column \"" + stringCol + "\" could not be found in the input data table.");
+        }
     }
 
     /**
@@ -131,7 +143,7 @@ public class StringToTermNodeModel extends NodeModel {
         throws Exception {
 
         BufferedDataTable bfd = inData[0];
-
+        checkDataTableSpec(bfd.getDataTableSpec());
         CellFactory fac = new TermCellFactory(m_stringColIndex, bfd.getDataTableSpec());
         ColumnRearranger rearranger = new ColumnRearranger(bfd.getDataTableSpec());
         rearranger.append(fac);
