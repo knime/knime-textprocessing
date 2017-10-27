@@ -100,6 +100,7 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
@@ -115,8 +116,6 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StanfordNlpNeScorerNodeModel.class);
 
     private SettingsModelString m_docColumnModel = StanfordNlpNeScorerNodeDialog.createDocumentColumnModel();
-
-    private String m_docColumnName;
 
     private Set<String> m_usedDict;
 
@@ -158,19 +157,14 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         NERModelPortObjectSpec modelSpec = (NERModelPortObjectSpec)inSpecs[1];
-        // guessing the document column
-        int colIndex = spec.findColumnIndex(m_docColumnModel.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < spec.getNumColumns(); i++) {
-                if (spec.getColumnSpec(i).getType().isCompatible(DocumentValue.class)) {
-                    colIndex = i;
-                    m_docColumnName = spec.getColumnSpec(i).getName();
-                    break;
-                }
-            }
-        } else if (colIndex >= 0) {
-            m_docColumnName = m_docColumnModel.getStringValue();
+
+        // select and verify column selection
+        ColumnSelectionVerifier docColSelVerifier =
+            new ColumnSelectionVerifier(m_docColumnModel, spec, DocumentValue.class);
+        if (docColSelVerifier.hasWarningMessage()) {
+            setWarningMessage(docColSelVerifier.getWarningMessage());
         }
+        int colIndex = spec.findColumnIndex(m_docColumnModel.getStringValue());
 
         // check if specific tokenizer is installed
         if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(modelSpec.getTokenizerName())) {
@@ -229,7 +223,7 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         // iterate through columns
         for (int i = 0; i < docTableSpec.getNumColumns(); i++) {
             // iterate through rows if column with correct name has been found
-            if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnName)) {
+            if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnModel.getStringValue())) {
                 int counter = 0;
                 Set<String> countMultiWordTerms = new HashSet<String>();
                 for (DataRow row : docDataInput) {
