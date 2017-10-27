@@ -263,15 +263,16 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
                             }
                         }
                     } else {
-                        if (++missingValueCounter == 1) {
-                            setWarningMessage(missingValueCounter + " row has been ignored due to missing value.");
-                        } else if (missingValueCounter > 1) {
-                            setWarningMessage(missingValueCounter + " rows have been ignored due to missing values.");
-                        }
+                        missingValueCounter++;
                     }
-
                 }
             }
+        }
+
+        if (missingValueCounter == 1) {
+            setWarningMessage(missingValueCounter + " row has been ignored due to missing value.");
+        } else if (missingValueCounter > 1) {
+            setWarningMessage(missingValueCounter + " rows have been ignored due to missing values.");
         }
 
         sentenceFileWriter.close();
