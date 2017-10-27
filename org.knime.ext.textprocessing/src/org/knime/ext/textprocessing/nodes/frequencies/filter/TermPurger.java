@@ -54,6 +54,7 @@ import java.util.Set;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.filestore.FileStoreFactory;
@@ -144,9 +145,12 @@ public class TermPurger {
         RowIterator it = m_inData.iterator();
         while (it.hasNext()) {
             DataRow row = it.next();
-            Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-            if (!m_terms.contains(t)) {
-                m_terms.add(t);
+            if (!row.getCell(m_termColIndex).isMissing()
+                && row.getCell(m_termColIndex).getType().isCompatible(TermValue.class)) {
+                Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+                if (!m_terms.contains(t)) {
+                    m_terms.add(t);
+                }
             }
         }
     }
@@ -176,14 +180,17 @@ public class TermPurger {
             currRow++;
 
             DataRow row = it.next();
-            Document origDoc = ((DocumentValue)row.getCell(m_docColIndex))
-                            .getDocument();
+            if (!row.getCell(m_docColIndex).isMissing()
+                && row.getCell(m_docColIndex).getType().isCompatible(DocumentValue.class)) {
+                Document origDoc = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
 
-            // purge only if not purged yet
-            if (!preprocessedDoc.containsKey(origDoc)) {
-                Document purgedDocument = purgeDocument(origDoc);
-                preprocessedDoc.put(origDoc, purgedDocument);
+                // purge only if not purged yet
+                if (!preprocessedDoc.containsKey(origDoc)) {
+                    Document purgedDocument = purgeDocument(origDoc);
+                    preprocessedDoc.put(origDoc, purgedDocument);
+                }
             }
+
         }
 
         return createNewDataTable(preprocessedDoc);
@@ -212,20 +219,26 @@ public class TermPurger {
                 currRow++;
 
                 DataRow row = it.next();
-                Document origDoc = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
-
+                DataCell[] cells = new DataCell[row.getNumCells()];
+                Document origDoc = null;
+                if (!row.getCell(m_docColIndex).isMissing()
+                    && row.getCell(m_docColIndex).getType().isCompatible(DocumentValue.class)) {
+                    origDoc = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
+                }
                 // add all cells of old data table except the document cell,
                 // which has to be re-created with the purged document.
-                DataCell[] cells = new DataCell[row.getNumCells()];
                 for (int i = 0; i < row.getNumCells(); i++) {
                     if (i == m_docColIndex) {
-                        DataCell docCell = dataCellCache.getInstance(preprocessedDoc.get(origDoc));
-                        cells[i] = docCell;
+                        if (!row.getCell(m_docColIndex).isMissing() || origDoc != null) {
+                            DataCell docCell = dataCellCache.getInstance(preprocessedDoc.get(origDoc));
+                            cells[i] = docCell;
+                        } else {
+                            cells[i] = DataType.getMissingCell();
+                        }
                     } else {
                         cells[i] = row.getCell(i);
                     }
                 }
-
                 DataRow newRow = new DefaultRow(row.getKey(), cells);
                 dc.addRowToTable(newRow);
             }

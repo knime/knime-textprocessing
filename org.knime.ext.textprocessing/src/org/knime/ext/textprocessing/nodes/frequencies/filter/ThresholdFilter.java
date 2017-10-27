@@ -96,16 +96,18 @@ public class ThresholdFilter extends FrequencyFilter {
     @Override
     public boolean internalMatches(final DataRow row, final long rowIndex) {
         DataCell cell = row.getCell(m_filterColIndex);
-        if (cell.getType().isCompatible(DoubleValue.class)) {
+        if (!cell.isMissing() && cell.getType().isCompatible(DoubleValue.class)) {
             double val = ((DoubleValue)cell).getDoubleValue();
             if (val >= m_min && val <= m_max) {
                 return true;
             }
-        } else if (cell.getType().isCompatible(IntValue.class)) {
+        } else if (!cell.isMissing() && cell.getType().isCompatible(IntValue.class)) {
             int val = ((IntValue)cell).getIntValue();
             if (val >= m_min && val <= m_max) {
                 return true;
             }
+        } else if (cell.isMissing()) {
+            return true;
         }
         return false;
     }

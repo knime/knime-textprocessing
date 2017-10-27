@@ -154,7 +154,7 @@ public abstract class FrequencyFilter extends AbstractRowFilter {
     @Override
     public final boolean matches(final DataRow row, final long rowIndex) throws EndOfTableException, IncludeFromNowOn {
         DataCell cell = row.getCell(m_termColIndex);
-        if (cell.getType().isCompatible(TermValue.class)) {
+        if (!cell.isMissing() && cell.getType().isCompatible(TermValue.class)) {
             Term t = ((TermValue)cell).getTermValue();
             if (t.isUnmodifiable() && !m_modifyUnmodifiable) {
                 return true;
