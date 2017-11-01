@@ -55,6 +55,7 @@ import javax.swing.event.ChangeListener;
 
 import org.knime.base.node.preproc.filter.row.RowFilterTable;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DoubleValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -67,7 +68,9 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleRange;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -181,12 +184,13 @@ public class FilterNodeModel extends NodeModel {
         verifier.verifyMinimumNumberCells(1, true);
         m_termColIndex = verifier.getTermCellIndex();
 
-        int documentColIndex = spec.findColumnIndex(
-                m_documentColModel.getStringValue());
-        if (documentColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! "
-                    + "Check your settings!");
+        ColumnSelectionVerifier docSelectionVerifier = new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
+        ColumnSelectionVerifier numColSelectionVerifier = new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
+        if (docSelectionVerifier.hasWarningMessage()) {
+            setWarningMessage(docSelectionVerifier.getWarningMessage());
+        }
+        if (numColSelectionVerifier.hasWarningMessage()) {
+            setWarningMessage(numColSelectionVerifier.getWarningMessage());
         }
     }
 
