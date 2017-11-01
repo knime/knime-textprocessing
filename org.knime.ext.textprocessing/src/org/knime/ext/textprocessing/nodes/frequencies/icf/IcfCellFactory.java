@@ -53,6 +53,7 @@ import java.util.Set;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.node.BufferedDataTable;
@@ -66,9 +67,8 @@ import org.knime.ext.textprocessing.nodes.frequencies.Frequencies;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequencyCellFactory;
 
 /**
- * The icf cell factory computes the inverse category frequency value of each
- * term and adds the value as a new double cell. The categories are taken from
- * the documents containing the term.
+ * The icf cell factory computes the inverse category frequency value of each term and adds the value as a new double
+ * cell. The categories are taken from the documents containing the term.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -80,8 +80,7 @@ public class IcfCellFactory extends FrequencyCellFactory {
     public static final String COLNAME = "ICF";
 
     /**
-     * The flag specifying that the column containing the icf values is a
-     * double column.
+     * The flag specifying that the column containing the icf values is a double column.
      */
     public static final boolean INT_COL = false;
 
@@ -121,22 +120,24 @@ public class IcfCellFactory extends FrequencyCellFactory {
             currRow++;
 
             DataRow row = it.next();
-            Term t = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
-            Set<DocumentCategory> cats =
-                ((DocumentValue)row.getCell(getDocumentColIndex()))
-                .getDocument().getCategories();
+            if (!row.getCell(getTermColIndex()).isMissing() && !row.getCell(getDocumentColIndex()).isMissing()) {
+                Term t = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
+                Set<DocumentCategory> cats =
+                    ((DocumentValue)row.getCell(getDocumentColIndex()))
+                    .getDocument().getCategories();
 
-            m_cats.addAll(cats);
+                m_cats.addAll(cats);
 
-            // save term and doc
-            Set<DocumentCategory> termCats;
-            if (!m_termCatData.containsKey(t)) {
-                termCats = new HashSet<DocumentCategory>();
-            } else {
-                termCats = m_termCatData.get(t);
+                // save term and doc
+                Set<DocumentCategory> termCats;
+                if (!m_termCatData.containsKey(t)) {
+                    termCats = new HashSet<DocumentCategory>();
+                } else {
+                    termCats = m_termCatData.get(t);
+                }
+                termCats.addAll(cats);
+                m_termCatData.put(t, termCats);
             }
-            termCats.addAll(cats);
-            m_termCatData.put(t, termCats);
         }
     }
 
@@ -145,13 +146,17 @@ public class IcfCellFactory extends FrequencyCellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
-        Term t = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
-        double idf = 0;
-        if (m_termCatData.containsKey(t)) {
-            idf = Frequencies.inverseDocumentFrequency(m_cats.size(),
-                    m_termCatData.get(t).size());
+        if (!row.getCell(getTermColIndex()).isMissing() && !row.getCell(getDocumentColIndex()).isMissing()) {
+            Term t = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
+            double idf = 0;
+            if (m_termCatData.containsKey(t)) {
+                idf = Frequencies.inverseDocumentFrequency(m_cats.size(), m_termCatData.get(t).size());
+            }
+            return new DoubleCell[]{new DoubleCell(idf)};
+        } else {
+            return new DataCell[]{DataType.getMissingCell()};
         }
-        return new DoubleCell[]{new DoubleCell(idf)};
+
     }
 
 }
