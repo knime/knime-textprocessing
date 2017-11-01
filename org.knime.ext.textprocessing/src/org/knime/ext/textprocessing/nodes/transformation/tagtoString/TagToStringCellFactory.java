@@ -41,11 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   17.03.2009 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.tagtoString;
+
+import java.util.Hashtable;
+import java.util.List;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -60,9 +63,6 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 
-import java.util.Hashtable;
-import java.util.List;
-
 /**
  *
  * @author Kilian Thiel
@@ -70,22 +70,22 @@ import java.util.List;
 public class TagToStringCellFactory implements CellFactory {
 
     private int m_termColIndex = -1;
-    
+
     private List<String> m_tagTypes;
-    
+
     private DataTableSpec m_oldSpec;
-    
+
     private DataCell m_missingCell;
-    
+
     /**
      * Creates new instance of <code>TagToStringCellFactory</code>.
-     * 
+     *
      * @param termColIndex The index of the term column.
      * @param tagTypes The tag types to consider.
      * @param oldSpec The incoming spec.
      * @param missingValue The missing-value value.
      */
-    public TagToStringCellFactory(final int termColIndex, 
+    public TagToStringCellFactory(final int termColIndex,
             final List<String> tagTypes, final DataTableSpec oldSpec,
             final String missingValue) {
         if (tagTypes == null) {
@@ -94,16 +94,16 @@ public class TagToStringCellFactory implements CellFactory {
         }
         if (termColIndex < 0) {
             throw new IllegalArgumentException(
-                    "Index of term column must be >= 0!");            
+                    "Index of term column must be >= 0!");
         }
         if (oldSpec == null) {
             throw new IllegalArgumentException(
-                    "DataTableSpec must not be null!");            
+                    "DataTableSpec must not be null!");
         }
         m_termColIndex = termColIndex;
         m_tagTypes = tagTypes;
         m_oldSpec = oldSpec;
-        
+
         if (missingValue == null || missingValue.equals(
                 TagToStringNodeModel.MISSING_CELL_VALUE)) {
             m_missingCell = DataType.getMissingCell();
@@ -111,32 +111,36 @@ public class TagToStringCellFactory implements CellFactory {
             m_missingCell = new StringCell(missingValue);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public DataCell[] getCells(final DataRow row) {        
-        Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-        // get tag types and values
-        Hashtable<String, String> appliedTagTypes = 
-            new Hashtable<String, String>();
-        for (Tag tag : t.getTags()) {
-            appliedTagTypes.put(tag.getTagType(), tag.getTagValue());
-        }
-        // create new data cells
-        DataCell[] newCells = new DataCell[m_tagTypes.size()];
-        int i = 0;
-        for (String tagType : m_tagTypes) {
-            String tagVal = appliedTagTypes.get(tagType); 
-            if (tagVal != null) {
-                newCells[i] = new StringCell(tagVal);
-            } else {
-                newCells[i] = m_missingCell;
+    public DataCell[] getCells(final DataRow row) {
+        if (!row.getCell(m_termColIndex).isMissing()) {
+            Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+            // get tag types and values
+            Hashtable<String, String> appliedTagTypes =
+                new Hashtable<String, String>();
+            for (Tag tag : t.getTags()) {
+                appliedTagTypes.put(tag.getTagType(), tag.getTagValue());
             }
-            i++;
+            // create new data cells
+            DataCell[] newCells = new DataCell[m_tagTypes.size()];
+            int i = 0;
+            for (String tagType : m_tagTypes) {
+                String tagVal = appliedTagTypes.get(tagType);
+                if (tagVal != null) {
+                    newCells[i] = new StringCell(tagVal);
+                } else {
+                    newCells[i] = m_missingCell;
+                }
+                i++;
+            }
+            return newCells;
+        } else {
+            return new DataCell[]{DataType.getMissingCell()};
         }
-        return newCells;
     }
 
     /**
@@ -151,10 +155,10 @@ public class TagToStringCellFactory implements CellFactory {
      * {@inheritDoc}
      */
     @Override
-    public void setProgress(final int curRowNr, final int rowCount, 
+    public void setProgress(final int curRowNr, final int rowCount,
             final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Converting tag to string of row: " + curRowNr 
+        exec.setProgress(prog, "Converting tag to string of row: " + curRowNr
                 + " of " + rowCount + " rows");
     }
 }
