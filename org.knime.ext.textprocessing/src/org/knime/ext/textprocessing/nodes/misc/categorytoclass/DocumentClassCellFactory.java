@@ -57,6 +57,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.data.def.StringCell;
@@ -90,29 +91,34 @@ public class DocumentClassCellFactory implements CellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
-        StringCell classCell;
-        Document doc = ((DocumentValue)row.getCell(m_documentCellIndex))
-                        .getDocument();
+        if (!row.getCell(m_documentCellIndex).isMissing()) {
+            StringCell classCell;
+            Document doc = ((DocumentValue)row.getCell(m_documentCellIndex))
+                            .getDocument();
 
-        Set<DocumentCategory> cats = doc.getCategories();
-        List<DocumentCategory> catsList = new ArrayList<DocumentCategory>(cats);
-        Collections.sort(catsList, new Comparator <DocumentCategory>() {
-            @Override
-            public int compare(final DocumentCategory o1,
-                    final DocumentCategory o2) {
-                if (o1 != null && o2 != null) {
-                    return o1.getCategoryName().compareTo(o2.getCategoryName());
+            Set<DocumentCategory> cats = doc.getCategories();
+            List<DocumentCategory> catsList = new ArrayList<DocumentCategory>(cats);
+            Collections.sort(catsList, new Comparator <DocumentCategory>() {
+                @Override
+                public int compare(final DocumentCategory o1,
+                        final DocumentCategory o2) {
+                    if (o1 != null && o2 != null) {
+                        return o1.getCategoryName().compareTo(o2.getCategoryName());
+                    }
+                    return 0;
                 }
-                return 0;
-            }
-        });
+            });
 
-        String cat = UNDEFINED;
-        if (catsList.size() > 0) {
-            cat = catsList.get(0).getCategoryName();
+            String cat = UNDEFINED;
+            if (catsList.size() > 0) {
+                cat = catsList.get(0).getCategoryName();
+            }
+            classCell = new StringCell(cat);
+            return new DataCell[]{classCell};
+        } else {
+            return new DataCell[]{DataType.getMissingCell()};
         }
-        classCell = new StringCell(cat);
-        return new DataCell[]{classCell};
+
     }
 
     /**
