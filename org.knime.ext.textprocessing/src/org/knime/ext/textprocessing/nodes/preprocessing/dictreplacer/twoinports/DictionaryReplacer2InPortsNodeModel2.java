@@ -50,6 +50,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports
 
 import java.util.HashMap;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -99,6 +100,7 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
     @Override
     protected void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws InvalidSettingsException {
+
         final int replaceColIndex = inData[1].getDataTableSpec().findColumnIndex(m_replaceColumModel.getStringValue());
         final int replacementColIndex =
             inData[1].getDataTableSpec().findColumnIndex(m_replacementColumModel.getStringValue());
@@ -122,6 +124,59 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        DataTableSpecVerifier dictTableSpecVerifier = new DataTableSpecVerifier(inSpecs[1]);
+        dataTableSpecVerifier.verifyMinimumDocumentCells(1, true);
+        dictTableSpecVerifier.verifyMinimumStringCells(2, true);
+
+        DataTableSpec dictTableSpec = inSpecs[1];
+
+        // initialize search string and replacement string columns
+        if (m_replaceColumModel.getStringValue().isEmpty()) {
+            for (DataColumnSpec colSpec : dictTableSpec) {
+                if (colSpec.getType().isCompatible(StringValue.class)) {
+                    m_replaceColumModel.setStringValue(colSpec.getName());
+                    setWarningMessage(
+                        "Auto guessing: Using column '" + colSpec.getName() + "' as search string column");
+                    break;
+                }
+            }
+        } else if (dictTableSpec.findColumnIndex(m_replaceColumModel.getStringValue()) < 0) {
+            // if document column is set but the column does not exist in data table throw exception
+            throw new InvalidSettingsException(
+                "String column '" + m_replaceColumModel.getStringValue() + "' could not be found in data table.");
+        } else if (!dictTableSpec.getColumnSpec(m_replaceColumModel.getStringValue()).getType()
+            .isCompatible(StringValue.class)) {
+            // if document column is set and the column exists but is not of right type throw exception
+            throw new InvalidSettingsException(
+                "Column '" + m_replaceColumModel.getStringValue() + "' is not a String column.");
+        }
+        if (m_replacementColumModel.getStringValue().isEmpty()) {
+            for (DataColumnSpec colSpec : dictTableSpec) {
+                if (colSpec.getType().isCompatible(StringValue.class)
+                    && !colSpec.getName().equals(m_replaceColumModel.getStringValue())) {
+                    m_replacementColumModel.setStringValue(colSpec.getName());
+                    setWarningMessage(
+                        "Auto guessing: Using column '" + colSpec.getName() + "' as replacement string column");
+                    break;
+                }
+            }
+        } else if (dictTableSpec.findColumnIndex(m_replacementColumModel.getStringValue()) < 0) {
+            // if document column is set but the column does not exist in data table throw exception
+            throw new InvalidSettingsException(
+                "String column '" + m_replacementColumModel.getStringValue() + "' could not be found in data table.");
+        } else if (!dictTableSpec.getColumnSpec(m_replacementColumModel.getStringValue()).getType()
+            .isCompatible(StringValue.class)) {
+            // if document column is set and the column exists but is not of right type throw exception
+            throw new InvalidSettingsException(
+                "Column '" + m_replacementColumModel.getStringValue() + "' is not a String column.");
+        }
+
+        if (m_replacementColumModel.getStringValue().equals(m_replaceColumModel.getStringValue())) {
+            throw new InvalidSettingsException(
+                "Lookup column cannot be replacement column at the same time. "
+                + "Select different columns for lookup and replacement column.");
+        }
+
         // check if specific tokenizer is installed
         if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerModel.getStringValue())) {
             throw new MissingTokenizerException(m_tokenizerModel.getStringValue());
@@ -191,7 +246,8 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
             ((SettingsModelString)m_replacementColumModel.createCloneWithValidatedValue(settings)).getStringValue();
         if (replaceColName.equals(replacementColName)) {
             throw new InvalidSettingsException(
-                "Lookup column cannot be replecement column at the same time. Select different columns for lookup and replecement column.");
+                "Lookup column cannot be replacement column at the same time. "
+                + "Select different columns for lookup and replacement column.");
         }
     }
 }
