@@ -118,7 +118,7 @@ public class FilterNodeModel extends NodeModel {
     /**
      * The min minimum number of threshold filtering.
      */
-    public static final double MIN_MIN_THRESHOLD = 0;
+    public static final double MIN_MIN_THRESHOLD = -Double.MAX_VALUE;
 
     /**
      * The default maximum number of threshold filtering.
