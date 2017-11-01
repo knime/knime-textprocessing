@@ -49,6 +49,7 @@ package org.knime.ext.textprocessing.nodes.frequencies.tf;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.ext.textprocessing.data.Document;
@@ -117,16 +118,19 @@ public class TfCellFactory extends FrequencyCellFactory {
      */
     @Override
     public final DataCell[] getCells(final DataRow row) {
-
-        Term term = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
-        Document doc = ((DocumentValue)row.getCell(getDocumentColIndex()))
-                        .getDocument();
-        DataCell freq;
-        if (m_relative) {
-            freq = new DoubleCell(Frequencies.relativeTermFrequency(term, doc));
+        if (!row.getCell(getTermColIndex()).isMissing() && !row.getCell(getDocumentColIndex()).isMissing()) {
+            Term term = ((TermValue)row.getCell(getTermColIndex())).getTermValue();
+            Document doc = ((DocumentValue)row.getCell(getDocumentColIndex()))
+                            .getDocument();
+            DataCell freq;
+            if (m_relative) {
+                freq = new DoubleCell(Frequencies.relativeTermFrequency(term, doc));
+            } else {
+                freq = new IntCell(Frequencies.absoluteTermFrequency(term, doc));
+            }
+            return new DataCell[]{freq};
         } else {
-            freq = new IntCell(Frequencies.absoluteTermFrequency(term, doc));
+            return new DataCell[]{DataType.getMissingCell()};
         }
-        return new DataCell[]{freq};
     }
 }
