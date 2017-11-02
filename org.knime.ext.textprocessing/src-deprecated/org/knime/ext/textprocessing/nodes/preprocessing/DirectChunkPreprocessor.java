@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -76,7 +76,7 @@ import org.knime.ext.textprocessing.util.DocumentChunk;
  * Provides a chunk preprocessor strategy based on document lists. For each document of the input data table a chunk
  * is created which can be preprocessed by a concrete {@link ChunkPreprocessing} instance.
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.9
  * @deprecated use {@link StreamablePreprocessingNodeModel} instead.
  */

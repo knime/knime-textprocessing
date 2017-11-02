@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ import javax.swing.table.TableModel;
  * A panel containing a table with document (meta) information to show. Which kind of information is shown is based
  * on the specified table mode.
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
 public class MetaInfoPanel extends JPanel {
@@ -264,7 +264,7 @@ public class MetaInfoPanel extends JPanel {
 
     /**
     *
-    * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+    * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
     */
    private class MetaInfoTableListener extends MouseAdapter {
 
@@ -281,7 +281,7 @@ public class MetaInfoPanel extends JPanel {
 
    /**
     *
-    * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+    * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
     */
    @SuppressWarnings("serial")
    private class AttributiveCellRenderer extends JLabel

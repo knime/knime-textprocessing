@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.tagging;
 /**
  * Config keys for all tagger nodes.
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 3.5
  */
 final class TaggerConfigKeys2 {

@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -61,7 +61,7 @@ import cc.mallet.types.Instance;
  * Helper class that converts {@link Document}s into a term stream.
  * Expects an {@link Instance} which returns {@link Document}s in the {@link Instance#getData()}
  * class and extracts the terms from each document.
- * @author Tobias Koetter, KNIME.com, Zurich, Switzerland
+ * @author Tobias Koetter, KNIME AG, Zurich, Switzerland
  */
 public class Document2FeatureSequencePipe extends Pipe {
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ import org.knime.ext.textprocessing.util.ImgLoaderUtil;
 
 
 /**
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
 public class DocumentControlPanel extends JPanel {
@@ -204,7 +204,7 @@ public class DocumentControlPanel extends JPanel {
     /**
      * Sets (un-)hilited text when action was performed.
      *
-     * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+     * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
      */
     private class HiliteActionListener implements ActionListener {
 
@@ -220,7 +220,7 @@ public class DocumentControlPanel extends JPanel {
 
     /**
     *
-    * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+    * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
     */
    private class SearchListener implements ActionListener, DocumentListener {
 
@@ -259,7 +259,7 @@ public class DocumentControlPanel extends JPanel {
 
    /**
    *
-   * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+   * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
    */
    private class NewDocumentListener implements ActionListener {
 
@@ -280,7 +280,7 @@ public class DocumentControlPanel extends JPanel {
 
    /**
    *
-   * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+   * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
    */
    private class LinkSourceListener implements ActionListener {
 
@@ -295,7 +295,7 @@ public class DocumentControlPanel extends JPanel {
 
    /**
    *
-   * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+   * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
    */
    private class ColorButtonListener implements ActionListener {
 

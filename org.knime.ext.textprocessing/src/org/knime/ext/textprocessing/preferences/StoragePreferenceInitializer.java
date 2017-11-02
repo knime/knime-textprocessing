@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -54,7 +54,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 /**
  * The initializer for the document cell storage prefrences.
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.9
  */
 public class StoragePreferenceInitializer extends AbstractPreferenceInitializer {

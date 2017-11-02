@@ -3,14 +3,14 @@
       id="org.knime.features.ext.textprocessing.dl4j"
       label="KNIME Textprocessing - Deeplearning4J Integration (64bit only)"
       version="3.5.0.qualifier"
-      provider-name="KNIME GmbH, Konstanz, Germany">
+      provider-name="KNIME AG, Zurich, Switzerland">
 
    <description>
       This extension contains additional textprocessing nodes that make use of the Deeplearning4J framework.
    </description>
 
    <copyright>
-      Copyright by KNIME GmbH, Konstanz, Germany
+      Copyright by KNIME AG, Zurich, Switzerland
    </copyright>
 
    <license>

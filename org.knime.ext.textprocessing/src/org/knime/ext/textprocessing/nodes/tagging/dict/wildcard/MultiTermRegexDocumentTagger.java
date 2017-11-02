@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -62,7 +62,7 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
  * matches, the last matching expression overrides previous, conflicting matches. If multiple terms are matching one
  * regular expression all terms will be tagged, as long as terms do not overlap (conflicting terms).
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
 public class MultiTermRegexDocumentTagger extends RegexDocumentTagger {

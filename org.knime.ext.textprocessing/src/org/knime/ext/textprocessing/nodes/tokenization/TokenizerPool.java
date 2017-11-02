@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -54,7 +54,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.tokenizer.sentence.OpenNl
  * Provides a pool of tokenizer instances. The pool size is the number of available word and sentence tokenizers. All
  * tokenizer instances are created in the constructor of the pool.
  *
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 3.3
  */
 public class TokenizerPool {

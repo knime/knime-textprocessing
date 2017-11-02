@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -75,7 +75,7 @@ import org.knime.ext.textprocessing.data.Term;
 
 
 /**
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
 public final class DocumentPanel extends JPanel implements Observer {
@@ -262,7 +262,7 @@ public final class DocumentPanel extends JPanel implements Observer {
 
     /**
     *
-    * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+    * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
     */
    private class LinkListener implements HyperlinkListener {
 
@@ -280,7 +280,7 @@ public final class DocumentPanel extends JPanel implements Observer {
 
     /**
     *
-    * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+    * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
     */
    private class RightClickMenueListener implements ActionListener {
 

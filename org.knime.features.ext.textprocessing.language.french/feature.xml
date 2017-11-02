@@ -3,7 +3,7 @@
       id="org.knime.features.ext.textprocessing.language.french"
       label="KNIME Textprocessing French Language Pack"
       version="3.5.0.qualifier"
-      provider-name="KNIME GmbH, Konstanz, Germany"
+      provider-name="KNIME AG, Zurich, Switzerland"
       plugin="org.knime.ext.textprocessing.language.french">
 
    <description url="http://tech.knime.org/knime-labs">
@@ -11,7 +11,7 @@
    </description>
 
    <copyright url="http://www.example.com/copyright">
-      Copyright by KNIME GmbH, Konstanz, Germany
+      Copyright by KNIME AG, Zurich, Switzerland
    </copyright>
 
    <license url="http://www.example.com/license">

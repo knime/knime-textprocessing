@@ -134,7 +134,7 @@ Examples for current implementations: org.knime.ext.textprocessing.tagging.stanf
          <meta.section type="copyright"/>
       </appInfo>
       <documentation>
-         (C) 2017 - KNIME.com GmbH, Berlin, Germany.
+         KNIME AG, Zurich, Switzerland
       </documentation>
    </annotation>
 

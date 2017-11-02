@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -74,7 +74,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.inport.DictionaryTaggerNo
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
- * @author Kilian Thiel, KNIME.com, Zurich, Switzerland
+ * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  * @deprecated Use {@link AbstractDictionaryTaggerModel2} instead.
  */

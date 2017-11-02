@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ import cc.mallet.types.Instance;
  * whereas each {@link Instance} represents a {@link Document} which can be retrieved using the
  * {@link Instance#getData()} method.
  *
- * @author Tobias Koetter, KNIME.com, Zurich, Switzerland
+ * @author Tobias Koetter, KNIME AG, Zurich, Switzerland
  */
 public class DocumentInstanceIterator implements Iterator<Instance> {
     private final int m_docColIdx;
