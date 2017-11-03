@@ -69,6 +69,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -149,26 +150,8 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
             throw new InvalidSettingsException("Confidence value column name already exists.");
         }
 
-        final DataTableSpecVerifier verifier = new DataTableSpecVerifier(in);
-        if (!verifier.verifyMinimumStringCells(1, false) && !verifier.verifyMinimumDocumentCells(1, false)) {
-            throw new InvalidSettingsException("Input table contains no string/document columns!");
-        }
-
+        checkDataTableSpec(in);
         colIndex = in.findColumnIndex(m_colModel.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < in.getNumColumns(); i++) {
-                if (in.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
-                    colIndex = i;
-                    LOGGER.info("Guessing string column \"" + in.getColumnSpec(i).getName() + "\".");
-                    break;
-                }
-            }
-        }
-
-        if (colIndex < 0) {
-            throw new InvalidSettingsException("String/Document column not set");
-        }
-        m_colModel.setStringValue(in.getColumnSpec(colIndex).getName());
 
         ColumnRearranger c = new ColumnRearranger(in);
 
@@ -189,6 +172,20 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
             LOGGER.error("Error while loading Tika language models");
         }
         return c;
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        if (!verifier.verifyMinimumStringCells(1, false) && !verifier.verifyMinimumDocumentCells(1, false)) {
+            throw new InvalidSettingsException("Input table contains no string/document columns!");
+        }
+
+        ColumnSelectionVerifier stringVerifier = new ColumnSelectionVerifier(m_colModel, spec, StringValue.class);
+        if (stringVerifier.hasWarningMessage()) {
+            setWarningMessage(stringVerifier.getWarningMessage());
+        }
+
     }
 
     private DataColumnSpec createColumnSpec(final boolean collection, final DataType type,
