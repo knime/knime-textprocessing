@@ -51,7 +51,6 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -64,7 +63,7 @@ public class TermToStringNodeDialog extends DefaultNodeSettingsPane {
      *         used as title column.
      */
     public static final SettingsModelString getTermColModel() {
-        return new SettingsModelString(TermToStringConfigKeys.CFGKEY_TERMCOL, CommonColumnNames.DEF_TERM_COLNAME);
+        return new SettingsModelString(TermToStringConfigKeys.CFGKEY_TERMCOL, "");
     }
 
     /**
