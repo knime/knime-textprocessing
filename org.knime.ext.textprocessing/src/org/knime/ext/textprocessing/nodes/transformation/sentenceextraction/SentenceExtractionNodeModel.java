@@ -55,6 +55,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
@@ -167,22 +168,26 @@ public class SentenceExtractionNodeModel extends NodeModel {
             RowIterator it = inData[0].iterator();
             while (it.hasNext()) {
                 DataRow row = it.next();
-                Document doc = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
-                DataCell docCell = docCache.getInstance(doc);
+                if (!row.getCell(m_docColIndex).isMissing()) {
+                    Document doc = ((DocumentValue)row.getCell(m_docColIndex)).getDocument();
+                    DataCell docCell = docCache.getInstance(doc);
 
-                Iterator<Sentence> si = doc.sentenceIterator();
-                while (si.hasNext()) {
-                    exec.checkCanceled();
+                    Iterator<Sentence> si = doc.sentenceIterator();
+                    while (si.hasNext()) {
+                        exec.checkCanceled();
 
-                    Sentence s = si.next();
-                    String sentenceStr = s.getText();
-                    int termCount = s.getTerms().size();
-
-                    RowKey rowKey = RowKey.createRowKey(count);
-                    DefaultRow newRow =
-                        new DefaultRow(rowKey, docCell, new StringCell(sentenceStr), new IntCell(termCount));
-                    dc.addRowToTable(newRow);
-
+                        Sentence s = si.next();
+                        String sentenceStr = s.getText();
+                        int termCount = s.getTerms().size();
+                        RowKey rowKey = RowKey.createRowKey(count);
+                        DefaultRow newRow =
+                            new DefaultRow(rowKey, docCell, new StringCell(sentenceStr), new IntCell(termCount));
+                        dc.addRowToTable(newRow);
+                        count++;
+                    }
+                } else {
+                    dc.addRowToTable(new DefaultRow(RowKey.createRowKey(count), DataType.getMissingCell(),
+                        DataType.getMissingCell(), DataType.getMissingCell()));
                     count++;
                 }
             }
