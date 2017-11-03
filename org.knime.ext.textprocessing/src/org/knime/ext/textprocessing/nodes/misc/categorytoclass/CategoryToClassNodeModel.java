@@ -97,19 +97,20 @@ public class CategoryToClassNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(
-                inSpecs[INDATA_INDEX]);
-        verifier.verifyMinimumDocumentCells(1, true);
-        
-        int docCellIndex = inSpecs[0].findColumnIndex(
-                m_documentCol.getStringValue());
-        if (docCellIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
-                    + "Check your settings!");
-        }
-        
+        checkDataTableSpec(inSpecs[INDATA_INDEX]);
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier docVerifier =
+            new ColumnSelectionVerifier(m_documentCol, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
     }
 
     /**
@@ -119,7 +120,7 @@ public class CategoryToClassNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
-        
+        checkDataTableSpec(inDataTable.getDataTableSpec());
         int docCellIndex = inData[0].getDataTableSpec().findColumnIndex(
                 m_documentCol.getStringValue());
         

@@ -51,7 +51,6 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -64,8 +63,7 @@ public class CategoryToClassNodeDialog extends DefaultNodeSettingsPane {
      *         column to use.
      */
     public static final SettingsModelString getDocumentColModel() {
-        return new SettingsModelString(CategoryToClassConfigKeys.CFG_KEY_DOCUMENT_COL,
-            CommonColumnNames.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(CategoryToClassConfigKeys.CFG_KEY_DOCUMENT_COL, "");
     }
 
     /**
