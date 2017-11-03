@@ -63,7 +63,6 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.IntCell;
@@ -93,6 +92,8 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
@@ -166,14 +167,14 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @return the document column settings model
      */
     static SettingsModelString createDocColModel() {
-        return new SettingsModelString("documentColumn", null);
+        return new SettingsModelString("documentColumn", "");
     }
 
     /**
      * @return the term column settings model
      */
     static SettingsModelString createTermColModel() {
-        return new SettingsModelString("termColumn", null);
+        return new SettingsModelString("termColumn", "");
     }
 
     /**
@@ -183,37 +184,23 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         final DataTableSpec spec = inSpecs[0];
-        if (m_docCol.getStringValue() == null && m_termCol.getStringValue() == null) {
-            //preselect the first matching column
-            m_docCol.setStringValue(findCompatibleColumn(spec, DocumentValue.class));
-            if (m_docCol.getStringValue() == null) {
-                throw new InvalidSettingsException("Input table contains no document column");
-            }
-            m_termCol.setStringValue(findCompatibleColumn(spec, TermValue.class));
-            if (m_termCol.getStringValue() == null) {
-                throw new InvalidSettingsException( "Input table contains no term column");
-            }
-        }
-        //check that the table contains the selected columns
-        if (!spec.containsName(m_docCol.getStringValue())) {
-            throw new InvalidSettingsException("Input table does not contain document column "
-                    + m_docCol.getStringValue());
-        }
-        if (!spec.containsName(m_termCol.getStringValue())) {
-            throw new InvalidSettingsException("Input table does not contain term column "
-        + m_termCol.getStringValue());
-        }
+        checkDataTableSpec(spec);
         return new DataTableSpec[] {createResultSpec(spec)};
     }
 
-    private static String findCompatibleColumn(final DataTableSpec spec,
-            final Class<? extends DataValue> valueClass) {
-        for (final DataColumnSpec colSpec : spec) {
-            if (colSpec.getType().isCompatible(valueClass)) {
-                return colSpec.getName();
-            }
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
+        verifier.verifyMinimumTermCells(1, true);
+
+        ColumnSelectionVerifier docVerifier = new ColumnSelectionVerifier(m_docCol, spec, DocumentValue.class);
+        ColumnSelectionVerifier termVerifier = new ColumnSelectionVerifier(m_termCol, spec, TermValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
         }
-        return null;
+        if (termVerifier.hasWarningMessage()) {
+            setWarningMessage(termVerifier.getWarningMessage());
+        }
     }
 
     /**
@@ -223,6 +210,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
             throws Exception {
         final DataTableSpec spec = inData[0].getDataTableSpec();
+        checkDataTableSpec(spec);
         final int docIdx = spec.findColumnIndex(m_docCol.getStringValue());
         final int termIdx = spec.findColumnIndex(m_termCol.getStringValue());
         final int rowCount = inData[0].getRowCount();
