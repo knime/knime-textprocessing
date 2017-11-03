@@ -72,6 +72,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.PartOfSpeechTag;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -141,32 +142,14 @@ public class TagToStringNodeModel extends NodeModel {
         // check input spec
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
-        int numOfTermCols = verifier.getNumTermCells();
 
-        // the node should only auto-guess column at the beginning (AP-7489)
-        String termCol = m_termColModel.getStringValue();
-        if (termCol.isEmpty()) {
-            String newTermCol = null;
-            if (numOfTermCols == 1) {
-                newTermCol = spec.getColumnSpec(verifier.getTermCellIndex()).getName();
-            } else if (numOfTermCols > 1) {
-                for (String colName : spec.getColumnNames()) {
-                    if (spec.getColumnSpec(colName).getType().isCompatible(TermValue.class)) {
-                        newTermCol = colName;
-                        break;
-                    }
-                }
-                setWarningMessage("Auto guessing: Using column '" + newTermCol + "' as term column");
-            }
-            m_termColModel.setStringValue(newTermCol);
-            termCol = newTermCol;
+        ColumnSelectionVerifier termVerifier =
+                new ColumnSelectionVerifier(m_termColModel, spec, TermValue.class);
+        if (termVerifier.hasWarningMessage()) {
+            setWarningMessage(termVerifier.getWarningMessage());
         }
-        m_termColIndex = spec.findColumnIndex(termCol);
 
-        if (m_termColIndex < 0) {
-            throw new InvalidSettingsException(
-                "Selected term column \"" + termCol + "\" could not be found in the input data table.");
-        }
+        m_termColIndex = spec.findColumnIndex(m_termColModel.getStringValue());
     }
 
     /**
