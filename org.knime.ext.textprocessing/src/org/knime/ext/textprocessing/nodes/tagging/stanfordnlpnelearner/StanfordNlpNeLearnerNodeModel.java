@@ -51,7 +51,6 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -90,6 +89,7 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import com.google.common.io.Files;
@@ -189,10 +189,6 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
      */
     static final boolean DEF_USE_DISJUNCTIVE = true;
 
-    private String m_docColumnName;
-
-    private String m_knownEntitiesColumnName;
-
     private SettingsModelString m_docColumnModel = StanfordNlpNeLearnerNodeDialog.createDocumentColumnModel();
 
     private SettingsModelString m_knownEntitiesColumnModel =
@@ -252,20 +248,27 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 
-        // checking specified string col and guessing first available string col if no col ist set.
+        // checking for document column in first input table and string column in second input table
         DataTableSpec spec = (DataTableSpec)inSpecs[0];
-        int colIndex = spec.findColumnIndex(m_docColumnModel.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < spec.getNumColumns(); i++) {
-                if (spec.getColumnSpec(i).getType().isCompatible(DocumentValue.class)) {
-                    colIndex = i;
-                    m_docColumnName = spec.getColumnSpec(i).getName();
-                    break;
-                }
-            }
-        } else if (colIndex >= 0) {
-            m_docColumnName = m_docColumnModel.getStringValue();
+        DataTableSpec spec2 = (DataTableSpec)inSpecs[1];
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        DataTableSpecVerifier verifier2 = new DataTableSpecVerifier((DataTableSpec)inSpecs[1]);
+        verifier.verifyMinimumDocumentCells(1, true);
+        verifier2.verifyMinimumStringCells(1, true);
+
+        // verifying the selected document column or select the first suitable column if none has been set yet
+        ColumnSelectionVerifier docColSelVerifier =
+            new ColumnSelectionVerifier(m_docColumnModel, spec, DocumentValue.class);
+        if (docColSelVerifier.hasWarningMessage()) {
+            setWarningMessage(docColSelVerifier.getWarningMessage());
         }
+
+        // verifying the selected string column or select the first suitable column if none has been set yet
+        ColumnSelectionVerifier dictColSelVerifier =
+                new ColumnSelectionVerifier(m_knownEntitiesColumnModel, spec2, StringValue.class);
+            if (dictColSelVerifier.hasWarningMessage()) {
+                setWarningMessage(dictColSelVerifier.getWarningMessage());
+            }
 
         // check if specific tokenizer is installed
         if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizer.getStringValue())) {
@@ -274,23 +277,9 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
 
         // check tokenizer settings from incoming document column
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
-        if (!dataTableSpecVerifier.verifyTokenizer(colIndex, m_tokenizer.getStringValue())) {
+        if (!dataTableSpecVerifier.verifyTokenizer(spec.findColumnIndex(m_docColumnModel.getStringValue()),
+            m_tokenizer.getStringValue())) {
             setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
-        }
-
-        // checking specified string col and guessing first available string col if no col is set.
-        DataTableSpec spec2 = (DataTableSpec)inSpecs[1];
-        int colIndex2 = spec2.findColumnIndex(m_knownEntitiesColumnModel.getStringValue());
-        if (colIndex2 < 0) {
-            for (int i = 0; i < spec2.getNumColumns(); i++) {
-                if (spec2.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
-                    colIndex2 = i;
-                    m_knownEntitiesColumnName = spec2.getColumnSpec(i).getName();
-                    break;
-                }
-            }
-        } else if (colIndex2 >= 0) {
-            m_knownEntitiesColumnName = m_knownEntitiesColumnModel.getStringValue();
         }
 
         return new PortObjectSpec[]{new NERModelPortObjectSpec(m_tokenizer.getStringValue())};
@@ -312,15 +301,23 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         // iterate through columns
         for (int i = 0; i < knownEntitiesTableSpec.getNumColumns(); i++) {
             // iterate through rows if column with correct name has been found
-            if (knownEntitiesTableSpec.getColumnSpec(i).getName().equals(m_knownEntitiesColumnName)) {
+            if (knownEntitiesTableSpec.getColumnSpec(i).getName().equals(m_knownEntitiesColumnModel.getStringValue())) {
                 for (DataRow row : knownEntitiesDataInput) {
-                    // add every known entity to the specified array list
-                    String cellText = row.getCell(i).toString();
-                    // TODO: Add case sensitivity
-                    knownEntitiesStringSet.add(cellText);
-                    knownEntitiesPatternSet.add(Pattern.compile(cellText));
+                    if (!row.getCell(i).isMissing()) {
+                        // add every known entity to the specified array list
+                        String cellText = row.getCell(i).toString();
+                        // TODO: Add case sensitivity
+                        if (!cellText.trim().isEmpty()) {
+                            knownEntitiesStringSet.add(cellText);
+                            knownEntitiesPatternSet.add(Pattern.compile(cellText));
+                        }
+                    }
                 }
             }
+        }
+
+        if (knownEntitiesPatternSet.size() == 0) {
+            setWarningMessage("Trained model on empty dictionary.");
         }
 
         // create tag for document tagger
@@ -340,59 +337,54 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         File m_annotatedDocFile = new File(m_annotatedDocPath);
         PrintWriter sentenceFileWriter = new PrintWriter(m_annotatedDocFile, "UTF-8");
 
+        int missingValueCounter = 0;
+
         // tag documents and transform sentences to strings while tagged terms get stanfordnlp annotation
         // iterate through columns
         for (int i = 0; i < docTableSpec.getNumColumns(); i++) {
             // iterate through rows if column with correct name has been found
-            if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnName)) {
+            if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnModel.getStringValue())) {
                 int counter = 0;
-                Set<String> countMultiWordTerms = new HashSet<String>();
                 for (DataRow row : docDataInput) {
                     //set progress bar
                     counter++;
                     double progress = (counter / (double)docDataInput.size()) / (2.0);
                     exec.setProgress(progress, "Preparing documents");
 
-                    Document doc = ((DocumentValue)row.getCell(i)).getDocument();
-                    Document taggedDoc = tagger.tag(doc);
-                    Iterator<Sentence> si = taggedDoc.sentenceIterator();
-                    while (si.hasNext()) {
-                        Sentence s = si.next();
-                        List<Term> termList = s.getTerms();
-                        Iterator<Term> ti = termList.iterator();
-                        while (ti.hasNext()) {
-                            Term t = ti.next();
-                            String termText = t.getText();
-                            String termTextWithWsSuffix = t.getTextWithWsSuffix();
-                            if (knownEntitiesStringSet.contains(termText)
-                                || knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
-                                if (t.getWords().size() > 1) {
-                                    // multi-word terms should not be written in one line in the training file
-                                    countMultiWordTerms.add(t.getText());
-
-                                    // so skip it by splitting the term and writing each word in one line
-                                    for (Word w : t.getWords()) {
-                                        sentenceFileWriter.println(w.getText() + "\tO");
+                    if (!row.getCell(i).isMissing() && row.getCell(i).getType().isCompatible(DocumentValue.class)) {
+                        Document doc = ((DocumentValue)row.getCell(i)).getDocument();
+                        Document taggedDoc = tagger.tag(doc);
+                        Iterator<Sentence> si = taggedDoc.sentenceIterator();
+                        while (si.hasNext()) {
+                            Sentence s = si.next();
+                            List<Term> termList = s.getTerms();
+                            Iterator<Term> ti = termList.iterator();
+                            while (ti.hasNext()) {
+                                Term t = ti.next();
+                                String termText = t.getText();
+                                String termTextWithWsSuffix = t.getTextWithWsSuffix();
+                                if (knownEntitiesStringSet.contains(termText)
+                                    || knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
+                                    if (t.getWords().size() > 1) {
+                                        for (Word w : t.getWords()) {
+                                            sentenceFileWriter
+                                                .println(w.getText() + "\t" + m_tagValueModel.getStringValue());
+                                        }
+                                    } else {
+                                        sentenceFileWriter.println(termText + "\t" + m_tagValueModel.getStringValue());
                                     }
-                                } else {
-                                    sentenceFileWriter.println(termText + "\t" + m_tagValueModel.getStringValue());
+                                } else if (!knownEntitiesStringSet.contains(termText)
+                                    || !knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
+                                    sentenceFileWriter.println(termText + "\tO");
                                 }
-                            } else if (!knownEntitiesStringSet.contains(termText)
-                                || !knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
-                                sentenceFileWriter.println(termText + "\tO");
                             }
                         }
+                    } else {
+                        missingValueCounter++;
                     }
                 }
-                // give a warning message if there is any multi-word term in the dictionary
-                if (!countMultiWordTerms.isEmpty()) {
-                    String multiWordMessage = "";
-                    if (countMultiWordTerms.size() > 1) {
-                        multiWordMessage = countMultiWordTerms.size() + " entities are skipped because they contain more than one word.";
-                    } else {
-                        multiWordMessage = "The entity \"" + countMultiWordTerms.iterator().next() + "\" is skipped because it contains more than one word.";
-                    }
-                    setWarningMessage(multiWordMessage);
+                if (counter == 0) {
+                    setWarningMessage("Node created an empty model.");
                 }
             }
         }
@@ -418,6 +410,12 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
 
         outputModel.delete();
         m_annotatedDocFile.delete();
+
+        if (missingValueCounter == 1) {
+            setWarningMessage(missingValueCounter + " row has been ignored due to missing value.");
+        } else if (missingValueCounter > 1) {
+            setWarningMessage(missingValueCounter + " rows have been ignored due to missing values.");
+        }
 
         return new PortObject[]{new StanfordNERModelPortObject(modelOutputBuffer, m_tag, knownEntitiesStringSet,
             m_tokenizer.getStringValue())};
