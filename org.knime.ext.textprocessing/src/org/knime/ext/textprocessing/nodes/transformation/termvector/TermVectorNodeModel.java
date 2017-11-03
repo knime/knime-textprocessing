@@ -87,6 +87,7 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeDialog;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -172,10 +173,20 @@ public class TermVectorNodeModel extends NodeModel {
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
 
+        ColumnSelectionVerifier docVerifier =
+                new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
+
         m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
-        if (m_documentColIndex < 0) {
-            throw new InvalidSettingsException(
-                "Index of specified document column is not valid! " + "Check your settings!");
+
+        if (!m_booleanModel.getBooleanValue()) {
+            ColumnSelectionVerifier valueVerifier =
+                    new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
+            if (valueVerifier.hasWarningMessage()) {
+                setWarningMessage(valueVerifier.getWarningMessage());
+            }
         }
     }
 
@@ -187,17 +198,11 @@ public class TermVectorNodeModel extends NodeModel {
         throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
-        m_documentColIndex = inData[0].getSpec().findColumnIndex(m_documentColModel.getStringValue());
-
         int colIndex = -1;
         // Check if no valid column selected, the use of boolean values is
         // specified !
         if (!m_booleanModel.getBooleanValue()) {
-            final String colName = m_colModel.getStringValue();
-            colIndex = inData[0].getDataTableSpec().findColumnIndex(colName);
-            if (colIndex < 0) {
-                throw new InvalidSettingsException("No valid column selected!");
-            }
+            colIndex = inData[0].getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
         }
 
         // Sort the data table first by term

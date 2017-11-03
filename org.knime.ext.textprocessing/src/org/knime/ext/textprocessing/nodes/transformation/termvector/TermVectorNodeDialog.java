@@ -112,10 +112,9 @@ public class TermVectorNodeDialog extends DefaultNodeSettingsPane {
      * column.
      */
     public static final SettingsModelString getDocColModel() {
-        return new SettingsModelString(TermVectorConfigKeys.CFGKEY_DOC_COL,
-                TermVectorNodeModel.DEFAULT_DOCUMENT_COLNAME);
-    }    
-    
+        return new SettingsModelString(TermVectorConfigKeys.CFGKEY_DOC_COL, "");
+    }
+
     private SettingsModelString m_columnModel;
 
     private SettingsModelBoolean m_booleanModel;
