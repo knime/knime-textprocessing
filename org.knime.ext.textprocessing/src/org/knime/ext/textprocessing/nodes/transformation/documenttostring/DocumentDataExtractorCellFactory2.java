@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.node.ExecutionMonitor;
@@ -107,15 +108,18 @@ public class DocumentDataExtractorCellFactory2 implements CellFactory {
     public DataCell[] getCells(final DataRow row) {
         final DataCell cell = row.getCell(m_docColIdx);
         Document doc = null;
+        final DataCell[] cells = new DataCell[m_extractors.length];
         if (cell instanceof DocumentValue) {
             final DocumentValue docCell = (DocumentValue)cell;
             doc = docCell.getDocument();
+            for (int i = 0, length = m_extractors.length; i < length; i++) {
+                cells[i] = m_extractors[i].getValue(doc);
+            }
         } else {
-            throw new IllegalStateException("Invalid column type");
-        }
-        final DataCell[] cells = new DataCell[m_extractors.length];
-        for (int i = 0, length = m_extractors.length; i < length; i++) {
-            cells[i] = m_extractors[i].getValue(doc);
+            for (int i = 0, length = m_extractors.length; i < length; i++) {
+                cells[i] = DataType.getMissingCell();
+            }
+
         }
         return cells;
     }
@@ -126,6 +130,7 @@ public class DocumentDataExtractorCellFactory2 implements CellFactory {
     public DataColumnSpec[] getColumnSpecs() {
         return m_columnSpecs;
     }
+
     /**
      * {@inheritDoc}
      */
