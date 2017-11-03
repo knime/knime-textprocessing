@@ -53,7 +53,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  *
@@ -98,7 +97,7 @@ public class NGramNodeDialog extends DefaultNodeSettingsPane {
      * @return The settings model with input document column.
      */
     static final SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(NGramConfigKeys.DOCUMENT_INPUT_COL, CommonColumnNames.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(NGramConfigKeys.DOCUMENT_INPUT_COL, "");
     }
 
     /**

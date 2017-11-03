@@ -71,6 +71,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -213,37 +214,25 @@ public class NGramNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         DataTableSpec spec = inSpecs[0];
+        checkDataTableSpec(spec);
 
+        m_nGramDataTableCreator = createNGramCreator(null);
+        return new DataTableSpec[]{m_nGramDataTableCreator.createDataTableSpec()};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         // check input spec
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        // checking specified document col and guessing first available document
-        // col if no col is set.
-        int colIndex =
-                spec.findColumnIndex(m_documentColumnModel.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < spec.getNumColumns(); i++) {
-                if (spec.getColumnSpec(i).getType()
-                        .isCompatible(DocumentValue.class)) {
-                    colIndex = i;
-                    this.setWarningMessage("Guessing document column \""
-                            + spec.getColumnSpec(i).getName() + "\".");
-                    break;
-                }
-            }
+        ColumnSelectionVerifier docVerifier =
+            new ColumnSelectionVerifier(m_documentColumnModel, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
         }
-        // if guess was not successful (no string col available), throw error
-        if (colIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Input table contains no document columns!");
-        }
-        // otherwise set string column index
-        m_documentColIndex = colIndex;
 
-        m_nGramDataTableCreator = createNGramCreator(null);
-        return new DataTableSpec[]{
-                m_nGramDataTableCreator.createDataTableSpec()};
+        m_documentColIndex = spec.findColumnIndex(m_documentColumnModel.getStringValue());
+
     }
 
     private NGramDataTableCreator createNGramCreator(
@@ -279,6 +268,7 @@ public class NGramNodeModel extends NodeModel {
         final ExecutionContext exec) throws Exception {
         BufferedDataTable inputTable = inData[0];
         final int inputTableSize = inputTable.getRowCount();
+        checkDataTableSpec(inputTable.getDataTableSpec());
 
         m_nGramDataTableCreator = createNGramCreator(exec);
 
