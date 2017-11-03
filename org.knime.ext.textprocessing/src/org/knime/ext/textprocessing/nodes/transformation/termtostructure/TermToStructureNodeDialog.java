@@ -55,7 +55,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelectio
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.FormatType;
 
@@ -70,7 +69,7 @@ public class TermToStructureNodeDialog extends DefaultNodeSettingsPane {
      *         used as title column.
      */
     public static final SettingsModelString getTermColModel() {
-        return new SettingsModelString(TermToStructureConfigKeys.CFGKEY_TERMCOL, CommonColumnNames.DEF_TERM_COLNAME);
+        return new SettingsModelString(TermToStructureConfigKeys.CFGKEY_TERMCOL, "");
     }
 
     /**

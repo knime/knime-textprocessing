@@ -64,6 +64,8 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import uk.ac.cam.ch.wwmm.oscar.chemnamedict.entities.FormatType;
@@ -102,14 +104,15 @@ public class TermToStructureNodeModel extends NodeModel {
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
-        
+
+        ColumnSelectionVerifier termVerifier =
+                new ColumnSelectionVerifier(m_termColModel, spec, TermValue.class);
+        if (termVerifier.hasWarningMessage()) {
+            setWarningMessage(termVerifier.getWarningMessage());
+        }
+
         m_termColIndex = spec.findColumnIndex(
-                m_termColModel.getStringValue());
-        if (m_termColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified term column is not valid! " 
-                    + "Check your settings!");
-        } 
+            m_termColModel.getStringValue());
     }
     
     private DataTableSpec createDataTableSpec(
@@ -152,7 +155,8 @@ public class TermToStructureNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
                 
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
-        
+        checkDataTableSpec(inDataTable.getDataTableSpec());
+
         // find index of term column
         m_termColIndex = inDataTable.getDataTableSpec().findColumnIndex(
                 m_termColModel.getStringValue());
