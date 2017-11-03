@@ -94,7 +94,7 @@ public class ColumnSelectionVerifier {
         String colType = StringUtils.remove(columnType.getSimpleName(), "Value");
 
         // if document column setting is empty take first feasible column from datatable
-        if (columnSetting.getStringValue().isEmpty() || columnSetting.getStringValue() == null) {
+        if (columnSetting.getStringValue() == null || columnSetting.getStringValue().isEmpty()) {
             for (DataColumnSpec column : spec) {
                 if (column.getType().isCompatible(columnType)) {
                     columnSetting.setStringValue(column.getName());
