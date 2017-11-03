@@ -76,7 +76,7 @@ public class KeygraphNodeDialog extends DefaultNodeSettingsPane {
     private static final int DEFAULT_NR_HIGHKEY_TERMS = 12;
     private static final int DEFAULT_NR_KEYWORDS = 10;
     private static final boolean DEFAULT_IGNORE_TERM_TAGS = true;
-    private static final String DEFAULT_DOCUMENT_COLUMN_NAME = "Document";
+    private static final String DEFAULT_DOCUMENT_COLUMN_NAME = "";
 
     /**
      * Creates a basic dialog for the Keygraph node.
