@@ -109,8 +109,7 @@ public class TermToStructureNodeModel extends NodeModel {
         ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null)
             .ifPresent(a -> setWarningMessage(a));
 
-        m_termColIndex = spec.findColumnIndex(
-            m_termColModel.getStringValue());
+        m_termColIndex = spec.findColumnIndex(m_termColModel.getStringValue());
     }
 
     private DataTableSpec createDataTableSpec(
