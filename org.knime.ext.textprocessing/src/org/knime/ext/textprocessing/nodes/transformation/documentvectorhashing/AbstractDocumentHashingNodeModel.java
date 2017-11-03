@@ -112,6 +112,13 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
         final ColumnRearranger rearranger = new ColumnRearranger(spec);
 
         DataColumnSpec[] specs = m_asCol.getBooleanValue() ? createSpecAsCollection() : createSpecAsColumns();
+        for (DataColumnSpec newSpec : specs) {
+            if (spec.containsName(newSpec.getName())) {
+                throw new InvalidSettingsException(
+                    "The input table already contains columns with names intended for vector space columns: '"
+                        + newSpec.getName() + "'.");
+            }
+        }
         rearranger.append(new AbstractCellFactory(specs) {
 
             private final int m_idx = spec.findColumnIndex(m_docCol.getStringValue());
