@@ -15,9 +15,10 @@
 			</p>
 			<p><i>/%KNIMEWORKSPACE%/%WORKFLOW%/StanfordNLP NE Learner(##)/port_1/object/portobject.zip</i></p>
             <p>
-            You can select the document column and the dictionary column to train your model with. Note that the dictionary should 
-            contain only one-word entities, otherwise they will be skipped. There is also a tab
-            in the dialog to specify the learner properties. Currently, there are only a few options, since the amount of
+            You can select the document column and the dictionary column to train your model with.
+            It is possible to use multi-term entities within the dictionary.
+            There is also a tab in the dialog to specify the learner properties.
+            Currently, there are only a few options, since the number of
             parameters is pretty huge. So please contact us, if there are important/highly used parameters,
             we should integrate!
 			</p>
@@ -101,7 +102,7 @@
         <inPort name="Documents input table" index="0">The input table
         containing the documents to train the model with.</inPort>
         <inPort name="Dictionary input table" index="1">The input dictionary
-        containing the known-entities to train the model with.</inPort>
+        containing known single- and/or multi-term entities to train the model.</inPort>
         <outPort name="Model output" index="0">The StanfordNLP NE model.</outPort>
     </ports>
 </knimeNode>
