@@ -88,6 +88,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.mallet.Document2FeatureSequencePipe;
 import org.knime.ext.textprocessing.util.mallet.DocumentInstanceIterator;
@@ -315,30 +316,11 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec spec = inSpecs[0];
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        verifier.verifyMinimumDocumentCells(1, true);
         if (spec == null) {
             return null;
         }
-        if (m_docCol.getStringValue() == null) {
-            //preset the first column with documents
-            for (DataColumnSpec colSpec : spec) {
-                if (colSpec.getType().isCompatible(DocumentValue.class)) {
-                    m_docCol.setStringValue(colSpec.getName());
-                    setWarningMessage("Preset document column to " + m_docCol.getStringValue());
-                    break;
-                }
-            }
-        }
-        final DataColumnSpec docColSpec = spec.getColumnSpec(m_docCol.getStringValue());
-        if (docColSpec == null) {
-            throw new InvalidSettingsException("Selected column with name "
-                    + m_docCol.getStringValue() + " not found in input table");
-        }
-        if (!docColSpec.getType().isCompatible(DocumentValue.class)) {
-            throw new InvalidSettingsException("Selected column with name "
-                        + m_docCol.getStringValue() + " does not contain documents");
-        }
+        checkDataTableSpec(spec);
+
         final ColumnRearranger docTopCR = createDocumentTopicColumnRearranger(spec, m_noOfTopics.getIntValue(), null,
             spec.findColumnIndex(m_docCol.getStringValue()));
         return new DataTableSpec[] {docTopCR.createSpec(), createTopicTableSpec(), createDetailedTableSpec()};
@@ -351,6 +333,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
             throws Exception {
         final BufferedDataTable table = inData[0];
+        checkDataTableSpec(table.getDataTableSpec());
         final int noOfTopics = m_noOfTopics.getIntValue();
         final int colIdx = table.getSpec().findColumnIndex(m_docCol.getStringValue());
         final int noOfThreads = m_noOfTopics.getIntValue();
@@ -396,6 +379,18 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         final BufferedDataTable topicTable =
                 createTopicTable(exec.createSubExecutionContext(0.025), dataAlphabet, model, m_topKWords.getIntValue());
         return new BufferedDataTable[] {docTopicTable, topicTable, myLogHandler.getDetailsTable()};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier docVerifier =
+                new ColumnSelectionVerifier(m_docCol, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
+
     }
 
     private ColumnRearranger createDocumentTopicColumnRearranger(final DataTableSpec inputSpec, final int noOfTopics,
