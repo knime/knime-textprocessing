@@ -77,6 +77,8 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  * The {@link NodeModel} for the RSS Feed Reader node.
@@ -239,21 +241,20 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         // checking specified string column and guessing first available string column if no column is set.
         DataTableSpec inSpec = inSpecs[0];
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpec);
+        verifier.verifyMinimumStringCells(1, true);
 
+        // check column selection
+        ColumnSelectionVerifier urlColSelVerifier =
+            new ColumnSelectionVerifier(m_feedUrlColumn, inSpec, StringValue.class);
+        if (urlColSelVerifier.hasWarningMessage()) {
+            setWarningMessage(urlColSelVerifier.getWarningMessage());
+        }
+
+        // check if defined column names are available
         checkColumnNames(m_docColName.getStringValue());
         checkColumnNames(m_xmlColName.getStringValue());
         checkColumnNames(m_httpColName.getStringValue());
-
-        int colIndex = inSpec.findColumnIndex(m_feedUrlColumn.getStringValue());
-        if (colIndex < 0) {
-            for (int i = 0; i < inSpec.getNumColumns(); i++) {
-                if (inSpec.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
-                    colIndex = i;
-                    this.setWarningMessage("Guessing url string column \"" + inSpec.getColumnSpec(i).getName() + "\".");
-                    break;
-                }
-            }
-        }
 
         // check if specific tokenizer is installed
         if (m_createDocColumn.getBooleanValue()) {
@@ -262,11 +263,7 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
             }
         }
 
-        if (colIndex < 0) {
-            throw new InvalidSettingsException("Input table contains no string column!");
-        }
-
-        m_urlColIndex = colIndex;
+        m_urlColIndex = inSpec.findColumnIndex(m_feedUrlColumn.getStringValue());
 
         RSSFeedReaderDataTableCreator2 rssFeedReaderDTC =
             new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
