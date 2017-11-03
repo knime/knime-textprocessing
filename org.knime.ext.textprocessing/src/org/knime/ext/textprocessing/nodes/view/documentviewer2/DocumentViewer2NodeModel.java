@@ -71,7 +71,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.frequencies.FrequenciesNodeSettingsPane;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataStructureUtil;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -113,17 +115,23 @@ public class DocumentViewer2NodeModel extends NodeModel implements BufferedDataT
      */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[INPUT_INDEX]);
-        verifier.verifyMinimumDocumentCells(1, true);
-        m_documentCellindex = verifier.getDocumentCellIndex();
+        checkDataTableSpec(inSpecs[0]);
+        return new DataTableSpec[]{};
+    }
 
-        int documentColIndex = inSpecs[0].findColumnIndex(m_documentColModel.getStringValue());
-        if (documentColIndex < 0) {
-            throw new InvalidSettingsException(
-                "Index of specified document column is not valid! " + "Check your settings!");
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier docVerifier =
+            new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
         }
 
-        return new DataTableSpec[]{};
+        m_documentCellindex = spec.findColumnIndex(m_documentColModel.getStringValue());
+
     }
 
     /**
@@ -133,7 +141,7 @@ public class DocumentViewer2NodeModel extends NodeModel implements BufferedDataT
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
         m_exec = exec;
-        m_documentCellindex = inData[0].getDataTableSpec().findColumnIndex(m_documentColModel.getStringValue());
+        checkDataTableSpec(inData[0].getDataTableSpec());
 
         m_documents = new ArrayList<Document>();
         m_data = inData[INPUT_INDEX];
