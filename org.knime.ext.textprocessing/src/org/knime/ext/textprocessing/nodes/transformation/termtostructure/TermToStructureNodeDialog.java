@@ -91,7 +91,9 @@ public class TermToStructureNodeDialog extends DefaultNodeSettingsPane {
 
         List<String> formats = new ArrayList<String>();
         for (FormatType f : FormatType.values()) {
-            formats.add(f.toString());
+            if (f.toString() != "STD_INCHI") {
+                formats.add(f.toString());
+            }
         }
         addDialogComponent(new DialogComponentStringSelection(getFormatTypeModel(), "Format type", formats));
     }
