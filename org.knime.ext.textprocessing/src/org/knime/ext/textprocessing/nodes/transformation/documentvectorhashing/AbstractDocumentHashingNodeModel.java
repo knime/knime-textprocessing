@@ -10,6 +10,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.container.AbstractCellFactory;
@@ -117,8 +118,20 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
 
             @Override
             public DataCell[] getCells(final DataRow row) {
-                final DocumentValue doc = (DocumentValue)row.getCell(m_idx);
-                return createVector(m_dim, doc.getDocument());
+                if (!row.getCell(m_idx).isMissing()) {
+                    final DocumentValue doc = (DocumentValue)row.getCell(m_idx);
+                    return createVector(m_dim, doc.getDocument());
+                } else {
+                    if (m_asCol.getBooleanValue()) {
+                        return new DataCell[]{DataType.getMissingCell()};
+                    } else {
+                        DataCell[] cells = new DataCell[m_dim];
+                        for (int i = 0, length = cells.length; i < length; i++) {
+                            cells[i] = DataType.getMissingCell();
+                        }
+                        return cells;
+                    }
+                }
             }
 
         });
