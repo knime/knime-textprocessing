@@ -216,10 +216,12 @@ public class TermVectorNodeModel extends NodeModel {
         while (it.hasNext()) {
             exec.checkCanceled();
             final DataRow row = it.next();
-            final Document d = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
-            if (!featureIndexTable.containsKey(d)) {
-                featureIndexTable.put(d, currIndex);
-                currIndex++;
+            if (!row.getCell(m_documentColIndex).isMissing()) {
+                final Document d = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
+                if (!featureIndexTable.containsKey(d)) {
+                    featureIndexTable.put(d, currIndex);
+                    currIndex++;
+                }
             }
         }
 
@@ -233,50 +235,64 @@ public class TermVectorNodeModel extends NodeModel {
 
         Term lastTerm = null;
         List<DoubleCell> featureVector = initFeatureVector(featureIndexTable.size());
+        int missingValueCount = 0;
 
         it = sortedTable.iterator();
         while (it.hasNext()) {
             exec.checkCanceled();
             final DataRow row = it.next();
-            final Document currDoc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
-            final Term currTerm = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
-            double currValue = 1;
-            if (colIndex > -1) {
-                currValue = ((DoubleValue)row.getCell(colIndex)).getDoubleValue();
-            }
-
-            // if current term is not equals last term, create new feature
-            // vector for last term
-            if (lastTerm != null) {
-                final boolean equals = m_ignoreTagsModel.getBooleanValue() ? currTerm.equalsWordsOnly(lastTerm)
-                    : currTerm.equals(lastTerm);
-                if (!equals) {
-                    // add old feature vector to table
-                    DataRow newRow;
-                    if (m_asCollectionModel.getBooleanValue()) {
-                        newRow = createDataRowAsCollection(lastTerm, featureVector);
-                    } else {
-                        newRow = createDataRowAsColumns(lastTerm, featureVector);
-                    }
-                    dc.addRowToTable(newRow);
-                    // create new feature vector
-                    featureVector = initFeatureVector(featureIndexTable.size());
+            if (!row.getCell(m_documentColIndex).isMissing() && !row.getCell(m_termColIndex).isMissing()) {
+                final Document currDoc = ((DocumentValue)row.getCell(m_documentColIndex)).getDocument();
+                final Term currTerm = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+                double currValue = 1;
+                if (colIndex > -1) {
+                    currValue = ((DoubleValue)row.getCell(colIndex)).getDoubleValue();
                 }
-            }
-            // add new document at certain index to feature vector
-            int index = featureIndexTable.get(currDoc);
-            featureVector.set(index, new DoubleCell(currValue));
 
-            lastTerm = currTerm;
+                // if current term is not equals last term, create new feature
+                // vector for last term
+                if (lastTerm != null) {
+                    final boolean equals = m_ignoreTagsModel.getBooleanValue() ? currTerm.equalsWordsOnly(lastTerm)
+                        : currTerm.equals(lastTerm);
+                    if (!equals) {
+                        // add old feature vector to table
+                        DataRow newRow;
+                        if (m_asCollectionModel.getBooleanValue()) {
+                            newRow = createDataRowAsCollection(lastTerm, featureVector);
+                        } else {
+                            newRow = createDataRowAsColumns(lastTerm, featureVector);
+                        }
+                        dc.addRowToTable(newRow);
+                        // create new feature vector
+                        featureVector = initFeatureVector(featureIndexTable.size());
+                    }
+                }
+                // add new document at certain index to feature vector
+                int index = featureIndexTable.get(currDoc);
+                featureVector.set(index, new DoubleCell(currValue));
+
+                lastTerm = currTerm;
+            } else {
+                missingValueCount++;
+            }
         }
+
         // add last term to data container
-        DataRow newRow;
-        if (m_asCollectionModel.getBooleanValue()) {
-            newRow = createDataRowAsCollection(lastTerm, featureVector);
-        } else {
-            newRow = createDataRowAsColumns(lastTerm, featureVector);
+        if (featureVector.size() > 0) {
+            DataRow newRow;
+            if (m_asCollectionModel.getBooleanValue()) {
+                newRow = createDataRowAsCollection(lastTerm, featureVector);
+            } else {
+                newRow = createDataRowAsColumns(lastTerm, featureVector);
+            }
+            dc.addRowToTable(newRow);
         }
-        dc.addRowToTable(newRow);
+
+        if (missingValueCount == 1) {
+            setWarningMessage("One row has been ignored due to missing values.");
+        } else if (missingValueCount > 1) {
+            setWarningMessage(missingValueCount + " rows have been ignored due to missing values.");
+        }
 
         dc.close();
         featureIndexTable.clear();
@@ -295,17 +311,17 @@ public class TermVectorNodeModel extends NodeModel {
     }
 
     private DataRow createDataRowAsColumns(final Term term, final List<DoubleCell> featureVector) {
-        final DataCell[] cells = new DataCell[featureVector.size() + 1];
-        cells[0] = m_termFac.createDataCell(term);
-        for (int i = 0; i < cells.length - 1; i++) {
-            cells[i + 1] = featureVector.get(i);
-        }
+            final DataCell[] cells = new DataCell[featureVector.size() + 1];
+            cells[0] = m_termFac.createDataCell(term);
+            for (int i = 0; i < cells.length - 1; i++) {
+                cells[i + 1] = featureVector.get(i);
+            }
 
-        final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
-        m_rowKeyNr++;
-        final DataRow newRow = new DefaultRow(rowKey, cells);
+            final RowKey rowKey = RowKey.createRowKey(m_rowKeyNr);
+            m_rowKeyNr++;
+            final DataRow newRow = new DefaultRow(rowKey, cells);
 
-        return newRow;
+            return newRow;
     }
 
     private DataTableSpec createDataTableSpecAsCollection(final Map<Document, Integer> featureIndexTable) {
