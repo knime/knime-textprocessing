@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<knimeNode icon="../../../icons/TextProcVectors.png" type="Manipulator" xmlns="http://knime.org/node/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<knimeNode icon="../../../icons/TextProcVectors.png" type="Predictor" xmlns="http://knime.org/node/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://knime.org/node/v3.1 http://knime.org/node/v3.1.xsd">
 	<name>Document Vector Applier</name>
 	<shortDescription>Creates a document vector for each document, whose
