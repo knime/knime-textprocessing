@@ -81,6 +81,7 @@ import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -295,36 +296,15 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(in);
         verifier.verifyMinimumDocumentCells(1, true);
         String docColName = m_documentColModel.getStringValue();
-        int numberOfDocumentCols = verifier.getNumDocumentCells();
 
         // auto guess settings if document column has not been set
-        if (docColName.isEmpty()) {
-            String documentCol = null;
-            // only one document col available
-            if (numberOfDocumentCols == 1) {
-                documentCol = in.getColumnSpec(verifier.getDocumentCellIndex()).getName();
-                // multiple document columns available
-            } else if (numberOfDocumentCols > 1) {
-                int count = 0;
-                // take first document column
-                while (documentCol == null) {
-                    if (in.getColumnSpec(count).getType().isCompatible(DocumentValue.class)) {
-                        documentCol = in.getColumnSpec(count).getName();
-                    }
-                    count++;
-                }
-                setWarningMessage("Auto guessing: Using column '" + documentCol + "' as document column");
-            }
-            m_documentColModel.setStringValue(documentCol);
-            docColName = m_documentColModel.getStringValue();
+        ColumnSelectionVerifier docVerifier =
+                new ColumnSelectionVerifier(m_documentColModel, in, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
         }
-
-        // check selected document column
+        docColName = m_documentColModel.getStringValue();
         int docColIndex = in.findColumnIndex(docColName);
-        if (docColIndex < 0) {
-            throw new InvalidSettingsException(
-                "Selected document column \"" + docColName + "\" could not be found in the input data table.");
-        }
 
         // check new column name
         String newColName = m_newDocumentColModel.getStringValue();

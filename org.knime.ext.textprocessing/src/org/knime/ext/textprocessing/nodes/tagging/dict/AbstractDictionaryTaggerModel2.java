@@ -69,6 +69,7 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel2;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -141,7 +142,13 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
     @Override
     protected final void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[DICT_TABLE_INDEX]);
-        verfier.verifyStringCell(true);
+        verfier.verifyMinimumStringCells(1, true);
+
+        ColumnSelectionVerifier stringVerifier =
+                new ColumnSelectionVerifier(m_columnModel, inSpecs[DICT_TABLE_INDEX], StringValue.class);
+        if (stringVerifier.hasWarningMessage()) {
+                setWarningMessage(stringVerifier.getWarningMessage());
+        }
     }
 
     /**
@@ -154,8 +161,7 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
     @Override
     protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
         // Read table with dictionary
-        final int dictIndex =
-            inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(m_columnModel.getStringValue());
+        final int dictIndex = inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(m_columnModel.getStringValue());
         if (dictIndex >= 0) {
             for (DataRow row : inData[DICT_TABLE_INDEX]) {
                 if (!row.getCell(dictIndex).isMissing()) {
