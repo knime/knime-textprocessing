@@ -76,6 +76,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
@@ -118,18 +119,23 @@ public class SentenceExtractionNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        DataTableSpecVerifier v = new DataTableSpecVerifier(inSpecs[0]);
-        v.verifyMinimumDocumentCells(1, true);
-
-        m_docColIndex = inSpecs[0].findColumnIndex(
-                m_documentColModel.getStringValue());
-        if (m_docColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! "
-                    + "Check your settings!");
-        }
+        checkDataTableSpec(inSpecs[0]);
 
         return new DataTableSpec[]{createOutDataTableSpec()};
+
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier v = new DataTableSpecVerifier(spec);
+        v.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier docVerifier =
+            new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
+
+        m_docColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
 
     }
 
@@ -153,6 +159,7 @@ public class SentenceExtractionNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
+        checkDataTableSpec(inData[0].getDataTableSpec());
         m_docColIndex = inData[0].getDataTableSpec().findColumnIndex(
                 m_documentColModel.getStringValue());
 
