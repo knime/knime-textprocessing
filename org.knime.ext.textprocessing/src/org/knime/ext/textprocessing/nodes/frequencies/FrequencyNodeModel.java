@@ -57,6 +57,8 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -129,14 +131,13 @@ public abstract class FrequencyNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-        
+
+        ColumnSelectionVerifier docVerifier = new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
         m_documentColIndex = spec.findColumnIndex(
                 m_documentColModel.getStringValue());
-        if (m_documentColIndex < 0) {
-            throw new InvalidSettingsException(
-                    "Index of specified document column is not valid! " 
-                    + "Check your settings!");
-        } 
     }
     
     /**
@@ -156,10 +157,9 @@ public abstract class FrequencyNodeModel extends NodeModel {
             final BufferedDataTable[] inData, final ExecutionContext exec) 
     throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
-        
-        m_documentColIndex = inDataTable.getDataTableSpec().findColumnIndex(
-                m_documentColModel.getStringValue());
-        
+        DataTableSpec spec = inDataTable.getDataTableSpec();
+        checkDataTableSpec(spec);
+
         // initializes the corresponding cell factory
         initCellFactory(inDataTable, exec);
         if (m_cellFac == null) {
@@ -168,8 +168,7 @@ public abstract class FrequencyNodeModel extends NodeModel {
         }
         
         // compute frequency and add column
-        ColumnRearranger rearranger = new ColumnRearranger(
-                inDataTable.getDataTableSpec());
+        ColumnRearranger rearranger = new ColumnRearranger(spec);
         rearranger.append(m_cellFac);
         
         return new BufferedDataTable[] {
