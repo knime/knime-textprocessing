@@ -65,6 +65,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -107,32 +108,14 @@ public class StringToTermNodeModel extends NodeModel {
         // check input spec
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumStringCells(1, true);
-        int numOfStringCols = verifier.getNumberStringCells();
 
-        // the node should only auto-guess column at the beginning (AP-7489)
-        String stringCol = m_stringColModel.getStringValue();
-        if (stringCol.isEmpty()) {
-            String newStringtCol = null;
-            if (numOfStringCols == 1) {
-                newStringtCol = spec.getColumnSpec(verifier.getStringCellIndex()).getName();
-            } else if (numOfStringCols > 1) {
-                for (String colName : spec.getColumnNames()) {
-                    if (spec.getColumnSpec(colName).getType().isCompatible(StringValue.class)) {
-                        newStringtCol = colName;
-                        break;
-                    }
-                }
-                setWarningMessage("Auto guessing: Using column '" + newStringtCol + "' as string column");
-            }
-            m_stringColModel.setStringValue(newStringtCol);
-            stringCol = newStringtCol;
+        ColumnSelectionVerifier docVerifier =
+                new ColumnSelectionVerifier(m_stringColModel, spec, StringValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
         }
-        m_stringColIndex = spec.findColumnIndex(stringCol);
 
-        if (m_stringColIndex < 0) {
-            throw new InvalidSettingsException(
-                "Selected string column \"" + stringCol + "\" could not be found in the input data table.");
-        }
+        m_stringColIndex = spec.findColumnIndex(m_stringColModel.getStringValue());
     }
 
     /**
