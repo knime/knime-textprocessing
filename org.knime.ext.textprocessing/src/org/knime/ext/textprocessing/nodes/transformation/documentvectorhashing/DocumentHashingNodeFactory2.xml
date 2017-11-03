@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../icons/TextProcVectors.png" type="Manipulator">
-	<name>Document vector hashing</name>
+	<name>Document Vector Hashing</name>
 	<shortDescription>Creates a document vector for each document using a
 		hash function.
 	</shortDescription>
