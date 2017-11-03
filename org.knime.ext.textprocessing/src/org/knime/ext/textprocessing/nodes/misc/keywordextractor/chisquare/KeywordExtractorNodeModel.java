@@ -78,7 +78,9 @@ import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentUtil;
@@ -169,6 +171,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
+        checkDataTableSpec(inData[0].getDataTableSpec());
         Set<Document> documents = DocumentUtil.extractUniqueDocuments(
                 inData[0], exec.createSubProgress(0.1),
                 m_documentColumnName.getStringValue());
@@ -388,6 +391,12 @@ public class KeywordExtractorNodeModel extends NodeModel {
             throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier docVerifier =
+                new ColumnSelectionVerifier(m_documentColumnName, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
     }
 
     /**

@@ -80,7 +80,7 @@ public class KeywordExtractorNodeDialog extends DefaultNodeSettingsPane {
     private static final boolean DEFAULT_IGNORE_TERM_TAGS = false;
     private static final double DEFAULT_PMI_THRESHOLD = Math.log(2);
     private static final double DEFAULT_L1_THRESHOLD = 0.4;
-    private static final String DEFAULT_DOCUMENT_COLUMN_NAME = "Document";
+    private static final String DEFAULT_DOCUMENT_COLUMN_NAME = "";
 
     /**
      * Creates a basic dialog for the Keyword Extractor node.
