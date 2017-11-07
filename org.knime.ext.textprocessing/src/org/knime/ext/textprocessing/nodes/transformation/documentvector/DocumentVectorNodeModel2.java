@@ -93,6 +93,7 @@ import org.knime.ext.textprocessing.data.DocumentVectorPortObject;
 import org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -173,36 +174,25 @@ class DocumentVectorNodeModel2 extends NodeModel {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        int numberOfDocumentCols = verifier.getNumDocumentCells();
+        verifier.verifyMinimumNumberCells(1, true);
 
-        m_termColIndex = verifier.getTermCellIndex();
-        String docColumn = m_documentColModel.getStringValue();
-
-        if (docColumn.isEmpty()) {
-            String documentCol = null;
-            // only one document col available
-            if (numberOfDocumentCols == 1) {
-                documentCol = spec.getColumnSpec(verifier.getDocumentCellIndex()).getName();
-                // multiple document columns available
-            } else if (numberOfDocumentCols > 1) {
-                // take first document column
-                for (String colName : spec.getColumnNames()) {
-                    if (spec.getColumnSpec(colName).getType().isCompatible(DocumentValue.class)) {
-                        documentCol = colName;
-                        break;
-                    }
-                }
-                setWarningMessage("Auto guessing: Using column '" + documentCol + "' as document column");
+        ColumnSelectionVerifier docColVerifier =
+                new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
+        if (docColVerifier.hasWarningMessage()) {
+            setWarningMessage(docColVerifier.getWarningMessage());
+        }
+        if (m_booleanModel.getBooleanValue()) {
+            ColumnSelectionVerifier numColVerifier =
+                    new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
+            if (numColVerifier.hasWarningMessage()) {
+                setWarningMessage(numColVerifier.getWarningMessage());
             }
-            m_documentColModel.setStringValue(documentCol);
-            docColumn = documentCol;
         }
 
-        m_documentColIndex = spec.findColumnIndex(docColumn);
-        if (m_documentColIndex < 0) {
-            throw new InvalidSettingsException(
-                "Selected document column \"" + docColumn + "\" could not be found in the input data table.");
-        }
+
+        m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
+        m_termColIndex = verifier.getTermCellIndex();
+
     }
 
     /**
