@@ -58,22 +58,20 @@ import java.util.List;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataType;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.uri.URIDataCell;
 import org.knime.core.data.uri.URIDataValue;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
 import org.knime.core.node.streamable.RowInput;
-import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.AbstractTikaNodeModel;
 import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  * The node model of the Tika Parser URL Input node. This model extends
@@ -82,8 +80,6 @@ import org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserConfig;
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
 final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(TikaParserInputNodeModel.class);
 
     private final SettingsModelString m_colModel = TikaParserConfig.getColModel();
 
@@ -100,35 +96,21 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec in = inSpecs[0];
-        int colIndex = -1;
-        final String colName = m_colModel.getStringValue();
-        if (colName == null) {
-            // auto-guessing parameters
-            for (int i = 0; i < in.getNumColumns(); i++) {
-                DataType dtype = in.getColumnSpec(i).getType();
-                if (dtype.isCompatible(StringValue.class) || dtype.isCompatible(URIDataValue.class)) {
-                    colIndex = i;
-                    LOGGER.info("Guessing column \"" + in.getColumnSpec(i).getName() + "\".");
-                    break;
-                }
-            }
-            CheckUtils.checkSetting(colIndex >= 0, "No string/URI compatible column in input");
-            m_colModel.setStringValue(in.getColumnSpec(colIndex).getName());
-        } else {
-            // we have user setting -- expect the column to be present and of appropriate type
-            colIndex = in.findColumnIndex(colName);
-            // column must be present, otherwise fail
-            CheckUtils.checkSetting(colIndex >= 0, "No such URI/String column in input: \"%s\"", colName);
-            DataType type = in.getColumnSpec(colIndex).getType();
-            // column must be URI or string compatible, otherwise fails
-            CheckUtils.checkSetting(type.isCompatible(StringValue.class) || type.isCompatible(URIDataCell.class),
-                "Column \"%s\" is present in the input table but not String/URI compatible, its type is \"%s\"",
-                colName, type.toPrettyString());
-        }
-
-        assert colIndex >= 0 : "colindex expected to be non-negative at this point";
+        checkDataTableSpec(in);
 
         return createDataTableSpec();
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        verifier.verifyMinimumStringCells(1, true);
+
+        // URI is compatible with StringValue
+        ColumnSelectionVerifier stringVerifier =
+            new ColumnSelectionVerifier(m_colModel, spec, StringValue.class);
+        if (stringVerifier.hasWarningMessage()) {
+            setWarningMessage(stringVerifier.getWarningMessage());
+        }
     }
 
     /** {@inheritDoc} */
@@ -182,8 +164,8 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
     @Override
     protected Iterable<URL> readInput(final RowInput input) throws InvalidSettingsException, InterruptedException, InvalidPathException, MalformedURLException {
         List<URL> files = new ArrayList<URL>();
+        checkDataTableSpec(input.getDataTableSpec());
         int colIndex = input.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
-        CheckUtils.checkSetting(colIndex >= 0, "no such column \"%s\"", m_colModel.getStringValue());
         DataRow row;
         while ((row = input.poll()) != null) {
             String url;
