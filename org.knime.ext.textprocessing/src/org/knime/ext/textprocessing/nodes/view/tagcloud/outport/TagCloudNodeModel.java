@@ -57,6 +57,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.swing.JPanel;
+
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.base.node.util.DefaultDataArray;
@@ -219,48 +221,52 @@ public class TagCloudNodeModel extends NodeModel {
 
         }
         if (numofRows <= 0) {
-            m_tagcloud = null;
-            setWarningMessage("Empty data table, nothing to display");
-            return null;
+            setWarningMessage("Empty data table, nothing to display.");
+            return createImagePortObject(new JPanel(), exec);
+        } else {
+            m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
+            setColumnindexes(dataTable.getDataTableSpec());
+            m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(m_termColModel.getStringValue());
+
+            if (m_termColIndex < 0) {
+                m_termColIndex = (new DataTableSpecVerifier(dataTable.getSpec())).getTermCellIndex();
+            }
+            m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(m_valueColModel.getStringValue());
+
+            if (m_valueColIndex < 0) {
+                m_valueColIndex = (new DataTableSpecVerifier(dataTable.getSpec())).getNumberCellIndex();
+            }
+
+            m_tagcloud = new TagCloud();
+            m_tagcloud.createTagCloud(exec, this);
+            m_tagcloud.changealpha(m_alphaModel.getIntValue());
+            m_tagcloud.changebold(m_boldModel.getIntValue());
+            m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(),
+                    m_tagcloud.getmaxFontsize(), getFont().getName(),
+                    m_tagcloud.getCalcType(), m_boldModel.getIntValue());
+            m_tagcloud.changeWidth(m_widthModel.getIntValue());
+            exec.setProgress(1, "TagCloud completed");
+
+            TagCloudViewPlotter plotter = new TagCloudViewPlotter();
+            plotter.setTagCloudModel(m_tagcloud);
+            plotter.updatePaintModel();
+            plotter.fitToSize(getWindowDimension());
+
+            TagCloudImageExportPanel panel = new TagCloudImageExportPanel(m_tagcloud);
+            panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
+            panel.setOpaque(true);
+            panel.setBackground(m_backgroundColorModel.getColorValue());
+            // don't know exactly why bonds have to be set, but they need
+            // to be set in order to get the background drawn properly.
+            // If bonds are not set background settings will be ignored even
+            // if opaque is set.
+            panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, m_tagcloud.getPreferredSize().height);
+            return createImagePortObject(panel, exec);
         }
-        m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
-        setColumnindexes(dataTable.getDataTableSpec());
-        m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(m_termColModel.getStringValue());
+    }
 
-        if (m_termColIndex < 0) {
-            m_termColIndex = (new DataTableSpecVerifier(dataTable.getSpec())).getTermCellIndex();
-        }
-        m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(m_valueColModel.getStringValue());
-
-        if (m_valueColIndex < 0) {
-            m_valueColIndex = (new DataTableSpecVerifier(dataTable.getSpec())).getNumberCellIndex();
-        }
-
-        m_tagcloud = new TagCloud();
-        m_tagcloud.createTagCloud(exec, this);
-        m_tagcloud.changealpha(m_alphaModel.getIntValue());
-        m_tagcloud.changebold(m_boldModel.getIntValue());
-        m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(),
-                m_tagcloud.getmaxFontsize(), getFont().getName(),
-                m_tagcloud.getCalcType(), m_boldModel.getIntValue());
-        m_tagcloud.changeWidth(m_widthModel.getIntValue());
-        exec.setProgress(1, "TagCloud completed");
-
-        TagCloudViewPlotter plotter = new TagCloudViewPlotter();
-        plotter.setTagCloudModel(m_tagcloud);
-        plotter.updatePaintModel();
-        plotter.fitToSize(getWindowDimension());
-
-        TagCloudImageExportPanel panel = new TagCloudImageExportPanel(m_tagcloud);
-        panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
-        panel.setOpaque(true);
-        panel.setBackground(m_backgroundColorModel.getColorValue());
-        // don't know exactly why bonds have to be set, but they need
-        // to be set in order to get the background drawn properly.
-        // If bonds are not set background settings will be ignored even
-        // if opaque is set.
-        panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, m_tagcloud.getPreferredSize().height);
-
+    // create the output ImagePortObject
+    private PortObject[] createImagePortObject(final JPanel panel, final ExecutionContext exec) throws Exception {
         final String imgType = m_imagetypeModel.getStringValue();
         final ExportType exportType = NodeViewExport.getViewExportMap().get(imgType);
         if (exportType == null) {
@@ -286,8 +292,6 @@ public class TagCloudNodeModel extends NodeModel {
         final PortObject po = new ImagePortObject(image, outSpec);
         return new PortObject[]{po};
     }
-
-
 
     /**
      * {@inheritDoc}
