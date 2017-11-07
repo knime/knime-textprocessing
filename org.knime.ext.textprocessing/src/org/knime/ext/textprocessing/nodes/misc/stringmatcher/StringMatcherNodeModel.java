@@ -49,7 +49,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
@@ -70,7 +69,11 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentCell;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  *
@@ -150,59 +153,42 @@ public class StringMatcherNodeModel extends NodeModel {
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
 
-        String mess = "";
         if (inSpecs.length < 2) {
             throw new IllegalArgumentException("Two input tables expected");
         }
-        if (m_col1.getStringValue() == null) {
-            m_col1.setStringValue(autoguess(inSpecs[0]));
-            mess += "Autoconfigure: Used column " + m_col1.getStringValue();
-        }
-        if (m_col2.getStringValue() == null) {
-            m_col2.setStringValue(autoguess(inSpecs[1]));
-            mess += "Autoconfigure: Used column " + m_col2.getStringValue();
-        }
+
+        checkDataTableSpec(inSpecs[0], m_col1);
+        checkDataTableSpec(inSpecs[1], m_col2);
+
         if (2 * m_ws.getIntValue() < m_wi.getIntValue() + m_wd.getIntValue()) {
             throw new InvalidSettingsException("2*weight(switch) must be >= weight(insert)+weight(delete)");
         }
 
-        // Check fields
-
-        if (inSpecs[0].findColumnIndex(m_col1.getStringValue()) < 0) {
-            throw new InvalidSettingsException("Column '" + m_col1.getStringValue() + "' not available in input data!");
-        }
-
-        if (inSpecs[1].findColumnIndex(m_col2.getStringValue()) < 0) {
-           throw new InvalidSettingsException("Column '" + m_col2.getStringValue() + "' not available in input data!'");
-        }
-
-        if (mess.length() > 0) {
-            setWarningMessage(mess);
-        }
-        return new DataTableSpec[]{createSpec()};
+        return new DataTableSpec[]{createSpec(inSpecs[0])};
     }
 
-    /**
-     * @return the first column compatible with the compatible Value.
-     * @throws InvalidSettingsException if no compatible column is available.
-     */
-    private String autoguess(final DataTableSpec inSpecs) throws InvalidSettingsException {
-        // count number of String columns
-        for (DataColumnSpec dcs : inSpecs) {
-            if (dcs.getType().isCompatible(StringValue.class)) {
-                    return dcs.getName();
-            }
+    private final void checkDataTableSpec(final DataTableSpec spec, final SettingsModelString modelStr) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        if (!verifier.verifyMinimumStringCells(1, false) && !verifier.verifyMinimumDocumentCells(1, false)) {
+            throw new InvalidSettingsException("No String column available in one input port");
         }
-        throw new InvalidSettingsException("No String column available in one input port");
+
+        ColumnSelectionVerifier strVerifier =
+            new ColumnSelectionVerifier(modelStr, spec, StringValue.class);
+        if (strVerifier.hasWarningMessage()) {
+            setWarningMessage(strVerifier.getWarningMessage());
+        }
     }
 
     /**
      * Creates the DataTablespec. Using the given configuration.
+     * @param spec The table spec of the input table (port 0).
      *
      * @return the new data table spec.
+     * @since 3.5
      *
      */
-    protected DataTableSpec createSpec() {
+    protected DataTableSpec createSpec(final DataTableSpec spec) {
         int numberofrelatedwords = m_numberofrelatedwords.getIntValue();
 
         int addcol = 0;
@@ -214,7 +200,7 @@ public class StringMatcherNodeModel extends NodeModel {
         DataType[] types = new DataType[numberofrelatedwords + 1 + addcol];
 
         names[0] = "Origin";
-        types[0] = StringCell.TYPE;
+        types[0] = spec.getColumnSpec(m_col1.getStringValue()).getType().isCompatible(DocumentValue.class)? DocumentCell.TYPE : StringCell.TYPE;
 
         if (addcol == 1) {
             names[1] = "Distance";
@@ -250,6 +236,9 @@ public class StringMatcherNodeModel extends NodeModel {
         }
         DataTable searchdata = inData[0]; // searching table
 
+        checkDataTableSpec(inData[0].getDataTableSpec(), m_col1);
+        checkDataTableSpec(inData[1].getDataTableSpec(), m_col2);
+
         int dictcol = inData[1].getDataTableSpec().findColumnIndex(m_col2.getStringValue());
         int searchcol = inData[0].getDataTableSpec().findColumnIndex(m_col1.getStringValue());
         if (searchcol < 0 || dictcol < 0) {
@@ -264,7 +253,7 @@ public class StringMatcherNodeModel extends NodeModel {
         DataCell[] related;
 
         // Initialize the buffer with one column for the origin word and if selected for related words
-        BufferedDataContainer buf = exec.createDataContainer(createSpec());
+        BufferedDataContainer buf = exec.createDataContainer(createSpec(inData[0].getDataTableSpec()));
 
         int startwords = 0; // if the min dist is not shown, the first word
         // will be written
