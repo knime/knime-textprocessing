@@ -57,9 +57,9 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  * This class provides methods that can be used within configure() methods of nodes to streamline their behaviour in
- * terms of column
+ * terms of column.
  *
- * @author Julian
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
 public class ColumnSelectionVerifier {
@@ -85,18 +85,40 @@ public class ColumnSelectionVerifier {
      */
     public ColumnSelectionVerifier(final SettingsModelString columnSetting, final DataTableSpec spec,
         final Class<? extends DataValue> columnType) throws InvalidSettingsException {
-        verifyColumn(columnSetting, spec, columnType);
+        verifyColumn(columnSetting, spec, columnType, null);
     }
 
+    /**
+     * Creates and returns a new instance of a {@code ColumnSelectionVerifier}. The ColumnSelectionVerifier checks if
+     * the {@link DataTableSpec} contains a column which name is contained within the {@code SettingsModelString}.
+     * Additionally, it checks for the correct column type (e.g. DocumentValue.class) which should be passed as an
+     * argument as well. If the SettingsModelString contains {@code null} or an empty string, the
+     * ColumnSelectionVerifier automatically sets the first suitable column name. Empty strings or {@code null} should
+     * only occur if the node is initialized for the first time and no column selection has been done within the node
+     * dialog.
+     *
+     * @param columnSetting The {@code SettingsModelString} containing the name of the column to verify.
+     * @param spec The {@code DataTableSpec} containing the column information.
+     * @param columnType The specific {@code DataValue} implementation to verify the column.
+     * @param ignoreName If this value is not null, the Verifier will ignore any column with the same name during the
+     *            search.
+     * @throws InvalidSettingsException Throws an InvalidSettingsException, if the column does not exist or if the
+     *             column has a wrong type.
+     */
+    public ColumnSelectionVerifier(final SettingsModelString columnSetting, final DataTableSpec spec,
+        final Class<? extends DataValue> columnType, final String ignoreName) throws InvalidSettingsException {
+        verifyColumn(columnSetting, spec, columnType, ignoreName);
+    }
 
     private void verifyColumn(final SettingsModelString columnSetting, final DataTableSpec spec,
-        final Class<? extends DataValue> columnType) throws InvalidSettingsException {
+        final Class<? extends DataValue> columnType, final String ignoreName) throws InvalidSettingsException {
         String colType = StringUtils.remove(columnType.getSimpleName(), "Value");
 
         // if document column setting is empty take first feasible column from datatable
         if (columnSetting.getStringValue() == null || columnSetting.getStringValue().isEmpty()) {
             for (DataColumnSpec column : spec) {
-                if (column.getType().isCompatible(columnType)) {
+                if ((column.getType().isCompatible(columnType)) &&
+                        (ignoreName != null ? !column.getName().equals(ignoreName) : true)) {
                     columnSetting.setStringValue(column.getName());
                     m_warningExists = true;
                     m_warningMessage =
