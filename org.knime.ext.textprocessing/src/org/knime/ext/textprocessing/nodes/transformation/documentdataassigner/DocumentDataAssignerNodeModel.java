@@ -63,6 +63,7 @@ import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.transformation.documentdataassigner.DocumentDataAssignerNodeDialog.ReplaceOrAppend;
 import org.knime.ext.textprocessing.nodes.transformation.documenttostring.DocumentDataExtractor2;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -135,6 +136,11 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
     protected ColumnRearranger createColumnRearranger(final DataTableSpec spec) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier docColSelectionVerifier = new ColumnSelectionVerifier(m_docColumnModel, spec, DocumentValue.class);
+        if (docColSelectionVerifier.hasWarningMessage()) {
+            setWarningMessage(docColSelectionVerifier.getWarningMessage());
+        }
 
         // creates the config
         DocumentDataAssignerConfig conf = new DocumentDataAssignerConfig();
