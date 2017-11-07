@@ -50,7 +50,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.ext.textprocessing.util.CommonColumnNames;
 
 /**
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
@@ -61,24 +60,21 @@ public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
      * @return The settings model containing the document column name.
      */
     public static SettingsModelString createDocumentColumnModel() {
-        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_DOCCOL,
-            CommonColumnNames.DEF_DOCUMENT_COLNAME);
+        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_DOCCOL,"");
     }
 
     /**
      * @return The settings model containing the key column name.
      */
     public static SettingsModelString createKeyColumnModel() {
-        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_KEYCOL,
-            MetaInfoInsertionNodeModel.DEF_KEYCOL);
+        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_KEYCOL,"");
     }
 
     /**
      * @return The settings model containing the value column name.
      */
     public static SettingsModelString createValueColumnModel() {
-        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_VALUECOL,
-            MetaInfoInsertionNodeModel.DEF_VALUECOL);
+        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_VALUECOL,"");
     }
 
     /**

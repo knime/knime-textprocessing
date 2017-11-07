@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -59,6 +60,8 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -103,13 +106,33 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec spec = inSpecs[0];
+        checkDataTableSpec(spec);
 
-        // check input spec
+        return new DataTableSpec[]{createDataTableSpec(spec)};
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyMinimumStringCells(2, true);
 
-        return new DataTableSpec[]{createDataTableSpec(spec)};
+        ColumnSelectionVerifier docVerifier =
+            new ColumnSelectionVerifier(m_docColModel, spec, DocumentValue.class);
+        if (docVerifier.hasWarningMessage()) {
+            setWarningMessage(docVerifier.getWarningMessage());
+        }
+
+        ColumnSelectionVerifier keyVerifier =
+                new ColumnSelectionVerifier(m_keyColModel, spec, StringValue.class);
+        if (keyVerifier.hasWarningMessage()) {
+            setWarningMessage(keyVerifier.getWarningMessage());
+        }
+
+        ColumnSelectionVerifier valueVerifier =
+                new ColumnSelectionVerifier(m_valueColModel, spec, StringValue.class, m_keyColModel.getStringValue());
+        if (valueVerifier.hasWarningMessage()) {
+            setWarningMessage(valueVerifier.getWarningMessage());
+        }
     }
 
     private DataTableSpec createDataTableSpec(final DataTableSpec inSpec) {
@@ -137,6 +160,7 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
             throws Exception {
 
         final DataTableSpec inSpec = inData[0].getDataTableSpec();
+        checkDataTableSpec(inSpec);
         final int docColIndx = inSpec.findColumnIndex(m_docColModel.getStringValue());
         final int keyColIndx = inSpec.findColumnIndex(m_keyColModel.getStringValue());
         final int valueColIndx = inSpec.findColumnIndex(m_valueColModel.getStringValue());
