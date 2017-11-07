@@ -67,6 +67,7 @@ import org.knime.core.node.streamable.InputPortRole;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilter;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -99,9 +100,18 @@ public class DictionaryFilterNodeModel extends StreamablePreprocessingNodeModel 
      */
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        super.internalConfigure(inSpecs);
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpecs[1]);
+        checkDataTableSpec(inSpecs[1]);
+    }
+
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumStringCells(1, true);
+
+        ColumnSelectionVerifier stringVerifier =
+            new ColumnSelectionVerifier(m_wordToFilterModel, spec, StringValue.class);
+        if (stringVerifier.hasWarningMessage()) {
+            setWarningMessage(stringVerifier.getWarningMessage());
+        }
     }
 
     /**
@@ -110,6 +120,7 @@ public class DictionaryFilterNodeModel extends StreamablePreprocessingNodeModel 
     @Override
     protected void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws InvalidSettingsException {
+        checkDataTableSpec(inData[1].getDataTableSpec());
         final int colIndex = inData[1].getDataTableSpec().findColumnIndex(m_wordToFilterModel.getStringValue());
         m_terms = new HashSet<String>();
         RowIterator iterator = inData[1].iterator();
