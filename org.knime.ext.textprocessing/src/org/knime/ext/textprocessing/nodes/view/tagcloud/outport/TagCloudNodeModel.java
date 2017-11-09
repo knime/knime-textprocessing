@@ -57,8 +57,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.JPanel;
-
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.base.node.util.DefaultDataArray;
@@ -220,9 +218,11 @@ public class TagCloudNodeModel extends NodeModel {
             numofRows = Math.min(m_noOfRows.getIntValue(), numofRows);
 
         }
+
+        TagCloudImageExportPanel panel;
         if (numofRows <= 0) {
             setWarningMessage("Empty data table, nothing to display.");
-            return createImagePortObject(new JPanel(), exec);
+            panel = new TagCloudImageExportPanel(null);
         } else {
             m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
             setColumnindexes(dataTable.getDataTableSpec());
@@ -252,7 +252,7 @@ public class TagCloudNodeModel extends NodeModel {
             plotter.updatePaintModel();
             plotter.fitToSize(getWindowDimension());
 
-            TagCloudImageExportPanel panel = new TagCloudImageExportPanel(m_tagcloud);
+            panel = new TagCloudImageExportPanel(m_tagcloud);
             panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
             panel.setOpaque(true);
             panel.setBackground(m_backgroundColorModel.getColorValue());
@@ -261,12 +261,8 @@ public class TagCloudNodeModel extends NodeModel {
             // If bonds are not set background settings will be ignored even
             // if opaque is set.
             panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, m_tagcloud.getPreferredSize().height);
-            return createImagePortObject(panel, exec);
         }
-    }
 
-    // create the output ImagePortObject
-    private PortObject[] createImagePortObject(final JPanel panel, final ExecutionContext exec) throws Exception {
         final String imgType = m_imagetypeModel.getStringValue();
         final ExportType exportType = NodeViewExport.getViewExportMap().get(imgType);
         if (exportType == null) {
