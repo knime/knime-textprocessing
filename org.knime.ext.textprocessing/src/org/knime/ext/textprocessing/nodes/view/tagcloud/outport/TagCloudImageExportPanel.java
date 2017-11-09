@@ -87,25 +87,27 @@ public class TagCloudImageExportPanel extends JPanel {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
 
-        Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud.getmaxFontsize());
-        TagCloudData[] points = m_tagcloud.getDataArray();
+        if (m_tagcloud != null) {
+            Font myfont = new Font(m_tagcloud.getfontName(), Font.PLAIN, m_tagcloud.getmaxFontsize());
+            TagCloudData[] points = m_tagcloud.getDataArray();
 
-        // through all points
-        for (TagCloudData tcd : points) {
-            myfont = myfont.deriveFont(Font.PLAIN, tcd.getFontsize());
+            // through all points
+            for (TagCloudData tcd : points) {
+                myfont = myfont.deriveFont(Font.PLAIN, tcd.getFontsize());
 
-            g2.setColor(tcd.getTextcolor());
-            g2.setFont(myfont);
+                g2.setColor(tcd.getTextcolor());
+                g2.setFont(myfont);
 
-            if (tcd.isSelected()) { // is the term is currently selec
-                // ted it will be in italic
-                myfont = myfont.deriveFont(Font.ITALIC);
+                if (tcd.isSelected()) { // is the term is currently selec
+                    // ted it will be in italic
+                    myfont = myfont.deriveFont(Font.ITALIC);
+                }
+                if (tcd.isBold()) {
+                    myfont = myfont.deriveFont(Font.BOLD);
+                }
+                TextLayout tl = new TextLayout(tcd.getTerm().getText(), myfont, g2.getFontRenderContext());
+                tl.draw(g2, (float)tcd.getX(), (float)(tcd.getY() + tcd.getHeight() * 0.8));
             }
-            if (tcd.isBold()) {
-                myfont = myfont.deriveFont(Font.BOLD);
-            }
-            TextLayout tl = new TextLayout(tcd.getTerm().getText(), myfont, g2.getFontRenderContext());
-            tl.draw(g2, (float)tcd.getX(), (float)(tcd.getY() + tcd.getHeight() * 0.8));
         }
     }
 
