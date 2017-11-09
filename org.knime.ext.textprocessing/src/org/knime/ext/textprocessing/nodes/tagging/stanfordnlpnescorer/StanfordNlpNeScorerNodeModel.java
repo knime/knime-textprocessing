@@ -80,7 +80,6 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -112,8 +111,6 @@ import edu.stanford.nlp.sequences.DocumentReaderAndWriter;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class StanfordNlpNeScorerNodeModel extends NodeModel {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(StanfordNlpNeScorerNodeModel.class);
 
     private SettingsModelString m_docColumnModel = StanfordNlpNeScorerNodeDialog.createDocumentColumnModel();
 
@@ -322,11 +319,9 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
             }
 
             if (!canParseModelQuality) {
-                LOGGER.error("Could not parse quality measures of model validation.");
                 setWarningMessage("Could not parse quality measures of model validation.");
             }
         } catch (NumberFormatException e) {
-            LOGGER.error("Could not parse quality measures of model validation.");
             setWarningMessage("Could not parse quality measures of model validation.");
         }
         accTable.addRowToTable(stats);
