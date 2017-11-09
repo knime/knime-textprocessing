@@ -48,7 +48,6 @@
  */
 package org.knime.ext.textprocessing.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
@@ -64,35 +63,10 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
  */
 public class ColumnSelectionVerifier {
 
-    private String m_warningMessage;
-
-    private boolean m_warningExists;
-
     /**
-     * Creates and returns a new instance of a {@code ColumnSelectionVerifier}. The ColumnSelectionVerifier checks if
-     * the {@link DataTableSpec} contains a column which name is contained within the {@code SettingsModelString}.
-     * Additionally, it checks for the correct column type (e.g. DocumentValue.class) which should be passed as an
-     * argument as well. If the SettingsModelString contains {@code null} or an empty string, the
-     * ColumnSelectionVerifier automatically sets the first suitable column name. Empty strings or {@code null} should
-     * only occur if the node is initialized for the first time and no column selection has been done within the node
-     * dialog.
-     *
-     * @param columnSetting The {@code SettingsModelString} containing the name of the column to verify.
-     * @param spec The {@code DataTableSpec} containing the column information.
-     * @param columnType The specific {@code DataValue} implementation to verify the column.
-     * @throws InvalidSettingsException Throws an InvalidSettingsException, if the column does not exist or if the
-     *             column has a wrong type.
-     */
-    public ColumnSelectionVerifier(final SettingsModelString columnSetting, final DataTableSpec spec,
-        final Class<? extends DataValue> columnType) throws InvalidSettingsException {
-        verifyColumn(columnSetting, spec, columnType, null);
-    }
-
-    /**
-     * Creates and returns a new instance of a {@code ColumnSelectionVerifier}. The ColumnSelectionVerifier checks if
-     * the {@link DataTableSpec} contains a column which name is contained within the {@code SettingsModelString}.
-     * Additionally, it checks for the correct column type (e.g. DocumentValue.class) which should be passed as an
-     * argument as well. If the SettingsModelString contains {@code null} or an empty string, the
+     * This static method checks if the {@link DataTableSpec} contains a column which name is contained within the
+     * {@code SettingsModelString}. Additionally, it checks for the correct column type (e.g. DocumentValue.class) which
+     * should be passed as an argument as well. If the SettingsModelString contains {@code null} or an empty string, the
      * ColumnSelectionVerifier automatically sets the first suitable column name. Empty strings or {@code null} should
      * only occur if the node is initialized for the first time and no column selection has been done within the node
      * dialog.
@@ -102,57 +76,34 @@ public class ColumnSelectionVerifier {
      * @param columnType The specific {@code DataValue} implementation to verify the column.
      * @param ignoreName If this value is not null, the Verifier will ignore any column with the same name during the
      *            search.
+     * @return Returns the warning message or null if no warning message has been set.
      * @throws InvalidSettingsException Throws an InvalidSettingsException, if the column does not exist or if the
      *             column has a wrong type.
      */
-    public ColumnSelectionVerifier(final SettingsModelString columnSetting, final DataTableSpec spec,
+    public static String verifyColumn(final SettingsModelString columnSetting, final DataTableSpec spec,
         final Class<? extends DataValue> columnType, final String ignoreName) throws InvalidSettingsException {
-        verifyColumn(columnSetting, spec, columnType, ignoreName);
-    }
-
-    private void verifyColumn(final SettingsModelString columnSetting, final DataTableSpec spec,
-        final Class<? extends DataValue> columnType, final String ignoreName) throws InvalidSettingsException {
-        String colType = StringUtils.remove(columnType.getSimpleName(), "Value");
 
         // if document column setting is empty take first feasible column from datatable
         if (columnSetting.getStringValue() == null || columnSetting.getStringValue().isEmpty()) {
             for (DataColumnSpec column : spec) {
-                if ((column.getType().isCompatible(columnType)) &&
-                        (ignoreName != null ? !column.getName().equals(ignoreName) : true)) {
+                if ((column.getType().isCompatible(columnType))
+                    && (ignoreName != null ? !column.getName().equals(ignoreName) : true)) {
                     columnSetting.setStringValue(column.getName());
-                    m_warningExists = true;
-                    m_warningMessage =
-                        "Auto guessing: Using column '" + column.getName() + "' as " + colType + " column.";
-                    break;
+                    return "Auto guessing: Using column '" + column.getName() + "' as " + columnType.getSimpleName()
+                        + " column.";
                 }
             }
         } else if (spec.findColumnIndex(columnSetting.getStringValue()) < 0) {
             // if document column is set but the column does not exist in data table throw exception
-            throw new InvalidSettingsException(
-                colType + " column '" + columnSetting.getStringValue() + "' could not be found in data table.");
+            throw new InvalidSettingsException(columnType.getSimpleName() + " column '" + columnSetting.getStringValue()
+                + "' could not be found in data table.");
         } else if (!spec.getColumnSpec(columnSetting.getStringValue()).getType().isCompatible(columnType)) {
             // if document column is set and the column exists but is not of right type throw exception
             throw new InvalidSettingsException(
-                "Column '" + columnSetting.getStringValue() + "' is not a " + colType + " column.");
+                "Column '" + columnSetting.getStringValue() + "' is not a " + columnType.getSimpleName() + " column.");
         }
-    }
 
-    /**
-     * Returns a String containing the warning message.
-     *
-     * @return Returns the warning message.
-     */
-    public String getWarningMessage() {
-        return m_warningMessage;
-    }
-
-    /**
-     * Returns true if a warning message exists and false if not.
-     *
-     * @return Returns true if a warning message exists.
-     */
-    public boolean hasWarningMessage() {
-        return m_warningExists;
+        return null;
     }
 
 }
