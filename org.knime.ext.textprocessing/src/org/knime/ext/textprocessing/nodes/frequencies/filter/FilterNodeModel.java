@@ -184,14 +184,11 @@ public class FilterNodeModel extends NodeModel {
         verifier.verifyMinimumNumberCells(1, true);
         m_termColIndex = verifier.getTermCellIndex();
 
-        ColumnSelectionVerifier docSelectionVerifier = new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        ColumnSelectionVerifier numColSelectionVerifier = new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
-        if (docSelectionVerifier.hasWarningMessage()) {
-            setWarningMessage(docSelectionVerifier.getWarningMessage());
-        }
-        if (numColSelectionVerifier.hasWarningMessage()) {
-            setWarningMessage(numColSelectionVerifier.getWarningMessage());
-        }
+        // set and verify column selections and set warning if present
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
+        ColumnSelectionVerifier.verifyColumn(m_colModel, spec, DoubleValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
     }
 
     /**
