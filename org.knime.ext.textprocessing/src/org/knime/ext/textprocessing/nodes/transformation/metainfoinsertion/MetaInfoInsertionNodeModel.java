@@ -84,7 +84,6 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
      */
     public static final boolean DEF_KEEPKEYVALCOLS = true;
 
-
     private SettingsModelString m_docColModel = MetaInfoInsertionNodeDialog.createDocumentColumnModel();
 
     private SettingsModelString m_keyColModel = MetaInfoInsertionNodeDialog.createKeyColumnModel();
@@ -133,8 +132,9 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
         final boolean keepKeyValCols = m_keepKeyValColModel.getBooleanValue();
 
         ColumnRearranger rearranger = new ColumnRearranger(inSpec);
-        rearranger.replace(new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx,
-                                                   valueColIndx, null), docColIndx);
+        rearranger.replace(
+            new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx, valueColIndx, null),
+            docColIndx);
         if (!keepKeyValCols) {
             rearranger.remove(keyColIndx, valueColIndx);
         }
@@ -148,7 +148,7 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-            throws Exception {
+        throws Exception {
 
         final DataTableSpec inSpec = inData[0].getDataTableSpec();
         checkDataTableSpec(inSpec);
@@ -159,14 +159,15 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
 
         // compute frequency and add column
         final ColumnRearranger rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
-        rearranger.replace(new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx,
-                                                   valueColIndx, exec), docColIndx);
+        rearranger.replace(
+            new MetaInfoCellFactory(inSpec.getColumnSpec(docColIndx), docColIndx, keyColIndx, valueColIndx, exec),
+            docColIndx);
         if (!keepKeyValCols) {
             rearranger.remove(keyColIndx, valueColIndx);
         }
 
-        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger,
-                                                                       exec.createSubExecutionContext(1.0))};
+        return new BufferedDataTable[]{
+            exec.createColumnRearrangeTable(inData[0], rearranger, exec.createSubExecutionContext(1.0))};
     }
 
     /* (non-Javadoc)
@@ -214,8 +215,8 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
      * @see org.knime.core.node.NodeModel#loadInternals(java.io.File, org.knime.core.node.ExecutionMonitor)
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -223,8 +224,8 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
      * @see org.knime.core.node.NodeModel#saveInternals(java.io.File, org.knime.core.node.ExecutionMonitor)
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }

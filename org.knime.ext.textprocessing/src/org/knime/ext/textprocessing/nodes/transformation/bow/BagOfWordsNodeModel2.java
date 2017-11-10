@@ -126,14 +126,14 @@ class BagOfWordsNodeModel2 extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
 
         ColumnSelectionVerifier.verifyColumn(m_docColModel, spec, DocumentValue.class, null)
-        .ifPresent(msg -> setWarningMessage(msg));
+            .ifPresent(msg -> setWarningMessage(msg));
 
         m_documentColIndex = spec.findColumnIndex(m_docColModel.getStringValue());
 
         // check if there already is a column named like the specified term column name
         if (BagOfWordsNodeDialog2.checkIncludes(m_colFilterModel, spec, m_termColModel.getStringValue())) {
             throw new InvalidSettingsException("Can't create new column '" + m_termColModel.getStringValue()
-            + "' as input spec already contains column named '" + m_termColModel.getStringValue() + "'!");
+                + "' as input spec already contains column named '" + m_termColModel.getStringValue() + "'!");
         }
     }
 

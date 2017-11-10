@@ -155,13 +155,12 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
 
         // creating thread pool, semaphore and chunk size
         final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool(m_numberOfThreadsModel.getIntValue());
-        final int chunkSize = (int) Math.min(rowCount / m_numberOfThreadsModel.getIntValue(), Integer.MAX_VALUE);
+        final int chunkSize = (int)Math.min(rowCount / m_numberOfThreadsModel.getIntValue(), Integer.MAX_VALUE);
 
-        RSSFeedReaderDataTableCreator2 joiner =
-            new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
-                m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
-                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue(),
-                m_tokenizerModel.getStringValue());
+        RSSFeedReaderDataTableCreator2 joiner = new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(),
+            m_createXMLColumn.getBooleanValue(), m_getHttpResponseCodeColumn.getBooleanValue(),
+            m_timeOutModel.getIntValue(), m_docColName.getStringValue(), m_xmlColName.getStringValue(),
+            m_httpColName.getStringValue(), m_tokenizerModel.getStringValue());
 
         List<DataCell> dataCellChunk = new ArrayList<>(chunkSize);
         AtomicLong urlCount = new AtomicLong(0);
@@ -180,16 +179,14 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
                 // chunk is full, process and clear
             } else {
                 dataCellChunk.add(row.getCell(m_urlColIndex));
-                futures.add(
-                    pool.enqueue(processChunk(dataCellChunk, joiner, exec, urlCount, rowCount, fsFactory)));
+                futures.add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, urlCount, rowCount, fsFactory)));
                 dataCellChunk = new ArrayList<>(chunkSize);
             }
         }
 
         // enqueue the last chunk and wait
         if (!dataCellChunk.isEmpty()) {
-            futures
-                .add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, urlCount, rowCount, fsFactory)));
+            futures.add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, urlCount, rowCount, fsFactory)));
         }
 
         for (Future<?> f : futures) {
@@ -212,11 +209,11 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
             @Override
             public void run() {
                 try {
-                    RSSFeedReaderDataTableCreator2 rssFeedReaderTC = new RSSFeedReaderDataTableCreator2(
-                        m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
-                        m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
-                        m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue(),
-                        m_tokenizerModel.getStringValue());
+                    RSSFeedReaderDataTableCreator2 rssFeedReaderTC =
+                        new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(),
+                            m_createXMLColumn.getBooleanValue(), m_getHttpResponseCodeColumn.getBooleanValue(),
+                            m_timeOutModel.getIntValue(), m_docColName.getStringValue(), m_xmlColName.getStringValue(),
+                            m_httpColName.getStringValue(), m_tokenizerModel.getStringValue());
                     for (DataCell dataCell : dataCellsWithUrls) {
                         exec.checkCanceled();
                         rssFeedReaderTC.createDataCellsFromUrl(dataCell, fsFactory);
@@ -262,11 +259,10 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
 
         m_urlColIndex = inSpec.findColumnIndex(m_feedUrlColumn.getStringValue());
 
-        RSSFeedReaderDataTableCreator2 rssFeedReaderDTC =
-            new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
-                m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
-                m_docColName.getStringValue(), m_xmlColName.getStringValue(), m_httpColName.getStringValue(),
-                m_tokenizerModel.getStringValue());
+        RSSFeedReaderDataTableCreator2 rssFeedReaderDTC = new RSSFeedReaderDataTableCreator2(
+            m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
+            m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(), m_docColName.getStringValue(),
+            m_xmlColName.getStringValue(), m_httpColName.getStringValue(), m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{rssFeedReaderDTC.createDataTableSpec()};
     }
 

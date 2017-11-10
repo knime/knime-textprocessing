@@ -97,9 +97,9 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
-
 /**
  * Node model class.
+ *
  * @author Tobias Koetter, University of Konstanz
  */
 public class CooccurrenceCounterNodeModel extends NodeModel {
@@ -120,7 +120,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
 
     private TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
-    /**Constructor for class CooccurrenceCounterNodeModel.
+    /**
+     * Constructor for class CooccurrenceCounterNodeModel.
      *
      */
     public CooccurrenceCounterNodeModel() {
@@ -153,7 +154,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      */
     static SettingsModelInteger createProcessCountModel() {
         return new SettingsModelIntegerBounded("noOfThreads", KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(), 1,
-                                                Integer.MAX_VALUE);
+            Integer.MAX_VALUE);
     }
 
     /**
@@ -181,11 +182,10 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec spec = inSpecs[0];
         checkDataTableSpec(spec);
-        return new DataTableSpec[] {createResultSpec(spec)};
+        return new DataTableSpec[]{createResultSpec(spec)};
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
@@ -204,7 +204,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-            throws Exception {
+        throws Exception {
         final DataTableSpec spec = inData[0].getDataTableSpec();
         checkDataTableSpec(spec);
         final int docIdx = spec.findColumnIndex(m_docCol.getStringValue());
@@ -216,7 +216,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             exec.setMessage("Sorting table...");
             final LinkedList<String> inclList = new LinkedList<String>();
             inclList.add(m_docCol.getStringValue());
-            table = new SortedTable(inData[0], inclList, new boolean[] {true}, exec.createSubExecutionContext(0.2));
+            table = new SortedTable(inData[0], inclList, new boolean[]{true}, exec.createSubExecutionContext(0.2));
             myExec = exec.createSubExecutionContext(0.8);
         } else {
             table = inData[0];
@@ -232,7 +232,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         final AtomicInteger rowId = new AtomicInteger();
         final AtomicInteger progressCounter = new AtomicInteger();
         exec.setMessage("Processing documents...");
-      //initialize the thread pool
+        //initialize the thread pool
         final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
         //The semaphore restricts the number of concurrent processes
         final Semaphore semaphore = new Semaphore(m_procCount.getIntValue());
@@ -259,7 +259,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                 terms.addTerm(term);
             } else {
                 pool.enqueue(processDocument(myExec, rowCount, progressCounter, docRowCounter, semaphore, rowId, dc,
-                                                previousDocCell, terms, skipMetaInfo, checkTags));
+                    previousDocCell, terms, skipMetaInfo, checkTags));
                 previousDocCell = docCell;
                 terms = new TermChecker(checkTags);
                 terms.addTerm(term);
@@ -269,19 +269,16 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         //process the last document
         exec.setMessage("Processing documents...");
         pool.enqueue(processDocument(myExec, rowCount, progressCounter, docRowCounter, semaphore, rowId, dc,
-                                        previousDocCell, terms, skipMetaInfo, checkTags));
+            previousDocCell, terms, skipMetaInfo, checkTags));
         pool.waitForTermination();
         dc.close();
-        return new BufferedDataTable[] {dc.getTable()};
+        return new BufferedDataTable[]{dc.getTable()};
     }
 
-    private Runnable processDocument(final ExecutionMonitor exec,
-            final int totalRowCount, final AtomicInteger progressCounter,
-            final int docRowCounter, final Semaphore semaphore,
-            final AtomicInteger rowId, final BufferedDataContainer dc,
-            final DataCell docCell, final TermChecker terms, final boolean skipMetaInformation,
-            final boolean checkTags)
-    throws CanceledExecutionException {
+    private Runnable processDocument(final ExecutionMonitor exec, final int totalRowCount,
+        final AtomicInteger progressCounter, final int docRowCounter, final Semaphore semaphore,
+        final AtomicInteger rowId, final BufferedDataContainer dc, final DataCell docCell, final TermChecker terms,
+        final boolean skipMetaInformation, final boolean checkTags) throws CanceledExecutionException {
         exec.checkCanceled();
         return new Runnable() {
             @Override
@@ -292,7 +289,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                     final HashMap<TermTuple, TermTuple> tuples = new LinkedHashMap<TermTuple, TermTuple>();
                     final List<Section> sections = doc.getSections();
                     final Map<TermContainer, MutableInteger> documentTerms =
-                            new LinkedHashMap<TermContainer, MutableInteger>();
+                        new LinkedHashMap<TermContainer, MutableInteger>();
                     final Map<TermContainer, MutableInteger> titleTerms =
                         new LinkedHashMap<TermContainer, MutableInteger>();
                     final Map<TermContainer, MutableInteger> sectionTerms =
@@ -304,8 +301,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                     for (final Section section : sections) {
                         final SectionAnnotation annotation = section.getAnnotation();
                         final boolean title = SectionAnnotation.TITLE.equals(annotation)
-                                                || SectionAnnotation.CONFERENCE_TITLE.equals(annotation)
-                                                    || SectionAnnotation.JOURNAL_TITLE.equals(annotation);
+                            || SectionAnnotation.CONFERENCE_TITLE.equals(annotation)
+                            || SectionAnnotation.JOURNAL_TITLE.equals(annotation);
                         if (skipMetaInformation && SectionAnnotation.META_INFORMATION.equals(annotation)) {
                             //this is a meta information section that should be skipped -> continue
                             continue;
@@ -339,8 +336,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                                         if (inclNeighbors()) {
                                             if (previousTermContainer != null) {
                                                 //the two terms are neighbors
-                                                processNeighbors(tuples, previousTermContainer,
-                                                    termContainer);
+                                                processNeighbors(tuples, previousTermContainer, termContainer);
                                             }
                                             previousTermContainer = termContainer;
                                         }
@@ -398,7 +394,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @param occurrence the type of occurrence
      */
     void processTerms(final Map<TermTuple, TermTuple> tuples, final Map<TermContainer, MutableInteger> terms,
-            final CooccurrenceLevel occurrence) {
+        final CooccurrenceLevel occurrence) {
         if (terms.size() < 2) {
             //the map might contain one element which we need to remove as well
             terms.clear();
@@ -431,7 +427,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @param termContainer2 the second term
      */
     void processNeighbors(final Map<TermTuple, TermTuple> tuples, final TermContainer termContainer1,
-            final TermContainer termContainer2) {
+        final TermContainer termContainer2) {
         //ignore terms that are equal
         if (termContainer1.equals(termContainer2)) {
             return;
@@ -453,10 +449,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @param tuples the tuples that occurred in the given document
      * @throws CanceledExecutionException if the operation has been canceled
      */
-    void createRows(final ExecutionMonitor exec,
-            final AtomicInteger rowId, final BufferedDataContainer dc,
-            final DataCell docCell, final HashMap<TermTuple, TermTuple> tuples)
-    throws CanceledExecutionException {
+    void createRows(final ExecutionMonitor exec, final AtomicInteger rowId, final BufferedDataContainer dc,
+        final DataCell docCell, final HashMap<TermTuple, TermTuple> tuples) throws CanceledExecutionException {
         synchronized (dc) {
             //we synchronize the whole block to ensure that the tuples of a
             //document added consecutively to the table
@@ -489,8 +483,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                 if (inclTitle()) {
                     cells.add(new IntCell(tuple.getTitle()));
                 }
-                final DefaultRow row = new DefaultRow(
-                        RowKey.createRowKey(rowId.getAndIncrement()), cells);
+                final DefaultRow row = new DefaultRow(RowKey.createRowKey(rowId.getAndIncrement()), cells);
                 dc.addRowToTable(row);
             }
         }
@@ -501,8 +494,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         specs.add(spec.getColumnSpec(m_docCol.getStringValue()));
         final DataColumnSpecCreator creator;
         if (m_checkTags.getBooleanValue()) {
-            creator = new DataColumnSpecCreator(
-                    spec.getColumnSpec(m_termCol.getStringValue()));
+            creator = new DataColumnSpecCreator(spec.getColumnSpec(m_termCol.getStringValue()));
         } else {
             creator = new DataColumnSpecCreator("Dummy", StringCell.TYPE);
         }
@@ -582,8 +574,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
 
     /**
      * @param level the {@link CooccurrenceLevel} to check for
-     * @return <code>true</code> if the user selected {@link CooccurrenceLevel}
-     * includes the given level
+     * @return <code>true</code> if the user selected {@link CooccurrenceLevel} includes the given level
      */
     private boolean includes(final CooccurrenceLevel level) {
         final CooccurrenceLevel selectedLevel = CooccurrenceLevel.getCooccurrenceLevel(m_coocLevel.getStringValue());
@@ -608,8 +599,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docCol.validateSettings(settings);
         m_termCol.validateSettings(settings);
         m_sort.validateSettings(settings);
@@ -622,8 +612,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docCol.loadSettingsFrom(settings);
         m_termCol.loadSettingsFrom(settings);
         m_sort.loadSettingsFrom(settings);
@@ -651,9 +640,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothing to do
 
     }
@@ -662,9 +650,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothing to do
 
     }

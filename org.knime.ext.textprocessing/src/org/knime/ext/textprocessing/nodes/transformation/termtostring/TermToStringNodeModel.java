@@ -80,8 +80,7 @@ public class TermToStringNodeModel extends NodeModel {
 
     private String m_newColName;
 
-    private SettingsModelString m_termColModel =
-        TermToStringNodeDialog.getTermColModel();
+    private SettingsModelString m_termColModel = TermToStringNodeDialog.getTermColModel();
 
     /**
      * Creates a new instance of <code>TermToStringNodeModel</code>.
@@ -90,8 +89,7 @@ public class TermToStringNodeModel extends NodeModel {
         super(1, 1);
     }
 
-    private final void checkDataTableSpec(final DataTableSpec spec)
-    throws InvalidSettingsException {
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
 
@@ -99,12 +97,10 @@ public class TermToStringNodeModel extends NodeModel {
         ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null)
             .ifPresent(a -> setWarningMessage(a));
 
-        m_termColIndex = spec.findColumnIndex(
-                m_termColModel.getStringValue());
+        m_termColIndex = spec.findColumnIndex(m_termColModel.getStringValue());
     }
 
-    private DataTableSpec createDataTableSpec(
-            final DataTableSpec inDataSpec) {
+    private DataTableSpec createDataTableSpec(final DataTableSpec inDataSpec) {
 
         String termCol = m_termColModel.getStringValue();
         if (termCol.isEmpty()) {
@@ -120,8 +116,7 @@ public class TermToStringNodeModel extends NodeModel {
             count++;
         }
 
-        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName,
-                StringCell.TYPE).createSpec();
+        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName, StringCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(strCol));
     }
 
@@ -129,8 +124,7 @@ public class TermToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[INDATA_INDEX]);
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
     }
@@ -139,32 +133,27 @@ public class TermToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
 
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
         checkDataTableSpec(inDataTable.getDataTableSpec());
 
         // initializes the corresponding cell factory
-        TermToStringCellFactory cellFac = new TermToStringCellFactory(
-                m_termColIndex, m_newColName);
+        TermToStringCellFactory cellFac = new TermToStringCellFactory(m_termColIndex, m_newColName);
 
         // compute frequency and add column
-        ColumnRearranger rearranger = new ColumnRearranger(
-                inDataTable.getDataTableSpec());
+        ColumnRearranger rearranger = new ColumnRearranger(inDataTable.getDataTableSpec());
         rearranger.append(cellFac);
 
-        return new BufferedDataTable[] {
-                exec.createColumnRearrangeTable(inDataTable, rearranger,
-                exec)};
+        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataTable, rearranger, exec)};
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_termColModel.loadSettingsFrom(settings);
     }
 
@@ -188,8 +177,7 @@ public class TermToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_termColModel.validateSettings(settings);
     }
 
@@ -197,9 +185,8 @@ public class TermToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -207,9 +194,8 @@ public class TermToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }

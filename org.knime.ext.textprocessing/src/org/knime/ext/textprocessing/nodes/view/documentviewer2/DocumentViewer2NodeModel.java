@@ -158,7 +158,7 @@ public class DocumentViewer2NodeModel extends NodeModel implements BufferedDataT
     /**
      * @return the set of documents to display.
      */
-        List<Document> getDocumentList() {
+    List<Document> getDocumentList() {
         return m_documents;
     }
 

@@ -109,8 +109,7 @@ public class NGramNodeModel extends NodeModel {
     /**
      * The max number of threads.
      */
-    static final int MAX_THREADS =
-            KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
+    static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
 
     /**
      * The default chunk size.
@@ -177,24 +176,17 @@ public class NGramNodeModel extends NodeModel {
      */
     static final String DOCUMENT_OUTPUT_COLNAME = "Document";
 
-
     private SettingsModelIntegerBounded m_nModel = NGramNodeDialog.getNModel();
 
-    private SettingsModelString m_nGramTypeModel =
-            NGramNodeDialog.getNGramTypeModel();
+    private SettingsModelString m_nGramTypeModel = NGramNodeDialog.getNGramTypeModel();
 
-    private SettingsModelString m_nGramOutputTableModel =
-            NGramNodeDialog.getNGramOutputTableModel();
+    private SettingsModelString m_nGramOutputTableModel = NGramNodeDialog.getNGramOutputTableModel();
 
-    private SettingsModelString m_documentColumnModel =
-            NGramNodeDialog.getDocumentColumnModel();
+    private SettingsModelString m_documentColumnModel = NGramNodeDialog.getDocumentColumnModel();
 
-    private SettingsModelIntegerBounded m_numberOfThreadsModel =
-            NGramNodeDialog.getNumberOfThreadsModel();
+    private SettingsModelIntegerBounded m_numberOfThreadsModel = NGramNodeDialog.getNumberOfThreadsModel();
 
-    private SettingsModelIntegerBounded m_chunkSizeModel =
-            NGramNodeDialog.getChunkSizeModel();
-
+    private SettingsModelIntegerBounded m_chunkSizeModel = NGramNodeDialog.getChunkSizeModel();
 
     private int m_documentColIndex = -1;
 
@@ -211,8 +203,7 @@ public class NGramNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec spec = inSpecs[0];
         checkDataTableSpec(spec);
 
@@ -232,24 +223,21 @@ public class NGramNodeModel extends NodeModel {
 
     }
 
-    private NGramDataTableCreator createNGramCreator(
-        final ExecutionContext exec) {
+    private NGramDataTableCreator createNGramCreator(final ExecutionContext exec) {
         int n = m_nModel.getIntValue();
 
         NGramIterator nGramIterator;
         if (m_nGramTypeModel.getStringValue().equals(CHAR_NGRAM_TYPE)) {
             nGramIterator = new NGramCharacterIterator(n);
         } else {
-            nGramIterator = new NGramWordIterator(n,
-                    NGramWordIterator.DEFAULT_WORD_SEPARATOR);
+            nGramIterator = new NGramWordIterator(n, NGramWordIterator.DEFAULT_WORD_SEPARATOR);
         }
 
         NGramDataTableCreator nGramCreator;
 
         String outputTableType = m_nGramOutputTableModel.getStringValue();
         if (outputTableType.equals(FREQUENCY_NGRAM_OUTPUT)) {
-            nGramCreator = new NGramFrequencyDataTableCreator(nGramIterator,
-                true);
+            nGramCreator = new NGramFrequencyDataTableCreator(nGramIterator, true);
         } else {
             nGramCreator = new NGramBoWDataTableCreator(nGramIterator);
         }
@@ -261,19 +249,17 @@ public class NGramNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-        final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         BufferedDataTable inputTable = inData[0];
         final int inputTableSize = inputTable.getRowCount();
         checkDataTableSpec(inputTable.getDataTableSpec());
 
         m_nGramDataTableCreator = createNGramCreator(exec);
 
-        final ThreadPool pool =
-                KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
+        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
         //The semaphore restricts the number of concurrent processes
-        final Semaphore semaphore =
-                new Semaphore(m_numberOfThreadsModel.getIntValue());
+        final Semaphore semaphore = new Semaphore(m_numberOfThreadsModel.getIntValue());
         final int chunkSize = m_chunkSizeModel.getIntValue();
         int count = 0;
 
@@ -298,16 +284,13 @@ public class NGramNodeModel extends NodeModel {
 
             // add to chunk
             if (count < chunkSize) {
-                documentChunk.add(((DocumentValue)row
-                        .getCell(m_documentColIndex)).getDocument());
+                documentChunk.add(((DocumentValue)row.getCell(m_documentColIndex)).getDocument());
 
-            // chunk is full, process and clear
+                // chunk is full, process and clear
             } else {
-                documentChunk.add(((DocumentValue)row
-                        .getCell(m_documentColIndex)).getDocument());
-                futures.add(pool.enqueue(processChunk(documentChunk,
-                                          joiner, exec, semaphore, docCount,
-                                          inputTableSize)));
+                documentChunk.add(((DocumentValue)row.getCell(m_documentColIndex)).getDocument());
+                futures
+                    .add(pool.enqueue(processChunk(documentChunk, joiner, exec, semaphore, docCount, inputTableSize)));
                 documentChunk = null;
                 count = 0;
             }
@@ -315,8 +298,7 @@ public class NGramNodeModel extends NodeModel {
 
         // enqueue the last chunk and wait
         if (documentChunk != null && documentChunk.size() > 0) {
-            futures.add(pool.enqueue(processChunk(documentChunk, joiner, exec, semaphore,
-                                      docCount, inputTableSize)));
+            futures.add(pool.enqueue(processChunk(documentChunk, joiner, exec, semaphore, docCount, inputTableSize)));
         }
 
         for (Future<?> f : futures) {
@@ -327,12 +309,9 @@ public class NGramNodeModel extends NodeModel {
         return new BufferedDataTable[]{joiner.createDataTable(exec)};
     }
 
-
-    private Runnable processChunk(
-        final List<Document> documents, final NGramDataTableCreator joiner,
-        final ExecutionContext exec, final Semaphore semaphore,
-        final AtomicInteger docCount, final int inputTableSize)
-                throws CanceledExecutionException {
+    private Runnable processChunk(final List<Document> documents, final NGramDataTableCreator joiner,
+        final ExecutionContext exec, final Semaphore semaphore, final AtomicInteger docCount, final int inputTableSize)
+        throws CanceledExecutionException {
         exec.checkCanceled();
         return new Runnable() {
 
@@ -352,8 +331,8 @@ public class NGramNodeModel extends NodeModel {
 
                     int docs = docCount.addAndGet(documents.size());
                     double progress = (double)docs / (double)inputTableSize;
-                    exec.setProgress(progress, "Created ngrams for documents "
-                            + docs + " of " + inputTableSize + " ...");
+                    exec.setProgress(progress,
+                        "Created ngrams for documents " + docs + " of " + inputTableSize + " ...");
                 } catch (final CanceledExecutionException e) {
                     // handeled in main executor thread
                 } catch (InterruptedException e) {
@@ -364,8 +343,6 @@ public class NGramNodeModel extends NodeModel {
             }
         };
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -384,8 +361,7 @@ public class NGramNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_nModel.validateSettings(settings);
         m_nGramTypeModel.validateSettings(settings);
         m_nGramOutputTableModel.validateSettings(settings);
@@ -398,8 +374,7 @@ public class NGramNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_nModel.loadSettingsFrom(settings);
         m_nGramTypeModel.loadSettingsFrom(settings);
         m_nGramOutputTableModel.loadSettingsFrom(settings);
@@ -420,17 +395,15 @@ public class NGramNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
     }
 }

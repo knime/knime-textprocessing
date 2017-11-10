@@ -41,11 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   25.06.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.misc.categorytoclass;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -65,40 +68,33 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class CategoryToClassNodeModel extends NodeModel {
 
     private static final int INDATA_INDEX = 0;
-    
-    private SettingsModelString m_documentCol = 
-        CategoryToClassNodeDialog.getDocumentColModel();
-    
+
+    private SettingsModelString m_documentCol = CategoryToClassNodeDialog.getDocumentColModel();
+
     /**
      * Creates a new instance of <code>CategoryToClassNodeModel</code>.
      */
     public CategoryToClassNodeModel() {
         super(1, 1);
     }
-    
-    private final DataTableSpec createDataTableSpec(
-            final DataTableSpec inDataSpec) {
-        DataColumnSpec classCol = new DataColumnSpecCreator("Document class", 
-                StringCell.TYPE).createSpec();
+
+    private final DataTableSpec createDataTableSpec(final DataTableSpec inDataSpec) {
+        DataColumnSpec classCol = new DataColumnSpecCreator("Document class", StringCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(classCol));
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[INDATA_INDEX]);
         return new DataTableSpec[]{createDataTableSpec(inSpecs[INDATA_INDEX])};
     }
@@ -116,25 +112,20 @@ public class CategoryToClassNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
         checkDataTableSpec(inDataTable.getDataTableSpec());
-        int docCellIndex = inData[0].getDataTableSpec().findColumnIndex(
-                m_documentCol.getStringValue());
-        
+        int docCellIndex = inData[0].getDataTableSpec().findColumnIndex(m_documentCol.getStringValue());
+
         // initializes the corresponding cell factory
-        DocumentClassCellFactory cellFac = new DocumentClassCellFactory(
-                docCellIndex);
-        
+        DocumentClassCellFactory cellFac = new DocumentClassCellFactory(docCellIndex);
+
         // compute frequency and add column
-        ColumnRearranger rearranger = new ColumnRearranger(
-                inDataTable.getDataTableSpec());
+        ColumnRearranger rearranger = new ColumnRearranger(inDataTable.getDataTableSpec());
         rearranger.append(cellFac);
-        
-        return new BufferedDataTable[] {
-                exec.createColumnRearrangeTable(inDataTable, rearranger, 
-                exec)};
+
+        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataTable, rearranger, exec)};
     }
 
     /**
@@ -149,27 +140,24 @@ public class CategoryToClassNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentCol.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentCol.loadSettingsFrom(settings);
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -185,9 +173,8 @@ public class CategoryToClassNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }

@@ -84,14 +84,12 @@ public class TagToStringNodeModel extends NodeModel {
     /**
      * Set with all tag types.
      */
-    public static final Set<String> ALL_TAG_TYPES =
-        TagFactory.getInstance().getTagTypes();
+    public static final Set<String> ALL_TAG_TYPES = TagFactory.getInstance().getTagTypes();
 
     /**
      * The default tag type.
      */
-    public static final String DEFAULT_TAG_TYPE =
-        PartOfSpeechTag.getDefault().getType();
+    public static final String DEFAULT_TAG_TYPE = PartOfSpeechTag.getDefault().getType();
 
     /**
      * The missing cell vaue.
@@ -105,14 +103,11 @@ public class TagToStringNodeModel extends NodeModel {
 
     private int m_termColIndex = -1;
 
-    private SettingsModelStringArray m_tagTypesModel =
-        TagToStringNodeDialog.getTagTypesModel();
+    private SettingsModelStringArray m_tagTypesModel = TagToStringNodeDialog.getTagTypesModel();
 
-    private SettingsModelString m_termColModel =
-        TagToStringNodeDialog.getTermColModel();
+    private SettingsModelString m_termColModel = TagToStringNodeDialog.getTermColModel();
 
-    private SettingsModelString m_missingTagValueModel =
-        TagToStringNodeDialog.getMissingTagModel();
+    private SettingsModelString m_missingTagValueModel = TagToStringNodeDialog.getMissingTagModel();
 
     /**
      * Creates new instance of <code>TagToStringNodeModel</code>.
@@ -133,9 +128,8 @@ public class TagToStringNodeModel extends NodeModel {
             tagTypes.add(tagType);
         }
 
-        return new DataTableSpec[]{new DataTableSpec(inSpecs[0],
-                                   new DataTableSpec(getDataTableSpec(
-                                           tagTypes, inSpecs[0])))};
+        return new DataTableSpec[]{
+            new DataTableSpec(inSpecs[0], new DataTableSpec(getDataTableSpec(tagTypes, inSpecs[0])))};
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
@@ -143,26 +137,25 @@ public class TagToStringNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
 
-        ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null).ifPresent(msg -> setWarningMessage(msg));
+        ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
 
         m_termColIndex = spec.findColumnIndex(m_termColModel.getStringValue());
     }
 
     /**
-     * Creates output <code>DataColumnSpec</code>s based on given tag types and
-     * incoming <code>DataTableSpec</code>.
+     * Creates output <code>DataColumnSpec</code>s based on given tag types and incoming <code>DataTableSpec</code>.
+     *
      * @param tagTypes tag types to consider.
      * @param oldSpec The incoming <code>DataTableSpec</code>
      * @return Output <code>DataColumnSpec</code>s.
      */
-    static DataColumnSpec[] getDataTableSpec(final List<String> tagTypes,
-            final DataTableSpec oldSpec) {
+    static DataColumnSpec[] getDataTableSpec(final List<String> tagTypes, final DataTableSpec oldSpec) {
         DataColumnSpec[] dataColumnSpecs = new DataColumnSpec[tagTypes.size()];
         int i = 0;
         for (String tagType : tagTypes) {
             String name = DataTableSpec.getUniqueColumnName(oldSpec, tagType);
-            dataColumnSpecs[i] = new DataColumnSpecCreator(
-                    name, StringCell.TYPE).createSpec();
+            dataColumnSpecs[i] = new DataColumnSpecCreator(name, StringCell.TYPE).createSpec();
             i++;
         }
         return dataColumnSpecs;
@@ -180,15 +173,12 @@ public class TagToStringNodeModel extends NodeModel {
         for (String tagType : m_tagTypesModel.getStringArrayValue()) {
             tagTypes.add(tagType);
         }
-        CellFactory cellFac = new TagToStringCellFactory(m_termColIndex, tagTypes,
-                    inData[0].getDataTableSpec(),
-                    m_missingTagValueModel.getStringValue());
-        ColumnRearranger rearranger = new ColumnRearranger(
-                inData[0].getDataTableSpec());
+        CellFactory cellFac = new TagToStringCellFactory(m_termColIndex, tagTypes, inData[0].getDataTableSpec(),
+            m_missingTagValueModel.getStringValue());
+        ColumnRearranger rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
         rearranger.append(cellFac);
 
-        return new BufferedDataTable[]{exec.createColumnRearrangeTable(
-                inData[0], rearranger, exec)};
+        return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
     }
 
     /**
@@ -213,8 +203,7 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_tagTypesModel.validateSettings(settings);
         m_termColModel.validateSettings(settings);
         m_missingTagValueModel.validateSettings(settings);
@@ -224,8 +213,7 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_tagTypesModel.loadSettingsFrom(settings);
         m_termColModel.loadSettingsFrom(settings);
         m_missingTagValueModel.loadSettingsFrom(settings);
@@ -235,8 +223,7 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // nothing to do ...
     }
@@ -245,9 +232,8 @@ public class TagToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-            throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothing to do ...
     }
 }

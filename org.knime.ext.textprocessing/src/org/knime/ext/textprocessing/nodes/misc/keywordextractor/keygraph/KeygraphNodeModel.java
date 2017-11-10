@@ -96,10 +96,9 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 import org.knime.ext.textprocessing.util.UnorderedPair;
 
 /**
- * Extracts keywords from a document according to the method presented in
- * "KeyGraph: Automatic Indexing by Co-occurrence Graph based on Building
- * Construction Metaphor" by Yukio Ohsawa. See the article and the xml node
- * description for a description of how the algorithm works.
+ * Extracts keywords from a document according to the method presented in "KeyGraph: Automatic Indexing by Co-occurrence
+ * Graph based on Building Construction Metaphor" by Yukio Ohsawa. See the article and the xml node description for a
+ * description of how the algorithm works.
  *
  * @author Pierre-Francois Laquerre, University of Konstanz
  */
@@ -108,40 +107,33 @@ public class KeygraphNodeModel extends NodeModel {
     /**
      * How many terms will be used for the "high key" set?
      */
-    private SettingsModelIntegerBounded m_nrHighKeyTerms =
-            KeygraphNodeDialog.createSetNrHighKeyTermsModel();
+    private SettingsModelIntegerBounded m_nrHighKeyTerms = KeygraphNodeDialog.createSetNrHighKeyTermsModel();
 
     /**
      * How many terms will be used for the "high frequency" set?
      */
-    private SettingsModelIntegerBounded m_nrHighFreqTerms =
-            KeygraphNodeDialog.createSetNrHighFreqTermsModel();
+    private SettingsModelIntegerBounded m_nrHighFreqTerms = KeygraphNodeDialog.createSetNrHighFreqTermsModel();
 
     /**
-     * How many keywords should we extract? If this value is larger than the
-     * number of unique terms in a document, fewer keywords will be returned.
+     * How many keywords should we extract? If this value is larger than the number of unique terms in a document, fewer
+     * keywords will be returned.
      */
-    private SettingsModelIntegerBounded m_nrKeywords =
-            KeygraphNodeDialog.createSetNrKeywordsModel();
+    private SettingsModelIntegerBounded m_nrKeywords = KeygraphNodeDialog.createSetNrKeywordsModel();
 
     /**
-     * When true, a copy of the input document will be created during internal
-     * processing. This copy contains the same elements as the original with the
-     * exception that the terms will not have any tags (essentially making
-     * .equals() behave like .equalsOnlyWords(). The documents returned by
-     * execute() will not be affected - this is solely for internal use.
+     * When true, a copy of the input document will be created during internal processing. This copy contains the same
+     * elements as the original with the exception that the terms will not have any tags (essentially making .equals()
+     * behave like .equalsOnlyWords(). The documents returned by execute() will not be affected - this is solely for
+     * internal use.
      */
-    private SettingsModelBoolean m_ignoreTermTags =
-            KeygraphNodeDialog.createSetIgnoreTermTagsModel();
+    private SettingsModelBoolean m_ignoreTermTags = KeygraphNodeDialog.createSetIgnoreTermTagsModel();
 
     /**
      * Which column contains the documents to analyse?
      */
-    private SettingsModelString m_documentColumnName =
-            KeygraphNodeDialog.createSetDocumentColumnNameModel();
+    private SettingsModelString m_documentColumnName = KeygraphNodeDialog.createSetDocumentColumnNameModel();
 
-    private NodeLogger m_logger =
-            org.knime.core.node.NodeLogger.getLogger(getClass());
+    private NodeLogger m_logger = org.knime.core.node.NodeLogger.getLogger(getClass());
 
     /**
      * One input port, one output port.
@@ -151,23 +143,19 @@ public class KeygraphNodeModel extends NodeModel {
     }
 
     /**
-     * For each unique document in the input table, a set of (Term, Double,
-     * Document) tuples will be output, where the set of Terms is the keywords
-     * that were extracted and the Double value is their keywordness score.
+     * For each unique document in the input table, a set of (Term, Double, Document) tuples will be output, where the
+     * set of Terms is the keywords that were extracted and the Double value is their keywordness score.
      *
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        Set<Document> documents =
-                DocumentUtil.extractUniqueDocuments(inData[0], exec
-                        .createSubProgress(0.1), m_documentColumnName
-                        .getStringValue());
+        Set<Document> documents = DocumentUtil.extractUniqueDocuments(inData[0], exec.createSubProgress(0.1),
+            m_documentColumnName.getStringValue());
 
-        Map<Document, Map<Term, Integer>> keywords =
-                new LinkedHashMap<Document, Map<Term, Integer>>();
+        Map<Document, Map<Term, Integer>> keywords = new LinkedHashMap<Document, Map<Term, Integer>>();
 
         // Process each document
         int i = 1;
@@ -175,15 +163,12 @@ public class KeygraphNodeModel extends NodeModel {
         ExecutionMonitor subExecDocs = exec.createSubProgress(0.9);
         for (Document doc : documents) {
             exec.checkCanceled();
-            ExecutionMonitor subDoc =
-                    subExecDocs.createSubProgress(1.0 / nbdocs);
+            ExecutionMonitor subDoc = subExecDocs.createSubProgress(1.0 / nbdocs);
 
-            subExecDocs.setProgress("Processing document " + i + " of "
-                    + nbdocs);
+            subExecDocs.setProgress("Processing document " + i + " of " + nbdocs);
 
             if (m_ignoreTermTags.getBooleanValue()) {
-                keywords.put(doc, extractKeywords(DocumentUtil
-                        .stripTermTags(doc), subDoc));
+                keywords.put(doc, extractKeywords(DocumentUtil.stripTermTags(doc), subDoc));
             } else {
                 keywords.put(doc, extractKeywords(doc, subDoc));
             }
@@ -195,44 +180,36 @@ public class KeygraphNodeModel extends NodeModel {
     }
 
     /**
-     * We start by creating a basic graph using the n most frequent terms,
-     * linking the n-1 ones with the strongest association. Weak edges (for
-     * which there does not exist a path between the two nodes if the edge is
-     * removed) are pruned, further isolating potential clusters.
+     * We start by creating a basic graph using the n most frequent terms, linking the n-1 ones with the strongest
+     * association. Weak edges (for which there does not exist a path between the two nodes if the edge is removed) are
+     * pruned, further isolating potential clusters.
      *
-     * The connected subgraphs are then extracted as clusters ("concepts"). For
-     * each term in the document, a "key" value is then calculated, which is the
-     *  probability of the term occurring when the author has all concepts in
-     * mind ( P(UNION_{c in C}(w|c)), c being a cluster and C being the set of
-     * all clusters. The top scoring terms are added to the graph.
+     * The connected subgraphs are then extracted as clusters ("concepts"). For each term in the document, a "key" value
+     * is then calculated, which is the probability of the term occurring when the author has all concepts in mind (
+     * P(UNION_{c in C}(w|c)), c being a cluster and C being the set of all clusters. The top scoring terms are added to
+     * the graph.
      *
-     * For each high key term, the edge with the strongest column score (where
-     * column(w1, w2) = summation for each sentence of min(freq(w1), freq(w2))
-     * to each cluster is added (so each high key term becomes connected to
-     * each cluster).
+     * For each high key term, the edge with the strongest column score (where column(w1, w2) = summation for each
+     * sentence of min(freq(w1), freq(w2)) to each cluster is added (so each high key term becomes connected to each
+     * cluster).
      *
-     * Each term is then scored based on the summation of the column measure for
-     *  each edge connected to it.
+     * Each term is then scored based on the summation of the column measure for each edge connected to it.
      *
      * @param doc the document to analyse
      * @param progress a mean of reporting progress
      * @return keywords and their associated 'keywordness' score
      * @throws CanceledExecutionException when cancelled from the outside
      */
-    private final Map<Term, Integer> extractKeywords(final Document doc,
-            final ExecutionMonitor progress) throws CanceledExecutionException {
+    private final Map<Term, Integer> extractKeywords(final Document doc, final ExecutionMonitor progress)
+        throws CanceledExecutionException {
         progress.setProgress(0.0, "Analysing the document");
         TermEvent ev = new TermEvent(doc, m_nrHighFreqTerms.getIntValue());
-        Map<Sentence, FrequencyMap<Term>> termFrequencies =
-                getTermFrequenciesPerSentence(doc);
+        Map<Sentence, FrequencyMap<Term>> termFrequencies = getTermFrequenciesPerSentence(doc);
 
         progress.checkCanceled();
-        progress.setProgress(0.1,
-                "Adding and linking the high frequency terms");
-        List<Term> highFrequencyTerms =
-                new ArrayList<Term>(ev.getTopFrequentTerms());
-        UndirectedGraph<Term, Integer> keyGraph =
-                new UndirectedGraph<Term, Integer>();
+        progress.setProgress(0.1, "Adding and linking the high frequency terms");
+        List<Term> highFrequencyTerms = new ArrayList<Term>(ev.getTopFrequentTerms());
+        UndirectedGraph<Term, Integer> keyGraph = new UndirectedGraph<Term, Integer>();
         for (Term t : highFrequencyTerms) {
             keyGraph.addNode(t);
         }
@@ -241,8 +218,7 @@ public class KeygraphNodeModel extends NodeModel {
             m_logger.debug("High frequency set: " + highFrequencyTerms);
         }
 
-        Map<UnorderedPair<Term>, Integer> hfLinks =
-                new LinkedHashMap<UnorderedPair<Term>, Integer>();
+        Map<UnorderedPair<Term>, Integer> hfLinks = new LinkedHashMap<UnorderedPair<Term>, Integer>();
         for (int it1 = 0; it1 < highFrequencyTerms.size(); it1++) {
             progress.checkCanceled();
             Term t1 = highFrequencyTerms.get(it1);
@@ -264,8 +240,7 @@ public class KeygraphNodeModel extends NodeModel {
             progress.checkCanceled();
 
             UnorderedPair<Term> pair = edge.getKey();
-            keyGraph.addEdge(pair.getFirst(), pair.getSecond(),
-                    edge.getValue());
+            keyGraph.addEdge(pair.getFirst(), pair.getSecond(), edge.getValue());
         }
 
         progress.checkCanceled();
@@ -276,21 +251,18 @@ public class KeygraphNodeModel extends NodeModel {
         progress.setProgress(0.3, "Finding clusters");
         Set<Set<Term>> clusters = keyGraph.getConnectedSubgraphs();
         if (m_logger.isDebugEnabled()) {
-            m_logger.debug(("Found " + clusters.size() + " clusters: "
-                    + clusters));
+            m_logger.debug(("Found " + clusters.size() + " clusters: " + clusters));
         }
 
         progress.checkCanceled();
         progress.setProgress(0.4, "Finding high key terms to add to the graph");
 
         // Calculate neighbour values (used for 'key')
-        Map<Set<Term>, Integer> neighbourvalues =
-                new LinkedHashMap<Set<Term>, Integer>();
+        Map<Set<Term>, Integer> neighbourvalues = new LinkedHashMap<Set<Term>, Integer>();
         for (Set<Term> cluster : clusters) {
             int score = 0;
 
-            for (Entry<Sentence, FrequencyMap<Term>> ent : termFrequencies
-                    .entrySet()) {
+            for (Entry<Sentence, FrequencyMap<Term>> ent : termFrequencies.entrySet()) {
                 progress.checkCanceled();
 
                 Sentence sen = ent.getKey();
@@ -314,8 +286,7 @@ public class KeygraphNodeModel extends NodeModel {
         }
 
         // Calculate based values (used for 'key')
-        Map<Pair<Term, Set<Term>>, Integer> basedvalues =
-                new LinkedHashMap<Pair<Term, Set<Term>>, Integer>();
+        Map<Pair<Term, Set<Term>>, Integer> basedvalues = new LinkedHashMap<Pair<Term, Set<Term>>, Integer>();
         for (Term t : ev.getTerms()) {
             for (Set<Term> cluster : clusters) {
                 progress.checkCanceled();
@@ -342,17 +313,14 @@ public class KeygraphNodeModel extends NodeModel {
 
             double prob = 1.0;
             for (Set<Term> cluster : clusters) {
-                prob *= 1.0 - (double)basedvalues.get(
-                        new Pair<Term, Set<Term>>(t,cluster))
-                        / neighbourvalues.get(cluster);
+                prob *=
+                    1.0 - (double)basedvalues.get(new Pair<Term, Set<Term>>(t, cluster)) / neighbourvalues.get(cluster);
             }
 
             keys.put(t, 1 - prob);
         }
 
-        Set<Term> highkey =
-                Maps.getTopValues(keys, m_nrHighKeyTerms.getIntValue())
-                        .keySet();
+        Set<Term> highkey = Maps.getTopValues(keys, m_nrHighKeyTerms.getIntValue()).keySet();
 
         if (m_logger.isDebugEnabled()) {
             m_logger.debug("High key set: " + highkey);
@@ -367,8 +335,7 @@ public class KeygraphNodeModel extends NodeModel {
         for (Term hk : highkey) {
             progress.checkCanceled();
 
-            Map<UnorderedPair<Term>, Integer> columns =
-                    new LinkedHashMap<UnorderedPair<Term>, Integer>();
+            Map<UnorderedPair<Term>, Integer> columns = new LinkedHashMap<UnorderedPair<Term>, Integer>();
 
             for (Term hf : highFrequencyTerms) {
                 int colvalue = 0;
@@ -397,8 +364,7 @@ public class KeygraphNodeModel extends NodeModel {
                 }
 
                 if (maxEdge != null) {
-                    keyGraph.addEdge(maxEdge.getFirst(), maxEdge.getSecond(),
-                        maxWeight);
+                    keyGraph.addEdge(maxEdge.getFirst(), maxEdge.getSecond(), maxWeight);
                 }
             }
         }
@@ -435,10 +401,8 @@ public class KeygraphNodeModel extends NodeModel {
      * @param doc the document to analyse
      * @return term frequencies for each sentence
      */
-    private Map<Sentence, FrequencyMap<Term>> getTermFrequenciesPerSentence(
-            final Document doc) {
-        Map<Sentence, FrequencyMap<Term>> freqs =
-                new LinkedHashMap<Sentence, FrequencyMap<Term>>();
+    private Map<Sentence, FrequencyMap<Term>> getTermFrequenciesPerSentence(final Document doc) {
+        Map<Sentence, FrequencyMap<Term>> freqs = new LinkedHashMap<Sentence, FrequencyMap<Term>>();
 
         Iterator<Sentence> senit = doc.sentenceIterator();
         while (senit.hasNext()) {
@@ -457,11 +421,9 @@ public class KeygraphNodeModel extends NodeModel {
      * @param exec an execution monitor to report on progress
      * @return a buffered data table with Keyword|Value|Document rows
      */
-    private static BufferedDataTable buildResultTable(
-            final Map<Document, Map<Term, Integer>> keywords,
-            final ExecutionContext exec) throws CanceledExecutionException {
-        BufferedDataContainer con =
-                exec.createDataContainer(createDataTableSpec());
+    private static BufferedDataTable buildResultTable(final Map<Document, Map<Term, Integer>> keywords,
+        final ExecutionContext exec) throws CanceledExecutionException {
+        BufferedDataContainer con = exec.createDataContainer(createDataTableSpec());
 
         final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
@@ -474,10 +436,8 @@ public class KeygraphNodeModel extends NodeModel {
                 exec.checkCanceled();
                 Document doc = e.getKey();
                 for (Entry<Term, Integer> kw : e.getValue().entrySet()) {
-                    DefaultRow row =
-                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{
-                            termFac.createDataCell(kw.getKey()), new DoubleCell(kw.getValue()),
-                            docCache.getInstance(doc)});
+                    DefaultRow row = new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{
+                        termFac.createDataCell(kw.getKey()), new DoubleCell(kw.getValue()), docCache.getInstance(doc)});
                     con.addRowToTable(row);
                     rowid++;
                 }
@@ -494,21 +454,18 @@ public class KeygraphNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
         return new DataTableSpec[]{createDataTableSpec()};
     }
 
     /**
-     * Ensures that the input table spec is valid. This node requires that a
-     * document cell be present.
+     * Ensures that the input table spec is valid. This node requires that a document cell be present.
      *
      * @param spec the spec to validate
      * @throws InvalidSettingsException thrown if the spec is not valid
      */
-    private final void checkDataTableSpec(final DataTableSpec spec)
-            throws InvalidSettingsException {
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
@@ -528,9 +485,8 @@ public class KeygraphNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // no internals to save
     }
 
@@ -553,9 +509,8 @@ public class KeygraphNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // no internals to load
     }
 
@@ -575,8 +530,7 @@ public class KeygraphNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_ignoreTermTags.loadSettingsFrom(settings);
         m_nrHighFreqTerms.loadSettingsFrom(settings);
         m_nrKeywords.loadSettingsFrom(settings);
@@ -588,8 +542,7 @@ public class KeygraphNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_nrHighFreqTerms.validateSettings(settings);
         m_ignoreTermTags.validateSettings(settings);
         m_nrHighKeyTerms.validateSettings(settings);

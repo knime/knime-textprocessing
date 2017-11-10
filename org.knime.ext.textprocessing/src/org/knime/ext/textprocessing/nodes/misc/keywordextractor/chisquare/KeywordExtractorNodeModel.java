@@ -98,58 +98,48 @@ import org.knime.ext.textprocessing.util.similarity.PointwiseMutualInformation;
 import org.knime.ext.textprocessing.util.similarity.SimilarityMeasure;
 
 /**
- * Extracts keywords from a document according to the method presented in
- * "Keyword extraction from a single document using word co-occurrence
- * statistical information" by Y. Matsuo and M. Ishizuka.
+ * Extracts keywords from a document according to the method presented in "Keyword extraction from a single document
+ * using word co-occurrence statistical information" by Y. Matsuo and M. Ishizuka.
  *
  * @author Pierre-Francois Laquerre, University of Konstanz
  */
 public class KeywordExtractorNodeModel extends NodeModel {
 
     /**
-     * How many terms should be considered for the frequent term set? This is
-     * calculated as a proportion of the total number of unique terms in the
-     * document.
-     * Valid range: ]0, 100]
+     * How many terms should be considered for the frequent term set? This is calculated as a proportion of the total
+     * number of unique terms in the document. Valid range: ]0, 100]
      */
     private SettingsModelIntegerBounded m_frequentTermsProportion =
         KeywordExtractorNodeDialog.createSetFrequentTermsProportionModel();
 
     /**
-     * How many keywords should we extract? If this value is larger than the
-     * number of unique terms in a document, fewer keywords will be returned.
+     * How many keywords should we extract? If this value is larger than the number of unique terms in a document, fewer
+     * keywords will be returned.
      */
-    private SettingsModelIntegerBounded m_nrKeywords =
-        KeywordExtractorNodeDialog.createSetNrKeywordsModel();
+    private SettingsModelIntegerBounded m_nrKeywords = KeywordExtractorNodeDialog.createSetNrKeywordsModel();
 
     /**
-     * When true, a copy of the input document will be created during internal
-     * processing. This copy contains the same elements as the original with the
-     * exception that the terms will not have any tags (essentially making
-     * .equals() behave like .equalsOnlyWords(). The documents returned by
-     * execute() will not be affected - this is solely for internal use.
+     * When true, a copy of the input document will be created during internal processing. This copy contains the same
+     * elements as the original with the exception that the terms will not have any tags (essentially making .equals()
+     * behave like .equalsOnlyWords(). The documents returned by execute() will not be affected - this is solely for
+     * internal use.
      */
-    private SettingsModelBoolean m_ignoreTermTags =
-        KeywordExtractorNodeDialog.createSetIgnoreTermTagsModel();
+    private SettingsModelBoolean m_ignoreTermTags = KeywordExtractorNodeDialog.createSetIgnoreTermTagsModel();
 
     /**
      * Which column holds the documents to analyse?
      */
-    private SettingsModelString m_documentColumnName =
-        KeywordExtractorNodeDialog.createSetDocumentColumnNameModel();
+    private SettingsModelString m_documentColumnName = KeywordExtractorNodeDialog.createSetDocumentColumnNameModel();
 
     /**
      * Inclusive threshold over which two terms are considered as similar.
      */
-    private SettingsModelDoubleBounded m_PMIThreshold =
-        KeywordExtractorNodeDialog.createSetPMIThresholdModel();
+    private SettingsModelDoubleBounded m_PMIThreshold = KeywordExtractorNodeDialog.createSetPMIThresholdModel();
 
     /**
-     * Inclusive threshold over which two cooccurrence probability distributions
-     *  are considered as similar.
+     * Inclusive threshold over which two cooccurrence probability distributions are considered as similar.
      */
-    private SettingsModelDoubleBounded m_L1Threshold =
-        KeywordExtractorNodeDialog.createSetL1ThresholdModel();
+    private SettingsModelDoubleBounded m_L1Threshold = KeywordExtractorNodeDialog.createSetL1ThresholdModel();
 
     private NodeLogger m_logger = org.knime.core.node.NodeLogger.getLogger(getClass());
 
@@ -161,23 +151,19 @@ public class KeywordExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * For each unique document in the input table, a set of
-     * (Term, Double, Document) tuples will be output, where the set of Terms is
-     * the keywords that were extracted and the Double value is their chi-square
-     * deviation.
+     * For each unique document in the input table, a set of (Term, Double, Document) tuples will be output, where the
+     * set of Terms is the keywords that were extracted and the Double value is their chi-square deviation.
      *
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        Set<Document> documents = DocumentUtil.extractUniqueDocuments(
-                inData[0], exec.createSubProgress(0.1),
-                m_documentColumnName.getStringValue());
+        Set<Document> documents = DocumentUtil.extractUniqueDocuments(inData[0], exec.createSubProgress(0.1),
+            m_documentColumnName.getStringValue());
 
-        Map<Document, Map<Term, Double>> keywords =
-                new LinkedHashMap<Document, Map<Term, Double>>();
+        Map<Document, Map<Term, Double>> keywords = new LinkedHashMap<Document, Map<Term, Double>>();
 
         // Process each document
         int i = 1;
@@ -185,15 +171,12 @@ public class KeywordExtractorNodeModel extends NodeModel {
         ExecutionMonitor subExecDocs = exec.createSubProgress(0.9);
         for (Document doc : documents) {
             exec.checkCanceled();
-            ExecutionMonitor subDoc = subExecDocs.createSubProgress(
-                    1.0 / nbdocs);
+            ExecutionMonitor subDoc = subExecDocs.createSubProgress(1.0 / nbdocs);
 
-            subExecDocs.setProgress("Processing document " + i + " of "
-                    + nbdocs);
+            subExecDocs.setProgress("Processing document " + i + " of " + nbdocs);
 
             if (m_ignoreTermTags.getBooleanValue()) {
-                keywords.put(doc, extractKeywords(DocumentUtil
-                        .stripTermTags(doc), subDoc));
+                keywords.put(doc, extractKeywords(DocumentUtil.stripTermTags(doc), subDoc));
             } else {
                 keywords.put(doc, extractKeywords(doc, subDoc));
             }
@@ -205,26 +188,21 @@ public class KeywordExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * Extracts keywords from a document according to the method presented in
-     * "Keyword extraction from a single document using word co-occurrence
-     * statistical information" by Y. Matsuo and M. Ishizuka.
+     * Extracts keywords from a document according to the method presented in "Keyword extraction from a single document
+     * using word co-occurrence statistical information" by Y. Matsuo and M. Ishizuka.
      *
-     * The document's m_frequentTermsProportion% most frequent terms are
-     * clustered. Terms are then sorted by the difference between their expected
-     * probability of cooccurrence with the clusters and the actual observed
-     * values. The terms with the top m_nrKeywords values will be returned as
-     * keywords.
+     * The document's m_frequentTermsProportion% most frequent terms are clustered. Terms are then sorted by the
+     * difference between their expected probability of cooccurrence with the clusters and the actual observed values.
+     * The terms with the top m_nrKeywords values will be returned as keywords.
      *
      * @param doc the document to extract the keywords from
      * @param subDoc an ExecutionMonitor to report on the progress
      * @return a set of keywords
      */
-    private final Map<Term, Double> extractKeywords(
-            final Document doc, final ExecutionMonitor subDoc) {
+    private final Map<Term, Double> extractKeywords(final Document doc, final ExecutionMonitor subDoc) {
         subDoc.setProgress(0.0, "Analysing the document");
 
-        TermEvent e = new TermEvent(doc,
-                (double)m_frequentTermsProportion.getIntValue() / 100);
+        TermEvent e = new TermEvent(doc, (double)m_frequentTermsProportion.getIntValue() / 100);
 
         subDoc.setProgress(0.1, "Clustering the frequent terms");
         Set<Term> frequentTerms = e.getTopFrequentTerms();
@@ -234,13 +212,10 @@ public class KeywordExtractorNodeModel extends NodeModel {
 
         ClusteringAlgorithm<Term> c = new GreedyClustering<Term>();
 
-        Set<SimilarityMeasure<Term>> measures =
-            new LinkedHashSet<SimilarityMeasure<Term>>();
+        Set<SimilarityMeasure<Term>> measures = new LinkedHashSet<SimilarityMeasure<Term>>();
 
-        measures.add(new NormalizedL1<Term>(
-                m_L1Threshold.getDoubleValue(), e));
-        measures.add(new PointwiseMutualInformation<Term>(
-                m_PMIThreshold.getDoubleValue(), e));
+        measures.add(new NormalizedL1<Term>(m_L1Threshold.getDoubleValue(), e));
+        measures.add(new PointwiseMutualInformation<Term>(m_PMIThreshold.getDoubleValue(), e));
         SimilarityMeasure<Term> sim = new OrCombination<Term>(measures);
 
         Set<Cluster<Term>> clusters = c.cluster(frequentTerms, sim);
@@ -259,45 +234,37 @@ public class KeywordExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * Calculates the total deviation for each term between the expected
-     * cooccurrence frequency with each cluster and the actual observed value.
+     * Calculates the total deviation for each term between the expected cooccurrence frequency with each cluster and
+     * the actual observed value.
      *
      * A high value indicates that a term might be important.
      *
-     * Observed frequency: the number of cooccurrences of the term and
-     * the cluster in the document
-     * Expected frequency: the probability of a term cooccurring with the
-     * cluster times the total amount of cooccurrences for the term.
+     * Observed frequency: the number of cooccurrences of the term and the cluster in the document Expected frequency:
+     * the probability of a term cooccurring with the cluster times the total amount of cooccurrences for the term.
      *
      * @param doc the document
      * @param e the probability distributions for the term (co)occurrences
      * @param clusters the clusters against which to compare the observed values
      * @return a total deviation score for each term
      */
-    private Map<Term, Double> calculateChiSquare(
-            final Document doc, final Event<Term> e,
-            final Set<Cluster<Term>> clusters) {
+    private Map<Term, Double> calculateChiSquare(final Document doc, final Event<Term> e,
+        final Set<Cluster<Term>> clusters) {
         // How many cooccurrences per cluster?
-        FrequencyMap<Cluster<Term>> clusternbcoocs =
-            DocumentUtil.getClusterNbCoocs(clusters, doc);
+        FrequencyMap<Cluster<Term>> clusternbcoocs = DocumentUtil.getClusterNbCoocs(clusters, doc);
 
         // How many times does a specific term cooccur with a given cluster?
-        Map<Cluster<Term>, FrequencyMap<Term>> clustercoocs =
-            DocumentUtil.getClusterCoocs(clusters, doc);
+        Map<Cluster<Term>, FrequencyMap<Term>> clustercoocs = DocumentUtil.getClusterCoocs(clusters, doc);
 
         // Compute the expected probability of a term cooccurring with a cluster
-        Map<Cluster<Term>, Double> expectedProbabilities =
-            new HashMap<Cluster<Term>, Double>();
+        Map<Cluster<Term>, Double> expectedProbabilities = new HashMap<Cluster<Term>, Double>();
 
         int totalnrcoocs = DocumentUtil.getNrTotalCoocs(doc);
         for (Cluster<Term> c : clusters) {
-            expectedProbabilities.put(
-                    c, (double)clusternbcoocs.get(c) / totalnrcoocs);
+            expectedProbabilities.put(c, (double)clusternbcoocs.get(c) / totalnrcoocs);
         }
 
         // How many cooccurrences per term in total?
-        FrequencyMap<Term> nrTermCoocs =
-            DocumentUtil.getTotalCoocs(doc, e.getDomain());
+        FrequencyMap<Term> nrTermCoocs = DocumentUtil.getTotalCoocs(doc, e.getDomain());
 
         // Calculate the deviation for each term (chi-square)
         Map<Term, Double> chivalues = new LinkedHashMap<Term, Double>();
@@ -308,8 +275,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
             double val = 0.0;
 
             for (Cluster<Term> cluster : clusters) {
-                double expected =
-                    expectedProbabilities.get(cluster) * nrTermCoocs.get(term);
+                double expected = expectedProbabilities.get(cluster) * nrTermCoocs.get(term);
                 int observed = clustercoocs.get(cluster).get(term);
 
                 val = Math.pow(observed - expected, 2) / expected;
@@ -338,9 +304,8 @@ public class KeywordExtractorNodeModel extends NodeModel {
      * @param exec an execution monitor to report on progress
      * @return a buffered data table with Keyword|Value|Document rows
      */
-    private static BufferedDataTable buildResultTable(
-            final Map<Document, Map<Term, Double>> keywords,
-            final ExecutionContext exec) throws CanceledExecutionException {
+    private static BufferedDataTable buildResultTable(final Map<Document, Map<Term, Double>> keywords,
+        final ExecutionContext exec) throws CanceledExecutionException {
         final TextContainerDataCellFactory termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
 
@@ -354,10 +319,8 @@ public class KeywordExtractorNodeModel extends NodeModel {
                 exec.checkCanceled();
                 Document doc = e.getKey();
                 for (Entry<Term, Double> kw : e.getValue().entrySet()) {
-                    DefaultRow row =
-                        new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{
-                            termFac.createDataCell(kw.getKey()), new DoubleCell(kw.getValue()),
-                            docCache.getInstance(doc)});
+                    DefaultRow row = new DefaultRow(new RowKey(Integer.toString(rowid)), new DataCell[]{
+                        termFac.createDataCell(kw.getKey()), new DoubleCell(kw.getValue()), docCache.getInstance(doc)});
                     con.addRowToTable(row);
                     rowid++;
                 }
@@ -374,21 +337,18 @@ public class KeywordExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
         return new DataTableSpec[]{createDataTableSpec()};
     }
 
     /**
-     * Ensures that the input table spec is valid. This node requires that a
-     * document cell be present.
+     * Ensures that the input table spec is valid. This node requires that a document cell be present.
      *
      * @param spec the spec to validate
      * @throws InvalidSettingsException thrown if the spec is not valid
      */
-    private final void checkDataTableSpec(final DataTableSpec spec)
-            throws InvalidSettingsException {
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
@@ -408,14 +368,14 @@ public class KeywordExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // no internals to save
     }
 
     /**
      * Creates a DataTableSpec for the node, namely (Term, Double, Document).
+     *
      * @return the data table spec
      */
     private static DataTableSpec createDataTableSpec() {
@@ -432,9 +392,8 @@ public class KeywordExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // no internals to load
     }
 
@@ -455,8 +414,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_frequentTermsProportion.loadSettingsFrom(settings);
         m_ignoreTermTags.loadSettingsFrom(settings);
         m_L1Threshold.loadSettingsFrom(settings);
@@ -469,8 +427,7 @@ public class KeywordExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_frequentTermsProportion.validateSettings(settings);
         m_ignoreTermTags.validateSettings(settings);
         m_L1Threshold.validateSettings(settings);

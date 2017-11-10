@@ -172,7 +172,7 @@ public class TermVectorNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-        
+
         // set and verify column selection and set warning message if present
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
             .ifPresent(a -> setWarningMessage(a));

@@ -108,18 +108,22 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
     private final class LogTranslator extends Handler {
         /**
-         * This constant is extracted from {@link LogRecord} where it is used to determine if the given
-         * thread id fits into int. "The default value of threadID will be the current thread's
-         * thread id, for ease of correlation, unless it is greater than MIN_SEQUENTIAL_THREAD_ID, in which case we
-         * try harder to keep our promise to keep threadIDs unique by avoiding collisions due to 32-bit wraparound.
-         * Unfortunately, LogRecord.getThreadID() returns int, while Thread.getId() returns long."
+         * This constant is extracted from {@link LogRecord} where it is used to determine if the given thread id fits
+         * into int. "The default value of threadID will be the current thread's thread id, for ease of correlation,
+         * unless it is greater than MIN_SEQUENTIAL_THREAD_ID, in which case we try harder to keep our promise to keep
+         * threadIDs unique by avoiding collisions due to 32-bit wraparound. Unfortunately, LogRecord.getThreadID()
+         * returns int, while Thread.getId() returns long."
          */
         private static final int MIN_SEQUENTIAL_THREAD_ID = Integer.MAX_VALUE / 2;
 
         private final Pattern m_progressPattern = Pattern.compile("<([0-9]+)> .* (-?[0-9]*[,\\.]?[0-9]+)");
+
         private final int m_maxNoOfIterations;
+
         private final ExecutionMonitor m_exec;
+
         private final long m_threadId;
+
         private int m_rowidCounter = 0;
 
         private BufferedDataContainer m_dc;
@@ -140,7 +144,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
             //this code is copied from LogRecord#defaultThreadID()
             long tid = Thread.currentThread().getId();
             if (tid < MIN_SEQUENTIAL_THREAD_ID) {
-                m_threadId = (int) tid;
+                m_threadId = (int)tid;
             } else {
                 m_threadId = -1;
             }
@@ -183,7 +187,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
                     }
                     final DataCell llCell = new DoubleCell(logLikelihood);
                     m_dc.addRowToTable(new DefaultRow(key, iterCell, llCell));
-                    m_exec.setProgress(currentIteration / (double) m_maxNoOfIterations,
+                    m_exec.setProgress(currentIteration / (double)m_maxNoOfIterations,
                         "Processing iteration " + currentIteration + " of " + m_maxNoOfIterations);
                 } catch (NumberFormatException e) {
                     // ignore it
@@ -243,8 +247,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
     private final SettingsModelInteger m_seed = createSeedModel();
 
-    private final SettingsModel[] m_models = new SettingsModel[] {
-        m_docCol, m_noOfThreads, m_noOfTopics, m_topKWords, m_noOfIterations, m_alpha, m_beta, m_seed};
+    private final SettingsModel[] m_models = new SettingsModel[]{m_docCol, m_noOfThreads, m_noOfTopics, m_topKWords,
+        m_noOfIterations, m_alpha, m_beta, m_seed};
 
     /**
      * Constructor.
@@ -299,8 +303,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
      * @return the number of threads model
      */
     static SettingsModelInteger createNoOfThreadsModel() {
-        return new SettingsModelIntegerBounded("noOfThreads", KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(),
-            1, KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
+        return new SettingsModelIntegerBounded("noOfThreads", KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(), 1,
+            KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
     }
 
     /**
@@ -323,7 +327,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
         final ColumnRearranger docTopCR = createDocumentTopicColumnRearranger(spec, m_noOfTopics.getIntValue(), null,
             spec.findColumnIndex(m_docCol.getStringValue()));
-        return new DataTableSpec[] {docTopCR.createSpec(), createTopicTableSpec(), createDetailedTableSpec()};
+        return new DataTableSpec[]{docTopCR.createSpec(), createTopicTableSpec(), createDetailedTableSpec()};
     }
 
     /**
@@ -331,7 +335,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
      */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-            throws Exception {
+        throws Exception {
         final BufferedDataTable table = inData[0];
         checkDataTableSpec(table.getDataTableSpec());
         final int noOfTopics = m_noOfTopics.getIntValue();
@@ -339,7 +343,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         final int noOfThreads = m_noOfTopics.getIntValue();
         final int noOfIterations = m_noOfIterations.getIntValue();
         final Iterator<Instance> docsIter =
-                new DocumentInstanceIterator(exec.createSubProgress(0.05), table, colIdx, false);
+            new DocumentInstanceIterator(exec.createSubProgress(0.05), table, colIdx, false);
         final Pipe docPipe = new Document2FeatureSequencePipe();
         exec.setMessage("Preprocessing documents");
         // Begin by importing documents from text to feature sequences
@@ -348,7 +352,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         instances.addThruPipe(docsIter);
         exec.checkCanceled();
         final ParallelTopicModel model =
-                new ParallelTopicModel(noOfTopics, m_alpha.getDoubleValue() * noOfTopics, m_beta.getDoubleValue());
+            new ParallelTopicModel(noOfTopics, m_alpha.getDoubleValue() * noOfTopics, m_beta.getDoubleValue());
         model.setRandomSeed(m_seed.getIntValue());
         model.addInstances(instances);
         model.setNumThreads(noOfThreads);
@@ -357,7 +361,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         exec.setMessage("Extracting topics");
         //redirect the logger output to our node logger
         final LogTranslator myLogHandler =
-                new LogTranslator(exec.createSubExecutionContext(0.9), noOfIterations, model);
+            new LogTranslator(exec.createSubExecutionContext(0.9), noOfIterations, model);
         ParallelTopicModel.logger.addHandler(myLogHandler);
         try {
             model.estimate();
@@ -372,13 +376,13 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         final ColumnRearranger dtcr =
             createDocumentTopicColumnRearranger(table.getDataTableSpec(), noOfTopics, model, colIdx);
         final BufferedDataTable docTopicTable =
-                exec.createColumnRearrangeTable(table, dtcr, exec.createSubProgress(0.025));
+            exec.createColumnRearrangeTable(table, dtcr, exec.createSubProgress(0.025));
         // The data alphabet maps word IDs to strings
         final Alphabet dataAlphabet = instances.getDataAlphabet();
         // Get an array of sorted sets of word ID/count pairs
         final BufferedDataTable topicTable =
-                createTopicTable(exec.createSubExecutionContext(0.025), dataAlphabet, model, m_topKWords.getIntValue());
-        return new BufferedDataTable[] {docTopicTable, topicTable, myLogHandler.getDetailsTable()};
+            createTopicTable(exec.createSubExecutionContext(0.025), dataAlphabet, model, m_topKWords.getIntValue());
+        return new BufferedDataTable[]{docTopicTable, topicTable, myLogHandler.getDetailsTable()};
     }
 
     private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
@@ -403,8 +407,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
     private DataTableSpec createTopicTableSpec() {
         final List<DataColumnSpec> specs = new LinkedList<>();
-        final DataColumnSpecCreator creator =
-                new DataColumnSpecCreator("Topic id", StringCell.TYPE);
+        final DataColumnSpecCreator creator = new DataColumnSpecCreator("Topic id", StringCell.TYPE);
         specs.add(creator.createSpec());
         creator.setName("Term");
         specs.add(creator.createSpec());
@@ -421,7 +424,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         int rowId = 0;
         int wordCounter = 0;
         for (int topicId = 0; topicId < model.getNumTopics(); topicId++) {
-            exec.setProgress(topicId / (double) model.getNumTopics(),
+            exec.setProgress(topicId / (double)model.getNumTopics(),
                 "create rows for topic " + topicId + " of " + model.getNumTopics());
             final DataCell topicIdCell = new StringCell(DocumentTopicCellFactory.TOPIC_PREFIX + topicId);
             wordCounter = 0;
@@ -432,8 +435,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
                 final DataCell termCell = new StringCell((String)dataAlphabet.lookupObject(idCountPair.getID()));
                 final DataCell termWeightCell = new DoubleCell(idCountPair.getWeight());
                 final RowKey rowKey = RowKey.createRowKey(rowId++);
-                final DefaultRow row =
-                        new DefaultRow(rowKey, topicIdCell, termCell, termWeightCell);
+                final DefaultRow row = new DefaultRow(rowKey, topicIdCell, termCell, termWeightCell);
                 dc.addRowToTable(row);
                 wordCounter++;
             }
@@ -444,8 +446,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
     private static final DataTableSpec createDetailedTableSpec() {
         final List<DataColumnSpec> specs = new LinkedList<>();
-        final DataColumnSpecCreator creator =
-                new DataColumnSpecCreator("Iteration", IntCell.TYPE);
+        final DataColumnSpecCreator creator = new DataColumnSpecCreator("Iteration", IntCell.TYPE);
         specs.add(creator.createSpec());
         creator.setName("Log likelihood");
         creator.setType(DoubleCell.TYPE);
@@ -457,8 +458,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothig to do
     }
 
@@ -466,8 +467,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothing to do
     }
 
