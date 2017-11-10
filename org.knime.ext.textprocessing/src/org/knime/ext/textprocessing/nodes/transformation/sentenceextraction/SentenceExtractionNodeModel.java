@@ -102,9 +102,7 @@ public class SentenceExtractionNodeModel extends NodeModel {
 
     private int m_docColIndex = -1;
 
-    private SettingsModelString m_documentColModel =
-        SentenceExtractionNodeDialog.getDocumentColumnModel();
-
+    private SettingsModelString m_documentColModel = SentenceExtractionNodeDialog.getDocumentColumnModel();
 
     /**
      * Creates a new instance of <code>SentenceStatisticsNodeModel</code>.
@@ -117,8 +115,7 @@ public class SentenceExtractionNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
 
         return new DataTableSpec[]{createOutDataTableSpec()};
@@ -129,46 +126,37 @@ public class SentenceExtractionNodeModel extends NodeModel {
         DataTableSpecVerifier v = new DataTableSpecVerifier(spec);
         v.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-            new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
 
         m_docColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
 
     }
 
     private DataTableSpec createOutDataTableSpec() {
-        DataColumnSpecCreator docCreator = new DataColumnSpecCreator(
-                DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME,
-                DocumentCell.TYPE);
-        DataColumnSpecCreator sentenceCreator = new DataColumnSpecCreator(
-                SENTENCE_COLNAME, StringCell.TYPE);
-        DataColumnSpecCreator lengthCreator = new DataColumnSpecCreator(
-                TERMCOUNT_COLNAME, IntCell.TYPE);
+        DataColumnSpecCreator docCreator =
+            new DataColumnSpecCreator(DocumentDataTableBuilder.DEF_DOCUMENT_COLNAME, DocumentCell.TYPE);
+        DataColumnSpecCreator sentenceCreator = new DataColumnSpecCreator(SENTENCE_COLNAME, StringCell.TYPE);
+        DataColumnSpecCreator lengthCreator = new DataColumnSpecCreator(TERMCOUNT_COLNAME, IntCell.TYPE);
 
-        return new DataTableSpec(docCreator.createSpec(),
-                sentenceCreator.createSpec(), lengthCreator.createSpec());
+        return new DataTableSpec(docCreator.createSpec(), sentenceCreator.createSpec(), lengthCreator.createSpec());
     }
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
-        m_docColIndex = inData[0].getDataTableSpec().findColumnIndex(
-                m_documentColModel.getStringValue());
+        m_docColIndex = inData[0].getDataTableSpec().findColumnIndex(m_documentColModel.getStringValue());
 
         // create cache
         final TextContainerDataCellFactory docCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         docCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
         final DataCellCache docCache = new LRUDataCellCache(docCellFac);
-        BufferedDataContainer dc = exec.createDataContainer(
-                createOutDataTableSpec());
+        BufferedDataContainer dc = exec.createDataContainer(createOutDataTableSpec());
 
         try {
             long count = 0;
@@ -206,8 +194,6 @@ public class SentenceExtractionNodeModel extends NodeModel {
         return new BufferedDataTable[]{dc.getTable()};
     }
 
-
-
     /**
      * {@inheritDoc}
      */
@@ -216,13 +202,11 @@ public class SentenceExtractionNodeModel extends NodeModel {
         // Nothing to do ...
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentColModel.loadSettingsFrom(settings);
     }
 
@@ -238,20 +222,16 @@ public class SentenceExtractionNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentColModel.validateSettings(settings);
     }
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-    throws IOException, CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 
@@ -259,9 +239,8 @@ public class SentenceExtractionNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec)
-    throws IOException, CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
 }
