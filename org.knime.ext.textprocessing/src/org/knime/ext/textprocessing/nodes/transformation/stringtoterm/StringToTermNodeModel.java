@@ -109,11 +109,7 @@ public class StringToTermNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumStringCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-                new ColumnSelectionVerifier(m_stringColModel, spec, StringValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_stringColModel, spec, StringValue.class, null).ifPresent(msg -> setWarningMessage(msg));
 
         m_stringColIndex = spec.findColumnIndex(m_stringColModel.getStringValue());
     }
