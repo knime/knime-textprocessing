@@ -181,10 +181,8 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
             throw new InvalidSettingsException("Input table contains no string/document columns!");
         }
 
-        ColumnSelectionVerifier stringVerifier = new ColumnSelectionVerifier(m_colModel, spec, StringValue.class);
-        if (stringVerifier.hasWarningMessage()) {
-            setWarningMessage(stringVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_colModel, spec, StringValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
 
     }
 
