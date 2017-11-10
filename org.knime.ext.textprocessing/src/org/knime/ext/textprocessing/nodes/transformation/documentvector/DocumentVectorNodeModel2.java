@@ -176,19 +176,13 @@ class DocumentVectorNodeModel2 extends NodeModel {
         verifier.verifyTermCell(true);
         verifier.verifyMinimumNumberCells(1, true);
 
-        ColumnSelectionVerifier docColVerifier =
-                new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        if (docColVerifier.hasWarningMessage()) {
-            setWarningMessage(docColVerifier.getWarningMessage());
-        }
+        // set and verify column selections and set warning if present
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
         if (m_booleanModel.getBooleanValue()) {
-            ColumnSelectionVerifier numColVerifier =
-                    new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
-            if (numColVerifier.hasWarningMessage()) {
-                setWarningMessage(numColVerifier.getWarningMessage());
-            }
+            ColumnSelectionVerifier.verifyColumn(m_colModel, spec, DoubleValue.class, null)
+                .ifPresent(a -> setWarningMessage(a));
         }
-
 
         m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
         m_termColIndex = verifier.getTermCellIndex();
