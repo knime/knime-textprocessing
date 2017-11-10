@@ -71,14 +71,16 @@ public class ColumnSelectionVerifier {
      * should be passed as an argument as well. If the SettingsModelString contains {@code null} or an empty string, the
      * ColumnSelectionVerifier automatically sets the first suitable column name. Empty strings or {@code null} should
      * only occur if the node is initialized for the first time and no column selection has been done within the node
-     * dialog.
+     * dialog. Additionally, the method returns a Optional containing a String or null, that represents a warning
+     * message. This warning message could be set within a node's configure() method using the
+     * {@link Optional#isPresent()} method.
      *
      * @param columnSetting The {@code SettingsModelString} containing the name of the column to verify.
      * @param spec The {@code DataTableSpec} containing the column information.
      * @param columnType The specific {@code DataValue} implementation to verify the column.
      * @param ignoreName If this value is not null, the Verifier will ignore any column with the same name during the
      *            search.
-     * @return Returns the warning message or null if no warning message has been set.
+     * @return Returns an Optional containing the warning message or null if no warning message has been set.
      * @throws InvalidSettingsException Throws an InvalidSettingsException, if the column does not exist or if the
      *             column has a wrong type.
      */
@@ -91,8 +93,8 @@ public class ColumnSelectionVerifier {
                 if ((column.getType().isCompatible(columnType))
                     && (ignoreName != null ? !column.getName().equals(ignoreName) : true)) {
                     columnSetting.setStringValue(column.getName());
-                    return Optional.of("Auto guessing: Using column '" + column.getName() + "' as " + columnType.getSimpleName()
-                        + " column.");
+                    return Optional.of("Auto guessing: Using column '" + column.getName() + "' as "
+                        + columnType.getSimpleName() + " column.");
                 }
             }
         } else if (spec.findColumnIndex(columnSetting.getStringValue()) < 0) {
