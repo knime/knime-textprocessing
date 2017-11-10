@@ -98,10 +98,9 @@ public abstract class AbstractDocumentHashingNodeModel extends NodeModel {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier colSecVerifier = new ColumnSelectionVerifier(m_docCol, spec, DocumentValue.class);
-        if (colSecVerifier.hasWarningMessage()) {
-            setWarningMessage(colSecVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning if present
+        ColumnSelectionVerifier.verifyColumn(m_docCol, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
 
         final ColumnRearranger rearranger = new ColumnRearranger(spec);
 
