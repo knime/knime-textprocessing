@@ -144,11 +144,10 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[DICT_TABLE_INDEX]);
         verfier.verifyMinimumStringCells(1, true);
 
-        ColumnSelectionVerifier stringVerifier =
-                new ColumnSelectionVerifier(m_columnModel, inSpecs[DICT_TABLE_INDEX], StringValue.class);
-        if (stringVerifier.hasWarningMessage()) {
-                setWarningMessage(stringVerifier.getWarningMessage());
-        }
+
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_columnModel, inSpecs[DICT_TABLE_INDEX], StringValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
     }
 
     /**
