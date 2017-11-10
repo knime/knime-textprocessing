@@ -225,11 +225,8 @@ public class NGramNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-            new ColumnSelectionVerifier(m_documentColumnModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentColumnModel, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
 
         m_documentColIndex = spec.findColumnIndex(m_documentColumnModel.getStringValue());
 
