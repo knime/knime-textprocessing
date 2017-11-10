@@ -193,14 +193,10 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyMinimumTermCells(1, true);
 
-        ColumnSelectionVerifier docVerifier = new ColumnSelectionVerifier(m_docCol, spec, DocumentValue.class);
-        ColumnSelectionVerifier termVerifier = new ColumnSelectionVerifier(m_termCol, spec, TermValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
-        if (termVerifier.hasWarningMessage()) {
-            setWarningMessage(termVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_docCol, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
+        ColumnSelectionVerifier.verifyColumn(m_termCol, spec, TermValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
     }
 
     /**
