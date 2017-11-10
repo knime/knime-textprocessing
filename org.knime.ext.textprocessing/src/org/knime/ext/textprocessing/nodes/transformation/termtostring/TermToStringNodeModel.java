@@ -41,11 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   26.06.2008 (thiel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.termtostring;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -65,68 +68,63 @@ import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermToStringNodeModel extends NodeModel {
 
     private static final int INDATA_INDEX = 0;
-    
+
     private int m_termColIndex = -1;
-    
+
     private String m_newColName;
-    
-    private SettingsModelString m_termColModel = 
+
+    private SettingsModelString m_termColModel =
         TermToStringNodeDialog.getTermColModel();
-    
+
     /**
      * Creates a new instance of <code>TermToStringNodeModel</code>.
      */
     public TermToStringNodeModel() {
         super(1, 1);
     }
-    
+
     private final void checkDataTableSpec(final DataTableSpec spec)
     throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
 
-        ColumnSelectionVerifier termVerifier =
-                new ColumnSelectionVerifier(m_termColModel, spec, TermValue.class);
-        if (termVerifier.hasWarningMessage()) {
-            setWarningMessage(termVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
 
         m_termColIndex = spec.findColumnIndex(
                 m_termColModel.getStringValue());
     }
-    
+
     private DataTableSpec createDataTableSpec(
             final DataTableSpec inDataSpec) {
-        
+
         String termCol = m_termColModel.getStringValue();
         if (termCol.isEmpty()) {
             termCol = "Term as String";
         } else {
             termCol += " as String";
         }
-        
+
         int count = 1;
         m_newColName = termCol;
         while (inDataSpec.containsName(m_newColName)) {
             m_newColName = termCol + " " + count;
             count++;
         }
-        
-        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName, 
+
+        DataColumnSpec strCol = new DataColumnSpecCreator(m_newColName,
                 StringCell.TYPE).createSpec();
         return new DataTableSpec(inDataSpec, new DataTableSpec(strCol));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -143,21 +141,21 @@ public class TermToStringNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-                
+
         BufferedDataTable inDataTable = inData[INDATA_INDEX];
         checkDataTableSpec(inDataTable.getDataTableSpec());
 
         // initializes the corresponding cell factory
         TermToStringCellFactory cellFac = new TermToStringCellFactory(
                 m_termColIndex, m_newColName);
-        
+
         // compute frequency and add column
         ColumnRearranger rearranger = new ColumnRearranger(
                 inDataTable.getDataTableSpec());
         rearranger.append(cellFac);
-        
+
         return new BufferedDataTable[] {
-                exec.createColumnRearrangeTable(inDataTable, rearranger, 
+                exec.createColumnRearrangeTable(inDataTable, rearranger,
                 exec)};
     }
 
@@ -199,17 +197,17 @@ public class TermToStringNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // Nothing to do ...
