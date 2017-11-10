@@ -106,11 +106,10 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
         verifier.verifyMinimumStringCells(1, true);
 
         // URI is compatible with StringValue
-        ColumnSelectionVerifier stringVerifier =
-            new ColumnSelectionVerifier(m_colModel, spec, StringValue.class);
-        if (stringVerifier.hasWarningMessage()) {
-            setWarningMessage(stringVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_colModel, spec, StringValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
+
     }
 
     /** {@inheritDoc} */
@@ -162,7 +161,8 @@ final class TikaParserInputNodeModel extends AbstractTikaNodeModel {
      * @throws InvalidPathException
      */
     @Override
-    protected Iterable<URL> readInput(final RowInput input) throws InvalidSettingsException, InterruptedException, InvalidPathException, MalformedURLException {
+    protected Iterable<URL> readInput(final RowInput input)
+        throws InvalidSettingsException, InterruptedException, InvalidPathException, MalformedURLException {
         List<URL> files = new ArrayList<URL>();
         checkDataTableSpec(input.getDataTableSpec());
         int colIndex = input.getDataTableSpec().findColumnIndex(m_colModel.getStringValue());
