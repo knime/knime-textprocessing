@@ -79,12 +79,12 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
 
     private final SettingsModelString m_documentCol = getDocumentColConfigObj();
 
-    private final SettingsModelStringArray m_extractorNames =
-        getExtractorNamesConfigObj();
+    private final SettingsModelStringArray m_extractorNames = getExtractorNamesConfigObj();
 
     private DataColumnSpec[] m_extractorColumnSpecs = null;
 
-    /**Constructor for class DocumentExtractorNodeModel2.
+    /**
+     * Constructor for class DocumentExtractorNodeModel2.
      */
     protected DocumentDataExtractorNodeModel2() {
         super(1, 1);
@@ -94,14 +94,12 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-    throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         if (inSpecs == null || inSpecs.length < 1) {
             throw new InvalidSettingsException("Invalid input spec");
         }
         final DocumentDataExtractor2[] extractors =
-            DocumentDataExtractor2.getExctractor(
-                    m_extractorNames.getStringArrayValue());
+            DocumentDataExtractor2.getExctractor(m_extractorNames.getStringArrayValue());
         if (extractors == null || extractors.length < 1) {
             setWarningMessage("No data extractors selected");
         }
@@ -117,15 +115,16 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier.verifyColumn(m_documentCol, spec, DocumentValue.class, null).ifPresent(msg -> setWarningMessage(msg));
+        ColumnSelectionVerifier.verifyColumn(m_documentCol, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         if (inData == null || inData.length < 1) {
             throw new IllegalArgumentException("Invalid input data");
         }
@@ -135,33 +134,28 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
         final int docColIdx = inSpec.findColumnIndex(m_documentCol.getStringValue());
 
         final DocumentDataExtractor2[] extractors =
-            DocumentDataExtractor2.getExctractor(
-                    m_extractorNames.getStringArrayValue());
+            DocumentDataExtractor2.getExctractor(m_extractorNames.getStringArrayValue());
         final BufferedDataTable resultTable;
         if (extractors == null || extractors.length == 0) {
-            setWarningMessage(
-                    "No extractor selected. Node returns unaltered table");
+            setWarningMessage("No extractor selected. Node returns unaltered table");
             resultTable = table;
         } else {
-            final ColumnRearranger rearranger =
-                new ColumnRearranger(inSpec);
-            final CellFactory factory = new DocumentDataExtractorCellFactory2(
-                    docColIdx, m_extractorColumnSpecs, extractors);
+            final ColumnRearranger rearranger = new ColumnRearranger(inSpec);
+            final CellFactory factory =
+                new DocumentDataExtractorCellFactory2(docColIdx, m_extractorColumnSpecs, extractors);
             rearranger.append(factory);
-            resultTable =
-                exec.createColumnRearrangeTable(table, rearranger, exec);
+            resultTable = exec.createColumnRearrangeTable(table, rearranger, exec);
         }
-        return new BufferedDataTable[] {resultTable};
+        return new BufferedDataTable[]{resultTable};
     }
 
     /**
      * @param origSpec the original {@link DataTableSpec}
      * @param columnSpecs the extractor {@link DataColumnSpec}s
-     * @return the original {@link DataTableSpec} with a new column
-     * specification per {@link DocumentDataExtractor} attached to it
+     * @return the original {@link DataTableSpec} with a new column specification per {@link DocumentDataExtractor}
+     *         attached to it
      */
-    private static final DataTableSpec createSpec(final DataTableSpec origSpec,
-            final DataColumnSpec[] columnSpecs) {
+    private static final DataTableSpec createSpec(final DataTableSpec origSpec, final DataColumnSpec[] columnSpecs) {
         if (columnSpecs == null || columnSpecs.length == 0) {
             return origSpec;
         }
@@ -169,23 +163,20 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
     }
 
     /**
-     *@param origSpec the original {@link DataTableSpec}
+     * @param origSpec the original {@link DataTableSpec}
      * @param extractors the extractors to use
-     * @return the {@link DataColumnSpec} for the given
-     * {@link DocumentDataExtractor} in the same order as given
+     * @return the {@link DataColumnSpec} for the given {@link DocumentDataExtractor} in the same order as given
      */
-    private static DataColumnSpec[] createColumnSpecs(
-            final DataTableSpec origSpec,
-            final DocumentDataExtractor2[] extractors) {
+    private static DataColumnSpec[] createColumnSpecs(final DataTableSpec origSpec,
+        final DocumentDataExtractor2[] extractors) {
         if (extractors == null || extractors.length < 1) {
             return new DataColumnSpec[0];
         }
         final DataColumnSpec[] cols = new DataColumnSpec[extractors.length];
         for (int i = 0, length = extractors.length; i < length; i++) {
-             final String name = DataTableSpec.getUniqueColumnName(origSpec,
-                     extractors[i].getName());
-             final DataType type = extractors[i].getDataType();
-             cols[i] = new DataColumnSpecCreator(name, type).createSpec();
+            final String name = DataTableSpec.getUniqueColumnName(origSpec, extractors[i].getName());
+            final DataType type = extractors[i].getDataType();
+            cols[i] = new DataColumnSpecCreator(name, type).createSpec();
         }
         return cols;
     }
@@ -203,8 +194,7 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentCol.validateSettings(settings);
         m_extractorNames.validateSettings(settings);
     }
@@ -213,8 +203,7 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentCol.loadSettingsFrom(settings);
         m_extractorNames.loadSettingsFrom(settings);
     }
@@ -231,8 +220,7 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) {
         // nothing to do
     }
 
@@ -240,21 +228,19 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) {
         // nothing to do
     }
 
     /**
-     * @return Creates and returns new <code>SettingsModelString</code>
-     * containing the name of the document column.
+     * @return Creates and returns new <code>SettingsModelString</code> containing the name of the document column.
      */
     protected static SettingsModelString getDocumentColConfigObj() {
         return new SettingsModelString("documentColumn", null);
     }
+
     /**
-     * @return Creates and returns new <code>SettingsModelStringArray</code>
-     * containing the document fields to extract.
+     * @return Creates and returns new <code>SettingsModelStringArray</code> containing the document fields to extract.
      */
     protected static SettingsModelStringArray getExtractorNamesConfigObj() {
         return new SettingsModelStringArray("extractorNames", null);
