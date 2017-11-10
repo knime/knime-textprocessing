@@ -256,19 +256,14 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier2.verifyMinimumStringCells(1, true);
 
-        // verifying the selected document column or select the first suitable column if none has been set yet
-        ColumnSelectionVerifier docColSelVerifier =
-            new ColumnSelectionVerifier(m_docColumnModel, spec, DocumentValue.class);
-        if (docColSelVerifier.hasWarningMessage()) {
-            setWarningMessage(docColSelVerifier.getWarningMessage());
-        }
+        // verifying the selected columns or select the first suitable column if none has been set yet and throw warning
+        // if present
+        ColumnSelectionVerifier.verifyColumn(m_docColumnModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
 
         // verifying the selected string column or select the first suitable column if none has been set yet
-        ColumnSelectionVerifier dictColSelVerifier =
-                new ColumnSelectionVerifier(m_knownEntitiesColumnModel, spec2, StringValue.class);
-            if (dictColSelVerifier.hasWarningMessage()) {
-                setWarningMessage(dictColSelVerifier.getWarningMessage());
-            }
+        ColumnSelectionVerifier.verifyColumn(m_knownEntitiesColumnModel, spec2, StringValue.class, null)
+        .ifPresent(a -> setWarningMessage(a));
 
         // check if specific tokenizer is installed
         if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizer.getStringValue())) {
@@ -523,7 +518,6 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_wordShape.loadSettingsFrom(settings);
         m_maxLeft.loadSettingsFrom(settings);
         m_maxNGramLeng.loadSettingsFrom(settings);
-
 
         // only load settings if settings contain SettingsModel key (for backwards compatibility)
         if (settings.containsKey(m_tokenizer.getKey())) {
