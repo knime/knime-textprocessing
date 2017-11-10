@@ -116,23 +116,14 @@ public class MetaInfoInsertionNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyMinimumStringCells(2, true);
 
-        ColumnSelectionVerifier docVerifier =
-            new ColumnSelectionVerifier(m_docColModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_docColModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
+        ColumnSelectionVerifier.verifyColumn(m_keyColModel, spec, StringValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
+        ColumnSelectionVerifier.verifyColumn(m_valueColModel, spec, StringValue.class, m_keyColModel.getStringValue())
+            .ifPresent(a -> setWarningMessage(a));
 
-        ColumnSelectionVerifier keyVerifier =
-                new ColumnSelectionVerifier(m_keyColModel, spec, StringValue.class);
-        if (keyVerifier.hasWarningMessage()) {
-            setWarningMessage(keyVerifier.getWarningMessage());
-        }
-
-        ColumnSelectionVerifier valueVerifier =
-                new ColumnSelectionVerifier(m_valueColModel, spec, StringValue.class, m_keyColModel.getStringValue());
-        if (valueVerifier.hasWarningMessage()) {
-            setWarningMessage(valueVerifier.getWarningMessage());
-        }
     }
 
     private DataTableSpec createDataTableSpec(final DataTableSpec inSpec) {
