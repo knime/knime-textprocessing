@@ -137,8 +137,7 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
             m_replaceColumModel.getStringValue()).ifPresent(msg -> setWarningMessage(msg));
 
         if (m_replacementColumModel.getStringValue().equals(m_replaceColumModel.getStringValue())) {
-            throw new InvalidSettingsException(
-                "Lookup column cannot be replacement column at the same time. "
+            throw new InvalidSettingsException("Lookup column cannot be replacement column at the same time. "
                 + "Select different columns for lookup and replacement column.");
         }
 
@@ -210,8 +209,7 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         String replacementColName =
             ((SettingsModelString)m_replacementColumModel.createCloneWithValidatedValue(settings)).getStringValue();
         if (replaceColName.equals(replacementColName)) {
-            throw new InvalidSettingsException(
-                "Lookup column cannot be replacement column at the same time. "
+            throw new InvalidSettingsException("Lookup column cannot be replacement column at the same time. "
                 + "Select different columns for lookup and replacement column.");
         }
     }

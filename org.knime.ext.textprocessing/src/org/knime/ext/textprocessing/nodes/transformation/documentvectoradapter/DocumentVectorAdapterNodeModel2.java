@@ -104,9 +104,8 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 /**
  * The model of the document vector adapter node. This node creates a document feature vector for each document exactly
  * as the normal document vector node. It has two inputs, the first one is the input table, whose features are to be
- * filtered based on the reference column names stored in the model of the second input.
- * This node returns a document feature vector with the features stored in the input model or the features selected
- * in the node dialog.
+ * filtered based on the reference column names stored in the model of the second input. This node returns a document
+ * feature vector with the features stored in the input model or the features selected in the node dialog.
  *
  * @author Andisa Dewi & Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
@@ -221,7 +220,6 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         verifier.verifyMinimumNumberCells(1, true);
         verifier.verifyTermCell(true);
 
-
         // set and verify column selections and set warning if present
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
             .ifPresent(a -> setWarningMessage(a));
@@ -312,8 +310,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
                 key = t.toString();
             }
             if (refTerms.contains(key) && !featureIndexTable.containsKey(key)) {
-                    featureIndexTable.put(key, currIndex);
-                    currIndex++;
+                featureIndexTable.put(key, currIndex);
+                currIndex++;
             }
         }
 
