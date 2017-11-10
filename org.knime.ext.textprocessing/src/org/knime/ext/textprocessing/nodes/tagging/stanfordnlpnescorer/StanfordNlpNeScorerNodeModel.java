@@ -155,12 +155,10 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         NERModelPortObjectSpec modelSpec = (NERModelPortObjectSpec)inSpecs[1];
 
-        // select and verify column selection
-        ColumnSelectionVerifier docColSelVerifier =
-            new ColumnSelectionVerifier(m_docColumnModel, spec, DocumentValue.class);
-        if (docColSelVerifier.hasWarningMessage()) {
-            setWarningMessage(docColSelVerifier.getWarningMessage());
-        }
+        // select and verify column selection and set warning if present
+        ColumnSelectionVerifier.verifyColumn(m_docColumnModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
+
         int colIndex = spec.findColumnIndex(m_docColumnModel.getStringValue());
 
         // check if specific tokenizer is installed
