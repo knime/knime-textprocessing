@@ -61,6 +61,8 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import java.io.File;
@@ -106,11 +108,8 @@ public class CategoryToClassNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-            new ColumnSelectionVerifier(m_documentCol, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentCol, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
     }
 
     /**
