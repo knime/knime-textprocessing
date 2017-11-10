@@ -112,11 +112,11 @@ public class DocumentDataExtractorCellFactory2 implements CellFactory {
         if (cell instanceof DocumentValue) {
             final DocumentValue docCell = (DocumentValue)cell;
             doc = docCell.getDocument();
-            for (int i = 0, length = m_extractors.length; i < length; i++) {
+            for (int i = 0; i < m_extractors.length; i++) {
                 cells[i] = m_extractors[i].getValue(doc);
             }
         } else {
-            for (int i = 0, length = m_extractors.length; i < length; i++) {
+            for (int i = 0; i < m_extractors.length; i++) {
                 cells[i] = DataType.getMissingCell();
             }
 
