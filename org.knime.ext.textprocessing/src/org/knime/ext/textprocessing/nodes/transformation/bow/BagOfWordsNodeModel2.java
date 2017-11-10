@@ -125,11 +125,8 @@ class BagOfWordsNodeModel2 extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-                new ColumnSelectionVerifier(m_docColModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_docColModel, spec, DocumentValue.class, null)
+        .ifPresent(msg -> setWarningMessage(msg));
 
         m_documentColIndex = spec.findColumnIndex(m_docColModel.getStringValue());
 
