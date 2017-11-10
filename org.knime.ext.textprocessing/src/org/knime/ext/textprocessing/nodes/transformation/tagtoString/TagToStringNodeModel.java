@@ -143,11 +143,7 @@ public class TagToStringNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumTermCells(1, true);
 
-        ColumnSelectionVerifier termVerifier =
-                new ColumnSelectionVerifier(m_termColModel, spec, TermValue.class);
-        if (termVerifier.hasWarningMessage()) {
-            setWarningMessage(termVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null).ifPresent(msg -> setWarningMessage(msg));
 
         m_termColIndex = spec.findColumnIndex(m_termColModel.getStringValue());
     }
