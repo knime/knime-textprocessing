@@ -107,11 +107,9 @@ public class DictionaryFilterNodeModel extends StreamablePreprocessingNodeModel 
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumStringCells(1, true);
 
-        ColumnSelectionVerifier stringVerifier =
-            new ColumnSelectionVerifier(m_wordToFilterModel, spec, StringValue.class);
-        if (stringVerifier.hasWarningMessage()) {
-            setWarningMessage(stringVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_wordToFilterModel, spec, StringValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
     }
 
     /**
