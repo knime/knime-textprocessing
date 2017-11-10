@@ -117,10 +117,7 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier colSelVerifier = new ColumnSelectionVerifier(m_documentCol, spec, DocumentValue.class);
-        if (colSelVerifier.hasWarningMessage()) {
-            setWarningMessage(colSelVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentCol, spec, DocumentValue.class, null).ifPresent(msg -> setWarningMessage(msg));
     }
 
     /**
