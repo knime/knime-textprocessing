@@ -62,6 +62,7 @@ import org.knime.base.data.xml.SvgImageContent;
 import org.knime.base.node.util.DefaultDataArray;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DoubleValue;
 import org.knime.core.data.image.ImageContent;
 import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.node.BufferedDataTable;
@@ -86,7 +87,9 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.core.util.FileUtil;
+import org.knime.ext.textprocessing.data.TermValue;
 import org.knime.ext.textprocessing.nodes.view.tagcloud.outport.font.SettingsModelFont;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -174,14 +177,7 @@ public class TagCloudNodeModel extends NodeModel {
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
         DataTableSpec inSpec = (DataTableSpec)inSpecs[0];
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpec);
-        /*
-         * Verifies if there are at least one termcell and
-         * one numbercell and initializes the selected column indexes
-         */
-        verifier.verifyMinimumTermCells(1, true);
-        verifier.verifyMinimumNumberCells(1, true);
-        setColumnindexes(inSpec);
+        checkDataTableSpec(inSpec);
 
         final String imgType = m_imagetypeModel.getStringValue();
         ImagePortObjectSpec outSpec;
@@ -193,17 +189,20 @@ public class TagCloudNodeModel extends NodeModel {
         return new PortObjectSpec[] {outSpec};
     }
 
-    /**
-     * Initializes the column index for the selected term and value column.
-     *
-     * @param spec the DataTableSpec of the input table
-     */
-    protected void setColumnindexes(final DataTableSpec spec) {
+    private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
+        // check input spec
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        m_termColIndex = verifier.getTermCellIndex();
-        m_valueColIndex = verifier.getNumberCellIndex();
-    }
+        verifier.verifyMinimumTermCells(1, true);
+        verifier.verifyMinimumNumberCells(1, true);
 
+        ColumnSelectionVerifier.verifyColumn(m_termColModel, spec, TermValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
+        ColumnSelectionVerifier.verifyColumn(m_valueColModel, spec, DoubleValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
+
+        m_termColIndex = spec.findColumnIndex(m_termColModel.getStringValue());
+        m_valueColIndex = spec.findColumnIndex(m_valueColModel.getStringValue());
+    }
 
     /**
      * {@inheritDoc}
@@ -224,19 +223,11 @@ public class TagCloudNodeModel extends NodeModel {
             setWarningMessage("Empty data table, nothing to display.");
             panel = new TagCloudImageExportPanel(null);
         } else {
-            m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
-            setColumnindexes(dataTable.getDataTableSpec());
-            m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(m_termColModel.getStringValue());
-
-            if (m_termColIndex < 0) {
-                m_termColIndex = (new DataTableSpecVerifier(dataTable.getSpec())).getTermCellIndex();
-            }
-            m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(m_valueColModel.getStringValue());
-
-            if (m_valueColIndex < 0) {
-                m_valueColIndex = (new DataTableSpecVerifier(dataTable.getSpec())).getNumberCellIndex();
-            }
-
+       		m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
+        	checkDataTableSpec(dataTable.getDataTableSpec());
+        	m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(m_termColModel.getStringValue());
+        	m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(m_valueColModel.getStringValue());
+        	
             m_tagcloud = new TagCloud();
             m_tagcloud.createTagCloud(exec, this);
             m_tagcloud.changealpha(m_alphaModel.getIntValue());
