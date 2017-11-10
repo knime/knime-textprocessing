@@ -298,11 +298,9 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         String docColName = m_documentColModel.getStringValue();
 
         // auto guess settings if document column has not been set
-        ColumnSelectionVerifier docVerifier =
-                new ColumnSelectionVerifier(m_documentColModel, in, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, in, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
+
         docColName = m_documentColModel.getStringValue();
         int docColIndex = in.findColumnIndex(docColName);
 
