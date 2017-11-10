@@ -50,7 +50,6 @@ package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports
 
 import java.util.HashMap;
 
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
@@ -67,6 +66,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.DictionaryReplacer;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
@@ -131,45 +131,10 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         DataTableSpec dictTableSpec = inSpecs[1];
 
         // initialize search string and replacement string columns
-        if (m_replaceColumModel.getStringValue().isEmpty()) {
-            for (DataColumnSpec colSpec : dictTableSpec) {
-                if (colSpec.getType().isCompatible(StringValue.class)) {
-                    m_replaceColumModel.setStringValue(colSpec.getName());
-                    setWarningMessage(
-                        "Auto guessing: Using column '" + colSpec.getName() + "' as search string column");
-                    break;
-                }
-            }
-        } else if (dictTableSpec.findColumnIndex(m_replaceColumModel.getStringValue()) < 0) {
-            // if document column is set but the column does not exist in data table throw exception
-            throw new InvalidSettingsException(
-                "String column '" + m_replaceColumModel.getStringValue() + "' could not be found in data table.");
-        } else if (!dictTableSpec.getColumnSpec(m_replaceColumModel.getStringValue()).getType()
-            .isCompatible(StringValue.class)) {
-            // if document column is set and the column exists but is not of right type throw exception
-            throw new InvalidSettingsException(
-                "Column '" + m_replaceColumModel.getStringValue() + "' is not a String column.");
-        }
-        if (m_replacementColumModel.getStringValue().isEmpty()) {
-            for (DataColumnSpec colSpec : dictTableSpec) {
-                if (colSpec.getType().isCompatible(StringValue.class)
-                    && !colSpec.getName().equals(m_replaceColumModel.getStringValue())) {
-                    m_replacementColumModel.setStringValue(colSpec.getName());
-                    setWarningMessage(
-                        "Auto guessing: Using column '" + colSpec.getName() + "' as replacement string column");
-                    break;
-                }
-            }
-        } else if (dictTableSpec.findColumnIndex(m_replacementColumModel.getStringValue()) < 0) {
-            // if document column is set but the column does not exist in data table throw exception
-            throw new InvalidSettingsException(
-                "String column '" + m_replacementColumModel.getStringValue() + "' could not be found in data table.");
-        } else if (!dictTableSpec.getColumnSpec(m_replacementColumModel.getStringValue()).getType()
-            .isCompatible(StringValue.class)) {
-            // if document column is set and the column exists but is not of right type throw exception
-            throw new InvalidSettingsException(
-                "Column '" + m_replacementColumModel.getStringValue() + "' is not a String column.");
-        }
+        ColumnSelectionVerifier.verifyColumn(m_replaceColumModel, dictTableSpec, StringValue.class,
+            m_replacementColumModel.getStringValue()).ifPresent(msg -> setWarningMessage(msg));
+        ColumnSelectionVerifier.verifyColumn(m_replacementColumModel, dictTableSpec, StringValue.class,
+            m_replaceColumModel.getStringValue()).ifPresent(msg -> setWarningMessage(msg));
 
         if (m_replacementColumModel.getStringValue().equals(m_replaceColumModel.getStringValue())) {
             throw new InvalidSettingsException(
