@@ -229,7 +229,7 @@ public class TermPurger {
                 // which has to be re-created with the purged document.
                 for (int i = 0; i < row.getNumCells(); i++) {
                     if (i == m_docColIndex) {
-                        if (!row.getCell(m_docColIndex).isMissing() || origDoc != null) {
+                        if (origDoc != null) {
                             DataCell docCell = dataCellCache.getInstance(preprocessedDoc.get(origDoc));
                             cells[i] = docCell;
                         } else {
