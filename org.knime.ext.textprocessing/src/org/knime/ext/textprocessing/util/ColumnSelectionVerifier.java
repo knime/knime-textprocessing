@@ -48,6 +48,8 @@
  */
 package org.knime.ext.textprocessing.util;
 
+import java.util.Optional;
+
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
@@ -80,7 +82,7 @@ public class ColumnSelectionVerifier {
      * @throws InvalidSettingsException Throws an InvalidSettingsException, if the column does not exist or if the
      *             column has a wrong type.
      */
-    public static String verifyColumn(final SettingsModelString columnSetting, final DataTableSpec spec,
+    public static Optional<String> verifyColumn(final SettingsModelString columnSetting, final DataTableSpec spec,
         final Class<? extends DataValue> columnType, final String ignoreName) throws InvalidSettingsException {
 
         // if document column setting is empty take first feasible column from datatable
@@ -89,8 +91,8 @@ public class ColumnSelectionVerifier {
                 if ((column.getType().isCompatible(columnType))
                     && (ignoreName != null ? !column.getName().equals(ignoreName) : true)) {
                     columnSetting.setStringValue(column.getName());
-                    return "Auto guessing: Using column '" + column.getName() + "' as " + columnType.getSimpleName()
-                        + " column.";
+                    return Optional.of("Auto guessing: Using column '" + column.getName() + "' as " + columnType.getSimpleName()
+                        + " column.");
                 }
             }
         } else if (spec.findColumnIndex(columnSetting.getStringValue()) < 0) {
@@ -103,7 +105,7 @@ public class ColumnSelectionVerifier {
                 "Column '" + columnSetting.getStringValue() + "' is not a " + columnType.getSimpleName() + " column.");
         }
 
-        return null;
+        return Optional.empty();
     }
 
 }
