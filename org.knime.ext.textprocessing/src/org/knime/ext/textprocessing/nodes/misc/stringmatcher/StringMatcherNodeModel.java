@@ -96,7 +96,7 @@ public class StringMatcherNodeModel extends NodeModel {
     /** The configuration key for the cost of one deletion. */
     protected static final String CFG_WD = "Cost for deletion";
 
-    /** The configuration key for the cost of one insert.*/
+    /** The configuration key for the cost of one insert. */
     protected static final String CFG_WI = "Cost for insertion";
 
     /** The configuration key for the cost of one change. */
@@ -126,7 +126,6 @@ public class StringMatcherNodeModel extends NodeModel {
 
     private final SettingsModelInteger m_numberofrelatedwords;
 
-
     /**
      *
      */
@@ -150,8 +149,7 @@ public class StringMatcherNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
 
         if (inSpecs.length < 2) {
             throw new IllegalArgumentException("Two input tables expected");
@@ -167,21 +165,21 @@ public class StringMatcherNodeModel extends NodeModel {
         return new DataTableSpec[]{createSpec(inSpecs[0])};
     }
 
-    private final void checkDataTableSpec(final DataTableSpec spec, final SettingsModelString modelStr) throws InvalidSettingsException {
+    private final void checkDataTableSpec(final DataTableSpec spec, final SettingsModelString modelStr)
+        throws InvalidSettingsException {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         if (!verifier.verifyMinimumStringCells(1, false) && !verifier.verifyMinimumDocumentCells(1, false)) {
             throw new InvalidSettingsException("No String column available in one input port");
         }
 
-        ColumnSelectionVerifier strVerifier =
-            new ColumnSelectionVerifier(modelStr, spec, StringValue.class);
-        if (strVerifier.hasWarningMessage()) {
-            setWarningMessage(strVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(modelStr, spec, StringValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
     }
 
     /**
      * Creates the DataTablespec. Using the given configuration.
+     *
      * @param spec The table spec of the input table (port 0).
      *
      * @return the new data table spec.
@@ -200,7 +198,8 @@ public class StringMatcherNodeModel extends NodeModel {
         DataType[] types = new DataType[numberofrelatedwords + 1 + addcol];
 
         names[0] = "Origin";
-        types[0] = spec.getColumnSpec(m_col1.getStringValue()).getType().isCompatible(DocumentValue.class)? DocumentCell.TYPE : StringCell.TYPE;
+        types[0] = spec.getColumnSpec(m_col1.getStringValue()).getType().isCompatible(DocumentValue.class)
+            ? DocumentCell.TYPE : StringCell.TYPE;
 
         if (addcol == 1) {
             names[1] = "Distance";
@@ -219,8 +218,8 @@ public class StringMatcherNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         // needed for the progress calculation.
         int count = 0;
         int max = inData[0].getRowCount();
@@ -274,17 +273,15 @@ public class StringMatcherNodeModel extends NodeModel {
             }
             if (!cell.isMissing()) {
                 /**
-                 * the field related representates the new row in the output the
-                 * first output column is the origin word the second one the
-                 * minimal found distance
+                 * the field related representates the new row in the output the first output column is the origin word
+                 * the second one the minimal found distance
                  */
 
                 double prog = (double)(count++) / (double)max;
                 exec.setProgress(prog, "Searching related words for '" + related[0] + "'");
 
                 /**
-                 * words includes all words from bibdata, which have the minimal
-                 * distance
+                 * words includes all words from bibdata, which have the minimal distance
                  */
                 words = ld.getNearestWord(((StringValue)related[0]).getStringValue().toCharArray());
 
@@ -317,9 +314,8 @@ public class StringMatcherNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothing to load
 
     }
@@ -328,8 +324,7 @@ public class StringMatcherNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_col1.loadSettingsFrom(settings);
         m_col2.loadSettingsFrom(settings);
         m_sortInMemory.loadSettingsFrom(settings);
@@ -354,9 +349,8 @@ public class StringMatcherNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
         // nothing to save
 
     }
@@ -383,8 +377,7 @@ public class StringMatcherNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_col1.validateSettings(settings);
         m_col2.validateSettings(settings);
     }
