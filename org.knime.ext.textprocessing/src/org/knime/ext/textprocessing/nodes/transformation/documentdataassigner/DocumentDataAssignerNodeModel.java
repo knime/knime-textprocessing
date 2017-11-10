@@ -137,10 +137,9 @@ public class DocumentDataAssignerNodeModel extends SimpleStreamableFunctionNodeM
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docColSelectionVerifier = new ColumnSelectionVerifier(m_docColumnModel, spec, DocumentValue.class);
-        if (docColSelectionVerifier.hasWarningMessage()) {
-            setWarningMessage(docColSelectionVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_docColumnModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
 
         // creates the config
         DocumentDataAssignerConfig conf = new DocumentDataAssignerConfig();
