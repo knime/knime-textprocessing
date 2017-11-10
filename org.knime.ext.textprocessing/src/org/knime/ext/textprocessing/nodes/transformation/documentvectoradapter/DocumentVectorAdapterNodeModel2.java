@@ -222,17 +222,12 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         verifier.verifyTermCell(true);
 
 
-        ColumnSelectionVerifier docColVerifier =
-                new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        if (docColVerifier.hasWarningMessage()) {
-            setWarningMessage(docColVerifier.getWarningMessage());
-        }
-        if (m_booleanModel.getBooleanValue()) {
-            ColumnSelectionVerifier numColVerifier =
-                    new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
-            if (numColVerifier.hasWarningMessage()) {
-                setWarningMessage(numColVerifier.getWarningMessage());
-            }
+        // set and verify column selections and set warning if present
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
+        if (!m_booleanModel.getBooleanValue()) {
+            ColumnSelectionVerifier.verifyColumn(m_colModel, spec, DoubleValue.class, null)
+                .ifPresent(a -> setWarningMessage(a));
         }
 
         m_termColIndex = verifier.getTermCellIndex();

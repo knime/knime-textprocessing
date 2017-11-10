@@ -179,7 +179,7 @@ class DocumentVectorNodeModel2 extends NodeModel {
         // set and verify column selections and set warning if present
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
             .ifPresent(a -> setWarningMessage(a));
-        if (m_booleanModel.getBooleanValue()) {
+        if (!m_booleanModel.getBooleanValue()) {
             ColumnSelectionVerifier.verifyColumn(m_colModel, spec, DoubleValue.class, null)
                 .ifPresent(a -> setWarningMessage(a));
         }
