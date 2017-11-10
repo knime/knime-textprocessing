@@ -244,12 +244,9 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(inSpec);
         verifier.verifyMinimumStringCells(1, true);
 
-        // check column selection
-        ColumnSelectionVerifier urlColSelVerifier =
-            new ColumnSelectionVerifier(m_feedUrlColumn, inSpec, StringValue.class);
-        if (urlColSelVerifier.hasWarningMessage()) {
-            setWarningMessage(urlColSelVerifier.getWarningMessage());
-        }
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_feedUrlColumn, inSpec, StringValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
 
         // check if defined column names are available
         checkColumnNames(m_docColName.getStringValue());
