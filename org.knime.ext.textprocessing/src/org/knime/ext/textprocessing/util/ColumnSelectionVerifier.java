@@ -63,7 +63,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.5
  */
-public class ColumnSelectionVerifier {
+public final class ColumnSelectionVerifier {
 
     /**
      * This static method checks if the {@link DataTableSpec} contains a column which name is contained within the
