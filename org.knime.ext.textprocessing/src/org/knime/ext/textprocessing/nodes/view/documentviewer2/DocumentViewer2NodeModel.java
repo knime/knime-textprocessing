@@ -124,11 +124,8 @@ public class DocumentViewer2NodeModel extends NodeModel implements BufferedDataT
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-            new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
 
         m_documentCellindex = spec.findColumnIndex(m_documentColModel.getStringValue());
 
