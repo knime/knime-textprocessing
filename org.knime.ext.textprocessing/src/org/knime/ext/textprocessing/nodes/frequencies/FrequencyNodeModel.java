@@ -132,10 +132,8 @@ public abstract class FrequencyNodeModel extends NodeModel {
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
 
-        ColumnSelectionVerifier docVerifier = new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null).ifPresent(msg -> setWarningMessage(msg));
+
         m_documentColIndex = spec.findColumnIndex(
                 m_documentColModel.getStringValue());
     }
