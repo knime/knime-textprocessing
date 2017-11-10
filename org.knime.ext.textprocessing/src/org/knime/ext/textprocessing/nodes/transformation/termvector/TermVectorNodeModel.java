@@ -172,22 +172,15 @@ public class TermVectorNodeModel extends NodeModel {
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
         m_termColIndex = verifier.getTermCellIndex();
-
-        ColumnSelectionVerifier docVerifier =
-                new ColumnSelectionVerifier(m_documentColModel, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
-
-        m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
-
+        
+        // set and verify column selection and set warning message if present
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
+            .ifPresent(a -> setWarningMessage(a));
         if (!m_booleanModel.getBooleanValue()) {
-            ColumnSelectionVerifier valueVerifier =
-                    new ColumnSelectionVerifier(m_colModel, spec, DoubleValue.class);
-            if (valueVerifier.hasWarningMessage()) {
-                setWarningMessage(valueVerifier.getWarningMessage());
-            }
+            ColumnSelectionVerifier.verifyColumn(m_colModel, spec, DoubleValue.class, null)
+                .ifPresent(a -> setWarningMessage(a));
         }
+        m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
     }
 
     /**
