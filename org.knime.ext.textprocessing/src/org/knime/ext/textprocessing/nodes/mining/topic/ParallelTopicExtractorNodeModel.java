@@ -385,11 +385,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-                new ColumnSelectionVerifier(m_docCol, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_docCol, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
 
     }
 
