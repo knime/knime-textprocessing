@@ -392,11 +392,8 @@ public class KeywordExtractorNodeModel extends NodeModel {
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
-        ColumnSelectionVerifier docVerifier =
-                new ColumnSelectionVerifier(m_documentColumnName, spec, DocumentValue.class);
-        if (docVerifier.hasWarningMessage()) {
-            setWarningMessage(docVerifier.getWarningMessage());
-        }
+        ColumnSelectionVerifier.verifyColumn(m_documentColumnName, spec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
     }
 
     /**
