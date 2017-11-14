@@ -127,9 +127,9 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
     private JSpinner m_maxSpinner;
 
-    private JComboBox m_fontCombo;
+    private JComboBox<String> m_fontCombo;
 
-    private JComboBox m_calcType;
+    private JComboBox<String> m_calcType;
 
     private JSlider m_alphaSlider;
 
@@ -183,7 +183,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
         String[] fontnames = ge.getAvailableFontFamilyNames();
 
-        m_fontCombo = new JComboBox();
+        m_fontCombo = new JComboBox<String>();
         int curentpos = 0;
         for (int i = 0; i < fontnames.length; i++) {
             if (fontnames[i].equals(fontname)) {
@@ -201,7 +201,7 @@ public class TagCloudFontStyleTab extends PropertiesTab {
 
             }
         });
-        m_calcType = new JComboBox();
+        m_calcType = new JComboBox<String>();
         for (int i = 0; i < TagCloudConfigKeys.CFG_TYPEOFFSCALCI.length; i++) {
             m_calcType.addItem(TagCloudConfigKeys.CFG_TYPEOFFSCALCI[i]);
         }
