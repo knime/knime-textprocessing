@@ -108,7 +108,7 @@ public class IcfCellFactory extends FrequencyCellFactory {
         m_termCatData = new Hashtable<Term, Set<DocumentCategory>>();
         m_cats = new HashSet<DocumentCategory>();
 
-        int maxRows = docData.getRowCount();
+        long maxRows = docData.size();
         int currRow = 1;
 
         RowIterator it = docData.iterator();

@@ -222,7 +222,7 @@ public class StringMatcherNodeModel extends NodeModel {
         throws Exception {
         // needed for the progress calculation.
         int count = 0;
-        int max = inData[0].getRowCount();
+        long max = inData[0].size();
 
         int numberofrelatedwords = m_numberofrelatedwords.getIntValue();
 

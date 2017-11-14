@@ -412,7 +412,7 @@ public final class DocumentUtil {
 
         Set<Document> docs = new LinkedHashSet<>();
         RowIterator it = data.iterator();
-        int n = data.getRowCount();
+        long n = data.size();
         int i = 1;
         while (it.hasNext()) {
             exec.checkCanceled();

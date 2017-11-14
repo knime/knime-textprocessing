@@ -89,7 +89,7 @@ public final class DataStructureUtil {
         Set<Document> documents = new HashSet<Document>();
 
         int rowCount = 1;
-        int rows = data.getRowCount();
+        long rows = data.size();
 
         RowIterator it = data.iterator();
         while (it.hasNext()) {
@@ -127,8 +127,8 @@ public final class DataStructureUtil {
             final BufferedDataTable data, final int documentCellIndex,
             final ExecutionContext exec) throws CanceledExecutionException {
         int rowCount = 1;
-        int rows = data.getRowCount();
-        List<Document> documents = new ArrayList<Document>(rows);
+        long rows = data.size();
+        List<Document> documents = new ArrayList<Document>((int)rows);
 
 
         RowIterator it = data.iterator();

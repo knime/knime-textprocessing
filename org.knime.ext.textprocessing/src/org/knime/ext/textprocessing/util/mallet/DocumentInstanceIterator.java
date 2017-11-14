@@ -74,7 +74,7 @@ public class DocumentInstanceIterator implements Iterator<Instance> {
     private CloseableRowIterator m_iterator;
     private Document m_next = null;
     private final ExecutionMonitor m_exec;
-    private final int m_noOfRows;
+    private final long m_noOfRows;
     private int m_rowCounter = 0;
     private final Set<UUID> m_processedDocUUIDs = new HashSet<>();
     private final boolean m_checkDuplicates;
@@ -100,7 +100,7 @@ public class DocumentInstanceIterator implements Iterator<Instance> {
         }
         m_exec = exec;
         m_docColIdx = docColIdx;
-        m_noOfRows = table.getRowCount();
+        m_noOfRows = table.size();
         m_iterator = table.iterator();
         m_checkDuplicates = checkDuplicates;
     }

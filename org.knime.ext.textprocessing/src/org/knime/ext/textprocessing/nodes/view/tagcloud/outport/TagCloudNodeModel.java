@@ -212,7 +212,7 @@ public class TagCloudNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
 
         BufferedDataTable dataTable = (BufferedDataTable)inData[0];
-        int numofRows = dataTable.getRowCount();
+        long numofRows = dataTable.size();
         if (!m_allRows.getBooleanValue()) {
             numofRows = Math.min(m_noOfRows.getIntValue(), numofRows);
 
@@ -223,11 +223,11 @@ public class TagCloudNodeModel extends NodeModel {
             setWarningMessage("Empty data table, nothing to display.");
             panel = new TagCloudImageExportPanel(null);
         } else {
-       		m_data = new DefaultDataArray(dataTable, 1, numofRows, exec);
+       		m_data = new DefaultDataArray(dataTable, 1, (int)numofRows, exec);
         	checkDataTableSpec(dataTable.getDataTableSpec());
         	m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(m_termColModel.getStringValue());
         	m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(m_valueColModel.getStringValue());
-        	
+
             m_tagcloud = new TagCloud();
             m_tagcloud.createTagCloud(exec, this);
             m_tagcloud.changealpha(m_alphaModel.getIntValue());

@@ -252,7 +252,7 @@ public class NGramNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
         BufferedDataTable inputTable = inData[0];
-        final int inputTableSize = inputTable.getRowCount();
+        final long inputTableSize = inputTable.size();
         checkDataTableSpec(inputTable.getDataTableSpec());
 
         m_nGramDataTableCreator = createNGramCreator(exec);
@@ -310,7 +310,7 @@ public class NGramNodeModel extends NodeModel {
     }
 
     private Runnable processChunk(final List<Document> documents, final NGramDataTableCreator joiner,
-        final ExecutionContext exec, final Semaphore semaphore, final AtomicInteger docCount, final int inputTableSize)
+        final ExecutionContext exec, final Semaphore semaphore, final AtomicInteger docCount, final long inputTableSize)
         throws CanceledExecutionException {
         exec.checkCanceled();
         return new Runnable() {

@@ -124,7 +124,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
         private final long m_threadId;
 
-        private int m_rowidCounter = 0;
+        private long m_rowidCounter = 0;
 
         private BufferedDataContainer m_dc;
 
@@ -421,7 +421,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         final ParallelTopicModel model, final int topKWords) throws CanceledExecutionException {
         final BufferedDataContainer dc = exec.createDataContainer(createTopicTableSpec());
         final ArrayList<TreeSet<IDSorter>> topicSortedWords = model.getSortedWords();
-        int rowId = 0;
+        long rowId = 0;
         int wordCounter = 0;
         for (int topicId = 0; topicId < model.getNumTopics(); topicId++) {
             exec.setProgress(topicId / (double)model.getNumTopics(),

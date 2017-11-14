@@ -170,7 +170,7 @@ public class TermPurger {
 
         ExecutionContext subExec = m_exec.createSubExecutionContext(0.7);
         int currRow = 1;
-        int maxRows = m_inData.getRowCount();
+        long maxRows = m_inData.size();
         RowIterator it = m_inData.iterator();
         while (it.hasNext()) {
             subExec.checkCanceled();
@@ -210,7 +210,7 @@ public class TermPurger {
         try {
             ExecutionContext subExec = m_exec.createSubExecutionContext(0.3);
             int currRow = 1;
-            int maxRows = m_inData.getRowCount();
+            long maxRows = m_inData.size();
             RowIterator it = m_inData.iterator();
             while (it.hasNext()) {
                 m_exec.checkCanceled();
