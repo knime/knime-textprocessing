@@ -133,7 +133,7 @@ public abstract class FrequencyFilter extends AbstractRowFilter {
 
     /**
      * This method is called right after
-     * {@link FrequencyFilter#matches(DataRow, int)}. By implementing this
+     * {@link FrequencyFilter#matches(DataRow, long)}. By implementing this
      * method the strategy of filtering can be specified. For rows that have
      * to be filtered out, <code>false</code> has to be returned, otherwise
      * <code>true</code>.
