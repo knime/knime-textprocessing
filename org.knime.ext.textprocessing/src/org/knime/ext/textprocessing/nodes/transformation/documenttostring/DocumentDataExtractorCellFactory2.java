@@ -133,7 +133,23 @@ public class DocumentDataExtractorCellFactory2 implements CellFactory {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 3.5
      */
+    @Override
+    public void setProgress(final long curRowNr, final long rowCount,
+            final RowKey lastKey, final ExecutionMonitor exec) {
+        exec.setProgress(1.0 / rowCount * curRowNr,
+                "Processing row " + curRowNr + " of " + rowCount);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link DocumentDataExtractorCellFactory2#setProgress(long, long, RowKey, ExecutionMonitor)}
+     *             instead.
+     */
+    @Deprecated
     @Override
     public void setProgress(final int curRowNr, final int rowCount,
             final RowKey lastKey, final ExecutionMonitor exec) {

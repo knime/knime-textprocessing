@@ -121,8 +121,24 @@ public abstract class FrequencyCellFactory implements CellFactory {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 3.5
      */
     @Override
+    public final void setProgress(final long curRowNr, final long rowCount,
+            final RowKey lastKey, final ExecutionMonitor exec) {
+        double prog = (double)curRowNr / (double)rowCount;
+        exec.setProgress(prog, "Computing frequency of row: " + curRowNr
+                + " of " + rowCount + " rows");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link FrequencyCellFactory#setProgress(long, long, RowKey, ExecutionMonitor)} instead.
+     */
+    @Override
+    @Deprecated
     public final void setProgress(final int curRowNr, final int rowCount,
             final RowKey lastKey, final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;

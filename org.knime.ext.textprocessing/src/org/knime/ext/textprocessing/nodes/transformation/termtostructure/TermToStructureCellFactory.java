@@ -138,12 +138,25 @@ public class TermToStructureCellFactory implements CellFactory {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 3.5
      */
     @Override
-    public void setProgress(final int curRowNr, final int rowCount,
-            final RowKey lastKey, final ExecutionMonitor exec) {
+    public void setProgress(final long curRowNr, final long rowCount, final RowKey lastKey,
+        final ExecutionMonitor exec) {
         double prog = (double)curRowNr / (double)rowCount;
-        exec.setProgress(prog, "Processing row: " + curRowNr
-                + " of " + rowCount + " rows");
+        exec.setProgress(prog, "Processing row: " + curRowNr + " of " + rowCount + " rows");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link TermToStructureCellFactory#setProgress(long, long, RowKey, ExecutionMonitor)} instead.
+     */
+    @Deprecated
+    @Override
+    public void setProgress(final int curRowNr, final int rowCount, final RowKey lastKey, final ExecutionMonitor exec) {
+        double prog = (double)curRowNr / (double)rowCount;
+        exec.setProgress(prog, "Processing row: " + curRowNr + " of " + rowCount + " rows");
     }
 }

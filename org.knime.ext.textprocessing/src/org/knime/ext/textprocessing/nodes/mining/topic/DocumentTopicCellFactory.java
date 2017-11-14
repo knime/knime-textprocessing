@@ -139,10 +139,24 @@ public class DocumentTopicCellFactory implements CellFactory {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 3.5
      */
     @Override
+    public void setProgress(final long curRowNr, final long rowCount, final RowKey lastKey,
+        final ExecutionMonitor exec) {
+        exec.setProgress(curRowNr / (double)rowCount, "processing row " + lastKey);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link DocumentTopicCellFactory#setProgress(long, long, RowKey, ExecutionMonitor)} instead.
+     */
+    @Deprecated
+    @Override
     public void setProgress(final int curRowNr, final int rowCount, final RowKey lastKey, final ExecutionMonitor exec) {
-        exec.setProgress(curRowNr / (double) rowCount, "processing row " + lastKey);
+        exec.setProgress(curRowNr / (double)rowCount, "processing row " + lastKey);
     }
 
 
