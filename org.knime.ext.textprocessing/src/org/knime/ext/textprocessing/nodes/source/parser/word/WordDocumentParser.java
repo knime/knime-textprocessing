@@ -174,6 +174,11 @@ public class WordDocumentParser extends AbstractDocumentParser {
         m_currentDoc.addDocumentCategory(m_category);
         m_currentDoc.addDocumentSource(m_source);
 
+        POIFSFileSystem poifs = null;
+        HWPFDocument hdoc = null;
+        XWPFDocument hdoc2 = null;
+        WordExtractor extractor = null;
+
         try {
             // doc files
             if (m_docPath.endsWith(".doc")) {
@@ -188,8 +193,8 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
                 // open stream with copied content to read text
                 InputStream copiedInput = new ByteArrayInputStream(content);
-                final HWPFDocument hdoc = new HWPFDocument(copiedInput);
-                final WordExtractor extractor = new WordExtractor(hdoc);
+                hdoc = new HWPFDocument(copiedInput);
+                extractor = new WordExtractor(hdoc);
                 for (String p : extractor.getParagraphText()) {
                     p = p.trim();
                     if (!onlyWhitepscaes(p)) {
@@ -199,7 +204,7 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
                 // open stream again with copied content to read meta info
                 copiedInput = new ByteArrayInputStream(content);
-                final POIFSFileSystem poifs = new POIFSFileSystem(copiedInput);
+                poifs = new POIFSFileSystem(copiedInput);
                 final DirectoryEntry dir = poifs.getRoot();
                 final DocumentEntry siEntry = (DocumentEntry)dir.getEntry(SummaryInformation.DEFAULT_STREAM_NAME);
                 final PropertySet ps = new PropertySet(new DocumentInputStream(siEntry));
@@ -211,8 +216,8 @@ public class WordDocumentParser extends AbstractDocumentParser {
 
                 // docx files
             } else if (m_docPath.endsWith(".docx") || m_docPath.endsWith(".docm")) {
-                final XWPFDocument hdoc = new XWPFDocument(is);
-                final List<XWPFParagraph> paragraphs = hdoc.getParagraphs();
+                hdoc2 = new XWPFDocument(is);
+                final List<XWPFParagraph> paragraphs = hdoc2.getParagraphs();
                 for (final XWPFParagraph paragraph : paragraphs) {
                     final String text = paragraph.getText();
                     if (!onlyWhitepscaes(text)) {
@@ -220,8 +225,8 @@ public class WordDocumentParser extends AbstractDocumentParser {
                     }
                 }
 
-                setAuthor(hdoc.getProperties().getCoreProperties().getCreator());
-                setPublicationDate(hdoc.getProperties().getCoreProperties().getCreated());
+                setAuthor(hdoc2.getProperties().getCoreProperties().getCreator());
+                setPublicationDate(hdoc2.getProperties().getCoreProperties().getCreated());
             }
 
             m_currentDoc.createNewSection(SectionAnnotation.CHAPTER);
@@ -250,6 +255,18 @@ public class WordDocumentParser extends AbstractDocumentParser {
             return m_currentDoc.createDocument();
         } finally {
             is.close();
+            if (poifs != null) {
+                poifs.close();
+            }
+            if (hdoc != null) {
+                hdoc.close();
+            }
+            if (hdoc2 != null) {
+                hdoc2.close();
+            }
+            if (extractor != null) {
+                extractor.close();
+            }
         }
     }
 
