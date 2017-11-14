@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.base.data.sort.SortedTable;
 import org.knime.core.data.DataCell;
@@ -209,7 +210,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         checkDataTableSpec(spec);
         final int docIdx = spec.findColumnIndex(m_docCol.getStringValue());
         final int termIdx = spec.findColumnIndex(m_termCol.getStringValue());
-        final int rowCount = inData[0].getRowCount();
+        final long rowCount = inData[0].size();
         DataTable table;
         ExecutionContext myExec;
         if (m_sort.getBooleanValue()) {
@@ -275,7 +276,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         return new BufferedDataTable[]{dc.getTable()};
     }
 
-    private Runnable processDocument(final ExecutionMonitor exec, final int totalRowCount,
+    private Runnable processDocument(final ExecutionMonitor exec, final long totalRowCount,
         final AtomicInteger progressCounter, final int docRowCounter, final Semaphore semaphore,
         final AtomicInteger rowId, final BufferedDataContainer dc, final DataCell docCell, final TermChecker terms,
         final boolean skipMetaInformation, final boolean checkTags) throws CanceledExecutionException {
@@ -449,6 +450,58 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
      * @param tuples the tuples that occurred in the given document
      * @throws CanceledExecutionException if the operation has been canceled
      */
+    void createRows(final ExecutionMonitor exec, final AtomicLong rowId, final BufferedDataContainer dc,
+        final DataCell docCell, final HashMap<TermTuple, TermTuple> tuples) throws CanceledExecutionException {
+        synchronized (dc) {
+            //we synchronize the whole block to ensure that the tuples of a
+            //document added consecutively to the table
+            for (final TermTuple tuple : tuples.keySet()) {
+                exec.checkCanceled();
+                final List<DataCell> cells = new LinkedList<DataCell>();
+                cells.add(docCell);
+                if (m_checkTags.getBooleanValue()) {
+                    cells.add(m_termFac.createDataCell(tuple.getTerm1()));
+                    cells.add(m_termFac.createDataCell(tuple.getTerm2()));
+                } else {
+                    cells.add(new StringCell(tuple.getTerm1().getText()));
+                    cells.add(new StringCell(tuple.getTerm2().getText()));
+                }
+                if (inclDoc()) {
+                    cells.add(new IntCell(tuple.getDocument()));
+                }
+                if (inclSection()) {
+                    cells.add(new IntCell(tuple.getSection()));
+                }
+                if (inclParagraph()) {
+                    cells.add(new IntCell(tuple.getParagraph()));
+                }
+                if (inclSentence()) {
+                    cells.add(new IntCell(tuple.getSentence()));
+                }
+                if (inclNeighbors()) {
+                    cells.add(new IntCell(tuple.getNeighbor()));
+                }
+                if (inclTitle()) {
+                    cells.add(new IntCell(tuple.getTitle()));
+                }
+                final DefaultRow row = new DefaultRow(RowKey.createRowKey(rowId.getAndIncrement()), cells);
+                dc.addRowToTable(row);
+            }
+        }
+    }
+
+    /**
+     * @param exec provide progress and cancellation
+     * @param rowId the {@link AtomicInteger} that holds the row id
+     * @param dc the data container to use
+     * @param docCell the {@link DocumentCell} that contains the given tuples
+     * @param tuples the tuples that occurred in the given document
+     * @throws CanceledExecutionException if the operation has been canceled
+     * @deprecated Use
+     *             {@link CooccurrenceCounterNodeModel#createRows(ExecutionMonitor, AtomicLong, BufferedDataContainer, DataCell, HashMap)}
+     *             instead.
+     */
+    @Deprecated
     void createRows(final ExecutionMonitor exec, final AtomicInteger rowId, final BufferedDataContainer dc,
         final DataCell docCell, final HashMap<TermTuple, TermTuple> tuples) throws CanceledExecutionException {
         synchronized (dc) {
