@@ -62,7 +62,6 @@ import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.data.time.localdate.LocalDateValue;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Author;
 import org.knime.ext.textprocessing.data.Document;
@@ -84,8 +83,6 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 class DocumentDataAssignerCellFactory extends AbstractCellFactory {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentDataAssignerCellFactory.class);
 
     private final LazyInitializer<DataCellCache> m_cacheInitializer;
 

@@ -473,16 +473,6 @@ public class PorterStemmer implements TermPreprocessing, StringPreprocessing {
         return str;
     }
 
-
-    /**
-     * Returne true if given String ends with 's'.
-     * @param str String to check if it ends with 's'.
-     * @return True if given String end with 's'.
-     */
-    private boolean endsWithS(final String str) {
-        return str.endsWith("s");
-    }
-
     /**
      * Returns true if given String contains a vowel.
      * @param str String to check if it contains a vowel.

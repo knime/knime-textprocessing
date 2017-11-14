@@ -88,8 +88,6 @@ public class IdfCellFactory extends FrequencyCellFactory {
 
     private Set<Integer> m_docs;
 
-    private int documentCellIndex;
-
     private String m_idfMethod;
 
     /**
