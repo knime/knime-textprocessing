@@ -63,6 +63,8 @@ import javax.swing.JPanel;
  */
 public class TagCloudImageExportPanel extends JPanel {
 
+    private static final long serialVersionUID = 2856757620090895488L;
+
     private TagCloud m_tagcloud = null;
 
     private boolean m_antialiasing = false;

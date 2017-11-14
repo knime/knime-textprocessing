@@ -103,6 +103,7 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  *
  * @author Kilian Thiel, University of Konstanz
  */
+@SuppressWarnings("deprecation")
 public final class TermDocumentDeSerializationUtil {
 
     private static final NodeLogger LOGGER =
@@ -408,8 +409,9 @@ public final class TermDocumentDeSerializationUtil {
         BufferedInputStream bis = new BufferedInputStream((InputStream)input);
         if (DESERIALIZATION_UTIL.m_dmlDeserialization) {
             if (TermDocumentDeSerializationUtil.docIsDeprecSerialized(bis)) {
-                LongUTFDataInputStream dis = new LongUTFDataInputStream(new DataInputStream(bis));
-                return TermDocumentDeSerializationUtil.createDocumentBlobCellFromDML(dis.readUTF());
+                try (LongUTFDataInputStream dis = new LongUTFDataInputStream(new DataInputStream(bis))) {
+                    return TermDocumentDeSerializationUtil.createDocumentBlobCellFromDML(dis.readUTF());
+                }
             }
         }
         return new DocumentBlobCell(TermDocumentDeSerializationUtil.deserializeDocument(bis));
@@ -431,10 +433,10 @@ public final class TermDocumentDeSerializationUtil {
                 (InputStream)input);
         if (DESERIALIZATION_UTIL.m_dmlDeserialization) {
             if (TermDocumentDeSerializationUtil.docIsDeprecSerialized(bis)) {
-                LongUTFDataInputStream dis =
-                    new LongUTFDataInputStream(new DataInputStream(bis));
-                return TermDocumentDeSerializationUtil.
-                createDocumentCellFromDML(dis.readUTF());
+                try (LongUTFDataInputStream dis =
+                    new LongUTFDataInputStream(new DataInputStream(bis))) {
+                    return TermDocumentDeSerializationUtil.createDocumentCellFromDML(dis.readUTF());
+                }
             }
         }
         return new DocumentCell(TermDocumentDeSerializationUtil.deserializeDocument(bis));
@@ -809,9 +811,9 @@ public final class TermDocumentDeSerializationUtil {
                 (InputStream)input);
         if (DESERIALIZATION_UTIL.m_dmlDeserialization) {
             if (TermDocumentDeSerializationUtil.termIsDeprecSerialized(bis)) {
-                LongUTFDataInputStream dis =
-                    new LongUTFDataInputStream(new DataInputStream(bis));
-                return TermDocumentDeSerializationUtil.createTermCellFromUTF(dis.readUTF());
+                try (LongUTFDataInputStream dis = new LongUTFDataInputStream(new DataInputStream(bis))) {
+                    return TermDocumentDeSerializationUtil.createTermCellFromUTF(dis.readUTF());
+                }
             }
         }
         return new TermCell(TermDocumentDeSerializationUtil.deserializeTerm(bis));
