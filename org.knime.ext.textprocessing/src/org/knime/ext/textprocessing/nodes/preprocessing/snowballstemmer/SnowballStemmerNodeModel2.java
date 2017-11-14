@@ -49,7 +49,6 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -62,8 +61,6 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @since 3.1
  */
 public final class SnowballStemmerNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(SnowballStemmerNodeModel2.class);
 
     /** Default snowball stemmer name. */
     public static final String DEF_STEMMER_NAME = "Porter";
