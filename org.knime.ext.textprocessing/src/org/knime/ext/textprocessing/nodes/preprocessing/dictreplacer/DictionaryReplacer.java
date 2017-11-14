@@ -70,6 +70,8 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
 
     private Tokenizer m_wordTokenizer;
 
+    private static final String DEFAULT_WHITESPACE_SUFFIX = " ";
+
     /**
      * Creates new instance of <code>DictionaryReplacer</code> with give dictionary, containing key value pairs for
      * replacement.
@@ -113,7 +115,7 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
             List<Word> newWords = new ArrayList<Word>();
             for (String s : tokenizedWords) {
                 // TODO here the original white space suffix of the term should be added as suffix of last word.
-                newWords.add(new Word(s));
+                newWords.add(new Word(s, DEFAULT_WHITESPACE_SUFFIX));
             }
             return new Term(newWords, term.getTags(), term.isUnmodifiable());
         }

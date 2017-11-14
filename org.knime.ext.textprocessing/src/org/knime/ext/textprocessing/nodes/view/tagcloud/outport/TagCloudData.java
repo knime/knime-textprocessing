@@ -105,6 +105,7 @@ public class TagCloudData {
     private static final String CFG_KEY_TERM_ROWKEYS = "rowkeys";
     private static final String CFG_KEY_TERM_TAG_TYPE = "tagtype";
     private static final String CFG_KEY_TERM_TAG_VALUE = "tagvalue";
+    private static final String DEFAULT_WHITESPACE = " ";
 
     /** Term, representing the Object. */
     private Term m_term;
@@ -721,7 +722,7 @@ public class TagCloudData {
         // loading term data
         String words = modelContent.getString(config + CFG_KEY_TERM_WORDS);
         List<Word> wordlist = new LinkedList<Word>();
-        wordlist.add(new Word(words));
+        wordlist.add(new Word(words, DEFAULT_WHITESPACE));
 
         // loading first tag (others aren't needed here)
         List<Tag> taglist = new LinkedList<Tag>();
