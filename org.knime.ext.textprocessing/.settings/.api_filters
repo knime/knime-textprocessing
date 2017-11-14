@@ -27,12 +27,37 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/frequencies/filter/FilterNodeModel.java" type="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeModel">
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.frequencies.filter.FilterNodeModel"/>
+                <message_argument value="MIN_MIN_THRESHOLD"/>
+                <message_argument value="0.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/misc/stringmatcher/StringMatcherNodeModel.java" type="org.knime.ext.textprocessing.nodes.misc.stringmatcher.StringMatcherNodeModel">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.misc.stringmatcher.StringMatcherNodeModel"/>
+                <message_argument value="createSpec()"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/snowballstemmer/SnowballStemmerFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerFactory">
         <filter id="643842064">
             <message_arguments>
                 <message_argument value="SnowballStemmer"/>
                 <message_argument value="SnowballStemmerFactory"/>
                 <message_argument value="getStemmerByName(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/transformation/documentvectorhashing/AbstractDocumentHashingNodeModel.java" type="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.AbstractDocumentHashingNodeModel">
+        <filter id="338755678">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.transformation.documentvectorhashing.AbstractDocumentHashingNodeModel"/>
+                <message_argument value="DEFAULT_DOCUMENT_COLNAME"/>
             </message_arguments>
         </filter>
     </resource>
