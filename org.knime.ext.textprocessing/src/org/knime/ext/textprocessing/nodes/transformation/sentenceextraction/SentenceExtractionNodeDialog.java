@@ -70,6 +70,7 @@ public class SentenceExtractionNodeDialog extends DefaultNodeSettingsPane {
     /**
      * Creates a new instance of <code>SentenceExtractionNodeDialog</code>.
      */
+    @SuppressWarnings("unchecked")
     public SentenceExtractionNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
                 getDocumentColumnModel(), "Document column", 0, 
