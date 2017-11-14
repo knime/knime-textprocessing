@@ -167,8 +167,8 @@ public class DocumentCell extends DataCell implements DocumentValue, StringValue
         @Override
         public DocumentCell deserialize(final DataCellDataInput input)
                 throws IOException {
-            return TermDocumentDeSerializationUtil
-                    .deserializeDocumentCell(input);
+            return new DocumentCell(TermDocumentDeSerializationUtil
+                    .fastDeserializeDocument((input)));
         }
 
         /**
