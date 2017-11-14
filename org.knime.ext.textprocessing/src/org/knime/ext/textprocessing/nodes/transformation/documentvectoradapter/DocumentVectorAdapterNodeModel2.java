@@ -169,46 +169,15 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec dataTableSpec = (DataTableSpec)inSpecs[0];
-        checkDataTableSpec(dataTableSpec);
 
-        // check if valid model is connected
-        DocumentVectorPortObjectSpec modelSpec = null;
-        if (inSpecs[1] instanceof DocumentVectorPortObjectSpec) {
-            modelSpec = (DocumentVectorPortObjectSpec)inSpecs[1];
-        } else {
-            throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
-        }
+        checkDataTableSpec(dataTableSpec);
+        DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inSpecs[1]);
 
         // create spec if collection flag is checked
         DataTableSpec spec = null;
         if ((m_asCollectionModel.isEnabled() && m_asCollectionModel.getBooleanValue())
             || (m_useSettingsFromModelPortModel.getBooleanValue() && modelSpec.getCollectionCellSetting())) {
             spec = createDataTableSpecAsCollection(null);
-        }
-
-        // check if vector value model is in the incoming datatable
-        if (m_useSettingsFromModelPortModel.getBooleanValue()) {
-            int vectorValueColumnIndex = dataTableSpec.findColumnIndex(modelSpec.getVectorValueColumnName());
-            if (vectorValueColumnIndex < 0) {
-                throw new InvalidSettingsException("Vector value column \"" + modelSpec.getVectorValueColumnName()
-                    + "\" from input model could not be found in the input data table.");
-            }
-        } else if ((!m_useSettingsFromModelPortModel.getBooleanValue() || !m_booleanModel.getBooleanValue())) {
-            int vectorValueColumnIndex = dataTableSpec.findColumnIndex(m_colModel.getStringValue());
-            if (vectorValueColumnIndex < 0) {
-                throw new InvalidSettingsException("Vector value column \"" + m_colModel.getStringValue()
-                    + "\" could not be found in the input data table.");
-            }
-        }
-
-        // check if column space from input model has changed
-        // throw exception in case
-        if (m_previousFeatureColumns == null || m_useSettingsFromModelPortModel.getBooleanValue()) {
-            m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
-        } else if (!Arrays.equals(modelSpec.getFeatureSpaceColumns(), m_previousFeatureColumns)
-            && !m_useSettingsFromModelPortModel.getBooleanValue()) {
-            m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
-            throw new InvalidSettingsException("Input model has changed! Please configure node!");
         }
 
         return new DataTableSpec[]{spec};
@@ -223,7 +192,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         // set and verify column selections and set warning if present
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
             .ifPresent(a -> setWarningMessage(a));
-        if (!m_booleanModel.getBooleanValue()) {
+        if (!m_useSettingsFromModelPortModel.getBooleanValue() && !m_booleanModel.getBooleanValue()) {
             ColumnSelectionVerifier.verifyColumn(m_colModel, spec, DoubleValue.class, null)
                 .ifPresent(a -> setWarningMessage(a));
         }
@@ -232,15 +201,50 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         m_documentColIndex = spec.findColumnIndex(m_documentColModel.getStringValue());
     }
 
+    private final DocumentVectorPortObjectSpec checkModelInput(final DataTableSpec spec,
+        final PortObjectSpec portObjectSpec) throws InvalidSettingsException {
+
+        // check if valid model is connected
+        DocumentVectorPortObjectSpec modelSpec = null;
+        if (portObjectSpec instanceof DocumentVectorPortObjectSpec) {
+            modelSpec = (DocumentVectorPortObjectSpec)portObjectSpec;
+        } else {
+            throw new InvalidSettingsException("No model or model of wrong type is connected to model port!");
+        }
+
+        // check if vector value column name is in the incoming datatable
+        if (m_useSettingsFromModelPortModel.getBooleanValue() && !modelSpec.getBitVectorSetting()) {
+            int vectorValueColumnIndex = spec.findColumnIndex(modelSpec.getVectorValueColumnName());
+            if (vectorValueColumnIndex < 0) {
+                throw new InvalidSettingsException("DoubleValue column '" + modelSpec.getVectorValueColumnName()
+                    + "' from input model could not be found in the input data table.");
+            } else if (!spec.getColumnSpec(vectorValueColumnIndex).getType().isCompatible(DoubleValue.class)) {
+                throw new InvalidSettingsException(
+                    "Column '" + modelSpec.getVectorValueColumnName() + "' is not a DoubleValue column.");
+            }
+        }
+
+        // check if column space from input model has changed
+        // throw exception in case
+        if (m_previousFeatureColumns == null || m_useSettingsFromModelPortModel.getBooleanValue()) {
+            m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
+        } else if (!Arrays.equals(modelSpec.getFeatureSpaceColumns(), m_previousFeatureColumns)
+            && !m_useSettingsFromModelPortModel.getBooleanValue()) {
+            m_previousFeatureColumns = modelSpec.getFeatureSpaceColumns();
+            throw new InvalidSettingsException("Input model has changed! Please configure node!");
+        }
+
+        return modelSpec;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec) throws Exception {
         DataTableSpec dataTableSpec = ((BufferedDataTable)inData[0]).getDataTableSpec();
-        DocumentVectorPortObjectSpec modelSpec = ((DocumentVectorPortObject)inData[1]).getSpec();
-
         checkDataTableSpec(dataTableSpec);
+        DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inData[1].getSpec());
 
         boolean useBitvector = m_booleanModel.getBooleanValue();
         boolean ignoreTags = modelSpec.getIgnoreTagsSetting();
