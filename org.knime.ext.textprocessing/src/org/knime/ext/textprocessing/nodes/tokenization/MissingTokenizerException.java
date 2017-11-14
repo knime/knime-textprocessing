@@ -58,6 +58,8 @@ import org.knime.core.node.InvalidSettingsException;
  */
 public class MissingTokenizerException extends InvalidSettingsException {
 
+    private static final long serialVersionUID = 9163750872260236276L;
+
     /**
      * @param name The name of the tokenizer that could not be found.
      */

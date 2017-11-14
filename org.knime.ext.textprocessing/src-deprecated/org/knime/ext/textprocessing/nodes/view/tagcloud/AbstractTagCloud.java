@@ -99,6 +99,8 @@ import org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize.TCFontsize;
 public abstract class AbstractTagCloud<TC extends TagCloudData> implements
         HiLiteListener, Serializable {
 
+    private static final long serialVersionUID = 8195863832163182293L;
+
     /**
      * The constant defines the horizontal distance between two
      * labels.
