@@ -51,8 +51,6 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerConfigKeys;
-import org.knime.ext.textprocessing.nodes.view.documentviewer.DocumentViewerNodeDialog;
 
 /**
  *
@@ -65,11 +63,11 @@ public class DocumentViewer2NodeDialog extends DefaultNodeSettingsPane {
      *         preprocess.
      */
     public static SettingsModelString getDocumentColumnModel() {
-        return new SettingsModelString(DocumentViewerConfigKeys.CFG_KEY_DOCUMENT_COL, "");
+        return new SettingsModelString(DocumentViewerConfigKeys2.CFG_KEY_DOCUMENT_COL, "");
     }
 
     /**
-     * Creates new instance of {@link DocumentViewerNodeDialog}.
+     * Creates new instance of {@link DocumentViewer2NodeDialog}.
      */
     @SuppressWarnings("unchecked")
     public DocumentViewer2NodeDialog() {

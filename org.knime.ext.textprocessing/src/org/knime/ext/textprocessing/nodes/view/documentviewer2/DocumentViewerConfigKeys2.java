@@ -1,5 +1,5 @@
 /*
-========================================================================
+ * ------------------------------------------------------------------------
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -40,48 +40,25 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * -------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *    09.12.2008 (Tobias Koetter): created
+ *   08.08.2008 (thiel): created
  */
-
-package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
-
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponent;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.ext.textprocessing.data.DocumentValue;
-
+package org.knime.ext.textprocessing.nodes.view.documentviewer2;
 
 /**
- * The NodeDialog implementation of the DocumentDataExtractor node.
+ * Configuration keys for the Document Viewer 2 node.
  *
- * @author Tobias Koetter, University of Konstanz
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.5
  */
-public class DocumentDataExtractorNodeDialog extends DefaultNodeSettingsPane {
+public final class DocumentViewerConfigKeys2 {
 
-    private final SettingsModelString m_documentCol =
-        DocumentDataExtractorNodeModel2.getDocumentColConfigObj();
+    private DocumentViewerConfigKeys2() { }
 
-    private final SettingsModelStringArray m_extractorNames =
-        DocumentDataExtractorNodeModel2.getExtractorNamesConfigObj();
-
-    /**Constructor for class DocumentDataExtractorNodeDialog.
+    /**
+     * The configuration key for the column containing he documents to process.
      */
-    @SuppressWarnings("unchecked")
-    public DocumentDataExtractorNodeDialog() {
-        final DialogComponent colName = new DialogComponentColumnNameSelection(
-                m_documentCol, "Document column: ", 0, true,
-                DocumentValue.class);
-        final DialogComponent extractors =
-            new DialogComponentStringListSelection(m_extractorNames,
-                    "Data extractors: ",
-                    DocumentDataExtractor2.getExtractorNames());
-        addDialogComponent(colName);
-        addDialogComponent(extractors);
-    }
+    public static final String CFG_KEY_DOCUMENT_COL = "DocCol";
 }

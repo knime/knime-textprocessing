@@ -86,7 +86,6 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
-import org.knime.ext.textprocessing.nodes.transformation.documentvector.DocumentVectorNodeDialog;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
@@ -138,7 +137,7 @@ public class TermVectorNodeModel extends NodeModel {
 
     private final SettingsModelString m_documentColModel = TermVectorNodeDialog.getDocColModel();
 
-    private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog.getAsCollectionModel();
+    private SettingsModelBoolean m_asCollectionModel = TermVectorNodeDialog.getAsCollectionModel();
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
 

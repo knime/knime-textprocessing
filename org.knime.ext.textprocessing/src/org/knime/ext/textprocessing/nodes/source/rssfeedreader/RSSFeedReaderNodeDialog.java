@@ -84,7 +84,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelBoolean createDocumentColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_DOC_COLUMN,
-            RSSFeedReaderNodeModel.DEF_CREATE_DOC_COLUMN);
+            RSSFeedReaderNodeModel2.DEF_CREATE_DOC_COLUMN);
     }
 
     /**
@@ -92,7 +92,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString createDocColumnNameModel() {
         return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_DOC_COL_NAME,
-            RSSFeedReaderNodeModel.DEF_DOC_COL_NAME);
+            RSSFeedReaderNodeModel2.DEF_DOC_COL_NAME);
     }
 
     /**
@@ -101,7 +101,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelBoolean createXMLColumnModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_CREATE_XML_COLUMN,
-            RSSFeedReaderNodeModel.DEF_CREATE_XML_COLUMN);
+            RSSFeedReaderNodeModel2.DEF_CREATE_XML_COLUMN);
     }
 
     /**
@@ -109,7 +109,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString createXmlColumnNameModel() {
         return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_XML_COL_NAME,
-            RSSFeedReaderNodeModel.DEF_XML_COL_NAME);
+            RSSFeedReaderNodeModel2.DEF_XML_COL_NAME);
     }
 
     /**
@@ -117,7 +117,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelIntegerBounded createNumberOfThreadsModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_NUMBER_OF_THREADS,
-            RSSFeedReaderNodeModel.DEF_THREADS, RSSFeedReaderNodeModel.MIN_THREADS, RSSFeedReaderNodeModel.MAX_THREADS);
+            RSSFeedReaderNodeModel2.DEF_THREADS, RSSFeedReaderNodeModel2.MIN_THREADS, RSSFeedReaderNodeModel2.MAX_THREADS);
     }
 
     /**
@@ -125,7 +125,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelIntegerBounded createTimeOutModel() {
         return new SettingsModelIntegerBounded(RSSFeedReaderConfigKeys.CFGKEY_TIMEOUT,
-            RSSFeedReaderNodeModel.DEF_TIMEOUT, RSSFeedReaderNodeModel.MIN_TIMEOUT, RSSFeedReaderNodeModel.MAX_TIMEOUT);
+            RSSFeedReaderNodeModel2.DEF_TIMEOUT, RSSFeedReaderNodeModel2.MIN_TIMEOUT, RSSFeedReaderNodeModel2.MAX_TIMEOUT);
     }
 
     /**
@@ -133,7 +133,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelBoolean getHttpResponseCodeModel() {
         return new SettingsModelBoolean(RSSFeedReaderConfigKeys.CFGKEY_GET_HTTP_RESPONSE_CODE_COLUMN,
-            RSSFeedReaderNodeModel.DEF_GET_HTTP_RESPONSE_CODE_COLUMN);
+            RSSFeedReaderNodeModel2.DEF_GET_HTTP_RESPONSE_CODE_COLUMN);
     }
 
     /**
@@ -141,7 +141,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString createHttpColumnNameModel() {
         return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_HTTP_COL_NAME,
-            RSSFeedReaderNodeModel.DEF_HTTP_COL_NAME);
+            RSSFeedReaderNodeModel2.DEF_HTTP_COL_NAME);
     }
 
     static SettingsModelString getTokenizerModel() {
