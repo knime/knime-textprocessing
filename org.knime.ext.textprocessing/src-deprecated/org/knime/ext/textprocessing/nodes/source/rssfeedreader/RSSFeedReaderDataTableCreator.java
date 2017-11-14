@@ -95,6 +95,7 @@ import com.rometools.rome.io.SyndFeedInput;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @deprecated Use {@link RSSFeedReaderDataTableCreator2} instead.
  */
+@SuppressWarnings("javadoc")
 @Deprecated
 class RSSFeedReaderDataTableCreator {
 

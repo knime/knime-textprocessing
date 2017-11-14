@@ -152,6 +152,7 @@ public final class TagFactory {
         return m_tagBuilder.get(type);
     }
 
+    @SuppressWarnings("unchecked")
     private void addTags(final Set<String> tagClassNames) {
         Class<? extends TagBuilder> tagClass;
         try {

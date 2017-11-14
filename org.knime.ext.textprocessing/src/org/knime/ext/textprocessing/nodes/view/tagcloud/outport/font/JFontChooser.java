@@ -79,6 +79,7 @@ import javax.swing.text.Position;
  * }
  * </pre>
  **/
+@SuppressWarnings("rawtypes")
 public class JFontChooser extends JComponent {
 
     private static final long serialVersionUID = -8417346501644932014L;
@@ -236,6 +237,7 @@ public class JFontChooser extends JComponent {
         return m_fontSizeTextField;
     }
 
+    @SuppressWarnings("unchecked")
     private JList getFontFamilyList() {
         if (m_fontNameList == null) {
             m_fontNameList = new JList(getFontFamilies());
@@ -250,6 +252,7 @@ public class JFontChooser extends JComponent {
         return m_fontNameList;
     }
 
+    @SuppressWarnings("unchecked")
     private JList getFontStyleList() {
         if (m_fontStyleList == null) {
             m_fontStyleList = new JList(getFontStyleNames());
@@ -264,6 +267,7 @@ public class JFontChooser extends JComponent {
         return m_fontStyleList;
     }
 
+    @SuppressWarnings("unchecked")
     private JList getFontSizeList() {
         if (m_fontSizeList == null) {
             m_fontSizeList = new JList(m_fontSizeStrings);

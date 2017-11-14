@@ -410,7 +410,6 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
         /**
          * {@inheritDoc}
          */
-        @SuppressWarnings("deprecation")
         @Override
         public boolean includeColumn(final DataColumnSpec colSpec) {
             if (colSpec == null) {

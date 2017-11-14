@@ -89,6 +89,7 @@ import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
  * @since 3.3
  * @deprecated Use {@link DocumentHashingNodeModel2} instead
  */
+@SuppressWarnings("javadoc")
 @Deprecated
 public class DocumentHashingNodeModel extends SimpleStreamableFunctionNodeModel {
 

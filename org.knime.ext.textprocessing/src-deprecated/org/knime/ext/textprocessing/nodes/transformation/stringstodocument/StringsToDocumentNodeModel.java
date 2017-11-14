@@ -441,7 +441,6 @@ public class StringsToDocumentNodeModel extends SimpleStreamableFunctionNodeMode
      * @param dataTableSpec
      * @since 3.3
      */
-    @SuppressWarnings("deprecation")
     protected void doSmartDialogSelection(final DataTableSpec dataTableSpec) {
         String[] columns = dataTableSpec.getColumnNames();
         if (settingsNotConfigured()) {

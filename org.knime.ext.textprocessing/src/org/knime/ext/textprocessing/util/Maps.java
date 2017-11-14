@@ -101,7 +101,7 @@ public class Maps {
      *
      * @author Pierre-Francois Laquerre, University of Konstanz
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static class ValueComparator implements
             Comparator<Entry<?, ? extends Comparable>> {
 

@@ -172,7 +172,6 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("deprecation")
     @Override
     public DataCell[] getCells(final DataRow row) {
         final DocumentBuilder docBuilder = new DocumentBuilder(m_tokenizerName);

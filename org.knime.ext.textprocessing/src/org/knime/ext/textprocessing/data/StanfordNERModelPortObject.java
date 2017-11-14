@@ -83,6 +83,7 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     /**
      * Define port type of objects of this class when used as PortObjects.
      */
+    @SuppressWarnings("hiding")
     public static final PortType TYPE = PortTypeRegistry.getInstance().getPortType(StanfordNERModelPortObject.class);
 
     /**

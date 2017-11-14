@@ -64,6 +64,7 @@ import com.rometools.rome.feed.synd.SyndFeed;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @deprecated Use {@link FeedReaderResult2} instead.
  */
+@SuppressWarnings("javadoc")
 @Deprecated
 class FeedReaderResult {
 

@@ -87,6 +87,7 @@ import com.rometools.rome.io.SyndFeedOutput;
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @deprecated Use {@link FeedEntryResult2}
  */
+@SuppressWarnings("javadoc")
 @Deprecated
 class FeedEntryResult {
 
