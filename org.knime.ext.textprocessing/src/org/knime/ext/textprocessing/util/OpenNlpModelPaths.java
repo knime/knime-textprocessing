@@ -119,6 +119,7 @@ public final class OpenNlpModelPaths {
     }
 
     /**
+     * @return the model file of the german tokenization model.
      * @since 3.3
      */
     public String getDeTokenizerModelFile() {
