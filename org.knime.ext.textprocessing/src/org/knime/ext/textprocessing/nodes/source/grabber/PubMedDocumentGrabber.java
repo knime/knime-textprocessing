@@ -153,6 +153,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public List < Document > grabDocuments(final File directory,
             final Query query) throws Exception {
         if (directory != null && query != null) {
@@ -398,6 +399,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             }
         } catch (IOException e) {
             LOGGER.error("Documents could not be downloaded.");
+            writer.close();
             throw e;
         }
 
