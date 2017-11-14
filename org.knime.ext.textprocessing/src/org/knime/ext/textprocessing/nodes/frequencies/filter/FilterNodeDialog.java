@@ -64,7 +64,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 
 /**
  * The dialog class of the filter node.
@@ -125,6 +124,15 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
+     * @return Creates and returns a new instance of {@code SettingsModelString} containing the name of the document
+     *         column.
+     * @since 3.5
+     */
+    public static final SettingsModelString getDocumentColumnModel() {
+        return new SettingsModelString(FilterConfigKeys.CFG_KEY_DOCUMENT_COL, "");
+    }
+
+    /**
      * @return Creates and returns a new instance of
      * <code>SettingsModelBoolean</code> specifying if modification of
      * unmodifiable terms is done.
@@ -155,7 +163,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
         DialogComponentColumnNameSelection comp3 =
             new DialogComponentColumnNameSelection(
-                    PreprocessingNodeSettingsPane.getDocumentColumnModel(),
+                    FilterNodeDialog.getDocumentColumnModel(),
                     "Document column", 0, DocumentValue.class);
         addDialogComponent(comp3);
 

@@ -69,7 +69,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelDoubleRange;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -153,7 +152,7 @@ public class FilterNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_modifyUnmodifiableModel = FilterNodeDialog.getModifyUnmodifiableModel();
 
-    private SettingsModelString m_documentColModel = PreprocessingNodeSettingsPane.getDocumentColumnModel();
+    private SettingsModelString m_documentColModel = FilterNodeDialog.getDocumentColumnModel();
 
     private int m_termColIndex = -1;
 
