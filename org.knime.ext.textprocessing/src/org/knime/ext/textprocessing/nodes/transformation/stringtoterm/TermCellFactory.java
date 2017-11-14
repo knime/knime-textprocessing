@@ -57,7 +57,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -68,7 +68,7 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermCellFactory implements CellFactory {
+public class TermCellFactory extends AbstractCellFactory {
 
     private int m_colIndex;
 

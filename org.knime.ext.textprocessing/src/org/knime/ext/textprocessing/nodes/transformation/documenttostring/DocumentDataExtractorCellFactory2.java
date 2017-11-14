@@ -53,6 +53,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.container.CellFactory;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Document;
@@ -66,7 +67,7 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * @author Tobias Koetter, University of Konstanz
  * @since 3.4
  */
-public class DocumentDataExtractorCellFactory2 implements CellFactory {
+public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
 
     private final DocumentDataExtractor2[] m_extractors;
     private final int m_docColIdx;

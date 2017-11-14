@@ -56,7 +56,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Tag;
@@ -67,7 +67,7 @@ import org.knime.ext.textprocessing.data.TermValue;
  *
  * @author Kilian Thiel
  */
-public class TagToStringCellFactory implements CellFactory {
+public class TagToStringCellFactory extends AbstractCellFactory {
 
     private int m_termColIndex = -1;
 

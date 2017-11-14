@@ -53,7 +53,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -64,7 +64,7 @@ import org.knime.ext.textprocessing.data.TermValue;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TermToStringCellFactory implements CellFactory {
+public class TermToStringCellFactory extends AbstractCellFactory {
 
     private int m_termColIndex = -1;
 

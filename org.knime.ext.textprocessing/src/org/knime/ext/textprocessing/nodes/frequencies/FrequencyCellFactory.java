@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.frequencies;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.node.ExecutionMonitor;
@@ -67,7 +67,7 @@ import org.knime.core.node.ExecutionMonitor;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public abstract class FrequencyCellFactory implements CellFactory {
+public abstract class FrequencyCellFactory extends AbstractCellFactory {
 
     private int m_documentColIndex = -1;
 

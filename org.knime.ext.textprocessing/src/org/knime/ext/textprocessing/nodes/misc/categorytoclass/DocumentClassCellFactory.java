@@ -59,7 +59,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Document;
@@ -70,7 +70,7 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class DocumentClassCellFactory implements CellFactory {
+public class DocumentClassCellFactory extends AbstractCellFactory {
 
     private static final String UNDEFINED = "undefined";
 

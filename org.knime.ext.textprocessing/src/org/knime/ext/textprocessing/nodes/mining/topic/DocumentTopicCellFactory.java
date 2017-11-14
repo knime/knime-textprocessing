@@ -55,7 +55,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.ExecutionMonitor;
@@ -68,7 +68,7 @@ import cc.mallet.topics.ParallelTopicModel;
  *
  * @author Tobias Koetter, KNIME AG, Zurich, Switzerland
  */
-public class DocumentTopicCellFactory implements CellFactory {
+public class DocumentTopicCellFactory extends AbstractCellFactory {
 
     /**Prefix for the topic id.*/
     public static final String TOPIC_PREFIX = "topic_";
