@@ -64,6 +64,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
+import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
 
@@ -167,7 +168,7 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
         m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
-        addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
+        addDialogComponent(new DialogComponentPasswordField((SettingsModelPassword)m_authModel, "Enter password"));
         setHorizontalPlacement(false);
 
         closeCurrentGroup();
