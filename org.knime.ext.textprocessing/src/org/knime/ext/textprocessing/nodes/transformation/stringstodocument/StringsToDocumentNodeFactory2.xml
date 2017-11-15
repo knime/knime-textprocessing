@@ -75,8 +75,8 @@
             If checked, the date value of the specified column will be used as document publication date.
         </option>
         <option name="Publication date column">
-            The column containing the date which is used as publication date. (if "Use publication date from column" 
-            is checked, otherwise the current date from "Publication date" field is set as date). 
+            The column containing the date which is used as publication date. If "Use publication date from column" 
+            is checked, otherwise the current date from "Publication date" field is set as date. 
             Note: The column type must be Date only. To convert the date &amp; time type to date only,
             consider using "Modify time" node to remove time. If the column has the legacy date &amp; time type,
             consider using the node "Legacy Date&amp;Time To Date&amp;Time" for conversion.
