@@ -228,30 +228,36 @@ public class TagCloudNodeModel extends NodeModel {
         	m_termColIndex = dataTable.getDataTableSpec().findColumnIndex(m_termColModel.getStringValue());
         	m_valueColIndex = dataTable.getDataTableSpec().findColumnIndex(m_valueColModel.getStringValue());
 
-            m_tagcloud = new TagCloud();
-            m_tagcloud.createTagCloud(exec, this);
-            m_tagcloud.changealpha(m_alphaModel.getIntValue());
-            m_tagcloud.changebold(m_boldModel.getIntValue());
-            m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(),
-                    m_tagcloud.getmaxFontsize(), getFont().getName(),
-                    m_tagcloud.getCalcType(), m_boldModel.getIntValue());
-            m_tagcloud.changeWidth(m_widthModel.getIntValue());
-            exec.setProgress(1, "TagCloud completed");
+            try {
+                m_tagcloud = new TagCloud();
+                m_tagcloud.createTagCloud(exec, this);
+                m_tagcloud.changealpha(m_alphaModel.getIntValue());
+                m_tagcloud.changebold(m_boldModel.getIntValue());
+                m_tagcloud.changeFontsizes(m_tagcloud.getminFontsize(),
+                        m_tagcloud.getmaxFontsize(), getFont().getName(),
+                        m_tagcloud.getCalcType(), m_boldModel.getIntValue());
+                m_tagcloud.changeWidth(m_widthModel.getIntValue());
+                exec.setProgress(1, "TagCloud completed");
 
-            TagCloudViewPlotter plotter = new TagCloudViewPlotter();
-            plotter.setTagCloudModel(m_tagcloud);
-            plotter.updatePaintModel();
-            plotter.fitToSize(getWindowDimension());
+                TagCloudViewPlotter plotter = new TagCloudViewPlotter();
+                plotter.setTagCloudModel(m_tagcloud);
+                plotter.updatePaintModel();
+                plotter.fitToSize(getWindowDimension());
 
-            panel = new TagCloudImageExportPanel(m_tagcloud);
-            panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
-            panel.setOpaque(true);
-            panel.setBackground(m_backgroundColorModel.getColorValue());
-            // don't know exactly why bonds have to be set, but they need
-            // to be set in order to get the background drawn properly.
-            // If bonds are not set background settings will be ignored even
-            // if opaque is set.
-            panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, m_tagcloud.getPreferredSize().height);
+                panel = new TagCloudImageExportPanel(m_tagcloud);
+                panel.setAntialiasing(m_antialiasingModel.getBooleanValue());
+                panel.setOpaque(true);
+                panel.setBackground(m_backgroundColorModel.getColorValue());
+                // don't know exactly why bonds have to be set, but they need
+                // to be set in order to get the background drawn properly.
+                // If bonds are not set background settings will be ignored even
+                // if opaque is set.
+                panel.setBounds(0, 0, m_tagcloud.getPreferredSize().width, m_tagcloud.getPreferredSize().height);
+            } catch (IllegalStateException e) {
+                setWarningMessage("Empty data table, nothing to display.");
+                m_tagcloud = null;
+                panel = new TagCloudImageExportPanel(null);
+            }
         }
 
         final String imgType = m_imagetypeModel.getStringValue();

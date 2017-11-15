@@ -151,9 +151,10 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
      *            check for cancel actions made by the user during the execution.
      * @param tagModel containing necessary data information
      * @throws CanceledExecutionException If execution was canceled by the user.
+     * @throws IllegalStateException in case of no data present
      */
     public void createTagCloud(final ExecutionContext totalexec,
-            final TagCloudNodeModel tagModel) throws CanceledExecutionException {
+            final TagCloudNodeModel tagModel) throws CanceledExecutionException, IllegalStateException {
         final int tablewidth = 1000;
 
         totalexec.setProgress(0, "Starting TagCloud Calculation");
@@ -162,6 +163,11 @@ public class TagCloud extends AbstractTagCloud<TagCloudData> {
         initMinMaxandData((DataArray)tagModel.getData(), tagModel.ignoreTags(),
             tagModel.getTermCol(), tagModel.getValueCol());
 
+        // the map shouldn't be empty at this point. If it is, it's highly likely
+        // that there's something wrong with the input data, e.g contains only missing values.
+        if (getDataMap().isEmpty()) {
+           throw new IllegalStateException("Cannot process data. Please check the input table!");
+        }
         totalexec.checkCanceled();
         initAllLabels(System.currentTimeMillis());
 
