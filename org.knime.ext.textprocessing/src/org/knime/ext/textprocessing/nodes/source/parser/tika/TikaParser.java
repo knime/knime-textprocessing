@@ -180,7 +180,7 @@ public class TikaParser {
         }
 
         if (!m_sourceNode && m_extBoolean) {
-            if (!m_validTypes.contains(FilenameUtils.getExtension(getPath(url)).toLowerCase())) { //getName
+            if (!m_validTypes.contains(FilenameUtils.getExtension(getStringRepresentation(url)).toLowerCase())) { //getName
                 m_errorMsg = "File doesn't match any selected extension(s)";
                 result.add(createMissingRow(url, m_errorMsg));
                 return result;
@@ -201,7 +201,7 @@ public class TikaParser {
             setPasswordToContext();
         }
 
-        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, FilenameUtils.getName(getPath(url))); //getName
+        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, FilenameUtils.getName(getStringRepresentation(url))); //getName
 
         try (BufferedInputStream str = new BufferedInputStream(FileUtil.openStreamWithTimeout(url))) {
             mime_type = m_parser.getDetector().detect(str, m_metadata).toString();
@@ -257,10 +257,10 @@ public class TikaParser {
                     ex.setContext(m_context);
                     ex.setDuplicateFilesList(m_duplicates);
                     ex.setExtractInlineImages(m_extractInlineImages);
-                    ex.extract(stream, attachmentDir.toPath(), FilenameUtils.getName(getPath(url))); //getName
+                    ex.extract(stream, attachmentDir.toPath(), FilenameUtils.getName(getStringRepresentation(url))); //getName
                     if (ex.hasError()) {
                         m_errorMsg = "Could not write embedded files to the output directory";
-                        LOGGER.error(m_errorMsg + ": " + getPath(url));
+                        LOGGER.error(m_errorMsg + ": " + getStringRepresentation(url));
                     }
                     m_metadata = ex.getMetadata();
                     m_handler = ex.getHandler();
@@ -268,7 +268,7 @@ public class TikaParser {
                     DataCell[] cellsTwo = {};
                     for (Entry<String, String> entry : ex.getOutputFiles().entrySet()) {
                         cellsTwo = new DataCell[TikaParserConfig.OUTPUT_TWO_COL_NAMES.length];
-                        cellsTwo[0] = new StringCell(getPath(url));
+                        cellsTwo[0] = new StringCell(getStringRepresentation(url));
                         cellsTwo[1] = new StringCell(entry.getKey());
                         cellsTwo[2] = new StringCell(entry.getValue());
                         result.add(cellsTwo);
@@ -294,7 +294,7 @@ public class TikaParser {
             String colName = m_outputColumnsOne.get(j);
             Property prop = TikaColumnKeys.COLUMN_PROPERTY_MAP.get(colName);
             if (prop == null && colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                cellsOne[j] = new StringCell(getPath(url));
+                cellsOne[j] = new StringCell(getStringRepresentation(url));
             } else if (prop == null && colName.equals(TikaColumnKeys.COL_MIME_TYPE)) {
                 if (mime_type.equals("-")) {
                     cellsOne[j] = DataType.getMissingCell();
@@ -339,7 +339,7 @@ public class TikaParser {
         for (int j = 0; j < outputSize; j++) {
             String colName = m_outputColumnsOne.get(j);
             if (colName.equals(TikaColumnKeys.COL_FILEPATH)) {
-                cells[j] = new StringCell(getPath(url));
+                cells[j] = new StringCell(getStringRepresentation(url));
             } else if (colName.equals(m_errorColName)) {
                 cells[j] = new StringCell(errorMsg);
             } else {
@@ -355,7 +355,7 @@ public class TikaParser {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public static String getPath(final URL url) throws IOException, URISyntaxException {
+    public static String getStringRepresentation(final URL url) throws IOException, URISyntaxException {
         Path path = FileUtil.resolveToPath(url);
         if (path == null) {
             return url.toString();

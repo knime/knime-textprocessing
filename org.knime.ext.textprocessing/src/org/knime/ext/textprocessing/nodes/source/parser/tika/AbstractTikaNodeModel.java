@@ -254,7 +254,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     errorMsg = tikaParser.getErrorMsg();
                     if (datacells == null || datacells.isEmpty()) {
                         if (!errorMsg.isEmpty()) {
-                            setWarningMessage(errorMsg + ": " + TikaParser.getPath(url));
+                            setWarningMessage(errorMsg + ": " + TikaParser.getStringRepresentation(url));
                             error = true;
                         }
                         continue; // skipped files
@@ -265,7 +265,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
                     rowKeyOne++;
 
                     if (!errorMsg.isEmpty()) {
-                        setWarningMessage(errorMsg + ": " + TikaParser.getPath(url));
+                        setWarningMessage(errorMsg + ": " + TikaParser.getStringRepresentation(url));
                         error = true;
                         continue;
                     }
