@@ -106,8 +106,6 @@ public class ThresholdFilter extends FrequencyFilter {
             if (val >= m_min && val <= m_max) {
                 return true;
             }
-        } else if (cell.isMissing()) {
-            return true;
         }
         return false;
     }
