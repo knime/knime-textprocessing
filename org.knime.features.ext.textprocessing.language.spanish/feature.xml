@@ -357,6 +357,10 @@ library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
    </license>
 
+   <requires>
+      <import feature="org.knime.features.ext.textprocessing" version="3.5.0.qualifier" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="org.knime.ext.textprocessing.language.spanish"
          download-size="0"
