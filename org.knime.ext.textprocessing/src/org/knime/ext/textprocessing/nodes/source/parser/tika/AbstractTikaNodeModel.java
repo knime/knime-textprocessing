@@ -331,6 +331,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_columnModel.validateSettings(settings);
         m_extractAttachmentModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
+        // only validate if password is stored as password not as string (for backwards compatibility)
         if (settings.getString(m_authModel.getKey(), null) == null) {
             m_authModel.validateSettings(settings);
         }
@@ -373,10 +374,13 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_columnModel.loadSettingsFrom(settings);
         m_extractAttachmentModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
+        // check if password is stored as string for backwards compatibility
         String oldPwdString = settings.getString(TikaParserConfigKeys.CFGKEY_CREDENTIALS, null);
         if (oldPwdString != null) {
+            // set the password to SettingsModelPassword
             m_authModel.setStringValue(oldPwdString);
         } else {
+            // just do normal loading if password is not stored as string but as password
             m_authModel.loadSettingsFrom(settings);
         }
         m_authBooleanModel.loadSettingsFrom(settings);
