@@ -47,9 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.frequencies.filter;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
@@ -170,7 +167,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         filteringOptions[1] = new FilteringOptions(FilterNodeModel.SELECTION_NUMBER);
 
         m_selectionModel = getSelectionModel();
-        m_selectionModel.addChangeListener(new FilterOptionChangeListener());
+        m_selectionModel.addChangeListener(e -> enableModels());
 
         DialogComponentButtonGroup filterOptionButtons =
             new DialogComponentButtonGroup(m_selectionModel, "Filtering by", false, filteringOptions);
@@ -214,16 +211,6 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
                 FilterNodeModel.SELECTION_THRESHOLD)) {
             m_numberModel.setEnabled(false);
             m_minMaxModel.setEnabled(true);
-        }
-    }
-
-    private class FilterOptionChangeListener implements ChangeListener {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            enableModels();
         }
     }
 
