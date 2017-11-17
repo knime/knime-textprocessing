@@ -58,6 +58,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
+import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 
@@ -246,8 +247,22 @@ public class TikaParserConfig {
 
     /**
      * @param authBooleanModel boolean to decide whether encrypted files should be parsed.
-     * @return SettingsModelString that contains the password of any encrypted files.
+     * @return SettingsModelPassword that contains the password of any encrypted files.
      */
+    public static SettingsModelPassword getCredentialsPWD(final SettingsModelBoolean authBooleanModel) {
+        final SettingsModelPassword s = new SettingsModelPassword(TikaParserConfigKeys.CFGKEY_CREDENTIALS,
+            ";Op5~pK{31AIN^eH~Ab`:YaiKM8CM`8_Dw:1Kl4_WHrvuAXO", "");
+        authBooleanModel.addChangeListener(e -> s.setEnabled(authBooleanModel.getBooleanValue()));
+        s.setEnabled(authBooleanModel.getBooleanValue());
+        return s;
+    }
+
+    /**
+     * @param authBooleanModel boolean to decide whether encrypted files should be parsed.
+     * @return SettingsModelString that contains the password of any encrypted files.
+     * @deprecated Use {@link #getCredentialsPWD(SettingsModelBoolean)} instead.
+     */
+    @Deprecated
     public static SettingsModelString getCredentials(final SettingsModelBoolean authBooleanModel) {
         final SettingsModelString s = new SettingsModelString(TikaParserConfigKeys.CFGKEY_CREDENTIALS, "");
         authBooleanModel.addChangeListener(e -> s.setEnabled(authBooleanModel.getBooleanValue()));

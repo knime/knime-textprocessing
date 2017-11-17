@@ -77,6 +77,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
+import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.port.PortObjectSpec;
@@ -110,7 +111,7 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
 
     private SettingsModelBoolean m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
 
-    private SettingsModelString m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
+    private SettingsModelPassword m_authModel = TikaParserConfig.getCredentialsPWD(m_authBooleanModel);
 
     private SettingsModelBoolean m_errorColumnModel = TikaParserConfig.getErrorColumnModel();
 
@@ -330,7 +331,9 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_columnModel.validateSettings(settings);
         m_extractAttachmentModel.validateSettings(settings);
         m_extractPathModel.validateSettings(settings);
-        m_authModel.validateSettings(settings);
+        if (settings.getString(m_authModel.getKey(), null) == null) {
+            m_authModel.validateSettings(settings);
+        }
         m_authBooleanModel.validateSettings(settings);
         m_errorColumnModel.validateSettings(settings);
         m_errorColNameModel.validateSettings(settings);
@@ -370,7 +373,12 @@ public abstract class AbstractTikaNodeModel extends NodeModel {
         m_columnModel.loadSettingsFrom(settings);
         m_extractAttachmentModel.loadSettingsFrom(settings);
         m_extractPathModel.loadSettingsFrom(settings);
-        m_authModel.loadSettingsFrom(settings);
+        String oldPwdString = settings.getString(TikaParserConfigKeys.CFGKEY_CREDENTIALS, null);
+        if (oldPwdString != null) {
+            m_authModel.setStringValue(oldPwdString);
+        } else {
+            m_authModel.loadSettingsFrom(settings);
+        }
         m_authBooleanModel.loadSettingsFrom(settings);
         m_errorColumnModel.loadSettingsFrom(settings);
         m_errorColNameModel.loadSettingsFrom(settings);

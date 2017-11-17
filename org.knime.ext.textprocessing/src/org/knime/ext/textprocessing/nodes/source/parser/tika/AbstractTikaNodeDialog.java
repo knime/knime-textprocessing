@@ -92,7 +92,7 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_authBooleanModel;
 
-    private SettingsModelString m_authModel;
+    private SettingsModelPassword m_authModel;
 
     private TikaDialogComponentStringFilter m_filterComponent;
 
@@ -166,9 +166,9 @@ public abstract class AbstractTikaNodeDialog extends DefaultNodeSettingsPane {
         createNewGroup("Encrypted files settings");
         setHorizontalPlacement(true);
         m_authBooleanModel = TikaParserConfig.getAuthBooleanModel();
-        m_authModel = TikaParserConfig.getCredentials(m_authBooleanModel);
+        m_authModel = TikaParserConfig.getCredentialsPWD(m_authBooleanModel);
         addDialogComponent(new DialogComponentBoolean(m_authBooleanModel, "Parse encrypted files"));
-        addDialogComponent(new DialogComponentPasswordField((SettingsModelPassword)m_authModel, "Enter password"));
+        addDialogComponent(new DialogComponentPasswordField(m_authModel, "Enter password"));
         setHorizontalPlacement(false);
 
         closeCurrentGroup();
