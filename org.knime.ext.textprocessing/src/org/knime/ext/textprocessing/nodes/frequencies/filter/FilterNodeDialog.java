@@ -178,7 +178,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(filterOptionButtons);
 
         // Min Max Settings
-        createNewGroup("Min Max Settings");
+        createNewGroup("Threshold settings");
         m_minMaxModel = getMinMaxModel();
         DialogComponentDoubleRange minMax = new DialogComponentDoubleRange(m_minMaxModel,
             FilterNodeModel.MIN_MIN_THRESHOLD, FilterNodeModel.MAX_MAX_THRESHOLD, 0.1, "");
@@ -187,8 +187,8 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
         // Number Settings
         m_numberModel = getNumberModel();
-        createNewGroup("Number Settings");
-        addDialogComponent(new DialogComponentNumber(m_numberModel, "Number", 100));
+        createNewGroup("Number of terms settings");
+        addDialogComponent(new DialogComponentNumber(m_numberModel, "Keep K most frequent terms", 100));
         closeCurrentGroup();
 
         createNewTabAt("Deep Filtering", 2);
