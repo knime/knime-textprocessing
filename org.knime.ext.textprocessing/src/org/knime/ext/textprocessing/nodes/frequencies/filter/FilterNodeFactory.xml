@@ -38,11 +38,11 @@
              value. The number of terms filter on the other hand keeps a number K
              rows with the highest values.
         </option>
-        <option name="Min Max settings">
+        <option name="Threshold settings">
             Specifies the minimum and the maximum threshold of the values of
             the filter column.
         </option>
-        <option name="Number Settings">
+        <option name="Number of terms settings">
             Specifies a number K of rows to keep, the rest is filtered out.
             Only these K rows with the highest value of the filter column are
             kept.
