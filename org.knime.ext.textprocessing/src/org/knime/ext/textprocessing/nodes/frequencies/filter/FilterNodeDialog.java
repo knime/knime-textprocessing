@@ -155,62 +155,52 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public FilterNodeDialog() {
         removeTab("Options");
-        createNewTabAt("Deep Filtering", 2);
-        DialogComponentBoolean comp = new DialogComponentBoolean(
-                getDeepFilteringModel(), "Deep filtering");
-        comp.setToolTipText(
-        "Be aware that deep filtering is more time consuming!");
 
-        DialogComponentColumnNameSelection comp3 =
-            new DialogComponentColumnNameSelection(
-                    FilterNodeDialog.getDocumentColumnModel(),
-                    "Document column", 0, DocumentValue.class);
-        addDialogComponent(comp3);
-
-
-        addDialogComponent(comp);
-                createNewTabAt("Filter Settings", 1);
-
+        createNewTabAt("Filter Settings", 1);
         // Modify Unmodifiable
-        addDialogComponent(new DialogComponentBoolean(
-                getModifyUnmodifiableModel(), "Filter unmodifiable terms"));
+        addDialogComponent(new DialogComponentBoolean(getModifyUnmodifiableModel(), "Filter unmodifiable terms"));
 
         // Column Selection
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                getColModel(), "Filter column", 0, IntValue.class,
-                DoubleValue.class));
-
+        addDialogComponent(new DialogComponentColumnNameSelection(getColModel(), "Filter column", 0, IntValue.class,
+            DoubleValue.class));
 
         // Filter Option
         ButtonGroupEnumInterface[] filteringOptions = new FilteringOptions[2];
-        filteringOptions[0] = new FilteringOptions(
-                FilterNodeModel.SELECTION_THRESHOLD);
-        filteringOptions[1] = new FilteringOptions(
-                FilterNodeModel.SELECTION_NUMBER);
+        filteringOptions[0] = new FilteringOptions(FilterNodeModel.SELECTION_THRESHOLD);
+        filteringOptions[1] = new FilteringOptions(FilterNodeModel.SELECTION_NUMBER);
 
         m_selectionModel = getSelectionModel();
         m_selectionModel.addChangeListener(new FilterOptionChangeListener());
 
         DialogComponentButtonGroup filterOptionButtons =
-            new DialogComponentButtonGroup(m_selectionModel, "Filtering by",
-                    false, filteringOptions);
+            new DialogComponentButtonGroup(m_selectionModel, "Filtering by", false, filteringOptions);
         addDialogComponent(filterOptionButtons);
 
         // Min Max Settings
         createNewGroup("Min Max Settings");
         m_minMaxModel = getMinMaxModel();
-        DialogComponentDoubleRange minMax = new DialogComponentDoubleRange(
-                m_minMaxModel, FilterNodeModel.MIN_MIN_THRESHOLD,
-                FilterNodeModel.MAX_MAX_THRESHOLD, 0.1, "");
+        DialogComponentDoubleRange minMax = new DialogComponentDoubleRange(m_minMaxModel,
+            FilterNodeModel.MIN_MIN_THRESHOLD, FilterNodeModel.MAX_MAX_THRESHOLD, 0.1, "");
         addDialogComponent(minMax);
         closeCurrentGroup();
 
         // Number Settings
         m_numberModel = getNumberModel();
         createNewGroup("Number Settings");
-        addDialogComponent(new DialogComponentNumber(m_numberModel, "Number",
-                100));
+        addDialogComponent(new DialogComponentNumber(m_numberModel, "Number", 100));
         closeCurrentGroup();
+
+        createNewTabAt("Deep Filtering", 2);
+        // document column selection
+        DialogComponentColumnNameSelection comp3 = new DialogComponentColumnNameSelection(
+            FilterNodeDialog.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
+        addDialogComponent(comp3);
+
+        // deep filtering checkbox
+        DialogComponentBoolean comp = new DialogComponentBoolean(getDeepFilteringModel(), "Deep filtering");
+        comp.setToolTipText("Be aware that deep filtering is more time consuming!");
+
+        addDialogComponent(comp);
 
         enableModels();
     }
