@@ -146,6 +146,10 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
     private final SettingsModelString m_selectionModel;
 
+    private final SettingsModelString m_docColumnModel;
+
+    private final SettingsModelBoolean m_deepFilteringModel;
+
     /**
      * Creates a new instance of <code>FilterNodeDialog</code>.
      */
@@ -189,17 +193,24 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
         createNewTabAt("Deep Filtering", 2);
         // document column selection
+        m_docColumnModel = getDocumentColumnModel();
         DialogComponentColumnNameSelection comp3 = new DialogComponentColumnNameSelection(
-            FilterNodeDialog.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
+            m_docColumnModel, "Document column", 0, DocumentValue.class);
         addDialogComponent(comp3);
 
         // deep filtering checkbox
-        DialogComponentBoolean comp = new DialogComponentBoolean(getDeepFilteringModel(), "Deep filtering");
+        m_deepFilteringModel = getDeepFilteringModel();
+        m_deepFilteringModel.addChangeListener(e -> checkSettings());
+        DialogComponentBoolean comp = new DialogComponentBoolean(m_deepFilteringModel, "Deep filtering");
         comp.setToolTipText("Be aware that deep filtering is more time consuming!");
 
         addDialogComponent(comp);
 
         enableModels();
+    }
+
+    private void checkSettings() {
+        m_docColumnModel.setEnabled(m_deepFilteringModel.getBooleanValue());
     }
 
     private void enableModels() {

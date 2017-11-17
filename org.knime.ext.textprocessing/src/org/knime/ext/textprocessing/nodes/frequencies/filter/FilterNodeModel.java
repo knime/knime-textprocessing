@@ -50,9 +50,6 @@ package org.knime.ext.textprocessing.nodes.frequencies.filter;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.base.node.preproc.filter.row.RowFilterTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
@@ -162,7 +159,9 @@ public class FilterNodeModel extends NodeModel {
     public FilterNodeModel() {
         super(1, 1);
 
-        m_filterSelectionModel.addChangeListener(new FilterOptionChangeListener());
+        m_deepFilteringModel.addChangeListener(e -> checkSettings());
+        m_filterSelectionModel.addChangeListener(e -> enableModels());
+        checkSettings();
         enableModels();
     }
 
@@ -222,6 +221,10 @@ public class FilterNodeModel extends NodeModel {
         return new BufferedDataTable[]{exec.createBufferedDataTable(filteredTable, subExec3)};
     }
 
+    private void checkSettings() {
+        m_documentColModel.setEnabled(m_deepFilteringModel.getBooleanValue());
+    }
+
     private void enableModels() {
         if (m_filterSelectionModel.getStringValue().equals(FilterNodeModel.SELECTION_NUMBER)) {
             m_numberModel.setEnabled(true);
@@ -229,16 +232,6 @@ public class FilterNodeModel extends NodeModel {
         } else if (m_filterSelectionModel.getStringValue().equals(FilterNodeModel.SELECTION_THRESHOLD)) {
             m_numberModel.setEnabled(false);
             m_minMaxModel.setEnabled(true);
-        }
-    }
-
-    private class FilterOptionChangeListener implements ChangeListener {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            enableModels();
         }
     }
 
