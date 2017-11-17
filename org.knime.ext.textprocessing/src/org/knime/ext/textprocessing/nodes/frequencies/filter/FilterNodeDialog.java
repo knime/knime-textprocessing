@@ -155,7 +155,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     public FilterNodeDialog() {
         removeTab("Options");
-        createNewTabAt("Deep Filtering", 1);
+        createNewTabAt("Deep Filtering", 2);
         DialogComponentBoolean comp = new DialogComponentBoolean(
                 getDeepFilteringModel(), "Deep filtering");
         comp.setToolTipText(
@@ -169,7 +169,7 @@ public class FilterNodeDialog extends DefaultNodeSettingsPane {
 
 
         addDialogComponent(comp);
-                createNewTabAt("Filter Settings", 2);
+                createNewTabAt("Filter Settings", 1);
 
         // Modify Unmodifiable
         addDialogComponent(new DialogComponentBoolean(
