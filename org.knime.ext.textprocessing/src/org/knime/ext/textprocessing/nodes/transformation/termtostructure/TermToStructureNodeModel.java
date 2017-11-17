@@ -166,7 +166,7 @@ public class TermToStructureNodeModel extends NodeModel {
         // initializes the corresponding cell factory
         TermToStructureCellFactory cellFac = new TermToStructureCellFactory(
                 m_termColIndex, m_newColName,
-                FormatType.valueOf(m_formatTypeModel.getStringValue()));
+                FormatType.valueOf(formatType));
 
         // compute frequency and add column
         ColumnRearranger rearranger = new ColumnRearranger(
