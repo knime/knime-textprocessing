@@ -17,18 +17,6 @@
         is filtered.
 	</intro>
 
-	<tab name="Deep Filtering">
-        <option name="Document column">
-              Specifies the column containing the documents to apply the
-              filtering.
-        </option>
-        <option name="Deep filtering">
-             If deep filtering is checked, the terms contained inside
-             the documents are filtered too, this means that the documents are
-             changed, which is more time consuming.
-        </option>
-    </tab>
-
     <tab name="Filter options">
         <option name="Filter unmodifiable terms">
              Usually terms which have been set unmodifiable are not modified
@@ -60,6 +48,19 @@
             kept.
         </option>
     </tab>
+    
+    <tab name="Deep Filtering">
+        <option name="Document column">
+              Specifies the column containing the documents to apply the
+              filtering.
+        </option>
+        <option name="Deep filtering">
+             If deep filtering is checked, the terms contained inside
+             the documents are filtered too, this means that the documents are
+             changed, which is more time consuming.
+        </option>
+    </tab>
+    
 	</fullDescription>
 
 	<ports>
