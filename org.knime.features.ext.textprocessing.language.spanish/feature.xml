@@ -6,7 +6,7 @@
       provider-name="KNIME Gmbh, Konstanz, Germany"
       plugin="org.knime.ext.textprocessing.language.spanish">
 
-   <description url="http://tech.knime.org/knime-labs">
+   <description url="https://www.knime.com/knime-text-processing">
       This feature contains natural language processing models for
 Spanish.
    </description>

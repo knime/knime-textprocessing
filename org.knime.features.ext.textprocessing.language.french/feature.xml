@@ -6,7 +6,7 @@
       provider-name="KNIME AG, Zurich, Switzerland"
       plugin="org.knime.ext.textprocessing.language.french">
 
-   <description url="http://tech.knime.org/knime-labs">
+   <description url="https://www.knime.com/knime-text-processing">
       This feature contains natural language processing models for French.
    </description>
 
