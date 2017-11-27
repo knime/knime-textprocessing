@@ -303,12 +303,12 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
                 if (scores.length >= 6) {
                     Locale loc = Locale.getDefault();
                     NumberFormat format = NumberFormat.getInstance(loc);
-                    Double precision = format.parse(scores[0]).doubleValue();
-                    Double recall = format.parse(scores[1]).doubleValue();
-                    Double f1 = format.parse(scores[2]).doubleValue();
-                    int tp = Integer.parseInt(scores[3]);
-                    int fp = Integer.parseInt(scores[4]);
-                    int fn = Integer.parseInt(scores[5].split("\r")[0]);
+                    Double precision = format.parse(scores[0].trim()).doubleValue();
+                    Double recall = format.parse(scores[1].trim()).doubleValue();
+                    Double f1 = format.parse(scores[2].trim()).doubleValue();
+                    int tp = Integer.parseInt(scores[3].trim());
+                    int fp = Integer.parseInt(scores[4].trim());
+                    int fn = Integer.parseInt(scores[5].trim());
                     // create the scores row and add it to the BufferedDataContainer we created in the beginning
                     stats = new DefaultRow(new RowKey("Row0"), new DataCell[]{new DoubleCell(precision),
                         new DoubleCell(recall), new DoubleCell(f1), new IntCell(tp), new IntCell(fp), new IntCell(fn)});
