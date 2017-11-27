@@ -14,9 +14,9 @@
 			terms space, exactly as the normal document vector node. The
 			difference is that this node takes one data table and one Document Vector model as input:
 			<br />
-			1. Table containing the bag-of-words terms
+			1. Document Vector model containing names of feature space columns and node settings
 			<br />
-			2. Document Vector model containing names of feature space columns and node settings
+			2. Table containing the bag-of-words terms
 			<br />
 			<br />
 			The terms from the first input will be converted into document
@@ -87,11 +87,11 @@
 	</fullDescription>
 
 	<ports>
-		<inPort name="Documents input table" index="0">The input table
-			containing the bag of words.
-		</inPort>
-		<inPort name="Document vector model input" index="1">The input
+		<inPort name="Document vector model input" index="0">The input
 			model containing the node settings and column names of the term feature space.
+		</inPort>
+		<inPort name="Documents input table" index="1">The input table
+			containing the bag of words.
 		</inPort>
 		<outPort name="Documents output table" index="0">An output table
 			containing the documents with the corresponding document vectors,
