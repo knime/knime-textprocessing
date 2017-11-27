@@ -48,6 +48,7 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -112,6 +113,8 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
     private final DialogComponentStringFilter m_stringFilterComponent;
 
+    private boolean m_hasNumberCol = true;
+
     /**
      * Creates a new instance of {@code DocumentVectorAdapterNodeDialog2}.
      */
@@ -120,7 +123,7 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
         createNewGroup("General settings");
         addDialogComponent(
-            new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 0, DocumentValue.class));
+            new DialogComponentColumnNameSelection(getDocumentColModel(), "Document column", 1, DocumentValue.class));
 
         m_useModelPortSettingsModel.addChangeListener(e -> checkUncheck());
 
@@ -132,7 +135,8 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(m_booleanModel, "Bitvector"));
 
-        addDialogComponent(new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 0, DoubleValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 1, false, DoubleValue.class));
 
         addDialogComponent(new DialogComponentBoolean(m_asCollectionCell, "As collection cell"));
         closeCurrentGroup();
@@ -146,17 +150,16 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     private void checkUncheck() {
-        m_booleanModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
+        m_booleanModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue() && m_hasNumberCol);
         m_asCollectionCell.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_vectorColsModel.setEnabled(!m_useModelPortSettingsModel.getBooleanValue());
         m_stringFilterComponent.setEnabledComponents(!m_useModelPortSettingsModel.getBooleanValue());
-
-        if (m_useModelPortSettingsModel.getBooleanValue()
-            || (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue())) {
-            m_columnModel.setEnabled(false);
-        } else {
-            m_columnModel.setEnabled(true);
+        // set bitVector setting to true if no number column present
+        if (!m_hasNumberCol) {
+            m_booleanModel.setBooleanValue(true);
         }
+        m_columnModel.setEnabled(
+            !m_useModelPortSettingsModel.getBooleanValue() && m_hasNumberCol && !m_booleanModel.getBooleanValue());
     }
 
     /**
@@ -177,6 +180,12 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
+
+        // check if spec contains a number column
+        DataTableSpec dataTableSpec = (DataTableSpec)specs[1];
+        m_hasNumberCol = dataTableSpec.containsCompatibleType(DoubleValue.class);
+        checkUncheck();
+
         DocumentVectorPortObjectSpec modelSpec = (DocumentVectorPortObjectSpec)specs[0];
         // throw exception if no or a wrong model is connected to the model port
         if (!(specs[0] instanceof DocumentVectorPortObjectSpec)) {
