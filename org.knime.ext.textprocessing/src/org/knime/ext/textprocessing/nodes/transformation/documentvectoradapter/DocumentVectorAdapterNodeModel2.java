@@ -149,6 +149,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
     private String[] m_previousFeatureColumns = null;
 
+    private boolean m_hasNumberCol = true;
+
     /**
      * Creates a new instance of {@code DocumentVectorAdapterNodeModel2}.
      */
@@ -184,8 +186,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
-        verifier.verifyMinimumNumberCells(1, true);
         verifier.verifyTermCell(true);
+        m_hasNumberCol = spec.containsCompatibleType(DoubleValue.class);
+        checkUncheck();
 
         // set and verify column selections and set warning if present
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
@@ -568,16 +571,16 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     }
 
     private void checkUncheck() {
-        m_booleanModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
+        m_booleanModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue() && m_hasNumberCol);
         m_asCollectionModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
         m_vectorColsModel.setEnabled(!m_useSettingsFromModelPortModel.getBooleanValue());
 
-        if (m_useSettingsFromModelPortModel.getBooleanValue()
-            || (m_booleanModel.isEnabled() && m_booleanModel.getBooleanValue())) {
-            m_colModel.setEnabled(false);
-        } else {
-            m_colModel.setEnabled(true);
+        // set bitVector setting to true if no number column present
+        if (!m_hasNumberCol) {
+            m_booleanModel.setBooleanValue(true);
         }
+        m_colModel.setEnabled(
+            !m_useSettingsFromModelPortModel.getBooleanValue() && m_hasNumberCol && !m_booleanModel.getBooleanValue());
     }
 
 }
