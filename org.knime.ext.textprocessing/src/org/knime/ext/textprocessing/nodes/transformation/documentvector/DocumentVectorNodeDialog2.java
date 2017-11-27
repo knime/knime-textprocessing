@@ -47,7 +47,10 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documentvector;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -120,6 +123,8 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
     private SettingsModelBoolean m_booleanModel;
 
+    private boolean m_hasNumberCol = true;
+
     /**
      * Creates a new instance of {@code DocumentVectorNodeDialog2}.
      */
@@ -136,7 +141,8 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentBoolean(m_booleanModel, "Bitvector"));
 
-        addDialogComponent(new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 0, DoubleValue.class));
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(m_columnModel, "Vector value", 0, false, DoubleValue.class));
 
         addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As collection cell"));
 
@@ -144,10 +150,23 @@ class DocumentVectorNodeDialog2 extends DefaultNodeSettingsPane {
     }
 
     private void checkUncheck() {
-        if (m_booleanModel.getBooleanValue()) {
-            m_columnModel.setEnabled(false);
-        } else {
-            m_columnModel.setEnabled(true);
+        m_booleanModel.setEnabled(m_hasNumberCol);
+        if (!m_hasNumberCol) {
+            m_booleanModel.setBooleanValue(true);
         }
+        m_columnModel.setEnabled(!m_booleanModel.getBooleanValue() && m_hasNumberCol);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        // TODO Auto-generated method stub
+        super.loadAdditionalSettingsFrom(settings, specs);
+
+        m_hasNumberCol = specs[0].containsCompatibleType(DoubleValue.class);
+        checkUncheck();
     }
 }

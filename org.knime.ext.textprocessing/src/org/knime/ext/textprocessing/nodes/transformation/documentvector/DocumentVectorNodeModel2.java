@@ -144,6 +144,8 @@ class DocumentVectorNodeModel2 extends NodeModel {
 
     private SettingsModelBoolean m_asCollectionModel = DocumentVectorNodeDialog2.getAsCollectionModel();
 
+    private boolean m_hasNumberCol = true;
+
     /**
      * Creates a new instance of {@code DocumentVectorNodeModel2}.
      */
@@ -174,7 +176,9 @@ class DocumentVectorNodeModel2 extends NodeModel {
         final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier.verifyTermCell(true);
-        verifier.verifyMinimumNumberCells(1, true);
+
+        m_hasNumberCol = spec.containsCompatibleType(DoubleValue.class);
+        checkUncheck();
 
         // set and verify column selections and set warning if present
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, spec, DocumentValue.class, null)
@@ -488,10 +492,10 @@ class DocumentVectorNodeModel2 extends NodeModel {
     }
 
     private void checkUncheck() {
-        if (m_booleanModel.getBooleanValue()) {
-            m_colModel.setEnabled(false);
-        } else {
-            m_colModel.setEnabled(true);
+        m_booleanModel.setEnabled(m_hasNumberCol);
+        if (!m_hasNumberCol) {
+            m_booleanModel.setBooleanValue(true);
         }
+        m_colModel.setEnabled(!m_booleanModel.getBooleanValue() && m_hasNumberCol);
     }
 }
