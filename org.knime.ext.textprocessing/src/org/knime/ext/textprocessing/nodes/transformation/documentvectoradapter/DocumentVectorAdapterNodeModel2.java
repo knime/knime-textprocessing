@@ -153,10 +153,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
      * Creates a new instance of {@code DocumentVectorAdapterNodeModel2}.
      */
     DocumentVectorAdapterNodeModel2() {
-        super(
-            new PortType[]{BufferedDataTable.TYPE,
-                PortTypeRegistry.getInstance().getPortType(DocumentVectorPortObject.class, false)},
-            new PortType[]{BufferedDataTable.TYPE});
+        super(new PortType[]{PortTypeRegistry.getInstance().getPortType(DocumentVectorPortObject.class, false),
+            BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
         m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
         m_booleanModel.addChangeListener(e -> checkUncheck());
         m_useSettingsFromModelPortModel.addChangeListener(e -> checkUncheck());
@@ -168,10 +166,10 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
      */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        DataTableSpec dataTableSpec = (DataTableSpec)inSpecs[0];
+        DataTableSpec dataTableSpec = (DataTableSpec)inSpecs[1];
 
         checkDataTableSpec(dataTableSpec);
-        DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inSpecs[1]);
+        DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inSpecs[0]);
 
         // create spec if collection flag is checked
         DataTableSpec spec = null;
@@ -242,9 +240,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
      */
     @Override
     protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec) throws Exception {
-        DataTableSpec dataTableSpec = ((BufferedDataTable)inData[0]).getDataTableSpec();
+        DataTableSpec dataTableSpec = ((BufferedDataTable)inData[1]).getDataTableSpec();
         checkDataTableSpec(dataTableSpec);
-        DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inData[1].getSpec());
+        DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inData[0].getSpec());
 
         boolean useBitvector = m_booleanModel.getBooleanValue();
         boolean ignoreTags = modelSpec.getIgnoreTagsSetting();
@@ -286,7 +284,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         colList.add(m_documentColModel.getStringValue());
         boolean[] sortAsc = {true};
         BufferedDataTable sortedTable =
-            new SortedTable((BufferedDataTable)inData[0], colList, sortAsc, exec).getBufferedDataTable();
+            new SortedTable((BufferedDataTable)inData[1], colList, sortAsc, exec).getBufferedDataTable();
 
         // hash table holding an index for each feature
         final Map<String, Integer> featureIndexTable = new HashMap<String, Integer>();

@@ -177,9 +177,9 @@ class DocumentVectorAdapterNodeDialog2 extends DefaultNodeSettingsPane {
     public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
-        DocumentVectorPortObjectSpec modelSpec = (DocumentVectorPortObjectSpec)specs[1];
+        DocumentVectorPortObjectSpec modelSpec = (DocumentVectorPortObjectSpec)specs[0];
         // throw exception if no or a wrong model is connected to the model port
-        if (!(specs[1] instanceof DocumentVectorPortObjectSpec)) {
+        if (!(specs[0] instanceof DocumentVectorPortObjectSpec)) {
             throw new NotConfigurableException("No model or wrong model connected to model port!");
         }
         StringFilterConfiguration config = new StringFilterConfiguration(CFG_CONFIGROOTNAME);
