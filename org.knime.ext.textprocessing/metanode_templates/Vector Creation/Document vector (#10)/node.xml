@@ -29,5 +29,9 @@
 <entry key="index" type="xint" value="0"/>
 <entry key="port_dir_location" type="xstring" isnull="true" value=""/>
 </config>
+<config key="port_1">
+<entry key="index" type="xint" value="1"/>
+<entry key="port_dir_location" type="xstring" isnull="true" value=""/>
+</config>
 </config>
 </config>
