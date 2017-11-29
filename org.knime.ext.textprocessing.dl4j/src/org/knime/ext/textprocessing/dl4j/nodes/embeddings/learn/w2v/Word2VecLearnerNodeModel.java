@@ -89,7 +89,7 @@ public class Word2VecLearnerNodeModel extends AbstractDLNodeModel {
     }
 
     @Override
-    protected WordVectorFileStorePortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
+    protected WordVectorFileStorePortObject[] executeDL4JMemorySafe(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
         final BufferedDataTable table = (BufferedDataTable)inObjects[0];
 
