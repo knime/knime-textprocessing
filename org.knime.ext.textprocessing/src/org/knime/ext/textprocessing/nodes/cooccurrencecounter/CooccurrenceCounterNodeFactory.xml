@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../icons/TextProcFrequencies.png" type="Learner">
-    <name>Term co-occurrence counter</name>
+    <name>Term Co-Occurrence Counter</name>
     <shortDescription>
         Counts the number of co-occurrences for the given list of terms 
         within the different parts e.g. sentence, paragraph, section and title
