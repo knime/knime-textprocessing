@@ -44,6 +44,14 @@
                 <li>English left3words caseless: Trained on WSJ sections 0-18 and extra 
                     parser training data using the left3words architecture and includes 
                     word shape and distributional similarity features. Ignores case.</li>
+             </ul>
+             </p>
+             <p>   
+             To use following tagger models, the specific language pack has to be installed.
+             (File -> Install KNIME Extensions...)
+             </p>
+             <p>   
+             <ul>
                 <li>German hgc: Trained on the first 80% of the Negra corpus, which uses
                     the STTS tagset.</li>
                 <li>German dewac: This model uses features from the distributional 
@@ -52,7 +60,7 @@
                     several times faster than the other alternatives.</li>
                 <li>French: Trained on the French treebank.</li>
                 <li>Spanish: Trained on the Spanish Ancora tagset.</li>
-                <li>Spanish distsin: Trained on the French Spanish ancora tagset.</li>
+                <li>Spanish distsim: Trained on the French Spanish ancora tagset.</li>
             </ul>
             </p>
         </intro>

@@ -69,6 +69,12 @@
                 <li> English all 3 class (nodistsim): Location, Person, Organization </li>
                 <li> English conll 4 class (nodistsim):  Location, Person, Organization, Misc </li>
                 <li> English muc 7 class (nodistsim): Location, Person, Organization, Money, Percent, Date, Time </li>
+            </ul>
+            
+            To use following tagger models, the specific language pack has to be installed.
+            (File -> Install KNIME Extensions...)
+            
+            <ul>
                 <li> German dewac (created by Faruqui and Pado) </li>
                 <li> German hgc (created by Faruqui and Pado) </li>
                 <li> Spanish ancora </li>             
