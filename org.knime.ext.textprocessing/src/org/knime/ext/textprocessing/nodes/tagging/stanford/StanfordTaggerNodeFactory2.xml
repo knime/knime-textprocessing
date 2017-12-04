@@ -15,13 +15,13 @@
             </p>
             <p>
             For English texts the Penn Treebank tag set is used:<br/>
-            <a href="http://www.cis.upenn.edu/~treebank">http://www.cis.upenn.edu/~treebank</a>).<br/>
+            <a href="https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html">https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html</a>.<br/>
             For German texts the STTS tag set is used:<br/>
-            <a href="http://www.ims.uni-stuttgart.de/projekte/CQPDemos/Bundestag/help-tagset.html">http://www.ims.uni-stuttgart.de/projekte/CQPDemos/Bundestag/help-tagset.html</a>.<br/>
-            For French texts the French Treebank tag set is used:
-            <a href="http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php">http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php</a>.
-            For Spanish texts the Ancora Treebank tag set is used:
-            <a href="https://nlp.stanford.edu/software/spanish-faq.shtml#tagset">https://nlp.stanford.edu/software/spanish-faq.shtml#tagset</a>.
+            <a href="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html</a>.<br/>
+            For French texts the French Treebank tag set is used:<br/>
+            <a href="http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php">http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php</a>.<br/>
+            For Spanish texts the Ancora Treebank tag set is used:<br/>
+            <a href="https://nlp.stanford.edu/software/spanish-faq.shtml#tagset">https://nlp.stanford.edu/software/spanish-faq.shtml#tagset</a>.<br/>
             </p>
             <p>
             <b>Note:</b> the provided tagger models vary in memory consumption and processing speed. Especially the 
