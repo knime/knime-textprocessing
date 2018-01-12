@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Term Neighborhood Extractor</name>
+    <shortDescription>Term Neighborhood Extractor
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node creates a bag of words (BoW) of a set of documents.
+            A BoW consists of at least one column containing the terms occurring in the corresponding document. 
+            All term related columns like the document column can be selected in the node dialog and will be copied
+            to the output table.
+        </intro>
+        <option name="Document column">
+            Select the document column that is used for term neighborhood extraction.
+    	</option>
+    	<option name="Neighbors to extract">
+            The number of (left/right) neighbors to extract.
+    	</option>
+    	<option name="Extract sentences">
+            If checked, the second column contains the sentence of the document containing the term.
+    	</option>
+    	<option name="Neighbor Terms as Strings">
+			If checked, neighbors will be extracted as String columns, otherwise as Term columns.
+		</option>
+		<option name="Neighbors as Collection">
+			If checked, the neighbors will be all encapsulated in a collection
+			(one collection for left neighbors, one collection for right neighbors), 
+			otherwise there will be one column for each neighbor. If no neighbor exists, the value is a missing value.
+		</option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing documents, terms and their N neighbors.</outPort>
+    </ports>
+</knimeNode>
