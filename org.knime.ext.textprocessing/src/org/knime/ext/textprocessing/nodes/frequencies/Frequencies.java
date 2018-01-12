@@ -132,7 +132,7 @@ public final class Frequencies {
                     List<Term> senTerms = sen.getTerms();
                     for (Term t : senTerms) {
                         if (t != null) {
-                            if (t.equalsWordsOnly(term)) {
+                            if (t.equals(term)) {
                                 termCount++;
                             }
                         }
@@ -166,7 +166,7 @@ public final class Frequencies {
                     for (Term t : senTerms) {
                         if (t != null) {
                             completeTermCount++;
-                            if (t.equalsWordsOnly(term)) {
+                            if (t.equals(term)) {
                                 termCount++;
                             }
                         }
