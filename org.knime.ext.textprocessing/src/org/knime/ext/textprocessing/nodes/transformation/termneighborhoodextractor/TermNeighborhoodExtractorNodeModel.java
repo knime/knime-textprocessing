@@ -248,24 +248,30 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      */
     private void extractInformation(final Set<Sentence> sentences, final DataCell[] inputCells,
         final BufferedDataContainer bdc, final AtomicLong rowId) {
+
+        // adding input cells to new data cells array
+        DataCell[] newDataCells = new DataCell[bdc.getTableSpec().getNumColumns()];
+        for (int k = 0; k < inputCells.length; k++) {
+            newDataCells[k] = inputCells[k];
+        }
+
         for (Sentence s : sentences) {
             List<Term> terms = s.getTerms();
             for (int i = 0; i < terms.size(); i++) {
                 final RowKey key = RowKey.createRowKey(rowId.getAndIncrement());
                 final DataCell tc = m_termFac.createDataCell(terms.get(i));
-                DataCell[] newDataCells = new DataCell[bdc.getTableSpec().getNumColumns()];
-                for (int k = 0; k < inputCells.length; k++) {
-                    newDataCells[k] = inputCells[k];
-                }
+
+                // add term and sentence cell (if selected)
                 if (m_extractSentenceModel.getBooleanValue()) {
                     newDataCells[inputCells.length] = new StringCell(s.getText());
                     newDataCells[inputCells.length + 1] = tc;
                 } else {
                     newDataCells[inputCells.length] = tc;
                 }
-//                List<Term> leftNeighbors = new LinkedList<Term>();
-//                List<Term> rightNeighbors = new LinkedList<Term>();
+
+
                 for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
+                    // add right neighbors
                     if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
                         if (!m_termsAsStringsModel.getBooleanValue()) {
                             newDataCells[newDataCells.length - j] =
@@ -277,6 +283,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
                     } else {
                         newDataCells[newDataCells.length - j] = DataType.getMissingCell();
                     }
+                    // add left neighbors
                     if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
                         if (!m_termsAsStringsModel.getBooleanValue()) {
                             newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
