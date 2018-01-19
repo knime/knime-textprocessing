@@ -57,15 +57,38 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 class TermNeighborhoodExtractorNodeModel extends NodeModel {
 
+    static final int DEF_N_NEIGHBORHOOD = 3;
+
+    static final boolean DEF_EXTRACT_SENTENCE = true;
+
+    static final boolean DEF_TERMS_AS_STRINGS = false;
+
+    static final boolean DEF_AS_COLLECTION = false;
+
+    final SettingsModelString m_docColumnModel = TermNeighborhoodExtractorNodeDialog.getDocColumnModel();
+
+    final SettingsModelIntegerBounded m_nNeighborhoodModel =
+        TermNeighborhoodExtractorNodeDialog.getNNeighborhoodModel();
+
+    final SettingsModelBoolean m_extractSentenceModel = TermNeighborhoodExtractorNodeDialog.getExtractSentenceModel();
+
+    final SettingsModelBoolean m_termsAsStringsModel = TermNeighborhoodExtractorNodeDialog.getTermsAsStringsModel();
+
+    final SettingsModelBoolean m_asCollectionModel = TermNeighborhoodExtractorNodeDialog.getAsCollectionModel();
+
     TermNeighborhoodExtractorNodeModel() {
-        super(1,1);
+        super(1, 1);
     }
 
     /**
@@ -74,7 +97,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
+        // Nothing to do here...
 
     }
 
@@ -84,7 +107,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
+        // Nothing to do here...
 
     }
 
@@ -93,8 +116,11 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
+        m_docColumnModel.saveSettingsTo(settings);
+        m_nNeighborhoodModel.saveSettingsTo(settings);
+        m_extractSentenceModel.saveSettingsTo(settings);
+        m_termsAsStringsModel.saveSettingsTo(settings);
+        m_asCollectionModel.saveSettingsTo(settings);
     }
 
     /**
@@ -102,8 +128,11 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        m_docColumnModel.validateSettings(settings);
+        m_nNeighborhoodModel.validateSettings(settings);
+        m_extractSentenceModel.validateSettings(settings);
+        m_termsAsStringsModel.validateSettings(settings);
+        m_asCollectionModel.validateSettings(settings);
     }
 
     /**
@@ -111,7 +140,11 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
+        m_docColumnModel.loadSettingsFrom(settings);
+        m_nNeighborhoodModel.loadSettingsFrom(settings);
+        m_extractSentenceModel.loadSettingsFrom(settings);
+        m_termsAsStringsModel.loadSettingsFrom(settings);
+        m_asCollectionModel.loadSettingsFrom(settings);
 
     }
 
@@ -120,8 +153,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        // TODO Auto-generated method stub
-
+        // Nothing to do here...
     }
 
 }

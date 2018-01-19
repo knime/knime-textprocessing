@@ -42,18 +42,66 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   Jan 12, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextractor;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
- * 
+ *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 class TermNeighborhoodExtractorNodeDialog extends DefaultNodeSettingsPane {
 
+    static final SettingsModelString getDocColumnModel() {
+        return new SettingsModelString(TermNeighborhoodExtractorConfigKeys.CFGKEY_DOCUMENT_COLUMN, "");
+    }
+
+    static final SettingsModelIntegerBounded getNNeighborhoodModel() {
+        return new SettingsModelIntegerBounded(TermNeighborhoodExtractorConfigKeys.CFGKEY_N_NEIGHBORHOOD,
+            TermNeighborhoodExtractorNodeModel.DEF_N_NEIGHBORHOOD, 1, Integer.MAX_VALUE);
+    }
+
+    static final SettingsModelBoolean getExtractSentenceModel() {
+        return new SettingsModelBoolean(TermNeighborhoodExtractorConfigKeys.CFGKEY_EXTRACT_SENTENCE,
+            TermNeighborhoodExtractorNodeModel.DEF_EXTRACT_SENTENCE);
+    }
+
+    static final SettingsModelBoolean getTermsAsStringsModel() {
+        return new SettingsModelBoolean(TermNeighborhoodExtractorConfigKeys.CFGKEY_TERMS_AS_STRINGS,
+            TermNeighborhoodExtractorNodeModel.DEF_TERMS_AS_STRINGS);
+    }
+
+    static final SettingsModelBoolean getAsCollectionModel() {
+        return new SettingsModelBoolean(TermNeighborhoodExtractorConfigKeys.CFGKEY_AS_COLLECTION,
+            TermNeighborhoodExtractorNodeModel.DEF_AS_COLLECTION);
+    }
+
+    @SuppressWarnings("unchecked")
+    TermNeighborhoodExtractorNodeDialog() {
+
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(getDocColumnModel(), "Document Column", 0, DocumentValue.class));
+
+        addDialogComponent(new DialogComponentNumber(getNNeighborhoodModel(), "N Neighborhood", 1));
+
+        addDialogComponent(new DialogComponentBoolean(getExtractSentenceModel(), "Extract sentence"));
+
+        addDialogComponent(new DialogComponentBoolean(getTermsAsStringsModel(), "Terms as Strings"));
+
+        setHorizontalPlacement(true);
+
+        addDialogComponent(new DialogComponentBoolean(getAsCollectionModel(), "As Collection"));
+    }
 }

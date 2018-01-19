@@ -55,6 +55,7 @@ import org.knime.core.node.NodeView;
 /**
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 public class TermNeighborhoodExtractorNodeFactory extends NodeFactory<TermNeighborhoodExtractorNodeModel> {
 
