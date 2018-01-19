@@ -267,16 +267,24 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
 //                List<Term> rightNeighbors = new LinkedList<Term>();
                 for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
                     if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
-                        newDataCells[newDataCells.length - j] =
-                            m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
+                        if (!m_termsAsStringsModel.getBooleanValue()) {
+                            newDataCells[newDataCells.length - j] =
+                                    m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
+                        } else {
+                            newDataCells[newDataCells.length - j] =
+                                new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText());
+                        }
                     } else {
                         newDataCells[newDataCells.length - j] = DataType.getMissingCell();
-                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
-                            DataType.getMissingCell();
                     }
                     if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
-                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
-                            m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
+                        if (!m_termsAsStringsModel.getBooleanValue()) {
+                            newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                                    m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
+                        } else {
+                            newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                                new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText());
+                        }
                     } else {
                         newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
                             DataType.getMissingCell();
