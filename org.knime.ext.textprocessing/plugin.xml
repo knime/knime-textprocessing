@@ -676,6 +676,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.documentvectoradapter.DocumentVectorAdapterNodeFactory2">
       </node>
+      <node
+            category-path="/applications/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextractor.TermNeighborhoodExtractorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
