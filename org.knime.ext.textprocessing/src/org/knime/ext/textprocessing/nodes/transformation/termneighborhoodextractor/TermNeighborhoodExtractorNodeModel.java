@@ -50,8 +50,27 @@ package org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextrac
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
+import org.knime.core.data.RowIterator;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.collection.ListCell;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.node.BufferedDataContainer;
+import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
@@ -60,6 +79,14 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentValue;
+import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
+import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  *
@@ -87,8 +114,190 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
 
     final SettingsModelBoolean m_asCollectionModel = TermNeighborhoodExtractorNodeDialog.getAsCollectionModel();
 
+    final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
+
     TermNeighborhoodExtractorNodeModel() {
         super(1, 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        checkDataTableSpec(inSpecs[0]);
+
+        return new DataTableSpec[]{createDataTableSpec(inSpecs[0])};
+    }
+
+    /**
+     * @param dataTableSpec
+     * @throws InvalidSettingsException
+     */
+    private final void checkDataTableSpec(final DataTableSpec dataTableSpec) throws InvalidSettingsException {
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(dataTableSpec);
+        verifier.verifyMinimumDocumentCells(1, true);
+
+        ColumnSelectionVerifier.verifyColumn(m_docColumnModel, dataTableSpec, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
+
+        //TODO: Check for column names term/sentence/Right neighbor etc.
+    }
+
+    private final DataTableSpec createDataTableSpec(final DataTableSpec dataTableSpec) {
+        //create sentence column spec
+        DataColumnSpecCreator sentenceCol = null;
+        if (m_extractSentenceModel.getBooleanValue()) {
+            sentenceCol = new DataColumnSpecCreator("Sentence", StringCell.TYPE);
+        }
+
+        // create term column spec
+        DataColumnSpecCreator termsSpecCreator = new DataColumnSpecCreator("Term", m_termFac.getDataType());
+
+        DataColumnSpec[] leftNeighborColSpecs = null;
+        DataColumnSpec[] rightNeighborColSpecs = null;
+        if (!m_asCollectionModel.getBooleanValue()) {
+            leftNeighborColSpecs = new DataColumnSpec[m_nNeighborhoodModel.getIntValue()];
+            rightNeighborColSpecs = new DataColumnSpec[m_nNeighborhoodModel.getIntValue()];
+            for (int i = 0; i < m_nNeighborhoodModel.getIntValue(); i++) {
+                leftNeighborColSpecs[i] = new DataColumnSpecCreator("Left Neighbor " + (i + 1),
+                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec();
+                rightNeighborColSpecs[i] = new DataColumnSpecCreator("Right Neighbor " + (i + 1),
+                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec();
+            }
+        } else {
+            leftNeighborColSpecs = new DataColumnSpec[1];
+            rightNeighborColSpecs = new DataColumnSpec[1];
+            leftNeighborColSpecs[0] =
+                new DataColumnSpecCreator("Left Neighbors",
+                    ListCell.getCollectionType(
+                        m_termsAsStringsModel.getBooleanValue() ? m_termFac.getDataType() : StringCell.TYPE))
+                            .createSpec();
+            rightNeighborColSpecs[0] =
+                new DataColumnSpecCreator("Right Neighbors",
+                    ListCell.getCollectionType(
+                        m_termsAsStringsModel.getBooleanValue() ? m_termFac.getDataType() : StringCell.TYPE))
+                            .createSpec();
+        }
+
+        // create DataTableSpec from right and left neighbors
+        DataTableSpec neighbors =
+            new DataTableSpec(new DataTableSpec(leftNeighborColSpecs), new DataTableSpec(rightNeighborColSpecs));
+        // create DataTableSpec from terms
+        DataTableSpec terms = new DataTableSpec(termsSpecCreator.createSpec());
+
+        if (sentenceCol != null) {
+            return new DataTableSpec(dataTableSpec,
+                new DataTableSpec(new DataTableSpec(sentenceCol.createSpec()), new DataTableSpec(terms, neighbors)));
+        } else {
+            return new DataTableSpec(dataTableSpec, new DataTableSpec(terms, neighbors));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
+        DataTableSpec inputSpec = inData[0].getDataTableSpec();
+        checkDataTableSpec(inputSpec);
+        int docColIndex = inputSpec.findColumnIndex(m_docColumnModel.getStringValue());
+
+        // prepare data container
+        final BufferedDataContainer bdc = exec.createDataContainer(createDataTableSpec(inputSpec));
+
+        final long rowCount = inData[0].size();
+        long currRow = 1;
+        AtomicLong rowId = new AtomicLong(0);
+        final RowIterator it = inData[0].iterator();
+        while (it.hasNext()) {
+            DataRow row = it.next();
+
+            // get cells from original data table
+            DataCell[] inputCells = new DataCell[inputSpec.getColumnNames().length];
+            for (int i = 0; i < inputCells.length; i++) {
+                inputCells[i] = row.getCell(inputSpec.findColumnIndex(inputSpec.getColumnNames()[i]));
+            }
+            DataCell docCell = inputCells[docColIndex];
+
+            if (!docCell.isMissing()) {
+                Document doc = ((DocumentValue)docCell).getDocument();
+                extractInformation(setOfSentences(doc), inputCells, bdc, rowId);
+            } else {
+             // set warning message
+                setWarningMessage(
+                    "Input table contains missing values in document column. Missing document values will be ignored.");
+            }
+            // report status
+            double progress = (double)currRow / (double)rowCount;
+            exec.setProgress(progress, "Processing document " + currRow + " of " + rowCount);
+            exec.checkCanceled();
+            currRow++;
+        }
+
+        bdc.close();
+        return new BufferedDataTable[]{bdc.getTable()};
+    }
+
+    /**
+     * @param doc
+     * @param inputCells
+     * @param bdc
+     * @param rowId
+     */
+    private void extractInformation(final Set<Sentence> sentences, final DataCell[] inputCells,
+        final BufferedDataContainer bdc, final AtomicLong rowId) {
+        for (Sentence s : sentences) {
+            List<Term> terms = s.getTerms();
+            for (int i = 0; i < terms.size(); i++) {
+                final RowKey key = RowKey.createRowKey(rowId.getAndIncrement());
+                final DataCell tc = m_termFac.createDataCell(terms.get(i));
+                DataCell[] newDataCells = new DataCell[bdc.getTableSpec().getNumColumns()];
+                for (int k = 0; k < inputCells.length; k++) {
+                    newDataCells[k] = inputCells[k];
+                }
+                if (m_extractSentenceModel.getBooleanValue()) {
+                    newDataCells[inputCells.length] = new StringCell(s.getText());
+                    newDataCells[inputCells.length + 1] = tc;
+                } else {
+                    newDataCells[inputCells.length] = tc;
+                }
+//                List<Term> leftNeighbors = new LinkedList<Term>();
+//                List<Term> rightNeighbors = new LinkedList<Term>();
+                for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
+                    if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
+                        newDataCells[newDataCells.length - j] =
+                            m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
+                    } else {
+                        newDataCells[newDataCells.length - j] = DataType.getMissingCell();
+                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                            DataType.getMissingCell();
+                    }
+                    if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
+                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                            m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
+                    } else {
+                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                            DataType.getMissingCell();
+                    }
+                }
+                bdc.addRowToTable(new DefaultRow(key, newDataCells));
+            }
+        }
+    }
+
+    private Set<Sentence> setOfSentences(final Document document) {
+        Set<Sentence> sentenceSet = null;
+
+        if (document != null) {
+            sentenceSet = new LinkedHashSet<Sentence>();
+            Iterator<Sentence> it = document.sentenceIterator();
+            while (it.hasNext()) {
+                sentenceSet.add(it.next());
+            }
+        }
+        return sentenceSet;
     }
 
     /**
