@@ -160,6 +160,7 @@ public abstract class AbstractDictionaryTaggerModel2 extends StreamableTaggerNod
     @Override
     protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
         // Read table with dictionary
+        m_dictionary.clear();
         final int dictIndex = inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(m_columnModel.getStringValue());
         if (dictIndex >= 0) {
             for (DataRow row : inData[DICT_TABLE_INDEX]) {
