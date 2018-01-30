@@ -52,6 +52,7 @@ package org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextrac
  * The configuration keys for the Term Neighborhood Extractor node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 final class TermNeighborhoodExtractorConfigKeys {
 

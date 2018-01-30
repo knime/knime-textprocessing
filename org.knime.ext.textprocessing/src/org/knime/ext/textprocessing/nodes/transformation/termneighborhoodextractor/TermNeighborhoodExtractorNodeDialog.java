@@ -48,6 +48,7 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextractor;
 
+import org.knime.core.node.NodeDialog;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -58,6 +59,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
+ * The {@link NodeDialog} for the Term Neighborhood Extractor node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
