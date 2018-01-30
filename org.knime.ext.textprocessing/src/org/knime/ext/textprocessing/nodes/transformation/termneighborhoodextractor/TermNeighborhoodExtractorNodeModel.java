@@ -300,47 +300,37 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             // add right neighbors
             if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
-                    rightNeighborList.add(m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)));
+                    rightNeighborList.add(0, m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)));
                 } else {
-                    rightNeighborList.add(new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText()));
+                    rightNeighborList.add(0, new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText()));
                 }
             }
             // add left neighbors
             if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
-                    leftNeighborList.add(m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
+                    leftNeighborList.add(0, m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
                 } else {
-                    leftNeighborList.add(new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText()));
+                    leftNeighborList.add(0, new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText()));
                 }
             }
         }
 
         if (!m_termsAsStringsModel.getBooleanValue()) {
-            if (!rightNeighborList.isEmpty()) {
-                newDataCells[newDataCells.length - 1] =
-                        CollectionCellFactory.createSparseListCell(rightNeighborList, new TermCell2(new Term()));
-            } else {
-                newDataCells[newDataCells.length - 1] = DataType.getMissingCell();
-            }
-            if (!leftNeighborList.isEmpty()) {
-                newDataCells[newDataCells.length - 2] =
-                        CollectionCellFactory.createSparseListCell(leftNeighborList, new TermCell2(new Term()));
-            } else {
-                newDataCells[newDataCells.length - 2] = DataType.getMissingCell();
-            }
+            createCollectionColumn(newDataCells, 1, rightNeighborList, new TermCell2(new Term()));
+            createCollectionColumn(newDataCells, 2, leftNeighborList, new TermCell2(new Term()));
         } else {
-            if (!rightNeighborList.isEmpty()) {
-                newDataCells[newDataCells.length - 1] =
-                        CollectionCellFactory.createSparseListCell(rightNeighborList, new StringCell(""));
-            } else {
-                newDataCells[newDataCells.length - 1] = DataType.getMissingCell();
-            }
-            if (!leftNeighborList.isEmpty()) {
-                newDataCells[newDataCells.length - 2] =
-                        CollectionCellFactory.createSparseListCell(leftNeighborList, new StringCell(""));
-            } else {
-                newDataCells[newDataCells.length - 2] = DataType.getMissingCell();
-            }
+            createCollectionColumn(newDataCells, 1, rightNeighborList, new StringCell(""));
+            createCollectionColumn(newDataCells, 2, leftNeighborList, new StringCell(""));
+        }
+    }
+
+    private void createCollectionColumn(final DataCell[] newDataCells, final int index, final List<DataCell> neighborList,
+        final DataCell defaultCell) {
+        if (!neighborList.isEmpty()) {
+            newDataCells[newDataCells.length - index] =
+                    CollectionCellFactory.createSparseListCell(neighborList, defaultCell);
+        } else {
+            newDataCells[newDataCells.length - index] = DataType.getMissingCell();
         }
     }
 
