@@ -145,7 +145,9 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         ColumnSelectionVerifier.verifyColumn(m_docColumnModel, dataTableSpec, DocumentValue.class, null)
             .ifPresent(msg -> setWarningMessage(msg));
 
-        //TODO: Check for column names term/sentence/Right neighbor etc.
+        if (dataTableSpec.containsName("Term")) {
+            throw new InvalidSettingsException("The data table already contains a column named Term.");
+        }
     }
 
     private final DataTableSpec createDataTableSpec(final DataTableSpec dataTableSpec) {
