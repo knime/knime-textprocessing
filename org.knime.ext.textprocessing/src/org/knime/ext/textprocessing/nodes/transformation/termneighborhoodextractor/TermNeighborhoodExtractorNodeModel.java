@@ -291,11 +291,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
                     newDataCells[inputCells.length] = tc;
                 }
 
-                if (!m_asCollectionModel.getBooleanValue()) {
-                    createNeighborCells(newDataCells, terms, i);
-                } else {
-                    createNeighborCellsAsCollection(newDataCells, terms, i);
-                }
+                createNeighborCells(newDataCells, terms, i);
 
                 bdc.addRowToTable(new DefaultRow(key, newDataCells));
             }
@@ -303,48 +299,73 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * This method creates and adds two collection cells (left and right neighbors) to data cell array that will be used
-     * to create a new row.
-     *
+     * This method creates and adds cells (left and right neighbors) to the data cell array that will be used to create
+     * a new row.
      *
      * @param newDataCells The array of data cells that will be added as a row to the data table.
      * @param terms The list of terms occuring in the sentence.
      * @param i The index iterating over the term list (see
      *            {@link #extractInformation(Set, DataCell[], BufferedDataContainer, AtomicLong)})
      */
-    private void createNeighborCellsAsCollection(final DataCell[] newDataCells, final List<Term> terms, final int i) {
-        List<DataCell> rightNeighborList = new LinkedList<DataCell>();
-        List<DataCell> leftNeighborList = new LinkedList<DataCell>();
+    private void createNeighborCells(final DataCell[] newDataCells, final List<Term> terms, final int i) {
+        List<DataCell> rightNeighborList = m_asCollectionModel.getBooleanValue() ? new LinkedList<DataCell>() : null;
+        List<DataCell> leftNeighborList = m_asCollectionModel.getBooleanValue() ? new LinkedList<DataCell>() : null;
 
         for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
             // add right neighbors
             if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
-                    rightNeighborList.add(0,
-                        m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)));
+                    if (rightNeighborList == null) {
+                        newDataCells[newDataCells.length - j] =
+                            m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
+                    } else {
+                        rightNeighborList.add(0,
+                            m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)));
+                    }
                 } else {
-                    rightNeighborList.add(0,
-                        new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText()));
+                    if (rightNeighborList == null) {
+                        newDataCells[newDataCells.length - j] =
+                            new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText());
+                    } else {
+                        rightNeighborList.add(0,
+                            new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText()));
+                    }
                 }
+            } else if (!m_asCollectionModel.getBooleanValue()) {
+                newDataCells[newDataCells.length - j] = DataType.getMissingCell();
             }
             // add left neighbors
             if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
-                    leftNeighborList.add(0,
-                        m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
+                    if (leftNeighborList == null) {
+                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                            m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
+                    } else {
+                        leftNeighborList.add(0,
+                            m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
+                    }
                 } else {
-                    leftNeighborList.add(0,
-                        new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText()));
+                    if (leftNeighborList == null) {
+                        newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
+                            new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText());
+                    } else {
+                        leftNeighborList.add(0,
+                            new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText()));
+                    }
                 }
+            } else if (!m_asCollectionModel.getBooleanValue()) {
+                newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] = DataType.getMissingCell();
             }
         }
 
-        if (!m_termsAsStringsModel.getBooleanValue()) {
-            createCollectionColumn(newDataCells, 1, rightNeighborList, new TermCell2(new Term()));
-            createCollectionColumn(newDataCells, 2, leftNeighborList, new TermCell2(new Term()));
-        } else {
-            createCollectionColumn(newDataCells, 1, rightNeighborList, new StringCell(""));
-            createCollectionColumn(newDataCells, 2, leftNeighborList, new StringCell(""));
+        if (m_asCollectionModel.getBooleanValue()) {
+            if (!m_termsAsStringsModel.getBooleanValue()) {
+                createCollectionColumn(newDataCells, 1, rightNeighborList, new TermCell2(new Term()));
+                createCollectionColumn(newDataCells, 2, leftNeighborList, new TermCell2(new Term()));
+            } else {
+                createCollectionColumn(newDataCells, 1, rightNeighborList, new StringCell(""));
+                createCollectionColumn(newDataCells, 2, leftNeighborList, new StringCell(""));
+            }
         }
     }
 
@@ -364,44 +385,6 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             newDataCells[newDataCells.length - index] = CollectionCellFactory.createListCell(neighborList);
         } else {
             newDataCells[newDataCells.length - index] = DataType.getMissingCell();
-        }
-    }
-
-    /**
-     * This method creates and adds cells (left and right neighbors) to the data cell array that will be used to create
-     * a new row.
-     *
-     * @param newDataCells The array of data cells that will be added as a row to the data table.
-     * @param terms The list of terms occuring in the sentence.
-     * @param i The index iterating over the term list (see
-     *            {@link #extractInformation(Set, DataCell[], BufferedDataContainer, AtomicLong)})
-     */
-    private void createNeighborCells(final DataCell[] newDataCells, final List<Term> terms, final int i) {
-        for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
-            // add right neighbors
-            if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
-                if (!m_termsAsStringsModel.getBooleanValue()) {
-                    newDataCells[newDataCells.length - j] =
-                        m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
-                } else {
-                    newDataCells[newDataCells.length - j] =
-                        new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText());
-                }
-            } else {
-                newDataCells[newDataCells.length - j] = DataType.getMissingCell();
-            }
-            // add left neighbors
-            if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
-                if (!m_termsAsStringsModel.getBooleanValue()) {
-                    newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
-                        m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
-                } else {
-                    newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
-                        new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText());
-                }
-            } else {
-                newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] = DataType.getMissingCell();
-            }
         }
     }
 
