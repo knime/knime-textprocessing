@@ -232,7 +232,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
                 Document doc = ((DocumentValue)docCell).getDocument();
                 extractInformation(setOfSentences(doc), inputCells, bdc, rowId);
             } else {
-             // set warning message
+                // set warning message
                 setWarningMessage(
                     "Input table contains missing values in document column. Missing document values will be ignored.");
             }
@@ -300,17 +300,21 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             // add right neighbors
             if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
-                    rightNeighborList.add(0, m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)));
+                    rightNeighborList.add(0,
+                        m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)));
                 } else {
-                    rightNeighborList.add(0, new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText()));
+                    rightNeighborList.add(0,
+                        new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText()));
                 }
             }
             // add left neighbors
             if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
-                    leftNeighborList.add(0, m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
+                    leftNeighborList.add(0,
+                        m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
                 } else {
-                    leftNeighborList.add(0, new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText()));
+                    leftNeighborList.add(0,
+                        new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText()));
                 }
             }
         }
@@ -324,11 +328,11 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         }
     }
 
-    private void createCollectionColumn(final DataCell[] newDataCells, final int index, final List<DataCell> neighborList,
-        final DataCell defaultCell) {
+    private void createCollectionColumn(final DataCell[] newDataCells, final int index,
+        final List<DataCell> neighborList, final DataCell defaultCell) {
         if (!neighborList.isEmpty()) {
             newDataCells[newDataCells.length - index] =
-                    CollectionCellFactory.createSparseListCell(neighborList, defaultCell);
+                CollectionCellFactory.createSparseListCell(neighborList, defaultCell);
         } else {
             newDataCells[newDataCells.length - index] = DataType.getMissingCell();
         }
@@ -340,7 +344,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
                     newDataCells[newDataCells.length - j] =
-                            m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
+                        m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
                 } else {
                     newDataCells[newDataCells.length - j] =
                         new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText());
@@ -352,14 +356,13 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
                     newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
-                            m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
+                        m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
                 } else {
                     newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
                         new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText());
                 }
             } else {
-                newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
-                    DataType.getMissingCell();
+                newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] = DataType.getMissingCell();
             }
         }
     }
