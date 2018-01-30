@@ -158,11 +158,13 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         // create term column spec
         DataColumnSpecCreator termsSpecCreator = new DataColumnSpecCreator("Term", m_termFac.getDataType());
 
+        // generate neighborhood column specs
         DataColumnSpec[] leftNeighborColSpecs = null;
         DataColumnSpec[] rightNeighborColSpecs = null;
         if (!m_asCollectionModel.getBooleanValue()) {
             leftNeighborColSpecs = new DataColumnSpec[m_nNeighborhoodModel.getIntValue()];
             rightNeighborColSpecs = new DataColumnSpec[m_nNeighborhoodModel.getIntValue()];
+            // each neighbor as a column
             for (int i = 0; i < m_nNeighborhoodModel.getIntValue(); i++) {
                 leftNeighborColSpecs[i] = new DataColumnSpecCreator("Left Neighbor " + (i + 1),
                     m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec();
@@ -172,6 +174,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         } else {
             leftNeighborColSpecs = new DataColumnSpec[1];
             rightNeighborColSpecs = new DataColumnSpec[1];
+            // neighbors as collection columns
             leftNeighborColSpecs[0] =
                 new DataColumnSpecCreator("Left Neighbors",
                     ListCell.getCollectionType(
@@ -278,7 +281,6 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
                 } else {
                     createNeighborCellsAsCollection(newDataCells, terms, i);
                 }
-
 
                 bdc.addRowToTable(new DefaultRow(key, newDataCells));
             }
