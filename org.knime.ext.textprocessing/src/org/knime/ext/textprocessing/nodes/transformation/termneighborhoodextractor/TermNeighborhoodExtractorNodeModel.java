@@ -120,6 +120,9 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
 
     final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
+    /**
+     * The constructor of the Term Neighborhood node. The node has one input- and one outputport.
+     */
     TermNeighborhoodExtractorNodeModel() {
         super(1, 1);
     }
@@ -135,7 +138,9 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * @param dataTableSpec
+     * Checks the data table spec.
+     *
+     * @param dataTableSpec The data table spec to check.
      * @throws InvalidSettingsException
      */
     private final void checkDataTableSpec(final DataTableSpec dataTableSpec) throws InvalidSettingsException {
@@ -150,6 +155,12 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         }
     }
 
+    /**
+     * Creates and returns the output data table spec.
+     *
+     * @param dataTableSpec The input data table spec.
+     * @return Returns the output data table spec.
+     */
     private final DataTableSpec createDataTableSpec(final DataTableSpec dataTableSpec) {
         //create sentence column spec
         DataColumnSpecCreator sentenceCol = null;
@@ -250,10 +261,12 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * @param doc
-     * @param inputCells
-     * @param bdc
-     * @param rowId
+     * Extracts the term neighborhood and adds rows to the data table.
+     *
+     * @param sentences A set of sentences.
+     * @param inputCells Array of cells from the input data table.
+     * @param bdc The BufferedDataContainer.
+     * @param rowId The row id.
      */
     private void extractInformation(final Set<Sentence> sentences, final DataCell[] inputCells,
         final BufferedDataContainer bdc, final AtomicLong rowId) {
@@ -290,9 +303,14 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * @param newDataCells
-     * @param terms
-     * @param i
+     * This method creates and adds two collection cells (left and right neighbors) to data cell array that will be used
+     * to create a new row.
+     *
+     *
+     * @param newDataCells The array of data cells that will be added as a row to the data table.
+     * @param terms The list of terms occuring in the sentence.
+     * @param i The index iterating over the term list (see
+     *            {@link #extractInformation(Set, DataCell[], BufferedDataContainer, AtomicLong)})
      */
     private void createNeighborCellsAsCollection(final DataCell[] newDataCells, final List<Term> terms, final int i) {
         List<DataCell> rightNeighborList = new LinkedList<DataCell>();
@@ -330,16 +348,34 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         }
     }
 
+    /**
+     * This method creates and adds two collection cells (left and right neighbors) to data cell array that will be used
+     * to create a new row.
+     *
+     * @param newDataCells The array of data cells that will be added as a row to the data table.
+     * @param index The index which defines the position in the data cell array (1 is the last position, 2 the second
+     *            last).
+     * @param neighborList The specific neighbors list (right neighbors or left neighbors).
+     * @param defaultCell The default cell for the collection.
+     */
     private void createCollectionColumn(final DataCell[] newDataCells, final int index,
         final List<DataCell> neighborList, final DataCell defaultCell) {
         if (!neighborList.isEmpty()) {
-            newDataCells[newDataCells.length - index] =
-                CollectionCellFactory.createSparseListCell(neighborList, defaultCell);
+            newDataCells[newDataCells.length - index] = CollectionCellFactory.createListCell(neighborList);
         } else {
             newDataCells[newDataCells.length - index] = DataType.getMissingCell();
         }
     }
 
+    /**
+     * This method creates and adds cells (left and right neighbors) to the data cell array that will be used to create
+     * a new row.
+     *
+     * @param newDataCells The array of data cells that will be added as a row to the data table.
+     * @param terms The list of terms occuring in the sentence.
+     * @param i The index iterating over the term list (see
+     *            {@link #extractInformation(Set, DataCell[], BufferedDataContainer, AtomicLong)})
+     */
     private void createNeighborCells(final DataCell[] newDataCells, final List<Term> terms, final int i) {
         for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
             // add right neighbors
@@ -369,6 +405,12 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         }
     }
 
+    /**
+     * Creates and returns a set of {@link Sentence}s from a given document.
+     *
+     * @param document The document.
+     * @return A set of {@code Sentence}s.
+     */
     private Set<Sentence> setOfSentences(final Document document) {
         Set<Sentence> sentenceSet = null;
 
