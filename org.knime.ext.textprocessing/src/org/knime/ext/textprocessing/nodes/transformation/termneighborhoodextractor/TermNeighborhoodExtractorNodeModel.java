@@ -316,6 +316,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             if (i + 1 + m_nNeighborhoodModel.getIntValue() - j < terms.size()) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
                     if (rightNeighborList == null) {
+                        //filling array from behind
                         newDataCells[newDataCells.length - j] =
                             m_termFac.createDataCell(terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j));
                     } else {
@@ -324,6 +325,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
                     }
                 } else {
                     if (rightNeighborList == null) {
+                        //filling array from behind
                         newDataCells[newDataCells.length - j] =
                             new StringCell((terms.get(i + 1 + m_nNeighborhoodModel.getIntValue() - j)).getText());
                     } else {
@@ -338,6 +340,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
             if (i - 1 - m_nNeighborhoodModel.getIntValue() + j >= 0) {
                 if (!m_termsAsStringsModel.getBooleanValue()) {
                     if (leftNeighborList == null) {
+                        //filling array from behind, skip positions for right neighbors
                         newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
                             m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j));
                     } else {
@@ -345,6 +348,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
                             m_termFac.createDataCell(terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)));
                     }
                 } else {
+                    //filling array from behind, skip positions for right neighbors
                     if (leftNeighborList == null) {
                         newDataCells[newDataCells.length - m_nNeighborhoodModel.getIntValue() - j] =
                             new StringCell((terms.get(i - 1 - m_nNeighborhoodModel.getIntValue() + j)).getText());
