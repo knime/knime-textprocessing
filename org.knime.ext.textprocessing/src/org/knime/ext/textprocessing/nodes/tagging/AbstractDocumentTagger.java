@@ -450,12 +450,12 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
             // search words of terms
             int w = -1;
-            for (Word word : words) {
+            for (int i = 0; i < words.size(); i++) {
                 w++;
 
                 // prepare word and ne for comparison (convert to lower case
                 // if case sensitivity is switched off)
-                String wordStr = word.getWord();
+                String wordStr = words.get(i).getWord();
 
                 String neStr = ne.get(found);
                 if (!m_caseSensitive) {
@@ -499,10 +499,14 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                         stopTermIndex = -1;
                         startWordIndex = -1;
                         stopWordIndex = -1;
+                        w--;
+                        i--;
                     }
                 }
             }
         }
         return ranges;
     }
+
+
 }
