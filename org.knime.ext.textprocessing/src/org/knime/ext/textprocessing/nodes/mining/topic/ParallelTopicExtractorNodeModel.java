@@ -340,7 +340,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
         checkDataTableSpec(table.getDataTableSpec());
         final int noOfTopics = m_noOfTopics.getIntValue();
         final int colIdx = table.getSpec().findColumnIndex(m_docCol.getStringValue());
-        final int noOfThreads = m_noOfTopics.getIntValue();
+        final int noOfThreads = m_noOfThreads.getIntValue();
         final int noOfIterations = m_noOfIterations.getIntValue();
         final Iterator<Instance> docsIter =
             new DocumentInstanceIterator(exec.createSubProgress(0.05), table, colIdx, false);
