@@ -121,7 +121,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
     final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
     /**
-     * The constructor of the Term Neighborhood node. The node has one input- and one outputport.
+     * The constructor of the Term Neighborhood node. The node has one input- and one output port.
      */
     TermNeighborhoodExtractorNodeModel() {
         super(1, 1);
