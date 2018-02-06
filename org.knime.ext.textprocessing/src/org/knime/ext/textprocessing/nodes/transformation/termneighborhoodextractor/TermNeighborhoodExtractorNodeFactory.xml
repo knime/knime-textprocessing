@@ -6,7 +6,10 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            This node extract term neighborhoods.
+            This node extracts the neighborhood for each term of the document. The neighborhood is defined by the N left
+            and N right neighbors that can be set in the dialog. The neighbors can be extracted as term cells or string cells. 
+            Each neighbor is stored in a column, however it's also possible to store the right and left neighbors in a
+            collection cell. Additionally, there is an option to extract the sentence in which the term occurs.
         </intro>
         <option name="Document column">
             Select the document column that is used for term neighborhood extraction.
