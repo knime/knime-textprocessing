@@ -254,9 +254,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
 
         // adding input cells to new data cells array
         DataCell[] newDataCells = new DataCell[bdc.getTableSpec().getNumColumns()];
-        for (int k = 0; k < inputCells.length; k++) {
-            newDataCells[k] = inputCells[k];
-        }
+        System.arraycopy(inputCells, 0, newDataCells, 0, inputCells.length);
 
         for (Sentence s : sentences) {
             List<Term> terms = s.getTerms();
