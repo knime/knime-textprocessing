@@ -85,7 +85,6 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.TermCell2;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -342,11 +341,11 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
 
         if (m_asCollectionModel.getBooleanValue()) {
             if (!m_termsAsStringsModel.getBooleanValue()) {
-                createCollectionColumn(newDataCells, 1, rightNeighborList, new TermCell2(new Term()));
-                createCollectionColumn(newDataCells, 2, leftNeighborList, new TermCell2(new Term()));
+                createCollectionColumn(newDataCells, 1, rightNeighborList);
+                createCollectionColumn(newDataCells, 2, leftNeighborList);
             } else {
-                createCollectionColumn(newDataCells, 1, rightNeighborList, new StringCell(""));
-                createCollectionColumn(newDataCells, 2, leftNeighborList, new StringCell(""));
+                createCollectionColumn(newDataCells, 1, rightNeighborList);
+                createCollectionColumn(newDataCells, 2, leftNeighborList);
             }
         }
     }
@@ -362,7 +361,7 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      * @param defaultCell The default cell for the collection.
      */
     private void createCollectionColumn(final DataCell[] newDataCells, final int index,
-        final List<DataCell> neighborList, final DataCell defaultCell) {
+        final List<DataCell> neighborList) {
         if (!neighborList.isEmpty()) {
             newDataCells[newDataCells.length - index] = CollectionCellFactory.createListCell(neighborList);
         } else {
