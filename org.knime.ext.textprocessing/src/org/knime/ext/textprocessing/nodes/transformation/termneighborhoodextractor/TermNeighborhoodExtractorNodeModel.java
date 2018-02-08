@@ -376,14 +376,10 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      * @return A set of {@code Sentence}s.
      */
     private Set<Sentence> setOfSentences(final Document document) {
-        Set<Sentence> sentenceSet = null;
-
-        if (document != null) {
-            sentenceSet = new LinkedHashSet<Sentence>();
-            Iterator<Sentence> it = document.sentenceIterator();
-            while (it.hasNext()) {
-                sentenceSet.add(it.next());
-            }
+        Set<Sentence> sentenceSet = new LinkedHashSet<Sentence>();
+        Iterator<Sentence> it = document.sentenceIterator();
+        while (it.hasNext()) {
+            sentenceSet.add(it.next());
         }
         return sentenceSet;
     }
