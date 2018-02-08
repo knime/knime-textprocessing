@@ -50,6 +50,7 @@ package org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextrac
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -149,10 +150,6 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
 
         ColumnSelectionVerifier.verifyColumn(m_docColumnModel, dataTableSpec, DocumentValue.class, null)
             .ifPresent(msg -> setWarningMessage(msg));
-
-        if (dataTableSpec.containsName("Term")) {
-            throw new InvalidSettingsException("The data table already contains a column named Term.");
-        }
     }
 
     /**
@@ -162,56 +159,40 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      * @return Returns the output data table spec.
      */
     private final DataTableSpec createDataTableSpec(final DataTableSpec dataTableSpec) {
+        List<DataColumnSpec> columns = new ArrayList<DataColumnSpec>();
+
         //create sentence column spec
         DataColumnSpecCreator sentenceCol = null;
         if (m_extractSentenceModel.getBooleanValue()) {
-            sentenceCol = new DataColumnSpecCreator("Sentence", StringCell.TYPE);
+            sentenceCol = new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Sentence"), StringCell.TYPE);
+            columns.add(sentenceCol.createSpec());
         }
 
         // create term column spec
-        DataColumnSpecCreator termsSpecCreator = new DataColumnSpecCreator("Term", m_termFac.getDataType());
+        columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Term"), m_termFac.getDataType()).createSpec());
 
         // generate neighborhood column specs
-        DataColumnSpec[] leftNeighborColSpecs = null;
-        DataColumnSpec[] rightNeighborColSpecs = null;
         if (!m_asCollectionModel.getBooleanValue()) {
-            leftNeighborColSpecs = new DataColumnSpec[m_nNeighborhoodModel.getIntValue()];
-            rightNeighborColSpecs = new DataColumnSpec[m_nNeighborhoodModel.getIntValue()];
             // each neighbor as a column
             for (int i = 0; i < m_nNeighborhoodModel.getIntValue(); i++) {
-                leftNeighborColSpecs[i] = new DataColumnSpecCreator("Left Neighbor " + (i + 1),
-                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec();
-                rightNeighborColSpecs[i] = new DataColumnSpecCreator("Right Neighbor " + (i + 1),
-                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec();
+                columns.add(columns.size() - i, new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Left Neighbor " + (i + 1)),
+                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec());
+                columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Right Neighbor " + (i + 1)),
+                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec());
             }
         } else {
-            leftNeighborColSpecs = new DataColumnSpec[1];
-            rightNeighborColSpecs = new DataColumnSpec[1];
             // neighbors as collection columns
-            leftNeighborColSpecs[0] =
-                new DataColumnSpecCreator("Left Neighbors",
+            columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Left Neighbors"),
                     ListCell.getCollectionType(
                         m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()))
-                            .createSpec();
-            rightNeighborColSpecs[0] =
-                new DataColumnSpecCreator("Right Neighbors",
+                            .createSpec());
+            columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Right Neighbors"),
                     ListCell.getCollectionType(
                         m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()))
-                            .createSpec();
+                            .createSpec());
         }
 
-        // create DataTableSpec from right and left neighbors
-        DataTableSpec neighbors =
-            new DataTableSpec(new DataTableSpec(leftNeighborColSpecs), new DataTableSpec(rightNeighborColSpecs));
-        // create DataTableSpec from terms
-        DataTableSpec terms = new DataTableSpec(termsSpecCreator.createSpec());
-
-        if (sentenceCol != null) {
-            return new DataTableSpec(dataTableSpec,
-                new DataTableSpec(new DataTableSpec(sentenceCol.createSpec()), new DataTableSpec(terms, neighbors)));
-        } else {
-            return new DataTableSpec(dataTableSpec, new DataTableSpec(terms, neighbors));
-        }
+        return new DataTableSpec(dataTableSpec, new DataTableSpec(columns.toArray(new DataColumnSpec[0])));
     }
 
     /**
