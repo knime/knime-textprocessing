@@ -351,32 +351,8 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         }
 
         if (m_asCollectionModel.getBooleanValue()) {
-            if (!m_termsAsStringsModel.getBooleanValue()) {
-                createCollectionColumn(newDataCells, 1, rightNeighborList);
-                createCollectionColumn(newDataCells, 2, leftNeighborList);
-            } else {
-                createCollectionColumn(newDataCells, 1, rightNeighborList);
-                createCollectionColumn(newDataCells, 2, leftNeighborList);
-            }
-        }
-    }
-
-    /**
-     * This method creates and adds two collection cells (left and right neighbors) to data cell array that will be used
-     * to create a new row.
-     *
-     * @param newDataCells The array of data cells that will be added as a row to the data table.
-     * @param index The index which defines the position in the data cell array (1 is the last position, 2 the second
-     *            last).
-     * @param neighborList The specific neighbors list (right neighbors or left neighbors).
-     * @param defaultCell The default cell for the collection.
-     */
-    private void createCollectionColumn(final DataCell[] newDataCells, final int index,
-        final List<DataCell> neighborList) {
-        if (!neighborList.isEmpty()) {
-            newDataCells[newDataCells.length - index] = CollectionCellFactory.createListCell(neighborList);
-        } else {
-            newDataCells[newDataCells.length - index] = DataType.getMissingCell();
+            newDataCells[newDataCells.length - 1] = CollectionCellFactory.createListCell(rightNeighborList);
+            newDataCells[newDataCells.length - 2] = CollectionCellFactory.createListCell(leftNeighborList);
         }
     }
 
