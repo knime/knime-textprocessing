@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -287,8 +286,8 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      *            {@link #extractInformation(Set, DataCell[], BufferedDataContainer, AtomicLong)})
      */
     private void createNeighborCells(final DataCell[] newDataCells, final List<Term> terms, final int i) {
-        List<DataCell> rightNeighborList = m_asCollectionModel.getBooleanValue() ? new LinkedList<DataCell>() : null;
-        List<DataCell> leftNeighborList = m_asCollectionModel.getBooleanValue() ? new LinkedList<DataCell>() : null;
+        List<DataCell> rightNeighborList = m_asCollectionModel.getBooleanValue() ? new ArrayList<DataCell>(m_nNeighborhoodModel.getIntValue()) : null;
+        List<DataCell> leftNeighborList = m_asCollectionModel.getBooleanValue() ? new ArrayList<DataCell>(m_nNeighborhoodModel.getIntValue()) : null;
 
         for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
             // add right neighbors
