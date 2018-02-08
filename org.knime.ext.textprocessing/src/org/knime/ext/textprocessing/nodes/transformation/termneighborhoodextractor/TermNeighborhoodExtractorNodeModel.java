@@ -162,29 +162,38 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
         //create sentence column spec
         DataColumnSpecCreator sentenceCol = null;
         if (m_extractSentenceModel.getBooleanValue()) {
-            sentenceCol = new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Sentence"), StringCell.TYPE);
+            sentenceCol = new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Sentence"),
+                StringCell.TYPE);
             columns.add(sentenceCol.createSpec());
         }
 
         // create term column spec
-        columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Term"), m_termFac.getDataType()).createSpec());
+        columns.add(
+            new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Term"), m_termFac.getDataType())
+                .createSpec());
 
         // generate neighborhood column specs
         if (!m_asCollectionModel.getBooleanValue()) {
             // each neighbor as a column
             for (int i = 0; i < m_nNeighborhoodModel.getIntValue(); i++) {
-                columns.add(columns.size() - i, new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Left Neighbor " + (i + 1)),
-                    m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec());
-                columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Right Neighbor " + (i + 1)),
+                columns.add(columns.size() - i,
+                    new DataColumnSpecCreator(
+                        DataTableSpec.getUniqueColumnName(dataTableSpec, "Left Neighbor " + (i + 1)),
+                        m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType())
+                            .createSpec());
+                columns.add(new DataColumnSpecCreator(
+                    DataTableSpec.getUniqueColumnName(dataTableSpec, "Right Neighbor " + (i + 1)),
                     m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()).createSpec());
             }
         } else {
             // neighbors as collection columns
-            columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Left Neighbors"),
+            columns
+                .add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Left Neighbors"),
                     ListCell.getCollectionType(
                         m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()))
                             .createSpec());
-            columns.add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Right Neighbors"),
+            columns
+                .add(new DataColumnSpecCreator(DataTableSpec.getUniqueColumnName(dataTableSpec, "Right Neighbors"),
                     ListCell.getCollectionType(
                         m_termsAsStringsModel.getBooleanValue() ? StringCell.TYPE : m_termFac.getDataType()))
                             .createSpec());
@@ -285,8 +294,10 @@ class TermNeighborhoodExtractorNodeModel extends NodeModel {
      *            {@link #extractInformation(Set, DataCell[], BufferedDataContainer, AtomicLong)})
      */
     private void createNeighborCells(final DataCell[] newDataCells, final List<Term> terms, final int i) {
-        List<DataCell> rightNeighborList = m_asCollectionModel.getBooleanValue() ? new ArrayList<DataCell>(m_nNeighborhoodModel.getIntValue()) : null;
-        List<DataCell> leftNeighborList = m_asCollectionModel.getBooleanValue() ? new ArrayList<DataCell>(m_nNeighborhoodModel.getIntValue()) : null;
+        List<DataCell> rightNeighborList =
+            m_asCollectionModel.getBooleanValue() ? new ArrayList<DataCell>(m_nNeighborhoodModel.getIntValue()) : null;
+        List<DataCell> leftNeighborList =
+            m_asCollectionModel.getBooleanValue() ? new ArrayList<DataCell>(m_nNeighborhoodModel.getIntValue()) : null;
 
         for (int j = 1; j <= m_nNeighborhoodModel.getIntValue(); j++) {
             // add right neighbors
