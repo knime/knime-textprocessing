@@ -304,7 +304,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
      */
     static SettingsModelInteger createNoOfThreadsModel() {
         return new SettingsModelIntegerBounded("noOfThreads", KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads(), 1,
-            KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
+            Integer.MAX_VALUE);
     }
 
     /**
