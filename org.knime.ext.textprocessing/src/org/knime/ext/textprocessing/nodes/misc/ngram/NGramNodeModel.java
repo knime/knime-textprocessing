@@ -109,7 +109,7 @@ public class NGramNodeModel extends NodeModel {
     /**
      * The max number of threads.
      */
-    static final int MAX_THREADS = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
+    static final int MAX_THREADS = Integer.MAX_VALUE;
 
     /**
      * The default chunk size.

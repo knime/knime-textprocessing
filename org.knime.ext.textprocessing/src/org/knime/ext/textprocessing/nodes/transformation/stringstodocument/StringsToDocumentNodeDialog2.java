@@ -268,7 +268,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
             Math.max(1,
                 Math.min(KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads() / 4,
                     (int)Math.ceil(Runtime.getRuntime().availableProcessors()))),
-            StringsToDocumentConfig2.MIN_THREADS, KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads());
+            StringsToDocumentConfig2.MIN_THREADS, Integer.MAX_VALUE);
     }
 
     /**
