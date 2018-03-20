@@ -206,7 +206,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
 
     private DocumentBuilder m_currentDoc;
 
-    private String m_lastTag;
+    private String m_lastTag = "";
 
     private String m_abstract = "";
 
@@ -413,6 +413,11 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     @Override
     public void startElement(final String uri, final String localName, final String qName,
         final Attributes attributes) {
+
+        if (m_lastTag.equals(ABSTRACTTEXT) || m_lastTag.equals(ARTICLETITLE)) {
+            return;
+        }
+
         m_lastTag = qName.toLowerCase();
 
         if (m_lastTag.equals(PUBMEDARTICLE)) {
@@ -503,6 +508,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
                 LOGGER.info(
                     "No <" + PUBMEDARTICLE + "> start Element: " + "Abstract (" + ABSTRACTTEXT + ") cannot be set.");
             }
+            m_lastTag = "";
         } else if (name.equals(ARTICLETITLE)) {
             if (m_currentDoc != null) {
                 m_currentDoc.addTitle(m_title.trim());
@@ -510,6 +516,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
                 LOGGER.info("No <" + PUBMEDARTICLE + "> start Element: " + "Title (" + ARTICLETITLE + ":"
                     + m_title.trim() + ") cannot be set.");
             }
+            m_lastTag = "";
         } else if (name.equals(AUTHOR) && m_currentDoc != null) {
             if (m_currentDoc != null) {
                 Author a = new Author(m_firstName.trim(), m_lastName.trim());
