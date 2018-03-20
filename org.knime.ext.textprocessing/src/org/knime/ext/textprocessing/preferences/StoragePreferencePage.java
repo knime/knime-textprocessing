@@ -129,8 +129,7 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
         m_dataCellType = new RadioGroupFieldEditor(
             StoragePreferenceInitializer.PREF_CELL_TYPE, "Document cell type", 1, new String[][] {
                 {"File Store Cells", StoragePreferenceInitializer.FILESTORE_CELLTYPE},
-                {"Blob Cells", StoragePreferenceInitializer.BLOB_CELLTYPE},
-                {"Regular Cells", StoragePreferenceInitializer.REGULAR_CELLTYPE}}, storageGrp);
+                {"Blob Cells", StoragePreferenceInitializer.BLOB_CELLTYPE}}, storageGrp);
         m_dataCellType.setPage(this);
         m_dataCellType.setPreferenceStore(getPreferenceStore());
         m_dataCellType.load();
@@ -176,8 +175,10 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
     }
 
     private static final GridData getGridData() {
-        GridData layoutData = new GridData(GridData.FILL);
+        GridData layoutData = new GridData(SWT.FILL);
         layoutData.widthHint = 500;
+        layoutData.horizontalAlignment = SWT.FILL;
+        layoutData.grabExcessHorizontalSpace = true;
         return layoutData;
     }
 
