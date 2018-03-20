@@ -49,7 +49,6 @@ package org.knime.ext.textprocessing.preferences;
 
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -76,18 +75,9 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
 
     private Composite m_chunkSizeComp;
 
-    private RadioGroupFieldEditor m_dataCellType;
-
     private IntegerFieldEditor m_fileStoreChunkSize;
 
     private Label m_lFileStoreSetings;
-
-
-    private static final String DESC_CELLTYPE =
-        "It is recommended to use file store cells in order to save memory and "
-      + "increase the \nprocessing speed. Regular cells are very memory and "
-      + "disk space consuming. Blob cells \ndecrease memory and disk space usage "
-      + "but may slow down processing speed.";
 
     private static final String DESC_FILESTORE_CHUNKSIZE =
         "The file store chunk size defines the number of documents to store "
@@ -122,30 +112,9 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
         gl.verticalSpacing = 15;
         m_mainComposite.setLayout(gl);
 
-        // Cell Type Settings
+        // Main Composite Settings
         final Group storageGrp = new Group(m_mainComposite, SWT.SHADOW_ETCHED_IN);
         storageGrp.setText("Document Storage Settings:");
-
-        m_dataCellType = new RadioGroupFieldEditor(
-            StoragePreferenceInitializer.PREF_CELL_TYPE, "Document cell type", 1, new String[][] {
-                {"File Store Cells", StoragePreferenceInitializer.FILESTORE_CELLTYPE},
-                {"Blob Cells", StoragePreferenceInitializer.BLOB_CELLTYPE}}, storageGrp);
-        m_dataCellType.setPage(this);
-        m_dataCellType.setPreferenceStore(getPreferenceStore());
-        m_dataCellType.load();
-        m_dataCellType.setPropertyChangeListener(this);
-
-        final Label lStorage = new Label(storageGrp, SWT.LEFT | SWT.WRAP);
-        lStorage.setText(DESC_CELLTYPE);
-
-        final Label sep = new Label(storageGrp, SWT.HORIZONTAL | SWT.SEPARATOR);
-        GridData gridData = new GridData();
-        gridData.horizontalSpan = 1;
-        gridData.horizontalAlignment = GridData.FILL;
-        gridData.grabExcessHorizontalSpace = false;
-        gridData.verticalAlignment = GridData.CENTER;
-        gridData.grabExcessVerticalSpace = false;
-        sep.setLayoutData(gridData);
 
         // file store chunk size settings
         m_chunkSizeComp = new Composite(storageGrp, SWT.LEFT);
@@ -163,13 +132,8 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
         storageGrp.setLayoutData(getGridData());
         storageGrp.setLayout(getLayout());
 
-        // enable/disable file store settings
-        if (StoragePreferenceInitializer.cellType().equals(
-            StoragePreferenceInitializer.FILESTORE_CELLTYPE)) {
-            enableFileStorSettings(true);
-        } else {
-            enableFileStorSettings(false);
-        }
+        m_fileStoreChunkSize.setEnabled(true, m_chunkSizeComp);
+        m_lFileStoreSetings.setEnabled(true);
 
         return m_mainComposite;
     }
@@ -195,7 +159,6 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
      */
     @Override
     protected void performDefaults() {
-        m_dataCellType.loadDefault();
         m_fileStoreChunkSize.loadDefault();
         super.performDefaults();
     }
@@ -205,7 +168,6 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
      */
     @Override
     public boolean performOk() {
-        m_dataCellType.store();
         m_fileStoreChunkSize.store();
         return super.performOk();
     }
@@ -215,15 +177,6 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
      */
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
-        if (event.getNewValue().equals(StoragePreferenceInitializer.FILESTORE_CELLTYPE)) {
-            enableFileStorSettings(true);
-        } else {
-            enableFileStorSettings(false);
-        }
-    }
-
-    private void enableFileStorSettings(final boolean enable) {
-        m_fileStoreChunkSize.setEnabled(enable, m_chunkSizeComp);
-        m_lFileStoreSetings.setEnabled(enable);
+        // Nothing to do here...
     }
 }
