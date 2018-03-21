@@ -89,6 +89,7 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -265,16 +266,24 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         ColumnSelectionVerifier.verifyColumn(m_knownEntitiesColumnModel, spec2, StringValue.class, null)
         .ifPresent(a -> setWarningMessage(a));
 
+        // check tokenizer settings from incoming document column
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
+        String tokenizerFromInput = dataTableSpecVerifier
+            .getTokenizerFromInputDocCol(spec.findColumnIndex(m_docColumnModel.getStringValue()));
+        if (m_tokenizer.getStringValue().isEmpty() && tokenizerFromInput != null) {
+            m_tokenizer.setStringValue(tokenizerFromInput);
+            setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
+                + "' as word tokenizer based on incoming documents.");
+        } else if (m_tokenizer.getStringValue().isEmpty()) {
+            m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
+        }
+        if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {
+            setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
+        }
+
         // check if specific tokenizer is installed
         if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizer.getStringValue())) {
             throw new MissingTokenizerException(m_tokenizer.getStringValue());
-        }
-
-        // check tokenizer settings from incoming document column
-        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
-        if (!dataTableSpecVerifier.verifyTokenizer(spec.findColumnIndex(m_docColumnModel.getStringValue()),
-            m_tokenizer.getStringValue())) {
-            setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
         }
 
         return new PortObjectSpec[]{new NERModelPortObjectSpec(m_tokenizer.getStringValue())};

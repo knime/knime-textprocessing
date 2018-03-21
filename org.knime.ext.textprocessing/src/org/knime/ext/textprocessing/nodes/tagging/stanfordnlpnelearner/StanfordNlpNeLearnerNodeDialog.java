@@ -67,7 +67,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -235,7 +234,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString createTokenizerModel() {
         return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            "");
     }
 
     private SettingsModelString m_tagtypemodel;
