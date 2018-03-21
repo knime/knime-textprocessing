@@ -81,6 +81,7 @@ import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
@@ -212,6 +213,12 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         DataTableSpec[] inDataTableSpecs = Arrays.stream(inSpecs).filter(spec -> spec instanceof DataTableSpec)
             .map(spec -> (DataTableSpec)spec).toArray(DataTableSpec[]::new);
 
+        DataTableSpec in = inDataTableSpecs[0];
+
+        // auto guess settings if document column has not been set
+        ColumnSelectionVerifier.verifyColumn(m_documentColModel, in, DocumentValue.class, null)
+            .ifPresent(msg -> setWarningMessage(msg));
+
         checkInputDataTableSpecs(inDataTableSpecs);
         checkInputPortSpecs(inSpecs);
         checkDocColTokenizerSettings(inDataTableSpecs);
@@ -221,7 +228,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
             throw new MissingTokenizerException(m_tokenizer.getStringValue());
         }
 
-        DataTableSpec in = inDataTableSpecs[0];
         ColumnRearranger r = createColumnRearranger(in);
         DataTableSpec out = r.createSpec();
 
@@ -253,7 +259,17 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @param inSpecs Specs of the input data tables.
      */
     private void checkDocColTokenizerSettings(final DataTableSpec[] inSpecs) {
-        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        DataTableSpec inSpec = inSpecs[0];
+        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpec);
+        String tokenizerFromInput = dataTableSpecVerifier
+            .getTokenizerFromInputDocCol(inSpec.findColumnIndex(m_documentColModel.getStringValue()));
+        if (m_tokenizer.getStringValue().isEmpty() && tokenizerFromInput != null) {
+            m_tokenizer.setStringValue(tokenizerFromInput);
+            setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
+            + "' as word tokenizer based on incoming documents.");
+        } else if (m_tokenizer.getStringValue().isEmpty()) {
+            m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
+        }
         if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {
             setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
         }
@@ -296,10 +312,6 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(in);
         verifier.verifyMinimumDocumentCells(1, true);
         String docColName = m_documentColModel.getStringValue();
-
-        // auto guess settings if document column has not been set
-        ColumnSelectionVerifier.verifyColumn(m_documentColModel, in, DocumentValue.class, null)
-            .ifPresent(msg -> setWarningMessage(msg));
 
         docColName = m_documentColModel.getStringValue();
         int docColIndex = in.findColumnIndex(docColName);

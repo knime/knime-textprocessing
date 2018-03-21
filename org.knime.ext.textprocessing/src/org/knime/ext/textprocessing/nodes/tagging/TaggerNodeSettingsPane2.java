@@ -60,7 +60,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * A {@link org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane} which provides additionally a tab
@@ -88,7 +87,7 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(TaggerConfigKeys2.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            "");
     }
 
     /**
