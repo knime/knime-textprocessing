@@ -181,7 +181,7 @@ public class StanfordNlpNeDocumentTagger extends AbstractDocumentTagger {
                 wordList.add(new edu.stanford.nlp.ling.Word(w.getText()));
             }
         }
-        List<CoreLabel> coreLabelList = edu.stanford.nlp.ling.Sentence.toCoreLabelList(wordList);
+        List<CoreLabel> coreLabelList = edu.stanford.nlp.ling.SentenceUtils.toCoreLabelList(wordList);
         List<CoreLabel> taggedWords = m_tagger.classifySentence(coreLabelList);
 
         List<TaggedEntity> taggedEntities = new ArrayList<TaggedEntity>();
