@@ -58,25 +58,10 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @since 2.9
  */
 public class StoragePreferenceInitializer extends AbstractPreferenceInitializer {
-
-    /** The blob cell type setting. */
-    public static final String BLOB_CELLTYPE = "blobCell";
-
-    /** The regular cell type setting. */
-    public static final String REGULAR_CELLTYPE = "regularCell";
-
-    /** The file store cell type setting. */
-    public static final String FILESTORE_CELLTYPE = "fileStoreCell";
-
-    /** The default cell type setting.*/
-    public static final String DEFAULT_CELLTYPE = FILESTORE_CELLTYPE;
-
-    /** The default number of documents to store in a single file store file.*/
+    /**
+     * The default number of documents to store in a single file store file.
+     */
     public static final int DEFAULT_FILESTORE_CHUNKSIZE = 10000;
-
-
-    /** Preference key for the document cell type. */
-    public static final String PREF_CELL_TYPE = "knime.textprocessing.celltype";
 
     /**
      * Preference key for the chunk size of the file store, specifying how many documents are stored in a single
@@ -92,7 +77,6 @@ public class StoragePreferenceInitializer extends AbstractPreferenceInitializer 
         IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
 
         //set default values
-        store.setDefault(PREF_CELL_TYPE, DEFAULT_CELLTYPE);
         store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
     }
 
@@ -108,16 +92,5 @@ public class StoragePreferenceInitializer extends AbstractPreferenceInitializer 
             return 1;
         }
         return pStore.getInt(PREF_FILESTORE_CHUNKSIZE);
-    }
-
-    /**
-     * @return The specified cell type to use.
-     */
-    public static String cellType() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        if (!pStore.contains(PREF_CELL_TYPE)) {
-            return DEFAULT_CELLTYPE;
-        }
-        return pStore.getString(PREF_CELL_TYPE);
     }
 }

@@ -67,16 +67,6 @@ public final class TextContainerDataCellFactoryBuilder {
      * document cells.
      */
     public static TextContainerDataCellFactory createDocumentCellFactory() {
-        if (StoragePreferenceInitializer.cellType().equals(
-            StoragePreferenceInitializer.REGULAR_CELLTYPE)) {
-            LOGGER.debug("Creating document cell factory!");
-            return new DocumentDataCellFactory();
-        } else if (StoragePreferenceInitializer.cellType().equals(
-            StoragePreferenceInitializer.BLOB_CELLTYPE)) {
-          LOGGER.debug("Creating document blob cell factory!");
-          return new DocumentBlobDataCellFactory();
-        }
-
         // create file store cells:
         // if more than 1 documents are stored in cell use buffered cell, else use regular file store cell.
         if (StoragePreferenceInitializer.fileStoreChunkSize() >= 2) {
