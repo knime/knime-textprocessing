@@ -292,7 +292,6 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
 
         try {
             // get values from output stream
-            boolean canParseModelQuality = false;
             String[] scores = logReader.readLine().split("\t");
             if (scores.length >= 7) {
                 Double precision = prfScores.first()/100;
@@ -304,11 +303,9 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
                 // create the scores row and add it to the BufferedDataContainer we created in the beginning
                 stats = new DefaultRow(new RowKey("Row0"), new DataCell[]{new DoubleCell(precision),
                     new DoubleCell(recall), new DoubleCell(f1), new IntCell(tp), new IntCell(fp), new IntCell(fn)});
-                canParseModelQuality = true;
-            }
-
-            if (!canParseModelQuality) {
-                setWarningMessage("Could not parse quality measures of model validation.");
+                if (tp == 0 && fp == 0 && fn== 0 && precision == 0 && recall == 1 && f1 == 0) {
+                    setWarningMessage("Could not parse quality measures of model validation.");
+                }
             }
         } catch (NumberFormatException e) {
             setWarningMessage("Could not parse quality measures of model validation.");
