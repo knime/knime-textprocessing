@@ -70,6 +70,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.core.node.streamable.OutputPortRole;
 import org.knime.core.node.streamable.PartitionInfo;
@@ -132,6 +133,32 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
                 "Number of input port roles must be equal to number of data in ports -1!");
         }
         m_roles = new InputPortRole[dataInPorts];
+        m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
+        for (int i = 1; i < m_roles.length; i++) {
+            m_roles[i] = roles[i - 1];
+        }
+
+        m_replaceOldDocModel.addChangeListener(new ColumnHandlingListener());
+    }
+
+    /**
+     * Constructor defining a node model with different input and output port types.
+     *
+     * @param inPortTypes The input port types. First port type has to be BufferedDataTable, since its role is set to
+     *            {@link InputPortRole#DISTRIBUTED_STREAMABLE}.
+     * @param outPortTypes The output port types.
+     * @param roles The roles of the input ports after the first port.
+     * @since 3.6
+     */
+    public StreamablePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
+        final InputPortRole[] roles) {
+        super(inPortTypes, outPortTypes);
+
+        if (roles.length != inPortTypes.length - 1) {
+            throw new IllegalArgumentException(
+                "Number of input port roles must be equal to number of data in ports -1!");
+        }
+        m_roles = new InputPortRole[inPortTypes.length];
         m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
         for (int i = 1; i < m_roles.length; i++) {
             m_roles[i] = roles[i - 1];
@@ -332,8 +359,8 @@ public abstract class StreamablePreprocessingNodeModel extends NodeModel {
                     if (m_roles[i].equals(InputPortRole.DISTRIBUTED_STREAMABLE)
                         || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
                         inData[i] = null;
-                    } else {
-                        inData[i] = (BufferedDataTable)((PortObjectInput)inputs[i]).getPortObject();
+                    } else if (inputs[i] != null) {
+                            inData[i] = (BufferedDataTable)((PortObjectInput)inputs[i]).getPortObject();
                     }
                 }
 
