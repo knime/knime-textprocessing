@@ -518,7 +518,7 @@
       </node>
       <node
             category-path="/applications/textprocessing/preprocessing"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilterNodeFactory2"
             >
       </node>
@@ -680,6 +680,11 @@
             category-path="/applications/textprocessing/transformation"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.termneighborhoodextractor.TermNeighborhoodExtractorNodeFactory">
+      </node>
+      <node
+            category-path="/applications/textprocessing/preprocessing"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilterNodeFactory3">
       </node>
    </extension>
    <extension

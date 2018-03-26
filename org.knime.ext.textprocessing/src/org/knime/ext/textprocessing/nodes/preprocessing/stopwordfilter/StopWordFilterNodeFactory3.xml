@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Stop Word Filter</name>
+    <shortDescription>Filters document terms contained in the stop word list.</shortDescription>
+    <fullDescription>
+        <intro>
+        	Filters all terms of the input documents, which are contained in the specified stop word list and/or in the second input table.
+        	The node provides built-in stop word lists for various languages. Additionally, stop words can be passed to
+        	the second input port. At least one stopword list (built-in or custom list) has to be selected in the dialog.
+		</intro>
+
+        <tab name="Filter options">
+        <option name="Use built-in list">
+              Specifies if built-in stop word list is used or not. If checked
+              the second input table will be ignored.
+        </option>
+        <option name="Stopword lists">
+              Available built-in stop word lists. If "Use built-in list" is
+              checked, the built-in stop word list to use can be specified here.
+        </option>
+        <option name="Use custom list">
+              If checked, the custom stop word list from the second input port is used.
+        </option>
+        <option name="Stopword column">
+              The string column from the second input port which contains one stop word per row.
+        </option>
+        <option name="Case sensitive">
+              If checked the stop words are matched case sensitive otherwise not.
+        </option>
+        
+        </tab>
+
+        <tab name="Preprocessing options">
+        <option name="Document column">
+            The column containing the documents to preprocess.
+        </option>
+        
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
+            documents will be appended as new column. 
+        </option>
+
+        <option name="Append column">
+            The name of the new appended column, containing the preprocessed documents.            
+        </option>
+        
+        <option name="Ignore unmodifiable tag">
+              If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+    </fullDescription>
+
+    <ports>
+        <inPort name="Documents to preprocess" index="0">
+            The input table which contains the documents to preprocess.
+        </inPort>
+		<inPort name="Stop words" index="1">
+            The input table which contains a string column with one stop word per row.
+        </inPort>
+        <outPort name="Preprocessed documents." index="0">
+            The output table which contains the preprocessed documents.
+        </outPort>
+    </ports>
+</knimeNode>
