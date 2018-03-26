@@ -51,18 +51,17 @@ package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnescorer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.text.NumberFormat;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -105,6 +104,9 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.sequences.DocumentReaderAndWriter;
+import edu.stanford.nlp.util.Triple;
+import edu.stanford.nlp.util.logging.RedwoodConfiguration;
+import edu.stanford.nlp.util.logging.RedwoodConfiguration.Handlers;
 
 /**
  *
@@ -273,47 +275,36 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
         sentenceFileWriter.close();
 
         exec.setProgress(0.5, "Validate model");
-        // we need to catch the System.err output, because unfortunately there is no method to get the scores
-        // maybe countResults method works, but at the moment this is fine
-        // Create a stream to hold the output
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream errOutput = new PrintStream(baos);
-        // save the old System.err
-        PrintStream oldErr = System.err;
-        // set the err output stream to own output stream
-        System.setErr(errOutput);
+        // create logger configuration and catch the scores which will be printed to the log file
+        File tmpLogFile = new File(KNIMEConstants.getKNIMETempDir() + "/scores.log");
+        RedwoodConfiguration conf = RedwoodConfiguration.empty();
+        conf.handlers(Handlers.chain(Handlers.hideDebug, Handlers.file(tmpLogFile))).apply();
+
         // classify the documents with our model
         DocumentReaderAndWriter<CoreLabel> raw = m_inputModel.makeReaderAndWriter();
-        m_inputModel.classifyAndWriteAnswers(m_annotatedTestFilePath, raw, true);
-        // set the err output back to standard output stream
-        System.err.flush();
-        System.setErr(oldErr);
+        Triple<Double, Double, Double> prfScores = m_inputModel.classifyAndWriteAnswers(m_annotatedTestFilePath, new ByteArrayOutputStream(), raw, true);
 
         DataRow stats = new DefaultRow(new RowKey("Row0"),
             new DataCell[]{DataType.getMissingCell(), DataType.getMissingCell(), DataType.getMissingCell(),
                 DataType.getMissingCell(), DataType.getMissingCell(), DataType.getMissingCell()});
 
+        ReversedLinesFileReader logReader = new ReversedLinesFileReader(tmpLogFile, StandardCharsets.UTF_8);
+
         try {
             // get values from output stream
             boolean canParseModelQuality = false;
-            String caughtScores = baos.toString();
-            String totalScores[] = caughtScores.split("Totals\t");
-            if (totalScores.length >= 2) {
-                String[] scores = totalScores[1].split("\t");
-                if (scores.length >= 6) {
-                    Locale loc = Locale.getDefault();
-                    NumberFormat format = NumberFormat.getInstance(loc);
-                    Double precision = format.parse(scores[0].trim()).doubleValue();
-                    Double recall = format.parse(scores[1].trim()).doubleValue();
-                    Double f1 = format.parse(scores[2].trim()).doubleValue();
-                    int tp = Integer.parseInt(scores[3].trim());
-                    int fp = Integer.parseInt(scores[4].trim());
-                    int fn = Integer.parseInt(scores[5].trim());
-                    // create the scores row and add it to the BufferedDataContainer we created in the beginning
-                    stats = new DefaultRow(new RowKey("Row0"), new DataCell[]{new DoubleCell(precision),
-                        new DoubleCell(recall), new DoubleCell(f1), new IntCell(tp), new IntCell(fp), new IntCell(fn)});
-                    canParseModelQuality = true;
-                }
+            String[] scores = logReader.readLine().split("\t");
+            if (scores.length >= 7) {
+                Double precision = prfScores.first()/100;
+                Double recall = prfScores.second()/100;
+                Double f1 = prfScores.third()/100;
+                int tp = Integer.parseInt(scores[4].trim());
+                int fp = Integer.parseInt(scores[5].trim());
+                int fn = Integer.parseInt(scores[6].trim());
+                // create the scores row and add it to the BufferedDataContainer we created in the beginning
+                stats = new DefaultRow(new RowKey("Row0"), new DataCell[]{new DoubleCell(precision),
+                    new DoubleCell(recall), new DoubleCell(f1), new IntCell(tp), new IntCell(fp), new IntCell(fn)});
+                canParseModelQuality = true;
             }
 
             if (!canParseModelQuality) {
@@ -321,10 +312,12 @@ public class StanfordNlpNeScorerNodeModel extends NodeModel {
             }
         } catch (NumberFormatException e) {
             setWarningMessage("Could not parse quality measures of model validation.");
+        } finally {
+            logReader.close();
+            tmpLogFile.delete();
+            m_annotatedTestFile.delete();
         }
         accTable.addRowToTable(stats);
-
-        m_annotatedTestFile.delete();
 
         accTable.close();
 
