@@ -78,6 +78,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
+@Deprecated
 public final class StopWordFilterNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StopWordFilterNodeModel2.class);

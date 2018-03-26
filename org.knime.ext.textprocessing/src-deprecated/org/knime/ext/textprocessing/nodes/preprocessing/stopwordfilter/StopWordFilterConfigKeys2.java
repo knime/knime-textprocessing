@@ -53,6 +53,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
+@Deprecated
 public final class StopWordFilterConfigKeys2 {
 
     private StopWordFilterConfigKeys2() { }

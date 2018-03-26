@@ -57,6 +57,7 @@ import org.knime.core.node.NodeView;
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
+@Deprecated
 public final class StopWordFilterNodeFactory2 extends NodeFactory<StopWordFilterNodeModel2> {
 
     /**
