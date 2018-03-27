@@ -28,6 +28,21 @@
             name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanHgcModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanConllHgcModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels.GermanConllHgcModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanFastCaselessModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanFastCaselessModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanUdModel"
+            name="org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels.GermanUdModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TokenizerFactory">
