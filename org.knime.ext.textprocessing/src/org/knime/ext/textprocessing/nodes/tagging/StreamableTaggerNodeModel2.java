@@ -263,12 +263,14 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpec);
         String tokenizerFromInput = dataTableSpecVerifier
             .getTokenizerFromInputDocCol(inSpec.findColumnIndex(m_documentColModel.getStringValue()));
-        if (m_tokenizer.getStringValue().isEmpty() && tokenizerFromInput != null) {
-            m_tokenizer.setStringValue(tokenizerFromInput);
-            setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
-            + "' as word tokenizer based on incoming documents.");
-        } else if (m_tokenizer.getStringValue().isEmpty()) {
-            m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
+        if (m_tokenizer.getStringValue().isEmpty()) {
+            if (tokenizerFromInput != null) {
+                m_tokenizer.setStringValue(tokenizerFromInput);
+                setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
+                    + "' as word tokenizer based on incoming documents.");
+            } else {
+                m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
+            }
         }
         if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {
             setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());

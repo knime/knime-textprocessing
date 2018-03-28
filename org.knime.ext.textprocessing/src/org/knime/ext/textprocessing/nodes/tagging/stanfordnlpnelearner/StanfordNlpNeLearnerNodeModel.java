@@ -270,12 +270,14 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
         String tokenizerFromInput = dataTableSpecVerifier
             .getTokenizerFromInputDocCol(spec.findColumnIndex(m_docColumnModel.getStringValue()));
-        if (m_tokenizer.getStringValue().isEmpty() && tokenizerFromInput != null) {
-            m_tokenizer.setStringValue(tokenizerFromInput);
-            setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
-                + "' as word tokenizer based on incoming documents.");
-        } else if (m_tokenizer.getStringValue().isEmpty()) {
-            m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
+        if (m_tokenizer.getStringValue().isEmpty()) {
+            if (tokenizerFromInput != null) {
+                m_tokenizer.setStringValue(tokenizerFromInput);
+                setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
+                    + "' as word tokenizer based on incoming documents.");
+            } else {
+                m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
+            }
         }
         if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {
             setWarningMessage(dataTableSpecVerifier.getTokenizerWarningMsg());
