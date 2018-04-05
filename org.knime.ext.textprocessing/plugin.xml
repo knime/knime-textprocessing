@@ -929,6 +929,51 @@
             name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesDistsimModel"
             type="Named Entity Recognition">
       </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English7ClassesCaselessDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English7ClassesCaselessDistsimModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesCaselessDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesCaselessDistsimModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018CaselessLeft3WordsDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018CaselessLeft3WordsDistsimModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018Left3WordsNoDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018Left3WordsNoDistsimModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018Left3WordsDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018Left3WordsDistsimModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018BidirectionalNoDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018BidirectionalNoDistsimModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018BidirectionalDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanford.posmodels.EnglishWSJ018BidirectionalDistsimModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesNoWikiNoDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English3ClassesNoWikiNoDistsimModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English4ClassesCaselessDistsimModel"
+            name="org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnetagger.nermodels.English4ClassesCaselessDistsimModel"
+            type="Named Entity Recognition">
+      </StanfordTaggerModel>
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TagSet">
