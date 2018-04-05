@@ -8,6 +8,11 @@
             name="org.knime.ext.textprocessing.french.nodes.tagging.stanford.posmodels.FrenchModel"
             type="Part-Of-Speech">
       </StanfordTaggerModel>
+      <StanfordTaggerModel
+            StanfordTaggerModel="org.knime.ext.textprocessing.language.french.nodes.tagging.stanford.posmodels.FrenchUDModel"
+            name="org.knime.ext.textprocessing.language.french.nodes.tagging.stanford.posmodels.FrenchUDModel"
+            type="Part-Of-Speech">
+      </StanfordTaggerModel>
    </extension>
 
 </plugin>
