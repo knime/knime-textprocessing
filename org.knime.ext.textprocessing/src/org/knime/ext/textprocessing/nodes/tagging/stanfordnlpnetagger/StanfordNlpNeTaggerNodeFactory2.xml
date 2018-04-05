@@ -66,18 +66,24 @@
                 <li> English conll 4 class (distsim): Location, Person, Organization, Misc </li>
                 <li> English muc 7 class (distsim): Location, Person, Organization, Money, Percent, Date, Time </li>
                 <li> English nowiki 3 class caseless (distsim): Location, Person, Organization </li>
-                <li> English all 3 class (nodistsim): Location, Person, Organization </li>
-                <li> English conll 4 class (nodistsim):  Location, Person, Organization, Misc </li>
-                <li> English muc 7 class (nodistsim): Location, Person, Organization, Money, Percent, Date, Time </li>
+                <li> English nowiki 3 class (no distsim): Location, Person, Organization </li>
+                <li> English all 3 class (no distsim): Location, Person, Organization </li>
+                <li> English conll 4 class (no distsim):  Location, Person, Organization, Misc </li>
+                <li> English muc 7 class (no distsim): Location, Person, Organization, Money, Percent, Date, Time </li>
+                <li> English all 3 class caseless (distsim): Location, Person, Organization </li>
+                <li> English conll 4 class caseless (distsim): Location, Person, Organization, Misc </li>
+                <li> English muc 7 class caseless (distsim): Location, Person, Organization, Money, Percent, Date, Time </li>
             </ul>
             
             To use following tagger models, the specific language pack has to be installed.
             (File -> Install KNIME Extensions...)
             
             <ul>
+            	<li> German Conll GermEval 2014 hgc (created by Faruqui and Pado) </li>
                 <li> German dewac (created by Faruqui and Pado) </li>
                 <li> German hgc (created by Faruqui and Pado) </li>
-                <li> Spanish ancora </li>             
+                <li> Spanish ancora </li>  
+                <li> Spanish KBP ancora </li>            
             </ul>
         </option>
         </tab>        

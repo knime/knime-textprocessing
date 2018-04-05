@@ -22,10 +22,12 @@
             <a href="http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php">http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php</a>.<br/>
             For Spanish texts the Ancora Treebank tag set is used:<br/>
             <a href="https://nlp.stanford.edu/software/spanish-faq.shtml#tagset">https://nlp.stanford.edu/software/spanish-faq.shtml#tagset</a>.<br/>
+            There are also German, Spanish and French models using the Universal Dependencies POS tag set:<br/>
+            <a href="http://universaldependencies.org/u/pos/">http://universaldependencies.org/u/pos/</a>.<br/>
             </p>
             <p>
             <b>Note:</b> the provided tagger models vary in memory consumption and processing speed. Especially the 
-            models English bidirectional, German hgc, and Germany dewac require a lot of memory. For the usage of these
+            models English bidirectional, WSJ bidirectional, German hgc, and German dewac require a lot of memory. For the usage of these
             models it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
             the -Xmx setting in the knime.ini file. If KNIME is running with less than 1.5GB heap space it is 
             recommended to use English left3words, English left3words caseless, or German fast models for tagging of 
@@ -37,13 +39,30 @@
             <ul>
                 <li>English bidirectional: Trained on WSJ sections 0-18 using a 
                     bidirectional architecture and including word shape and 
-                    distributional similarity features.</li>
+                    distributional similarity features. Penn Treebank tagset.</li>
                 <li>English left3words: Trained on WSJ sections 0-18 and extra parser 
                     training data using the left3words architecture and includes word 
-                    shape and distributional similarity features.</li>
+                    shape and distributional similarity features. Penn Treebank tagset.</li>
                 <li>English left3words caseless: Trained on WSJ sections 0-18 and extra 
                     parser training data using the left3words architecture and includes 
-                    word shape and distributional similarity features. Ignores case.</li>
+                    word shape and distributional similarity features. Penn Treebank tagset. Ignores case.</li>
+                <li>English WSJ 0-18 bidirectional distsim: Trained on WSJ sections 0-18 
+                	using a bidirectional architecture and including word shape and distributional
+                	similarity features. Penn Treebank tagset.</li>
+                <li>English WSJ 0-18 bidirectional distsim: Trained on WSJ sections 0-18 
+                	using a bidirectional architecture and including word shape and distributional
+                	similarity features. Penn Treebank tagset.</li>
+                <li>English WSJ 0-18 bidirectional no distsim: Trained on WSJ sections 0-18 
+                	using a bidirectional architecture and including word shape. No distributional
+                	similarity features. Penn Treebank tagset.</li>
+                <li>English WSJ 0-18 caseless left 3 words distsim: Trained on WSJ sections 0-18 
+                	left3words architecture and includes word shape and distributional similarity features. 
+                	Penn Treebank tagset. Ignores case.</li>
+                <li>English WSJ 0-18 left 3 words distsim: Trained on WSJ sections 0-18 using the 
+                	left3words architecture and includes word shape and distributional similarity features.
+                	Penn Treebank tagset.</li>
+                <li>English WSJ 0-18 left 3 words no distsim: Trained on WSJ sections 0-18 using the 
+                	left3words architecture and includes word shape. Penn Treebank tagset.</li>
              </ul>
              </p>
              <p>   
@@ -56,11 +75,16 @@
                     the STTS tagset.</li>
                 <li>German dewac: This model uses features from the distributional 
                     similarity clusters built from the deWac web corpus.</li>
-                <li>German Fast: Lacks distributional similarity features, but is 
+                <li>German fast: Lacks distributional similarity features, but is 
                     several times faster than the other alternatives.</li>
+                <li>German fast caseless: Lacks distributional similarity features, but is 
+                    several times faster than the other alternatives. Ignores case.</li>
+                <li>German UD: This is a model that produces Universal Dependencies POS tags.</li>
                 <li>French: Trained on the French treebank.</li>
+                <li>French UD: This is a model that produces Universal Dependencies POS tags.</li>
                 <li>Spanish: Trained on the Spanish Ancora tagset.</li>
                 <li>Spanish distsim: Trained on the French Spanish ancora tagset.</li>
+                <li>Spanish UD: This is a model that produces Universal Dependencies POS tags.</li>
             </ul>
             </p>
         </intro>
