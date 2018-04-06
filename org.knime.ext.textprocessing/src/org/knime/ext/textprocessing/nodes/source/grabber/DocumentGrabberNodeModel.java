@@ -161,13 +161,13 @@ public class DocumentGrabberNodeModel extends NodeModel {
             throw new MissingTokenizerException(m_tokenizerModel.getStringValue());
         }
 
+        // check target directory
+        getFile(m_directoryModel.getStringValue());
+
         return new DataTableSpec[]{createColumnRearranger(m_dtBuilder.createDataTableSpec()).createSpec()};
     }
 
     private ColumnRearranger createColumnRearranger(final DataTableSpec dataSpec) throws InvalidSettingsException {
-        // check target directory
-        getFile(m_directoryModel.getStringValue());
-
         ColumnRearranger cR = new ColumnRearranger(dataSpec);
         if (m_appendQueryColumnModel.getBooleanValue()) {
             cR.append(new QueryStringCellFactory(QUERYCOL_NAME, m_queryModel.getStringValue()));
