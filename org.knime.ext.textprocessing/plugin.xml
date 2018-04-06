@@ -980,5 +980,8 @@
       <TagSet
             TagBuilder="org.knime.ext.textprocessing.data.AncoraSpanishTreebankTag">
       </TagSet>
+      <TagSet
+            TagBuilder="org.knime.ext.textprocessing.data.UniversalDependenciesPOSTag">
+      </TagSet>
    </extension>
 </plugin>

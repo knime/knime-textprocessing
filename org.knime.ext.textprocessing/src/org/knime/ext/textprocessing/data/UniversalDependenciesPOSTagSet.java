@@ -44,48 +44,98 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   08.05.2017 (Julian): created
+ *   Mar 26, 2018 (julian): created
  */
-package org.knime.ext.textprocessing.language.french.nodes.tagging.stanford.posmodels;
-
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.data.UniversalDependenciesPOSTag;
-import org.knime.ext.textprocessing.language.french.TextprocessingFrenchLanguagePack;
-import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
+package org.knime.ext.textprocessing.data;
 
 /**
- * This class implements the {@link StanfordTaggerModel} interface to provide
- * the "French UD" part-of-speech model.
+ * This enum contains the Universal Dependencies tag set for part-of-speech tagging. To create a
+ * valid {@link org.knime.ext.textprocessing.data.Tag} instance use
+ * {@link org.knime.ext.textprocessing.data.UniversalDependenciesPOSTagSet#getTag()}, i.e:
+ * <br><br>
+ * {@code Tag t = UniversalDependenciesPOSTagSet.AO.getTag();}
+ * <br>
+ * The tagset is provided by universaldependencies.org.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
-public class FrenchUDModel implements StanfordTaggerModel {
+public enum UniversalDependenciesPOSTagSet {
 
-	private static final String MODELNAME = "French UD";
+    /** Unknown type. */
+    UNKNOWN,
 
-	private static final String MODELPATH = "models/stanfordmodels/pos/french-ud.tagger";
+    /** Adjective. */
+    ADJ,
+    /** Adposition. */
+    ADP,
+    /** Adverb. */
+    ADV,
+    /** Auxiliary. */
+    AUX,
+    /** Coordinating conjunction. */
+    CCONJ,
+    /** Determiner. */
+    DET,
+    /** Interjection. */
+    INTJ,
+    /** Noun. */
+    NOUN,
+    /** Numeral. */
+    NUM,
+    /** Particle. */
+    PART,
+    /** Pronoun. */
+    PRON,
+    /** Proper noun. */
+    PROPN,
+    /** Punctuation. */
+    PUNCT,
+    /** Subordinating conjunction. */
+    SCONJ,
+    /** Symbol. */
+    SYM,
+    /** Verb. */
+    VERB,
+    /** Other. */
+    X;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModelName() {
-		return MODELNAME;
-	}
+    private final Tag m_tag;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModelPath() {
-		return TextprocessingFrenchLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
-	}
+    /**
+     * The constant for POS tag types.
+     */
+    public static final String TAG_TYPE = "UDPOS";
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TagBuilder getTagBuilder() {
-		return new UniversalDependenciesPOSTag();
-	}
+    private UniversalDependenciesPOSTagSet() {
+        m_tag = new Tag(name(), TAG_TYPE);
+    }
+
+    /**
+     * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
+     *         to the specified {@code UniversalDependenciesPOSTag}.
+     */
+    public Tag getTag() {
+        return m_tag;
+    }
+
+    /**
+     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to the
+     * given string. If no corresponding
+     * {@link org.knime.ext.textprocessing.data.Tag} is available the
+     * {@code UNKNOWN} tag is returned.
+     *
+     * @param str The string representing a
+     *            {@link org.knime.ext.textprocessing.data.Tag}.
+     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
+     *         given string.
+     */
+    public static Tag stringToTag(final String str) {
+        for (UniversalDependenciesPOSTagSet pos : values()) {
+            if (pos.getTag().getTagValue().equals(str)) {
+                return pos.getTag();
+            }
+        }
+        return PartOfSpeechTag.UNKNOWN.getTag();
+    }
 }

@@ -87,6 +87,6 @@ public class GermanUdModel implements StanfordTaggerModel {
 	 */
 	@Override
 	public TagBuilder getTagBuilder() {
-		return UniversalDependenciesPOSTag.getDefault();
+		return new UniversalDependenciesPOSTag();
 	}
 }

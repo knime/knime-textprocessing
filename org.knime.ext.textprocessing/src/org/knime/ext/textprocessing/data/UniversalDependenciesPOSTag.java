@@ -54,67 +54,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
- * @author Julian Bunzel, KNIME AG, Berlin, Germany
+ * This class provides methods given by the {@link TagBuilder} interface to use the
+ * {@link UniversalDependenciesPOSTagSet}.
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public enum UniversalDependenciesPOSTag implements TagBuilder {
-
-    /** Unknown type. */
-    UNKNOWN,
-
-    /** Adjective. */
-    ADJ,
-    /** Adposition. */
-    ADP,
-    /** Adverb. */
-    ADV,
-    /** Auxiliary. */
-    AUX,
-    /** Coordinating conjunction. */
-    CCONJ,
-    /** Determiner. */
-    DET,
-    /** Interjection. */
-    INTJ,
-    /** Noun. */
-    NOUN,
-    /** Numeral. */
-    NUM,
-    /** Particle. */
-    PART,
-    /** Pronoun. */
-    PRON,
-    /** Proper noun. */
-    PROPN,
-    /** Punctuation. */
-    PUNCT,
-    /** Subordinating conjunction. */
-    SCONJ,
-    /** Symbol. */
-    SYM,
-    /** Verb. */
-    VERB,
-    /** Other. */
-    X;
-
-    private final Tag m_tag;
+public class UniversalDependenciesPOSTag implements TagBuilder {
 
     /**
-     * The constant for POS tag types.
+     * Default tag value.
      */
-    public static final String TAG_TYPE = "UDPOS";
-
-    private UniversalDependenciesPOSTag() {
-        m_tag = new Tag(name(), TAG_TYPE);
-    }
+    public static final String DEFAULT_TAG = UniversalDependenciesPOSTagSet.UNKNOWN.toString();
 
     /**
-     * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding
-     *         to the specified {@code UniversalDependenciesPOSTag}.
+     * Creates new instance of {@code UniversalDependenciesPOSTag}.
      */
-    public Tag getTag() {
-        return m_tag;
+    public UniversalDependenciesPOSTag() {
+        // Empty constructor...
     }
 
     /**
@@ -122,27 +78,7 @@ public enum UniversalDependenciesPOSTag implements TagBuilder {
      */
     @Override
     public Tag buildTag(final String value) {
-        return UniversalDependenciesPOSTag.stringToTag(value);
-    }
-
-    /**
-     * Returns the {@link org.knime.ext.textprocessing.data.Tag} related to the
-     * given string. If no corresponding
-     * {@link org.knime.ext.textprocessing.data.Tag} is available the
-     * {@code UNKNOWN} tag is returned.
-     *
-     * @param str The string representing a
-     *            {@link org.knime.ext.textprocessing.data.Tag}.
-     * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the
-     *         given string.
-     */
-    private static Tag stringToTag(final String str) {
-        for (UniversalDependenciesPOSTag pos : values()) {
-            if (pos.getTag().getTagValue().equals(str)) {
-                return pos.getTag();
-            }
-        }
-        return PartOfSpeechTag.UNKNOWN.getTag();
+        return UniversalDependenciesPOSTagSet.stringToTag(value);
     }
 
     /**
@@ -150,7 +86,7 @@ public enum UniversalDependenciesPOSTag implements TagBuilder {
      */
     @Override
     public List<String> asStringList() {
-        Enum<UniversalDependenciesPOSTag>[] values = values();
+        Enum<UniversalDependenciesPOSTagSet>[] values = UniversalDependenciesPOSTagSet.values();
         List<String> list = new ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
             list.add(values[i].name());
@@ -159,20 +95,12 @@ public enum UniversalDependenciesPOSTag implements TagBuilder {
     }
 
     /**
-     * @return The default "UNKNOWN" {@code UniversalDependenciesPOSTag} as
-     *         {@code TagBuilder}.
-     */
-    public static TagBuilder getDefault() {
-        return UniversalDependenciesPOSTag.UNKNOWN;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public Set<Tag> getTags() {
-        Set<Tag> tagSet = new LinkedHashSet<Tag>(values().length);
-        for (UniversalDependenciesPOSTag tag : values()) {
+        Set<Tag> tagSet = new LinkedHashSet<Tag>(UniversalDependenciesPOSTagSet.values().length);
+        for (UniversalDependenciesPOSTagSet tag : UniversalDependenciesPOSTagSet.values()) {
             tagSet.add(tag.getTag());
         }
         return tagSet;
@@ -183,7 +111,7 @@ public enum UniversalDependenciesPOSTag implements TagBuilder {
      */
     @Override
     public String getType() {
-        return TAG_TYPE;
+        return UniversalDependenciesPOSTagSet.TAG_TYPE;
     }
 
 }
