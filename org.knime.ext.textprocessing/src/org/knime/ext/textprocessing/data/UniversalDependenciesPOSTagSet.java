@@ -53,7 +53,7 @@ package org.knime.ext.textprocessing.data;
  * valid {@link org.knime.ext.textprocessing.data.Tag} instance use
  * {@link org.knime.ext.textprocessing.data.UniversalDependenciesPOSTagSet#getTag()}, i.e:
  * <br><br>
- * {@code Tag t = UniversalDependenciesPOSTagSet.AO.getTag();}
+ * {@code Tag t = UniversalDependenciesPOSTagSet.ADJ.getTag();}
  * <br>
  * The tagset is provided by universaldependencies.org.
  *
