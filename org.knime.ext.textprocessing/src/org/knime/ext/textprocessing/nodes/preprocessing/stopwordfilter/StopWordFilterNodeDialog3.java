@@ -164,6 +164,9 @@ final class StopWordFilterNodeDialog3 extends PreprocessingNodeSettingsPane2 {
         }
         if (!m_useCustomListModel.getBooleanValue()) {
             m_useBuiltInListModel.setBooleanValue(true);
+            if (m_hasStopWordInput) {
+                m_useBuiltInListModel.setEnabled(true);
+            }
         } else {
             m_useBuiltInListModel.setEnabled(m_hasStopWordInput);
         }
