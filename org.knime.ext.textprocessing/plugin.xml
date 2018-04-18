@@ -686,6 +686,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.stopwordfilter.StopWordFilterNodeFactory3">
       </node>
+      <node
+            category-path="/applications/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.DictionaryTaggerMultiColumnNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
