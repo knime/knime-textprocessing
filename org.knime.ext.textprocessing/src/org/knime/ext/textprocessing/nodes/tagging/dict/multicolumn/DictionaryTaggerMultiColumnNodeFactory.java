@@ -52,10 +52,10 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * The factory class of the dictionary based named entity recognizer node.
+ * The factory class of the multiple dictionary based named entity recognizer node.
  *
- * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
- * @since 3.5
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+ * @since 3.6
  */
 public class DictionaryTaggerMultiColumnNodeFactory extends NodeFactory<DictionaryTaggerMultiColumnNodeModel> {
 

@@ -64,6 +64,7 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
@@ -71,10 +72,11 @@ import javax.swing.Scrollable;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeDialog;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ConfigurationRequestEvent;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ConfigurationRequestListener;
@@ -82,17 +84,24 @@ import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ConfiguredCol
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ListModifier;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.SearchedItemsSelectionMode;
 import org.knime.core.node.util.DataColumnSpecListCellRenderer;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
+import org.knime.ext.textprocessing.nodes.tagging.MultiTaggerConfigKeys;
+import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
+import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSettingModels;
 
 /**
+ * The {@link NodeDialog} for the {@code DictionaryTaggerMultiColumnNodeModel}. It extends the
+ * {@link TaggerNodeSettingsPane2} to provide options shared between all tagger nodes.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin Germany
+ * @since 3.6
  */
-public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
+class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 {
 
     private static final DictionaryTaggerPanel DUMMY_PANEL = new DictionaryTaggerPanel(
-        new DictionaryTaggerColumnSetting("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
+        new DocumentTaggerConfiguration("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
 
-    private final Map<DataColumnSpec, DictionaryTaggerColumnSetting> m_columnToSettings;
+    private final Map<DataColumnSpec, DocumentTaggerConfiguration> m_columnToSettings;
 
     private final IndividualsPanel m_individualsPanel;
 
@@ -106,13 +115,14 @@ public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
 
     private ListModifier m_searchableListModifier;
 
-    /**
-     *
-     */
-    public DictionaryTaggerMultiColumnNodeDialogPane() {
+    private final SettingsModelBoolean m_setUnmodifiableModel =
+        CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
+
+    DictionaryTaggerMultiColumnNodeDialogPane() {
         super();
 
-        m_columnToSettings = new LinkedHashMap<DataColumnSpec, DictionaryTaggerColumnSetting>();
+        // Dictionary Tagger Tab
+        m_columnToSettings = new LinkedHashMap<DataColumnSpec, DocumentTaggerConfiguration>();
         m_errornousColNames = new HashSet<String>();
 
         m_searchableListPanel = new ColumnSelectionSearchableListPanel(SearchedItemsSelectionMode.SELECT_FIRST,
@@ -135,7 +145,7 @@ public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
                     case DELETION:
                         for (DataColumnSpec spec : m_searchableListPanel.getSelectedColumns()) {
 
-                            DictionaryTaggerColumnSetting dictTaggerColumnSetting = m_columnToSettings.get(spec);
+                            DocumentTaggerConfiguration dictTaggerColumnSetting = m_columnToSettings.get(spec);
                             if (dictTaggerColumnSetting != null) {
                                 int indexIndividualIndex = getIndexIndividualIndex(m_columnToSettings.get(spec));
                                 removeFromIndividualPanel(
@@ -148,35 +158,53 @@ public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
             }
         });
 
-        final JPanel tabPanel = new JPanel(new BorderLayout());
-        tabPanel.add(m_searchableListPanel, BorderLayout.CENTER);
+        final JPanel westPanel = new JPanel(new BorderLayout());
+
+        final JPanel setUnmodifiablePanel = new JPanel(new BorderLayout());
+        final JCheckBox unmodifiableBox = new JCheckBox("Set entities unmodifiable");
+        unmodifiableBox.setSelected(m_setUnmodifiableModel.getBooleanValue());
+        unmodifiableBox.addItemListener(e -> m_setUnmodifiableModel.setBooleanValue(unmodifiableBox.isSelected()));
+        setUnmodifiablePanel.add(unmodifiableBox, BorderLayout.CENTER);
+        setUnmodifiablePanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+
+        westPanel.add(m_searchableListPanel, BorderLayout.CENTER);
+        westPanel.add(setUnmodifiablePanel, BorderLayout.SOUTH);
 
         m_individualsPanel = new IndividualsPanel();
         m_individualsScrollPanel = new JScrollPane(m_individualsPanel);
+
+        final JPanel tabPanel = new JPanel(new BorderLayout());
+        tabPanel.add(westPanel, BorderLayout.CENTER);
         tabPanel.add(m_individualsScrollPanel, BorderLayout.EAST);
 
-        addTab("Set dictionaries", tabPanel);
-
+        addTab("Dictionary Tagger Selection", tabPanel);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
         throws NotConfigurableException {
-        DataTableSpec spec = specs[0];
+        super.loadAdditionalSettingsFrom(settings, specs);
+        DataTableSpec spec = specs[1];
         if (spec.getNumColumns() == 0) {
             throw new NotConfigurableException("No columns at input.");
         }
 
-        m_orgTableSpec = specs[0];
+        m_orgTableSpec = specs[1];
 
         m_columnToSettings.clear();
         m_errornousColNames.clear();
         m_individualsPanel.removeAll();
 
         m_searchableListModifier = m_searchableListPanel.update(spec);
+
+        try {
+            m_setUnmodifiableModel.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException e) {
+            // just catch...
+        }
 
         NodeSettingsRO subSettings;
         try {
@@ -193,50 +221,46 @@ public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
                 NodeSettingsRO idSettings;
                 String nameForSettings;
                 try {
-                    // idSettigs address the settings for one particular column
                     idSettings = subSettings.getNodeSettings(id);
-                    // the name of the column - must match
-                    nameForSettings = idSettings.getString(DictionaryTaggerMultiColumnConfigKeys.CFGKEY_COLUMNNAME);
-
+                    nameForSettings = idSettings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
                 } catch (InvalidSettingsException is) {
                     continue;
                 }
 
                 final DataColumnSpec orgSpec = m_orgTableSpec.getColumnSpec(nameForSettings);
-                final DictionaryTaggerColumnSetting renameColumnSetting =
-                    orgSpec == null ? new DictionaryTaggerColumnSetting(nameForSettings) : new DictionaryTaggerColumnSetting(orgSpec.getName());
-
-                renameColumnSetting.loadSettingsFrom(idSettings);
+                final DocumentTaggerConfiguration dictTaggerColumnSetting =
+                    new DocumentTaggerConfiguration(nameForSettings);
+                dictTaggerColumnSetting.loadSettingsFrom(idSettings);
 
                 if (orgSpec == null) {
                     DataColumnSpec invalidSpec = createInvalidSpec(nameForSettings);
                     m_searchableListModifier.addAdditionalColumn(invalidSpec);
-                    m_columnToSettings.put(invalidSpec, renameColumnSetting);
+                    m_columnToSettings.put(invalidSpec, dictTaggerColumnSetting);
                 } else {
-                    m_columnToSettings.put(orgSpec, renameColumnSetting);
-
+                    m_columnToSettings.put(orgSpec, dictTaggerColumnSetting);
                 }
             }
         }
 
         //add for each setting a panel in the individual panel
-        for (Map.Entry<DataColumnSpec, DictionaryTaggerColumnSetting> entries : m_columnToSettings.entrySet()) {
+        for (Map.Entry<DataColumnSpec, DocumentTaggerConfiguration> entries : m_columnToSettings.entrySet()) {
             addToIndividualPanel(new DictionaryTaggerPanel(entries.getValue(), entries.getKey()));
         }
-
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        super.saveAdditionalSettingsTo(settings);
+        m_setUnmodifiableModel.saveSettingsTo(settings);
         NodeSettingsWO subSettings = settings.addNodeSettings(DictionaryTaggerMultiColumnNodeModel.CFG_SUB_CONFIG);
 
         clearBorders();
 
         int i = 0;
-        for (DictionaryTaggerColumnSetting colSet : m_columnToSettings.values()) {
+        for (DocumentTaggerConfiguration colSet : m_columnToSettings.values()) {
             NodeSettingsWO subSub = subSettings.addNodeSettings(Integer.toString(i++));
             colSet.saveSettingsTo(subSub);
         }
@@ -246,8 +270,7 @@ public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
         // there can only by one or non column selected.
         final DataColumnSpec selected = m_searchableListPanel.getSelectedColumn();
         if (selected != null && !m_columnToSettings.containsKey(selected)) {
-            DictionaryTaggerColumnSetting dictTaggerColumnSetting =
-                new DictionaryTaggerColumnSetting(selected.getName());
+            DocumentTaggerConfiguration dictTaggerColumnSetting = new DocumentTaggerConfiguration(selected.getName());
             m_columnToSettings.put(selected, dictTaggerColumnSetting);
             addToIndividualPanel(new DictionaryTaggerPanel(dictTaggerColumnSetting, selected));
         }
@@ -267,20 +290,20 @@ public class DictionaryTaggerMultiColumnNodeDialogPane extends NodeDialogPane {
     }
 
     /**
-    *
-    * @param colSet the setting
-    * @return the index of the panel in the {@link #m_individualsPanel} corresponding to the given column setting or
-    *         <code>-1</code>.
-    */
-   private int getIndexIndividualIndex(final DictionaryTaggerColumnSetting colSet) {
-       for (int i = 0; i < m_individualsPanel.getComponentCount(); i++) {
-           DictionaryTaggerPanel component = (DictionaryTaggerPanel)m_individualsPanel.getComponent(i);
-           if (component.getSettings().getColumnName().equals(colSet.getColumnName())) {
-               return i;
-           }
-       }
-       return -1;
-   }
+     *
+     * @param colSet the setting
+     * @return the index of the panel in the {@link #m_individualsPanel} corresponding to the given column setting or
+     *         <code>-1</code>.
+     */
+    private int getIndexIndividualIndex(final DocumentTaggerConfiguration colSet) {
+        for (int i = 0; i < m_individualsPanel.getComponentCount(); i++) {
+            DictionaryTaggerPanel component = (DictionaryTaggerPanel)m_individualsPanel.getComponent(i);
+            if (component.getSettings().getColName().equals(colSet.getColName())) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     /**
      * @param panel

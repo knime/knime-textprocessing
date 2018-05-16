@@ -66,6 +66,7 @@ import javax.swing.JPanel;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.node.util.DataColumnSpecListCellRenderer;
 import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
  *
@@ -82,7 +83,7 @@ public class DictionaryTaggerPanel extends JPanel {
      */
     public static final String REMOVE_ACTION = "REMOVE_ACTION";
 
-    private final DictionaryTaggerColumnSetting m_settings;
+    private final DocumentTaggerConfiguration m_settings;
 
     private final DataColumnSpec m_columnSpec;
 
@@ -90,18 +91,17 @@ public class DictionaryTaggerPanel extends JPanel {
      * @param colSet
      * @param spec
      */
-    public DictionaryTaggerPanel(final DictionaryTaggerColumnSetting colSet, final DataColumnSpec spec) {
+    public DictionaryTaggerPanel(final DocumentTaggerConfiguration colSet, final DataColumnSpec spec) {
 
         m_settings = colSet;
         m_columnSpec = spec;
-        final String colName = colSet.getColumnName();
-        boolean caseSensitive = colSet.caseSensitive();
-        boolean exactMatch = colSet.exactMatch();
-        String tagType = colSet.tagType();
-        String tagValue = colSet.tagValue();
+        final String colName = colSet.getColName();
+        boolean caseSensitive = colSet.getCaseSensitivityOption();
+        boolean exactMatch = colSet.getExactMatchOption();
+        String tagType = colSet.getTagType();
+        String tagValue = colSet.getTagValue();
 
-        String labelName =
-                colName.length() > MAX_LETTERS ? colName.substring(0, MAX_LETTERS) + "..." : colName;
+        String labelName = colName.length() > MAX_LETTERS ? colName.substring(0, MAX_LETTERS) + "..." : colName;
 
         final JLabel nameLabel = new JLabel(labelName);
         nameLabel.setToolTipText(colName);
@@ -110,14 +110,18 @@ public class DictionaryTaggerPanel extends JPanel {
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
 
         final JCheckBox caseSensitivityChecker = new JCheckBox("Case sensitive", caseSensitive);
+        caseSensitivityChecker.addItemListener(e -> m_settings.setCaseSensitivityOption(caseSensitivityChecker.isSelected()));
 
         final JCheckBox exactMatchChecker = new JCheckBox("Exact match", exactMatch);
+        exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(exactMatchChecker.isSelected()));
 
-        final JComboBox<String> tagValueSelection =
-            new JComboBox<String>(TagFactory.getInstance().getTagSetByType(tagType).asStringList().toArray(new String[0]));
+        final JComboBox<String> tagValueSelection = new JComboBox<String>(
+            TagFactory.getInstance().getTagSetByType(tagType).asStringList().toArray(new String[0]));
         tagValueSelection.setSelectedItem(tagValue);
+        tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)tagValueSelection.getSelectedItem()));
 
-        final JComboBox<String> tagTypeSelection = new JComboBox<String>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
+        final JComboBox<String> tagTypeSelection =
+            new JComboBox<String>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
 
         tagTypeSelection.setSelectedItem(tagType);
 
@@ -132,11 +136,12 @@ public class DictionaryTaggerPanel extends JPanel {
                 for (String value : tagSetByType) {
                     tagValueSelection.addItem(value);
                 }
+                m_settings.setTagType((String)tagTypeSelection.getSelectedItem());
             }
         });
 
-        setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2) : BorderFactory.createLineBorder(
-            Color.BLACK, 1));
+        setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2)
+            : BorderFactory.createLineBorder(Color.BLACK, 1));
 
         JPanel northLayout = new JPanel(new BorderLayout());
         northLayout.add(nameLabel, BorderLayout.WEST);
@@ -146,7 +151,7 @@ public class DictionaryTaggerPanel extends JPanel {
         centerLayout.add(caseSensitivityChecker, BorderLayout.WEST);
         centerLayout.add(exactMatchChecker, BorderLayout.EAST);
 
-        JPanel southLayout = new JPanel(new BorderLayout());
+        JPanel southLayout = new JPanel(new BorderLayout(20, 0));
         southLayout.add(tagTypeSelection, BorderLayout.WEST);
         southLayout.add(tagValueSelection, BorderLayout.EAST);
 
@@ -159,7 +164,7 @@ public class DictionaryTaggerPanel extends JPanel {
         add(dtp);
     }
 
-    DictionaryTaggerColumnSetting getSettings() {
+    DocumentTaggerConfiguration getSettings() {
         return m_settings;
     }
 

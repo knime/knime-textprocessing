@@ -44,61 +44,70 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 11, 2018 (julian): created
+ *   Apr 18, 2018 (julian): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
+ * The {@code DictionaryTaggerConfiguration} is an extension of the {@link DocumentTaggerConfiguration}. It contains a
+ * set of entities (the dictionary) which is used to tag documents.
  *
- * @author julian
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
-public class DictionaryTaggerConfiguration {
+public class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
-    private final Map<String, DictionaryTaggerColumnSetting> m_settings = new LinkedHashMap<>();
+    private Set<String> m_entities;
 
     /**
+     * Creates an instance of {@code DictionaryTaggerConfiguration} based on a {@link DocumentTaggerConfiguration} and a
+     * set of entities.
      *
+     * @param config The {@code DocumentTaggerConfiguration} to create the {@code DictionaryTaggerConfiguration}.
+     * @param entities A set of entities.
      */
-    public DictionaryTaggerConfiguration() {
-        // Nothing to do...
+    public DictionaryTaggerConfiguration(final DocumentTaggerConfiguration config, final Set<String> entities) {
+        this(config.getColName(), config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTagType(),
+            config.getTagValue(), entities);
     }
 
     /**
-     * @param settings
-     * @throws InvalidSettingsException
+     * Creates an instance of {@code DictionaryTaggerConfiguration} based on a column name, values for the case
+     * sensitivity and exact match flag, the tag type and tag value and as well the set of entities.
      *
+     * @param colName The column name.
+     * @param caseSensitivity Set {@code true} for case sensitive matching.
+     * @param exactMatch Set {@code true} for exact matching.
+     * @param tagType The tag type to set.
+     * @param tagValue The tag value to set.
+     * @param entities The set of entities used for tagging.
      */
-    public DictionaryTaggerConfiguration(final NodeSettingsRO settings) throws InvalidSettingsException {
-        for (String identifier : settings) {
-            NodeSettingsRO col = settings.getNodeSettings(identifier);
-            m_settings.put(identifier, DictionaryTaggerColumnSetting.createFrom(col));
-        }
+    public DictionaryTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
+        final String tagType, final String tagValue, final Set<String> entities) {
+        super(colName, caseSensitivity, exactMatch, tagType, tagValue);
+
+        setEntities(entities);
     }
 
     /**
-     * @param settings the NodeSettingsWO to write to
+     * Sets a set of entities as dictionary.
+     *
+     * @param entities The set of entities to set.
      */
-    public void save(final NodeSettingsWO settings) {
-        for (Entry<String, DictionaryTaggerColumnSetting> entry : m_settings.entrySet()) {
-            NodeSettingsWO subSub = settings.addNodeSettings(entry.getKey());
-            entry.getValue().saveSettingsTo(subSub);
-        }
+    public void setEntities(final Set<String> entities) {
+        m_entities = entities;
     }
 
     /**
-     * @return the RenameColumnSettings
+     * Returns the set of entities used for tagging.
+     *
+     * @return Returns the set of entities.
      */
-    public Collection<DictionaryTaggerColumnSetting> getDictionaryTaggerColumnSettings() {
-        return m_settings.values();
+    public Set<String> getEntities() {
+        return m_entities;
     }
-
 }
