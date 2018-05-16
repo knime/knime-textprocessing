@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   29.02.2008 (thiel): created
  */
@@ -49,23 +49,23 @@ package org.knime.ext.textprocessing.nodes.tagging;
 
 /**
  * Provides start and stop indices for terms and words.
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 class IndexRange {
-    
+
     private int m_startTermIndex = -1;
-    
+
     private int m_stopTermIndex = -1;
-    
+
     private int m_startWordIndex = -1;
-    
+
     private int m_stopWordIndex = -1;
-    
+
     /**
      * Creates a new instance of <code>IndexRange</code> with given start and
      * stop indices of terms and words.
-     * 
+     *
      * @param startTermIndex A term's start index.
      * @param stopTermIndex A term's stop index.
      * @param startWordIndex A word's start index.
@@ -106,4 +106,49 @@ class IndexRange {
     public int getStopWordIndex() {
         return m_stopWordIndex;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + m_startTermIndex;
+        result = prime * result + m_startWordIndex;
+        result = prime * result + m_stopTermIndex;
+        result = prime * result + m_stopWordIndex;
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        IndexRange other = (IndexRange)obj;
+        if (m_startTermIndex != other.m_startTermIndex) {
+            return false;
+        }
+        if (m_startWordIndex != other.m_startWordIndex) {
+            return false;
+        }
+        if (m_stopTermIndex != other.m_stopTermIndex) {
+            return false;
+        }
+        if (m_stopWordIndex != other.m_stopWordIndex) {
+            return false;
+        }
+        return true;
+    }
+
 }
