@@ -50,7 +50,12 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import java.util.Set;
 
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
+import org.knime.ext.textprocessing.nodes.tagging.MultiTaggerConfigKeys;
 
 /**
  * The {@code DictionaryTaggerConfiguration} is an extension of the {@link DocumentTaggerConfiguration}. It contains a
@@ -61,7 +66,11 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
  */
 class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DictionaryTaggerConfiguration.class);
+
     private Set<String> m_entities;
+
+    private String m_columnName;
 
     /**
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on a {@link DocumentTaggerConfiguration} and a
@@ -70,8 +79,9 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      * @param config The {@code DocumentTaggerConfiguration} to create the {@code DictionaryTaggerConfiguration}.
      * @param entities A set of entities.
      */
-    DictionaryTaggerConfiguration(final DocumentTaggerConfiguration config, final Set<String> entities) {
-        this(config.getColName(), config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTagType(),
+    DictionaryTaggerConfiguration(final String colName, final DocumentTaggerConfiguration config,
+        final Set<String> entities) {
+        this(colName, config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTagType(),
             config.getTagValue(), entities);
     }
 
@@ -88,9 +98,20 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      */
     DictionaryTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
         final String tagType, final String tagValue, final Set<String> entities) {
-        super(colName, caseSensitivity, exactMatch, tagType, tagValue);
+        super(caseSensitivity, exactMatch, tagType, tagValue);
 
+        setColumnName(colName);
         setEntities(entities);
+    }
+
+    /**
+     * Creates an instance of {@code DictionaryTaggerConfiguration} based on column name. Tagger parameters will be set
+     * to their default values. Entities will be set to null.
+     *
+     * @param colName The column name.
+     */
+    DictionaryTaggerConfiguration(final String colName) {
+        this(colName, new DocumentTaggerConfiguration(), null);
     }
 
     /**
@@ -109,5 +130,67 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      */
     Set<String> getEntities() {
         return m_entities;
+    }
+
+    /**
+     * Returns the column name containing the dictionaries.
+     *
+     * @return Returns the column name.
+     */
+    String getColumnName() {
+        return m_columnName;
+    }
+
+    /**
+     * Sets the column name containing the dictionary.
+     *
+     * @param columnName The column name to set.
+     */
+    void setColumnName(final String columnName) {
+        m_columnName = columnName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveSettingsTo(final NodeSettingsWO settings) {
+        super.saveSettingsTo(settings);
+        settings.addString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME, m_columnName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadSettingsFrom(final NodeSettingsRO settings) {
+        String columnName = "";
+        try {
+            columnName = settings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
+        } catch (InvalidSettingsException ise) {
+            // this method is called from the dialog which inits "this" first
+            // and immediately calls this method, name should (must) match
+            LOGGER.warn("Can't safely update settings for column \"" + m_columnName + "\": No matching identifier.",
+                ise);
+            columnName = m_columnName;
+        }
+
+        if (!m_columnName.equals(columnName)) {
+            LOGGER.warn("Can't update settings for column \"" + m_columnName + "\": got NodeSettings for \""
+                + columnName + "\"");
+        }
+        setColumnName(columnName);
+        super.loadSettingsFrom(settings);
+    }
+
+    public static DictionaryTaggerConfiguration createFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+
+        String colName = settings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
+        boolean caseSensitive = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE);
+        boolean exactMatch = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH);
+        String tagType = settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE);
+        String tagValue = settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGVALUE);
+
+        return new DictionaryTaggerConfiguration(colName, caseSensitive, exactMatch, tagType, tagValue, null);
     }
 }

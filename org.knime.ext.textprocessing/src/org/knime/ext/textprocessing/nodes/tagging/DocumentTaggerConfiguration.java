@@ -87,9 +87,6 @@ public class DocumentTaggerConfiguration {
      */
     private static final String DEFAULT_TAG_VALUE = NamedEntityTag.UNKNOWN.toString();
 
-    // TODO: Probably only necessary for DictionaryTagger.
-    private String m_columnName;
-
     private boolean m_caseSensitivity;
 
     private boolean m_exactMatch;
@@ -104,8 +101,8 @@ public class DocumentTaggerConfiguration {
      *
      * @param colName The column.
      */
-    public DocumentTaggerConfiguration(final String colName) {
-        this(colName, DEFAULT_CASE_SENSITIVITY, DEFAULT_EXACT_MATCH, DEFAULT_TAG_TYPE, DEFAULT_TAG_VALUE);
+    public DocumentTaggerConfiguration() {
+        this(DEFAULT_CASE_SENSITIVITY, DEFAULT_EXACT_MATCH, DEFAULT_TAG_TYPE, DEFAULT_TAG_VALUE);
     }
 
     /**
@@ -119,10 +116,9 @@ public class DocumentTaggerConfiguration {
      * @param tagValue The tag value.
      *
      */
-    public DocumentTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
+    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch,
         final String tagType, final String tagValue) {
 
-        setColName(colName);
         setCaseSensitivityOption(caseSensitivity);
         setExactMatchOption(exactMatch);
         setTagType(tagType);
@@ -133,31 +129,14 @@ public class DocumentTaggerConfiguration {
      * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name, values for case
      * sensitivity, exact match and a given {@link Tag}.
      *
-     * @param colName
      * @param caseSensitivity
      * @param exactMatch
      * @param tag
      *
      */
-    public DocumentTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
+    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch,
         final Tag tag) {
-        this(colName, caseSensitivity, exactMatch, tag.getTagType(), tag.getTagValue());
-    }
-
-    /**
-     * @return The column name.
-     */
-    // TODO: Probably only necessary for DictionaryTagger.
-    public String getColName() {
-        return m_columnName;
-    }
-
-    /**
-     * @param colName The column name to set.
-     */
-    // TODO: Probably only necessary for DictionaryTagger.
-    public void setColName(final String colName) {
-        m_columnName = colName;
+        this(caseSensitivity, exactMatch, tag.getTagType(), tag.getTagValue());
     }
 
     /**
@@ -238,27 +217,10 @@ public class DocumentTaggerConfiguration {
      *            settings.
      */
     public void loadSettingsFrom(final NodeSettingsRO settings) {
-        String columnName;
-        try {
-            columnName = settings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
-        } catch (InvalidSettingsException ise) {
-            // this method is called from the dialog which inits "this" first
-            // and immediately calls this method, name should (must) match
-            LOGGER.warn("Can't safely update settings for column \"" + m_columnName + "\": No matching identifier.",
-                ise);
-            columnName = m_columnName;
-        }
-
-        if (!m_columnName.equals(columnName)) {
-            LOGGER.warn("Can't update settings for column \"" + m_columnName + "\": got NodeSettings for \""
-                + columnName + "\"");
-        }
-
         try {
             setCaseSensitivityOption(settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE));
         } catch (InvalidSettingsException e) {
-            LOGGER.warn("Can't update case sensitivity setting for column \"" + columnName
-                + "\". Value has been set to default.");
+            LOGGER.warn("Can't update case sensitivity setting. Value has been set to default.");
             setCaseSensitivityOption(DEFAULT_CASE_SENSITIVITY);
         }
 
@@ -266,7 +228,7 @@ public class DocumentTaggerConfiguration {
             setExactMatchOption(settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH));
         } catch (InvalidSettingsException e) {
             LOGGER.warn(
-                "Can't update exact match setting for column \"" + columnName + "\". Value has been set to default.");
+                "Can't update exact match setting. Value has been set to default.");
             setExactMatchOption(DEFAULT_EXACT_MATCH);
         }
 
@@ -274,7 +236,7 @@ public class DocumentTaggerConfiguration {
             setTagType(settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn(
-                "Can't update tag type setting for column \"" + columnName + "\". Value has been set to default.");
+                "Can't update tag type setting. Value has been set to default.");
             setTagType(DEFAULT_TAG_TYPE);
         }
 
@@ -282,11 +244,9 @@ public class DocumentTaggerConfiguration {
             setTagValue(settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGVALUE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn(
-                "Can't update tag type setting for column \"" + columnName + "\". Value has been set to default.");
+                "Can't update tag type setting. Value has been set to default.");
             setTagValue(DEFAULT_TAG_VALUE);
         }
-
-        setColName(columnName);
     }
 
     /**
@@ -295,7 +255,6 @@ public class DocumentTaggerConfiguration {
      * @param settings The {@code NodeSettingsWO} instance to save the settings to.
      */
     public void saveSettingsTo(final NodeSettingsWO settings) {
-        settings.addString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME, m_columnName);
         settings.addBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE, m_caseSensitivity);
         settings.addBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH, m_exactMatch);
         settings.addString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE, m_tagType);
@@ -312,14 +271,12 @@ public class DocumentTaggerConfiguration {
      */
     public static DocumentTaggerConfiguration createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
-
-        String colName = settings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
         boolean caseSensitive = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE);
         boolean exactMatch = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH);
         String tagType = settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE);
         String tagValue = settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGVALUE);
 
-        return new DocumentTaggerConfiguration(colName, caseSensitive, exactMatch, tagType, tagValue);
+        return new DocumentTaggerConfiguration(caseSensitive, exactMatch, tagType, tagValue);
     }
 
 }
