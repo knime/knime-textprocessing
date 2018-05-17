@@ -47,14 +47,7 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.StringValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -63,8 +56,6 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
-import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
-import org.knime.ext.textprocessing.nodes.tagging.MultipleDocumentTaggerSettings;
 import org.knime.ext.textprocessing.nodes.tagging.MultipleTagsetDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel2;
 import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSettingModels;
@@ -95,9 +86,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     static final int DATA_TABLE_INDEX = 0;
 
     /** contains settings for each individual column. */
-    private MultipleDocumentTaggerSettings m_config;
-
-    private List<DictionaryTaggerConfiguration> m_taggerConfigs;
+    private MultipleDictionaryTaggerConfiguration m_config;
 
     private final SettingsModelBoolean m_setUnmodifiableModel =
         CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
@@ -107,7 +96,6 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     DictionaryTaggerMultiColumnNodeModel() {
         super(2, new InputPortRole[]{InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
-        m_taggerConfigs = new ArrayList<DictionaryTaggerConfiguration>();
     }
 
     /**
@@ -128,7 +116,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     @Override
     public DocumentTagger createTagger() throws Exception {
         return new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(),
-            new MultipleDictionarySentenceTagger(m_taggerConfigs), getTokenizerName());
+            new MultipleDictionarySentenceTagger(m_config.getValidConfigs()), getTokenizerName());
     }
 
     /**
@@ -140,22 +128,10 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     @Override
     protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
-        //Read table with dictionaries
-        m_taggerConfigs.clear();
-        List<DocumentTaggerConfiguration> collectionOfSettings = m_config.getDocumentTaggerConfigurations();
-        for (DocumentTaggerConfiguration settings : collectionOfSettings) {
-            final int dictIndex = inData[DICT_TABLE_INDEX].getDataTableSpec().findColumnIndex(settings.getColName());
-            if (dictIndex >= 0) {
-                Set<String> dictionary = new HashSet<String>();
-                for (DataRow row : inData[DICT_TABLE_INDEX]) {
-                    if (!row.getCell(dictIndex).isMissing()) {
-                        dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
-                    }
-                }
-                m_taggerConfigs.add(new DictionaryTaggerConfiguration(settings, dictionary));
-            } else {
-                setWarningMessage("Could not find dictionary column '" + settings.getColName() + "' in input table.");
-            }
+        //Validate configs with given data table
+        m_config.validate(inData[DICT_TABLE_INDEX]);
+        if (m_config.getWarningMessage() != null) {
+            setWarningMessage(m_config.getWarningMessage());
         }
     }
 
@@ -164,7 +140,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     @Override
     protected void reset() {
-        m_taggerConfigs.clear();
+        // Nothing to do here...
     }
 
     /**
@@ -187,7 +163,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
-        new MultipleDocumentTaggerSettings(settings.getNodeSettings(CFG_SUB_CONFIG));
+        new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
     }
 
     /**
@@ -197,6 +173,6 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
-        m_config = new MultipleDocumentTaggerSettings(settings.getNodeSettings(CFG_SUB_CONFIG));
+        m_config = new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
     }
 }

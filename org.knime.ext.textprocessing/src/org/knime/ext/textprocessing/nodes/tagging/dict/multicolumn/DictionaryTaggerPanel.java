@@ -66,7 +66,6 @@ import javax.swing.JPanel;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.node.util.DataColumnSpecListCellRenderer;
 import org.knime.ext.textprocessing.data.TagFactory;
-import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
  * The {@code DictionaryTaggerPanel} which holds the tagger options for each column.
@@ -84,7 +83,7 @@ class DictionaryTaggerPanel extends JPanel {
      */
     static final String REMOVE_ACTION = "REMOVE_ACTION";
 
-    private final DocumentTaggerConfiguration m_settings;
+    private final DictionaryTaggerConfiguration m_settings;
 
     private final DataColumnSpec m_columnSpec;
 
@@ -95,11 +94,11 @@ class DictionaryTaggerPanel extends JPanel {
      * @param spec The {@code DataColumnSpec} containing the name of the column which contains the dictionary used for
      *            tagging.
      */
-    DictionaryTaggerPanel(final DocumentTaggerConfiguration colSet, final DataColumnSpec spec) {
+    DictionaryTaggerPanel(final DictionaryTaggerConfiguration colSet, final DataColumnSpec spec) {
 
         m_settings = colSet;
         m_columnSpec = spec;
-        final String colName = colSet.getColName();
+        final String colName = colSet.getColumnName();
         boolean caseSensitive = colSet.getCaseSensitivityOption();
         boolean exactMatch = colSet.getExactMatchOption();
         String tagType = colSet.getTagType();
@@ -173,7 +172,7 @@ class DictionaryTaggerPanel extends JPanel {
         add(dtp);
     }
 
-    DocumentTaggerConfiguration getSettings() {
+    DictionaryTaggerConfiguration getSettings() {
         return m_settings;
     }
 

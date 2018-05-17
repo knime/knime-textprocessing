@@ -46,17 +46,20 @@
  * History
  *   Apr 11, 2018 (julian): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
+import org.knime.core.data.DataRow;
+import org.knime.core.data.StringValue;
+import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
  * Stores {@link DocumentTaggerConfiguration}s and their identifiers in a map.
@@ -64,9 +67,15 @@ import org.knime.core.node.NodeSettingsWO;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class MultipleDocumentTaggerSettings {
+class MultipleDictionaryTaggerConfiguration {
 
-    private final Map<String, DocumentTaggerConfiguration> m_settings = new LinkedHashMap<>();
+    private final List<DictionaryTaggerConfiguration> m_configs = new ArrayList<DictionaryTaggerConfiguration>();
+
+    private final List<DictionaryTaggerConfiguration> m_validConfigs = new ArrayList<DictionaryTaggerConfiguration>();
+
+    private final List<DictionaryTaggerConfiguration> m_invalidConfigs = new ArrayList<DictionaryTaggerConfiguration>();
+
+    private String m_warningMessage = null;
 
     /**
      * Creates an instance of {@code MultipleDocumentTaggerSettings}.
@@ -74,10 +83,10 @@ public class MultipleDocumentTaggerSettings {
      * @param settings The settings to store.
      * @throws InvalidSettingsException, if node settings could not be retrieved.
      */
-    public MultipleDocumentTaggerSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+    MultipleDictionaryTaggerConfiguration(final NodeSettingsRO settings) throws InvalidSettingsException {
         for (String identifier : settings) {
             NodeSettingsRO col = settings.getNodeSettings(identifier);
-            m_settings.put(identifier, DocumentTaggerConfiguration.createFrom(col));
+            m_configs.add(DictionaryTaggerConfiguration.createFrom(col));
         }
     }
 
@@ -86,20 +95,54 @@ public class MultipleDocumentTaggerSettings {
      *
      * @param settings The {@code NodeSettingsWO} to write to.
      */
-    public void save(final NodeSettingsWO settings) {
-        for (Entry<String, DocumentTaggerConfiguration> entry : m_settings.entrySet()) {
-            NodeSettingsWO subSub = settings.addNodeSettings(entry.getKey());
-            entry.getValue().saveSettingsTo(subSub);
+    void save(final NodeSettingsWO settings) {
+        for (DictionaryTaggerConfiguration entry : m_configs) {
+            NodeSettingsWO subSub = settings.addNodeSettings(entry.getColumnName());
+            entry.saveSettingsTo(subSub);
         }
     }
 
     /**
-     * Returns a collection of {@code DocumentTaggerConfiguration}s.
+     * Validates the {@code DictionaryTaggerConfiguration}s on a given {@link BufferedDataTable}.
      *
-     * @return Returns a collection of {@code DocumentTaggerConfiguration}s.
+     * @param inData The {@code BufferedDataTable} containing the dictionaries.
      */
-    public List<DocumentTaggerConfiguration> getDocumentTaggerConfigurations() {
-        return new ArrayList<DocumentTaggerConfiguration>(m_settings.values());
+    void validate(final BufferedDataTable inData) {
+        m_warningMessage = null;
+        m_validConfigs.clear();
+        m_invalidConfigs.clear();
+        List<String> invalidColumns = new ArrayList<String>();
+        for (DictionaryTaggerConfiguration config : m_configs) {
+            config.setEntities(null);
+            final int dictIndex = inData.getDataTableSpec().findColumnIndex(config.getColumnName());
+            if (dictIndex >= 0) {
+                Set<String> dictionary = new HashSet<String>();
+                for (DataRow row : inData) {
+                    if (!row.getCell(dictIndex).isMissing()) {
+                        dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+                    }
+                }
+                config.setEntities(dictionary);
+                m_validConfigs.add(config);
+            } else {
+                m_invalidConfigs.add(config);
+                invalidColumns.add(config.getColumnName());
+            }
+        }
+        if (!invalidColumns.isEmpty()) {
+            m_warningMessage = "Could not find dictionary column(s) " + invalidColumns.toString() + " in input table.";
+        }
     }
 
+    List<DictionaryTaggerConfiguration> getValidConfigs() {
+        return m_validConfigs;
+    }
+
+    List<DictionaryTaggerConfiguration> getInvalidConfigs() {
+        return m_invalidConfigs;
+    }
+
+    String getWarningMessage() {
+        return m_warningMessage;
+    }
 }

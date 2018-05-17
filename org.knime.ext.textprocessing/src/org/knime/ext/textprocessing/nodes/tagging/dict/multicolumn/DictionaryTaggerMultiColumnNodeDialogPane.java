@@ -99,9 +99,9 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSet
 class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 {
 
     private static final DictionaryTaggerPanel DUMMY_PANEL = new DictionaryTaggerPanel(
-        new DocumentTaggerConfiguration("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
+        new DictionaryTaggerConfiguration("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
 
-    private final Map<DataColumnSpec, DocumentTaggerConfiguration> m_columnToSettings;
+    private final Map<DataColumnSpec, DictionaryTaggerConfiguration> m_columnToSettings;
 
     private final IndividualsPanel m_individualsPanel;
 
@@ -122,7 +122,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         super();
 
         // Dictionary Tagger Tab
-        m_columnToSettings = new LinkedHashMap<DataColumnSpec, DocumentTaggerConfiguration>();
+        m_columnToSettings = new LinkedHashMap<DataColumnSpec, DictionaryTaggerConfiguration>();
         m_errornousColNames = new HashSet<String>();
 
         m_searchableListPanel = new ColumnSelectionSearchableListPanel(SearchedItemsSelectionMode.SELECT_FIRST,
@@ -145,7 +145,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
                     case DELETION:
                         for (DataColumnSpec spec : m_searchableListPanel.getSelectedColumns()) {
 
-                            DocumentTaggerConfiguration dictTaggerColumnSetting = m_columnToSettings.get(spec);
+                            DictionaryTaggerConfiguration dictTaggerColumnSetting = m_columnToSettings.get(spec);
                             if (dictTaggerColumnSetting != null) {
                                 int indexIndividualIndex = getIndexIndividualIndex(m_columnToSettings.get(spec));
                                 removeFromIndividualPanel(
@@ -228,8 +228,8 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
                 }
 
                 final DataColumnSpec orgSpec = m_orgTableSpec.getColumnSpec(nameForSettings);
-                final DocumentTaggerConfiguration dictTaggerColumnSetting =
-                    new DocumentTaggerConfiguration(nameForSettings);
+                final DictionaryTaggerConfiguration dictTaggerColumnSetting =
+                    new DictionaryTaggerConfiguration(nameForSettings);
                 dictTaggerColumnSetting.loadSettingsFrom(idSettings);
 
                 if (orgSpec == null) {
@@ -243,7 +243,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         }
 
         //add for each setting a panel in the individual panel
-        for (Map.Entry<DataColumnSpec, DocumentTaggerConfiguration> entries : m_columnToSettings.entrySet()) {
+        for (Map.Entry<DataColumnSpec, DictionaryTaggerConfiguration> entries : m_columnToSettings.entrySet()) {
             addToIndividualPanel(new DictionaryTaggerPanel(entries.getValue(), entries.getKey()));
         }
     }
@@ -270,7 +270,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         // there can only by one or non column selected.
         final DataColumnSpec selected = m_searchableListPanel.getSelectedColumn();
         if (selected != null && !m_columnToSettings.containsKey(selected)) {
-            DocumentTaggerConfiguration dictTaggerColumnSetting = new DocumentTaggerConfiguration(selected.getName());
+            DictionaryTaggerConfiguration dictTaggerColumnSetting = new DictionaryTaggerConfiguration(selected.getName());
             m_columnToSettings.put(selected, dictTaggerColumnSetting);
             addToIndividualPanel(new DictionaryTaggerPanel(dictTaggerColumnSetting, selected));
         }
@@ -289,10 +289,10 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         }
     }
 
-    private int getIndexIndividualIndex(final DocumentTaggerConfiguration colSet) {
+    private int getIndexIndividualIndex(final DictionaryTaggerConfiguration colSet) {
         for (int i = 0; i < m_individualsPanel.getComponentCount(); i++) {
             DictionaryTaggerPanel component = (DictionaryTaggerPanel)m_individualsPanel.getComponent(i);
-            if (component.getSettings().getColName().equals(colSet.getColName())) {
+            if (component.getSettings().getColumnName().equals(colSet.getColumnName())) {
                 return i;
             }
         }
