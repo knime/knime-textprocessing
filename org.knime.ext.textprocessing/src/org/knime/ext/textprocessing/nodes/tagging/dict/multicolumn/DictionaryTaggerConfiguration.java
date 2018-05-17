@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
+class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
     private Set<String> m_entities;
 
@@ -70,7 +70,7 @@ public class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      * @param config The {@code DocumentTaggerConfiguration} to create the {@code DictionaryTaggerConfiguration}.
      * @param entities A set of entities.
      */
-    public DictionaryTaggerConfiguration(final DocumentTaggerConfiguration config, final Set<String> entities) {
+    DictionaryTaggerConfiguration(final DocumentTaggerConfiguration config, final Set<String> entities) {
         this(config.getColName(), config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTagType(),
             config.getTagValue(), entities);
     }
@@ -86,7 +86,7 @@ public class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      * @param tagValue The tag value to set.
      * @param entities The set of entities used for tagging.
      */
-    public DictionaryTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
+    DictionaryTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
         final String tagType, final String tagValue, final Set<String> entities) {
         super(colName, caseSensitivity, exactMatch, tagType, tagValue);
 
@@ -98,7 +98,7 @@ public class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      *
      * @param entities The set of entities to set.
      */
-    public void setEntities(final Set<String> entities) {
+    void setEntities(final Set<String> entities) {
         m_entities = entities;
     }
 
@@ -107,7 +107,7 @@ public class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      *
      * @return Returns the set of entities.
      */
-    public Set<String> getEntities() {
+    Set<String> getEntities() {
         return m_entities;
     }
 }

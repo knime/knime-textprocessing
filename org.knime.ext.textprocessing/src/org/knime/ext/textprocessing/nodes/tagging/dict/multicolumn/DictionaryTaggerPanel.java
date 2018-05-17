@@ -69,11 +69,12 @@ import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
+ * The {@code DictionaryTaggerPanel} which holds the tagger options for each column.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin Germany
  */
 @SuppressWarnings("serial")
-public class DictionaryTaggerPanel extends JPanel {
+class DictionaryTaggerPanel extends JPanel {
 
     /** abbreviate names to this number of letters. */
     private static final int MAX_LETTERS = 25;
@@ -81,17 +82,20 @@ public class DictionaryTaggerPanel extends JPanel {
     /**
      * fired if the remove button is pressed.
      */
-    public static final String REMOVE_ACTION = "REMOVE_ACTION";
+    static final String REMOVE_ACTION = "REMOVE_ACTION";
 
     private final DocumentTaggerConfiguration m_settings;
 
     private final DataColumnSpec m_columnSpec;
 
     /**
-     * @param colSet
-     * @param spec
+     * Creates a new instance of {@code DictionaryTaggerPanel}.
+     *
+     * @param colSet The {@code DocumentTaggerConfiguration} containing the configuration values used for tagging.
+     * @param spec The {@code DataColumnSpec} containing the name of the column which contains the dictionary used for
+     *            tagging.
      */
-    public DictionaryTaggerPanel(final DocumentTaggerConfiguration colSet, final DataColumnSpec spec) {
+    DictionaryTaggerPanel(final DocumentTaggerConfiguration colSet, final DataColumnSpec spec) {
 
         m_settings = colSet;
         m_columnSpec = spec;
@@ -110,7 +114,8 @@ public class DictionaryTaggerPanel extends JPanel {
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
 
         final JCheckBox caseSensitivityChecker = new JCheckBox("Case sensitive", caseSensitive);
-        caseSensitivityChecker.addItemListener(e -> m_settings.setCaseSensitivityOption(caseSensitivityChecker.isSelected()));
+        caseSensitivityChecker
+            .addItemListener(e -> m_settings.setCaseSensitivityOption(caseSensitivityChecker.isSelected()));
 
         final JCheckBox exactMatchChecker = new JCheckBox("Exact match", exactMatch);
         exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(exactMatchChecker.isSelected()));
@@ -143,21 +148,25 @@ public class DictionaryTaggerPanel extends JPanel {
         setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2)
             : BorderFactory.createLineBorder(Color.BLACK, 1));
 
-        JPanel northLayout = new JPanel(new BorderLayout());
+        // Panel for name label and remove button
+        JPanel northLayout = new JPanel(new BorderLayout(15, 0));
         northLayout.add(nameLabel, BorderLayout.WEST);
         northLayout.add(removeButton, BorderLayout.EAST);
 
+        // Panel for case sensitivity and exact match check box
         JPanel centerLayout = new JPanel(new BorderLayout());
         centerLayout.add(caseSensitivityChecker, BorderLayout.WEST);
         centerLayout.add(exactMatchChecker, BorderLayout.EAST);
 
+        // Panel for tag type and tag selection
         JPanel southLayout = new JPanel(new BorderLayout(20, 0));
         southLayout.add(tagTypeSelection, BorderLayout.WEST);
         southLayout.add(tagValueSelection, BorderLayout.EAST);
 
         setLayout(new FlowLayout());
 
-        JPanel dtp = new JPanel(new BorderLayout());
+        // Add three panels from above to a super panel
+        JPanel dtp = new JPanel(new BorderLayout(0, 10));
         dtp.add(northLayout, BorderLayout.NORTH);
         dtp.add(centerLayout, BorderLayout.CENTER);
         dtp.add(southLayout, BorderLayout.SOUTH);
@@ -173,8 +182,8 @@ public class DictionaryTaggerPanel extends JPanel {
     }
 
     /**
-     * @return <code>true</code> if {@link DataColumnSpecListCellRenderer#isInvalid(DataColumnSpec)} returns
-     *         <code>false</code> for the current spec
+     * @return {@code true} if {@link DataColumnSpecListCellRenderer#isInvalid(DataColumnSpec)} returns {@code false}
+     *         for the current spec.
      */
     boolean hasValidSpec() {
         return !isInvalid(m_columnSpec);
