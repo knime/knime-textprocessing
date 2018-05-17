@@ -158,7 +158,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
             }
         });
 
-        final JPanel westPanel = new JPanel(new BorderLayout());
+        final JPanel leftPanel = new JPanel(new BorderLayout());
 
         final JPanel setUnmodifiablePanel = new JPanel(new BorderLayout());
         final JCheckBox unmodifiableBox = new JCheckBox("Set entities unmodifiable");
@@ -167,14 +167,14 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         setUnmodifiablePanel.add(unmodifiableBox, BorderLayout.CENTER);
         setUnmodifiablePanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
-        westPanel.add(m_searchableListPanel, BorderLayout.CENTER);
-        westPanel.add(setUnmodifiablePanel, BorderLayout.SOUTH);
+        leftPanel.add(m_searchableListPanel, BorderLayout.CENTER);
+        leftPanel.add(setUnmodifiablePanel, BorderLayout.SOUTH);
 
         m_individualsPanel = new IndividualsPanel();
         m_individualsScrollPanel = new JScrollPane(m_individualsPanel);
 
         final JPanel tabPanel = new JPanel(new BorderLayout());
-        tabPanel.add(westPanel, BorderLayout.CENTER);
+        tabPanel.add(leftPanel, BorderLayout.CENTER);
         tabPanel.add(m_individualsScrollPanel, BorderLayout.EAST);
 
         addTab("Dictionary Tagger Selection", tabPanel);
@@ -289,12 +289,6 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         }
     }
 
-    /**
-     *
-     * @param colSet the setting
-     * @return the index of the panel in the {@link #m_individualsPanel} corresponding to the given column setting or
-     *         <code>-1</code>.
-     */
     private int getIndexIndividualIndex(final DocumentTaggerConfiguration colSet) {
         for (int i = 0; i < m_individualsPanel.getComponentCount(); i++) {
             DictionaryTaggerPanel component = (DictionaryTaggerPanel)m_individualsPanel.getComponent(i);
@@ -305,10 +299,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         return -1;
     }
 
-    /**
-     * @param panel
-     */
-    protected void removeFromIndividualPanel(final DictionaryTaggerPanel panel) {
+    private void removeFromIndividualPanel(final DictionaryTaggerPanel panel) {
         if (m_searchableListPanel.isAdditionalColumn(panel.getColumnSpec())) {
             m_searchableListModifier.removeAdditionalColumn(panel.getColumnSpec().getName());
         }
