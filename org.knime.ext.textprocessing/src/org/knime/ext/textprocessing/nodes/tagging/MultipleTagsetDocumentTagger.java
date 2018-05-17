@@ -185,6 +185,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
 
             int r = 0;
             boolean newTermAdded = false;
+            boolean newTermIsBuilt = false;
             List<Tag> tags = new ArrayList<Tag>(term.getTags());
             for (IndexRange range : startStopRanges.keySet()) {
                 // get tags for current index range
@@ -222,7 +223,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                         if (term.getWords().size() == 1) {
                             // CREATE NEW TERM !!!
                             newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
-
+                            newTermList.add(newTerm);
                             // the old term consists of more than one word so split
                             // it
                         } else if (term.getWords().size() > 1) {
@@ -241,6 +242,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     if (w == range.getStopWordIndex()) {
                                         // CREATE NEW TERM !!!
                                         newTerm = new Term(newWords, tags, m_setNeUnmodifiable);
+                                        newTermList.add(newTerm);
                                         endTerm = true;
                                     }
 
@@ -253,6 +255,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     tags = new ArrayList<Tag>();
                                     // CREATE NEW TERM !!!
                                     newTerm = new Term(newWord, tags, false);
+                                    newTermList.add(newTerm);
                                 }
                             }
                         }
@@ -277,6 +280,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                 // if word is part of the named entity add it
                                 if (w >= range.getStartWordIndex()) {
                                     namedEntity.add(word);
+                                    newTermIsBuilt = true;
 
                                     // otherwise create a new term containing the
                                     // word
@@ -286,6 +290,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     tags = new ArrayList<Tag>();
                                     // CREATE NEW TERM !!!
                                     newTerm = new Term(newWord, tags, false);
+                                    newTermList.add(newTerm);
                                 }
 
                                 // if current term is stop term
@@ -299,6 +304,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     if (w == range.getStopWordIndex()) {
                                         // CREATE NEW TERM !!!
                                         newTerm = new Term(namedEntity, tags, m_setNeUnmodifiable);
+                                        newTermList.add(newTerm);
                                     }
 
                                     // otherwise create a term for each word
@@ -308,12 +314,14 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     tags = new ArrayList<Tag>();
                                     // CREATE NEW TERM !!!
                                     newTerm = new Term(newWord, tags, false);
+                                    newTermList.add(newTerm);
                                 }
 
                                 // if we are in between the start term and the stop
                                 // term just add all words to the new word list
                             } else if (t > range.getStartTermIndex() && t < range.getStopTermIndex()) {
                                 namedEntity.add(word);
+                                newTermIsBuilt = true;
                             }
                         }
                         if (endTerm) {
@@ -327,12 +335,11 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                     }
                 }
                 if (newTerm != null) {
-                    newTermList.add(newTerm);
                     newTerm = null;
                     newTermAdded = true;
                 }
             }
-            if (newTermAdded == false) {
+            if (newTermAdded == false && newTermIsBuilt == false) {
                 // if we are before or after the interesting part just add the
                 // terms without rearrangement
                 newTermList.add(term);
