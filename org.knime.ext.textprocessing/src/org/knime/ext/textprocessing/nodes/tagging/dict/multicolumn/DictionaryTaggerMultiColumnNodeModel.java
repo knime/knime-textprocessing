@@ -82,17 +82,17 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     /**
      * Config identifier for the NodeSettings object contained in the NodeSettings which contains the settings.
      */
-    public static final String CFG_SUB_CONFIG = "all_columns";
+    static final String CFG_SUB_CONFIG = "all_columns";
 
     /**
      * Default dictionary table index.
      */
-    public static final int DICT_TABLE_INDEX = 1;
+    static final int DICT_TABLE_INDEX = 1;
 
     /**
      * Default document table index.
      */
-    public static final int DATA_TABLE_INDEX = 0;
+    static final int DATA_TABLE_INDEX = 0;
 
     /** contains settings for each individual column. */
     private MultipleDocumentTaggerSettings m_config;
@@ -120,11 +120,6 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     protected final void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[DICT_TABLE_INDEX]);
         verfier.verifyMinimumStringCells(1, true);
-
-        // TODO: Verify all columns
-        //set and verify column selection and set warning message if present
-        //ColumnSelectionVerifier.verifyColumn(m_columnModel, inSpecs[DICT_TABLE_INDEX], StringValue.class, null)
-        //   .ifPresent(a -> setWarningMessage(a));
     }
 
     /**
@@ -159,8 +154,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
                 }
                 m_taggerConfigs.add(new DictionaryTaggerConfiguration(settings, dictionary));
             } else {
-                throw new InvalidSettingsException(
-                    "Could not find dictionary column '" + settings.getColName() + "' in input table.");
+                setWarningMessage("Could not find dictionary column '" + settings.getColName() + "' in input table.");
             }
         }
     }
@@ -191,7 +185,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        //super.validateSettings(settings);
+        super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
         new MultipleDocumentTaggerSettings(settings.getNodeSettings(CFG_SUB_CONFIG));
     }
@@ -201,7 +195,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        //super.loadValidatedSettingsFrom(settings);
+        super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
         m_config = new MultipleDocumentTaggerSettings(settings.getNodeSettings(CFG_SUB_CONFIG));
     }
