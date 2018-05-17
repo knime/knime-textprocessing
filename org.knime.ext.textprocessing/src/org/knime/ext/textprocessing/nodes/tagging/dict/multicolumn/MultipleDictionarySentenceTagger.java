@@ -56,16 +56,14 @@ import org.knime.ext.textprocessing.nodes.tagging.MultipleTaggedEntity;
 import org.knime.ext.textprocessing.nodes.tagging.SentenceTagger;
 
 /**
+ * The {@code MultipleDictionarySentenceTagger} is used for tagging documents with different tags and dictionaries.
  *
- * @author julian
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
 class MultipleDictionarySentenceTagger implements SentenceTagger {
 
     private List<DictionaryTaggerConfiguration> m_configs;
 
-    /**
-     *
-     */
     MultipleDictionarySentenceTagger(final List<DictionaryTaggerConfiguration> configs) {
         m_configs = configs;
     }
@@ -77,8 +75,9 @@ class MultipleDictionarySentenceTagger implements SentenceTagger {
     public List<MultipleTaggedEntity> tagEntities(final Sentence sentence) {
         List<MultipleTaggedEntity> foundEntities = new ArrayList<MultipleTaggedEntity>();
 
-        String sentenceStr = sentence.getText();
+        String origSentenceStr = sentence.getText();
         for (DictionaryTaggerConfiguration config : m_configs) {
+            String sentenceStr = origSentenceStr;
             if (!config.getCaseSensitivityOption()) {
                 sentenceStr = sentenceStr.toLowerCase();
             }
