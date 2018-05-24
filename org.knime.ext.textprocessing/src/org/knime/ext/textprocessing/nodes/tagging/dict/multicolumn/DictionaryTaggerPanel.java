@@ -65,6 +65,7 @@ import javax.swing.JPanel;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.node.util.DataColumnSpecListCellRenderer;
+import org.knime.core.node.util.SharedIcons;
 import org.knime.ext.textprocessing.data.TagFactory;
 
 /**
@@ -109,7 +110,7 @@ class DictionaryTaggerPanel extends JPanel {
         final JLabel nameLabel = new JLabel(labelName);
         nameLabel.setToolTipText(colName);
 
-        JButton removeButton = new JButton("Remove");
+        JButton removeButton = new JButton(SharedIcons.DELETE_TRASH.get());
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
 
         final JCheckBox caseSensitivityChecker = new JCheckBox("Case sensitive", caseSensitive);
