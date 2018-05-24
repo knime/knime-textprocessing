@@ -25,7 +25,7 @@
 		</intro>
 
 		<tab name="Lemmatizer options">
-			<option name="Skip terms with no POS tag">
+			<option name="Node should fail when terms with no POS tag are found">
 				If checked, the node will fail when at least one term has no POS tag. Otherwise, all terms that have no
 				POS tag will simply be skipped.
 			</option>
