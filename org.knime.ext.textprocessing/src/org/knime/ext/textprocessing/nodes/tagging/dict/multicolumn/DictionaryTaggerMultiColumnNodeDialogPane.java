@@ -57,8 +57,10 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,6 +73,7 @@ import javax.swing.Scrollable;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialog;
 import org.knime.core.node.NodeSettingsRO;
@@ -188,8 +191,18 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
         DataTableSpec spec = specs[1];
-        if (spec.getNumColumns() == 0) {
-            throw new NotConfigurableException("No columns at input.");
+
+        List<DataColumnSpec> possibleSpecs = new ArrayList<DataColumnSpec>();
+        for (String colName : spec.getColumnNames()) {
+            DataColumnSpec colSpec = spec.getColumnSpec(colName);
+            if (colSpec.getType().isCompatible(StringValue.class)) {
+                possibleSpecs.add(colSpec);
+            }
+        }
+        DataTableSpec possibleSpec = new DataTableSpec(possibleSpecs.toArray(new DataColumnSpec[0]));
+
+        if (spec.getNumColumns() == 0 || possibleSpecs.isEmpty()) {
+            throw new NotConfigurableException("No (String) columns at input.");
         }
 
         m_orgTableSpec = specs[1];
@@ -198,7 +211,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         m_errornousColNames.clear();
         m_individualsPanel.removeAll();
 
-        m_searchableListModifier = m_searchableListPanel.update(spec);
+        m_searchableListModifier = m_searchableListPanel.update(possibleSpec);
 
         try {
             m_setUnmodifiableModel.loadSettingsFrom(settings);
