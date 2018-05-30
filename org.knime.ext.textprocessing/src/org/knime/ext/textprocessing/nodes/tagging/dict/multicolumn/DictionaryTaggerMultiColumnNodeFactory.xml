@@ -7,13 +7,13 @@
     </shortDescription>
     <fullDescription>
         <intro>
-            This node recognizes named entities specified in a dictionary column 
-            and assigns a specified tag value and type. Optionally the 
+            This node recognizes named entities specified in one or more dictionary columns 
+            and assigns a specified tag value and type. Optionally, the 
             recognized named entity terms can be set unmodifiable, meaning that 
             the terms are not modified or filtered afterwards by any following 
-            node.
+            node. 
         </intro>
-        <tab name="General options">
+        <tab name="General Options">
         <option name="Document column">
             The column containing the documents to tag.
         </option>
@@ -35,11 +35,11 @@
             available for KNIME, leave the number to 1.
         </option>
         </tab>       
-        <tab name="Tagger options">
-        <option name="Dictionary column">
-            Specifies the dictionary column containing the terms to search for. 
-        </option>
-        <option name="Set named entities unmodifiable">
+        <tab name="Dictionary Tagger Selection">
+        Select one or more dictionary columns from the list in left panel
+        and set the tagging options for each dictionary in the right panel.
+        To remove a dictionary tagger configuration press the button with the trash can icon. 
+        <option name="Set entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
         </option>
         <option name="Case sensitive">
@@ -64,7 +64,7 @@
         <inPort name="Documents input table" index="0">The input table
         containing the documents to tag.</inPort>
         <inPort name="Dictionary input table" index="1">The input table
-        containing the dictionary column.</inPort>    
+        containing one or multiple dictionary columns.</inPort>    
         <outPort name="Documents output table" index="0">An output table
         containing the tagged documents.</outPort>
     </ports>
