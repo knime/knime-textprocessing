@@ -138,6 +138,42 @@ public final class TagFactory {
     }
 
     /**
+     * Returns the tag value with the longest String. Useful for GUI components like {@code JComboBox} to set a
+     * preferred size or a prototype display value.
+     *
+     * @return Returns the tag value with the longest String.
+     * @since 3.6
+     */
+    public String getLongestTagValue() {
+        String longestString = "";
+        for (TagBuilder tb : m_tagBuilder.values()) {
+            for (String value : tb.asStringList()) {
+                if (value.length() > longestString.length()) {
+                    longestString = value;
+                }
+            }
+        }
+        return longestString;
+    }
+
+    /**
+     * Returns the tag type with the longest String. Useful for GUI components like {@code JComboBox} to set a
+     * preferred size or a prototype display value.
+     *
+     * @return Returns the tag type with the longest String.
+     * @since 3.6
+     */
+    public String getLongestTagType() {
+        String longestString = "";
+        for (String type : m_tagBuilder.keySet()) {
+            if (type.length() > longestString.length()) {
+                longestString = type;
+            }
+        }
+        return longestString;
+    }
+
+    /**
      * @return The set of tag types.
      */
     public Set<String> getTagTypes() {
