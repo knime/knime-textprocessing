@@ -36,9 +36,11 @@
         </option>
         </tab>       
         <tab name="Dictionary Tagger Selection">
-        Select one or more dictionary columns from the list in left panel
-        and set the tagging options for each dictionary in the right panel.
-        To remove a dictionary tagger configuration press the button with the trash can icon. 
+        <option name="General information"> 
+        	Select one or more dictionary columns from the list in left panel
+        	and set the tagging options for each dictionary in the right panel.
+        	To remove a dictionary tagger configuration press the button with the trash can icon.
+        </option>
         <option name="Set entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
         </option>
