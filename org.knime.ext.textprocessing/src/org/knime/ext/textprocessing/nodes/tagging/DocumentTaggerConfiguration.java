@@ -87,19 +87,29 @@ public class DocumentTaggerConfiguration {
      */
     private static final String DEFAULT_TAG_VALUE = NamedEntityTag.UNKNOWN.toString();
 
+    /**
+     * The value of the case sensitivity option.
+     */
     private boolean m_caseSensitivity;
 
+    /**
+     * The value of the exact match option.
+     */
     private boolean m_exactMatch;
 
+    /**
+     * The tag type.
+     */
     private String m_tagType;
 
+    /**
+     * The tag value.
+     */
     private String m_tagValue;
 
     /**
      * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name. Sets default values for
      * case sensitivity, exact match, tag type and tag value.
-     *
-     * @param colName The column.
      */
     public DocumentTaggerConfiguration() {
         this(DEFAULT_CASE_SENSITIVITY, DEFAULT_EXACT_MATCH, DEFAULT_TAG_TYPE, DEFAULT_TAG_VALUE);
@@ -109,9 +119,8 @@ public class DocumentTaggerConfiguration {
      * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name and values for case
      * sensitivity, exact match, tag type and tag value.
      *
-     * @param colName The column name.
      * @param caseSensitivity Boolean value for case sensitivity.
-     * @param exactMatch Boolean value for exact matching behaviour.
+     * @param exactMatch Boolean value for exact matching behavior.
      * @param tagType The tag type.
      * @param tagValue The tag value.
      *
@@ -140,13 +149,17 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
-     * @return The case sensitivity option.
+     * Returns the value of the case sensitivity option.
+     *
+     * @return The value of the case sensitivity option.
      */
     public boolean getCaseSensitivityOption() {
         return m_caseSensitivity;
     }
 
     /**
+     * Sets the boolean value for the case sensitivity value.
+     *
      * @param caseSensitivity Set true for case sensitive matching.
      */
     public void setCaseSensitivityOption(final boolean caseSensitivity) {
@@ -154,13 +167,17 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
-     * @return The exact match option.
+     * Returns the value of the exact match option.
+     *
+     * @return The value of the exact match option.
      */
     public boolean getExactMatchOption() {
         return m_exactMatch;
     }
 
     /**
+     * Set the boolean value for the exact match option.
+     *
      * @param exactMatch Set true for exact matching.
      */
     public void setExactMatchOption(final boolean exactMatch) {
@@ -168,6 +185,8 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
+     * Returns the tag type that is to be set for the terms.
+     *
      * @return The tag type.
      */
     public String getTagType() {
@@ -175,6 +194,8 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
+     * Sets the tag type to be set for the terms.
+     *
      * @param tagType The tag type to set.
      */
     public void setTagType(final String tagType) {
@@ -182,6 +203,8 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
+     * Returns the tag value that is to be set for the terms.
+     *
      * @return The tag value.
      */
     public String getTagValue() {
@@ -189,6 +212,8 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
+     * Sets the tag value to be set for the terms.
+     *
      * @param tagValue The tag value to set.
      */
     public void setTagValue(final String tagValue) {
@@ -196,13 +221,17 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
-     * @return The tag build from tag type and tag value.
+     * Returns a {@link Tag} built from the tag type and tag value.
+     *
+     * @return The tag built from tag type and tag value.
      */
     public Tag getTag() {
         return new Tag(m_tagValue, m_tagType);
     }
 
     /**
+     * Sets the tag type and tag value based on a {@link Tag} object.
+     *
      * @param tag The tag that contains tag value and tag type information that will be set.
      */
     public void setTag(final Tag tag) {
