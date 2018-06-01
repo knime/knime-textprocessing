@@ -52,15 +52,15 @@ package org.knime.ext.textprocessing.nodes.tagging;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-class IndexRange {
+final class IndexRange {
 
-    private int m_startTermIndex = -1;
+    private final int m_startTermIndex;
 
-    private int m_stopTermIndex = -1;
+    private final int m_stopTermIndex;
 
-    private int m_startWordIndex = -1;
+    private final int m_startWordIndex;
 
-    private int m_stopWordIndex = -1;
+    private final int m_stopWordIndex;
 
     /**
      * Creates a new instance of <code>IndexRange</code> with given start and

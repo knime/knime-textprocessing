@@ -55,7 +55,7 @@ package org.knime.ext.textprocessing.nodes.tagging;
  */
 public final class MultiTaggerConfigKeys {
 
-    MultiTaggerConfigKeys() {
+    private MultiTaggerConfigKeys() {
     }
 
     /**
