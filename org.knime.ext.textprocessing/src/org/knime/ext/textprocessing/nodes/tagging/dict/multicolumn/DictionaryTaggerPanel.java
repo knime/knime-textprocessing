@@ -124,12 +124,12 @@ class DictionaryTaggerPanel extends JPanel {
             TagFactory.getInstance().getTagSetByType(tagType).asStringList().toArray(new String[0]));
         tagValueSelection.setSelectedItem(tagValue);
         tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)tagValueSelection.getSelectedItem()));
+        tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());
 
         final JComboBox<String> tagTypeSelection =
             new JComboBox<String>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
 
         tagTypeSelection.setSelectedItem(tagType);
-
         tagTypeSelection.addItemListener(new ItemListener() {
 
             @Override
@@ -144,6 +144,7 @@ class DictionaryTaggerPanel extends JPanel {
                 m_settings.setTagType((String)tagTypeSelection.getSelectedItem());
             }
         });
+        tagTypeSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagType());
 
         setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2)
             : BorderFactory.createLineBorder(Color.BLACK, 1));
