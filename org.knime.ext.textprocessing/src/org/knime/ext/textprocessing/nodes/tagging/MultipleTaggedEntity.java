@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 25, 2018 (julian): created
+ *   Apr 25, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
@@ -55,14 +55,20 @@ import java.util.List;
  * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a List of
  * {@link DocumentTaggerConfiguration}s. The configurations contain information about how the entity has to be tagged.
  *
- * @author julian
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
 public class MultipleTaggedEntity {
 
-    final private String m_entity;
+    /**
+     * The name of the entity.
+     */
+    private final String m_entity;
 
-    final private List<DocumentTaggerConfiguration> m_configs;
+    /**
+     * The list of {@code DocumentTaggerConfiguration}s containing all necessary properties for tagging.
+     */
+    private final List<DocumentTaggerConfiguration> m_configs;
 
     /**
      * Creates an new instance of {@code MultipleTaggedEntity} based on a given entity and initializes an empty list for
@@ -72,7 +78,7 @@ public class MultipleTaggedEntity {
      */
     public MultipleTaggedEntity(final String entity) {
         m_entity = entity;
-        m_configs = new ArrayList<DocumentTaggerConfiguration>();
+        m_configs = new ArrayList<>();
     }
 
     /**
@@ -80,7 +86,7 @@ public class MultipleTaggedEntity {
      *
      * @param config The {@code DocumentTaggerConfiguration} to add.
      */
-    public void addConfig(final DocumentTaggerConfiguration config) {
+    public final void addConfig(final DocumentTaggerConfiguration config) {
         m_configs.add(config);
     }
 
@@ -89,7 +95,7 @@ public class MultipleTaggedEntity {
      *
      * @return Returns the entity as a String.
      */
-    public String getEntity() {
+    public final String getEntity() {
         return m_entity;
     }
 
@@ -99,7 +105,7 @@ public class MultipleTaggedEntity {
      *
      * @return Returns a list of {@code DocumentTaggerConfiguration}s.
      */
-    public List<DocumentTaggerConfiguration> getConfigs() {
+    public final List<DocumentTaggerConfiguration> getConfigs() {
         return m_configs;
     }
 }

@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 11, 2018 (julian): created
+ *   Apr 11, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
@@ -55,8 +55,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -83,7 +81,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ConfigurationRequestEvent;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ConfigurationRequestListener;
-import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ConfiguredColumnDeterminer;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ListModifier;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.SearchedItemsSelectionMode;
 import org.knime.core.node.util.DataColumnSpecListCellRenderer;
@@ -96,28 +93,52 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSet
  * The {@link NodeDialog} for the {@code DictionaryTaggerMultiColumnNodeModel}. It extends the
  * {@link TaggerNodeSettingsPane2} to provide options shared between all tagger nodes.
  *
- * @author Julian Bunzel, KNIME GmbH, Berlin Germany
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
 class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 {
 
+    /**
+     * Dummy panel to have a reference preferred size for the {@code IndividualsPanel.}
+     */
     private static final DictionaryTaggerPanel DUMMY_PANEL = new DictionaryTaggerPanel(
         new DictionaryTaggerConfiguration("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
 
+    /**
+     * Map containing a {@code DataColumnSpec} and a specific {@code DictionaryTaggerConfiguration} holding properties
+     * for tagging terms based on the dictionary that is stored in the key column.
+     */
     private final Map<DataColumnSpec, DictionaryTaggerConfiguration> m_columnToSettings;
 
+    /**
+     * The {@code IndividualsPanel} which holds all {@code DictionaryTaggerPanel}s.
+     */
     private final IndividualsPanel m_individualsPanel;
 
+    /**
+     * Panel that provides a list of possible columns to select and a search field.
+     */
     private final ColumnSelectionSearchableListPanel m_searchableListPanel;
 
+    /**
+     * Set of column names that are no longer available in the {@code DataTableSpec}.
+     */
     private final Set<String> m_errornousColNames;
 
-    private DataTableSpec m_orgTableSpec;
+    /**
+     * {@code JScrollPane} holding the {@code IndividualsPanel}
+     */
+    private final JScrollPane m_individualsScrollPanel;
 
-    private JScrollPane m_individualsScrollPanel;
-
+    /**
+     * Provides functionality to add/remove {@code DataColumnSpecs}.
+     */
     private ListModifier m_searchableListModifier;
 
+    /**
+     * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
+     * being tagged or not.
+     */
     private final SettingsModelBoolean m_setUnmodifiableModel =
         CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
 
@@ -125,17 +146,11 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         super();
 
         // Dictionary Tagger Tab
-        m_columnToSettings = new LinkedHashMap<DataColumnSpec, DictionaryTaggerConfiguration>();
-        m_errornousColNames = new HashSet<String>();
+        m_columnToSettings = new LinkedHashMap<>();
+        m_errornousColNames = new HashSet<>();
 
         m_searchableListPanel = new ColumnSelectionSearchableListPanel(SearchedItemsSelectionMode.SELECT_FIRST,
-            new ConfiguredColumnDeterminer() {
-
-                @Override
-                public boolean isConfiguredColumn(final DataColumnSpec spec) {
-                    return m_columnToSettings.containsKey(spec);
-                }
-            });
+            spec -> m_columnToSettings.containsKey(spec));
 
         m_searchableListPanel.addConfigurationRequestListener(new ConfigurationRequestListener() {
 
@@ -155,6 +170,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
                                     (DictionaryTaggerPanel)m_individualsPanel.getComponent(indexIndividualIndex));
                             }
                         }
+                        break;
                     default:
                         break;
                 }
@@ -192,7 +208,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         super.loadAdditionalSettingsFrom(settings, specs);
         DataTableSpec spec = specs[1];
 
-        List<DataColumnSpec> possibleSpecs = new ArrayList<DataColumnSpec>();
+        List<DataColumnSpec> possibleSpecs = new ArrayList<>();
         for (String colName : spec.getColumnNames()) {
             DataColumnSpec colSpec = spec.getColumnSpec(colName);
             if (colSpec.getType().isCompatible(StringValue.class)) {
@@ -205,7 +221,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
             throw new NotConfigurableException("No (String) columns at input.");
         }
 
-        m_orgTableSpec = specs[1];
+        final DataTableSpec dictTableSpec = specs[1];
 
         m_columnToSettings.clear();
         m_errornousColNames.clear();
@@ -240,7 +256,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
                     continue;
                 }
 
-                final DataColumnSpec orgSpec = m_orgTableSpec.getColumnSpec(nameForSettings);
+                final DataColumnSpec orgSpec = dictTableSpec.getColumnSpec(nameForSettings);
                 final DictionaryTaggerConfiguration dictTaggerColumnSetting =
                     new DictionaryTaggerConfiguration(nameForSettings);
                 dictTaggerColumnSetting.loadSettingsFrom(idSettings);
@@ -274,25 +290,27 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
 
         int i = 0;
         for (DocumentTaggerConfiguration colSet : m_columnToSettings.values()) {
-            NodeSettingsWO subSub = subSettings.addNodeSettings(Integer.toString(i++));
+            NodeSettingsWO subSub = subSettings.addNodeSettings(Integer.toString(i));
             colSet.saveSettingsTo(subSub);
+            i++;
         }
     }
 
-    private void createAndAddDictTaggerPanelSetting() {
+    private final void createAndAddDictTaggerPanelSetting() {
         // there can only by one or non column selected.
         final DataColumnSpec selected = m_searchableListPanel.getSelectedColumn();
         if (selected != null && !m_columnToSettings.containsKey(selected)) {
-            DictionaryTaggerConfiguration dictTaggerColumnSetting = new DictionaryTaggerConfiguration(selected.getName());
+            DictionaryTaggerConfiguration dictTaggerColumnSetting =
+                new DictionaryTaggerConfiguration(selected.getName());
             m_columnToSettings.put(selected, dictTaggerColumnSetting);
             addToIndividualPanel(new DictionaryTaggerPanel(dictTaggerColumnSetting, selected));
         }
     }
 
     /**
-     * resets all marked components.
+     * Resets all marked components.
      */
-    private void clearBorders() {
+    private final void clearBorders() {
         m_errornousColNames.clear();
         for (int i = 0; i < m_individualsPanel.getComponentCount(); i++) {
             DictionaryTaggerPanel panel = ((DictionaryTaggerPanel)m_individualsPanel.getComponent(i));
@@ -302,17 +320,29 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         }
     }
 
-    private int getIndexIndividualIndex(final DictionaryTaggerConfiguration colSet) {
+    /**
+     * Returns the index of a {@code DictionaryTaggerPanel} within an {@code IndividualsPanel} based on a
+     * {@code DictionaryTaggerConfiguration}.
+     *
+     * @param config
+     * @return Returns the index of a {@code DictionaryTaggerPanel} within an {@code IndividualsPanel}.
+     */
+    private final int getIndexIndividualIndex(final DictionaryTaggerConfiguration config) {
         for (int i = 0; i < m_individualsPanel.getComponentCount(); i++) {
             DictionaryTaggerPanel component = (DictionaryTaggerPanel)m_individualsPanel.getComponent(i);
-            if (component.getSettings().getColumnName().equals(colSet.getColumnName())) {
+            if (component.getSettings().getColumnName().equals(config.getColumnName())) {
                 return i;
             }
         }
         return -1;
     }
 
-    private void removeFromIndividualPanel(final DictionaryTaggerPanel panel) {
+    /**
+     * Removes {@code DictionaryTaggerPanel} from IndividualsPanel.
+     *
+     * @param panel The {@code DictionaryTaggerPanel} to remove.
+     */
+    private final void removeFromIndividualPanel(final DictionaryTaggerPanel panel) {
         if (m_searchableListPanel.isAdditionalColumn(panel.getColumnSpec())) {
             m_searchableListModifier.removeAdditionalColumn(panel.getColumnSpec().getName());
         }
@@ -324,14 +354,14 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         m_searchableListPanel.repaint();
     }
 
-    private void addToIndividualPanel(final DictionaryTaggerPanel panel) {
-        panel.addPropertyChangeListener(DictionaryTaggerPanel.REMOVE_ACTION, new PropertyChangeListener() {
-            /** {@inheritDoc} */
-            @Override
-            public void propertyChange(final PropertyChangeEvent evt) {
-                removeFromIndividualPanel(panel);
-            }
-        });
+    /**
+     * Adds a {@code DictionaryTaggerPanel} to IndividualsPanel.
+     *
+     * @param panel The {@code DictionaryTaggerPanel} to add.
+     */
+    private final void addToIndividualPanel(final DictionaryTaggerPanel panel) {
+        panel.addPropertyChangeListener(DictionaryTaggerPanel.REMOVE_ACTION,
+            propertyChangeEvent -> removeFromIndividualPanel(panel));
         m_individualsPanel.add(panel);
         m_individualsPanel.revalidate();
         m_individualsPanel.ensureLastVisible();
@@ -399,9 +429,9 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         }
 
         /**
-         * ensures that the last added component is visible.
+         * Ensures that the last added component is visible.
          */
-        public void ensureLastVisible() {
+        public final void ensureLastVisible() {
             if (getComponentCount() > 2) {
                 //the bounds of the last added components is zeroed, so we use the second last.
                 Rectangle bounds = getComponent(getComponentCount() - 2).getBounds();

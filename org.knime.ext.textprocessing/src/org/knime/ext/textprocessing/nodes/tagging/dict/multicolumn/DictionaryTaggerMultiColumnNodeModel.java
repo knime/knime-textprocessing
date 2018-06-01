@@ -43,7 +43,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.04.2008 (thiel): created
+ *   11.04.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
@@ -85,9 +85,15 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     static final int DATA_TABLE_INDEX = 0;
 
-    /** contains settings for each individual column. */
+    /**
+     * Contains settings for each individual column.
+     */
     private MultipleDictionaryTaggerConfiguration m_config;
 
+    /**
+     * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
+     * being tagged or not.
+     */
     private final SettingsModelBoolean m_setUnmodifiableModel =
         CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
 

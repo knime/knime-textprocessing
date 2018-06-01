@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 11, 2018 (julian): created
+ *   Apr 11, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
@@ -71,39 +71,47 @@ import org.knime.ext.textprocessing.data.TagFactory;
 /**
  * The {@code DictionaryTaggerPanel} which holds the tagger options for each column.
  *
- * @author Julian Bunzel, KNIME GmbH, Berlin Germany
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
 @SuppressWarnings("serial")
 class DictionaryTaggerPanel extends JPanel {
 
-    /** abbreviate names to this number of letters. */
+    /**
+     * Abbreviate names to this number of letters.
+     */
     private static final int MAX_LETTERS = 25;
 
     /**
-     * fired if the remove button is pressed.
+     * Fired if the remove button is pressed.
      */
     static final String REMOVE_ACTION = "REMOVE_ACTION";
 
+    /**
+     * The configuration that is displayed by the panel.
+     */
     private final DictionaryTaggerConfiguration m_settings;
 
+    /**
+     * The column spec related to the panel.
+     */
     private final DataColumnSpec m_columnSpec;
 
     /**
      * Creates a new instance of {@code DictionaryTaggerPanel}.
      *
-     * @param colSet The {@code DocumentTaggerConfiguration} containing the configuration values used for tagging.
+     * @param config The {@code DocumentTaggerConfiguration} containing the configuration values used for tagging.
      * @param spec The {@code DataColumnSpec} containing the name of the column which contains the dictionary used for
      *            tagging.
      */
-    DictionaryTaggerPanel(final DictionaryTaggerConfiguration colSet, final DataColumnSpec spec) {
+    DictionaryTaggerPanel(final DictionaryTaggerConfiguration config, final DataColumnSpec spec) {
 
-        m_settings = colSet;
+        m_settings = config;
         m_columnSpec = spec;
-        final String colName = colSet.getColumnName();
-        boolean caseSensitive = colSet.getCaseSensitivityOption();
-        boolean exactMatch = colSet.getExactMatchOption();
-        String tagType = colSet.getTagType();
-        String tagValue = colSet.getTagValue();
+        final String colName = config.getColumnName();
+        boolean caseSensitive = config.getCaseSensitivityOption();
+        boolean exactMatch = config.getExactMatchOption();
+        String tagType = config.getTagType();
+        String tagValue = config.getTagValue();
 
         String labelName = colName.length() > MAX_LETTERS ? colName.substring(0, MAX_LETTERS) + "..." : colName;
 
@@ -120,14 +128,14 @@ class DictionaryTaggerPanel extends JPanel {
         final JCheckBox exactMatchChecker = new JCheckBox("Exact match", exactMatch);
         exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(exactMatchChecker.isSelected()));
 
-        final JComboBox<String> tagValueSelection = new JComboBox<String>(
+        final JComboBox<String> tagValueSelection = new JComboBox<>(
             TagFactory.getInstance().getTagSetByType(tagType).asStringList().toArray(new String[0]));
         tagValueSelection.setSelectedItem(tagValue);
         tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)tagValueSelection.getSelectedItem()));
         tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());
 
         final JComboBox<String> tagTypeSelection =
-            new JComboBox<String>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
+            new JComboBox<>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
 
         tagTypeSelection.setSelectedItem(tagType);
         tagTypeSelection.addItemListener(new ItemListener() {
@@ -174,10 +182,20 @@ class DictionaryTaggerPanel extends JPanel {
         add(dtp);
     }
 
+    /**
+     * Returns a {@code DictionaryTaggerConfiguration} that is displayed by an instance of this panel.
+     *
+     * @return Returns a {@code DictionaryTaggerConfiguration} that is displayed by an instance of this panel.
+     */
     DictionaryTaggerConfiguration getSettings() {
         return m_settings;
     }
 
+    /**
+     * Returns a {@code DataColumnSpec} that is related to an instance of this panel.
+     *
+     * @return Returns a {@code DataColumnSpec} that is related to an instance of this panel.
+     */
     DataColumnSpec getColumnSpec() {
         return m_columnSpec;
     }

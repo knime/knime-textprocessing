@@ -43,7 +43,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.02.2008 (Kilian Thiel): created
+ *   30.04.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
@@ -77,7 +77,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
     /**
      * The unmodifiable flag.
      */
-    protected boolean m_setNeUnmodifiable;
+    protected final boolean m_setNeUnmodifiable;
 
     /**
      * Initialize old standard word tokenizer name for backwards compatibility.
@@ -118,7 +118,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         DocumentBuilder db = new DocumentBuilder(doc, m_tokenizerName);
         for (Section s : doc.getSections()) {
             for (Paragraph p : s.getParagraphs()) {
-                List<Sentence> newSentenceList = new ArrayList<Sentence>();
+                List<Sentence> newSentenceList = new ArrayList<>();
                 for (Sentence sn : p.getSentences()) {
                     final Sentence taggedSentence;
                     if (sn.getTerms().isEmpty()) {
@@ -139,10 +139,16 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         return db.createDocument();
     }
 
-    private Sentence tagSentence(final Sentence s) {
+    /**
+     * Tags a {@code Sentence}.
+     *
+     * @param s The Sentence to tag.
+     * @return Returns the tagged sentence.
+     */
+    private final Sentence tagSentence(final Sentence s) {
         // detect named entities and return a list of MultipleTaggedEntities
         List<MultipleTaggedEntity> entities = m_sentenceTagger.tagEntities(s);
-        if (entities.size() <= 0) {
+        if (entities.isEmpty()) {
             return s;
         }
 
@@ -158,7 +164,14 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         return new Sentence(termList);
     }
 
-    private List<Term> buildTermList(final List<Term> oldTermList, final MultipleTaggedEntity entity) {
+    /**
+     * Builds the term list with newly tagged entities.
+     *
+     * @param oldTermList The term list containing terms from the original document.
+     * @param entity The entity to be tagged.
+     * @return Returns a list of terms containing the newly tagged terms.
+     */
+    private final List<Term> buildTermList(final List<Term> oldTermList, final MultipleTaggedEntity entity) {
         List<Term> newTermList = null;
         List<Term> oldList = oldTermList;
 
@@ -172,11 +185,11 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             return oldList;
         }
 
-        newTermList = new ArrayList<Term>();
+        newTermList = new ArrayList<>();
 
         boolean endTerm = false;
         // list to save term representing named entity at.
-        List<Word> namedEntity = new ArrayList<Word>();
+        List<Word> namedEntity = new ArrayList<>();
 
         // go through all the old term list
         int t = -1;
@@ -186,11 +199,11 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             int r = 0;
             boolean newTermAdded = false;
             boolean newTermIsBuilt = false;
-            List<Tag> tags = new ArrayList<Tag>(term.getTags());
+            List<Tag> tags = new ArrayList<>(term.getTags());
             for (IndexRange range : startStopRanges.keySet()) {
                 // get tags for current index range
                 List<DocumentTaggerConfiguration> configs = startStopRanges.get(range);
-                List<Tag> newTags = new ArrayList<Tag>();
+                List<Tag> newTags = new ArrayList<>();
                 for (DocumentTaggerConfiguration conf : configs) {
                     newTags.add(conf.getTag());
                 }
@@ -227,7 +240,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                             // the old term consists of more than one word so split
                             // it
                         } else if (term.getWords().size() > 1) {
-                            List<Word> newWords = new ArrayList<Word>();
+                            List<Word> newWords = new ArrayList<>();
 
                             int w = -1;
                             for (Word word : term.getWords()) {
@@ -250,9 +263,9 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     // it as
                                     // a term.
                                 } else {
-                                    List<Word> newWord = new ArrayList<Word>();
+                                    List<Word> newWord = new ArrayList<>();
                                     newWord.add(word);
-                                    tags = new ArrayList<Tag>();
+                                    tags = new ArrayList<>();
                                     // CREATE NEW TERM !!!
                                     newTerm = new Term(newWord, tags, false);
                                     newTermList.add(newTerm);
@@ -285,9 +298,9 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     // otherwise create a new term containing the
                                     // word
                                 } else {
-                                    List<Word> newWord = new ArrayList<Word>();
+                                    List<Word> newWord = new ArrayList<>();
                                     newWord.add(word);
-                                    tags = new ArrayList<Tag>();
+                                    tags = new ArrayList<>();
                                     // CREATE NEW TERM !!!
                                     newTerm = new Term(newWord, tags, false);
                                     newTermList.add(newTerm);
@@ -309,9 +322,9 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
 
                                     // otherwise create a term for each word
                                 } else {
-                                    List<Word> newWord = new ArrayList<Word>();
+                                    List<Word> newWord = new ArrayList<>();
                                     newWord.add(word);
-                                    tags = new ArrayList<Tag>();
+                                    tags = new ArrayList<>();
                                     // CREATE NEW TERM !!!
                                     newTerm = new Term(newWord, tags, false);
                                     newTermList.add(newTerm);
@@ -339,7 +352,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                     newTermAdded = true;
                 }
             }
-            if (newTermAdded == false && newTermIsBuilt == false) {
+            if (!newTermAdded && !newTermIsBuilt) {
                 // if we are before or after the interesting part just add the
                 // terms without rearrangement
                 newTermList.add(term);
@@ -348,10 +361,18 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         return newTermList;
     }
 
-    private Map<IndexRange, List<DocumentTaggerConfiguration>> findNe(final List<Term> sentence,
+    /**
+     * Finds named entities within a list of terms.
+     *
+     * @param sentence List of terms built from original sentence.
+     * @param entity The {@code MultipleTaggedEntity} containing the name of the entity and properties how it has to be
+     *            tagged.
+     * @return Returns a map containing IndexRanges (location of found entities) and a list of
+     *         {@code DocumentTaggerConfiguration}s containing properties for how the entity has to be tagged.
+     */
+    private final Map<IndexRange, List<DocumentTaggerConfiguration>> findNe(final List<Term> sentence,
         final MultipleTaggedEntity entity) {
-        Map<IndexRange, List<DocumentTaggerConfiguration>> ranges =
-            new LinkedHashMap<IndexRange, List<DocumentTaggerConfiguration>>();
+        Map<IndexRange, List<DocumentTaggerConfiguration>> ranges = new LinkedHashMap<>();
         int found = 0;
         boolean foundFlag = false;
         int startTermIndex = -1;
@@ -363,7 +384,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         // tokenized by the default tokenizer to create words out of them.
         List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
 
-        if (neWords.size() <= 0) {
+        if (neWords.isEmpty()) {
             return ranges;
         }
 
@@ -411,7 +432,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
 
                             IndexRange indexRange =
                                 new IndexRange(startTermIndex, stopTermIndex, startWordIndex, stopWordIndex);
-                            List<DocumentTaggerConfiguration> configs = new ArrayList<DocumentTaggerConfiguration>();
+                            List<DocumentTaggerConfiguration> configs = new ArrayList<>();
                             if (ranges.containsKey(indexRange)) {
                                 configs = ranges.get(indexRange);
                             }
@@ -425,17 +446,15 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                             foundFlag = false;
                             found = 0;
                         }
-                    } else {
-                        if (foundFlag) {
-                            foundFlag = false;
-                            found = 0;
-                            startTermIndex = -1;
-                            stopTermIndex = -1;
-                            startWordIndex = -1;
-                            stopWordIndex = -1;
-                            w--;
-                            i--;
-                        }
+                    } else if (foundFlag) {
+                        foundFlag = false;
+                        found = 0;
+                        startTermIndex = -1;
+                        stopTermIndex = -1;
+                        startWordIndex = -1;
+                        stopWordIndex = -1;
+                        w--;
+                        i--;
                     }
                 }
             }

@@ -44,10 +44,11 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 18, 2018 (julian): created
+ *   Apr 18, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.knime.core.node.InvalidSettingsException;
@@ -66,10 +67,19 @@ import org.knime.ext.textprocessing.nodes.tagging.MultiTaggerConfigKeys;
  */
 class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
+    /**
+     * Node logger for this class.
+     */
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DictionaryTaggerConfiguration.class);
 
+    /**
+     * Set to store the entities (dictionary).
+     */
     private Set<String> m_entities;
 
+    /**
+     * The name of the column containing the dictionary.
+     */
     private String m_columnName;
 
     /**
@@ -119,7 +129,7 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      *
      * @param entities The set of entities to set.
      */
-    void setEntities(final Set<String> entities) {
+    final void setEntities(final Set<String> entities) {
         m_entities = entities;
     }
 
@@ -128,8 +138,8 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      *
      * @return Returns the set of entities.
      */
-    Set<String> getEntities() {
-        return m_entities;
+    final Set<String> getEntities() {
+        return Collections.unmodifiableSet(m_entities);
     }
 
     /**
@@ -137,7 +147,7 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      *
      * @return Returns the column name.
      */
-    String getColumnName() {
+    final String getColumnName() {
         return m_columnName;
     }
 
@@ -146,7 +156,7 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      *
      * @param columnName The column name to set.
      */
-    void setColumnName(final String columnName) {
+    final void setColumnName(final String columnName) {
         m_columnName = columnName;
     }
 
@@ -183,7 +193,16 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
         super.loadSettingsFrom(settings);
     }
 
-    public static DictionaryTaggerConfiguration createFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+    /**
+     * Static method to create a {@code DictionaryTaggerConfiguration} from an instance of {@link NodeSettingsRO}.
+     *
+     * @param settings The instance of {@code NodeSettingsRO} to create the {@code DictionaryTaggerConfiguration}
+     *            instance from.
+     * @throws InvalidSettingsException If settings could not be retrieved.
+     * @return Returns an instance of {@code DictionaryTaggerConfiguration}.
+     */
+    public final static DictionaryTaggerConfiguration createFrom(final NodeSettingsRO settings)
+        throws InvalidSettingsException {
 
         String colName = settings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
         boolean caseSensitive = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE);

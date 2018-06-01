@@ -43,7 +43,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   30.04.2008 (thiel): created
+ *   11.04.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 

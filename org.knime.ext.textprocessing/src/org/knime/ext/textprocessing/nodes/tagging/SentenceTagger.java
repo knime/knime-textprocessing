@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   May 9, 2018 (julian): created
+ *   May 9, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 

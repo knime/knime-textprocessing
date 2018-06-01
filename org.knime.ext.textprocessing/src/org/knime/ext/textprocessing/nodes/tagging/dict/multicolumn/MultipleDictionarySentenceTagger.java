@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   May 9, 2018 (julian): created
+ *   May 9, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
@@ -62,8 +62,18 @@ import org.knime.ext.textprocessing.nodes.tagging.SentenceTagger;
  */
 class MultipleDictionarySentenceTagger implements SentenceTagger {
 
+    /**
+     * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries used for
+     * tagging.
+     */
     private List<DictionaryTaggerConfiguration> m_configs;
 
+    /**
+     * Creates a new instance of {@code MultipleDictionarySentenceTagger} which is used to tag {@code Sentence}s of
+     * {@code Document}s based on multiple dictionaries.
+     *
+     * @param configs List of {@code DictionaryTaggerConfiguration} containing configurations for all dictionaries.
+     */
     MultipleDictionarySentenceTagger(final List<DictionaryTaggerConfiguration> configs) {
         m_configs = configs;
     }
@@ -73,7 +83,7 @@ class MultipleDictionarySentenceTagger implements SentenceTagger {
      */
     @Override
     public List<MultipleTaggedEntity> tagEntities(final Sentence sentence) {
-        List<MultipleTaggedEntity> foundEntities = new ArrayList<MultipleTaggedEntity>();
+        List<MultipleTaggedEntity> foundEntities = new ArrayList<>();
 
         String origSentenceStr = sentence.getText();
         for (DictionaryTaggerConfiguration config : m_configs) {

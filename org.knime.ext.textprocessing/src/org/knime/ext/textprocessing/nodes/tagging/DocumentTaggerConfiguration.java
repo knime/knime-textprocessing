@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 18, 2018 (julian): created
+ *   Apr 18, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
@@ -65,6 +65,9 @@ import org.knime.ext.textprocessing.data.Tag;
  */
 public class DocumentTaggerConfiguration {
 
+    /**
+     * Node logger for this class.
+     */
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentTaggerConfiguration.class);
 
     /**
@@ -138,9 +141,9 @@ public class DocumentTaggerConfiguration {
      * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name, values for case
      * sensitivity, exact match and a given {@link Tag}.
      *
-     * @param caseSensitivity
-     * @param exactMatch
-     * @param tag
+     * @param caseSensitivity Boolean value for case sensitivity.
+     * @param exactMatch Boolean value for exact matching behavior.
+     * @param tag The tag containing tag value and tag type.
      *
      */
     public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch,
@@ -153,7 +156,7 @@ public class DocumentTaggerConfiguration {
      *
      * @return The value of the case sensitivity option.
      */
-    public boolean getCaseSensitivityOption() {
+    public final boolean getCaseSensitivityOption() {
         return m_caseSensitivity;
     }
 
@@ -162,7 +165,7 @@ public class DocumentTaggerConfiguration {
      *
      * @param caseSensitivity Set true for case sensitive matching.
      */
-    public void setCaseSensitivityOption(final boolean caseSensitivity) {
+    public final void setCaseSensitivityOption(final boolean caseSensitivity) {
         m_caseSensitivity = caseSensitivity;
     }
 
@@ -171,7 +174,7 @@ public class DocumentTaggerConfiguration {
      *
      * @return The value of the exact match option.
      */
-    public boolean getExactMatchOption() {
+    public final boolean getExactMatchOption() {
         return m_exactMatch;
     }
 
@@ -180,7 +183,7 @@ public class DocumentTaggerConfiguration {
      *
      * @param exactMatch Set true for exact matching.
      */
-    public void setExactMatchOption(final boolean exactMatch) {
+    public final void setExactMatchOption(final boolean exactMatch) {
         m_exactMatch = exactMatch;
     }
 
@@ -189,7 +192,7 @@ public class DocumentTaggerConfiguration {
      *
      * @return The tag type.
      */
-    public String getTagType() {
+    public final String getTagType() {
         return m_tagType;
     }
 
@@ -198,7 +201,7 @@ public class DocumentTaggerConfiguration {
      *
      * @param tagType The tag type to set.
      */
-    public void setTagType(final String tagType) {
+    public final void setTagType(final String tagType) {
         m_tagType = tagType;
     }
 
@@ -207,7 +210,7 @@ public class DocumentTaggerConfiguration {
      *
      * @return The tag value.
      */
-    public String getTagValue() {
+    public final String getTagValue() {
         return m_tagValue;
     }
 
@@ -216,7 +219,7 @@ public class DocumentTaggerConfiguration {
      *
      * @param tagValue The tag value to set.
      */
-    public void setTagValue(final String tagValue) {
+    public final void setTagValue(final String tagValue) {
         m_tagValue = tagValue;
     }
 
@@ -225,7 +228,7 @@ public class DocumentTaggerConfiguration {
      *
      * @return The tag built from tag type and tag value.
      */
-    public Tag getTag() {
+    public final Tag getTag() {
         return new Tag(m_tagValue, m_tagType);
     }
 
@@ -234,7 +237,7 @@ public class DocumentTaggerConfiguration {
      *
      * @param tag The tag that contains tag value and tag type information that will be set.
      */
-    public void setTag(final Tag tag) {
+    public final void setTag(final Tag tag) {
         setTagType(tag.getTagType());
         setTagValue(tag.getTagValue());
     }
