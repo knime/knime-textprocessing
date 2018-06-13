@@ -52,9 +52,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Sentence;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.nodes.tagging.MultipleTaggedEntity;
 import org.knime.ext.textprocessing.nodes.tagging.SentenceTagger;
+import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 
 /**
  * The {@code MultipleDictionarySentenceTagger} is used for tagging documents with different tags and dictionaries.
@@ -84,8 +83,8 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
      * {@inheritDoc}
      */
     @Override
-    public List<MultipleTaggedEntity> tagEntities(final Sentence sentence) {
-        List<MultipleTaggedEntity> foundEntities = new ArrayList<>();
+    public List<TaggedEntity> tagEntities(final Sentence sentence) {
+        List<TaggedEntity> foundEntities = new ArrayList<>();
 
         String origSentenceStr = sentence.getText();
 
@@ -94,30 +93,11 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
                 NamedEntityMatcher matcher =
                     new NamedEntityMatcher(config.getCaseSensitivityOption(), config.getExactMatchOption());
                 if (matcher.matchWithSentence(entity, origSentenceStr)) {
-                    foundEntities = addToListAndCheckOccurrence(entity, config.getTag(), matcher, foundEntities);
+                    foundEntities.add(new TaggedEntity(entity, config.getTagValue(), config.getTagType(), matcher));
                 }
             }
         }
 
         return foundEntities;
     }
-
-    private List<MultipleTaggedEntity> addToListAndCheckOccurrence(final String entity, final Tag tag,
-        final NamedEntityMatcher matcher, final List<MultipleTaggedEntity> mtes) {
-        MultipleTaggedEntity mte = null;
-        for (int i = 0; i < mtes.size(); i++) {
-            if (entity.equals(mtes.get(i).getEntity())) {
-                mte = mtes.get(i);
-                mtes.remove(i);
-                break;
-            }
-        }
-        if (mte == null) {
-            mte = new MultipleTaggedEntity(entity);
-        }
-        mte.addConfig(tag, matcher);
-        mtes.add(mte);
-        return mtes;
-    }
-
 }
