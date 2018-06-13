@@ -73,8 +73,12 @@ import org.knime.ext.textprocessing.data.TagFactory;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-@SuppressWarnings("serial")
 class DictionaryTaggerPanel extends JPanel {
+
+    /**
+     * Serial version uid.
+     */
+    private static final long serialVersionUID = -199770705515091178L;
 
     /**
      * Abbreviate names to this number of letters.
@@ -104,7 +108,6 @@ class DictionaryTaggerPanel extends JPanel {
      *            tagging.
      */
     DictionaryTaggerPanel(final DictionaryTaggerConfiguration config, final DataColumnSpec spec) {
-
         m_settings = config;
         m_columnSpec = spec;
         final String colName = config.getColumnName();
@@ -121,23 +124,23 @@ class DictionaryTaggerPanel extends JPanel {
         JButton removeButton = new JButton(SharedIcons.DELETE_TRASH.get());
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
 
-        final JCheckBox caseSensitivityChecker = new JCheckBox("Case sensitive", caseSensitive);
+        final JCheckBox caseSensitivityChecker = new JCheckBox("Case sensitive", config.getCaseSensitivityOption());
         caseSensitivityChecker
             .addItemListener(e -> m_settings.setCaseSensitivityOption(caseSensitivityChecker.isSelected()));
 
-        final JCheckBox exactMatchChecker = new JCheckBox("Exact match", exactMatch);
+        final JCheckBox exactMatchChecker = new JCheckBox("Exact match", config.getExactMatchOption());
         exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(exactMatchChecker.isSelected()));
 
         final JComboBox<String> tagValueSelection = new JComboBox<>(
             TagFactory.getInstance().getTagSetByType(tagType).asStringList().toArray(new String[0]));
-        tagValueSelection.setSelectedItem(tagValue);
+        tagValueSelection.setSelectedItem(config.getTagValue());
         tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)tagValueSelection.getSelectedItem()));
         tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());
 
         final JComboBox<String> tagTypeSelection =
             new JComboBox<>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
 
-        tagTypeSelection.setSelectedItem(tagType);
+        tagTypeSelection.setSelectedItem(config.getTagType());
         tagTypeSelection.addItemListener(new ItemListener() {
 
             @Override

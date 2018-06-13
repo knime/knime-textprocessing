@@ -48,8 +48,11 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.NamedEntityMatcher;
 
 /**
  * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a List of
@@ -58,7 +61,7 @@ import java.util.List;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class MultipleTaggedEntity {
+public final class MultipleTaggedEntity{
 
     /**
      * The name of the entity.
@@ -68,7 +71,9 @@ public class MultipleTaggedEntity {
     /**
      * The list of {@code DocumentTaggerConfiguration}s containing all necessary properties for tagging.
      */
-    private final List<DocumentTaggerConfiguration> m_configs;
+    //private final List<DocumentTaggerConfiguration> m_configs;
+
+    private final Map<Tag, NamedEntityMatcher> m_matcher;
 
     /**
      * Creates an new instance of {@code MultipleTaggedEntity} based on a given entity and initializes an empty list for
@@ -78,7 +83,9 @@ public class MultipleTaggedEntity {
      */
     public MultipleTaggedEntity(final String entity) {
         m_entity = entity;
-        m_configs = new ArrayList<>();
+        //m_configs = new ArrayList<>();
+        m_matcher = new HashMap<>();
+
     }
 
     /**
@@ -86,8 +93,8 @@ public class MultipleTaggedEntity {
      *
      * @param config The {@code DocumentTaggerConfiguration} to add.
      */
-    public final void addConfig(final DocumentTaggerConfiguration config) {
-        m_configs.add(config);
+    public final void addConfig(final Tag tag, final NamedEntityMatcher matcher) {
+        m_matcher.put(tag, matcher);
     }
 
     /**
@@ -105,7 +112,7 @@ public class MultipleTaggedEntity {
      *
      * @return Returns a list of {@code DocumentTaggerConfiguration}s.
      */
-    public final List<DocumentTaggerConfiguration> getConfigs() {
-        return m_configs;
+    public final Map<Tag, NamedEntityMatcher> getTagMap() {
+        return m_matcher;
     }
 }

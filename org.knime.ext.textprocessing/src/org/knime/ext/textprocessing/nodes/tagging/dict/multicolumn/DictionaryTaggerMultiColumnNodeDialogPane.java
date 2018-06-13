@@ -85,7 +85,6 @@ import org.knime.core.node.util.ColumnSelectionSearchableListPanel.ListModifier;
 import org.knime.core.node.util.ColumnSelectionSearchableListPanel.SearchedItemsSelectionMode;
 import org.knime.core.node.util.DataColumnSpecListCellRenderer;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
-import org.knime.ext.textprocessing.nodes.tagging.MultiTaggerConfigKeys;
 import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
 import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSettingModels;
 
@@ -103,6 +102,11 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
      */
     private static final DictionaryTaggerPanel DUMMY_PANEL = new DictionaryTaggerPanel(
         new DictionaryTaggerConfiguration("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
+
+    /**
+     * The configuration key of the column name setting.
+     */
+    private static final String CFGKEY_COLUMNNAME = "ColumnName";
 
     /**
      * Map containing a {@code DataColumnSpec} and a specific {@code DictionaryTaggerConfiguration} holding properties
@@ -251,7 +255,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
                 String nameForSettings;
                 try {
                     idSettings = subSettings.getNodeSettings(id);
-                    nameForSettings = idSettings.getString(MultiTaggerConfigKeys.CFGKEY_COLUMNNAME);
+                    nameForSettings = idSettings.getString(CFGKEY_COLUMNNAME);
                 } catch (InvalidSettingsException is) {
                     continue;
                 }

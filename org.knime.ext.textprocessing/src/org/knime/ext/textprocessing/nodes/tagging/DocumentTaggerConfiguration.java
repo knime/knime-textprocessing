@@ -71,6 +71,26 @@ public class DocumentTaggerConfiguration {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentTaggerConfiguration.class);
 
     /**
+     * The configuration key of the exact match flag.
+     */
+    public static final String CFGKEY_EXACTMATCH = "ExactMatch";
+
+    /**
+     * The configuration key of the case sensitivity flag.
+     */
+    public static final String CFGKEY_CASESENSITIVE = "CaseSensitive";
+
+    /**
+     * The configuration key of the tag type.
+     */
+    public static final String CFGKEY_TAGTYPE = "TagType";
+
+    /**
+     * The configuration key of the tag value.
+     */
+    public static final String CFGKEY_TAGVALUE = "TagValue";
+
+    /**
      * The default value for the case sensitivity flag.
      */
     private static final boolean DEFAULT_CASE_SENSITIVITY = true;
@@ -86,7 +106,7 @@ public class DocumentTaggerConfiguration {
     private static final String DEFAULT_TAG_TYPE = NamedEntityTag.TAG_TYPE;
 
     /**
-     * The default tag type.
+     * The default tag value.
      */
     private static final String DEFAULT_TAG_VALUE = NamedEntityTag.UNKNOWN.toString();
 
@@ -130,7 +150,6 @@ public class DocumentTaggerConfiguration {
      */
     public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch,
         final String tagType, final String tagValue) {
-
         setCaseSensitivityOption(caseSensitivity);
         setExactMatchOption(exactMatch);
         setTagType(tagType);
@@ -250,14 +269,14 @@ public class DocumentTaggerConfiguration {
      */
     public void loadSettingsFrom(final NodeSettingsRO settings) {
         try {
-            setCaseSensitivityOption(settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE));
+            setCaseSensitivityOption(settings.getBoolean(CFGKEY_CASESENSITIVE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn("Can't update case sensitivity setting. Value has been set to default.");
             setCaseSensitivityOption(DEFAULT_CASE_SENSITIVITY);
         }
 
         try {
-            setExactMatchOption(settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH));
+            setExactMatchOption(settings.getBoolean(CFGKEY_EXACTMATCH));
         } catch (InvalidSettingsException e) {
             LOGGER.warn(
                 "Can't update exact match setting. Value has been set to default.");
@@ -265,7 +284,7 @@ public class DocumentTaggerConfiguration {
         }
 
         try {
-            setTagType(settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE));
+            setTagType(settings.getString(CFGKEY_TAGTYPE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn(
                 "Can't update tag type setting. Value has been set to default.");
@@ -273,7 +292,7 @@ public class DocumentTaggerConfiguration {
         }
 
         try {
-            setTagValue(settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGVALUE));
+            setTagValue(settings.getString(CFGKEY_TAGVALUE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn(
                 "Can't update tag type setting. Value has been set to default.");
@@ -287,10 +306,10 @@ public class DocumentTaggerConfiguration {
      * @param settings The {@code NodeSettingsWO} instance to save the settings to.
      */
     public void saveSettingsTo(final NodeSettingsWO settings) {
-        settings.addBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE, m_caseSensitivity);
-        settings.addBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH, m_exactMatch);
-        settings.addString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE, m_tagType);
-        settings.addString(MultiTaggerConfigKeys.CFGKEY_TAGVALUE, m_tagValue);
+        settings.addBoolean(CFGKEY_CASESENSITIVE, m_caseSensitivity);
+        settings.addBoolean(CFGKEY_EXACTMATCH, m_exactMatch);
+        settings.addString(CFGKEY_TAGTYPE, m_tagType);
+        settings.addString(CFGKEY_TAGVALUE, m_tagValue);
     }
 
     /**
@@ -303,10 +322,10 @@ public class DocumentTaggerConfiguration {
      */
     public static DocumentTaggerConfiguration createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
-        boolean caseSensitive = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_CASESENSITIVE);
-        boolean exactMatch = settings.getBoolean(MultiTaggerConfigKeys.CFGKEY_EXACTMATCH);
-        String tagType = settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGTYPE);
-        String tagValue = settings.getString(MultiTaggerConfigKeys.CFGKEY_TAGVALUE);
+        boolean caseSensitive = settings.getBoolean(CFGKEY_CASESENSITIVE);
+        boolean exactMatch = settings.getBoolean(CFGKEY_EXACTMATCH);
+        String tagType = settings.getString(CFGKEY_TAGTYPE);
+        String tagValue = settings.getString(CFGKEY_TAGVALUE);
 
         return new DocumentTaggerConfiguration(caseSensitive, exactMatch, tagType, tagValue);
     }
