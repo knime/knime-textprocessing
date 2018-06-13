@@ -44,80 +44,55 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   May 9, 2018 (Julian Bunzel): created
+ *   Jun 6, 2018 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.knime.ext.textprocessing.data.Sentence;
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.nodes.tagging.MultipleTaggedEntity;
-import org.knime.ext.textprocessing.nodes.tagging.SentenceTagger;
-
 /**
- * The {@code MultipleDictionarySentenceTagger} is used for tagging documents with different tags and dictionaries.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class MultipleDictionarySentenceTagger implements SentenceTagger {
+public class NamedEntityMatcher {
+
+    private final boolean m_caseSensitivity;
+
+    private final boolean m_exactMatch;
 
     /**
-     * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries used for
-     * tagging.
-     */
-    private List<DictionaryTaggerConfiguration> m_configs;
-
-    /**
-     * Creates a new instance of {@code MultipleDictionarySentenceTagger} which is used to tag {@code Sentence}s of
-     * {@code Document}s based on multiple dictionaries.
+     * @param caseSensitivity
+     * @param exactMatch
      *
-     * @param namedEntityFinder List of {@code DictionaryTaggerConfiguration} containing configurations for all
-     *            dictionaries.
      */
-    MultipleDictionarySentenceTagger(final List<DictionaryTaggerConfiguration> configs) {
-        m_configs = configs;
+    public NamedEntityMatcher(final boolean caseSensitivity, final boolean exactMatch) {
+        m_caseSensitivity = caseSensitivity;
+        m_exactMatch = exactMatch;
     }
 
     /**
-     * {@inheritDoc}
+     * @param entity
+     * @param sentence
+     * @return
      */
-    @Override
-    public List<MultipleTaggedEntity> tagEntities(final Sentence sentence) {
-        List<MultipleTaggedEntity> foundEntities = new ArrayList<>();
-
-        String origSentenceStr = sentence.getText();
-
-        for (DictionaryTaggerConfiguration config : m_configs) {
-            for (String entity : config.getEntities()) {
-                NamedEntityMatcher matcher =
-                    new NamedEntityMatcher(config.getCaseSensitivityOption(), config.getExactMatchOption());
-                if (matcher.matchWithSentence(entity, origSentenceStr)) {
-                    foundEntities = addToListAndCheckOccurrence(entity, config.getTag(), matcher, foundEntities);
-                }
-            }
+    public boolean matchWithSentence(String entity, String sentence) {
+        if (!m_caseSensitivity) {
+            sentence = sentence.toLowerCase();
+            entity = entity.toLowerCase();
         }
 
-        return foundEntities;
+        return sentence.contains(entity);
     }
 
-    private List<MultipleTaggedEntity> addToListAndCheckOccurrence(final String entity, final Tag tag,
-        final NamedEntityMatcher matcher, final List<MultipleTaggedEntity> mtes) {
-        MultipleTaggedEntity mte = null;
-        for (int i = 0; i < mtes.size(); i++) {
-            if (entity.equals(mtes.get(i).getEntity())) {
-                mte = mtes.get(i);
-                mtes.remove(i);
-                break;
-            }
+    /**
+     * @param entity
+     * @param word
+     * @return
+     */
+    public boolean matchWithWord(String entity, String word) {
+        if (!m_caseSensitivity) {
+            word = word.toLowerCase();
+            entity = entity.toLowerCase();
         }
-        if (mte == null) {
-            mte = new MultipleTaggedEntity(entity);
-        }
-        mte.addConfig(tag, matcher);
-        mtes.add(mte);
-        return mtes;
-    }
 
+        return (m_exactMatch && word.equals(entity)) || (!m_exactMatch && word.contains(entity));
+    }
 }

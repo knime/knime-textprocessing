@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -60,6 +61,7 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.NamedEntityMatcher;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -147,7 +149,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      */
     private final Sentence tagSentence(final Sentence s) {
         // detect named entities and return a list of MultipleTaggedEntities
-        List<MultipleTaggedEntity> entities = m_sentenceTagger.tagEntities(s);
+        final List<MultipleTaggedEntity> entities = m_sentenceTagger.tagEntities(s);
         if (entities.isEmpty()) {
             return s;
         }
@@ -161,6 +163,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             // entities and entity tag.
             termList = buildTermList(termList, entity);
         }
+
         return new Sentence(termList);
     }
 
@@ -177,11 +180,11 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
 
         // Won't this blow up if we have "a,b,a" as an entity and "ababab" as a
         // sentence?
-        Map<IndexRange, List<DocumentTaggerConfiguration>> startStopRanges = findNe(oldList, entity);
+        Map<IndexRange, List<Tag>> rangesAndTags = findNe(oldTermList, entity);
 
         // if new list contains no entities to look up for return old list
         // so that no tag is assigned to empty entities.
-        if (startStopRanges.size() <= 0) {
+        if (rangesAndTags.isEmpty()) {
             return oldList;
         }
 
@@ -200,13 +203,10 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             boolean newTermAdded = false;
             boolean newTermIsBuilt = false;
             List<Tag> tags = new ArrayList<>(term.getTags());
-            for (IndexRange range : startStopRanges.keySet()) {
+            for (Entry<IndexRange, List<Tag>> entry : rangesAndTags.entrySet()) {
                 // get tags for current index range
-                List<DocumentTaggerConfiguration> configs = startStopRanges.get(range);
-                List<Tag> newTags = new ArrayList<>();
-                for (DocumentTaggerConfiguration conf : configs) {
-                    newTags.add(conf.getTag());
-                }
+
+                List<Tag> newTags = entry.getValue();
                 // only add tag if not already added
                 for (Tag tag : newTags) {
                     if (!tags.contains(tag)) {
@@ -218,11 +218,11 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
 
                 // if we reached the interesting terms containing the named
                 // entity
-                if (t >= range.getStartTermIndex() && t <= range.getStopTermIndex()) {
+                if (t >= entry.getKey().getStartTermIndex() && t <= entry.getKey().getStopTermIndex()) {
 
                     // detected a named entity consisting only of one term
                     // check if it has to be split up
-                    if (range.getStartTermIndex() == range.getStopTermIndex()) {
+                    if (entry.getKey().getStartTermIndex() == entry.getKey().getStopTermIndex()) {
 
                         //
                         // BUT does the term consist of one or more words ?
@@ -247,14 +247,14 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                 w++;
 
                                 // add word if index matches
-                                if (w >= range.getStartWordIndex() && w <= range.getStopWordIndex()) {
+                                if (w >= entry.getKey().getStartWordIndex() && w <= entry.getKey().getStopWordIndex()) {
                                     newWords.add(word);
 
                                     // if last word to add, create term and add it
                                     // to new list
-                                    if (w == range.getStopWordIndex()) {
+                                    if (w == entry.getKey().getStopWordIndex()) {
                                         // CREATE NEW TERM !!!
-                                        newTerm = new Term(newWords, tags, m_setNeUnmodifiable);
+                                        newTerm = new Term(newWords, newTags, m_setNeUnmodifiable);
                                         newTermList.add(newTerm);
                                         endTerm = true;
                                     }
@@ -276,7 +276,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                         // reset new named entity list and go to the next found
                         // named entity range
                         r++;
-                        if (r < startStopRanges.size()) {
+                        if (r < rangesAndTags.size()) {
                             namedEntity.clear();
                         }
 
@@ -289,9 +289,9 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                             w++;
 
                             // if current term is start term
-                            if (t == range.getStartTermIndex()) {
+                            if (t == entry.getKey().getStartTermIndex()) {
                                 // if word is part of the named entity add it
-                                if (w >= range.getStartWordIndex()) {
+                                if (w >= entry.getKey().getStartWordIndex()) {
                                     namedEntity.add(word);
                                     newTermIsBuilt = true;
 
@@ -302,21 +302,21 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                                     newWord.add(word);
                                     tags = new ArrayList<>();
                                     // CREATE NEW TERM !!!
-                                    newTerm = new Term(newWord, tags, false);
+                                    newTerm = new Term(newWord, newTags, false);
                                     newTermList.add(newTerm);
                                 }
 
                                 // if current term is stop term
-                            } else if (t == range.getStopTermIndex()) {
+                            } else if (t == entry.getKey().getStopTermIndex()) {
                                 // add words as long as stopWordIndex is not reached
-                                if (w <= range.getStartWordIndex()) {
+                                if (w <= entry.getKey().getStartWordIndex()) {
                                     namedEntity.add(word);
 
                                     // if last word is reached, create term and
                                     // add it
-                                    if (w == range.getStopWordIndex()) {
+                                    if (w == entry.getKey().getStopWordIndex()) {
                                         // CREATE NEW TERM !!!
-                                        newTerm = new Term(namedEntity, tags, m_setNeUnmodifiable);
+                                        newTerm = new Term(namedEntity, newTags, m_setNeUnmodifiable);
                                         newTermList.add(newTerm);
                                     }
 
@@ -332,7 +332,8 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
 
                                 // if we are in between the start term and the stop
                                 // term just add all words to the new word list
-                            } else if (t > range.getStartTermIndex() && t < range.getStopTermIndex()) {
+                            } else if (t > entry.getKey().getStartTermIndex()
+                                && t < entry.getKey().getStopTermIndex()) {
                                 namedEntity.add(word);
                                 newTermIsBuilt = true;
                             }
@@ -341,7 +342,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                             // next found term range
                             endTerm = false;
                             r++;
-                            if (r < startStopRanges.size()) {
+                            if (r < rangesAndTags.size()) {
                                 namedEntity.clear();
                             }
                         }
@@ -370,11 +371,10 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @return Returns a map containing IndexRanges (location of found entities) and a list of
      *         {@code DocumentTaggerConfiguration}s containing properties for how the entity has to be tagged.
      */
-    private final Map<IndexRange, List<DocumentTaggerConfiguration>> findNe(final List<Term> sentence,
-        final MultipleTaggedEntity entity) {
-        Map<IndexRange, List<DocumentTaggerConfiguration>> ranges = new LinkedHashMap<>();
-        int found = 0;
-        boolean foundFlag = false;
+    private final Map<IndexRange, List<Tag>> findNe(final List<Term> sentence, final MultipleTaggedEntity entity) {
+        Map<IndexRange, List<Tag>> rangesAndTags = new LinkedHashMap<>();
+        List<Integer> foundIndex = new ArrayList<>();
+        List<Boolean> foundFlag = new ArrayList<>();
         int startTermIndex = -1;
         int stopTermIndex = -1;
         int startWordIndex = -1;
@@ -385,80 +385,69 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
 
         if (neWords.isEmpty()) {
-            return ranges;
+            return rangesAndTags;
         }
 
         // search all terms
         int t = -1;
         for (Term term : sentence) {
             t++;
-            List<Word> words = term.getWords();
+            List<Word> wordsOfTerm = term.getWords();
 
             // search words of terms
-            for (DocumentTaggerConfiguration config : entity.getConfigs()) {
+            int entryIndex = -1;
+            for (Entry<Tag, NamedEntityMatcher> entry : entity.getTagMap().entrySet()) {
+                entryIndex++;
+                if (entryIndex == foundIndex.size()) {
+                    foundIndex.add(0);
+                    foundFlag.add(false);
+                }
                 int w = -1;
-                for (int i = 0; i < words.size(); i++) {
+                for (int i = 0; i < wordsOfTerm.size(); i++) {
                     w++;
 
                     // prepare word and ne for comparison (convert to lower case
                     // if case sensitivity is switched off)
-                    String wordStr = words.get(i).getWord();
-
-                    String neStr = neWords.get(found);
-
-                    if (!config.getCaseSensitivityOption()) {
-                        wordStr = wordStr.toLowerCase();
-                        neStr = neStr.toLowerCase();
-                    }
+                    String wordStr = wordsOfTerm.get(i).getWord();
+                    String neStr = neWords.get(foundIndex.get(entryIndex));
 
                     // if ne element at "found" equals the current word
-                    if (found < neWords.size() && ((config.getExactMatchOption() && wordStr.equals(neStr))
-                        || (!config.getExactMatchOption() && wordStr.contains(neStr)))) {
-                        //if (found < ne.size() && wordStr.equals(neStr)) {
+                    if (foundIndex.get(entryIndex) < neWords.size() && entry.getValue().matchWithWord(neStr, wordStr)) {
                         // if "found" 0 means we are at the beginning of the named
                         // entity
-                        if (found == 0) {
+                        if (foundIndex.get(entryIndex) == 0) {
                             startTermIndex = t;
                             startWordIndex = w;
                         }
 
-                        found++;
-                        foundFlag = true;
+                        foundIndex.set(entryIndex, foundIndex.get(entryIndex) + 1);
+                        foundFlag.set(entryIndex, true);
 
                         // means we are at the end of the named entity
-                        if (found == neWords.size()) {
+                        if (foundIndex.get(entryIndex) == neWords.size()) {
                             stopTermIndex = t;
                             stopWordIndex = w;
 
                             IndexRange indexRange =
                                 new IndexRange(startTermIndex, stopTermIndex, startWordIndex, stopWordIndex);
-                            List<DocumentTaggerConfiguration> configs = new ArrayList<>();
-                            if (ranges.containsKey(indexRange)) {
-                                configs = ranges.get(indexRange);
+                            List<Tag> tags = new ArrayList<>();
+                            if (rangesAndTags.containsKey(indexRange)) {
+                                tags = rangesAndTags.get(indexRange);
                             }
-                            configs.add(config);
-                            ranges.put(indexRange, configs);
-
-                            startTermIndex = -1;
-                            stopTermIndex = -1;
-                            startWordIndex = -1;
-                            stopWordIndex = -1;
-                            foundFlag = false;
-                            found = 0;
+                            tags.add(entry.getKey());
+                            rangesAndTags.put(indexRange, tags);
+                            foundFlag.set(entryIndex, false);
+                            foundIndex.set(entryIndex, 0);
                         }
-                    } else if (foundFlag) {
-                        foundFlag = false;
-                        found = 0;
-                        startTermIndex = -1;
-                        stopTermIndex = -1;
-                        startWordIndex = -1;
-                        stopWordIndex = -1;
+                    } else if (foundFlag.get(entryIndex)) {
+                        foundFlag.set(entryIndex, false);
+                        foundIndex.set(entryIndex, 0);
                         w--;
                         i--;
                     }
                 }
             }
         }
-        return ranges;
+        return rangesAndTags;
     }
 }
