@@ -47,14 +47,13 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.NamedEntityMatcher;
-
 /**
- * This class holds two strings, the first represents an entity, such as a term consisting of one or more words and the
- * second represents a tag, such as a part of speech tag (POS) or a named entity tag (ABNER) etc. External tagger, like
- * ABNER (A Biomedical Named Entity Recognizer) or the OpenNLP POS tagger return their results in various kinds. This
- * class helps to unify the different results and enable an unique way of accessing them.
+ * This class holds two strings, the first represents an entity, such as a
+ * term consisting of one or more words and the second represents a tag, such as
+ * a part of speech tag (POS) or a named entity tag (ABNER) etc.
+ * External tagger, like ABNER (A Biomedical Named Entity Recognizer) or the
+ * OpenNLP POS tagger return their results in various kinds. This class helps
+ * to unify the different results and enable an unique way of accessing them.
  *
  * @author Kilian Thiel, University of Konstanz
  */
@@ -62,35 +61,18 @@ public class TaggedEntity {
 
     private String m_entity;
 
-    private String m_tagValue;
-
-    private String m_tagType;
-
-    private NamedEntityMatcher m_matcher;
+    private String m_tag;
 
     /**
-     * Creates a new instance of <code>TaggedEntity</code> with given entity (a term as string) and tag as string.
+     * Creates a new instance of <code>TaggedEntity</code> with given entity
+     * (a term as string) and tag as string.
      *
      * @param entity The term entity to set.
      * @param tagString The tag string to set.
      */
     public TaggedEntity(final String entity, final String tagString) {
-        this(entity, tagString, null, null);
-    }
-
-    /**
-     * @param entity
-     * @param tagString
-     * @param tagType
-     * @param matcher
-     * @since 3.6
-     */
-    public TaggedEntity(final String entity, final String tagString, final String tagType,
-        final NamedEntityMatcher matcher) {
         m_entity = entity;
-        m_tagValue = tagString;
-        m_tagType = tagType;
-        m_matcher = matcher;
+        m_tag = tagString;
     }
 
     /**
@@ -104,28 +86,7 @@ public class TaggedEntity {
      * @return the tag as string.
      */
     public String getTagString() {
-        return m_tagValue;
-    }
-
-    /**
-     * @since 3.6
-     */
-    public String getTagType() {
-        return m_tagValue;
-    }
-
-    /**
-     * @since 3.6
-     */
-    public Tag getTag() {
-        return new Tag(m_tagValue, m_tagType);
-    }
-
-    /**
-     * @since 3.6
-     */
-    public NamedEntityMatcher getMatcher() {
-        return m_matcher;
+        return m_tag;
     }
 
     /**
@@ -133,6 +94,6 @@ public class TaggedEntity {
      */
     @Override
     public String toString() {
-        return m_entity + "[" + m_tagValue + "]";
+        return m_entity + "[" + m_tag + "]";
     }
 }

@@ -82,28 +82,28 @@ final class IndexRange {
     /**
      * @return the startTermIndex
      */
-    public int getStartTermIndex() {
+    int getStartTermIndex() {
         return m_startTermIndex;
     }
 
     /**
      * @return the stopTermIndex
      */
-    public int getStopTermIndex() {
+    int getStopTermIndex() {
         return m_stopTermIndex;
     }
 
     /**
      * @return the startWordIndex
      */
-    public int getStartWordIndex() {
+    int getStartWordIndex() {
         return m_startWordIndex;
     }
 
     /**
      * @return the stopWordIndex
      */
-    public int getStopWordIndex() {
+    int getStopWordIndex() {
         return m_stopWordIndex;
     }
 

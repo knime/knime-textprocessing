@@ -55,13 +55,13 @@ import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.NamedEntityMatcher;
 
 /**
- * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a List of
- * {@link DocumentTaggerConfiguration}s. The configurations contain information about how the entity has to be tagged.
+ * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a Map of {@code Tag}s
+ * and {@code NamedEntityMatcher}. The map contains information about how the entity has to be found and tagged.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public final class MultipleTaggedEntity{
+public final class MultipleTaggedEntity {
 
     /**
      * The name of the entity.
@@ -69,32 +69,32 @@ public final class MultipleTaggedEntity{
     private final String m_entity;
 
     /**
-     * The list of {@code DocumentTaggerConfiguration}s containing all necessary properties for tagging.
+     * The map of containing all necessary properties for tagging.
      */
-    //private final List<DocumentTaggerConfiguration> m_configs;
-
-    private final Map<Tag, NamedEntityMatcher> m_matcher;
+    private final Map<Tag, NamedEntityMatcher> m_tagMatcherMap;
 
     /**
-     * Creates an new instance of {@code MultipleTaggedEntity} based on a given entity and initializes an empty list for
-     * {@link DocumentTaggerConfiguration}s.
+     * Creates an new instance of {@code MultipleTaggedEntity} based on a given entity and initializes an empty map for
+     * tag and matching behavior.
      *
      * @param entity The named entity.
      */
     public MultipleTaggedEntity(final String entity) {
         m_entity = entity;
-        //m_configs = new ArrayList<>();
-        m_matcher = new HashMap<>();
+        m_tagMatcherMap = new HashMap<>();
 
     }
 
     /**
-     * Adds a {@link DocumentTaggerConfiguration} to the current {@code MultipleTaggedEntity} instance.
+     * Adds a combination of a {@code Tag} and {@code NamedEntityMatcher} to the current {@code MultipleTaggedEntity}
+     * instance. The combination will later be used for looking up the entity within terms and applying the specific
+     * tag.
      *
-     * @param config The {@code DocumentTaggerConfiguration} to add.
+     * @param tag The tag to be used for tagging the entity.
+     * @param matcher The matcher to be used for finding the entity within terms.
      */
-    public final void addConfig(final Tag tag, final NamedEntityMatcher matcher) {
-        m_matcher.put(tag, matcher);
+    public final void addTagMatcherCombination(final Tag tag, final NamedEntityMatcher matcher) {
+        m_tagMatcherMap.put(tag, matcher);
     }
 
     /**
@@ -112,7 +112,7 @@ public final class MultipleTaggedEntity{
      *
      * @return Returns a list of {@code DocumentTaggerConfiguration}s.
      */
-    public final Map<Tag, NamedEntityMatcher> getTagMap() {
-        return m_matcher;
+    public final Map<Tag, NamedEntityMatcher> getTagMatcherMap() {
+        return m_tagMatcherMap;
     }
 }

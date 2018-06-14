@@ -136,9 +136,7 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
     protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
         //Validate configs with given data table
         m_config.validate(inData[DICT_TABLE_INDEX]);
-        if (m_config.getWarningMessage() != null) {
-            setWarningMessage(m_config.getWarningMessage());
-        }
+        m_config.getWarningMessage().ifPresent(warningMessage -> setWarningMessage(warningMessage));
     }
 
     /**

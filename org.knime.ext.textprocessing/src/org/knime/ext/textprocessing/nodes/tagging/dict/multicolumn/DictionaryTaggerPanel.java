@@ -111,10 +111,6 @@ class DictionaryTaggerPanel extends JPanel {
         m_settings = config;
         m_columnSpec = spec;
         final String colName = config.getColumnName();
-        boolean caseSensitive = config.getCaseSensitivityOption();
-        boolean exactMatch = config.getExactMatchOption();
-        String tagType = config.getTagType();
-        String tagValue = config.getTagValue();
 
         String labelName = colName.length() > MAX_LETTERS ? colName.substring(0, MAX_LETTERS) + "..." : colName;
 
@@ -132,7 +128,7 @@ class DictionaryTaggerPanel extends JPanel {
         exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(exactMatchChecker.isSelected()));
 
         final JComboBox<String> tagValueSelection = new JComboBox<>(
-            TagFactory.getInstance().getTagSetByType(tagType).asStringList().toArray(new String[0]));
+            TagFactory.getInstance().getTagSetByType(config.getTagType()).asStringList().toArray(new String[0]));
         tagValueSelection.setSelectedItem(config.getTagValue());
         tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)tagValueSelection.getSelectedItem()));
         tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());

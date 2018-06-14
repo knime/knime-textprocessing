@@ -148,8 +148,8 @@ public class DocumentTaggerConfiguration {
      * @param tagValue The tag value.
      *
      */
-    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch,
-        final String tagType, final String tagValue) {
+    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch, final String tagType,
+        final String tagValue) {
         setCaseSensitivityOption(caseSensitivity);
         setExactMatchOption(exactMatch);
         setTagType(tagType);
@@ -165,8 +165,7 @@ public class DocumentTaggerConfiguration {
      * @param tag The tag containing tag value and tag type.
      *
      */
-    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch,
-        final Tag tag) {
+    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch, final Tag tag) {
         this(caseSensitivity, exactMatch, tag.getTagType(), tag.getTagValue());
     }
 
@@ -278,24 +277,21 @@ public class DocumentTaggerConfiguration {
         try {
             setExactMatchOption(settings.getBoolean(CFGKEY_EXACTMATCH));
         } catch (InvalidSettingsException e) {
-            LOGGER.warn(
-                "Can't update exact match setting. Value has been set to default.");
+            LOGGER.warn("Can't update exact match setting. Value has been set to default.");
             setExactMatchOption(DEFAULT_EXACT_MATCH);
         }
 
         try {
             setTagType(settings.getString(CFGKEY_TAGTYPE));
         } catch (InvalidSettingsException e) {
-            LOGGER.warn(
-                "Can't update tag type setting. Value has been set to default.");
+            LOGGER.warn("Can't update tag type setting. Value has been set to default.");
             setTagType(DEFAULT_TAG_TYPE);
         }
 
         try {
             setTagValue(settings.getString(CFGKEY_TAGVALUE));
         } catch (InvalidSettingsException e) {
-            LOGGER.warn(
-                "Can't update tag type setting. Value has been set to default.");
+            LOGGER.warn("Can't update tag type setting. Value has been set to default.");
             setTagValue(DEFAULT_TAG_VALUE);
         }
     }
@@ -322,12 +318,9 @@ public class DocumentTaggerConfiguration {
      */
     public static DocumentTaggerConfiguration createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
-        boolean caseSensitive = settings.getBoolean(CFGKEY_CASESENSITIVE);
-        boolean exactMatch = settings.getBoolean(CFGKEY_EXACTMATCH);
-        String tagType = settings.getString(CFGKEY_TAGTYPE);
-        String tagValue = settings.getString(CFGKEY_TAGVALUE);
-
-        return new DocumentTaggerConfiguration(caseSensitive, exactMatch, tagType, tagValue);
+        return new DocumentTaggerConfiguration(settings.getBoolean(CFGKEY_CASESENSITIVE),
+            settings.getBoolean(CFGKEY_EXACTMATCH), settings.getString(CFGKEY_TAGTYPE),
+            settings.getString(CFGKEY_TAGVALUE));
     }
 
 }

@@ -207,10 +207,7 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      */
     public final static DictionaryTaggerConfiguration createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
-
-        String colName = settings.getString(CFGKEY_COLUMNNAME);
-
-        return new DictionaryTaggerConfiguration(colName,
+        return new DictionaryTaggerConfiguration(settings.getString(CFGKEY_COLUMNNAME),
             DocumentTaggerConfiguration.createFrom(settings), null);
     }
 }

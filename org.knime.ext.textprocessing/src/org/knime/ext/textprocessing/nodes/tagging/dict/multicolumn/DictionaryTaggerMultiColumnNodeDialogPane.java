@@ -387,7 +387,7 @@ class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 
         /** {@inheritDoc} */
         @Override
         public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
+            return DUMMY_PANEL.getPreferredSize();
         }
 
         /** {@inheritDoc} */

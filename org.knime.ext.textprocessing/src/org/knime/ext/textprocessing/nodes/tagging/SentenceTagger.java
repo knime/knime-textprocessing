@@ -68,5 +68,5 @@ public interface SentenceTagger {
      * @param sentence The sentence to be tagged.
      * @return Returns a list of {@link MultipleTaggedEntity}s containing entities as well as some tagging properties.
      */
-    public List<TaggedEntity> tagEntities(final Sentence sentence);
+    public List<MultipleTaggedEntity> tagEntities(final Sentence sentence);
 }
