@@ -162,7 +162,10 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         for (MultipleTaggedEntity entity : entities) {
             // build new term list with old term list, words of detected named
             // entities and entity tag.
-            termList = buildTermList(termList, entity);
+
+            Map<IndexRange, List<Tag>> rangesAndTags = findNe(termList, entity);
+
+            termList = buildTermList(termList, rangesAndTags);
         }
 
         return new Sentence(termList);
@@ -175,10 +178,8 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @param entity The entity to be tagged.
      * @return Returns a list of terms containing the newly tagged terms.
      */
-    private final List<Term> buildTermList(final List<Term> oldTermList, final MultipleTaggedEntity entity) {
-        // Won't this blow up if we have "a,b,a" as an entity and "ababab" as a
-        // sentence?
-        Map<IndexRange, List<Tag>> rangesAndTags = findNe(oldTermList, entity);
+    private final List<Term> buildTermList(final List<Term> oldTermList,
+        final Map<IndexRange, List<Tag>> rangesAndTags) {
 
         // if new list contains no entities to look up for return old list
         // so that no tag is assigned to empty entities.
@@ -423,8 +424,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                     String neStr = neWords.get(foundIndex);
 
                     // if ne element at "found" equals the current word
-                    if (foundIndex < numberOfNeWords
-                        && entry.getValue().matchWithWord(neStr, wordStr)) {
+                    if (foundIndex < numberOfNeWords && entry.getValue().matchWithWord(neStr, wordStr)) {
                         // if "found" 0 means we are at the beginning of the named
                         // entity
                         if (foundIndex == 0) {
@@ -461,7 +461,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                             wordIndex = wordIndex - numberOfMatches;
                         } else {
                             remainingWordsToGoBack = -(wordIndex - numberOfMatches + 1);
-                            termIndex = termIndex-2;
+                            termIndex = termIndex - 2;
                         }
                     }
                 }
