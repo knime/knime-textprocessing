@@ -48,10 +48,11 @@
 package org.knime.ext.textprocessing.nodes.tagging;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentBuilder;
@@ -61,6 +62,7 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
+import org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.NamedEntityMatcher;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
@@ -137,7 +139,6 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             }
             db.createNewSection(s.getAnnotation());
         }
-
         return db.createDocument();
     }
 
@@ -149,7 +150,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      */
     private final Sentence tagSentence(final Sentence s) {
         // detect named entities and return a list of MultipleTaggedEntities
-        final List<TaggedEntity> entities = m_sentenceTagger.tagEntities(s);
+        final List<MultipleTaggedEntity> entities = m_sentenceTagger.tagEntities(s);
         if (entities.isEmpty()) {
             return s;
         }
@@ -157,219 +158,315 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         // Collect words and terms
         List<Term> termList = s.getTerms();
 
-        //Map<String, Set<Tag>> occurringNamedEntities = new HashMap<>();
-        //occurringNamedEntities = getNeMap(occurringNamedEntities, termList);
-
         // go through all recognized named entities and rearrange terms
-        for (TaggedEntity entity : entities) {
+        for (MultipleTaggedEntity entity : entities) {
             // build new term list with old term list, words of detected named
             // entities and entity tag.
-            termList = buildNewTermList(termList, entity);
-            //occurringNamedEntities = getNeMap(occurringNamedEntities, termList);
+            termList = buildTermList(termList, entity);
         }
-
-        //termList = updateTermList(termList, occurringNamedEntities);
 
         return new Sentence(termList);
     }
 
-    private final List<Term> buildNewTermList(final List<Term> oldTermList, final TaggedEntity entity) {
-        // new term list that will be filled with terms to create new sentence
-        final List<Term> newTermList = new LinkedList<>();
+    /**
+     * Builds the term list with newly tagged entities.
+     *
+     * @param oldTermList The term list containing terms from the original document.
+     * @param entity The entity to be tagged.
+     * @return Returns a list of terms containing the newly tagged terms.
+     */
+    private final List<Term> buildTermList(final List<Term> oldTermList, final MultipleTaggedEntity entity) {
+        // Won't this blow up if we have "a,b,a" as an entity and "ababab" as a
+        // sentence?
+        Map<IndexRange, List<Tag>> rangesAndTags = findNe(oldTermList, entity);
 
-        // tokenized entity & number of tokenized entities
-        final List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
-        // number of tokenized entities
-        final int numberOfNeWords = neWords.size();
-
-        if (numberOfNeWords == 0) {
+        // if new list contains no entities to look up for return old list
+        // so that no tag is assigned to empty entities.
+        if (rangesAndTags.isEmpty()) {
             return oldTermList;
         }
 
-        //        // set of tag & matcher combinations for the specific entity
-        //        final Set<Map.Entry<Tag, NamedEntityMatcher>> tagMatcherSetEntrySet = entity.getTagMap().entrySet();
-        //        // number of combinations
-        //        final int numberOfTagMatcherEntries = tagMatcherSetEntrySet.size();
+        final List<Term> newTermList = new LinkedList<>();
 
-        // list of words used to create the term
-        final List<Word> newWords = new ArrayList<>();
-        // list of new tags for specific term
-        //        List<Tag> newTags = new ArrayList<>(numberOfTagMatcherEntries);
+        // list to save term representing named entity at.
+        List<Word> namedEntity = new ArrayList<>();
 
-        // list of indices; each position refers to one specific tag/matcher combination and indicates how many
-        // word matches we have in a row for this entity
-        int foundIndex = 0;
-        // list of booleans; each position refers to one specific tag/matcher combination and indicates
-        // if the last words matched
-        boolean foundFlag = false;
+        boolean endTerm = false;
 
-        // set true if a new term has been added
-        boolean newTermAdded = false;
-        // set true if two words matched
-        boolean wordFound = false;
+        // go through all the old term list
+        int termIndex = -1;
+        for (Term term : oldTermList) {
+            termIndex++;
 
-        List<Tag> newTags = new ArrayList<>();
+            int numberOfWords = term.getWords().size();
 
-        // iterate over terms
-        for (int termIndex = 0; termIndex < oldTermList.size(); termIndex++) {
-            // get words of term and numer of words
-            final List<Word> wordsOfTerm = oldTermList.get(termIndex).getWords();
-            final int numberOfWords = wordsOfTerm.size();
-            // get old tags of current term
-            final List<Tag> oldTags = oldTermList.get(termIndex).getTags();
-            // set true if we found multiple word matches but the following words didnt match, so the total named entity
-            // has not been found and we have to step back to previous terms!
-            boolean broke = false;
+            int entryIndex = 0;
+            boolean newTermAdded = false;
+            boolean newTermIsBuilt = false;
+            List<Tag> tags = new ArrayList<>(term.getTags());
+            int numberOfEntries = rangesAndTags.size();
+            for (Entry<IndexRange, List<Tag>> entry : rangesAndTags.entrySet()) {
+                // get tags for current index range
 
-            // iterate over the words of the term
-            for (int wordIndex = 0; wordIndex < numberOfWords; wordIndex++) {
-                // add the word to the new words list
-                newWords.add(wordsOfTerm.get(wordIndex));
-                // get the current word as string
-                String wordStr = wordsOfTerm.get(wordIndex).getWord();
+                List<Tag> newTags = entry.getValue();
+                // only add tag if not already added
+                for (Tag tag : newTags) {
+                    if (!tags.contains(tag)) {
+                        tags.add(tag);
+                    }
+                }
 
-                // get word from the named entity
-                String neStr = neWords.get(foundIndex);
+                Term newTerm = null;
 
-                // if named entity element at "foundIndex" equals the current word of the term
-                if (foundIndex < numberOfNeWords && entity.getMatcher().matchWithWord(neStr, wordStr)) {
-                    // set to true
-                    wordFound = true;
-                    // update foundIndex and foundFlag
-                    foundIndex++;
-                    foundFlag = true;
+                // if we reached the interesting terms containing the named
+                // entity
+                if (termIndex >= entry.getKey().getStartTermIndex() && termIndex <= entry.getKey().getStopTermIndex()) {
 
-                    // means we are at the end of the named entity
-                    if (foundIndex == numberOfNeWords) {
-                        // reset foundFlag and foundIndex
-                        foundFlag = false;
-                        foundIndex = 0;
+                    // detected a named entity consisting only of one term
+                    // check if it has to be split up
+                    if (entry.getKey().getStartTermIndex() == entry.getKey().getStopTermIndex()) {
 
-                        // add old tags to new tags if old word list and new word list are the same
-                        if (!oldTags.isEmpty() && wordListsMatch(wordsOfTerm, newWords)) {
-                            Set<Tag> setOfTags = new LinkedHashSet<>(oldTags);
-                            setOfTags.add(entity.getTag());
-                            newTags = new ArrayList<>(setOfTags);
-                        } else {
-                            newTags.add(entity.getTag());
+                        //
+                        // BUT does the term consist of one or more words ?
+                        // If it consists of more words, it has to be split up,
+                        // if it consists only of one word just add the tags.
+                        //
+
+                        // the old term consists only of one word, so just add a tag
+                        // By the way, this is the _only_ situation an old tag is
+                        // kept and also assigned to the new term.
+                        if (numberOfWords == 1) {
+                            // CREATE NEW TERM !!!
+                            newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
+                            newTermList.add(newTerm);
+                            // the old term consists of more than one word so split
+                            // it
+                        } else if (numberOfWords > 1) {
+                            List<Word> newWords = new ArrayList<>();
+
+                            int w = -1;
+                            for (Word word : term.getWords()) {
+                                w++;
+
+                                // add word if index matches
+                                if (w >= entry.getKey().getStartWordIndex() && w <= entry.getKey().getStopWordIndex()) {
+                                    newWords.add(word);
+
+                                    // if last word to add, create term and add it
+                                    // to new list
+                                    if (w == entry.getKey().getStopWordIndex()) {
+                                        // CREATE NEW TERM !!!
+                                        newTerm = new Term(newWords, newTags, m_setNeUnmodifiable);
+                                        newTermList.add(newTerm);
+                                        endTerm = true;
+                                    }
+
+                                    // if word is not part of the named entity add
+                                    // it as
+                                    // a term.
+                                } else {
+                                    List<Word> newWord = new ArrayList<>();
+                                    newWord.add(word);
+                                    tags = new ArrayList<>();
+                                    // CREATE NEW TERM !!!
+                                    newTerm = new Term(newWord, tags, false);
+                                    newTermList.add(newTerm);
+                                }
+                            }
                         }
-                        // add term to term list
-                        newTermList
-                            .add(new Term(new ArrayList<>(newWords), new ArrayList<>(newTags), m_setNeUnmodifiable));
-                        newTermAdded = true;
-                        // clear lists
-                        newWords.clear();
-                        newTags.clear();
 
-                    }
-                    // means that we had a match for the previous words but not for the whole entity
-                } else if (foundFlag) {
-                    // remove the words for the latest matches from the new word list
-                    for (int j = 0; j < foundIndex; j++) {
-                        newWords.remove(newWords.size() - 1);
-                    }
-                    // means we are at the end of tag/matcher entries
-                    // create term for remaining words and add to term list
-                    if (wordListsMatch(wordsOfTerm, newWords)) {
-                        newTermList.add(new Term(new ArrayList<>(newWords), oldTags, m_setNeUnmodifiable));
+                        // reset new named entity list and go to the next found
+                        // named entity range
+                        entryIndex++;
+                        if (entryIndex < numberOfEntries) {
+                            namedEntity.clear();
+                        }
+
+                        // entity consists of more than one term, so split it up.
                     } else {
-                        newTermList.add(new Term(new ArrayList<>(newWords), null, false));
+                        List<Word> words = term.getWords();
+
+                        int w = -1;
+                        for (Word word : words) {
+                            w++;
+
+                            // if current term is start term
+                            if (termIndex == entry.getKey().getStartTermIndex()) {
+                                // if word is part of the named entity add it
+                                if (w >= entry.getKey().getStartWordIndex()) {
+                                    namedEntity.add(word);
+                                    newTermIsBuilt = true;
+
+                                    // otherwise create a new term containing the
+                                    // word
+                                } else {
+                                    List<Word> newWord = new ArrayList<>();
+                                    newWord.add(word);
+                                    tags = new ArrayList<>();
+                                    // CREATE NEW TERM !!!
+                                    newTerm = new Term(newWord, newTags, false);
+                                    newTermList.add(newTerm);
+                                }
+
+                                // if current term is stop term
+                            } else if (termIndex == entry.getKey().getStopTermIndex()) {
+                                // add words as long as stopWordIndex is not reached
+                                if (w <= entry.getKey().getStartWordIndex()) {
+                                    namedEntity.add(word);
+
+                                    // if last word is reached, create term and
+                                    // add it
+                                    if (w == entry.getKey().getStopWordIndex()) {
+                                        // CREATE NEW TERM !!!
+                                        newTerm = new Term(namedEntity, newTags, m_setNeUnmodifiable);
+                                        newTermList.add(newTerm);
+                                    }
+
+                                    // otherwise create a term for each word
+                                } else {
+                                    List<Word> newWord = new ArrayList<>();
+                                    newWord.add(word);
+                                    tags = new ArrayList<>();
+                                    // CREATE NEW TERM !!!
+                                    newTerm = new Term(newWord, tags, false);
+                                    newTermList.add(newTerm);
+                                }
+
+                                // if we are in between the start term and the stop
+                                // term just add all words to the new word list
+                            } else if (termIndex > entry.getKey().getStartTermIndex()
+                                && termIndex < entry.getKey().getStopTermIndex()) {
+                                namedEntity.add(word);
+                                newTermIsBuilt = true;
+                            }
+                        }
+                        if (endTerm) {
+                            // next found term range
+                            endTerm = false;
+                            entryIndex++;
+                            if (entryIndex < numberOfEntries) {
+                                namedEntity.clear();
+                            }
+                        }
                     }
+                }
+                if (newTerm != null) {
+                    newTerm = null;
                     newTermAdded = true;
-                    newWords.clear();
-
-                    // step back termIndex if we have to
-                    if (wordIndex - foundIndex < -1) {
-                        termIndex = termIndex - (-(wordIndex - foundIndex));
-                        foundFlag = false;
-                        foundIndex = 0;
-                        newTermAdded = false;
-                        // break, since we have to step back in term index
-                        broke = true;
-                        break;
-                        // or step back in wordIndex
-                    } else {
-                        wordIndex = wordIndex - foundIndex;
-                        foundFlag = false;
-                        foundIndex = 0;
-                    }
-
-                }
-                // means we are at the end of words and at the end of tag/matcher entries
-                // and there was no match at all
-                if (wordIndex == numberOfWords - 1 && !newTermAdded && !wordFound) {
-                    // create term from words
-                    if (wordListsMatch(wordsOfTerm, newWords)) {
-                        newTermList.add(new Term(new ArrayList<>(newWords), oldTags, m_setNeUnmodifiable));
-                    } else {
-                        newTermList.add(new Term(new ArrayList<>(newWords), null, false));
-                    }
-                    newTermAdded = true;
-                    newWords.clear();
-                }
-                // means we are at the end of tag/matcher entries and added a new term
-                // reset values
-                if (newTermAdded) {
-                    newTermAdded = false;
-                    wordFound = false;
-                }
-                // break again to get to the term loop if we broke before
-                if (broke) {
-                    break;
                 }
             }
+            if (!newTermAdded && !newTermIsBuilt) {
+                // if we are before or after the interesting part just add the
+                // terms without rearrangement
+                newTermList.add(term);
+            }
         }
-
         return newTermList;
     }
 
-    private boolean wordListsMatch(final List<Word> list1, final List<Word> list2) {
-        if (list1.size() != list2.size()) {
-            return false;
+    /**
+     * Finds named entities within a list of terms.
+     *
+     * @param sentence List of terms built from original sentence.
+     * @param entity The {@code MultipleTaggedEntity} containing the name of the entity and properties how it has to be
+     *            tagged.
+     * @return Returns a map containing IndexRanges (location of found entities) and a list of
+     *         {@code DocumentTaggerConfiguration}s containing properties for how the entity has to be tagged.
+     */
+    private final Map<IndexRange, List<Tag>> findNe(final List<Term> sentence, final MultipleTaggedEntity entity) {
+        Map<IndexRange, List<Tag>> rangesAndTags = new LinkedHashMap<>();
+
+        int startTermIndex = -1;
+        int stopTermIndex = -1;
+        int startWordIndex = -1;
+        int stopWordIndex = -1;
+
+        // named entity can contain one or more words, so they have to be
+        // tokenized by the default tokenizer to create words out of them.
+        List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
+        int numberOfNeWords = neWords.size();
+
+        if (neWords.isEmpty()) {
+            return rangesAndTags;
         }
-        for (int i = 0; i < list1.size(); i++) {
-            if (!list1.get(i).getWord().equals(list2.get(i).getWord())) {
-                return false;
+
+        // search words of terms
+        for (Entry<Tag, NamedEntityMatcher> entry : entity.getTagMatcherMap().entrySet()) {
+
+            int foundIndex = 0;
+            boolean foundFlag = false;
+            int remainingWordsToGoBack = 0;
+            boolean stepBack = false;
+
+            // search all terms
+            for (int termIndex = 0; termIndex < sentence.size(); termIndex++) {
+                List<Word> wordsOfTerm = sentence.get(termIndex).getWords();
+                int numberOfWords = wordsOfTerm.size();
+                int wordsToGoForward = 0;
+
+                if (stepBack) {
+                    if (remainingWordsToGoBack - numberOfWords > 1) {
+                        remainingWordsToGoBack = remainingWordsToGoBack - numberOfWords;
+                        termIndex = termIndex - 2;
+                        continue;
+                    } else if (numberOfWords - remainingWordsToGoBack > 1) {
+                        wordsToGoForward = numberOfWords - remainingWordsToGoBack;
+                        remainingWordsToGoBack = 0;
+                    }
+                }
+
+                for (int wordIndex = 0 + wordsToGoForward; wordIndex < numberOfWords; wordIndex++) {
+
+                    // prepare word and ne for comparison (convert to lower case
+                    // if case sensitivity is switched off)
+                    String wordStr = wordsOfTerm.get(wordIndex).getWord();
+                    String neStr = neWords.get(foundIndex);
+
+                    // if ne element at "found" equals the current word
+                    if (foundIndex < numberOfNeWords
+                        && entry.getValue().matchWithWord(neStr, wordStr)) {
+                        // if "found" 0 means we are at the beginning of the named
+                        // entity
+                        if (foundIndex == 0) {
+                            startTermIndex = termIndex;
+                            startWordIndex = wordIndex;
+                        }
+
+                        foundIndex++;
+                        foundFlag = true;
+
+                        // means we are at the end of the named entity
+                        if (foundIndex == numberOfNeWords) {
+                            stopTermIndex = termIndex;
+                            stopWordIndex = wordIndex;
+
+                            IndexRange indexRange =
+                                new IndexRange(startTermIndex, stopTermIndex, startWordIndex, stopWordIndex);
+                            List<Tag> tags = new ArrayList<>();
+                            if (rangesAndTags.containsKey(indexRange)) {
+                                tags = rangesAndTags.get(indexRange);
+                            }
+                            tags.add(entry.getKey());
+                            rangesAndTags.put(indexRange, tags);
+                            foundFlag = false;
+                            foundIndex = 0;
+                        }
+                    } else if (foundFlag) {
+                        int numberOfMatches = foundIndex;
+                        foundIndex = 0;
+                        foundFlag = false;
+                        stepBack = true;
+                        boolean stepBackTerms = (wordIndex - numberOfMatches < -1);
+                        if (!stepBackTerms) {
+                            wordIndex = wordIndex - numberOfMatches;
+                        } else {
+                            remainingWordsToGoBack = -(wordIndex - numberOfMatches + 1);
+                            termIndex = termIndex-2;
+                        }
+                    }
+                }
             }
         }
-        return true;
+        return rangesAndTags;
     }
-
-//    private Map<String, Set<Tag>> getNeMap(final Map<String, Set<Tag>> occurringNamedEntities,
-//        final List<Term> termList) {
-//        Map<String, Set<Tag>> neMap = occurringNamedEntities;
-//        for (Term term : termList) {
-//            if (!term.getTags().isEmpty()) {
-//                String termAsString = term.getText();
-//                List<Tag> tags = term.getTags();
-//                Set<Tag> setOfTags = new HashSet<>();
-//                if (neMap.containsKey(termAsString)) {
-//                    setOfTags = neMap.get(termAsString);
-//                }
-//                setOfTags.addAll(tags);
-//                neMap.put(termAsString, setOfTags);
-//            }
-//        }
-//        return neMap;
-//    }
-//
-//    /**
-//     * @param newTermList
-//     * @param occurringNamedEntities
-//     */
-//    private List<Term> updateTermList(final List<Term> termList, final Map<String, Set<Tag>> occurringNamedEntities) {
-//        List<Term> newTermList = new ArrayList<>();
-//        Term newTerm = null;
-//        for (Term term : termList) {
-//            String termAsString = term.getText();
-//            if (occurringNamedEntities.containsKey(termAsString)) {
-//                newTerm = new Term(term.getWords(), new ArrayList<>(occurringNamedEntities.get(termAsString)),
-//                    m_setNeUnmodifiable);
-//                newTermList.add(newTerm);
-//            } else {
-//                newTermList.add(term);
-//            }
-//        }
-//        return newTermList;
-//    }
 }
