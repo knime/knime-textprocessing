@@ -11,7 +11,11 @@
             and assigns a specified tag value and type. Optionally, the 
             recognized named entity terms can be set unmodifiable, meaning that 
             the terms are not modified or filtered afterwards by any following 
-            node. 
+            node.
+            If the same entity is contained in different dictionaries, it will be tagged for every fitting configuration.
+            For example: The document contains the term London and London is also contained in three different dictionaries, 
+            it will be tagged with all three tags that have been set for the specific dictionaries.
+            This tagger also keeps all tags of terms that occur in the documents of the input data table.  
         </intro>
         <tab name="General Options">
         <option name="Document column">
