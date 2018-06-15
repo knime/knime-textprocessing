@@ -50,7 +50,9 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,7 +70,7 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-class MultipleDictionaryTaggerConfiguration {
+final class MultipleDictionaryTaggerConfiguration {
 
     /**
      * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries used for
@@ -77,16 +79,9 @@ class MultipleDictionaryTaggerConfiguration {
     private final List<DictionaryTaggerConfiguration> m_configs = new ArrayList<>();
 
     /**
-     * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries coming from
-     * columns that are available in the DataTableSpec.
+     * Map of {@code DictionaryTaggerConfiguration}s and a set of entities belonging to the specific configuration.
      */
-    private final List<DictionaryTaggerConfiguration> m_validConfigs = new ArrayList<>();
-
-    /**
-     * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries coming from
-     * columns that are not available in the DataTableSpec.
-     */
-    private final List<DictionaryTaggerConfiguration> m_invalidConfigs = new ArrayList<>();
+    private final Map<DictionaryTaggerConfiguration, Set<String>> m_columnsToDictionaries = new LinkedHashMap<>();
 
     /**
      * Warning message which is shown, if there are columns selected in the dialog that are not in the DataTableSpec
@@ -126,26 +121,28 @@ class MultipleDictionaryTaggerConfiguration {
      */
     final void validate(final BufferedDataTable inData) {
         m_warningMessage = null;
-        m_validConfigs.clear();
-        m_invalidConfigs.clear();
+        m_columnsToDictionaries.clear();
         List<String> invalidColumns = new ArrayList<>();
-        for (DictionaryTaggerConfiguration config : m_configs) {
-            config.setEntities(null);
-            final int dictIndex = inData.getDataTableSpec().findColumnIndex(config.getColumnName());
-            if (dictIndex >= 0) {
-                Set<String> dictionary = new HashSet<>();
-                for (DataRow row : inData) {
+
+        for (DataRow row : inData) {
+            for (DictionaryTaggerConfiguration config : m_configs) {
+                final int dictIndex = inData.getDataTableSpec().findColumnIndex(config.getColumnName());
+                if (dictIndex >= 0) {
                     if (!row.getCell(dictIndex).isMissing()) {
-                        dictionary.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+                        Set<String> entities = m_columnsToDictionaries.remove(config);
+                        if (entities == null) {
+                            entities = new HashSet<>();
+                        }
+                        entities.add(((StringValue)row.getCell(dictIndex)).getStringValue());
+                        m_columnsToDictionaries.put(config, entities);
                     }
+                } else {
+                    invalidColumns.add(config.getColumnName());
                 }
-                config.setEntities(dictionary);
-                m_validConfigs.add(config);
-            } else {
-                m_invalidConfigs.add(config);
-                invalidColumns.add(config.getColumnName());
+
             }
         }
+
         if (!invalidColumns.isEmpty()) {
             m_warningMessage = "Could not find dictionary column(s) " + invalidColumns.toString() + " in input table.";
         }
@@ -157,25 +154,15 @@ class MultipleDictionaryTaggerConfiguration {
      *
      * @return Returns valid configurations.
      */
-    final List<DictionaryTaggerConfiguration> getValidConfigs() {
-        return m_validConfigs;
-    }
-
-    /**
-     * Returns list of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries coming
-     * from columns that are not available in the DataTableSpec anymore.
-     *
-     * @return Returns invalid configurations.
-     */
-    final List<DictionaryTaggerConfiguration> getInvalidConfigs() {
-        return m_invalidConfigs;
+    final Map<DictionaryTaggerConfiguration, Set<String>> getConfigsAndDicts() {
+        return m_columnsToDictionaries;
     }
 
     /**
      * Returns the warning message which is shown, if there are columns selected in the dialog that are not in the
      * DataTableSpec anymore.
      *
-     * @return The warning message.
+     * @return An {@code Optional} containing the warning message or {@code null} if no warning message is present.
      */
     final Optional<String> getWarningMessage() {
         return Optional.ofNullable(m_warningMessage);

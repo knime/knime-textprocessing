@@ -48,9 +48,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
@@ -64,7 +61,7 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
+final class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
     /**
      * Node logger for this class.
@@ -77,11 +74,6 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
     private static final String CFGKEY_COLUMNNAME = "ColumnName";
 
     /**
-     * Set to store the entities (dictionary).
-     */
-    private Set<String> m_entities;
-
-    /**
      * The name of the column containing the dictionary.
      */
     private String m_columnName;
@@ -90,60 +82,39 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on a {@link DocumentTaggerConfiguration} and a
      * set of entities.
      *
+     * @param colName The name of the the column containing the named entities to tag.
      * @param config The {@code DocumentTaggerConfiguration} to create the {@code DictionaryTaggerConfiguration}.
-     * @param entities A set of entities.
      */
-    private DictionaryTaggerConfiguration(final String colName, final DocumentTaggerConfiguration config,
-        final Set<String> entities) {
+    private DictionaryTaggerConfiguration(final String colName, final DocumentTaggerConfiguration config) {
         this(colName, config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTagType(),
-            config.getTagValue(), entities);
+            config.getTagValue());
     }
 
     /**
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on a column name, values for the case
      * sensitivity and exact match flag, the tag type and tag value and as well the set of entities.
      *
-     * @param colName The column name.
+     * @param colName colName The name of the the column containing the named entities to tag.
      * @param caseSensitivity Set {@code true} for case sensitive matching.
      * @param exactMatch Set {@code true} for exact matching.
      * @param tagType The tag type to set.
      * @param tagValue The tag value to set.
-     * @param entities The set of entities used for tagging.
      */
     DictionaryTaggerConfiguration(final String colName, final boolean caseSensitivity, final boolean exactMatch,
-        final String tagType, final String tagValue, final Set<String> entities) {
+        final String tagType, final String tagValue) {
         super(caseSensitivity, exactMatch, tagType, tagValue);
 
         setColumnName(colName);
-        setEntities(entities);
     }
 
     /**
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on column name. Tagger parameters will be set
      * to their default values. Entities will be set to null.
      *
-     * @param colName The column name.
+     * @param colName colName The name of the the column containing the named entities to tag.
      */
     DictionaryTaggerConfiguration(final String colName) {
-        this(colName, new DocumentTaggerConfiguration(), null);
-    }
-
-    /**
-     * Sets a set of entities as dictionary.
-     *
-     * @param entities The set of entities to set.
-     */
-    final void setEntities(final Set<String> entities) {
-        m_entities = entities;
-    }
-
-    /**
-     * Returns the set of entities used for tagging.
-     *
-     * @return Returns the set of entities.
-     */
-    final Set<String> getEntities() {
-        return Collections.unmodifiableSet(m_entities);
+        this(colName, new DocumentTaggerConfiguration());
     }
 
     /**
@@ -205,9 +176,9 @@ class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
      * @throws InvalidSettingsException If settings could not be retrieved.
      * @return Returns an instance of {@code DictionaryTaggerConfiguration}.
      */
-    public final static DictionaryTaggerConfiguration createFrom(final NodeSettingsRO settings)
+    public static final DictionaryTaggerConfiguration createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
         return new DictionaryTaggerConfiguration(settings.getString(CFGKEY_COLUMNNAME),
-            DocumentTaggerConfiguration.createFrom(settings), null);
+            DocumentTaggerConfiguration.createFrom(settings));
     }
 }

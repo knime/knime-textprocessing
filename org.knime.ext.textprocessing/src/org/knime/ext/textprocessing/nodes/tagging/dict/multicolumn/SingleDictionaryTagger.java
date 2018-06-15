@@ -44,73 +44,88 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 25, 2018 (Julian Bunzel): created
+ *   Jun 15, 2018 (julian): created
  */
-package org.knime.ext.textprocessing.nodes.tagging;
+package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import org.knime.ext.textprocessing.data.Tag;
+import org.knime.ext.textprocessing.nodes.tagging.NamedEntityMatcher;
 
 /**
- * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a Map of {@code Tag}s
- * and {@code NamedEntityMatcher}. The map contains information about how the entity has to be found and tagged.
+ * The {@code SingleDictionaryTagger} contains the {@code Tag} and dictionary used for tagging and a
+ * {@code NamedEntityMatcher} which provides matching behavior (case sensitive and exact matching).
  *
- * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.6
  */
-public final class MultipleTaggedEntity {
+final class SingleDictionaryTagger {
 
     /**
-     * The name of the entity.
+     * A set of entities.
      */
-    private final String m_entity;
+    private Set<String> m_entities;
 
     /**
-     * The map of containing all necessary properties for tagging.
+     * The {@code NamedEntityMatcher} used for word matching.
      */
-    private final Map<Tag, NamedEntityMatcher> m_tagMatcherMap;
+    private NamedEntityMatcher m_matcher;
 
     /**
-     * Creates an new instance of {@code MultipleTaggedEntity} based on a given entity and initializes an empty map for
-     * tag and matching behavior.
+     * The {@code Tag} to be used.
+     */
+    private Tag m_tag;
+
+    /**
+     * Creates a new instance of {@code SingleDictionaryTagger}.
      *
-     * @param entity The named entity.
+     * @param caseSensitivity The case sensitivity behavior.
+     * @param exactMatch The exact matching behavior.
+     * @param entities A set of entities.
      */
-    public MultipleTaggedEntity(final String entity) {
-        m_entity = entity;
-        m_tagMatcherMap = new HashMap<>();
+    SingleDictionaryTagger(final boolean caseSensitivity, final boolean exactMatch, final Tag tag,
+        final Set<String> entities) {
+        m_entities = entities;
+        m_tag = tag;
+        m_matcher = new NamedEntityMatcher(caseSensitivity, exactMatch);
     }
 
     /**
-     * Adds a combination of a {@code Tag} and {@code NamedEntityMatcher} to the current {@code MultipleTaggedEntity}
-     * instance. The combination will later be used for looking up the entity within terms and applying the specific
-     * tag.
+     * Creates a new instance of {@code SingleDictionaryTagger}.
      *
-     * @param tag The tag to be used for tagging the entity.
-     * @param matcher The matcher to be used for finding the entity within terms.
+     * @param config The {@code DictionaryTaggerConfiguration}.
+     * @param entities A set of entities.
      */
-    public final void addTagMatcherCombination(final Tag tag, final NamedEntityMatcher matcher) {
-        m_tagMatcherMap.put(tag, matcher);
+    SingleDictionaryTagger(final DictionaryTaggerConfiguration config, final Set<String> entities) {
+        this(config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTag(), entities);
     }
 
     /**
-     * Returns the entity as a String.
+     * Returns the set of entities used for tagging.
      *
-     * @return Returns the entity as a String.
+     * @return Returns a set of entities used for tagging.
      */
-    public final String getEntity() {
-        return m_entity;
+    Set<String> getEntities() {
+        return m_entities;
     }
 
     /**
-     * Returns a map of {@code Tags} and the specific {@code NamedEntityMatcher} that is used to find the entity within
-     * a sentence or word.
+     * Returns the {@code NamedEntityMatcher} used to for word matching.
      *
-     * @return Returns a map of {@code Tags} and {@code NamedEntityMatcher}.
+     * @return Returns the {@code NamedEntityMatcher} used to for word matching.
      */
-    public final Map<Tag, NamedEntityMatcher> getTagMatcherMap() {
-        return m_tagMatcherMap;
+    NamedEntityMatcher getMatcher() {
+        return m_matcher;
     }
+
+    /**
+     * Returns the {@code Tag} to be used.
+     *
+     * @return The tag.
+     */
+    Tag getTag() {
+        return m_tag;
+    }
+
 }

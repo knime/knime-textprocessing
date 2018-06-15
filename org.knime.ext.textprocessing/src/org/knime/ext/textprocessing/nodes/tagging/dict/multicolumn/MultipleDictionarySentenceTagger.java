@@ -49,11 +49,14 @@
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.MultipleTaggedEntity;
+import org.knime.ext.textprocessing.nodes.tagging.NamedEntityMatcher;
 import org.knime.ext.textprocessing.nodes.tagging.SentenceTagger;
 
 /**
@@ -64,20 +67,18 @@ import org.knime.ext.textprocessing.nodes.tagging.SentenceTagger;
 final class MultipleDictionarySentenceTagger implements SentenceTagger {
 
     /**
-     * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries used for
-     * tagging.
+     * Array of {@link SingleDictionaryTagger SingleDictionaryTaggers}.
      */
-    private List<DictionaryTaggerConfiguration> m_configs;
+    private final List<SingleDictionaryTagger> m_singleTagger;
 
     /**
-     * Creates a new instance of {@code MultipleDictionarySentenceTagger} which is used to tag {@code Sentence}s of
-     * {@code Document}s based on multiple dictionaries.
+     * Creates and returns a new instance of {@code MultipleDictionarySentenceTagger} which is build from a list of
+     * several {@link SingleDictionaryTagger SingleDictionaryTaggers}.
      *
-     * @param namedEntityFinder List of {@code DictionaryTaggerConfiguration} containing configurations for all
-     *            dictionaries.
+     * @param singleTagger The list of {@code SingleDictionaryTagger}.
      */
-    MultipleDictionarySentenceTagger(final List<DictionaryTaggerConfiguration> configs) {
-        m_configs = configs;
+    MultipleDictionarySentenceTagger(final List<SingleDictionaryTagger> singleTagger) {
+        m_singleTagger = singleTagger;
     }
 
     /**
@@ -85,50 +86,39 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
      */
     @Override
     public List<MultipleTaggedEntity> tagEntities(final Sentence sentence) {
-        List<MultipleTaggedEntity> foundEntities = new ArrayList<>();
+        Map<String, MultipleTaggedEntity> foundEntities = new LinkedHashMap<>();
 
         final String origSentenceStr = sentence.getText();
 
-        for (DictionaryTaggerConfiguration config : m_configs) {
-            for (String entity : config.getEntities()) {
-                NamedEntityMatcher matcher =
-                    new NamedEntityMatcher(config.getCaseSensitivityOption(), config.getExactMatchOption());
-                if (matcher.matchWithSentence(entity, origSentenceStr)) {
-                    addToListAndCheckOccurrence(entity, config.getTag(), matcher, foundEntities);
+        for (SingleDictionaryTagger singleTagger : m_singleTagger) {
+            for (String entity : singleTagger.getEntities()) {
+                if (singleTagger.getMatcher().matchWithSentence(entity, origSentenceStr)) {
+                    addToListAndCheckOccurrence(entity, singleTagger.getTag(), singleTagger.getMatcher(),
+                        foundEntities);
                 }
             }
         }
-
-        return foundEntities;
+        return new ArrayList<>(foundEntities.values());
     }
 
     /**
      * This method checks if the list of {@code MultipleTaggedEntity}s already contains the entity. If it is the case,
      * this method adds a new combination of {@code Tag} and {@code NamedEntityMatcher} to the specific
-     * MultipleTaggedEntity.
+     * MultipleTaggedEntity, otherwise creates a new.
      *
      * @param entity The found entity as String.
      * @param tag The tag to be used for tagging the entity.
      * @param matcher The matcher to be used for matching the entity with a word.
-     * @param mtes The list of entities.
-     * @return The updated list of entities.
+     * @param mtes The map of entities to their {@code MultipleTaggedEntity}.
      */
-    private List<MultipleTaggedEntity> addToListAndCheckOccurrence(final String entity, final Tag tag,
-        final NamedEntityMatcher matcher, final List<MultipleTaggedEntity> mtes) {
-        MultipleTaggedEntity mte = null;
-        for (int i = 0; i < mtes.size(); i++) {
-            if (entity.equals(mtes.get(i).getEntity())) {
-                mte = mtes.get(i);
-                mtes.remove(i);
-                break;
-            }
-        }
+    private void addToListAndCheckOccurrence(final String entity, final Tag tag, final NamedEntityMatcher matcher,
+        final Map<String, MultipleTaggedEntity> mtes) {
+        MultipleTaggedEntity mte = mtes.remove(entity);
         if (mte == null) {
             mte = new MultipleTaggedEntity(entity);
         }
         mte.addTagMatcherCombination(tag, matcher);
-        mtes.add(mte);
-        return mtes;
+        mtes.put(entity, mte);
     }
 
 }

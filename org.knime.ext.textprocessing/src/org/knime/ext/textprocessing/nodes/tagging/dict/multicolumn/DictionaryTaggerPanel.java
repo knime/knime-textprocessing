@@ -73,7 +73,7 @@ import org.knime.ext.textprocessing.data.TagFactory;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-class DictionaryTaggerPanel extends JPanel {
+final class DictionaryTaggerPanel extends JPanel {
 
     /**
      * Serial version uid.

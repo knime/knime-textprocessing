@@ -46,7 +46,7 @@
  * History
  *   Jun 6, 2018 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
-package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
+package org.knime.ext.textprocessing.nodes.tagging;
 
 /**
  * This class provides methods to match an entity with a sentence or another entity based on predefined case sensitivity
@@ -73,7 +73,6 @@ public class NamedEntityMatcher {
      *
      * @param caseSensitivity The case sensitivity behavior.
      * @param exactMatch The exact match behavior.
-     *
      */
     public NamedEntityMatcher(final boolean caseSensitivity, final boolean exactMatch) {
         m_caseSensitivity = caseSensitivity;

@@ -95,7 +95,7 @@ import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSet
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 {
+final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettingsPane2 {
 
     /**
      * Dummy panel to have a reference preferred size for the {@code IndividualsPanel.}

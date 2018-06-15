@@ -47,6 +47,11 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -68,7 +73,7 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.6
  */
-class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
+final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
 
     /**
      * Config identifier for the NodeSettings object contained in the NodeSettings which contains the settings.
@@ -89,6 +94,11 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      * Contains settings for each individual column.
      */
     private MultipleDictionaryTaggerConfiguration m_config;
+
+    /**
+     * List of {@code SingleDictionaryTagger}.
+     */
+    private List<SingleDictionaryTagger> m_tagger = new ArrayList<>();
 
     /**
      * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
@@ -121,8 +131,15 @@ class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        return new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(),
-            new MultipleDictionarySentenceTagger(m_config.getValidConfigs()), getTokenizerName());
+        assert m_tagger.isEmpty();
+        for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_config.getConfigsAndDicts().entrySet()) {
+            m_tagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
+        }
+        MultipleTagsetDocumentTagger docTagger =
+            new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(),
+                new MultipleDictionarySentenceTagger(new ArrayList<>(m_tagger)), getTokenizerName());
+        m_tagger.clear();
+        return docTagger;
     }
 
     /**
