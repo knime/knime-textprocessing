@@ -164,12 +164,8 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         // go through all recognized named entities and rearrange terms
         for (MultipleTaggedEntity entity : entities) {
             // find index ranges for every entity as well as the tags that should be used for the index range
-            Map<IndexRange, List<Tag>> rangesAndTags = findNe(termList, entity);
-
             // build a new rearranged term list based on every index range
-            for (Map.Entry<IndexRange, List<Tag>> rangeAndTags : rangesAndTags.entrySet()) {
-                termList = buildTermList(termList, rangeAndTags);
-            }
+            termList = buildTermList(termList, findNe(termList, entity));
         }
 
         // merge tags from initial term list to the new term list and return it
@@ -182,7 +178,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @param initialTerms The previous term list.
      * @param newTerms The new term list.
      */
-    private Sentence mergeTermLists(final List<Term> initialTerms, final List<Term> newTerms) {
+    private static Sentence mergeTermLists(final List<Term> initialTerms, final List<Term> newTerms) {
         final ArrayList<Term> mergedTerms = new ArrayList<Term>(newTerms.size());
 
         int prevInitWordCnt = -1;
@@ -225,7 +221,8 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @param mergedTerms List of merged terms {code Term}s.
      * @param termIndex The index of the term to be merged.
      */
-    private void mergeTerms(final List<Term> initialTerms, final ArrayList<Term> mergedTerms, final int termIndex) {
+    private static void mergeTerms(final List<Term> initialTerms, final ArrayList<Term> mergedTerms,
+        final int termIndex) {
         final Term t = mergedTerms.remove(mergedTerms.size() - 1);
         List<Tag> tags = new ArrayList<Tag>(t.getTags());
         // only add tag if not already added
@@ -237,123 +234,131 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             }
         }
         // CREATE NEW TERM !!!
-        mergedTerms.add(new Term(t.getWords(), tags, m_setNeUnmodifiable));
+        mergedTerms.add(new Term(t.getWords(), tags, t.isUnmodifiable()));
     }
 
-    /**
-     * Builds the term list with newly tagged entities.
-     *
-     * @param oldTermList The term list containing terms from the original document.
-     * @param entry A map entry containing the an index range and a list of tags that should be applied to the index
-     *            range.
-     * @return Returns a list of terms containing the newly tagged terms.
-     */
-    private final List<Term> buildTermList(final List<Term> oldTermList, final Map.Entry<IndexRange, List<Tag>> entry) {
 
-        final List<Term> newTermList = new LinkedList<>();
 
-        // get the start and stop indices from the index range
-        final int startTermIndex = entry.getKey().getStartTermIndex();
-        final int stopTermIndex = entry.getKey().getStopTermIndex();
-        final int startWordIndex = entry.getKey().getStartWordIndex();
-        final int stopWordIndex = entry.getKey().getStopWordIndex();
+    // TODO: UPDATE JAVADOC
+     /**
+      * Builds the term list with newly tagged entities.
+      *
+      * @param oldTermList The term list containing terms from the original document.
+      * @param map A map entry containing the an index range and a list of tags that should be applied to the index
+      *            range.
+      * @return Returns a list of terms containing the newly tagged terms.
+      */
+     private final List<Term> buildTermList(final List<Term> oldTermList,
+         final LinkedHashMap<IndexRange, List<Tag>> map) {
 
-        // list to save term representing named entity at.
-        final List<Word> namedEntity = new ArrayList<>();
+         if (map.isEmpty()) {
+             return oldTermList;
+         }
 
-        // go through all terms of old term list
-        int t = -1;
-        for (Term term : oldTermList) {
-            t++;
+         final List<Term> newTermList = new LinkedList<>();
+         final List<Word> namedEntity = new ArrayList<>();
+         IndexRange range;
+         // go through all terms of old term list
+         int termIdx = 0;
 
-            if (t < startTermIndex || t > stopTermIndex) {
-                // if we are before or after the interesting part just add the
-                // terms without rearrangement
-                newTermList.add(term);
-            } else {
-                // we have found the interesting term
+         for (Entry<IndexRange, List<Tag>> entry : map.entrySet()) {
+             // get the start and stop indices from the index range
+             range = entry.getKey();
+             int startTermIndex = range.getStartTermIndex();
+             int stopTermIndex = range.getStopTermIndex();
+             int startWordIndex = range.getStartWordIndex();
+             int stopWordIndex = range.getStopWordIndex();
+             while (termIdx < startTermIndex) {
+                 newTermList.add(oldTermList.get(termIdx));
+                 termIdx++;
+             }
+             if (startTermIndex == stopTermIndex) {
+                 final Term term = oldTermList.get(termIdx);
+                 if (term.getWords().size() - 1 == stopWordIndex - startWordIndex) {
+                     List<Tag> tags = new ArrayList<>();
+                     tags.addAll(term.getTags());
+                     // only add tag if not already added
+                     List<Tag> newTags = entry.getValue();
+                     for (Tag ct : newTags) {
+                         if (!tags.contains(ct)) {
+                             tags.add(ct);
+                         }
+                     }
+                     // CREATE NEW TERM !!!
+                     Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
+                     newTermList.add(newTerm);
+                 } else {
+                     // our term contains only a subset of the words
+                     // so we have to split it into several terms
 
-                // easy case start = end
-                if (startTermIndex == stopTermIndex) {
+                     List<Word> newWords = new ArrayList<>();
+                     int w = -1;
+                     for (Word word : term.getWords()) {
+                         w++;
+                         // if we are outside our range
+                         if (w < startWordIndex || w > stopWordIndex) {
+                             createSingleWordTerm(newTermList, word);
+                         } else {
+                             newWords.add(word);
+                             // if last word to add, create term and add it
+                             // to new list
+                             if (w == stopWordIndex) {
+                                 createMultiWordTerm(entry, newTermList, newWords);
+                             }
+                         }
+                     }
+                 }
+                 ++termIdx;
+             }
+             while (termIdx <= stopTermIndex) {
+                 final Term term = oldTermList.get(termIdx);
+                 // entity consists of more than one term, so split it up.
+                 List<Word> words = term.getWords();
+                 int w = -1;
+                 for (Word word : words) {
+                     w++;
+                     // if current term is start term
+                     if (termIdx == startTermIndex) {
+                         // if word is part of the named entity add it
+                         if (w >= startWordIndex) {
+                             namedEntity.add(word);
+                             // otherwise create a new term containing the
+                             // word
+                         } else {
+                             createSingleWordTerm(newTermList, word);
+                         }
+                         // if current term is stop term
+                     } else if (termIdx == stopTermIndex) {
+                         // add words as long as stopWordIndex is not reached
+                         if (w <= stopWordIndex) {
+                             namedEntity.add(word);
 
-                    if (term.getWords().size() - 1 == stopWordIndex - startWordIndex) {
-                        List<Tag> tags = new ArrayList<>();
-                        tags.addAll(term.getTags());
-                        // only add tag if not already added
-                        List<Tag> newTags = entry.getValue();
-                        for (Tag ct : newTags) {
-                            if (!tags.contains(ct)) {
-                                tags.add(ct);
-                            }
-                        }
+                             // if last word is reached, create term and
+                             // add it
+                             if (w == stopWordIndex) {
+                                 createMultiWordTerm(entry, newTermList, namedEntity);
+                             }
+                             // otherwise create a term for each word
+                         } else {
+                             createSingleWordTerm(newTermList, word);
+                         }
+                         // if we are in between the start term and the stop
+                         // term just add all words to the new word list
+                     } else if (termIdx > startTermIndex && termIdx < stopTermIndex) {
+                         namedEntity.add(word);
+                     }
+                 }
+                 termIdx++;
+             }
+         }
+         for (final int end = oldTermList.size(); termIdx < end; termIdx++) {
+             newTermList.add(oldTermList.get(termIdx));
+         }
+         return newTermList;
+     }
 
-                        // CREATE NEW TERM !!!
-                        Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
-                        newTermList.add(newTerm);
-                    } else {
-                        // our term contains only a subset of the words
-                        // so we have to split it into several terms
 
-                        List<Word> newWords = new ArrayList<>();
-                        int w = -1;
-                        for (Word word : term.getWords()) {
-                            w++;
-                            // if we are outside our range
-                            if (w < startWordIndex || w > stopWordIndex) {
-                                createSingleWordTerm(newTermList, word);
-                            } else {
-                                newWords.add(word);
-                                // if last word to add, create term and add it
-                                // to new list
-                                if (w == stopWordIndex) {
-                                    createMultiWordTerm(entry, newTermList, newWords);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // entity consists of more than one term, so split it up.
-                    List<Word> words = term.getWords();
-                    int w = -1;
-                    for (Word word : words) {
-                        w++;
 
-                        // if current term is start term
-                        if (t == startTermIndex) {
-                            // if word is part of the named entity add it
-                            if (w >= startWordIndex) {
-                                namedEntity.add(word);
-                                // otherwise create a new term containing the
-                                // word
-                            } else {
-                                createSingleWordTerm(newTermList, word);
-                            }
-                            // if current term is stop term
-                        } else if (t == stopTermIndex) {
-                            // add words as long as stopWordIndex is not reached
-                            if (w <= stopWordIndex) {
-                                namedEntity.add(word);
-
-                                // if last word is reached, create term and
-                                // add it
-                                if (w == stopWordIndex) {
-                                    createMultiWordTerm(entry, newTermList, namedEntity);
-                                }
-                                // otherwise create a term for each word
-                            } else {
-                                createSingleWordTerm(newTermList, word);
-                            }
-                            // if we are in between the start term and the stop
-                            // term just add all words to the new word list
-                        } else if (t > startTermIndex && t < stopTermIndex) {
-                            namedEntity.add(word);
-                        }
-                    }
-                }
-            }
-        }
-        return newTermList;
-    }
 
     /**
      * Creates a new {@code Term} built from multiple {@code words}.
@@ -374,8 +379,9 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         }
 
         // CREATE NEW TERM !!!
-        Term newTerm = new Term(newWords, tags, m_setNeUnmodifiable);
+        Term newTerm = new Term(new ArrayList<Word>(newWords), tags, m_setNeUnmodifiable);
         newTermList.add(newTerm);
+        newWords.clear();
     }
 
     /**
@@ -384,7 +390,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @param newTermList The term list containing the new terms.
      * @param word The word used to built a new term.
      */
-    private void createSingleWordTerm(final List<Term> newTermList, final Word word) {
+    private static void createSingleWordTerm(final List<Term> newTermList, final Word word) {
         List<Word> newWord = new ArrayList<>();
         newWord.add(word);
         List<Tag> tags = new ArrayList<>();
@@ -405,8 +411,9 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @return Returns a map containing IndexRanges (location of found entities) and a list of
      *         {@code DocumentTaggerConfiguration}s containing properties for how the entity has to be tagged.
      */
-    private final Map<IndexRange, List<Tag>> findNe(final List<Term> sentence, final MultipleTaggedEntity entity) {
-        Map<IndexRange, List<Tag>> rangesAndTags = new LinkedHashMap<>();
+    private final LinkedHashMap<IndexRange, List<Tag>> findNe(final List<Term> sentence,
+        final MultipleTaggedEntity entity) {
+        LinkedHashMap<IndexRange, List<Tag>> rangesAndTags = new LinkedHashMap<>();
         // named entity can contain one or more words, so they have to be
         // tokenized by the default tokenizer to create words out of them.
         List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
