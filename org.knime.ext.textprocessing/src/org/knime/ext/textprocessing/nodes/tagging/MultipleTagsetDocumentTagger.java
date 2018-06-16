@@ -237,128 +237,128 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         mergedTerms.add(new Term(t.getWords(), tags, t.isUnmodifiable()));
     }
 
+    /**
+     * Builds the term list with newly tagged entities.
+     *
+     * @param oldTermList The term list containing initial terms.
+     * @param map A map entry containing the an index range and a list of tags that should be applied to the index
+     *            range.
+     * @return Returns a list of terms containing the newly tagged terms.
+     */
+    private final List<Term> buildTermList(final List<Term> oldTermList,
+        final LinkedHashMap<IndexRange, List<Tag>> map) {
 
+        if (map.isEmpty()) {
+            return oldTermList;
+        }
 
-    // TODO: UPDATE JAVADOC
-     /**
-      * Builds the term list with newly tagged entities.
-      *
-      * @param oldTermList The term list containing terms from the original document.
-      * @param map A map entry containing the an index range and a list of tags that should be applied to the index
-      *            range.
-      * @return Returns a list of terms containing the newly tagged terms.
-      */
-     private final List<Term> buildTermList(final List<Term> oldTermList,
-         final LinkedHashMap<IndexRange, List<Tag>> map) {
+        final List<Term> newTermList = new LinkedList<>();
+        final List<Word> namedEntity = new ArrayList<>();
+        IndexRange range;
+        // go through all terms of old term list
+        int termIdx = 0;
 
-         if (map.isEmpty()) {
-             return oldTermList;
-         }
+        for (Entry<IndexRange, List<Tag>> entry : map.entrySet()) {
+            // get the start and stop indices from the index range
+            range = entry.getKey();
+            int startTermIndex = range.getStartTermIndex();
+            int stopTermIndex = range.getStopTermIndex();
+            int startWordIndex = range.getStartWordIndex();
+            int stopWordIndex = range.getStopWordIndex();
+            while (termIdx < startTermIndex) {
+                newTermList.add(oldTermList.get(termIdx));
+                termIdx++;
+            }
+            if (startTermIndex == stopTermIndex) {
+                final Term term = oldTermList.get(termIdx);
+                if (term.getWords().size() - 1 == stopWordIndex - startWordIndex) {
+                    List<Tag> tags = new ArrayList<>();
+                    tags.addAll(term.getTags());
+                    // only add tag if not already added
+                    List<Tag> newTags = entry.getValue();
+                    for (Tag ct : newTags) {
+                        if (!tags.contains(ct)) {
+                            tags.add(ct);
+                        }
+                    }
+                    // CREATE NEW TERM !!!
+                    Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
+                    newTermList.add(newTerm);
+                } else {
+                    // our term contains only a subset of the words
+                    // so we have to split it into several terms
 
-         final List<Term> newTermList = new LinkedList<>();
-         final List<Word> namedEntity = new ArrayList<>();
-         IndexRange range;
-         // go through all terms of old term list
-         int termIdx = 0;
+                    List<Word> newWords = new ArrayList<>();
+                    int w = -1;
+                    for (Word word : term.getWords()) {
+                        w++;
+                        // if we are outside our range
+                        if (w < startWordIndex || w > stopWordIndex) {
+                            createSingleWordTerm(newTermList, word);
+                        } else {
+                            newWords.add(word);
+                            // if last word to add, create term and add it
+                            // to new list
+                            if (w == stopWordIndex) {
+                                createMultiWordTerm(entry, newTermList, newWords);
+                            }
+                        }
+                    }
+                }
+                ++termIdx;
+            }
+            while (termIdx <= stopTermIndex) {
+                final Term term = oldTermList.get(termIdx);
+                // entity consists of more than one term, so split it up.
+                // if current term is start term
+                if (termIdx == startTermIndex) {
+                    List<Word> words = term.getWords();
+                    int w = -1;
+                    for (Word word : words) {
+                        w++;
+                        // if word is part of the named entity add it
+                        if (w >= startWordIndex) {
+                            namedEntity.add(word);
+                            // otherwise create a new term containing the
+                            // word
+                        } else {
+                            createSingleWordTerm(newTermList, word);
+                        }
+                    }
+                    // if current term is stop term
+                } else if (termIdx == stopTermIndex) {
+                    // add words as long as stopWordIndex is not reached
+                    List<Word> words = term.getWords();
+                    int w = -1;
+                    for (Word word : words) {
+                        w++;
 
-         for (Entry<IndexRange, List<Tag>> entry : map.entrySet()) {
-             // get the start and stop indices from the index range
-             range = entry.getKey();
-             int startTermIndex = range.getStartTermIndex();
-             int stopTermIndex = range.getStopTermIndex();
-             int startWordIndex = range.getStartWordIndex();
-             int stopWordIndex = range.getStopWordIndex();
-             while (termIdx < startTermIndex) {
-                 newTermList.add(oldTermList.get(termIdx));
-                 termIdx++;
-             }
-             if (startTermIndex == stopTermIndex) {
-                 final Term term = oldTermList.get(termIdx);
-                 if (term.getWords().size() - 1 == stopWordIndex - startWordIndex) {
-                     List<Tag> tags = new ArrayList<>();
-                     tags.addAll(term.getTags());
-                     // only add tag if not already added
-                     List<Tag> newTags = entry.getValue();
-                     for (Tag ct : newTags) {
-                         if (!tags.contains(ct)) {
-                             tags.add(ct);
-                         }
-                     }
-                     // CREATE NEW TERM !!!
-                     Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
-                     newTermList.add(newTerm);
-                 } else {
-                     // our term contains only a subset of the words
-                     // so we have to split it into several terms
+                        if (w <= stopWordIndex) {
+                            namedEntity.add(word);
 
-                     List<Word> newWords = new ArrayList<>();
-                     int w = -1;
-                     for (Word word : term.getWords()) {
-                         w++;
-                         // if we are outside our range
-                         if (w < startWordIndex || w > stopWordIndex) {
-                             createSingleWordTerm(newTermList, word);
-                         } else {
-                             newWords.add(word);
-                             // if last word to add, create term and add it
-                             // to new list
-                             if (w == stopWordIndex) {
-                                 createMultiWordTerm(entry, newTermList, newWords);
-                             }
-                         }
-                     }
-                 }
-                 ++termIdx;
-             }
-             while (termIdx <= stopTermIndex) {
-                 final Term term = oldTermList.get(termIdx);
-                 // entity consists of more than one term, so split it up.
-                 List<Word> words = term.getWords();
-                 int w = -1;
-                 for (Word word : words) {
-                     w++;
-                     // if current term is start term
-                     if (termIdx == startTermIndex) {
-                         // if word is part of the named entity add it
-                         if (w >= startWordIndex) {
-                             namedEntity.add(word);
-                             // otherwise create a new term containing the
-                             // word
-                         } else {
-                             createSingleWordTerm(newTermList, word);
-                         }
-                         // if current term is stop term
-                     } else if (termIdx == stopTermIndex) {
-                         // add words as long as stopWordIndex is not reached
-                         if (w <= stopWordIndex) {
-                             namedEntity.add(word);
-
-                             // if last word is reached, create term and
-                             // add it
-                             if (w == stopWordIndex) {
-                                 createMultiWordTerm(entry, newTermList, namedEntity);
-                             }
-                             // otherwise create a term for each word
-                         } else {
-                             createSingleWordTerm(newTermList, word);
-                         }
-                         // if we are in between the start term and the stop
-                         // term just add all words to the new word list
-                     } else if (termIdx > startTermIndex && termIdx < stopTermIndex) {
-                         namedEntity.add(word);
-                     }
-                 }
-                 termIdx++;
-             }
-         }
-         for (final int end = oldTermList.size(); termIdx < end; termIdx++) {
-             newTermList.add(oldTermList.get(termIdx));
-         }
-         return newTermList;
-     }
-
-
-
+                            // if last word is reached, create term and
+                            // add it
+                            if (w == stopWordIndex) {
+                                createMultiWordTerm(entry, newTermList, namedEntity);
+                            }
+                            // otherwise create a term for each word
+                        } else {
+                            createSingleWordTerm(newTermList, word);
+                        }
+                    }
+                    // if we are in between the start term and the stop
+                    // term just add all words to the new word list
+                } else {
+                    namedEntity.addAll(term.getWords());
+                }
+                termIdx++;
+            }
+        }
+        for (final int end = oldTermList.size(); termIdx < end; termIdx++) {
+            newTermList.add(oldTermList.get(termIdx));
+        }
+        return newTermList;
+    }
 
     /**
      * Creates a new {@code Term} built from multiple {@code words}.
@@ -491,7 +491,6 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             }
         }
         return rangesAndTags;
-
     }
 
     /**
@@ -504,7 +503,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
      * @param end Size of the {@code SentenceEntry} list.
      * @return True, if the rest of the named-entity words match the words from the list {@code SentenceEntry}s.
      */
-    private boolean matchRest(final List<String> neWords, final NamedEntityMatcher matcher,
+    private static boolean matchRest(final List<String> neWords, final NamedEntityMatcher matcher,
         final ArrayList<SentenceEntry> w, final int i, final int end) {
         for (int j = i + 1; j < end; j++) {
             if (!matcher.matchWithWord(neWords.get(j - i), w.get(j).getWord())) {
