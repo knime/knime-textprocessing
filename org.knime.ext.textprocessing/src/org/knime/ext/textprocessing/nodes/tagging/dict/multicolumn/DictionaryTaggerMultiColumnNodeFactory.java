@@ -57,7 +57,7 @@ import org.knime.core.node.NodeView;
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.6
  */
-public class DictionaryTaggerMultiColumnNodeFactory extends NodeFactory<DictionaryTaggerMultiColumnNodeModel> {
+public final class DictionaryTaggerMultiColumnNodeFactory extends NodeFactory<DictionaryTaggerMultiColumnNodeModel> {
 
     /**
      * {@inheritDoc}

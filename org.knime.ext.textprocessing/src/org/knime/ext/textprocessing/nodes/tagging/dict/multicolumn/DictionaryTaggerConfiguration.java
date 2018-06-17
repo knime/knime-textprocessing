@@ -55,8 +55,8 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
- * The {@code DictionaryTaggerConfiguration} is an extension of the {@link DocumentTaggerConfiguration}. It contains a
- * set of entities (the dictionary) which is used to tag documents.
+ * The {@code DictionaryTaggerConfiguration} extends the functionality of the {@link DocumentTaggerConfiguration} by
+ * adding a set of entities (the dictionary) which is used to tag documents.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
@@ -80,7 +80,7 @@ final class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
     /**
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on a {@link DocumentTaggerConfiguration} and a
-     * set of entities.
+     * column name.
      *
      * @param colName The name of the the column containing the named entities to tag.
      * @param config The {@code DocumentTaggerConfiguration} to create the {@code DictionaryTaggerConfiguration}.
@@ -92,7 +92,7 @@ final class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
 
     /**
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on a column name, values for the case
-     * sensitivity and exact match flag, the tag type and tag value and as well the set of entities.
+     * sensitivity and exact match flag, the tag type and tag value.
      *
      * @param colName colName The name of the the column containing the named entities to tag.
      * @param caseSensitivity Set {@code true} for case sensitive matching.
@@ -108,8 +108,8 @@ final class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
     }
 
     /**
-     * Creates an instance of {@code DictionaryTaggerConfiguration} based on column name. Tagger parameters will be set
-     * to their default values. Entities will be set to null.
+     * Creates an instance of {@code DictionaryTaggerConfiguration} based on a column name. The tagger parameters will
+     * be set to their default values.
      *
      * @param colName colName The name of the the column containing the named entities to tag.
      */

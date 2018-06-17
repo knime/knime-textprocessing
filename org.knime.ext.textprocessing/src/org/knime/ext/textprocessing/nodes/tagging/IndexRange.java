@@ -63,16 +63,14 @@ final class IndexRange {
     private final int m_stopWordIndex;
 
     /**
-     * Creates a new instance of <code>IndexRange</code> with given start and
-     * stop indices of terms and words.
+     * Creates a new instance of <code>IndexRange</code> with given start and stop indices of terms and words.
      *
      * @param startTermIndex A term's start index.
      * @param stopTermIndex A term's stop index.
      * @param startWordIndex A word's start index.
      * @param stopIndex A word's stop index.
      */
-    IndexRange(final int startTermIndex, final int stopTermIndex,
-            final int startWordIndex, final int stopIndex) {
+    IndexRange(final int startTermIndex, final int stopTermIndex, final int startWordIndex, final int stopIndex) {
         m_startTermIndex = startTermIndex;
         m_stopTermIndex = stopTermIndex;
         m_startWordIndex = startWordIndex;
@@ -80,28 +78,36 @@ final class IndexRange {
     }
 
     /**
-     * @return the startTermIndex
+     * Returns the start term index.
+     *
+     * @return The start index of the term.
      */
     int getStartTermIndex() {
         return m_startTermIndex;
     }
 
     /**
-     * @return the stopTermIndex
+     * Returns the stop term index.
+     *
+     * @return The stop index of the term.
      */
     int getStopTermIndex() {
         return m_stopTermIndex;
     }
 
     /**
-     * @return the startWordIndex
+     * Returns the start word index.
+     *
+     * @return The start index of the word.
      */
     int getStartWordIndex() {
         return m_startWordIndex;
     }
 
     /**
-     * @return the stopWordIndex
+     * Returns the stop word index.
+     *
+     * @return The stop index of the word.
      */
     int getStopWordIndex() {
         return m_stopWordIndex;

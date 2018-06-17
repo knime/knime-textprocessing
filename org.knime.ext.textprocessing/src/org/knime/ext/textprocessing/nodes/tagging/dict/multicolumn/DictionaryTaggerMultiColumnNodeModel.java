@@ -150,7 +150,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
      * @throws Exception If tagger cannot be prepared.
      */
     @Override
-    protected final void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
+    protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
         //Validate configs with given data table
         m_config.validate(inData[DICT_TABLE_INDEX]);
         m_config.getWarningMessage().ifPresent(warningMessage -> setWarningMessage(warningMessage));
@@ -184,6 +184,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
+        // TODO: what is this object used for?
         new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
     }
 

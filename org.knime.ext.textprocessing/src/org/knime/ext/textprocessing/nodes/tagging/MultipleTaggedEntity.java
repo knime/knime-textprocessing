@@ -54,8 +54,9 @@ import java.util.Map;
 import org.knime.ext.textprocessing.data.Tag;
 
 /**
- * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a Map of {@code Tag}s
- * and {@code NamedEntityMatcher}. The map contains information about how the entity has to be found and tagged.
+ * The {@code MultipleTaggedEntity} contains the name of the entity as a {@code String} as well as a Map from {@link Tag
+ * Tags} to {@link NamedEntityMatcher NamedEntityMatchers}. The map contains information about how the entity has to be
+ * found and tagged.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
@@ -89,7 +90,7 @@ public final class MultipleTaggedEntity {
      * tag.
      *
      * @param tag The tag to be used for tagging the entity.
-     * @param matcher The matcher to be used for finding the entity within terms.
+     * @param matcher The matcher to be used to find the entity.
      */
     public final void addTagMatcherCombination(final Tag tag, final NamedEntityMatcher matcher) {
         m_tagMatcherMap.put(tag, matcher);
@@ -100,7 +101,7 @@ public final class MultipleTaggedEntity {
      *
      * @return Returns the entity as a String.
      */
-    public final String getEntity() {
+    final String getEntity() {
         return m_entity;
     }
 
@@ -110,7 +111,7 @@ public final class MultipleTaggedEntity {
      *
      * @return Returns a map of {@code Tags} and {@code NamedEntityMatcher}.
      */
-    public final Map<Tag, NamedEntityMatcher> getTagMatcherMap() {
+    final Map<Tag, NamedEntityMatcher> getTagMatcherMap() {
         return m_tagMatcherMap;
     }
 }

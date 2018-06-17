@@ -65,7 +65,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
 
 /**
- * Stores {@link DocumentTaggerConfiguration}s and their identifiers in a map.
+ * Stores {@link DocumentTaggerConfiguration DocumentTaggerConfigurations} and their identifiers in a map.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
@@ -124,6 +124,11 @@ final class MultipleDictionaryTaggerConfiguration {
         m_columnsToDictionaries.clear();
         List<String> invalidColumns = new ArrayList<>();
 
+        // TODO: m_config gibts nicht. nur deine dic. wenn ins dic was gesetzt wird dann wird ein empty set reingemacht
+        // anstatt clear auf dieser map machst du clear auf den sets und dann machst du da unten nix anderes als über
+        // das entrySet drüber zu gehen. die indizes werden auch nicht für jede row einmal neu geholt sondern einmal
+        // am anfang und dann wird über die rows gegangen! Wenn die dics abgegeb werden sollten danach die lists
+        // gecleared werden!
         for (DataRow row : inData) {
             for (DictionaryTaggerConfiguration config : m_configs) {
                 final int dictIndex = inData.getDataTableSpec().findColumnIndex(config.getColumnName());

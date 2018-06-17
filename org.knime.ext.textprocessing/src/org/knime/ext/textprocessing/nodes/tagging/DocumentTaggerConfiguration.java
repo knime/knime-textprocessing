@@ -73,22 +73,22 @@ public class DocumentTaggerConfiguration {
     /**
      * The configuration key of the exact match flag.
      */
-    public static final String CFGKEY_EXACTMATCH = "ExactMatch";
+    private static final String CFGKEY_EXACTMATCH = "ExactMatch";
 
     /**
      * The configuration key of the case sensitivity flag.
      */
-    public static final String CFGKEY_CASESENSITIVE = "CaseSensitive";
+    private static final String CFGKEY_CASESENSITIVE = "CaseSensitive";
 
     /**
      * The configuration key of the tag type.
      */
-    public static final String CFGKEY_TAGTYPE = "TagType";
+    private static final String CFGKEY_TAG_TYPE = "TagType";
 
     /**
      * The configuration key of the tag value.
      */
-    public static final String CFGKEY_TAGVALUE = "TagValue";
+    private static final String CFGKEY_TAG_VALUE = "TagValue";
 
     /**
      * The default value for the case sensitivity flag.
@@ -157,19 +157,6 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
-     * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name, values for case
-     * sensitivity, exact match and a given {@link Tag}.
-     *
-     * @param caseSensitivity Boolean value for case sensitivity.
-     * @param exactMatch Boolean value for exact matching behavior.
-     * @param tag The tag containing tag value and tag type.
-     *
-     */
-    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch, final Tag tag) {
-        this(caseSensitivity, exactMatch, tag.getTagType(), tag.getTagValue());
-    }
-
-    /**
      * Returns the value of the case sensitivity option.
      *
      * @return The value of the case sensitivity option.
@@ -181,7 +168,7 @@ public class DocumentTaggerConfiguration {
     /**
      * Sets the boolean value for the case sensitivity value.
      *
-     * @param caseSensitivity Set true for case sensitive matching.
+     * @param caseSensitivity Set {@code true} for case sensitive matching.
      */
     public final void setCaseSensitivityOption(final boolean caseSensitivity) {
         m_caseSensitivity = caseSensitivity;
@@ -199,7 +186,7 @@ public class DocumentTaggerConfiguration {
     /**
      * Set the boolean value for the exact match option.
      *
-     * @param exactMatch Set true for exact matching.
+     * @param exactMatch Set {@code true} for exact matching.
      */
     public final void setExactMatchOption(final boolean exactMatch) {
         m_exactMatch = exactMatch;
@@ -282,14 +269,14 @@ public class DocumentTaggerConfiguration {
         }
 
         try {
-            setTagType(settings.getString(CFGKEY_TAGTYPE));
+            setTagType(settings.getString(CFGKEY_TAG_TYPE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn("Can't update tag type setting. Value has been set to default.");
             setTagType(DEFAULT_TAG_TYPE);
         }
 
         try {
-            setTagValue(settings.getString(CFGKEY_TAGVALUE));
+            setTagValue(settings.getString(CFGKEY_TAG_VALUE));
         } catch (InvalidSettingsException e) {
             LOGGER.warn("Can't update tag type setting. Value has been set to default.");
             setTagValue(DEFAULT_TAG_VALUE);
@@ -304,8 +291,8 @@ public class DocumentTaggerConfiguration {
     public void saveSettingsTo(final NodeSettingsWO settings) {
         settings.addBoolean(CFGKEY_CASESENSITIVE, m_caseSensitivity);
         settings.addBoolean(CFGKEY_EXACTMATCH, m_exactMatch);
-        settings.addString(CFGKEY_TAGTYPE, m_tagType);
-        settings.addString(CFGKEY_TAGVALUE, m_tagValue);
+        settings.addString(CFGKEY_TAG_TYPE, m_tagType);
+        settings.addString(CFGKEY_TAG_VALUE, m_tagValue);
     }
 
     /**
@@ -319,8 +306,8 @@ public class DocumentTaggerConfiguration {
     public static DocumentTaggerConfiguration createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
         return new DocumentTaggerConfiguration(settings.getBoolean(CFGKEY_CASESENSITIVE),
-            settings.getBoolean(CFGKEY_EXACTMATCH), settings.getString(CFGKEY_TAGTYPE),
-            settings.getString(CFGKEY_TAGVALUE));
+            settings.getBoolean(CFGKEY_EXACTMATCH), settings.getString(CFGKEY_TAG_TYPE),
+            settings.getString(CFGKEY_TAG_VALUE));
     }
 
 }

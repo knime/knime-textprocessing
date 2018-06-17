@@ -65,17 +65,17 @@ final class SingleDictionaryTagger {
     /**
      * A set of entities.
      */
-    private Set<String> m_entities;
+    private final Set<String> m_entities;
 
     /**
      * The {@code NamedEntityMatcher} used for word matching.
      */
-    private NamedEntityMatcher m_matcher;
+    private final NamedEntityMatcher m_matcher;
 
     /**
      * The {@code Tag} to be used.
      */
-    private Tag m_tag;
+    private final Tag m_tag;
 
     /**
      * Creates a new instance of {@code SingleDictionaryTagger}.
@@ -111,18 +111,18 @@ final class SingleDictionaryTagger {
     }
 
     /**
-     * Returns the {@code NamedEntityMatcher} used to for word matching.
+     * Returns the {@code NamedEntityMatcher}.
      *
-     * @return Returns the {@code NamedEntityMatcher} used to for word matching.
+     * @return Returns the {@code NamedEntityMatcher}.
      */
     NamedEntityMatcher getMatcher() {
         return m_matcher;
     }
 
     /**
-     * Returns the {@code Tag} to be used.
+     * Returns the assigned {@code Tag}.
      *
-     * @return The tag.
+     * @return The assigned {@code Tag}.
      */
     Tag getTag() {
         return m_tag;

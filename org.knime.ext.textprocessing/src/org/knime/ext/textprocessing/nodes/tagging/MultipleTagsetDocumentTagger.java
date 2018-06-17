@@ -64,7 +64,6 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * The {@code MultipleTagsetDocumentTagger} implements the {@link DocumentTagger} interface. This implementation is used
@@ -75,22 +74,21 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class MultipleTagsetDocumentTagger implements DocumentTagger {
+public final class MultipleTagsetDocumentTagger implements DocumentTagger {
     /**
      * The unmodifiable flag.
      */
-    protected final boolean m_setNeUnmodifiable;
+    private final boolean m_setNeUnmodifiable;
 
     /**
      * Initialize old standard word tokenizer name for backwards compatibility.
      */
-    protected String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+    private final String m_tokenizerName;
 
     /**
      * Initialize old standard word tokenizer for backwards compatibility.
      */
-    protected Tokenizer m_wordTokenizer =
-        DefaultTokenization.getWordTokenizer(TextprocessingPreferenceInitializer.tokenizerName());
+    private final Tokenizer m_wordTokenizer;
 
     /**
      * Specific {@code SentenceTagger} implementation.
@@ -173,71 +171,6 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
     }
 
     /**
-     * Merges the tags of same terms of two term lists.
-     *
-     * @param initialTerms The previous term list.
-     * @param newTerms The new term list.
-     */
-    private static Sentence mergeTermLists(final List<Term> initialTerms, final List<Term> newTerms) {
-        final ArrayList<Term> mergedTerms = new ArrayList<Term>(newTerms.size());
-
-        int prevInitWordCnt = -1;
-        int prevNewWordCnt = -1;
-
-        int initWordCnt = 0;
-        int newWordCnt = 0;
-
-        int initTermIdx = 0;
-        int newTermIdx = 0;
-
-        final int initSize = initialTerms.size();
-        final int newSize = newTerms.size();
-        while (initTermIdx < initSize || newTermIdx < newSize) {
-            if (initWordCnt <= newWordCnt) {
-                prevInitWordCnt = initWordCnt;
-                initWordCnt += initialTerms.get(initTermIdx).getWords().size();
-                initTermIdx++;
-            } else if (initWordCnt >= newWordCnt) {
-                prevNewWordCnt = newWordCnt;
-                final Term t = newTerms.get(newTermIdx);
-                newWordCnt += t.getWords().size();
-                mergedTerms.add(t);
-                newTermIdx++;
-            }
-            // if initWordCnt == newWordCnt and prev counts are also equal it's the same term and they have
-            // to be merge
-            if (initWordCnt == newWordCnt && prevInitWordCnt == prevNewWordCnt) {
-                mergeTerms(initialTerms, mergedTerms, initTermIdx - 1);
-            }
-        }
-        return new Sentence(mergedTerms);
-    }
-
-    /**
-     * Merges the tags of terms of initial term list to the terms of new term list to keep tags from incoming data table
-     * available even if the term has been split and reassembled during tagging process.
-     *
-     * @param initialTerms List of {@code Term}s from initial term list.
-     * @param mergedTerms List of merged terms {code Term}s.
-     * @param termIndex The index of the term to be merged.
-     */
-    private static void mergeTerms(final List<Term> initialTerms, final ArrayList<Term> mergedTerms,
-        final int termIndex) {
-        final Term t = mergedTerms.remove(mergedTerms.size() - 1);
-        List<Tag> tags = new ArrayList<Tag>(t.getTags());
-        // only add tag if not already added
-        List<Tag> newTags = initialTerms.get(termIndex).getTags();
-        int addToPosition = 0;
-        for (Tag ct : newTags) {
-            if (!tags.contains(ct)) {
-                tags.add(addToPosition++, ct);
-            }
-        }
-        // CREATE NEW TERM !!!
-        mergedTerms.add(new Term(t.getWords(), tags, t.isUnmodifiable()));
-    }
-
-    /**
      * Builds the term list with newly tagged entities.
      *
      * @param oldTermList The term list containing initial terms.
@@ -281,7 +214,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
                             tags.add(ct);
                         }
                     }
-                    // CREATE NEW TERM !!!
+                    // create the new term
                     Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
                     newTermList.add(newTerm);
                 } else {
@@ -378,7 +311,7 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
             }
         }
 
-        // CREATE NEW TERM !!!
+        // create the new term
         Term newTerm = new Term(new ArrayList<Word>(newWords), tags, m_setNeUnmodifiable);
         newTermList.add(newTerm);
         newWords.clear();
@@ -394,25 +327,22 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         List<Word> newWord = new ArrayList<>();
         newWord.add(word);
         List<Tag> tags = new ArrayList<>();
-        // CREATE NEW TERM !!!
+        // create the new term
         Term newTerm = new Term(newWord, tags, false);
         newTermList.add(newTerm);
     }
 
     /**
-     * TODO: Implement Knuth-Morris-Pratt algorithm and overthink the whole idea of how we find named-entities right
-     * now.
-     *
      * Finds named entities within a list of terms.
      *
      * @param sentence List of terms built from original sentence.
      * @param entity The {@code MultipleTaggedEntity} containing the name of the entity and properties how it has to be
      *            tagged.
-     * @return Returns a map containing IndexRanges (location of found entities) and a list of
-     *         {@code DocumentTaggerConfiguration}s containing properties for how the entity has to be tagged.
+     * @return A map storing for each {@link IndexRange} the assigned {@link Tag Tags}.
      */
     private final LinkedHashMap<IndexRange, List<Tag>> findNe(final List<Term> sentence,
         final MultipleTaggedEntity entity) {
+        // Time could be improved using Knuth-Morris-Pratt algorithm
         LinkedHashMap<IndexRange, List<Tag>> rangesAndTags = new LinkedHashMap<>();
         // named entity can contain one or more words, so they have to be
         // tokenized by the default tokenizer to create words out of them.
@@ -494,23 +424,95 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
     }
 
     /**
-     * Matches the remaining elements of named-entity word list with entries of an {@code SentenceEntry} list.
+     * Matches the remaining elements of a named-entity word list with entries of an {@code SentenceEntry} list.
      *
      * @param neWords The words from the named entity to be tagged.
      * @param matcher The {@code NamedEntityMatcher} to match words.
-     * @param w A list of {@code SentenceEntry}s.
-     * @param i The index of the {@code SentenceEntry}.
+     * @param sentenceEntries A list of {@code SentenceEntry}s.
+     * @param firstMatchIdx The index of the {@code SentenceEntry}.
      * @param end Size of the {@code SentenceEntry} list.
-     * @return True, if the rest of the named-entity words match the words from the list {@code SentenceEntry}s.
+     * @return {@code True}, if the rest of the named-entity words match the words from the list {@code SentenceEntry}s.
      */
     private static boolean matchRest(final List<String> neWords, final NamedEntityMatcher matcher,
-        final ArrayList<SentenceEntry> w, final int i, final int end) {
-        for (int j = i + 1; j < end; j++) {
-            if (!matcher.matchWithWord(neWords.get(j - i), w.get(j).getWord())) {
+        final ArrayList<SentenceEntry> sentenceEntries, final int firstMatchIdx, final int end) {
+        for (int j = firstMatchIdx + 1; j < end; j++) {
+            if (!matcher.matchWithWord(neWords.get(j - firstMatchIdx), sentenceEntries.get(j).getWord())) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Merges the tags of two term lists of the identical sentence.
+     *
+     * @param initialTerms The term list of the sentence before adding the new tags.
+     * @param newTerms The new term list of the sentence after adding the new tags.
+     */
+    private static Sentence mergeTermLists(final List<Term> initialTerms, final List<Term> newTerms) {
+        final ArrayList<Term> mergedTerms = new ArrayList<Term>(newTerms.size());
+
+        // the previous word counts
+        int prevInitWordCnt = -1;
+        int prevNewWordCnt = -1;
+
+        // the current word counts
+        int curInitWordCnt = 0;
+        int curNewWordCnt = 0;
+
+        // the currently processed term index
+        int initTermIdx = 0;
+        int newTermIdx = 0;
+
+        // the sizes of the the two term lists
+        final int initSize = initialTerms.size();
+        final int newSize = newTerms.size();
+
+        // while there are unprocessed elements in any of the two lists
+        while (initTermIdx < initSize || newTermIdx < newSize) {
+            // process the next term of the initial/new term list
+            if (curInitWordCnt <= curNewWordCnt) {
+                prevInitWordCnt = curInitWordCnt;
+                curInitWordCnt += initialTerms.get(initTermIdx).getWords().size();
+                initTermIdx++;
+            } else if (curInitWordCnt >= curNewWordCnt) {
+                prevNewWordCnt = curNewWordCnt;
+                final Term t = newTerms.get(newTermIdx);
+                curNewWordCnt += t.getWords().size();
+                mergedTerms.add(t);
+                newTermIdx++;
+            }
+            // if initWordCnt == newWordCnt and prev counts are also equal it's the same term and they have
+            // to be merge
+            if (curInitWordCnt == curNewWordCnt && prevInitWordCnt == prevNewWordCnt) {
+                mergeTerms(initialTerms, mergedTerms, initTermIdx - 1);
+            }
+        }
+        return new Sentence(mergedTerms);
+    }
+
+    /**
+     * Merges the tags of terms of initial term list to the terms of new term list to keep tags from incoming data table
+     * available even if the term has been split and reassembled during tagging process.
+     *
+     * @param initialTerms List of {@code Term}s from initial term list.
+     * @param mergedTerms List of merged terms {code Term}s.
+     * @param termIndex The index of the term to be merged.
+     */
+    private static void mergeTerms(final List<Term> initialTerms, final ArrayList<Term> mergedTerms,
+        final int termIndex) {
+        final Term t = mergedTerms.remove(mergedTerms.size() - 1);
+        List<Tag> tags = new ArrayList<Tag>(t.getTags());
+        // only add tag if not already added
+        List<Tag> newTags = initialTerms.get(termIndex).getTags();
+        int addToPosition = 0;
+        for (Tag ct : newTags) {
+            if (!tags.contains(ct)) {
+                tags.add(addToPosition++, ct);
+            }
+        }
+        // create the new term
+        mergedTerms.add(new Term(t.getWords(), tags, t.isUnmodifiable()));
     }
 
     /**
@@ -539,8 +541,8 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         /**
          * Creates a new instance of {@code SentenceEntry}.
          *
-         * @param termIdx The position in the term list where the word has been found.
-         * @param wordIdx The position in the word list of a term where the word has been found.
+         * @param termIdx The position in the term list where the word was found.
+         * @param wordIdx The position in the word list of a term where the word was found.
          * @param word The found word.
          */
         SentenceEntry(final int termIdx, final int wordIdx, final String word) {
@@ -550,18 +552,18 @@ public class MultipleTagsetDocumentTagger implements DocumentTagger {
         }
 
         /**
-         * Returns position in the term list where the word has been found.
+         * Returns position in the term list where the word was found.
          *
-         * @return Returns position in the term list where the word has been found.
+         * @return Returns position in the term list where the word was found.
          */
         int getTermIdx() {
             return m_termIdx;
         }
 
         /**
-         * The position in the word list of a term where the word has been found.
+         * The position in the word list of a term where the word was found.
          *
-         * @return The position in the word list of a term where the word has been found.
+         * @return The position in the word list of a term where the word was found.
          */
         int getWordIdx() {
             return m_wordIdx;

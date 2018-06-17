@@ -55,7 +55,7 @@ package org.knime.ext.textprocessing.nodes.tagging;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class NamedEntityMatcher {
+public final class NamedEntityMatcher {
 
     /**
      * The case sensitivity behavior.
@@ -68,8 +68,7 @@ public class NamedEntityMatcher {
     private final boolean m_exactMatch;
 
     /**
-     * Creates a new instance of {@code NamedEntityMatcher} given two booleans to define the behavior for case sensitive
-     * and exact matching.
+     * Creates an {@code NamedEntityMatcher} respecting the provided properties.
      *
      * @param caseSensitivity The case sensitivity behavior.
      * @param exactMatch The exact match behavior.
@@ -80,11 +79,11 @@ public class NamedEntityMatcher {
     }
 
     /**
-     * This method returns true, if the sentence contains the entity based on the case sensitivity behavior.
+     * This method returns {@code true}, if the sentence contains the entity based on the case sensitivity behavior.
      *
      * @param entity The entity.
      * @param sentence The sentence.
-     * @return True, if the sentence contains the entity.
+     * @return {@code True}, if the sentence contains the entity.
      */
     public boolean matchWithSentence(String entity, String sentence) {
         if (!m_caseSensitivity) {
@@ -96,20 +95,19 @@ public class NamedEntityMatcher {
     }
 
     /**
-     * This method returns true, if the given entity matches the given word based on the case sensitive and exact
-     * matching behavior.
+     * This method returns {@code true}, if the given entity matches the given word based on the case sensitive and
+     * exact matching behavior.
      *
      * @param entity The entity.
      * @param word The word.
-     * @return True, if the word is equal to the entity or contains the entity. Depending on case sensitivity and exact
-     *         matching behavior.
+     * @return {@code True}, if the word is equal to the entity or contains the entity. Depending on case sensitivity
+     *         and exact matching behavior.
      */
     public boolean matchWithWord(String entity, String word) {
         if (!m_caseSensitivity) {
             word = word.toLowerCase();
             entity = entity.toLowerCase();
         }
-
         if (m_exactMatch) {
             return word.equals(entity);
         } else {

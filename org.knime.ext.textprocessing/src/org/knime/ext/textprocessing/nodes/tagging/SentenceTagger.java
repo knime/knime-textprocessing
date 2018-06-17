@@ -53,8 +53,8 @@ import java.util.List;
 import org.knime.ext.textprocessing.data.Sentence;
 
 /**
- * The {@code SentenceTagger} interface. The {@link SentenceTagger#tagEntities(Sentence)} method is used to tag
- * entities within a {@link Sentence}.
+ * The {@code SentenceTagger} interface. The {@link SentenceTagger#tagEntities(Sentence)} method is used to tag entities
+ * within a {@link Sentence}.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
@@ -66,7 +66,7 @@ public interface SentenceTagger {
      * implementation of this method.
      *
      * @param sentence The sentence to be tagged.
-     * @return Returns a list of {@link MultipleTaggedEntity}s containing entities as well as some tagging properties.
+     * @return Returns a list of {@link MultipleTaggedEntity MultipleTaggedEntities}.
      */
     public List<MultipleTaggedEntity> tagEntities(final Sentence sentence);
 }
