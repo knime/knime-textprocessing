@@ -108,9 +108,12 @@ final class MultipleDictionaryTaggerConfiguration {
      * @param settings The {@code NodeSettingsWO} to write to.
      */
     final void save(final NodeSettingsWO settings) {
+        final String CFG_KEY_DICT_TAGGER_SUB = "dict-tagger-sub";
+        int index = 0;
         for (DictionaryTaggerConfiguration entry : m_configs) {
-            NodeSettingsWO subSub = settings.addNodeSettings(entry.getColumnName());
+            NodeSettingsWO subSub = settings.addNodeSettings(CFG_KEY_DICT_TAGGER_SUB + "_" + Integer.toString(index));
             entry.saveSettingsTo(subSub);
+            index++;
         }
     }
 

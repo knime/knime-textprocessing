@@ -73,22 +73,22 @@ public class DocumentTaggerConfiguration {
     /**
      * The configuration key of the exact match flag.
      */
-    private static final String CFGKEY_EXACTMATCH = "ExactMatch";
+    private static final String CFGKEY_EXACTMATCH = "exact-match";
 
     /**
      * The configuration key of the case sensitivity flag.
      */
-    private static final String CFGKEY_CASESENSITIVE = "CaseSensitive";
+    private static final String CFGKEY_CASESENSITIVE = "case-sensitive";
 
     /**
      * The configuration key of the tag type.
      */
-    private static final String CFGKEY_TAG_TYPE = "TagType";
+    private static final String CFGKEY_TAG_TYPE = "tag-type";
 
     /**
      * The configuration key of the tag value.
      */
-    private static final String CFGKEY_TAG_VALUE = "TagValue";
+    private static final String CFGKEY_TAG_VALUE = "tag-value";
 
     /**
      * The default value for the case sensitivity flag.

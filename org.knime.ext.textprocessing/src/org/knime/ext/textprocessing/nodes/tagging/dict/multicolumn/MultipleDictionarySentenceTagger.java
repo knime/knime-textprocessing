@@ -72,13 +72,10 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
     private final List<SingleDictionaryTagger> m_singleTagger;
 
     /**
-     * Creates and returns a new instance of {@code MultipleDictionarySentenceTagger} which is build from a list of
-     * several {@link SingleDictionaryTagger SingleDictionaryTaggers}.
-     *
-     * @param singleTagger The list of {@code SingleDictionaryTagger}.
+     * Creates and returns a new instance of {@code MultipleDictionarySentenceTagger}.
      */
-    MultipleDictionarySentenceTagger(final List<SingleDictionaryTagger> singleTagger) {
-        m_singleTagger = singleTagger;
+    MultipleDictionarySentenceTagger() {
+        m_singleTagger = new ArrayList<>();
     }
 
     /**
@@ -102,8 +99,7 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
     }
 
     /**
-     * TODO: there is no list of MultipletaggedEntities here!
-     * This method checks if the list of {@code MultipleTaggedEntity}s already contains the entity. If it is the case,
+     * This method checks if the map of {@code MultipleTaggedEntity}s already contains the entity. If it is the case,
      * this method adds a new combination of {@code Tag} and {@code NamedEntityMatcher} to the specific
      * MultipleTaggedEntity, otherwise creates a new.
      *
@@ -112,14 +108,23 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
      * @param matcher The matcher to be used for matching the entity with a word.
      * @param mtes The map of entities to their {@code MultipleTaggedEntity}.
      */
-    private static void addToListAndCheckOccurrence(final String entity, final Tag tag, final NamedEntityMatcher matcher,
-        final Map<String, MultipleTaggedEntity> mtes) {
+    private static void addToListAndCheckOccurrence(final String entity, final Tag tag,
+        final NamedEntityMatcher matcher, final Map<String, MultipleTaggedEntity> mtes) {
         MultipleTaggedEntity mte = mtes.remove(entity);
         if (mte == null) {
             mte = new MultipleTaggedEntity(entity);
         }
         mte.addTagMatcherCombination(tag, matcher);
         mtes.put(entity, mte);
+    }
+
+    /**
+     * Adds an instance of {@link SingleDictionaryTagger}.
+     *
+     * @param singleTagger The {@code SingleDictionaryTagger} to add.
+     */
+    void add(final SingleDictionaryTagger singleTagger) {
+        m_singleTagger.add(singleTagger);
     }
 
 }

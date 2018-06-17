@@ -71,7 +71,7 @@ final class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
     /**
      * The configuration key of the column name setting.
      */
-    private static final String CFGKEY_COLUMNNAME = "ColumnName";
+    private static final String CFGKEY_COLUMNNAME = "column-name";
 
     /**
      * The name of the column containing the dictionary.

@@ -106,7 +106,7 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
     /**
      * The configuration key of the column name setting.
      */
-    private static final String CFGKEY_COLUMNNAME = "ColumnName";
+    private static final String CFGKEY_COLUMNNAME = "column-name";
 
     /**
      * Map containing a {@code DataColumnSpec} and a specific {@code DictionaryTaggerConfiguration} holding properties
@@ -292,9 +292,10 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
 
         clearBorders();
 
+        final String CFG_KEY_DICT_TAGGER_SUB = "dict-tagger-sub";
         int i = 0;
         for (DocumentTaggerConfiguration colSet : m_columnToSettings.values()) {
-            NodeSettingsWO subSub = subSettings.addNodeSettings(Integer.toString(i));
+            NodeSettingsWO subSub = subSettings.addNodeSettings(CFG_KEY_DICT_TAGGER_SUB + "_" + Integer.toString(i));
             colSet.saveSettingsTo(subSub);
             i++;
         }

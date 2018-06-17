@@ -47,8 +47,6 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -96,11 +94,6 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     private MultipleDictionaryTaggerConfiguration m_config;
 
     /**
-     * List of {@code SingleDictionaryTagger}.
-     */
-    private List<SingleDictionaryTagger> m_tagger = new ArrayList<>();
-
-    /**
      * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
      * being tagged or not.
      */
@@ -131,15 +124,12 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        assert m_tagger.isEmpty();
+        MultipleDictionarySentenceTagger multiDictTagger = new MultipleDictionarySentenceTagger();
         for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_config.getConfigsAndDicts().entrySet()) {
-            m_tagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
+            multiDictTagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
         }
-        MultipleTagsetDocumentTagger docTagger =
-            new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(),
-                new MultipleDictionarySentenceTagger(new ArrayList<>(m_tagger)), getTokenizerName());
-        m_tagger.clear();
-        return docTagger;
+        return new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), multiDictTagger,
+            getTokenizerName());
     }
 
     /**
@@ -184,7 +174,8 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
-        // TODO: what is this object used for?
+        // TODO: what is this object used for? --> tries to create an object for given node settings, if it fails
+        // InvalidSettingsException will be thrown
         new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
     }
 
