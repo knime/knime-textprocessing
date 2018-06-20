@@ -48,7 +48,7 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.knime.ext.textprocessing.data.Tag;
@@ -81,7 +81,7 @@ public final class MultipleTaggedEntity {
      */
     public MultipleTaggedEntity(final String entity) {
         m_entity = entity;
-        m_tagMatcherMap = new HashMap<>();
+        m_tagMatcherMap = new LinkedHashMap<>();
     }
 
     /**
