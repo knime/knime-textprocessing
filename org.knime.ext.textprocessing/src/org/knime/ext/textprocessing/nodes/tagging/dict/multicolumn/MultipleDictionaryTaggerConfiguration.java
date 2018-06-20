@@ -49,16 +49,8 @@
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
-import org.knime.core.data.DataRow;
-import org.knime.core.data.StringValue;
-import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -77,17 +69,6 @@ final class MultipleDictionaryTaggerConfiguration {
      * tagging.
      */
     private final List<DictionaryTaggerConfiguration> m_configs = new ArrayList<>();
-
-    /**
-     * Map of {@code DictionaryTaggerConfiguration}s and a set of entities belonging to the specific configuration.
-     */
-    private final Map<DictionaryTaggerConfiguration, Set<String>> m_columnsToDictionaries = new LinkedHashMap<>();
-
-    /**
-     * Warning message which is shown, if there are columns selected in the dialog that are not in the DataTableSpec
-     * anymore.
-     */
-    private String m_warningMessage = null;
 
     /**
      * Creates an instance of {@code MultipleDocumentTaggerSettings}.
@@ -118,61 +99,12 @@ final class MultipleDictionaryTaggerConfiguration {
     }
 
     /**
-     * Validates the {@code DictionaryTaggerConfiguration}s on a given {@link BufferedDataTable}.
+     * Returns list of {@code DictionaryTaggerConfiguration}s containing the specific settings for each dictionary
+     * column.
      *
-     * @param inData The {@code BufferedDataTable} containing the dictionaries.
+     * @return Returns the settings for each dictionary column.
      */
-    final void validate(final BufferedDataTable inData) {
-        m_warningMessage = null;
-        m_columnsToDictionaries.clear();
-        List<String> invalidColumns = new ArrayList<>();
-
-        // TODO: m_config gibts nicht. nur deine dic. wenn ins dic was gesetzt wird dann wird ein empty set reingemacht
-        // anstatt clear auf dieser map machst du clear auf den sets und dann machst du da unten nix anderes als über
-        // das entrySet drüber zu gehen. die indizes werden auch nicht für jede row einmal neu geholt sondern einmal
-        // am anfang und dann wird über die rows gegangen! Wenn die dics abgegeb werden sollten danach die lists
-        // gecleared werden!
-        for (DataRow row : inData) {
-            for (DictionaryTaggerConfiguration config : m_configs) {
-                final int dictIndex = inData.getDataTableSpec().findColumnIndex(config.getColumnName());
-                if (dictIndex >= 0) {
-                    if (!row.getCell(dictIndex).isMissing()) {
-                        Set<String> entities = m_columnsToDictionaries.remove(config);
-                        if (entities == null) {
-                            entities = new HashSet<>();
-                        }
-                        entities.add(((StringValue)row.getCell(dictIndex)).getStringValue());
-                        m_columnsToDictionaries.put(config, entities);
-                    }
-                } else {
-                    invalidColumns.add(config.getColumnName());
-                }
-
-            }
-        }
-
-        if (!invalidColumns.isEmpty()) {
-            m_warningMessage = "Could not find dictionary column(s) " + invalidColumns.toString() + " in input table.";
-        }
-    }
-
-    /**
-     * Returns list of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries coming
-     * from columns that are available in the DataTableSpec.
-     *
-     * @return Returns valid configurations.
-     */
-    final Map<DictionaryTaggerConfiguration, Set<String>> getConfigsAndDicts() {
-        return m_columnsToDictionaries;
-    }
-
-    /**
-     * Returns the warning message which is shown, if there are columns selected in the dialog that are not in the
-     * DataTableSpec anymore.
-     *
-     * @return An {@code Optional} containing the warning message or {@code null} if no warning message is present.
-     */
-    final Optional<String> getWarningMessage() {
-        return Optional.ofNullable(m_warningMessage);
+    final List<DictionaryTaggerConfiguration> getConfigs() {
+        return m_configs;
     }
 }

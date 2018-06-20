@@ -47,10 +47,17 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -91,7 +98,13 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     /**
      * Contains settings for each individual column.
      */
-    private MultipleDictionaryTaggerConfiguration m_config;
+    private MultipleDictionaryTaggerConfiguration m_settings;
+
+    /**
+     * Contains valid {@link DictionaryTaggerConfiguration DictionaryTaggerConfigurations} which map to their specific
+     * dictionary.
+     */
+    private Map<DictionaryTaggerConfiguration, Set<String>> m_validSettingsAndDicts;
 
     /**
      * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
@@ -115,8 +128,41 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
      */
     @Override
     protected final void checkInputDataTableSpecs(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        DataTableSpecVerifier verfier = new DataTableSpecVerifier(inSpecs[DICT_TABLE_INDEX]);
-        verfier.verifyMinimumStringCells(1, true);
+        DataTableSpec dictTableSpec = inSpecs[DICT_TABLE_INDEX];
+        DataTableSpecVerifier verifier = new DataTableSpecVerifier(dictTableSpec);
+        verifier.verifyMinimumStringCells(1, true);
+
+        List<String> invalidColumns = new ArrayList<>();
+
+        // Check if there are any dictionary columns selected at all
+        if (m_settings == null || m_settings.getConfigs().isEmpty()) {
+            throw new InvalidSettingsException("No dictionary column selected. Please configure.");
+        }
+
+        // Check for invalid dictionary columns
+        for (DictionaryTaggerConfiguration settings : m_settings.getConfigs()) {
+            int dictTableIndex = dictTableSpec.findColumnIndex(settings.getColumnName());
+            if (dictTableIndex < 0) {
+                invalidColumns.add(settings.getColumnName());
+            } else {
+                if (m_validSettingsAndDicts == null) {
+                    m_validSettingsAndDicts = new LinkedHashMap<>();
+                }
+                m_validSettingsAndDicts.put(settings, null);
+            }
+        }
+
+        // Throw exception if all configs are invalid
+        if (invalidColumns.size() == m_settings.getConfigs().size())
+
+        {
+            throw new InvalidSettingsException("No valid dictionary column selected. Please configure.");
+        }
+
+        // Set warning message if there are invalid columns
+        if (!invalidColumns.isEmpty()) {
+            setWarningMessage("Could not find dictionary column(s) " + invalidColumns.toString() + " in input table.");
+        }
     }
 
     /**
@@ -125,15 +171,18 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     @Override
     public DocumentTagger createTagger() throws Exception {
         MultipleDictionarySentenceTagger multiDictTagger = new MultipleDictionarySentenceTagger();
-        for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_config.getConfigsAndDicts().entrySet()) {
-            multiDictTagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
+        for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_validSettingsAndDicts.entrySet()) {
+            if (entry.getValue() != null) {
+                multiDictTagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
+            }
         }
+        m_validSettingsAndDicts.clear();
         return new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), multiDictTagger,
             getTokenizerName());
     }
 
     /**
-     * Reads strings of string column of second input data table to build dictionary.
+     * Builds dictionaries for valid columns.
      *
      * @param inData Input data tables.
      * @param exec The execution context of the node.
@@ -141,9 +190,20 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
      */
     @Override
     protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
-        //Validate configs with given data table
-        m_config.validate(inData[DICT_TABLE_INDEX]);
-        m_config.getWarningMessage().ifPresent(warningMessage -> setWarningMessage(warningMessage));
+        BufferedDataTable dictDataTable = inData[DICT_TABLE_INDEX];
+        for (DataRow row : dictDataTable) {
+            for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_validSettingsAndDicts.entrySet()) {
+                int dictIdx = dictDataTable.getSpec().findColumnIndex(entry.getKey().getColumnName());
+                if (!row.getCell(dictIdx).isMissing()) {
+                    Set<String> dict = entry.getValue();
+                    if (dict == null) {
+                        dict = new HashSet<>();
+                    }
+                    dict.add(((StringValue)row.getCell(dictIdx)).getStringValue());
+                    m_validSettingsAndDicts.put(entry.getKey(), dict);
+                }
+            }
+        }
     }
 
     /**
@@ -161,9 +221,9 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         super.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
-        if (m_config != null) {
+        if (m_settings != null) {
             final NodeSettingsWO subSettings = settings.addNodeSettings(CFG_SUB_CONFIG);
-            m_config.save(subSettings);
+            m_settings.save(subSettings);
         }
     }
 
@@ -176,7 +236,9 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
         m_setUnmodifiableModel.validateSettings(settings);
         // TODO: what is this object used for? --> tries to create an object for given node settings, if it fails
         // InvalidSettingsException will be thrown
-        new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
+        if (settings.containsKey(CFG_SUB_CONFIG)) {
+            new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
+        }
     }
 
     /**
@@ -186,6 +248,8 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
-        m_config = new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
+        if (settings.containsKey(CFG_SUB_CONFIG)) {
+            m_settings = new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
+        }
     }
 }
