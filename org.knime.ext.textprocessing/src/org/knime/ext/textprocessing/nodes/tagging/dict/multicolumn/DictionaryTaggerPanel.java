@@ -110,6 +110,10 @@ final class DictionaryTaggerPanel extends JPanel {
      */
     private final DataColumnSpec m_columnSpec;
 
+    private final JButton m_upButton;
+
+    private final JButton m_downButton;
+
     /**
      * Creates a new instance of {@code DictionaryTaggerPanel}.
      *
@@ -127,11 +131,11 @@ final class DictionaryTaggerPanel extends JPanel {
         final JLabel nameLabel = new JLabel(labelName);
         nameLabel.setToolTipText(colName);
 
-        JButton upButton = new JButton(SharedIcons.MOVE_UP.get());
-        upButton.addActionListener(e -> firePropertyChange(UP_ACTION, null, null));
+        m_upButton = new JButton(SharedIcons.MOVE_UP.get());
+        m_upButton.addActionListener(e -> firePropertyChange(UP_ACTION, null, null));
 
-        JButton downButton = new JButton(SharedIcons.MOVE_DOWN.get());
-        downButton.addActionListener(e -> firePropertyChange(DOWN_ACTION, null, null));
+        m_downButton = new JButton(SharedIcons.MOVE_DOWN.get());
+        m_downButton.addActionListener(e -> firePropertyChange(DOWN_ACTION, null, null));
 
         JButton removeButton = new JButton(SharedIcons.DELETE_TRASH.get());
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
@@ -173,8 +177,8 @@ final class DictionaryTaggerPanel extends JPanel {
             : BorderFactory.createLineBorder(Color.BLACK, 1));
 
         JPanel buttonLayout = new JPanel(new BorderLayout(0, 0));
-        buttonLayout.add(upButton, BorderLayout.WEST);
-        buttonLayout.add(downButton, BorderLayout.CENTER);
+        buttonLayout.add(m_upButton, BorderLayout.WEST);
+        buttonLayout.add(m_downButton, BorderLayout.CENTER);
         buttonLayout.add(removeButton, BorderLayout.EAST);
 
         // Panel for name label and remove button
@@ -226,5 +230,19 @@ final class DictionaryTaggerPanel extends JPanel {
      */
     boolean hasValidSpec() {
         return !isInvalid(m_columnSpec);
+    }
+
+    /**
+     * @param enable
+     */
+    public void enableUpButton(final boolean enable) {
+        m_upButton.setEnabled(enable);
+    }
+
+    /**
+     * @param enable
+     */
+    public void enableDownButton(final boolean enable) {
+        m_downButton.setEnabled(enable);
     }
 }
