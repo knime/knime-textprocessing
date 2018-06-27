@@ -71,30 +71,76 @@ final class MultipleDictionaryTaggerConfiguration {
     private final List<DictionaryTaggerConfiguration> m_configs = new ArrayList<>();
 
     /**
+     * Config identifier for the NodeSettings object contained in the NodeSettings which contains the settings.
+     */
+    private static final String CFG_SUB_CONFIG = "all_columns";
+
+    /**
+     * Config identifier for the column names.
+     */
+    private static final String CFG_KEY_DICT_TAGGER_SUB = "dict-tagger-sub";
+
+    /**
      * Creates an instance of {@code MultipleDocumentTaggerSettings}.
      *
      * @param settings The settings to store.
      * @throws InvalidSettingsException, if node settings could not be retrieved.
      */
     MultipleDictionaryTaggerConfiguration(final NodeSettingsRO settings) throws InvalidSettingsException {
-        for (String identifier : settings) {
-            NodeSettingsRO col = settings.getNodeSettings(identifier);
-            m_configs.add(DictionaryTaggerConfiguration.createFrom(col));
+        if (settings.containsKey(CFG_SUB_CONFIG)) {
+            NodeSettingsRO subSettings = settings.getNodeSettings(CFG_SUB_CONFIG);
+            if (subSettings != null) {
+                for (String identifier : subSettings) {
+                    NodeSettingsRO col = subSettings.getNodeSettings(identifier);
+                    m_configs.add(DictionaryTaggerConfiguration.createFrom(col));
+                }
+            }
         }
+    }
+
+    /**
+     * Creates an instance of {@code MultipleDocumentTaggerSettings}.
+     *
+     * @param settings The list of {@code DictionaryTaggerSettings}.
+     */
+    MultipleDictionaryTaggerConfiguration(final List<DictionaryTaggerConfiguration> settings) {
+        m_configs.addAll(settings);
     }
 
     /**
      * Writes the settings to a {@code NodeSettingsWO} object.
      *
      * @param settings The {@code NodeSettingsWO} to write to.
+     * @throws InvalidSettingsException
      */
     final void save(final NodeSettingsWO settings) {
-        final String CFG_KEY_DICT_TAGGER_SUB = "dict-tagger-sub";
-        int index = 0;
-        for (DictionaryTaggerConfiguration entry : m_configs) {
-            NodeSettingsWO subSub = settings.addNodeSettings(CFG_KEY_DICT_TAGGER_SUB + "_" + Integer.toString(index));
-            entry.saveSettingsTo(subSub);
-            index++;
+        if (settings != null) {
+            final NodeSettingsWO subSettings = settings.addNodeSettings(CFG_SUB_CONFIG);
+            int index = 0;
+            for (DictionaryTaggerConfiguration entry : m_configs) {
+                NodeSettingsWO subSub =
+                    subSettings.addNodeSettings(CFG_KEY_DICT_TAGGER_SUB + "_" + Integer.toString(index));
+                entry.saveSettingsTo(subSub);
+                index++;
+            }
+        }
+    }
+
+    /**
+     * Validates the settings of a {@code NodeSettingsRO} object.
+     *
+     * @param settings The {@code NodeSettingsRO} to validate.
+     * @throws InvalidSettingsException
+     */
+    static final void validate(final NodeSettingsRO settings) throws InvalidSettingsException {
+        if (settings.containsKey(CFG_SUB_CONFIG)) {
+            NodeSettingsRO subSettings = settings.getNodeSettings(CFG_SUB_CONFIG);
+            if (subSettings != null) {
+                for (String identifier : subSettings) {
+                    NodeSettingsRO col = subSettings.getNodeSettings(identifier);
+                    DictionaryTaggerConfiguration.createFrom(col);
+                }
+            }
         }
     }
 
@@ -106,5 +152,19 @@ final class MultipleDictionaryTaggerConfiguration {
      */
     final List<DictionaryTaggerConfiguration> getConfigs() {
         return m_configs;
+    }
+
+    /**
+     * @param dictTaggerColumnSetting
+     */
+    void add(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
+        m_configs.add(dictTaggerColumnSetting);
+    }
+
+    /**
+     * @param dictTaggerColumnSetting
+     */
+    void remove(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
+        m_configs.remove(dictTaggerColumnSetting);
     }
 }

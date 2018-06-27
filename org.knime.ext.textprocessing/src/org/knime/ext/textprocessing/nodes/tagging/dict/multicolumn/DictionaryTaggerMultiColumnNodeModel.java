@@ -79,11 +79,6 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
 
     /**
-     * Config identifier for the NodeSettings object contained in the NodeSettings which contains the settings.
-     */
-    static final String CFG_SUB_CONFIG = "all_columns";
-
-    /**
      * Default dictionary table index.
      */
     static final int DICT_TABLE_INDEX = 1;
@@ -211,10 +206,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         super.saveSettingsTo(settings);
         m_setUnmodifiableModel.saveSettingsTo(settings);
-        if (m_settings != null) {
-            final NodeSettingsWO subSettings = settings.addNodeSettings(CFG_SUB_CONFIG);
-            m_settings.save(subSettings);
-        }
+        m_settings.save(settings);
     }
 
     /**
@@ -224,11 +216,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
-        // TODO: what is this object used for? --> tries to create an object for given node settings, if it fails
-        // InvalidSettingsException will be thrown
-        if (settings.containsKey(CFG_SUB_CONFIG)) {
-            new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
-        }
+        MultipleDictionaryTaggerConfiguration.validate(settings);
     }
 
     /**
@@ -238,8 +226,6 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
-        if (settings.containsKey(CFG_SUB_CONFIG)) {
-            m_settings = new MultipleDictionaryTaggerConfiguration(settings.getNodeSettings(CFG_SUB_CONFIG));
-        }
+        m_settings = new MultipleDictionaryTaggerConfiguration(settings);
     }
 }
