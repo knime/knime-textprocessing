@@ -91,6 +91,16 @@ final class DictionaryTaggerPanel extends JPanel {
     static final String REMOVE_ACTION = "REMOVE_ACTION";
 
     /**
+     * Fired if the up button is pressed.
+     */
+    static final String UP_ACTION = "UP_ACTION";
+
+    /**
+     * Fired if the up button is pressed.
+     */
+    static final String DOWN_ACTION = "DOWN_ACTION";
+
+    /**
      * The configuration that is displayed by the panel.
      */
     private final DictionaryTaggerConfiguration m_settings;
@@ -116,6 +126,12 @@ final class DictionaryTaggerPanel extends JPanel {
 
         final JLabel nameLabel = new JLabel(labelName);
         nameLabel.setToolTipText(colName);
+
+        JButton upButton = new JButton(SharedIcons.MOVE_UP.get());
+        upButton.addActionListener(e -> firePropertyChange(UP_ACTION, null, null));
+
+        JButton downButton = new JButton(SharedIcons.MOVE_DOWN.get());
+        downButton.addActionListener(e -> firePropertyChange(DOWN_ACTION, null, null));
 
         JButton removeButton = new JButton(SharedIcons.DELETE_TRASH.get());
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
@@ -156,10 +172,15 @@ final class DictionaryTaggerPanel extends JPanel {
         setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2)
             : BorderFactory.createLineBorder(Color.BLACK, 1));
 
+        JPanel buttonLayout = new JPanel(new BorderLayout(0, 0));
+        buttonLayout.add(upButton, BorderLayout.WEST);
+        buttonLayout.add(downButton, BorderLayout.CENTER);
+        buttonLayout.add(removeButton, BorderLayout.EAST);
+
         // Panel for name label and remove button
         JPanel northLayout = new JPanel(new BorderLayout(15, 0));
         northLayout.add(nameLabel, BorderLayout.WEST);
-        northLayout.add(removeButton, BorderLayout.EAST);
+        northLayout.add(buttonLayout, BorderLayout.EAST);
 
         // Panel for case sensitivity and exact match check box
         JPanel centerLayout = new JPanel(new BorderLayout());
