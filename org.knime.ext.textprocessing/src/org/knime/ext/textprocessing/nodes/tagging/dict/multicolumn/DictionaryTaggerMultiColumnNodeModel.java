@@ -48,12 +48,10 @@
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -104,7 +102,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
      * Contains valid {@link DictionaryTaggerConfiguration DictionaryTaggerConfigurations} which map to their specific
      * dictionary.
      */
-    private Map<DictionaryTaggerConfiguration, Set<String>> m_validSettingsAndDicts;
+    private final Map<DictionaryTaggerConfiguration, List<String>> m_validSettingsAndDicts = new LinkedHashMap<>();
 
     /**
      * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
@@ -145,17 +143,12 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
             if (dictTableIndex < 0) {
                 invalidColumns.add(settings.getColumnName());
             } else {
-                if (m_validSettingsAndDicts == null) {
-                    m_validSettingsAndDicts = new LinkedHashMap<>();
-                }
-                m_validSettingsAndDicts.put(settings, null);
+                m_validSettingsAndDicts.put(settings, new ArrayList<>());
             }
         }
 
         // Throw exception if all configs are invalid
-        if (invalidColumns.size() == m_settings.getConfigs().size())
-
-        {
+        if (invalidColumns.size() == m_settings.getConfigs().size()) {
             throw new InvalidSettingsException("No valid dictionary column selected. Please configure.");
         }
 
@@ -171,7 +164,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     @Override
     public DocumentTagger createTagger() throws Exception {
         MultipleDictionarySentenceTagger multiDictTagger = new MultipleDictionarySentenceTagger();
-        for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_validSettingsAndDicts.entrySet()) {
+        for (Entry<DictionaryTaggerConfiguration, List<String>> entry : m_validSettingsAndDicts.entrySet()) {
             if (entry.getValue() != null) {
                 multiDictTagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
             }
@@ -190,17 +183,14 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
      */
     @Override
     protected void prepareTagger(final BufferedDataTable[] inData, final ExecutionContext exec) throws Exception {
-        BufferedDataTable dictDataTable = inData[DICT_TABLE_INDEX];
+        final BufferedDataTable dictDataTable = inData[DICT_TABLE_INDEX];
+        final DataTableSpec spec = dictDataTable.getSpec();
+
         for (DataRow row : dictDataTable) {
-            for (Entry<DictionaryTaggerConfiguration, Set<String>> entry : m_validSettingsAndDicts.entrySet()) {
-                int dictIdx = dictDataTable.getSpec().findColumnIndex(entry.getKey().getColumnName());
+            for (Entry<DictionaryTaggerConfiguration, List<String>> entry : m_validSettingsAndDicts.entrySet()) {
+                int dictIdx = spec.findColumnIndex(entry.getKey().getColumnName());
                 if (!row.getCell(dictIdx).isMissing()) {
-                    Set<String> dict = entry.getValue();
-                    if (dict == null) {
-                        dict = new HashSet<>();
-                    }
-                    dict.add(((StringValue)row.getCell(dictIdx)).getStringValue());
-                    m_validSettingsAndDicts.put(entry.getKey(), dict);
+                    entry.getValue().add(((StringValue)row.getCell(dictIdx)).getStringValue());
                 }
             }
         }

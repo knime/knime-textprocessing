@@ -48,7 +48,7 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
-import java.util.Set;
+import java.util.List;
 
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.nodes.tagging.NamedEntityMatcher;
@@ -65,7 +65,7 @@ final class SingleDictionaryTagger {
     /**
      * A set of entities.
      */
-    private final Set<String> m_entities;
+    private final List<String> m_entities;
 
     /**
      * The {@code NamedEntityMatcher} used for word matching.
@@ -85,7 +85,7 @@ final class SingleDictionaryTagger {
      * @param entities A set of entities.
      */
     SingleDictionaryTagger(final boolean caseSensitivity, final boolean exactMatch, final Tag tag,
-        final Set<String> entities) {
+        final List<String> entities) {
         m_entities = entities;
         m_tag = tag;
         m_matcher = new NamedEntityMatcher(caseSensitivity, exactMatch);
@@ -97,7 +97,7 @@ final class SingleDictionaryTagger {
      * @param config The {@code DictionaryTaggerConfiguration}.
      * @param entities A set of entities.
      */
-    SingleDictionaryTagger(final DictionaryTaggerConfiguration config, final Set<String> entities) {
+    SingleDictionaryTagger(final DictionaryTaggerConfiguration config, final List<String> entities) {
         this(config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTag(), entities);
     }
 
@@ -106,7 +106,7 @@ final class SingleDictionaryTagger {
      *
      * @return Returns a set of entities used for tagging.
      */
-    Set<String> getEntities() {
+    List<String> getEntities() {
         return m_entities;
     }
 
