@@ -7,15 +7,44 @@
     </shortDescription>
     <fullDescription>
         <intro>
+        	<p>
             This node recognizes named entities specified in one or more dictionary columns 
             and assigns a specified tag value and type. Optionally, the 
             recognized named entity terms can be set unmodifiable, meaning that 
-            the terms are not modified or filtered afterwards by any following 
-            node.
+            the terms are not modified or filtered afterwards by any following preprocessing
+            node. However, succeeding tagging nodes can overwrite tags of an unmodifiable term.
+            </p>
+            <p>
             If the same entity is contained in different dictionaries, it will be tagged for every fitting configuration.
-            For example: The document contains the term London and London is also contained in three different dictionaries, 
-            it will be tagged with all three tags that have been set for the specific dictionaries.
-            This tagger also keeps all tags of terms that occur in the documents of the input data table.  
+            For example: The document contains the term "London" and "London" is also contained in three different
+            dictionaries, it will be tagged with all three tags that have been set for the specific dictionaries.
+            </p>
+            <p>
+            The sequence of the tags depends on the order of the dictionaries within the node dialog. 
+            The dictionary column at the top of the node dialog contains the entities to be tagged first in the documents. 
+            The order can be changed by using the up/down arrow buttons.
+            </p>
+            <p>
+            Attention: If there are any multi word entities in your dictionary and there is a succeeding dictionary
+            containing one word of the multi word entity, the single word will be tagged only.
+            </p>
+            <p>
+            Example:
+            </p>
+ 			<ul>
+  			<li>Document: "New York is beautiful."</li>
+ 			<li>Dictionary 1: "New York"</li>
+  			<li>Dictionary 2: "York"</li>
+			</ul> 
+			<p>
+			In this case only "York" will be tagged. If there is a third dictionary containing "New York" as well,
+            "New York" will be tagged with the tags set for the first and the third dictionary. <br/>
+			The order of the entities within a dictionary is also important. 
+            Equally as the order of the dictionaries, the first entity in the dictionary will be tagged first.
+			</p>
+			<p>
+            This tagger also keeps all tags of terms that occur in the documents of the input data table.
+            </p>
         </intro>
         <tab name="General Options">
         <option name="Document column">
@@ -40,10 +69,8 @@
         </option>
         </tab>       
         <tab name="Dictionary Tagger Selection">
-        <option name="General information"> 
-        	Select one or more dictionary columns from the list in left panel
-        	and set the tagging options for each dictionary in the right panel.
-        	To remove a dictionary tagger configuration press the button with the trash can icon.
+        <option name="Column Search"> 
+        	Search a column based on its name.
         </option>
         <option name="Set entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
@@ -63,6 +90,14 @@
         <option name="Tag value">
             Specifies the tag value to use for tagging recognized named entities.
         </option>
+        <option name="Arrows">
+       		Change the order of the dictionaries used for tagging. The dictionary at the top of the dialog will be used 
+       		at first.
+        </option>
+        <option name="Remove">
+       		Clicking the trash can button removes the dictionary and its configuration.
+        </option>
+        
         </tab>         
     </fullDescription>
         
