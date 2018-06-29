@@ -54,21 +54,21 @@ import java.util.List;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerConfiguration;
+import org.knime.ext.textprocessing.nodes.tagging.DocumentTaggerSettings;
 
 /**
- * Stores {@link DocumentTaggerConfiguration DocumentTaggerConfigurations} and their identifiers in a map.
+ * Stores {@link DocumentTaggerSettings} and their identifiers in a map.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-final class MultipleDictionaryTaggerConfiguration {
+final class MultipleDictionaryTaggerSettings {
 
     /**
-     * List of {@code DictionaryTaggerConfiguration}s containing the configurations for all dictionaries used for
+     * List of {@code DictionaryTaggerSettings} containing the settings for all dictionaries used for
      * tagging.
      */
-    private final List<DictionaryTaggerConfiguration> m_configs = new ArrayList<>();
+    private final List<DictionaryTaggerSettings> m_settings = new ArrayList<>();
 
     /**
      * Config identifier for the NodeSettings object contained in the NodeSettings which contains the settings.
@@ -86,13 +86,13 @@ final class MultipleDictionaryTaggerConfiguration {
      * @param settings The settings to store.
      * @throws InvalidSettingsException, if node settings could not be retrieved.
      */
-    MultipleDictionaryTaggerConfiguration(final NodeSettingsRO settings) throws InvalidSettingsException {
+    MultipleDictionaryTaggerSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         if (settings.containsKey(CFG_SUB_CONFIG)) {
             NodeSettingsRO subSettings = settings.getNodeSettings(CFG_SUB_CONFIG);
             if (subSettings != null) {
                 for (String identifier : subSettings) {
                     NodeSettingsRO col = subSettings.getNodeSettings(identifier);
-                    m_configs.add(DictionaryTaggerConfiguration.createFrom(col));
+                    m_settings.add(DictionaryTaggerSettings.createFrom(col));
                 }
             }
         }
@@ -103,8 +103,8 @@ final class MultipleDictionaryTaggerConfiguration {
      *
      * @param settings The list of {@code DictionaryTaggerSettings}.
      */
-    MultipleDictionaryTaggerConfiguration(final List<DictionaryTaggerConfiguration> settings) {
-        m_configs.addAll(settings);
+    MultipleDictionaryTaggerSettings(final List<DictionaryTaggerSettings> settings) {
+        m_settings.addAll(settings);
     }
 
     /**
@@ -117,7 +117,7 @@ final class MultipleDictionaryTaggerConfiguration {
         if (settings != null) {
             final NodeSettingsWO subSettings = settings.addNodeSettings(CFG_SUB_CONFIG);
             int index = 0;
-            for (DictionaryTaggerConfiguration entry : m_configs) {
+            for (DictionaryTaggerSettings entry : m_settings) {
                 NodeSettingsWO subSub =
                     subSettings.addNodeSettings(CFG_KEY_DICT_TAGGER_SUB + "_" + Integer.toString(index));
                 entry.saveSettingsTo(subSub);
@@ -138,47 +138,47 @@ final class MultipleDictionaryTaggerConfiguration {
             if (subSettings != null) {
                 for (String identifier : subSettings) {
                     NodeSettingsRO col = subSettings.getNodeSettings(identifier);
-                    DictionaryTaggerConfiguration.createFrom(col);
+                    DictionaryTaggerSettings.createFrom(col);
                 }
             }
         }
     }
 
     /**
-     * Returns list of {@code DictionaryTaggerConfiguration}s containing the specific settings for each dictionary
+     * Returns list of {@code DictionaryTaggerSettings} containing the specific settings for each dictionary
      * column.
      *
      * @return Returns the settings for each dictionary column.
      */
-    final List<DictionaryTaggerConfiguration> getConfigs() {
-        return m_configs;
+    final List<DictionaryTaggerSettings> getSettings() {
+        return m_settings;
     }
 
     /**
-     * Adds a {@code DictionaryTaggerConfiguration}.
+     * Adds a {@code DictionaryTaggerSettings}.
      *
-     * @param dictTaggerColumnSetting The {@code DictionaryTaggerConfiguration} to add.
+     * @param dictTaggerColumnSetting The {@code DictionaryTaggerSettings} to add.
      */
-    final void add(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
-        m_configs.add(dictTaggerColumnSetting);
+    final void add(final DictionaryTaggerSettings dictTaggerColumnSetting) {
+        m_settings.add(dictTaggerColumnSetting);
     }
 
     /**
-     * Removes a {@code DictionaryTaggerConfiguration}.
+     * Removes a {@code DictionaryTaggerSettings}.
      *
-     * @param dictTaggerColumnSetting The {@code DictionaryTaggerConfiguration} to remove.
+     * @param dictTaggerColumnSetting The {@code DictionaryTaggerSettings} to remove.
      */
-    final void remove(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
-        m_configs.remove(dictTaggerColumnSetting);
+    final void remove(final DictionaryTaggerSettings dictTaggerColumnSetting) {
+        m_settings.remove(dictTaggerColumnSetting);
     }
 
     /**
-     * Retrieves a {@code DictionaryTaggerConfiguration} based on an index.
+     * Retrieves a {@code DictionaryTaggerSettings} based on an index.
      *
-     * @param configIndex The index.
-     * @return Returns a {@code DictionaryTaggerConfiguration}.
+     * @param settingsIndex The index.
+     * @return Returns a {@code DictionaryTaggerSettings}.
      */
-    final DictionaryTaggerConfiguration get(final int configIndex) {
-        return m_configs.get(configIndex);
+    final DictionaryTaggerSettings get(final int settingsIndex) {
+        return m_settings.get(settingsIndex);
     }
 }

@@ -94,11 +94,11 @@ final class SingleDictionaryTagger {
     /**
      * Creates a new instance of {@code SingleDictionaryTagger}.
      *
-     * @param config The {@code DictionaryTaggerConfiguration}.
+     * @param settings The {@code DictionaryTaggerSettings}.
      * @param entities A set of entities.
      */
-    SingleDictionaryTagger(final DictionaryTaggerConfiguration config, final List<String> entities) {
-        this(config.getCaseSensitivityOption(), config.getExactMatchOption(), config.getTag(), entities);
+    SingleDictionaryTagger(final DictionaryTaggerSettings settings, final List<String> entities) {
+        this(settings.getCaseSensitivityOption(), settings.getExactMatchOption(), settings.getTag(), entities);
     }
 
     /**

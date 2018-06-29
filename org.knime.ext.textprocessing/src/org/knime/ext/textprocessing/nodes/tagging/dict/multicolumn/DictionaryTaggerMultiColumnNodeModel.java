@@ -91,13 +91,13 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     /**
      * Contains settings for each individual column.
      */
-    private MultipleDictionaryTaggerConfiguration m_settings;
+    private MultipleDictionaryTaggerSettings m_settings;
 
     /**
-     * Contains valid {@link DictionaryTaggerConfiguration DictionaryTaggerConfigurations} which map to their specific
+     * Contains valid {@link DictionaryTaggerSettings} which map to their specific
      * dictionary.
      */
-    private final Map<DictionaryTaggerConfiguration, List<String>> m_validSettingsAndDicts = new LinkedHashMap<>();
+    private final Map<DictionaryTaggerSettings, List<String>> m_validSettingsAndDicts = new LinkedHashMap<>();
 
     /**
      * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
@@ -128,13 +128,13 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
         List<String> invalidColumns = new ArrayList<>();
 
         // Check if there are any dictionary columns selected at all
-        if (m_settings == null || m_settings.getConfigs().isEmpty()) {
+        if (m_settings == null || m_settings.getSettings().isEmpty()) {
             throw new InvalidSettingsException("No dictionary column selected. Please configure.");
         }
 
         // Check for invalid dictionary columns
         m_validSettingsAndDicts.clear();
-        for (DictionaryTaggerConfiguration settings : m_settings.getConfigs()) {
+        for (DictionaryTaggerSettings settings : m_settings.getSettings()) {
             int dictTableIndex = dictTableSpec.findColumnIndex(settings.getColumnName());
             if (dictTableIndex < 0) {
                 invalidColumns.add(settings.getColumnName());
@@ -143,8 +143,8 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
             }
         }
 
-        // Throw exception if all configs are invalid
-        if (invalidColumns.size() == m_settings.getConfigs().size()) {
+        // Throw exception if all settings are invalid
+        if (invalidColumns.size() == m_settings.getSettings().size()) {
             throw new InvalidSettingsException("No valid dictionary column selected. Please configure.");
         }
 
@@ -160,7 +160,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     @Override
     public DocumentTagger createTagger() throws Exception {
         MultipleDictionarySentenceTagger multiDictTagger = new MultipleDictionarySentenceTagger();
-        for (Entry<DictionaryTaggerConfiguration, List<String>> entry : m_validSettingsAndDicts.entrySet()) {
+        for (Entry<DictionaryTaggerSettings, List<String>> entry : m_validSettingsAndDicts.entrySet()) {
             if (entry.getValue() != null) {
                 multiDictTagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
             }
@@ -183,7 +183,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
         final DataTableSpec spec = dictDataTable.getSpec();
 
         for (DataRow row : dictDataTable) {
-            for (Entry<DictionaryTaggerConfiguration, List<String>> entry : m_validSettingsAndDicts.entrySet()) {
+            for (Entry<DictionaryTaggerSettings, List<String>> entry : m_validSettingsAndDicts.entrySet()) {
                 int dictIdx = spec.findColumnIndex(entry.getKey().getColumnName());
                 if (!row.getCell(dictIdx).isMissing()) {
                     entry.getValue().add(((StringValue)row.getCell(dictIdx)).getStringValue());
@@ -217,7 +217,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
         m_setUnmodifiableModel.validateSettings(settings);
-        MultipleDictionaryTaggerConfiguration.validate(settings);
+        MultipleDictionaryTaggerSettings.validate(settings);
     }
 
     /**
@@ -227,6 +227,6 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadValidatedSettingsFrom(settings);
         m_setUnmodifiableModel.loadSettingsFrom(settings);
-        m_settings = new MultipleDictionaryTaggerConfiguration(settings);
+        m_settings = new MultipleDictionaryTaggerSettings(settings);
     }
 }

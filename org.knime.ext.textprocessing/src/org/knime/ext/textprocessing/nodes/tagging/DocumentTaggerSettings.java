@@ -56,19 +56,19 @@ import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Tag;
 
 /**
- * The {@code DocumentTaggerConfiguration} class contains all properties a tagger instance needs to tag documents. This
+ * The {@code DocumentTaggerSettings} class contains all properties a tagger instance needs to tag documents. This
  * class also provides getters and setters for the member variables, as well as helper methods for the loading and
  * saving processes of node settings.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class DocumentTaggerConfiguration {
+public class DocumentTaggerSettings {
 
     /**
      * Node logger for this class.
      */
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentTaggerConfiguration.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DocumentTaggerSettings.class);
 
     /**
      * The configuration key of the exact match flag.
@@ -131,15 +131,15 @@ public class DocumentTaggerConfiguration {
     private String m_tagValue;
 
     /**
-     * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name. Sets default values for
+     * Creates a new instance of {@code DocumentTaggerSettings} with a given column name. Sets default values for
      * case sensitivity, exact match, tag type and tag value.
      */
-    public DocumentTaggerConfiguration() {
+    public DocumentTaggerSettings() {
         this(DEFAULT_CASE_SENSITIVITY, DEFAULT_EXACT_MATCH, DEFAULT_TAG_TYPE, DEFAULT_TAG_VALUE);
     }
 
     /**
-     * Creates a new instance of {@code DocumentTaggerConfiguration} with a given column name and values for case
+     * Creates a new instance of {@code DocumentTaggerSettings} with a given column name and values for case
      * sensitivity, exact match, tag type and tag value.
      *
      * @param caseSensitivity Boolean value for case sensitivity.
@@ -148,7 +148,7 @@ public class DocumentTaggerConfiguration {
      * @param tagValue The tag value.
      *
      */
-    public DocumentTaggerConfiguration(final boolean caseSensitivity, final boolean exactMatch, final String tagType,
+    public DocumentTaggerSettings(final boolean caseSensitivity, final boolean exactMatch, final String tagType,
         final String tagValue) {
         setCaseSensitivityOption(caseSensitivity);
         setExactMatchOption(exactMatch);
@@ -250,7 +250,7 @@ public class DocumentTaggerConfiguration {
     /**
      * This methods sets all settings based on a {@link NodeSettingsRO} instance.
      *
-     * @param settings The {@code NodeSettingsRO} instance containing {@code DocumentTaggerConfiguration} specific
+     * @param settings The {@code NodeSettingsRO} instance containing {@code DocumentTaggerSettings} specific
      *            settings.
      */
     public void loadSettingsFrom(final NodeSettingsRO settings) {
@@ -284,7 +284,7 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
-     * Saves the settings of the {@code DocumentTaggerConfiguration} to an instance of {@link NodeSettingsWO}.
+     * Saves the settings of the {@code DocumentTaggerSettings} to an instance of {@link NodeSettingsWO}.
      *
      * @param settings The {@code NodeSettingsWO} instance to save the settings to.
      */
@@ -296,16 +296,16 @@ public class DocumentTaggerConfiguration {
     }
 
     /**
-     * Static method to create a {@code DocumentTaggerConfiguration} from an instance of {@link NodeSettingsRO}.
+     * Static method to create a {@code DocumentTaggerSettings} from an instance of {@link NodeSettingsRO}.
      *
-     * @param settings The instance of {@code NodeSettingsRO} to create the {@code DocumentTaggerConfiguration} instance
+     * @param settings The instance of {@code NodeSettingsRO} to create the {@code DocumentTaggerSettings} instance
      *            from.
      * @throws InvalidSettingsException If settings could not be retrieved.
-     * @return Returns an instance of {@code DocumentTaggerConfiguration}.
+     * @return Returns an instance of {@code DocumentTaggerSettings}.
      */
-    public static DocumentTaggerConfiguration createFrom(final NodeSettingsRO settings)
+    public static DocumentTaggerSettings createFrom(final NodeSettingsRO settings)
         throws InvalidSettingsException {
-        return new DocumentTaggerConfiguration(settings.getBoolean(CFGKEY_CASESENSITIVE),
+        return new DocumentTaggerSettings(settings.getBoolean(CFGKEY_CASESENSITIVE),
             settings.getBoolean(CFGKEY_EXACTMATCH), settings.getString(CFGKEY_TAG_TYPE),
             settings.getString(CFGKEY_TAG_VALUE));
     }

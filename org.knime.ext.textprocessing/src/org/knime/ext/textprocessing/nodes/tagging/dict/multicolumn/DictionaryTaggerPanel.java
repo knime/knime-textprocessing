@@ -103,9 +103,9 @@ final class DictionaryTaggerPanel extends JPanel {
     static final String DOWN_ACTION = "DOWN_ACTION";
 
     /**
-     * The configuration that is displayed by the panel.
+     * The settings that is displayed by the panel.
      */
-    private final DictionaryTaggerConfiguration m_settings;
+    private final DictionaryTaggerSettings m_settings;
 
     /**
      * The column spec related to the panel.
@@ -150,14 +150,14 @@ final class DictionaryTaggerPanel extends JPanel {
     /**
      * Creates a new instance of {@code DictionaryTaggerPanel}.
      *
-     * @param config The {@code DocumentTaggerConfiguration} containing the configuration values used for tagging.
+     * @param settings The {@code DocumentTaggerSettings} containing the settings values used for tagging.
      * @param spec The {@code DataColumnSpec} containing the name of the column which contains the dictionary used for
      *            tagging.
      */
-    DictionaryTaggerPanel(final DictionaryTaggerConfiguration config, final DataColumnSpec spec) {
-        m_settings = config;
+    DictionaryTaggerPanel(final DictionaryTaggerSettings settings, final DataColumnSpec spec) {
+        m_settings = settings;
         m_columnSpec = spec;
-        final String colName = config.getColumnName();
+        final String colName = settings.getColumnName();
 
         String labelName = colName.length() > MAX_LETTERS ? colName.substring(0, MAX_LETTERS) + "..." : colName;
 
@@ -173,22 +173,22 @@ final class DictionaryTaggerPanel extends JPanel {
         JButton removeButton = new JButton(SharedIcons.DELETE_TRASH.get());
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
 
-        m_caseSensitivityChecker = new JCheckBox("Case sensitive", config.getCaseSensitivityOption());
+        m_caseSensitivityChecker = new JCheckBox("Case sensitive", settings.getCaseSensitivityOption());
         m_caseSensitivityChecker
             .addItemListener(e -> m_settings.setCaseSensitivityOption(m_caseSensitivityChecker.isSelected()));
 
-        m_exactMatchChecker = new JCheckBox("Exact match", config.getExactMatchOption());
+        m_exactMatchChecker = new JCheckBox("Exact match", settings.getExactMatchOption());
         m_exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(m_exactMatchChecker.isSelected()));
 
         m_tagValueSelection = new JComboBox<>(
-            TagFactory.getInstance().getTagSetByType(config.getTagType()).asStringList().toArray(new String[0]));
-        m_tagValueSelection.setSelectedItem(config.getTagValue());
+            TagFactory.getInstance().getTagSetByType(settings.getTagType()).asStringList().toArray(new String[0]));
+        m_tagValueSelection.setSelectedItem(settings.getTagValue());
         m_tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)m_tagValueSelection.getSelectedItem()));
         m_tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());
 
         m_tagTypeSelection = new JComboBox<>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
 
-        m_tagTypeSelection.setSelectedItem(config.getTagType());
+        m_tagTypeSelection.setSelectedItem(settings.getTagType());
         m_tagTypeSelection.addItemListener(new ItemListener() {
 
             @Override
@@ -240,11 +240,11 @@ final class DictionaryTaggerPanel extends JPanel {
     }
 
     /**
-     * Returns a {@code DictionaryTaggerConfiguration} that is displayed by an instance of this panel.
+     * Returns a {@code DictionaryTaggerSettings} that is displayed by an instance of this panel.
      *
-     * @return Returns a {@code DictionaryTaggerConfiguration} that is displayed by an instance of this panel.
+     * @return Returns a {@code DictionaryTaggerSettings} that is displayed by an instance of this panel.
      */
-    DictionaryTaggerConfiguration getSettings() {
+    DictionaryTaggerSettings getSettings() {
         return m_settings;
     }
 
@@ -284,20 +284,20 @@ final class DictionaryTaggerPanel extends JPanel {
     }
 
     /**
-     * Sets the configuration of the {@code DictionaryTaggerPanel} based on a {@code DictionaryTaggerConfiguration} and
+     * Sets the settings of the {@code DictionaryTaggerPanel} based on a {@code DictionaryTaggerSettings} and
      * a {@code DataTableSpec}.
      *
-     * @param config The {@code DictionaryTaggerConfiguration} holding the settings to be set.
+     * @param settings The {@code DictionaryTaggerSettings} holding the settings to be set.
      * @param spec The {@code DataColumnSpec} to be set.
      */
-    void setSettings(final DictionaryTaggerConfiguration config, final DataColumnSpec spec) {
-        final String newName = config.getColumnName();
+    void setSettings(final DictionaryTaggerSettings settings, final DataColumnSpec spec) {
+        final String newName = settings.getColumnName();
         m_nameLabel.setText(newName.length() > MAX_LETTERS ? newName.substring(0, MAX_LETTERS) + "..." : newName);
         m_settings.setColumnName(newName);
-        m_caseSensitivityChecker.setSelected(config.getCaseSensitivityOption());
-        m_exactMatchChecker.setSelected(config.getExactMatchOption());
-        m_tagTypeSelection.setSelectedItem(config.getTagType());
-        m_tagValueSelection.setSelectedItem(config.getTagValue());
+        m_caseSensitivityChecker.setSelected(settings.getCaseSensitivityOption());
+        m_exactMatchChecker.setSelected(settings.getExactMatchOption());
+        m_tagTypeSelection.setSelectedItem(settings.getTagType());
+        m_tagValueSelection.setSelectedItem(settings.getTagValue());
         m_columnSpec = spec;
     }
 }
