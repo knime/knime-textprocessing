@@ -16,16 +16,15 @@
             </p>
             <p>
             If the same entity is contained in different dictionaries, it will be tagged for every fitting configuration.
-            For example: The document contains the term "London" and "London" is also contained in three different
+            For example, the document contains the term "London" and "London" is also contained in three different
             dictionaries, it will be tagged with all three tags that have been set for the specific dictionaries.
             </p>
             <p>
             The sequence of the tags depends on the order of the dictionaries within the node dialog. 
-            The dictionary column at the top of the node dialog contains the entities to be tagged first in the documents. 
             The order can be changed by using the up/down arrow buttons.
             </p>
             <p>
-            Attention: If there are any multi word entities in your dictionary and there is a succeeding dictionary
+            Note, if there are any multi word entities in your dictionary and there is a succeeding dictionary
             containing one word of the multi word entity, the single word will be tagged only.
             </p>
             <p>
@@ -42,9 +41,6 @@
 			The order of the entities within a dictionary is also important. 
             Equally as the order of the dictionaries, the first entity in the dictionary will be tagged first.
 			</p>
-			<p>
-            This tagger also keeps all tags of terms that occur in the documents of the input data table.
-            </p>
         </intro>
         <tab name="General Options">
         <option name="Document column">
