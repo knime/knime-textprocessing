@@ -8,10 +8,9 @@
         <intro>
             This node assigns to each term of a document a part of speech (POS)
             tag. Therefore the Penn Treebank tag set is used, for details
-            see (http://www.cis.upenn.edu/~treebank). The underlying tagger 
-            model deciding what tag to assign to which term is a
-            model of the opennlp framework version 1.6.0
-            (see for http://opennlp.apache.org/documentation.html details).
+            click <a href="https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html">here</a>.
+            The underlying tagger model deciding what tag to assign to which term is a model of the OpenNLP framework 
+            version 1.8.4 (<a href="http://opennlp.apache.org/docs/">details</a>).
         </intro>
  		<tab name="General options">
         <option name="Document column">
