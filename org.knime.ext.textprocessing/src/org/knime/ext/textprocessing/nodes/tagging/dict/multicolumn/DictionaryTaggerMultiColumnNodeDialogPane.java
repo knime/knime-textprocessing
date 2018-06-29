@@ -426,7 +426,7 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
             DictionaryTaggerPanel dictPanel = (DictionaryTaggerPanel)panel;
             if (componentCount == 1) {
                 dictPanel.enableUpButton(false);
-                dictPanel.enableUpButton(false);
+                dictPanel.enableDownButton(false);
             } else {
                 int individualIndex = getIndexIndividualIndex(dictPanel.getSettings());
                 // case for panel between first and last panel
