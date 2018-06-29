@@ -67,6 +67,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.Scrollable;
 
 import org.knime.core.data.DataColumnSpec;
@@ -99,12 +100,13 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
     /**
      * Dummy panel to have a reference preferred size for the {@code IndividualsPanel.}
      */
-    private static final DictionaryTaggerPanel DUMMY_PANEL = new DictionaryTaggerPanel(
-        new DictionaryTaggerSettings("DUMMY"), DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY"));
+    private static final DictionaryTaggerPanel DUMMY_PANEL =
+        new DictionaryTaggerPanel(new DictionaryTaggerSettings("DUMMY with a very long name"),
+            DataColumnSpecListCellRenderer.createInvalidSpec("DUMMY with a very long name"));
 
     /**
-     * Map containing a {@code DataColumnSpec} and a specific {@code DictionaryTaggerSettings} holding properties
-     * for tagging terms based on the dictionary that is stored in the key column.
+     * Map containing a {@code DataColumnSpec} and a specific {@code DictionaryTaggerSettings} holding properties for
+     * tagging terms based on the dictionary that is stored in the key column.
      */
     private final Map<DataColumnSpec, DictionaryTaggerSettings> m_columnToSettings;
 
@@ -134,8 +136,7 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
     private ListModifier m_searchableListModifier;
 
     /**
-     * The {@link MultipleDictionaryTaggerSettings} containing the settings for every single dictionary
-     * column.
+     * The {@link MultipleDictionaryTaggerSettings} containing the settings for every single dictionary column.
      */
     private MultipleDictionaryTaggerSettings m_multipleDictTaggerSettings;
 
@@ -187,7 +188,7 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
                 }
             }
         });
-
+        //TODO: add it again
         m_searchableListPanel.showSelectionPanel(false);
 
         final JPanel leftPanel = new JPanel(new BorderLayout());
@@ -203,7 +204,8 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
         leftPanel.add(setUnmodifiablePanel, BorderLayout.SOUTH);
 
         m_individualsPanel = new IndividualsPanel();
-        m_individualsScrollPanel = new JScrollPane(m_individualsPanel);
+        m_individualsScrollPanel = new JScrollPane(m_individualsPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         final JPanel tabPanel = new JPanel(new BorderLayout());
         tabPanel.add(leftPanel, BorderLayout.CENTER);
@@ -275,8 +277,7 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
         // there can only by one or non column selected.
         final DataColumnSpec selected = m_searchableListPanel.getSelectedColumn();
         if (selected != null && !m_columnToSettings.containsKey(selected)) {
-            DictionaryTaggerSettings dictTaggerColumnSetting =
-                new DictionaryTaggerSettings(selected.getName());
+            DictionaryTaggerSettings dictTaggerColumnSetting = new DictionaryTaggerSettings(selected.getName());
             m_columnToSettings.put(selected, dictTaggerColumnSetting);
             m_multipleDictTaggerSettings.add(dictTaggerColumnSetting);
             addToIndividualPanel(new DictionaryTaggerPanel(dictTaggerColumnSetting, selected));

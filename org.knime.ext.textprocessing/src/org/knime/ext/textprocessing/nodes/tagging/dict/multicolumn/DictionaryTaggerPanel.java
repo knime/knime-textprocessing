@@ -50,15 +50,18 @@ package org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn;
 
 import static org.knime.core.node.util.DataColumnSpecListCellRenderer.isInvalid;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -155,6 +158,8 @@ final class DictionaryTaggerPanel extends JPanel {
      *            tagging.
      */
     DictionaryTaggerPanel(final DictionaryTaggerSettings settings, final DataColumnSpec spec) {
+        super(new GridBagLayout());
+
         m_settings = settings;
         m_columnSpec = spec;
         final String colName = settings.getColumnName();
@@ -208,35 +213,94 @@ final class DictionaryTaggerPanel extends JPanel {
         setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2)
             : BorderFactory.createLineBorder(Color.BLACK, 1));
 
-        JPanel buttonLayout = new JPanel(new GridLayout(0, 3));
-        buttonLayout.add(m_upButton);
-        buttonLayout.add(m_downButton);
-        buttonLayout.add(removeButton);
-        buttonLayout.setPreferredSize(new Dimension(80, 20));
+        fillPanel(removeButton);
+    }
 
-        // Panel for name label and remove button
-        JPanel northLayout = new JPanel(new BorderLayout(15, 0));
-        northLayout.add(m_nameLabel, BorderLayout.WEST);
-        northLayout.add(buttonLayout, BorderLayout.EAST);
+    /**
+     * Fills the panel.
+     *
+     * @param removeButton The remove button
+     */
+    private void fillPanel(final JButton removeButton) {
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.weightx = 1;
 
-        // Panel for case sensitivity and exact match check box
-        JPanel centerLayout = new JPanel(new BorderLayout());
-        centerLayout.add(m_caseSensitivityChecker, BorderLayout.WEST);
-        centerLayout.add(m_exactMatchChecker, BorderLayout.EAST);
+        // add the identifier row
+        JPanel identifier = createIdentifierPanel(removeButton);
+        add(identifier, gbc);
+        gbc.gridwidth = 1;
+        ++gbc.gridy;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 0, 0, 0);
 
-        // Panel for tag type and tag selection
-        JPanel southLayout = new JPanel(new BorderLayout(20, 0));
-        southLayout.add(m_tagTypeSelection, BorderLayout.WEST);
-        southLayout.add(m_tagValueSelection, BorderLayout.EAST);
+        // add the checkbox row
+        add(m_caseSensitivityChecker, gbc);
+        ++gbc.gridx;
+        add(m_exactMatchChecker, gbc);
+        gbc.gridx = 0;
+        ++gbc.gridy;
 
-        setLayout(new FlowLayout());
+        // add the tag type row
+        gbc.insets = new Insets(5, 5, 0, 0);
+        add(new JLabel("Tag type:"), gbc);
+        ++gbc.gridx;
+        add(m_tagTypeSelection, gbc);
+        gbc.gridx = 0;
+        ++gbc.gridy;
 
-        // Add three panels from above to a super panel
-        JPanel dtp = new JPanel(new BorderLayout(0, 10));
-        dtp.add(northLayout, BorderLayout.NORTH);
-        dtp.add(centerLayout, BorderLayout.CENTER);
-        dtp.add(southLayout, BorderLayout.SOUTH);
-        add(dtp);
+        // add the tag value row
+        add(new JLabel("Tag value:"), gbc);
+        ++gbc.gridx;
+        add(m_tagValueSelection, gbc);
+    }
+
+    /**
+     * Creates the identifier panel containing the column name and navigation elements.
+     *
+     * @param removeButton The remove button
+     * @return The identifier panel
+     */
+    private JPanel createIdentifierPanel(final Component removeButton) {
+
+        // create the button panel
+        JPanel buttonPanel = new JPanel(new GridLayout(0, 3));
+        buttonPanel.add(m_upButton);
+        buttonPanel.add(m_downButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.setPreferredSize(new Dimension(80, 20));
+
+        JPanel identifierPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.weightx = 0;
+        gbc.weighty = 1;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+
+        // add the column / label name
+        identifierPanel.add(m_nameLabel, gbc);
+        gbc.gridx++;
+        gbc.weightx = 1;
+
+        // add something to fill the empty space
+        identifierPanel.add(Box.createGlue(), gbc);
+        gbc.weightx = 0;
+        gbc.gridx++;
+
+        // add the button panel
+        gbc.anchor = GridBagConstraints.LINE_END;
+        identifierPanel.add(buttonPanel, gbc);
+        return identifierPanel;
     }
 
     /**
@@ -284,8 +348,8 @@ final class DictionaryTaggerPanel extends JPanel {
     }
 
     /**
-     * Sets the settings of the {@code DictionaryTaggerPanel} based on a {@code DictionaryTaggerSettings} and
-     * a {@code DataTableSpec}.
+     * Sets the settings of the {@code DictionaryTaggerPanel} based on a {@code DictionaryTaggerSettings} and a
+     * {@code DataTableSpec}.
      *
      * @param settings The {@code DictionaryTaggerSettings} holding the settings to be set.
      * @param spec The {@code DataColumnSpec} to be set.
