@@ -108,6 +108,18 @@ final class DictionaryTaggerConfiguration extends DocumentTaggerConfiguration {
     }
 
     /**
+     * Creates an instance of {@code DictionaryTaggerConfiguration} based on another
+     * {@code DictionaryTaggerConfiguration.}
+     *
+     * @param settings The {@code DictionaryTaggerConfiguration} to create a new instance from.
+     */
+    DictionaryTaggerConfiguration(final DictionaryTaggerConfiguration settings) {
+        super(settings.getCaseSensitivityOption(), settings.getExactMatchOption(), settings.getTagType(),
+            settings.getTagValue());
+        setColumnName(settings.getColumnName());
+    }
+
+    /**
      * Creates an instance of {@code DictionaryTaggerConfiguration} based on a column name. The tagger parameters will
      * be set to their default values.
      *

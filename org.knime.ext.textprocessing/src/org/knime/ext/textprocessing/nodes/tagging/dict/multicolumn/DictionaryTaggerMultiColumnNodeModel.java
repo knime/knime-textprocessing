@@ -133,6 +133,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
         }
 
         // Check for invalid dictionary columns
+        m_validSettingsAndDicts.clear();
         for (DictionaryTaggerConfiguration settings : m_settings.getConfigs()) {
             int dictTableIndex = dictTableSpec.findColumnIndex(settings.getColumnName());
             if (dictTableIndex < 0) {

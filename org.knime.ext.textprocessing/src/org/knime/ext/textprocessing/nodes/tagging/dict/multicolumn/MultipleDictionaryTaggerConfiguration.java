@@ -155,16 +155,30 @@ final class MultipleDictionaryTaggerConfiguration {
     }
 
     /**
-     * @param dictTaggerColumnSetting
+     * Adds a {@code DictionaryTaggerConfiguration}.
+     *
+     * @param dictTaggerColumnSetting The {@code DictionaryTaggerConfiguration} to add.
      */
-    void add(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
+    final void add(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
         m_configs.add(dictTaggerColumnSetting);
     }
 
     /**
-     * @param dictTaggerColumnSetting
+     * Removes a {@code DictionaryTaggerConfiguration}.
+     *
+     * @param dictTaggerColumnSetting The {@code DictionaryTaggerConfiguration} to remove.
      */
-    void remove(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
+    final void remove(final DictionaryTaggerConfiguration dictTaggerColumnSetting) {
         m_configs.remove(dictTaggerColumnSetting);
+    }
+
+    /**
+     * Retrieves a {@code DictionaryTaggerConfiguration} based on an index.
+     *
+     * @param configIndex The index.
+     * @return Returns a {@code DictionaryTaggerConfiguration}.
+     */
+    final DictionaryTaggerConfiguration get(final int configIndex) {
+        return m_configs.get(configIndex);
     }
 }

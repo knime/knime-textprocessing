@@ -52,7 +52,9 @@ import static org.knime.core.node.util.DataColumnSpecListCellRenderer.isInvalid;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -83,7 +85,7 @@ final class DictionaryTaggerPanel extends JPanel {
     /**
      * Abbreviate names to this number of letters.
      */
-    private static final int MAX_LETTERS = 25;
+    private static final int MAX_LETTERS = 20;
 
     /**
      * Fired if the remove button is pressed.
@@ -108,11 +110,42 @@ final class DictionaryTaggerPanel extends JPanel {
     /**
      * The column spec related to the panel.
      */
-    private final DataColumnSpec m_columnSpec;
+    private DataColumnSpec m_columnSpec;
 
+    /**
+     * The "arrow up" button.
+     */
     private final JButton m_upButton;
 
+    /**
+     * The "arrow down" button.
+     */
     private final JButton m_downButton;
+
+    /**
+     * The case sensitivity checkbox.
+     */
+    private final JCheckBox m_caseSensitivityChecker;
+
+    /**
+     * The exact match checkbox.
+     */
+    private final JCheckBox m_exactMatchChecker;
+
+    /**
+     * The tag value selection combo box.
+     */
+    private final JComboBox<String> m_tagValueSelection;
+
+    /**
+     * The tag type selection combo box.
+     */
+    private final JComboBox<String> m_tagTypeSelection;
+
+    /**
+     * The label holding the column name.
+     */
+    private final JLabel m_nameLabel;
 
     /**
      * Creates a new instance of {@code DictionaryTaggerPanel}.
@@ -128,8 +161,8 @@ final class DictionaryTaggerPanel extends JPanel {
 
         String labelName = colName.length() > MAX_LETTERS ? colName.substring(0, MAX_LETTERS) + "..." : colName;
 
-        final JLabel nameLabel = new JLabel(labelName);
-        nameLabel.setToolTipText(colName);
+        m_nameLabel = new JLabel(labelName);
+        m_nameLabel.setToolTipText(colName);
 
         m_upButton = new JButton(SharedIcons.MOVE_UP.get());
         m_upButton.addActionListener(e -> firePropertyChange(UP_ACTION, null, null));
@@ -140,61 +173,61 @@ final class DictionaryTaggerPanel extends JPanel {
         JButton removeButton = new JButton(SharedIcons.DELETE_TRASH.get());
         removeButton.addActionListener(e -> firePropertyChange(REMOVE_ACTION, null, null));
 
-        final JCheckBox caseSensitivityChecker = new JCheckBox("Case sensitive", config.getCaseSensitivityOption());
-        caseSensitivityChecker
-            .addItemListener(e -> m_settings.setCaseSensitivityOption(caseSensitivityChecker.isSelected()));
+        m_caseSensitivityChecker = new JCheckBox("Case sensitive", config.getCaseSensitivityOption());
+        m_caseSensitivityChecker
+            .addItemListener(e -> m_settings.setCaseSensitivityOption(m_caseSensitivityChecker.isSelected()));
 
-        final JCheckBox exactMatchChecker = new JCheckBox("Exact match", config.getExactMatchOption());
-        exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(exactMatchChecker.isSelected()));
+        m_exactMatchChecker = new JCheckBox("Exact match", config.getExactMatchOption());
+        m_exactMatchChecker.addItemListener(e -> m_settings.setExactMatchOption(m_exactMatchChecker.isSelected()));
 
-        final JComboBox<String> tagValueSelection = new JComboBox<>(
+        m_tagValueSelection = new JComboBox<>(
             TagFactory.getInstance().getTagSetByType(config.getTagType()).asStringList().toArray(new String[0]));
-        tagValueSelection.setSelectedItem(config.getTagValue());
-        tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)tagValueSelection.getSelectedItem()));
-        tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());
+        m_tagValueSelection.setSelectedItem(config.getTagValue());
+        m_tagValueSelection.addItemListener(e -> m_settings.setTagValue((String)m_tagValueSelection.getSelectedItem()));
+        m_tagValueSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagValue());
 
-        final JComboBox<String> tagTypeSelection =
-            new JComboBox<>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
+        m_tagTypeSelection = new JComboBox<>(TagFactory.getInstance().getTagTypes().toArray(new String[0]));
 
-        tagTypeSelection.setSelectedItem(config.getTagType());
-        tagTypeSelection.addItemListener(new ItemListener() {
+        m_tagTypeSelection.setSelectedItem(config.getTagType());
+        m_tagTypeSelection.addItemListener(new ItemListener() {
 
             @Override
             public void itemStateChanged(final ItemEvent e) {
-                tagValueSelection.removeAllItems();
+                m_tagValueSelection.removeAllItems();
                 String[] tagSetByType =
                     TagFactory.getInstance().getTagSetByType((String)e.getItem()).asStringList().toArray(new String[0]);
 
                 for (String value : tagSetByType) {
-                    tagValueSelection.addItem(value);
+                    m_tagValueSelection.addItem(value);
                 }
-                m_settings.setTagType((String)tagTypeSelection.getSelectedItem());
+                m_settings.setTagType((String)m_tagTypeSelection.getSelectedItem());
             }
         });
-        tagTypeSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagType());
+        m_tagTypeSelection.setPrototypeDisplayValue(TagFactory.getInstance().getLongestTagType());
 
         setBorder(isInvalid(spec) ? BorderFactory.createLineBorder(Color.RED, 2)
             : BorderFactory.createLineBorder(Color.BLACK, 1));
 
-        JPanel buttonLayout = new JPanel(new BorderLayout(0, 0));
-        buttonLayout.add(m_upButton, BorderLayout.WEST);
-        buttonLayout.add(m_downButton, BorderLayout.CENTER);
-        buttonLayout.add(removeButton, BorderLayout.EAST);
+        JPanel buttonLayout = new JPanel(new GridLayout(0, 3));
+        buttonLayout.add(m_upButton);
+        buttonLayout.add(m_downButton);
+        buttonLayout.add(removeButton);
+        buttonLayout.setPreferredSize(new Dimension(80, 20));
 
         // Panel for name label and remove button
         JPanel northLayout = new JPanel(new BorderLayout(15, 0));
-        northLayout.add(nameLabel, BorderLayout.WEST);
+        northLayout.add(m_nameLabel, BorderLayout.WEST);
         northLayout.add(buttonLayout, BorderLayout.EAST);
 
         // Panel for case sensitivity and exact match check box
         JPanel centerLayout = new JPanel(new BorderLayout());
-        centerLayout.add(caseSensitivityChecker, BorderLayout.WEST);
-        centerLayout.add(exactMatchChecker, BorderLayout.EAST);
+        centerLayout.add(m_caseSensitivityChecker, BorderLayout.WEST);
+        centerLayout.add(m_exactMatchChecker, BorderLayout.EAST);
 
         // Panel for tag type and tag selection
         JPanel southLayout = new JPanel(new BorderLayout(20, 0));
-        southLayout.add(tagTypeSelection, BorderLayout.WEST);
-        southLayout.add(tagValueSelection, BorderLayout.EAST);
+        southLayout.add(m_tagTypeSelection, BorderLayout.WEST);
+        southLayout.add(m_tagValueSelection, BorderLayout.EAST);
 
         setLayout(new FlowLayout());
 
@@ -233,16 +266,38 @@ final class DictionaryTaggerPanel extends JPanel {
     }
 
     /**
-     * @param enable
+     * Method to enable/disable the arrow up button.
+     *
+     * @param enable Set true to enable the button, otherwise false.
      */
-    public void enableUpButton(final boolean enable) {
+    void enableUpButton(final boolean enable) {
         m_upButton.setEnabled(enable);
     }
 
     /**
-     * @param enable
+     * Method to enable/disable the arrow down button.
+     *
+     * @param enable Set true to enable the button, otherwise false.
      */
-    public void enableDownButton(final boolean enable) {
+    void enableDownButton(final boolean enable) {
         m_downButton.setEnabled(enable);
+    }
+
+    /**
+     * Sets the configuration of the {@code DictionaryTaggerPanel} based on a {@code DictionaryTaggerConfiguration} and
+     * a {@code DataTableSpec}.
+     *
+     * @param config The {@code DictionaryTaggerConfiguration} holding the settings to be set.
+     * @param spec The {@code DataColumnSpec} to be set.
+     */
+    void setSettings(final DictionaryTaggerConfiguration config, final DataColumnSpec spec) {
+        final String newName = config.getColumnName();
+        m_nameLabel.setText(newName.length() > MAX_LETTERS ? newName.substring(0, MAX_LETTERS) + "..." : newName);
+        m_settings.setColumnName(newName);
+        m_caseSensitivityChecker.setSelected(config.getCaseSensitivityOption());
+        m_exactMatchChecker.setSelected(config.getExactMatchOption());
+        m_tagTypeSelection.setSelectedItem(config.getTagType());
+        m_tagValueSelection.setSelectedItem(config.getTagValue());
+        m_columnSpec = spec;
     }
 }
