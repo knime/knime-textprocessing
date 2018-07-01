@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.nodes.tagging;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.knime.ext.textprocessing.data.Document;
@@ -109,7 +110,6 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      */
     protected Tokenizer m_wordTokenizer =
         DefaultTokenization.getWordTokenizer(TextprocessingPreferenceInitializer.tokenizerName());
-
 
     /**
      * Constructor of {@code AbstractDocumentTagger} with the given flag which specifies if recognized named entities
@@ -177,7 +177,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         DocumentBuilder db = new DocumentBuilder(doc, m_tokenizerName);
         for (Section s : doc.getSections()) {
             for (Paragraph p : s.getParagraphs()) {
-                List<Sentence> newSentenceList = new ArrayList<Sentence>();
+                List<Sentence> newSentenceList = new ArrayList<>();
                 for (Sentence sn : p.getSentences()) {
                     final Sentence taggedSentence;
                     if (sn.getTerms().isEmpty()) {
@@ -201,7 +201,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
     private Sentence tagSentence(final Sentence s) {
         // detect named entities
         List<TaggedEntity> entities = tagEntities(s);
-        if (entities.size() <= 0) {
+        if (entities.isEmpty()) {
             return s;
         }
 
@@ -210,303 +210,339 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
 
         // go through all recognized named entities and rearrange terms
         for (TaggedEntity entity : entities) {
-            // named entity can contain one or more words, so they have to be
-            // tokenized by the default tokenizer to create words out of them.
-            List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
-
             // build new term list with old term list, words of detected named
             // entities and entity tag.
-            termList = buildTermList(termList, neWords, entity.getTagString());
+            termList = buildTermList(termList, findNe(termList, entity), entity.getTagString());
         }
         return new Sentence(termList);
     }
 
-    private List<Term> buildTermList(final List<Term> oldTermList, final List<String> neWords, final String entityTag) {
-        List<Term> newTermList = null;
-        List<Term> oldList = oldTermList;
+    /**
+     * Builds the term list with newly tagged entities.
+     *
+     * @param oldTermList The term list containing initial terms.
+     * @param ranges A list containing the index ranges.
+     * @param tagValue The tag value.
+     * @return Returns a list of terms containing the newly tagged terms.
+     */
+    private final List<Term> buildTermList(final List<Term> oldTermList,
+        final List<IndexRange> ranges, final String tagValue) {
 
-        if (neWords.size() <= 0) {
-            return oldList;
+        if (ranges.isEmpty()) {
+            return oldTermList;
         }
 
-        // Won't this blow up if we have "a,b,a" as an entity and "ababab" as a
-        // sentence?
-        List<IndexRange> startStopRanges = findNe(oldList, neWords);
+        final List<Term> newTermList = new LinkedList<>();
+        final List<Word> namedEntity = new ArrayList<>();
+        // go through all terms of old term list
+        int termIdx = 0;
 
-        // if new list contains no entities to look up for return old list
-        // so that no tag is assigned to empty entities.
-        if (startStopRanges.size() <= 0) {
-            return oldList;
-        }
-
-        // if start >= 0 means that there is a named entity contained
-        // in the list of terms, so the terms have to be rearranged.
-        int startStopIndex = 0;
-        newTermList = new ArrayList<Term>();
-
-        // get the first start and stop indices
-        int startTermIndex = startStopRanges.get(startStopIndex).getStartTermIndex();
-        int stopTermIndex = startStopRanges.get(startStopIndex).getStopTermIndex();
-        int startWordIndex = startStopRanges.get(startStopIndex).getStartWordIndex();
-        int stopWordIndex = startStopRanges.get(startStopIndex).getStopWordIndex();
-
-        boolean endTerm = false;
-        // list to save term representing named entity at.
-        List<Word> namedEntity = new ArrayList<Word>(neWords.size());
-
-        // go through all the old term list
-        int t = -1;
-        for (Term term : oldList) {
-            t++;
-
-            // if we reached the interesting terms containing the named
-            // entity
-            if (t >= startTermIndex && t <= stopTermIndex) {
-
-                // detected a named entity consisting only of one term
-                // check if it has to be split up
-                if (startTermIndex == stopTermIndex) {
-
-                    //
-                    // BUT does the term consist of one or more words ?
-                    // If it consists of more words, it has to be split up,
-                    // if it consists only of one word just add the tags.
-                    //
-
-                    // the old term consists only of one word, so just add a tag
-                    // By the way, this is the _only_ situation an old tag is
-                    // kept and also assigned to the new term.
-                    if (term.getWords().size() == 1) {
-                        List<Tag> tags = new ArrayList<Tag>();
-                        tags.addAll(term.getTags());
-                        // only add tag if not already added
-                        List<Tag> newTags = getTags(entityTag);
-                        for (Tag ct : newTags) {
-                            if (!tags.contains(ct)) {
-                                tags.add(ct);
-                            }
-                        }
-
-                        // CREATE NEW TERM !!!
-                        Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
-                        newTermList.add(newTerm);
-
-                        // the old term consists of more than one word so split
-                        // it
-                    } else if (term.getWords().size() > 1) {
-                        List<Word> newWords = new ArrayList<Word>();
-
-                        int w = -1;
-                        for (Word word : term.getWords()) {
-                            w++;
-
-                            // add word if index matches
-                            if (w >= startWordIndex && w <= stopWordIndex) {
-                                newWords.add(word);
-
-                                // if last word to add, create term and add it
-                                // to new list
-                                if (w == stopWordIndex) {
-                                    List<Tag> tags = new ArrayList<Tag>();
-                                    // only add tag if not already added
-                                    List<Tag> newTags = getTags(entityTag);
-                                    for (Tag ct : newTags) {
-                                        if (!tags.contains(ct)) {
-                                            tags.add(ct);
-                                        }
-                                    }
-
-                                    // CREATE NEW TERM !!!
-                                    Term newTerm = new Term(newWords, tags, m_setNeUnmodifiable);
-                                    newTermList.add(newTerm);
-                                    endTerm = true;
-                                }
-
-                                // if word is not part of the named entity add
-                                // it as
-                                // a term.
-                            } else {
-                                List<Word> newWord = new ArrayList<Word>();
-                                newWord.add(word);
-                                List<Tag> tags = new ArrayList<Tag>();
-                                // CREATE NEW TERM !!!
-                                Term newTerm = new Term(newWord, tags, false);
-                                newTermList.add(newTerm);
-                            }
+        for (IndexRange range : ranges) {
+            // get the start and stop indices from the index range
+            int startTermIndex = range.getStartTermIndex();
+            int stopTermIndex = range.getStopTermIndex();
+            int startWordIndex = range.getStartWordIndex();
+            int stopWordIndex = range.getStopWordIndex();
+            while (termIdx < startTermIndex) {
+                newTermList.add(oldTermList.get(termIdx));
+                termIdx++;
+            }
+            if (startTermIndex == stopTermIndex) {
+                final Term term = oldTermList.get(termIdx);
+                if (term.getWords().size() - 1 == stopWordIndex - startWordIndex) {
+                    List<Tag> tags = new ArrayList<>();
+                    tags.addAll(term.getTags());
+                    // only add tag if not already added
+                    List<Tag> newTags = getTags(tagValue);
+                    for (Tag ct : newTags) {
+                        if (!tags.contains(ct)) {
+                            tags.add(ct);
                         }
                     }
-
-                    // reset new named entity list and go to the next found
-                    // named entity range
-                    startStopIndex++;
-                    if (startStopIndex < startStopRanges.size()) {
-                        startTermIndex = startStopRanges.get(startStopIndex).getStartTermIndex();
-                        stopTermIndex = startStopRanges.get(startStopIndex).getStopTermIndex();
-                        startWordIndex = startStopRanges.get(startStopIndex).getStartWordIndex();
-                        stopWordIndex = startStopRanges.get(startStopIndex).getStopWordIndex();
-                        namedEntity.clear();
-                    }
-
-                    // entity consists of more than one term, so split it up.
+                    // create the new term
+                    Term newTerm = new Term(term.getWords(), tags, m_setNeUnmodifiable);
+                    newTermList.add(newTerm);
                 } else {
-                    List<Word> words = term.getWords();
+                    // our term contains only a subset of the words
+                    // so we have to split it into several terms
 
+                    List<Word> newWords = new ArrayList<>();
+                    int w = -1;
+                    for (Word word : term.getWords()) {
+                        w++;
+                        // if we are outside our range
+                        if (w < startWordIndex || w > stopWordIndex) {
+                            createSingleWordTerm(newTermList, word);
+                        } else {
+                            newWords.add(word);
+                            // if last word to add, create term and add it
+                            // to new list
+                            if (w == stopWordIndex) {
+                                createMultiWordTerm(tagValue, newTermList, newWords);
+                            }
+                        }
+                    }
+                }
+                ++termIdx;
+            }
+            while (termIdx <= stopTermIndex) {
+                final Term term = oldTermList.get(termIdx);
+                // entity consists of more than one term, so split it up.
+                // if current term is start term
+                if (termIdx == startTermIndex) {
+                    List<Word> words = term.getWords();
+                    int w = -1;
+                    for (Word word : words) {
+                        w++;
+                        // if word is part of the named entity add it
+                        if (w >= startWordIndex) {
+                            namedEntity.add(word);
+                            // otherwise create a new term containing the
+                            // word
+                        } else {
+                            createSingleWordTerm(newTermList, word);
+                        }
+                    }
+                    // if current term is stop term
+                } else if (termIdx == stopTermIndex) {
+                    // add words as long as stopWordIndex is not reached
+                    List<Word> words = term.getWords();
                     int w = -1;
                     for (Word word : words) {
                         w++;
 
-                        // if current term is start term
-                        if (t == startTermIndex) {
-                            // if word is part of the named entity add it
-                            if (w >= startWordIndex) {
-                                namedEntity.add(word);
-
-                                // otherwise create a new term containing the
-                                // word
-                            } else {
-                                List<Word> newWord = new ArrayList<Word>();
-                                newWord.add(word);
-                                List<Tag> tags = new ArrayList<Tag>();
-                                // CREATE NEW TERM !!!
-                                Term newTerm = new Term(newWord, tags, false);
-                                newTermList.add(newTerm);
-                            }
-
-                            // if current term is stop term
-                        } else if (t == stopTermIndex) {
-                            // add words as long as stopWordIndex is not reached
-                            if (w <= stopWordIndex) {
-                                namedEntity.add(word);
-
-                                // if last word is reached, create term and
-                                // add it
-                                if (w == stopWordIndex) {
-                                    List<Tag> tags = new ArrayList<Tag>();
-                                    // only add tag if not already added
-                                    List<Tag> newTags = getTags(entityTag);
-                                    for (Tag ct : newTags) {
-                                        if (!tags.contains(ct)) {
-                                            tags.add(ct);
-                                        }
-                                    }
-
-                                    // CREATE NEW TERM !!!
-                                    Term newTerm = new Term(namedEntity, tags, m_setNeUnmodifiable);
-                                    newTermList.add(newTerm);
-                                }
-
-                                // otherwise create a term for each word
-                            } else {
-                                List<Word> newWord = new ArrayList<Word>();
-                                newWord.add(word);
-                                List<Tag> tags = new ArrayList<Tag>();
-                                // CREATE NEW TERM !!!
-                                Term newTerm = new Term(newWord, tags, false);
-                                newTermList.add(newTerm);
-                            }
-
-                            // if we are in between the start term and the stop
-                            // term just add all words to the new word list
-                        } else if (t > startTermIndex && t < stopTermIndex) {
+                        if (w <= stopWordIndex) {
                             namedEntity.add(word);
+
+                            // if last word is reached, create term and
+                            // add it
+                            if (w == stopWordIndex) {
+                                createMultiWordTerm(tagValue, newTermList, namedEntity);
+                            }
+                            // otherwise create a term for each word
+                        } else {
+                            createSingleWordTerm(newTermList, word);
                         }
                     }
-                    if (endTerm) {
-                        // next found term range
-                        endTerm = false;
-                        startStopIndex++;
-                        if (startStopIndex < startStopRanges.size()) {
-                            startTermIndex = startStopRanges.get(startStopIndex).getStartTermIndex();
-                            stopTermIndex = startStopRanges.get(startStopIndex).getStopTermIndex();
-                            startWordIndex = startStopRanges.get(startStopIndex).getStartWordIndex();
-                            stopWordIndex = startStopRanges.get(startStopIndex).getStopWordIndex();
-                            namedEntity.clear();
-                        }
-                    }
+                    // if we are in between the start term and the stop
+                    // term just add all words to the new word list
+                } else {
+                    namedEntity.addAll(term.getWords());
                 }
-            } else {
-                // if we are before or after the interesting part just add the
-                // terms without rearrangement
-                newTermList.add(term);
+                termIdx++;
             }
+        }
+        for (final int end = oldTermList.size(); termIdx < end; termIdx++) {
+            newTermList.add(oldTermList.get(termIdx));
         }
         return newTermList;
     }
 
-    private List<IndexRange> findNe(final List<Term> sentence, final List<String> ne) {
-        List<IndexRange> ranges = new ArrayList<IndexRange>();
-        int found = 0;
-        boolean foundFlag = false;
-        int startTermIndex = -1;
-        int stopTermIndex = -1;
-        int startWordIndex = -1;
-        int stopWordIndex = -1;
+    /**
+     * Creates a new {@code Term} built from multiple {@code words}.
+     *
+     * @param tagValue The tag value.
+     * @param newTermList The term list containing the new terms.
+     * @param newWords The word list containing the new words to built a new term.
+     */
+    private void createMultiWordTerm(final String tagValue, final List<Term> newTermList,
+        final List<Word> newWords) {
+        List<Tag> tags = new ArrayList<>();
+        // only add tag if not already added
+        List<Tag> newTags = getTags(tagValue);
+        for (Tag ct : newTags) {
+            if (!tags.contains(ct)) {
+                tags.add(ct);
+            }
+        }
 
-        // search all terms
-        int t = -1;
-        for (Term term : sentence) {
-            t++;
-            List<Word> words = term.getWords();
+        // create the new term
+        Term newTerm = new Term(new ArrayList<Word>(newWords), tags, m_setNeUnmodifiable);
+        newTermList.add(newTerm);
+        newWords.clear();
+    }
 
-            // search words of terms
-            int w = -1;
-            for (int i = 0; i < words.size(); i++) {
-                w++;
+    /**
+     * Creates a new {@code Term} built from one {@code Word}.
+     *
+     * @param newTermList The term list containing the new terms.
+     * @param word The word used to built a new term.
+     */
+    private static void createSingleWordTerm(final List<Term> newTermList, final Word word) {
+        List<Word> newWord = new ArrayList<>();
+        newWord.add(word);
+        List<Tag> tags = new ArrayList<>();
+        // create the new term
+        Term newTerm = new Term(newWord, tags, false);
+        newTermList.add(newTerm);
+    }
 
-                // prepare word and ne for comparison (convert to lower case
-                // if case sensitivity is switched off)
-                String wordStr = words.get(i).getWord();
+    /**
+     * Finds named entities within a list of terms.
+     *
+     * @param sentence List of terms built from original sentence.
+     * @param entity The {@code MultipleTaggedEntity} containing the name of the entity and properties how it has to be
+     *            tagged.
+     * @return A map storing for each {@link IndexRange} the assigned {@link Tag Tags}.
+     */
+    private final List<IndexRange> findNe(final List<Term> sentence, final TaggedEntity entity) {
+        // Time could be improved using Knuth-Morris-Pratt algorithm
+        LinkedList<IndexRange> ranges = new LinkedList<>();
+        // named entity can contain one or more words, so they have to be
+        // tokenized by the default tokenizer to create words out of them.
+        List<String> neWords = m_wordTokenizer.tokenize(entity.getEntity());
+        final int neWordsSize = neWords.size();
+        if (neWords.isEmpty()) {
+            return ranges;
+        }
 
-                String neStr = ne.get(found);
-                if (!m_caseSensitive) {
-                    wordStr = wordStr.toLowerCase();
-                    neStr = neStr.toLowerCase();
+        int startTermIdx;
+        int startWordIdx;
+        final ArrayList<SentenceEntry> sentenceEntries = new ArrayList<>();
+        // this is the index of the word in neWords to be checked - 1!
+        // Similar to the solution with found etc.
+        int curEntryTokenIdx = -1;
+        startTermIdx = -1;
+        startWordIdx = -1;
+        sentenceEntries.clear();
+        final NamedEntityMatcher matcher = new NamedEntityMatcher(m_caseSensitive, m_exactMatch);
+        for (int termIdx = 0, termEndIdx = sentence.size(); termIdx < termEndIdx; termIdx++) {
+            List<Word> words = sentence.get(termIdx).getWords();
+            for (int wordIdx = 0, wordEndIdx = words.size(); wordIdx < wordEndIdx; wordIdx++) {
+                final String wordStr = words.get(wordIdx).getWord();
+                if (matcher.matchWithWord(neWords.get(curEntryTokenIdx + 1), wordStr)) {
+                    // do not add the first word that matches !!!
+                    if (++curEntryTokenIdx != 0) {
+                        sentenceEntries.add(new SentenceEntry(termIdx, wordIdx, wordStr));
+                    }
+                } else if (curEntryTokenIdx >= 0) {
+                    // search for a substring match (note this list does not contain the first word that matched
+                    // i.e. neWord.get(0) is not eWord[entityIdx].get(0)!!
+                    sentenceEntries.add(new SentenceEntry(termIdx, wordIdx, wordStr));
+                    curEntryTokenIdx = -1;
+                    // what we do here is go from left to right if we found a match for neWord 0 then we check
+                    // the rest. If everything else matches we update the curEntryTokenIdx and the eWords!
+                    // check String.indexOf(int ch, int fromIndex)
+                    for (int i = 0, end = sentenceEntries.size(); i < end; i++) {
+                        final SentenceEntry e = sentenceEntries.get(i);
+                        if (matcher.matchWithWord(neWords.get(0), e.getWord())) {
+                            if (matchRest(neWords, matcher, sentenceEntries, i, end)) {
+                                // redundant in case that i + 1 = end
+                                startTermIdx = e.getTermIdx();
+                                startWordIdx = e.getWordIdx();
+                                curEntryTokenIdx = end - i - 1;
+                                // probably a linked list would be better!?!? to check
+                                for (int j = 0; j <= i; j++) {
+                                    sentenceEntries.remove(0);
+                                }
+                                // stop the loop
+                                i = end;
+                            }
+                        }
+                    }
                 }
-
-                // if ne element at "found" equals the current word
-                if (found < ne.size()
-                    && ((m_exactMatch && wordStr.equals(neStr)) || (!m_exactMatch && wordStr.contains(neStr)))) {
-                    //if (found < ne.size() && wordStr.equals(neStr)) {
-                    // if "found" 0 means we are at the beginning of the named
-                    // entity
-                    if (found == 0) {
-                        startTermIndex = t;
-                        startWordIndex = w;
+                if (curEntryTokenIdx == 0) {
+                    startTermIdx = termIdx;
+                    startWordIdx = wordIdx;
+                }
+                if (curEntryTokenIdx + 1 == neWordsSize) {
+                    sentenceEntries.clear();
+                    IndexRange indexRange = new IndexRange(startTermIdx, termIdx, startWordIdx, wordIdx);
+                    if (!ranges.contains(indexRange)) {
+                        ranges.add(indexRange);
                     }
-
-                    found++;
-                    foundFlag = true;
-
-                    // means we are at the end of the named entity
-                    if (found == ne.size()) {
-                        stopTermIndex = t;
-                        stopWordIndex = w;
-
-                        ranges.add(new IndexRange(startTermIndex, stopTermIndex, startWordIndex, stopWordIndex));
-
-                        startTermIndex = -1;
-                        stopTermIndex = -1;
-                        startWordIndex = -1;
-                        stopWordIndex = -1;
-                        foundFlag = false;
-                        found = 0;
-                    }
-                } else {
-                    if (foundFlag) {
-                        foundFlag = false;
-                        found = 0;
-                        startTermIndex = -1;
-                        stopTermIndex = -1;
-                        startWordIndex = -1;
-                        stopWordIndex = -1;
-                        w--;
-                        i--;
-                    }
+                    curEntryTokenIdx = -1;
+                    startTermIdx = -1;
+                    startWordIdx = -1;
                 }
             }
         }
+
         return ranges;
     }
 
+    /**
+     * Matches the remaining elements of a named-entity word list with entries of an {@code SentenceEntry} list.
+     *
+     * @param neWords The words from the named entity to be tagged.
+     * @param matcher The {@code NamedEntityMatcher} to match words.
+     * @param sentenceEntries A list of {@code SentenceEntry}s.
+     * @param firstMatchIdx The index of the {@code SentenceEntry}.
+     * @param end Size of the {@code SentenceEntry} list.
+     * @return {@code True}, if the rest of the named-entity words match the words from the list {@code SentenceEntry}s.
+     */
+    private static boolean matchRest(final List<String> neWords, final NamedEntityMatcher matcher,
+        final ArrayList<SentenceEntry> sentenceEntries, final int firstMatchIdx, final int end) {
+        for (int j = firstMatchIdx + 1; j < end; j++) {
+            if (!matcher.matchWithWord(neWords.get(j - firstMatchIdx), sentenceEntries.get(j).getWord())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * An instance of {@code SentenceEntry} containing a word and the specific term and word indices where the word has
+     * been matched.
+     *
+     * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
+     */
+    private static final class SentenceEntry {
+
+        /**
+         * The position in the term list where the word has been found.
+         */
+        private final int m_termIdx;
+
+        /**
+         * The position in the word list of a term where the word has been found.
+         */
+        private final int m_wordIdx;
+
+        /**
+         * The found word.
+         */
+        private final String m_word;
+
+        /**
+         * Creates a new instance of {@code SentenceEntry}.
+         *
+         * @param termIdx The position in the term list where the word was found.
+         * @param wordIdx The position in the word list of a term where the word was found.
+         * @param word The found word.
+         */
+        SentenceEntry(final int termIdx, final int wordIdx, final String word) {
+            m_termIdx = termIdx;
+            m_wordIdx = wordIdx;
+            m_word = word;
+        }
+
+        /**
+         * Returns position in the term list where the word was found.
+         *
+         * @return Returns position in the term list where the word was found.
+         */
+        int getTermIdx() {
+            return m_termIdx;
+        }
+
+        /**
+         * The position in the word list of a term where the word was found.
+         *
+         * @return The position in the word list of a term where the word was found.
+         */
+        int getWordIdx() {
+            return m_wordIdx;
+        }
+
+        /**
+         * The found word.
+         *
+         * @return The found word.
+         */
+        String getWord() {
+            return m_word;
+        }
+    }
 
 }
