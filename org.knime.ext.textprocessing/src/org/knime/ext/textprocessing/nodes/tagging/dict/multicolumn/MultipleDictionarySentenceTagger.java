@@ -72,7 +72,7 @@ final class MultipleDictionarySentenceTagger implements SentenceTagger {
     private final List<SingleDictionaryTagger> m_singleTagger;
 
     /**
-     * Creates and returns a new instance of {@code MultipleDictionarySentenceTagger}.
+     * Creates a new instance of {@code MultipleDictionarySentenceTagger}.
      */
     MultipleDictionarySentenceTagger() {
         m_singleTagger = new ArrayList<>();

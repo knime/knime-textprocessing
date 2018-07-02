@@ -188,7 +188,7 @@ final class DictionaryTaggerMultiColumnNodeDialogPane extends TaggerNodeSettings
                 }
             }
         });
-        //TODO: add it again
+
         m_searchableListPanel.showSelectionPanel(false);
 
         final JPanel leftPanel = new JPanel(new BorderLayout());

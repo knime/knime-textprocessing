@@ -79,14 +79,14 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeModel2 {
 
     /**
-     * Default dictionary table index.
-     */
-    static final int DICT_TABLE_INDEX = 1;
-
-    /**
      * Default document table index.
      */
     static final int DATA_TABLE_INDEX = 0;
+
+    /**
+     * Default dictionary table index.
+     */
+    static final int DICT_TABLE_INDEX = 1;
 
     /**
      * Contains settings for each individual column.

@@ -184,7 +184,7 @@ public class DocumentTaggerSettings {
     }
 
     /**
-     * Set the boolean value for the exact match option.
+     * Sets the boolean value for the exact match option.
      *
      * @param exactMatch Set {@code true} for exact matching.
      */
