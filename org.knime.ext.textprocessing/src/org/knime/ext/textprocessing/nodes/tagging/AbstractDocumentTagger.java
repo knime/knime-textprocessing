@@ -225,8 +225,8 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      * @param tagValue The tag value.
      * @return Returns a list of terms containing the newly tagged terms.
      */
-    private final List<Term> buildTermList(final List<Term> oldTermList,
-        final List<IndexRange> ranges, final String tagValue) {
+    private final List<Term> buildTermList(final List<Term> oldTermList, final List<IndexRange> ranges,
+        final String tagValue) {
 
         if (ranges.isEmpty()) {
             return oldTermList;
@@ -345,8 +345,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      * @param newTermList The term list containing the new terms.
      * @param newWords The word list containing the new words to built a new term.
      */
-    private void createMultiWordTerm(final String tagValue, final List<Term> newTermList,
-        final List<Word> newWords) {
+    private void createMultiWordTerm(final String tagValue, final List<Term> newTermList, final List<Word> newWords) {
         List<Tag> tags = new ArrayList<>();
         // only add tag if not already added
         List<Tag> newTags = getTags(tagValue);
@@ -447,10 +446,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 }
                 if (curEntryTokenIdx + 1 == neWordsSize) {
                     sentenceEntries.clear();
-                    IndexRange indexRange = new IndexRange(startTermIdx, termIdx, startWordIdx, wordIdx);
-                    if (!ranges.contains(indexRange)) {
-                        ranges.add(indexRange);
-                    }
+                    ranges.add(new IndexRange(startTermIdx, termIdx, startWordIdx, wordIdx));
                     curEntryTokenIdx = -1;
                     startTermIdx = -1;
                     startWordIdx = -1;
