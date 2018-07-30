@@ -58,8 +58,8 @@ import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 
 /**
- * A tokenizer that detects English words based on the "StanfordNLP PTB Tokenizer" model.
- * It provides each word as one token.
+ * A tokenizer that detects English words based on the "StanfordNLP PTB Tokenizer" model. It provides each word as one
+ * token.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.4
@@ -72,18 +72,20 @@ public class StanfordNlpPTBTokenizer implements Tokenizer {
      * Creates a new instance of {@code StanfordNlpPTBTokenizer}
      */
     public StanfordNlpPTBTokenizer() {
-        m_tokenizer =
-            PTBTokenizerFactory.newWordTokenizerFactory("ptb3Escaping=false");
+        m_tokenizer = PTBTokenizerFactory.newWordTokenizerFactory("ptb3Escaping=false,"
+                                                                + "strictTreebank3=true");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<String> tokenize(final String sentence) {
-
         if (m_tokenizer != null) {
             StringReader readString = new StringReader(sentence);
             edu.stanford.nlp.process.Tokenizer<Word> tokenizer = m_tokenizer.getTokenizer(readString);
             List<Word> wordList = tokenizer.tokenize();
-            List<String> tokenList = new ArrayList<String>();
+            List<String> tokenList = new ArrayList<>();
             for (Word word : wordList) {
                 tokenList.add(word.word());
             }
