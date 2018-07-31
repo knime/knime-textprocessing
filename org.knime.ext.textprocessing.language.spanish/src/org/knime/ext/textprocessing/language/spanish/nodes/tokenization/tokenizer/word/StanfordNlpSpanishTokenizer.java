@@ -52,6 +52,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
 import edu.stanford.nlp.international.spanish.process.SpanishTokenizer;
@@ -100,8 +101,31 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
             SpanishTokenizer<CoreLabel> tokenizer = (SpanishTokenizer<CoreLabel>)m_tokenizer.getTokenizer(readString);
             List<CoreLabel> coreLabelList = tokenizer.tokenize();
             List<String> tokenList = new ArrayList<String>();
+            String cpySentence = sentence;
             for (CoreLabel cl : coreLabelList) {
-                tokenList.add(cl.originalText());
+                cpySentence = cpySentence.trim();
+                // check if the next part of the sentence is the current word and add it if it is the case
+                if (cl.originalText().equals(cpySentence.substring(0, cl.originalText().length()))) {
+                    tokenList.add(cl.originalText());
+                    cpySentence = cpySentence.substring(cl.originalText().length(), cpySentence.length());
+                } else {
+                    // else normalize the word
+                    String normWord = StringEscapeUtils.escapeHtml4(cl.originalText());
+                    // check if the next part of the sentence is the normalized word and add it if it is the case
+                    if (normWord.equals(cpySentence.substring(0, normWord.length()))) {
+                        tokenList.add(normWord);
+                        cpySentence = cpySentence.substring(normWord.length(), cpySentence.length());
+                    } else {
+                        // add untokenized parts as token (this happens if there is a whitespace HTML entity in the text
+                        // e.g. "&nbsp;" - the tokenizer will detect it as a whitespace and will not add to the word
+                        // list, but we want it as a token, so we add the skipped part manually)
+                        int wordStart = cpySentence.indexOf(cl.originalText());
+                        String skippedWord = cpySentence.substring(0, wordStart).trim();
+                        tokenList.add(skippedWord);
+                        tokenList.add(cl.originalText());
+                        cpySentence = cpySentence.substring(wordStart + cl.originalText().length());
+                    }
+                }
             }
             return tokenList;
         } else {

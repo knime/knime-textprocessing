@@ -52,6 +52,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
 import edu.stanford.nlp.ling.Word;
@@ -86,8 +87,31 @@ public class StanfordNlpPTBTokenizer implements Tokenizer {
             edu.stanford.nlp.process.Tokenizer<Word> tokenizer = m_tokenizer.getTokenizer(readString);
             List<Word> wordList = tokenizer.tokenize();
             List<String> tokenList = new ArrayList<>();
+            String cpySentence = sentence;
             for (Word word : wordList) {
-                tokenList.add(word.word());
+                cpySentence = cpySentence.trim();
+                // check if the next part of the sentence is the current word and add it if it's the case
+                if (word.word().equals(cpySentence.substring(0, word.word().length()))) {
+                    tokenList.add(word.word());
+                    cpySentence = cpySentence.substring(word.word().length(), cpySentence.length());
+                } else {
+                    // else normalize the word
+                    String normWord = StringEscapeUtils.escapeHtml4(word.word());
+                    // check if the next part of the sentence is the normalized word and add it if it's the case
+                    if (normWord.equals(cpySentence.substring(0, normWord.length()))) {
+                        tokenList.add(normWord);
+                        cpySentence = cpySentence.substring(normWord.length(), cpySentence.length());
+                    } else {
+                        // add untokenized parts as token (this happens if there is a whitespace HTML entity in the text
+                        // e.g. "&nbsp;" - the tokenizer will detect it as a whitespace and will not add to the word
+                        // list, but we want it as a token, so we add the skipped part manually)
+                        final int wordStart = cpySentence.indexOf(word.word());
+                        final String skippedWord = cpySentence.substring(0, wordStart).trim();
+                        tokenList.add(skippedWord);
+                        tokenList.add(word.word());
+                        cpySentence = cpySentence.substring(wordStart + word.word().length());
+                    }
+                }
             }
             return tokenList;
         } else {
