@@ -50,6 +50,7 @@ package org.knime.ext.textprocessing.language.spanish.nodes.tokenization.tokeniz
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -95,7 +96,6 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
      */
     @Override
     public List<String> tokenize(final String sentence) {
-
         if (m_tokenizer != null) {
             StringReader readString = new StringReader(sentence);
             SpanishTokenizer<CoreLabel> tokenizer = (SpanishTokenizer<CoreLabel>)m_tokenizer.getTokenizer(readString);
@@ -103,27 +103,25 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
             List<String> tokenList = new ArrayList<String>();
             String cpySentence = sentence;
             for (CoreLabel cl : coreLabelList) {
+                String token = cl.originalText();
                 cpySentence = cpySentence.trim();
+
                 // check if the next part of the sentence is the current word and add it if it is the case
-                if (cl.originalText().equals(cpySentence.substring(0, cl.originalText().length()))) {
-                    tokenList.add(cl.originalText());
-                    cpySentence = cpySentence.substring(cl.originalText().length(), cpySentence.length());
+                if (token.equals(cpySentence.substring(0, token.length()))) {
+                    tokenList.add(token);
+                    cpySentence = cpySentence.substring(token.length(), cpySentence.length());
                 } else {
                     // else normalize the word
-                    String normWord = StringEscapeUtils.escapeHtml4(cl.originalText());
+                    String normToken = StringEscapeUtils.escapeHtml4(token);
                     // check if the next part of the sentence is the normalized word and add it if it is the case
-                    if (normWord.equals(cpySentence.substring(0, normWord.length()))) {
-                        tokenList.add(normWord);
-                        cpySentence = cpySentence.substring(normWord.length(), cpySentence.length());
+                    if (normToken.equals(cpySentence.substring(0, normToken.length()))) {
+                        tokenList.add(normToken);
+                        cpySentence = cpySentence.substring(normToken.length(), cpySentence.length());
                     } else {
-                        // add untokenized parts as token (this happens if there is a whitespace HTML entity in the text
-                        // e.g. "&nbsp;" - the tokenizer will detect it as a whitespace and will not add to the word
-                        // list, but we want it as a token, so we add the skipped part manually)
-                        int wordStart = cpySentence.indexOf(cl.originalText());
-                        String skippedWord = cpySentence.substring(0, wordStart).trim();
-                        tokenList.add(skippedWord);
-                        tokenList.add(cl.originalText());
-                        cpySentence = cpySentence.substring(wordStart + cl.originalText().length());
+                        // if the sentence doesn't start with the tokenized word or the normalized word, look up the
+                        // position of the word / normalized word add the skipped part as tokens as well as token that
+                        // has been found behind the skipped part
+                        cpySentence = handleSkippedParts(readString, tokenList, cpySentence, token, normToken);
                     }
                 }
             }
@@ -131,6 +129,62 @@ public class StanfordNlpSpanishTokenizer implements Tokenizer {
         } else {
             return null;
         }
+    }
 
+    private static String handleSkippedParts(StringReader sr, List<String> tokenList, String sentence,
+        String token, String normalizedToken) {
+        // add untokenized parts as token (this happens if there is a whitespace HTML entity in the text
+        // e.g. "&nbsp;" - the tokenizer will detect it as a whitespace and will not add to the word
+        // list, but we want it as a token, so we add the skipped part manually)
+        // -> get indices of word and normalized word
+        int wordStart = sentence.indexOf(token);
+        int normWordStart = sentence.indexOf(normalizedToken);
+
+        // if normalized word exists in sentence and its index is smaller than the index of the
+        // tokenized word, check for the normalized word. also check for the normalized word, if only
+        // the normalized word exists in the text. in other cases (normWordStart < 0 or normWordStart >
+        // wordStart) the tokenized word will be used for checking.
+        if ((wordStart >= 0 && normWordStart >= 0 && wordStart > normWordStart)
+            || (wordStart < 0 && normWordStart >= 0)) {
+            wordStart = normWordStart;
+            token = normalizedToken;
+        } else if (wordStart < 0 && normWordStart < 0) {
+            // if neither the tokenized word nor the normalized word could be found throw an exception
+            sr.close();
+            throw new RuntimeException("The token " + token + " / " + normalizedToken
+                + " cannot be found in the sentence: \"" + sentence + "\"!");
+        }
+        // get the skipped part
+        String skippedWord = sentence.substring(0, wordStart).trim();
+        // transform the skipped part into useful tokens and add them to the token list
+        splitSkippedWordAndAdd(skippedWord, tokenList);
+
+        tokenList.add(token);
+        return sentence.substring(wordStart + token.length());
+    }
+
+    // split by whitespace and ;& for the case of html entities
+    private static void splitSkippedWordAndAdd(String skippedWord, List<String> tokenList) {
+        String[] split = skippedWord.split("\\s+");
+        for (String token : split) {
+            if (token.contains(";&")) {
+                tokenList.addAll(rebuildHTMLEntity(token.split(";&")));
+            } else {
+                tokenList.add(token);
+            }
+        }
+    }
+
+    private static List<String> rebuildHTMLEntity(String[] tokens) {
+        for (int i = 0; i < tokens.length; i++) {
+            if (i == 0) {
+                tokens[i] = tokens[i] + ";";
+            } else if (i == tokens.length - 1) {
+                tokens[i] = "&" + tokens[i];
+            } else {
+                tokens[i] = "&" + tokens[i] + ";";
+            }
+        }
+        return Arrays.asList(tokens);
     }
 }
