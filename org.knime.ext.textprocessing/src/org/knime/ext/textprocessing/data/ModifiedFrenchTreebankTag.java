@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -44,48 +43,76 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   08.05.2017 (Julian): created
+ *   21.12.2006 (Kilian Thiel): created
  */
-package org.knime.ext.textprocessing.language.french.nodes.tagging.stanford.posmodels;
+package org.knime.ext.textprocessing.data;
 
-import org.knime.ext.textprocessing.data.ModifiedFrenchTreebankTag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.language.french.TextprocessingFrenchLanguagePack;
-import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * This class implements the {@link StanfordTaggerModel} interface to provide the "French"
- * part-of-speech model.
+ * This class provides methods given by the {@link TagBuilder} interface to use the
+ * {@link ModifiedFrenchTreebankTagSet}.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
-public class FrenchModel implements StanfordTaggerModel {
-
-    private static final String MODELNAME = "French";
-
-    private static final String MODELPATH = "models/stanfordmodels/pos/french.tagger";
+public class ModifiedFrenchTreebankTag implements TagBuilder {
 
     /**
-     * {@inheritDoc}
+     * Default tag value.
+     */
+    public static final String DEFAULT_TAG = ModifiedFrenchTreebankTagSet.UNKNOWN.toString();
+
+    /**
+     * Creates a new instance of {@code ModifiedFrenchTreebankTag}.
+     */
+    public ModifiedFrenchTreebankTag() {
+        // Empty constructor...
+    }
+
+    /**
+     * Returns the enum fields as a String list of their names.
+     *
+     * @return The enum fields as a String list of their names.
      */
     @Override
-    public String getModelName() {
-        return MODELNAME;
+    public List<String> asStringList() {
+        Enum<ModifiedFrenchTreebankTagSet>[] values = ModifiedFrenchTreebankTagSet.values();
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < values.length; i++) {
+            list.add(values[i].name());
+        }
+        return list;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getModelPath() {
-        return TextprocessingFrenchLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
+    public Tag buildTag(final String value) {
+        return ModifiedFrenchTreebankTagSet.stringToTag(value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public TagBuilder getTagBuilder() {
-        return new ModifiedFrenchTreebankTag();
+    public String getType() {
+        return ModifiedFrenchTreebankTagSet.TAG_TYPE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Tag> getTags() {
+        Set<Tag> tagSet = new LinkedHashSet<>(ModifiedFrenchTreebankTagSet.values().length);
+        for (ModifiedFrenchTreebankTagSet tag : ModifiedFrenchTreebankTagSet.values()) {
+            tagSet.add(tag.getTag());
+        }
+        return tagSet;
     }
 }
