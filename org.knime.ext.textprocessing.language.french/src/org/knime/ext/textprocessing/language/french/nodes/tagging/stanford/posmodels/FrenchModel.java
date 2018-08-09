@@ -48,7 +48,7 @@
  */
 package org.knime.ext.textprocessing.language.french.nodes.tagging.stanford.posmodels;
 
-import org.knime.ext.textprocessing.data.ModifiedFrenchTreebankTag;
+import org.knime.ext.textprocessing.data.ExtendedFTBCrabbeCanditeTag;
 import org.knime.ext.textprocessing.data.TagBuilder;
 import org.knime.ext.textprocessing.language.french.TextprocessingFrenchLanguagePack;
 import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
@@ -86,6 +86,6 @@ public class FrenchModel implements StanfordTaggerModel {
      */
     @Override
     public TagBuilder getTagBuilder() {
-        return new ModifiedFrenchTreebankTag();
+        return new ExtendedFTBCrabbeCanditeTag();
     }
 }

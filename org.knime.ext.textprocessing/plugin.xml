@@ -989,7 +989,7 @@
             TagBuilder="org.knime.ext.textprocessing.data.UniversalDependenciesPOSTag">
       </TagSet>
       <TagSet
-            TagBuilder="org.knime.ext.textprocessing.data.ModifiedFrenchTreebankTag">
+            TagBuilder="org.knime.ext.textprocessing.data.ExtendedFTBCrabbeCanditeTag">
       </TagSet>
    </extension>
 </plugin>
