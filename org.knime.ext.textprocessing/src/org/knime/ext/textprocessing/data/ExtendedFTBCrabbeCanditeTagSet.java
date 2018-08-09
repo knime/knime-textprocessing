@@ -47,21 +47,24 @@
  */
 package org.knime.ext.textprocessing.data;
 
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This enum contains a modified version of the part-of-speech tag set created by Crabbé & Candite in 2008.
  * Originally, it is based on the French Treebank (FTB) tag set, but the Stanford CoreNLP group transformed it
  * to get better results with their French POS tagger.
  * To create a a valid {@link org.knime.ext.textprocessing.data.Tag} instance use
- * {@link org.knime.ext.textprocessing.data.ModifiedFrenchTreebankTagSet#getTag()}, i.e:
+ * {@link org.knime.ext.textprocessing.data.ExtendedFTBCrabbeCanditeTagSet#getTag()}, i.e:
  * <br><br>
- * {@code Tag t = ModifiedFrenchTreebankTag.A.getTag();}
+ * {@code Tag t = ExtendedFTBCrabbeCanditeTag.A.getTag();}
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
  * @since 3.6
  */
-public enum ModifiedFrenchTreebankTagSet {
+public enum ExtendedFTBCrabbeCanditeTagSet {
 
         /** Unknown type. */
         UNKNOWN,
@@ -137,15 +140,20 @@ public enum ModifiedFrenchTreebankTagSet {
     private final Tag m_tag;
 
     /**
-     * The constant for French Treebank tag types.
+     * The tag type constant for this extended version of the French Treebank tag set and  the Crabbé & Candite tag set.
      */
-    public static final String TAG_TYPE = "FTBCC";
+    public static final String TAG_TYPE = "FTBCC+";
 
     /**
-     * Creates a new instance of {@code ModifiedFrenchTreebankTagSet} and creates a
+     *
+     */
+    private static Map<String, Tag> tagMap = null;
+
+    /**
+     * Creates a new instance of {@code ExtendedFTBCrabbeCanditeTagSet} and creates a
      * {@link org.knime.ext.textprocessing.data.Tag} with the specified POS tag.
      */
-    private ModifiedFrenchTreebankTagSet() {
+    private ExtendedFTBCrabbeCanditeTagSet() {
         m_tag = new Tag(name(), TAG_TYPE);
     }
 
@@ -153,7 +161,7 @@ public enum ModifiedFrenchTreebankTagSet {
      * Returns the {@code Tag}.
      *
      * @return The {@link org.knime.ext.textprocessing.data.Tag} corresponding to the specified object from
-     *         {@code ModifiedFrenchTreebankTagSet}.
+     *         {@code ExtendedFTBCrabbeCanditeTagSet}.
      */
     public Tag getTag() {
         return m_tag;
@@ -167,17 +175,21 @@ public enum ModifiedFrenchTreebankTagSet {
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the given string.
      */
     public static Tag stringToTag(final String str) {
-        for (ModifiedFrenchTreebankTagSet pos : values()) {
-            if (pos.getTag().getTagValue().equals(str)) {
-                return pos.getTag();
-            }
+        if (tagMap == null) {
+            initializeTagMap();
         }
-
+        if (tagMap.containsKey(str)) {
+            return tagMap.get(str);
+        }
         if (isSymbol(str)) {
-            return ModifiedFrenchTreebankTagSet.SYM.getTag();
+            return ExtendedFTBCrabbeCanditeTagSet.SYM.getTag();
         }
+        return ExtendedFTBCrabbeCanditeTagSet.UNKNOWN.getTag();
+    }
 
-        return ModifiedFrenchTreebankTagSet.UNKNOWN.getTag();
+    private static synchronized void initializeTagMap() {
+        tagMap = Stream.of(values())
+            .collect(Collectors.toMap(t -> t.getTag().getTagValue(), ExtendedFTBCrabbeCanditeTagSet::getTag));
     }
 
     private static Pattern symbolPattern = Pattern.compile("[!#$%&'\"()*+\\-,./\\:;<=>?@^_`{|}~\\[\\]]");

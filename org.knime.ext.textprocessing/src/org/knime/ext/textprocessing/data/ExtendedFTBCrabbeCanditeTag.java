@@ -43,33 +43,33 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   21.12.2006 (Kilian Thiel): created
+ *   04.07.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.data;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class provides methods given by the {@link TagBuilder} interface to use the
- * {@link ModifiedFrenchTreebankTagSet}.
+ * {@link ExtendedFTBCrabbeCanditeTagSet}.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.6
  */
-public class ModifiedFrenchTreebankTag implements TagBuilder {
+public class ExtendedFTBCrabbeCanditeTag implements TagBuilder {
 
     /**
      * Default tag value.
      */
-    public static final String DEFAULT_TAG = ModifiedFrenchTreebankTagSet.UNKNOWN.toString();
+    public static final String DEFAULT_TAG = ExtendedFTBCrabbeCanditeTagSet.UNKNOWN.toString();
 
     /**
-     * Creates a new instance of {@code ModifiedFrenchTreebankTag}.
+     * Creates a new instance of {@code ExtendedFTBCrabbeCanditeTag}.
      */
-    public ModifiedFrenchTreebankTag() {
+    public ExtendedFTBCrabbeCanditeTag() {
         // Empty constructor...
     }
 
@@ -80,12 +80,8 @@ public class ModifiedFrenchTreebankTag implements TagBuilder {
      */
     @Override
     public List<String> asStringList() {
-        Enum<ModifiedFrenchTreebankTagSet>[] values = ModifiedFrenchTreebankTagSet.values();
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < values.length; i++) {
-            list.add(values[i].name());
-        }
-        return list;
+        return Stream.of(ExtendedFTBCrabbeCanditeTagSet.values()).map(ExtendedFTBCrabbeCanditeTagSet::name)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -93,7 +89,7 @@ public class ModifiedFrenchTreebankTag implements TagBuilder {
      */
     @Override
     public Tag buildTag(final String value) {
-        return ModifiedFrenchTreebankTagSet.stringToTag(value);
+        return ExtendedFTBCrabbeCanditeTagSet.stringToTag(value);
     }
 
     /**
@@ -101,7 +97,7 @@ public class ModifiedFrenchTreebankTag implements TagBuilder {
      */
     @Override
     public String getType() {
-        return ModifiedFrenchTreebankTagSet.TAG_TYPE;
+        return ExtendedFTBCrabbeCanditeTagSet.TAG_TYPE;
     }
 
     /**
@@ -109,10 +105,7 @@ public class ModifiedFrenchTreebankTag implements TagBuilder {
      */
     @Override
     public Set<Tag> getTags() {
-        Set<Tag> tagSet = new LinkedHashSet<>(ModifiedFrenchTreebankTagSet.values().length);
-        for (ModifiedFrenchTreebankTagSet tag : ModifiedFrenchTreebankTagSet.values()) {
-            tagSet.add(tag.getTag());
-        }
-        return tagSet;
+        return Stream.of(ExtendedFTBCrabbeCanditeTagSet.values()).map(ExtendedFTBCrabbeCanditeTagSet::getTag)
+            .collect(Collectors.toSet());
     }
 }
