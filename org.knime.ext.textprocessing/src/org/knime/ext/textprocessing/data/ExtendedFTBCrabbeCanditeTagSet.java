@@ -43,7 +43,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   21.12.2006 (Kilian Thiel): created
+ *   04.07.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.data;
 
@@ -145,9 +145,10 @@ public enum ExtendedFTBCrabbeCanditeTagSet {
     public static final String TAG_TYPE = "FTBCC+";
 
     /**
-     *
+     * Map contains the {@link Tag Tags}.
      */
-    private static Map<String, Tag> tagMap = null;
+    private static final Map<String, Tag> TAG_MAP = Stream.of(values())
+            .collect(Collectors.toMap(t -> t.getTag().getTagValue(), ExtendedFTBCrabbeCanditeTagSet::getTag));
 
     /**
      * Creates a new instance of {@code ExtendedFTBCrabbeCanditeTagSet} and creates a
@@ -175,21 +176,13 @@ public enum ExtendedFTBCrabbeCanditeTagSet {
      * @return The related {@link org.knime.ext.textprocessing.data.Tag} to the given string.
      */
     public static Tag stringToTag(final String str) {
-        if (tagMap == null) {
-            initializeTagMap();
-        }
-        if (tagMap.containsKey(str)) {
-            return tagMap.get(str);
+        if (TAG_MAP.containsKey(str)) {
+            return TAG_MAP.get(str);
         }
         if (isSymbol(str)) {
             return ExtendedFTBCrabbeCanditeTagSet.SYM.getTag();
         }
         return ExtendedFTBCrabbeCanditeTagSet.UNKNOWN.getTag();
-    }
-
-    private static synchronized void initializeTagMap() {
-        tagMap = Stream.of(values())
-            .collect(Collectors.toMap(t -> t.getTag().getTagValue(), ExtendedFTBCrabbeCanditeTagSet::getTag));
     }
 
     private static Pattern symbolPattern = Pattern.compile("[!#$%&'\"()*+\\-,./\\:;<=>?@^_`{|}~\\[\\]]");
