@@ -57,7 +57,7 @@ import java.util.stream.Stream;
  * {@link ExtendedFTBCrabbeCanditeTagSet}.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
- * @since 3.6
+ * @since 3.7
  */
 public class ExtendedFTBCrabbeCanditeTag implements TagBuilder {
 

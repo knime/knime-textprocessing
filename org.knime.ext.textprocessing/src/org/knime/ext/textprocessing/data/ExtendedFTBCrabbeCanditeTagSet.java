@@ -62,7 +62,7 @@ import java.util.stream.Stream;
  * {@code Tag t = ExtendedFTBCrabbeCanditeTag.A.getTag();}
  *
  * @author Julian Bunzel, KNIME.com GmbH, Berlin, Germany
- * @since 3.6
+ * @since 3.7
  */
 public enum ExtendedFTBCrabbeCanditeTagSet {
 
