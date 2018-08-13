@@ -64,7 +64,6 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
-import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.collection.CollectionCellFactory;
 import org.knime.core.data.collection.ListCell;
@@ -151,6 +150,8 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
     private boolean m_hasNumberCol = true;
 
     private static final DoubleCell DEFAULT_CELL = new DoubleCell(0.0);
+
+    private static final DataCell ONE = new DoubleCell(1d);
 
     /**
      * Creates a new instance of {@code DocumentVectorAdapterNodeModel2}.
@@ -249,7 +250,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         DocumentVectorPortObjectSpec modelSpec = checkModelInput(dataTableSpec, inData[0].getSpec());
 
         boolean useBitvector = m_booleanModel.getBooleanValue();
-        boolean ignoreTags = modelSpec.getIgnoreTagsSetting();
+        final boolean ignoreTags = modelSpec.getIgnoreTagsSetting();
         String vectorValueColumn = m_colModel.getStringValue();
         boolean asCollectionCell = m_asCollectionModel.getBooleanValue();
         List<String> includedTerms = m_vectorColsModel.getIncludeList();
@@ -290,23 +291,16 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
 
         // Create data table spec
         exec.setProgress("Filling feature vectors");
-        BufferedDataContainer dc;
-        if (asCollectionCell) {
-            dc = exec.createDataContainer(createDataTableSpecAsCollection(includedTerms));
-        } else {
-            dc = exec.createDataContainer(createDataTableSpecAsColumns(includedTerms));
-        }
+        final BufferedDataContainer dc = exec.createDataContainer(asCollectionCell
+            ? createDataTableSpecAsCollection(includedTerms) : createDataTableSpecAsColumns(includedTerms));
 
         // first go through data table to collect the features, create double cells and rows
-        RowIterator it = sortedTable.iterator();
         long rowid = 0;
-        Document currDoc = null;
         Document lastDoc = null;
-        Map<String, DoubleCell> featureVector = initializeFeatureVector(includedTerms);
+        Map<String, DataCell> featureVector = initializeFeatureVector(includedTerms);
 
-        while (it.hasNext()) {
+        for (DataRow row : sortedTable) {
             exec.checkCanceled();
-            final DataRow row = it.next();
             final DataCell termCell = row.getCell(m_termColIndex);
             final DataCell docCell = row.getCell(m_documentColIndex);
             // if the term or document is missing, then skip the row
@@ -315,9 +309,9 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
                 // add last feature vector to table if last row has missing term/document
             } else {
                 // get current document, current term and its frequency (or bitvector)
-                currDoc = ((DocumentValue)docCell).getDocument();
+                final Document currDoc = ((DocumentValue)docCell).getDocument();
                 final Term currTerm = ((TermValue)termCell).getTermValue();
-                double currValue = getDoubleValue(colIndex, row);
+                final DataCell currValue = getDoubleValue(colIndex, row);
 
                 // if current doc is not equals last doc, create new feature vector
                 // for last doc
@@ -329,14 +323,10 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
                 }
 
                 // if tags have to be ignored
-                String key = "";
-                if (ignoreTags) {
-                    key = currTerm.getText();
-                } else {
-                    key = currTerm.toString();
-                }
+                final String key = ignoreTags ? currTerm.getText() : currTerm.toString();
+
                 if (includedTerms.contains(key)) {
-                    featureVector.replace(key, new DoubleCell(currValue));
+                    featureVector.replace(key, currValue);
                 }
                 lastDoc = currDoc;
             }
@@ -353,41 +343,39 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         return new BufferedDataTable[]{dc.getTable()};
     }
 
-    private double getDoubleValue(final int colIndex, final DataRow row) {
-        double currValue = 1;
+    private DataCell getDoubleValue(final int colIndex, final DataRow row) {
         if (colIndex > -1) {
             DataCell cell = row.getCell(colIndex);
             // if the value is missing, set it to 0
             if (cell.isMissing()) {
-                currValue = 0;
                 setWarningMessage(row.getKey() + " has a missing TF value. The value will be set to 0...");
-            } else {
-                currValue = ((DoubleValue)cell).getDoubleValue();
+                return DEFAULT_CELL;
             }
+            return cell;
         }
-        return currValue;
+        return ONE;
     }
 
     private void createRowAndAddToDc(final boolean asCollectionCell, final BufferedDataContainer dc, final long rowid,
-        final Document lastDoc, final Map<String, DoubleCell> featureVector) {
+        final Document lastDoc, final Map<String, DataCell> featureVector) {
         DataRow newRow;
         if (asCollectionCell) {
-            newRow = createDataRowAsCollection(lastDoc, new ArrayList<DoubleCell>(featureVector.values()), rowid);
+            newRow = createDataRowAsCollection(lastDoc, new ArrayList<DataCell>(featureVector.values()), rowid);
         } else {
-            newRow = createDataRowAsColumns(lastDoc, new ArrayList<DoubleCell>(featureVector.values()), rowid);
+            newRow = createDataRowAsColumns(lastDoc, new ArrayList<DataCell>(featureVector.values()), rowid);
         }
         dc.addRowToTable(newRow);
     }
 
-    private static Map<String, DoubleCell> initializeFeatureVector(final List<String> refTerms) {
-        Map<String, DoubleCell> featureVector = new LinkedHashMap<>();
+    private static Map<String, DataCell> initializeFeatureVector(final List<String> refTerms) {
+        Map<String, DataCell> featureVector = new LinkedHashMap<>();
         for (String term : refTerms) {
             featureVector.put(term, DEFAULT_CELL);
         }
         return featureVector;
     }
 
-    private DataRow createDataRowAsCollection(final Document doc, final List<DoubleCell> featureVector,
+    private DataRow createDataRowAsCollection(final Document doc, final List<DataCell> featureVector,
         final long rowid) {
         final RowKey rowKey = RowKey.createRowKey(rowid);
         final DataCell docCell = m_documentCellFac.createDataCell(doc);
@@ -395,7 +383,7 @@ class DocumentVectorAdapterNodeModel2 extends NodeModel {
         return new DefaultRow(rowKey, docCell, vectorCell);
     }
 
-    private DataRow createDataRowAsColumns(final Document doc, final List<DoubleCell> featureVector, final long rowid) {
+    private DataRow createDataRowAsColumns(final Document doc, final List<DataCell> featureVector, final long rowid) {
         final RowKey rowKey = RowKey.createRowKey(rowid);
         final List<DataCell> cells = new ArrayList<>(featureVector.size()+1);
         cells.add(m_documentCellFac.createDataCell(doc));
