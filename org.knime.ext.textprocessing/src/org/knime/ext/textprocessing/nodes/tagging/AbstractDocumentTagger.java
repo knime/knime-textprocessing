@@ -236,6 +236,7 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
         final List<Word> namedEntity = new ArrayList<>();
         // go through all terms of old term list
         int termIdx = 0;
+        int wordIdx = -1;
 
         for (IndexRange range : ranges) {
             // get the start and stop indices from the index range
@@ -243,6 +244,17 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
             int stopTermIndex = range.getStopTermIndex();
             int startWordIndex = range.getStartWordIndex();
             int stopWordIndex = range.getStopWordIndex();
+            if (wordIdx != -1) {
+                termIdx--;
+                if (termIdx != startTermIndex) {
+                    final List<Word> words = oldTermList.get(termIdx).getWords();
+                    for (wordIdx++; wordIdx < words.size(); wordIdx++) {
+                        createSingleWordTerm(newTermList, words.get(wordIdx));
+                    }
+                    wordIdx = -1;
+                    termIdx++;
+                }
+            }
             while (termIdx < startTermIndex) {
                 newTermList.add(oldTermList.get(termIdx));
                 termIdx++;
@@ -267,18 +279,18 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                     // so we have to split it into several terms
 
                     List<Word> newWords = new ArrayList<>();
-                    int w = -1;
-                    for (Word word : term.getWords()) {
-                        w++;
+                    List<Word> words = term.getWords();
+                    for (wordIdx++; wordIdx < words.size(); wordIdx++) {
                         // if we are outside our range
-                        if (w < startWordIndex || w > stopWordIndex) {
-                            createSingleWordTerm(newTermList, word);
+                        if (wordIdx < startWordIndex) {
+                            createSingleWordTerm(newTermList, words.get(wordIdx));
                         } else {
-                            newWords.add(word);
+                            newWords.add(words.get(wordIdx));
                             // if last word to add, create term and add it
                             // to new list
-                            if (w == stopWordIndex) {
+                            if (wordIdx == stopWordIndex) {
                                 createMultiWordTerm(tagValue, newTermList, newWords);
+                                break;
                             }
                         }
                     }
@@ -291,37 +303,31 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 // if current term is start term
                 if (termIdx == startTermIndex) {
                     List<Word> words = term.getWords();
-                    int w = -1;
-                    for (Word word : words) {
-                        w++;
+                    for (wordIdx++; wordIdx < words.size() ; wordIdx++) {
                         // if word is part of the named entity add it
-                        if (w >= startWordIndex) {
-                            namedEntity.add(word);
+                        if (wordIdx >= startWordIndex) {
+                            namedEntity.add(words.get(wordIdx));
                             // otherwise create a new term containing the
                             // word
                         } else {
-                            createSingleWordTerm(newTermList, word);
+                            createSingleWordTerm(newTermList, words.get(wordIdx));
                         }
                     }
+                    wordIdx = -1;
                     // if current term is stop term
                 } else if (termIdx == stopTermIndex) {
                     // add words as long as stopWordIndex is not reached
                     List<Word> words = term.getWords();
-                    int w = -1;
-                    for (Word word : words) {
-                        w++;
-
-                        if (w <= stopWordIndex) {
-                            namedEntity.add(word);
-
+                    for (wordIdx++ ; wordIdx < words.size(); wordIdx++) {
+                        if (wordIdx <= stopWordIndex) {
+                            namedEntity.add(words.get(wordIdx));
                             // if last word is reached, create term and
                             // add it
-                            if (w == stopWordIndex) {
+                            if (wordIdx == stopWordIndex) {
                                 createMultiWordTerm(tagValue, newTermList, namedEntity);
+                                break;
                             }
                             // otherwise create a term for each word
-                        } else {
-                            createSingleWordTerm(newTermList, word);
                         }
                     }
                     // if we are in between the start term and the stop
@@ -332,6 +338,15 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
                 termIdx++;
             }
         }
+        if (wordIdx != -1) {
+            termIdx--;
+            final List<Word> words = oldTermList.get(termIdx).getWords();
+            for (wordIdx++; wordIdx < words.size(); wordIdx++) {
+                createSingleWordTerm(newTermList, words.get(wordIdx));
+            }
+            termIdx++;
+        }
+
         for (final int end = oldTermList.size(); termIdx < end; termIdx++) {
             newTermList.add(oldTermList.get(termIdx));
         }
