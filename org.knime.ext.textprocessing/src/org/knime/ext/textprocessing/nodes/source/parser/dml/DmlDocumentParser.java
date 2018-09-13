@@ -484,7 +484,7 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
         } else if (endTag.equals(TERM)) {
             if (m_words != null && m_tags != null) {
                 boolean mod = new Boolean(m_modifiability.trim());
-                Term t = new Term(m_words, m_tags, mod);
+                Term t = new Term(new ArrayList<>(m_words), new ArrayList<>(m_tags), mod);
                 m_currentDoc.addTerm(t);
             }
         } else if (endTag.equals(SENTENCE)) {
