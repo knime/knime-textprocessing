@@ -202,12 +202,7 @@ public final class MultipleTagsetDocumentTagger implements DocumentTagger {
             if (wordIdx != -1) {
                 termIdx--;
                 if (termIdx != startTermIndex) {
-                    // read the rest ... just copy the code
-                    final List<Word> words = oldTermList.get(termIdx).getWords();
-                    for (wordIdx++; wordIdx < words.size(); wordIdx++) {
-                        createSingleWordTerm(newTermList, words.get(wordIdx));
-                    }
-                    wordIdx = -1;
+                    wordIdx = addRemainingWordsAsTerms(oldTermList, newTermList, termIdx, wordIdx);
                     termIdx++;
                 }
             }
@@ -296,10 +291,7 @@ public final class MultipleTagsetDocumentTagger implements DocumentTagger {
         }
         if (wordIdx != -1) {
             termIdx--;
-            final List<Word> words = oldTermList.get(termIdx).getWords();
-            for (wordIdx++; wordIdx < words.size(); wordIdx++) {
-                createSingleWordTerm(newTermList, words.get(wordIdx));
-            }
+            addRemainingWordsAsTerms(oldTermList, newTermList, termIdx, wordIdx);
             termIdx++;
         }
 
@@ -307,6 +299,24 @@ public final class MultipleTagsetDocumentTagger implements DocumentTagger {
             newTermList.add(oldTermList.get(termIdx));
         }
         return newTermList;
+    }
+
+    /**
+     * Adds remaining words of a term as single terms to the new term list.
+     *
+     * @param oldTermList The old term list containing the terms of the incoming sentence.
+     * @param newTermList The new term list containing the processed and/or tagged terms.
+     * @param termIdx The index of the term to be processed.
+     * @param wordIdx The index of the word where the remaining words start within the term.
+     * @return Returns {@code -1} which is the new wordIdx since all remaining words of the term are processed.
+     */
+    private static int addRemainingWordsAsTerms(final List<Term> oldTermList, final List<Term> newTermList,
+        final int termIdx, int wordIdx) {
+        final List<Word> words = oldTermList.get(termIdx).getWords();
+        for (wordIdx++; wordIdx < words.size(); wordIdx++) {
+            createSingleWordTerm(newTermList, words.get(wordIdx));
+        }
+        return -1;
     }
 
     /**
