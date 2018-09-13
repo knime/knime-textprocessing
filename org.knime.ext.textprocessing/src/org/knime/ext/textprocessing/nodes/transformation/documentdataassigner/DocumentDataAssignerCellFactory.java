@@ -69,8 +69,8 @@ import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
+import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.data.PublicationDate;
-import org.knime.ext.textprocessing.data.filestore.DocumentBufferedFileStoreCell;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -141,9 +141,7 @@ class DocumentDataAssignerCellFactory extends AbstractCellFactory {
         // check if cell contains missing value
         if (!row.getCell(m_conf.getDocumentColumnIndex()).isMissing()) {
             // get document content from incoming table
-            DocumentBufferedFileStoreCell docCell =
-                (DocumentBufferedFileStoreCell)row.getCell(m_conf.getDocumentColumnIndex());
-            Document doc = docCell.getDocument();
+            Document doc = ((DocumentValue)row.getCell(m_conf.getDocumentColumnIndex())).getDocument();
 
             // create document builder and set sections from incoming document
             DocumentBuilder docBuilder = new DocumentBuilder(doc);
