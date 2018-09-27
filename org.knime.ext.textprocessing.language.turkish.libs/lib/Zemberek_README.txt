@@ -1,0 +1,3 @@
+This plug-in makes use of the Zemberek-NLP library, which is released by: Zemberek-NLP (Ahmet A. Akın, Mehmet D. Akın), https://github.com/ahmetaa/zemberek-nlp
+
+The library is released under Apache License, Version 2.0, which can be found here https://github.com/ahmetaa/zemberek-nlp/blob/master/LICENSE (https://www.apache.org/licenses/LICENSE-2.0.txt) and also in the ZEMBEREK_LICENSE.txt file in this directory.

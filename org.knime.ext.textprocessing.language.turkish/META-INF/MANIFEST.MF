@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing Turkish Language Pack
+Bundle-SymbolicName: org.knime.ext.textprocessing.language.turkish;singleton:=true
+Bundle-Version: 3.7.0.qualifier
+Bundle-Vendor: KNIME AG, Zurich, Switzerland
+Automatic-Module-Name: org.knime.ext.textprocessing.language.turkish
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.knime.ext.textprocessing.language.turkish.TextprocessingTurkishLanguagePack
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.knime.core;bundle-version="3.7.0",
+ org.knime.ext.textprocessing;bundle-version="3.7.0",
+ org.apache.commons.lang3;bundle-version="3.3.1",
+ org.knime.ext.textprocessing.language.turkish.libs;bundle-version="3.7.0"
+Export-Package: org.knime.ext.textprocessing.language.turkish
+Bundle-ClassPath: .
