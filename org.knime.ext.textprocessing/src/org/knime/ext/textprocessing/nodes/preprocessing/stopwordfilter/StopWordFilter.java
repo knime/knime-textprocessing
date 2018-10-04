@@ -102,7 +102,7 @@ public class StopWordFilter implements TermPreprocessing, StringPreprocessing {
         }
     }
 
-    private Set<String> convert(final Set<String> set) {
+    private static Set<String> convert(final Set<String> set) {
         Set<String> convertedSet = new HashSet<String>();
         for (String s : set) {
             convertedSet.add(s.toLowerCase());

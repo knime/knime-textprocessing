@@ -169,10 +169,11 @@ public final class BuildInStopwordListFactory {
         return m_defaultName;
     }
 
-    private Set<String> readList(final File file) {
+    private static Set<String> readList(final File file) {
         final Set<String> stopWords = new LinkedHashSet<String>();
         if (file.exists() && file.canRead() && file.isFile()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+            try (BufferedReader reader =
+                new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     stopWords.add(line.trim());

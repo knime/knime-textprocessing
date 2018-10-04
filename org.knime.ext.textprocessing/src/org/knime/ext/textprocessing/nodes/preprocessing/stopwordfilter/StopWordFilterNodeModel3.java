@@ -99,8 +99,6 @@ final class StopWordFilterNodeModel3 extends StreamablePreprocessingNodeModel {
 
     private Set<String> m_stopWords;
 
-    private boolean m_hasStopWordInput = true;
-
     /**
      * Constructor of {@link StopWordFilterNodeModel3}.
      */
@@ -152,6 +150,7 @@ final class StopWordFilterNodeModel3 extends StreamablePreprocessingNodeModel {
      */
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        boolean hasStopWordInput = true;
         // check column selection
         if (inSpecs[1] != null) {
             if (inSpecs[1].getNumColumns() == 0) {
@@ -163,13 +162,13 @@ final class StopWordFilterNodeModel3 extends StreamablePreprocessingNodeModel {
 
         // check if optional port has content
         if ((inSpecs[1] == null || !inSpecs[1].containsCompatibleType(StringValue.class))) {
-            m_hasStopWordInput = false;
+            hasStopWordInput = false;
         } else {
-            m_hasStopWordInput = true;
+            hasStopWordInput = true;
         }
 
         // throw exception if custom list model should be used, but table is not connected anymore.
-        if (!m_hasStopWordInput && m_useCustomListModel.getBooleanValue()) {
+        if (!hasStopWordInput && m_useCustomListModel.getBooleanValue()) {
             throw new InvalidSettingsException("Second input port disconnected. Please reconfigure.");
         }
     }
