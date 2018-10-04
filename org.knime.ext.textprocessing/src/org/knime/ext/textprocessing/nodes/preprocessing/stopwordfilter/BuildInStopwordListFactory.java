@@ -129,6 +129,9 @@ public final class BuildInStopwordListFactory {
 
         File russianFilename = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Russian-Stopwords.txt");
         m_buildInStopwordLists.put("Russian", readList(russianFilename));
+
+        File turkishFileName = TextprocessingCorePlugin.resolvePath(STOPWORDLIST_PATH + "/Turkish-Stopwords.txt");
+        m_buildInStopwordLists.put("Turkish", readList(turkishFileName));
     }
 
     /**
