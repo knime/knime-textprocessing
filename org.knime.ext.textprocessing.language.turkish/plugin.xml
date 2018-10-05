@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension
+         point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/applications/textprocessing/preprocessing"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.language.turkish.nodes.preprocessing.zemberekstemmer.ZemberekStemmerNodeFactory">
+      </node>
+   </extension>
    <extension point="org.knime.ext.textprocessing.TokenizerFactory">
       	<TokenizerFactory
             TokenizerFactory="org.knime.ext.textprocessing.language.turkish.nodes.tokenization.tokenizer.word.ZemberekTurkishTokenizerFactory">

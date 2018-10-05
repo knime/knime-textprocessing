@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Zemberek Stemmer</name>
+    <shortDescription>Disambiguates document terms and stems them afterwards.</shortDescription>
+    <fullDescription>
+        <intro>
+        	Stems terms contained in the input documents with the Zemberek stemming algorithm, terms will be 
+        	disambiguated and reduced to their stem. The Zemberek stemming algorithm works for Turkish texts only.
+        	
+        	<br/><i>Warning:</i> It is highly recommended to use this node only with documents that have been tokenized with
+        	the <i>Zemberek TurkishTokenizer</i>. Otherwise term information (letter case, tags etc.) might be lost. 
+        	Please double-check the node configurations of the preceding nodes. 
+		</intro>
+
+        <tab name="Preprocessing options">
+        <option name="Document column">
+            The column containing the documents to preprocess.
+        </option>
+        
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
+            documents will be appended as new column. 
+        </option>
+
+        <option name="Append column">
+            The name of the new appended column, containing the preprocessed documents.            
+        </option>
+        
+        <option name="Ignore unmodifiable tag">
+              If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+        <tab name="Stemming options">
+        <option name="Maintain letter case">
+        	If checked, the case of the letters of the stem will be preserved accordingly to their original term.
+        </option>
+        </tab>
+    </fullDescription>
+
+    <ports>
+        <inPort name="Documents to preprocess" index="0">
+            The input table which contains the documents to preprocess.
+        </inPort>
+        <outPort name="Preprocessed documents." index="0">
+            The output table which contains the preprocessed documents.
+        </outPort>
+    </ports>
+</knimeNode>
