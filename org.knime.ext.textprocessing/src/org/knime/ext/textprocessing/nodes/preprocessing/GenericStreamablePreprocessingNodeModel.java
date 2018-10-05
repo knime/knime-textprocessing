@@ -106,17 +106,18 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
     public static final String DEF_NEW_DOCUMENT_COL = "Preprocessed Document";
 
     /** The {@code SettingsModelString} keeping the the name of the document to preprocess. */
-    private SettingsModelString m_documentColModel = PreprocessingNodeSettingsPane2.getDocumentColumnModel();
+    private final SettingsModelString m_documentColModel = PreprocessingNodeSettingsPane2.getDocumentColumnModel();
 
     /** The {@code SettingsModelString} keeping the the name of the preprocessed document column to create. */
-    private SettingsModelString m_newDocumentColModel = PreprocessingNodeSettingsPane2.getNewDocumentColumnModel();
+    private final SettingsModelString m_newDocumentColModel =
+        PreprocessingNodeSettingsPane2.getNewDocumentColumnModel();
 
     /** The {@code SettingsModelBoolean} keeping the boolean value of the option to replace the old document column. */
-    private SettingsModelBoolean m_replaceOldDocModel = PreprocessingNodeSettingsPane2.getReplaceDocumentModel();
+    private final SettingsModelBoolean m_replaceOldDocModel = PreprocessingNodeSettingsPane2.getReplaceDocumentModel();
 
     /** The {@code SettingsModelBoolean} keeping the boolean value of the option to preprocess unmodifiable terms. */
-    private SettingsModelBoolean m_preproUnModifiableModel =
-        PreprocessingNodeSettingsPane2.getPreprocessUnmodifiableModel();
+    private final SettingsModelBoolean m_preproUnModifiableModel =
+            PreprocessingNodeSettingsPane2.getPreprocessUnmodifiableModel();
 
     /** The role of the input ports. */
     private InputPortRole[] m_roles;
@@ -137,9 +138,9 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
     public GenericStreamablePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
         super(dataInPorts, 1);
 
-        if (roles.length != dataInPorts - 1) {
+        if (roles.length != (dataInPorts - 1)) {
             throw new IllegalArgumentException(
-                "Number of input port roles must be equal to number of data in ports -1!");
+                    "Number of input port roles must be equal to number of data in ports -1!");
         }
         m_roles = new InputPortRole[dataInPorts];
         m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
@@ -162,9 +163,9 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
         final InputPortRole[] roles) {
         super(inPortTypes, outPortTypes);
 
-        if (roles.length != inPortTypes.length - 1) {
+        if (roles.length != (inPortTypes.length - 1)) {
             throw new IllegalArgumentException(
-                "Number of input port roles must be equal to number of data in ports -1!");
+                    "Number of input port roles must be equal to number of data in ports -1!");
         }
         m_roles = new InputPortRole[inPortTypes.length];
         m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
@@ -178,12 +179,12 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
     /** {@inheritDoc} */
     @Override
     protected final BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
-        throws Exception {
+            throws Exception {
         preparePreprocessing(inData, exec);
         final ColumnRearranger rearranger = createColumnRearranger(inData[0].getDataTableSpec());
 
-        BufferedDataTable[] output =
-            new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
+        final BufferedDataTable[] output =
+                new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
         afterProcessing();
         return output;
     }
@@ -192,8 +193,8 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
     @Override
     protected final DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         internalConfigure(inSpecs);
-        ColumnRearranger r = createColumnRearranger(inSpecs[0]);
-        DataTableSpec out = r.createSpec();
+        final ColumnRearranger r = createColumnRearranger(inSpecs[0]);
+        final DataTableSpec out = r.createSpec();
         return new DataTableSpec[]{out};
     }
 
@@ -215,7 +216,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      */
     protected void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
-        throws InvalidSettingsException {
+            throws InvalidSettingsException {
     }
 
     /**
@@ -289,16 +290,16 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      */
     protected final ColumnRearranger createColumnRearranger(final DataTableSpec in,
         final StreamableOperatorInternals internals) throws InvalidSettingsException {
-        DataTableSpecVerifier verfier = new DataTableSpecVerifier(in);
+        final DataTableSpecVerifier verfier = new DataTableSpecVerifier(in);
         verfier.verifyMinimumDocumentCells(1, true);
         String docColName = m_documentColModel.getStringValue();
-        int numberOfDocumentCols = verfier.getNumDocumentCells();
+        final int numberOfDocumentCols = verfier.getNumDocumentCells();
 
         // auto guess settings if document column has not been set
         if (docColName.isEmpty()) {
             // only one document col available, probably the first preprocessing node in the chain
             if (numberOfDocumentCols == 1) {
-                String documentCol = in.getColumnSpec(verfier.getDocumentCellIndex()).getName();
+                final String documentCol = in.getColumnSpec(verfier.getDocumentCellIndex()).getName();
                 m_documentColModel.setStringValue(documentCol);
                 m_replaceOldDocModel.setBooleanValue(false);
                 m_newDocumentColModel.setStringValue(DEF_NEW_DOCUMENT_COL);
@@ -310,10 +311,10 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
         // check selected document column
         docColName = m_documentColModel.getStringValue();
-        int docColIndex = in.findColumnIndex(docColName);
+        final int docColIndex = in.findColumnIndex(docColName);
         if (docColIndex < 0) {
             throw new InvalidSettingsException("Selected document column \"" + m_documentColModel.getStringValue()
-                + "\" could not be found in the input data table.");
+            + "\" could not be found in the input data table.");
         }
 
         // check new column name
@@ -330,7 +331,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
         // create new column spec
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        DataColumnSpec docCol = new DataColumnSpecCreator(newColName, docFactory.getDataType()).createSpec();
+        final DataColumnSpec docCol = new DataColumnSpecCreator(newColName, docFactory.getDataType()).createSpec();
 
         // create cell factory and column rearranger
         try {
@@ -342,7 +343,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
 
             final ColumnRearranger rearranger = new ColumnRearranger(in);
-            SingleCellFactory cellFac = createDocumentCellFactory(preprocessing, docColIndex, docCol,
+            final SingleCellFactory cellFac = createDocumentCellFactory(preprocessing, docColIndex, docCol,
                 m_preproUnModifiableModel.getBooleanValue());
 
             // replace or append
@@ -353,7 +354,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
             }
 
             return rearranger;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.error("Preprocessing instance could not be created!");
             throw new InvalidSettingsException(e);
         }
@@ -368,7 +369,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
     /** {@inheritDoc} */
     @Override
     public OutputPortRole[] getOutputPortRoles() {
-        OutputPortRole out = OutputPortRole.DISTRIBUTED;
+        final OutputPortRole out = OutputPortRole.DISTRIBUTED;
         return new OutputPortRole[]{out};
     }
 
@@ -382,13 +383,13 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
             @Override
             public void runFinal(final PortInput[] inputs, final PortOutput[] outputs, final ExecutionContext exec)
-                throws Exception {
+                    throws Exception {
 
                 // covert non streamable in ports to BufferedDatatables
-                BufferedDataTable[] inData = new BufferedDataTable[inputs.length];
+                final BufferedDataTable[] inData = new BufferedDataTable[inputs.length];
                 for (int i = 0; i < inputs.length; i++) {
                     if (m_roles[i].equals(InputPortRole.DISTRIBUTED_STREAMABLE)
-                        || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
+                            || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
                         inData[i] = null;
                     } else if (inputs[i] != null) {
                         inData[i] = (BufferedDataTable)((PortObjectInput)inputs[i]).getPortObject();
@@ -396,7 +397,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
                 }
 
                 preparePreprocessing(inData, exec);
-                ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
+                final ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
                 colre.createStreamableFunction().runFinal(inputs, outputs, exec);
             }
         };
@@ -414,7 +415,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      */
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
+            throws IOException, CanceledExecutionException {
     }
 
     /**
@@ -422,7 +423,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      */
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
+            throws IOException, CanceledExecutionException {
     }
 
     /**
