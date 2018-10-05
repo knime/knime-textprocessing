@@ -62,7 +62,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionSenten
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-class ZemberekStemmerNodeModel extends StreamableFunctionSentencePreprocessingNodeModel {
+final class ZemberekStemmerNodeModel extends StreamableFunctionSentencePreprocessingNodeModel {
 
     /** The default setting for maintaining the case of the stem. */
     private static final boolean DEF_MAINTAIN_CASE = true;

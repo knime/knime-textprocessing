@@ -49,7 +49,6 @@
 package org.knime.ext.textprocessing.language.turkish.nodes.preprocessing.zemberekstemmer;
 
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
@@ -57,7 +56,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSetting
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-class ZemberekStemmerNodeDialog extends PreprocessingNodeSettingsPane2 {
+final class ZemberekStemmerNodeDialog extends PreprocessingNodeSettingsPane2 {
 
     /**
      * Creates a new instance of {@code ZemberekStemmerNodeDialog}.
@@ -65,8 +64,8 @@ class ZemberekStemmerNodeDialog extends PreprocessingNodeSettingsPane2 {
     ZemberekStemmerNodeDialog() {
         super();
         createNewTab("Stemming options");
-        final SettingsModelBoolean maintainCase = ZemberekStemmerNodeModel.getMaintainCaseModel();
-        addDialogComponent(new DialogComponentBoolean(maintainCase, "Maintain letter case"));
+        addDialogComponent(
+            new DialogComponentBoolean(ZemberekStemmerNodeModel.getMaintainCaseModel(), "Maintain capitalization"));
     }
 
 }

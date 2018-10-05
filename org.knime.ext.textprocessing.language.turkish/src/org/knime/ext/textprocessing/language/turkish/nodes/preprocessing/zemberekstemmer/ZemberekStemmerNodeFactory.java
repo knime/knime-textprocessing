@@ -57,7 +57,7 @@ import org.knime.core.node.NodeView;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-public class ZemberekStemmerNodeFactory extends NodeFactory<ZemberekStemmerNodeModel> {
+public final class ZemberekStemmerNodeFactory extends NodeFactory<ZemberekStemmerNodeModel> {
 
     /**
      * {@inheritDoc}

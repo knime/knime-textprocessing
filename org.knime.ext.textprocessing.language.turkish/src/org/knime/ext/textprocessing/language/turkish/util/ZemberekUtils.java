@@ -58,7 +58,7 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-public class ZemberekUtils {
+public final class ZemberekUtils {
 
     private ZemberekUtils() {
         // empty constructor

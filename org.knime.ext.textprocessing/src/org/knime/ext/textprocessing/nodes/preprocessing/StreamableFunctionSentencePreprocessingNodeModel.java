@@ -69,7 +69,7 @@ public abstract class StreamableFunctionSentencePreprocessingNodeModel extends S
 
     /** Default constructor, defining one data input and one data output port. */
     public StreamableFunctionSentencePreprocessingNodeModel() {
-        super(1, new InputPortRole[] {});
+        super(1, new InputPortRole[]{});
     }
 
     /**
@@ -92,7 +92,9 @@ public abstract class StreamableFunctionSentencePreprocessingNodeModel extends S
      * @param inSpecs the specs of the input port objects.
      * @throws InvalidSettingsException If settings or specs are invalid.
      */
-    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException { }
+    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        // nothing to do here
+    }
 
     /**
      * {@inheritDoc}

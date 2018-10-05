@@ -32,8 +32,8 @@
         </option>
         </tab>
         <tab name="Stemming options">
-        <option name="Maintain letter case">
-        	If checked, the case of the letters of the stem will be preserved accordingly to their original term.
+        <option name="Maintain capitalization">
+        	If checked, the capitalization will be preserved.
         </option>
         </tab>
     </fullDescription>

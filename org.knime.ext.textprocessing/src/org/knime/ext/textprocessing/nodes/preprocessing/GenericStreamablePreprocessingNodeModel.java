@@ -125,7 +125,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
     /**
      * Default constructor, defining one data input and one data output port.
      */
-    public GenericStreamablePreprocessingNodeModel() {
+    protected GenericStreamablePreprocessingNodeModel() {
         this(1, new InputPortRole[]{});
     }
 
@@ -135,7 +135,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      * @param dataInPorts The number of data input ports.
      * @param roles The roles of the input ports after the first port.
      */
-    public GenericStreamablePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
+    protected GenericStreamablePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
         super(dataInPorts, 1);
 
         if (roles.length != (dataInPorts - 1)) {
@@ -159,7 +159,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      * @param outPortTypes The output port types.
      * @param roles The roles of the input ports after the first port.
      */
-    public GenericStreamablePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
+    protected GenericStreamablePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
         final InputPortRole[] roles) {
         super(inPortTypes, outPortTypes);
 
@@ -205,6 +205,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      * @throws InvalidSettingsException If settings or specs of input data tables are invalid.
      */
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        // nothing to do here
     }
 
     /**
@@ -217,6 +218,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      */
     protected void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
             throws InvalidSettingsException {
+        // nothing to do here
     }
 
     /**
@@ -228,6 +230,20 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      * @throws Exception If preprocessing instance cannot be created.
      */
     protected abstract T createPreprocessing() throws Exception;
+
+    /**
+     * Creates a new instance of an implementation of {@link Preprocessing} that will be used to preprocess the terms of
+     * the input documents. Extending classes need to create the corresponding preprocessing instance here. Extends the
+     * behavior of {@code createPreprocessing()} by an empty internals object that is filled while processing the data.
+     *
+     * @param internals the empty internals.
+     * @return A new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
+     *         documents.
+     * @throws Exception
+     */
+    protected T createPreprocessingWithInternals(final StreamableOperatorInternals internals) throws Exception {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /**
      * Creates a new instance of an extension of {@code SingleCellFactory}.
@@ -253,19 +269,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
             "There is no cell factory supporting \"" + preprocessing.getClass().getName() + "\".");
     }
 
-    /**
-     * Creates a new instance of an implementation of {@link Preprocessing} that will be used to preprocess the terms of
-     * the input documents. Extending classes need to create the corresponding preprocessing instance here. Extends the
-     * behavior of {@code createPreprocessing()} by an empty internals object that is filled while processing the data.
-     *
-     * @param internals the empty internals.
-     * @return A new instance of {@link TermPreprocessing} that will be used to preprocess the terms of the input
-     *         documents.
-     * @throws Exception
-     */
-    protected T createPreprocessingWithInternals(final StreamableOperatorInternals internals) throws Exception {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+
 
     /**
      * Creates column rearranger for creation of new data table.
