@@ -44,67 +44,28 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.10.2015 (Kilian): created
+ *   Aug 10, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.core.node.port.PortType;
-import org.knime.core.node.streamable.InputPortRole;
-import org.knime.core.node.streamable.StreamableOperatorInternals;
+import org.knime.ext.textprocessing.data.Sentence;
 
 /**
- * Abstract class that extends the generic superclass.
- * This class provides abstract methods for nodes that use {@link TermPreprocessing}.
+ * This interface has to be implemented by all preprocessing nodes that do not only process terms one by one, but also
+ * include information coming from the whole sentence. E.g. the {@code WrappedZemberekStemmer}, for stemming Turkish
+ * words, needs sentence based information to correctly disambiguate words and return stems afterwards.
  *
- * @author Kilian Thiel, KNIME.com, Berlin, Germany
- * @since 3.1
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.7
  */
-public abstract class StreamablePreprocessingNodeModel
-    extends GenericStreamablePreprocessingNodeModel<TermPreprocessing> {
+public interface SentencePreprocessing extends Preprocessing {
 
     /**
-     * Default constructor, defining one data input and one data output port.
-     */
-    public StreamablePreprocessingNodeModel() {
-        this(1, new InputPortRole[]{});
-    }
-
-    /**
-     * Constructor defining a specified number of data input and one data output port.
+     * Creates and returns a new Sentence that is processed based on term and sentence based information.
      *
-     * @param dataInPorts The number of data input ports.
-     * @param roles The roles of the input ports after the first port.
+     * @param sentence The sentence containing the terms to process.
+     * @param processUnmodifiableTerms Set true, if unmodifiable {@code Terms} within the sentence should be processed.
+     * @return Returns a new {@link Sentence}.
      */
-    public StreamablePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
-        super(dataInPorts, roles);
-    }
-
-    /**
-     * Constructor defining a node model with different input and output port types.
-     *
-     * @param inPortTypes The input port types. First port type has to be BufferedDataTable, since its role is set to
-     *            {@link InputPortRole#DISTRIBUTED_STREAMABLE}.
-     * @param outPortTypes The output port types.
-     * @param roles The roles of the input ports after the first port.
-     * @since 3.6
-     */
-    public StreamablePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
-        final InputPortRole[] roles) {
-        super(inPortTypes, outPortTypes, roles);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected abstract TermPreprocessing createPreprocessing() throws Exception;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected TermPreprocessing createPreprocessingWithInternals(final StreamableOperatorInternals internals)
-        throws Exception {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    public Sentence preprocessSentence(final Sentence sentence, final boolean processUnmodifiableTerms);
 }

@@ -44,67 +44,64 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.10.2015 (Kilian): created
+ *   04.10.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
-import org.knime.core.node.port.PortType;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.streamable.InputPortRole;
-import org.knime.core.node.streamable.StreamableOperatorInternals;
+import org.knime.core.node.streamable.PartitionInfo;
+import org.knime.core.node.streamable.StreamableFunction;
+import org.knime.core.node.streamable.StreamableFunctionProducer;
 
 /**
- * Abstract class that extends the generic superclass.
- * This class provides abstract methods for nodes that use {@link TermPreprocessing}.
+ * This abstract class implements the {@link StreamableFunctionProducer} interface.
  *
- * @author Kilian Thiel, KNIME.com, Berlin, Germany
- * @since 3.1
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.7
  */
-public abstract class StreamablePreprocessingNodeModel
-    extends GenericStreamablePreprocessingNodeModel<TermPreprocessing> {
+public abstract class StreamableFunctionSentencePreprocessingNodeModel extends StreamableSentencePreprocessingNodeModel
+    implements StreamableFunctionProducer {
 
-    /**
-     * Default constructor, defining one data input and one data output port.
-     */
-    public StreamablePreprocessingNodeModel() {
-        this(1, new InputPortRole[]{});
-    }
-
-    /**
-     * Constructor defining a specified number of data input and one data output port.
-     *
-     * @param dataInPorts The number of data input ports.
-     * @param roles The roles of the input ports after the first port.
-     */
-    public StreamablePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
-        super(dataInPorts, roles);
-    }
-
-    /**
-     * Constructor defining a node model with different input and output port types.
-     *
-     * @param inPortTypes The input port types. First port type has to be BufferedDataTable, since its role is set to
-     *            {@link InputPortRole#DISTRIBUTED_STREAMABLE}.
-     * @param outPortTypes The output port types.
-     * @param roles The roles of the input ports after the first port.
-     * @since 3.6
-     */
-    public StreamablePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
-        final InputPortRole[] roles) {
-        super(inPortTypes, outPortTypes, roles);
+    /** Default constructor, defining one data input and one data output port. */
+    public StreamableFunctionSentencePreprocessingNodeModel() {
+        super(1, new InputPortRole[] {});
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected abstract TermPreprocessing createPreprocessing() throws Exception;
+    protected final void preparePreprocessing(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws InvalidSettingsException {
+        PortObjectSpec[] inSpecs = new PortObjectSpec[inData.length];
+        for (int i = 0; i < inData.length; i++) {
+            inSpecs[i] = inData[i].getDataTableSpec();
+        }
+        preparePreprocessing(inSpecs);
+    }
+
+    /**
+     * Method to prepare preprocessing instance before it can be applied. This method can be overwritten to apply
+     * preprocessing routines.
+     *
+     * @param inSpecs the specs of the input port objects.
+     * @throws InvalidSettingsException If settings or specs are invalid.
+     */
+    protected void preparePreprocessing(final PortObjectSpec[] inSpecs) throws InvalidSettingsException { }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected TermPreprocessing createPreprocessingWithInternals(final StreamableOperatorInternals internals)
-        throws Exception {
-        throw new UnsupportedOperationException("Not implemented");
+    public final StreamableFunction createStreamableOperator(final PartitionInfo partitionInfo,
+        final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        preparePreprocessing(inSpecs);
+        DataTableSpec in = (DataTableSpec)inSpecs[0];
+        return createColumnRearranger(in).createStreamableFunction();
     }
 }

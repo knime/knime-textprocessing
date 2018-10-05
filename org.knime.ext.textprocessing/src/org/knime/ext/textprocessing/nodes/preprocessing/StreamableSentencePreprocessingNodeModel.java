@@ -44,28 +44,27 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.10.2015 (Kilian): created
+ *   04.10.2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.nodes.preprocessing;
 
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.streamable.InputPortRole;
-import org.knime.core.node.streamable.StreamableOperatorInternals;
 
 /**
- * Abstract class that extends the generic superclass.
- * This class provides abstract methods for nodes that use {@link TermPreprocessing}.
+ * Abstract class that extends the generic superclass while extensions of this class use the
+ * {@link SentencePreprocessing} interface.
  *
- * @author Kilian Thiel, KNIME.com, Berlin, Germany
- * @since 3.1
+ * @author Julian Bunzel, KNIME.com, Berlin, Germany
+ * @since 3.7
  */
-public abstract class StreamablePreprocessingNodeModel
-    extends GenericStreamablePreprocessingNodeModel<TermPreprocessing> {
+public abstract class StreamableSentencePreprocessingNodeModel
+    extends GenericStreamablePreprocessingNodeModel<SentencePreprocessing> {
 
     /**
      * Default constructor, defining one data input and one data output port.
      */
-    public StreamablePreprocessingNodeModel() {
+    public StreamableSentencePreprocessingNodeModel() {
         this(1, new InputPortRole[]{});
     }
 
@@ -75,7 +74,7 @@ public abstract class StreamablePreprocessingNodeModel
      * @param dataInPorts The number of data input ports.
      * @param roles The roles of the input ports after the first port.
      */
-    public StreamablePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
+    public StreamableSentencePreprocessingNodeModel(final int dataInPorts, final InputPortRole[] roles) {
         super(dataInPorts, roles);
     }
 
@@ -86,25 +85,9 @@ public abstract class StreamablePreprocessingNodeModel
      *            {@link InputPortRole#DISTRIBUTED_STREAMABLE}.
      * @param outPortTypes The output port types.
      * @param roles The roles of the input ports after the first port.
-     * @since 3.6
      */
-    public StreamablePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
+    public StreamableSentencePreprocessingNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes,
         final InputPortRole[] roles) {
         super(inPortTypes, outPortTypes, roles);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected abstract TermPreprocessing createPreprocessing() throws Exception;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected TermPreprocessing createPreprocessingWithInternals(final StreamableOperatorInternals internals)
-        throws Exception {
-        throw new UnsupportedOperationException("Not implemented");
     }
 }
