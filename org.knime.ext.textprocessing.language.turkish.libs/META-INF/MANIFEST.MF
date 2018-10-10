@@ -8,6 +8,8 @@ Automatic-Module-Name: org.knime.ext.textprocessing.language.turkish.libs
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/zemberek-full_0.15.0.jar
-Export-Package: zemberek.morphology,
+Export-Package: zemberek.core.turkish,
+ zemberek.morphology,
  zemberek.morphology.analysis,
+ zemberek.morphology.lexicon,
  zemberek.tokenization
