@@ -406,7 +406,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @param tokenizer The name of the tokenizer to set
      * @since 3.7
      */
-    protected void setTokenizerName(final String tokenizer) {
+    protected final void setTokenizerName(final String tokenizer) {
         m_tokenizer.setStringValue(tokenizer);
     }
 

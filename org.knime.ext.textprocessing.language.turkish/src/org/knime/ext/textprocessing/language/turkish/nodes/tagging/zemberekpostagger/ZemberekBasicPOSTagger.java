@@ -65,8 +65,8 @@ import zemberek.morphology.TurkishMorphology.Builder;
 /**
  * The Zemberek POS tagger node adds part of speech (POS) tags to terms of documents. Here the Zemberek part-of-speech
  * tag set is used to define all kinds of tags, see
- * {@link org.knime.ext.textprocessing.data.ZemberekBasicTurkishPOSTagSet} for more details. The POS tagger is based on
- * the ZemberekNLP library (https://github.com/ahmetaa/zemberek-nlp).
+ * {@link ZemberekBasicTurkishPOSTag} for more details. The POS
+ * tagger is based on the ZemberekNLP library (https://github.com/ahmetaa/zemberek-nlp).
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
@@ -75,7 +75,7 @@ final class ZemberekBasicPOSTagger extends AbstractDocumentTagger {
     /** The {@code TurkishMorphology} instance used for tagging. */
     private final TurkishMorphology m_tagger;
 
-    /** Creates a new instance of {@code ZemberekBasicPOSTagger} */
+    /** Creates a new instance of {@code ZemberekBasicPOSTagger}. */
     ZemberekBasicPOSTagger(final String tokenizerName) {
         super(false, tokenizerName);
         m_tagger = new Builder().addDefaultBinaryDictionary().build();

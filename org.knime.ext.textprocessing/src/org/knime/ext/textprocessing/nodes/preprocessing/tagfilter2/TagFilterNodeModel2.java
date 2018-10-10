@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter2;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -101,6 +102,19 @@ public class TagFilterNodeModel2 extends StreamableFunctionPreprocessingNodeMode
 
         return new TagFilter(validTags, tb.getType(), m_strictFilteringModel.getBooleanValue(),
             m_filterMatchingModel.getBooleanValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        final TagBuilder tb = TagFactory.getInstance().getTagSetByType(m_tagTypeModel.getStringValue());
+        if (tb == null) {
+            throw new InvalidSettingsException("Selected tag type \"" + m_tagTypeModel.getStringValue()
+                + "\" could not be found, due to missing language extension!\n"
+                + "Install additional language extensions at File->Install KNIME Extensions.");
+        }
     }
 
     /**
