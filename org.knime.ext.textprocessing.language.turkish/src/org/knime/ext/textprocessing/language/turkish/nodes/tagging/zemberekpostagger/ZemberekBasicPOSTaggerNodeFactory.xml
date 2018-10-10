@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
+    <name>Zemberek POS Tagger</name>
+    <shortDescription>Assigns part of speech tags to terms.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+            This node assigns a part of speech (POS) tag to each term of a document. 
+            Therefore the primary POS tag set from ZemberekNLP is used, for details
+            click <a href="https://github.com/ahmetaa/zemberek-nlp/blob/master/core/src/main/java/zemberek/core/turkish/PrimaryPos.java">here</a>.
+            The underlying tagger deciding what tag to assign to which term is based on the ZemberekNLP framework 
+            version 0.15.0 (<a href="https://github.com/ahmetaa/zemberek-nlp">details</a>).
+            
+			<br/><i>Note:</i> To avoid unwanted behavior, it is highly recommended to use this node only with documents 
+			that have been tokenized with the <i>Zemberek TurkishTokenizer</i>.
+        </intro>
+ 		<tab name="General options">
+        <option name="Document column">
+            The column containing the documents to tag.
+        </option>
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new tagged documents. Otherwise the tagged
+            documents will be appended as new column. 
+        </option>
+        <option name="Append column">
+            The name of the new appended column, containing the tagged documents.            
+        </option>
+		<option name="Word tokenizer">
+            Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
+            to read the description for each tokenizer.
+            <br/><i>Note:</i> Currently there is only the <i>Zemberek TurkishTokenizer</i> available for this node, since
+            other tokenizer might cause undesired behavior.
+        </option>
+		<option name="Number of maximal parallel tagging processes">
+            Defines the maximal number of parallel threads that are used for tagging. Please note, that for each thread
+            a tagging model will be loaded into memory. If this value is set to a number greater than 1, make sure that
+            enough heap space is available, in order to be able to load the models. If you are not sure how much heap is 
+            available for KNIME, leave the number to 1.
+        </option>
+        </tab>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents to tag.</inPort>    
+        <outPort name="Documents output table" index="0">An output table
+        containing the tagged documents.</outPort>
+    </ports>
+</knimeNode>

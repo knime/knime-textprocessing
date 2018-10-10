@@ -46,83 +46,57 @@
  * History
  *   Aug 10, 2018 (julian): created
  */
-package org.knime.ext.textprocessing.language.turkish.data;
+package org.knime.ext.textprocessing.language.turkish.nodes.tagging.zemberekpostagger;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-
-import zemberek.core.turkish.PrimaryPos;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * This class provides methods given by the {@link TagBuilder} interface to use the {@link PrimaryPos} tag set
- * provided by ZemberekNLP.
+ * The {@code NodeFactory} of the Zemberek POS Tagger node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
- * @since 3.7
  */
-public class ZemberekBasicTurkishPOSTag implements TagBuilder {
-
-    /**
-     * The tag type constant for the ZemberekNLP tag set.
-     */
-    private static final String TAG_TYPE = "ZEMNLP";
+public final class ZemberekBasicPOSTaggerNodeFactory extends NodeFactory<ZemberekBasicPOSTaggerNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Tag buildTag(final String value) {
-        return stringToTag(value);
+    public ZemberekBasicPOSTaggerNodeModel createNodeModel() {
+        return new ZemberekBasicPOSTaggerNodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> asStringList() {
-        return Stream.of(PrimaryPos.values())//
-            .map(e -> e.name().equals(PrimaryPos.Unknown.name()) ? e.name().toUpperCase()
-                : e.getStringForm().toUpperCase())//
-            .collect(Collectors.toList());
+    protected int getNrNodeViews() {
+        return 0;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Tag> getTags() {
-        return Stream.of(PrimaryPos.values())//
-            .map(e -> stringToTag(e.name()))//
-            .collect(Collectors.toSet());
+    public NodeView<ZemberekBasicPOSTaggerNodeModel> createNodeView(final int viewIndex,
+        final ZemberekBasicPOSTaggerNodeModel nodeModel) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getType() {
-        return TAG_TYPE;
+    protected boolean hasDialog() {
+        return true;
     }
 
     /**
-     * Converts a string to the corresponding {@link Tag}.
-     *
-     * @param str The string to be converted to a {@code Tag}.
-     * @return Returns the corresponding {@code Tag}.
+     * {@inheritDoc}
      */
-    public static final Tag stringToTag(final String str) {
-        final String tagValue;
-        if (str.equalsIgnoreCase(PrimaryPos.Unknown.name())) {
-            tagValue = str;
-        } else {
-            tagValue = PrimaryPos.valueOf(str).getStringForm();
-        }
-        return new Tag(tagValue.toUpperCase(), TAG_TYPE);
+    @Override
+    protected ZemberekBasicPOSTaggerNodeDialog createNodeDialogPane() {
+        return new ZemberekBasicPOSTaggerNodeDialog();
     }
 
 }

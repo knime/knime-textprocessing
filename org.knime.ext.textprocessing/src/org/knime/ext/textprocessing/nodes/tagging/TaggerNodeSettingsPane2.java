@@ -127,32 +127,42 @@ public class TaggerNodeSettingsPane2 extends DefaultNodeSettingsPane {
         removeTab("Options");
         createNewTabAt("General options", 1);
 
-        SettingsModelString documentColModel = getDocumentColumnModel();
-        DialogComponentColumnNameSelection docComp =
+        final SettingsModelString documentColModel = getDocumentColumnModel();
+        final DialogComponentColumnNameSelection docComp =
             new DialogComponentColumnNameSelection(documentColModel, "Document column", 0, DocumentValue.class);
         docComp.setToolTipText("The documents to tag");
         addDialogComponent(docComp);
 
         setHorizontalPlacement(true);
 
-        DialogComponentBoolean replaceComp = new DialogComponentBoolean(m_replaceDocModel, "Replace column");
+        final DialogComponentBoolean replaceComp = new DialogComponentBoolean(m_replaceDocModel, "Replace column");
         replaceComp.setToolTipText("Replace selected document column");
         m_replaceDocModel.addChangeListener(e -> checkSettings());
         addDialogComponent(replaceComp);
 
-        DialogComponentString newDocColNameComp =
+        final DialogComponentString newDocColNameComp =
             new DialogComponentString(m_newDocumentColModel, "Append column:", true, 20);
         newDocColNameComp.setToolTipText("Name of the new document column");
         addDialogComponent(newDocColNameComp);
 
         setHorizontalPlacement(false);
 
-        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
-        addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
+        addDialogComponent(
+            new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", getTokenizerList()));
 
         addDialogComponent(
             new DialogComponentNumber(getNumberOfThreadsModel(), "Number of maximal parallel tagging processes", 1));
         checkSettings();
+    }
+
+    /**
+     * Returns a collection of names of registered word tokenizers.
+     *
+     * @return Returns a collection of names of registered word tokenizers.
+     * @since 3.7
+     */
+    protected Collection<String> getTokenizerList() {
+        return TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
     }
 
     private void checkSettings() {

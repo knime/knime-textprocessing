@@ -8,6 +8,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.language.turkish.nodes.preprocessing.zemberekstemmer.ZemberekStemmerNodeFactory">
       </node>
+      <node
+            category-path="/applications/textprocessing/tagging"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.language.turkish.nodes.tagging.zemberekpostagger.ZemberekBasicPOSTaggerNodeFactory">
+      </node>
    </extension>
    <extension point="org.knime.ext.textprocessing.TokenizerFactory">
       	<TokenizerFactory

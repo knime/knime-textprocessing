@@ -44,50 +44,60 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Aug 10, 2018 (julian): created
+ *   Aug 10, 2018 (Julian Bunzel): created
  */
-package org.knime.ext.textprocessing.language.turkish.data;
+package org.knime.ext.textprocessing.language.turkish.nodes.tagging.zemberekpostagger;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
+import org.knime.ext.textprocessing.language.turkish.data.ZemberekBasicTurkishPOSTag;
+import org.knime.ext.textprocessing.nodes.tagging.AbstractDocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.TaggedEntity;
 
-import zemberek.core.turkish.PrimaryPos;
+import zemberek.morphology.TurkishMorphology;
+import zemberek.morphology.TurkishMorphology.Builder;
 
 /**
- * This class provides methods given by the {@link TagBuilder} interface to use the {@link PrimaryPos} tag set
- * provided by ZemberekNLP.
+ * The Zemberek POS tagger node adds part of speech (POS) tags to terms of documents. Here the Zemberek part-of-speech
+ * tag set is used to define all kinds of tags, see
+ * {@link org.knime.ext.textprocessing.data.ZemberekBasicTurkishPOSTagSet} for more details. The POS tagger is based on
+ * the ZemberekNLP library (https://github.com/ahmetaa/zemberek-nlp).
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
- * @since 3.7
  */
-public class ZemberekBasicTurkishPOSTag implements TagBuilder {
+final class ZemberekBasicPOSTagger extends AbstractDocumentTagger {
 
-    /**
-     * The tag type constant for the ZemberekNLP tag set.
-     */
-    private static final String TAG_TYPE = "ZEMNLP";
+    /** The {@code TurkishMorphology} instance used for tagging. */
+    private final TurkishMorphology m_tagger;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tag buildTag(final String value) {
-        return stringToTag(value);
+    /** Creates a new instance of {@code ZemberekBasicPOSTagger} */
+    ZemberekBasicPOSTagger(final String tokenizerName) {
+        super(false, tokenizerName);
+        m_tagger = new Builder().addDefaultBinaryDictionary().build();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> asStringList() {
-        return Stream.of(PrimaryPos.values())//
-            .map(e -> e.name().equals(PrimaryPos.Unknown.name()) ? e.name().toUpperCase()
-                : e.getStringForm().toUpperCase())//
+    protected List<Tag> getTags(final String tag) {
+        return Collections.singletonList(ZemberekBasicTurkishPOSTag.stringToTag(tag));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<TaggedEntity> tagEntities(final Sentence sentence) {
+        return m_tagger.analyzeAndDisambiguate(sentence.getText()).getWordAnalyses()//
+            .stream()//
+            .map(swa -> new TaggedEntity(swa.getWordAnalysis().getInput(),
+                swa.getBestAnalysis().getDictionaryItem().primaryPos.name()))//
             .collect(Collectors.toList());
     }
 
@@ -95,34 +105,7 @@ public class ZemberekBasicTurkishPOSTag implements TagBuilder {
      * {@inheritDoc}
      */
     @Override
-    public Set<Tag> getTags() {
-        return Stream.of(PrimaryPos.values())//
-            .map(e -> stringToTag(e.name()))//
-            .collect(Collectors.toSet());
+    protected void preprocess(final Document doc) {
+        // Nothing to do here...
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getType() {
-        return TAG_TYPE;
-    }
-
-    /**
-     * Converts a string to the corresponding {@link Tag}.
-     *
-     * @param str The string to be converted to a {@code Tag}.
-     * @return Returns the corresponding {@code Tag}.
-     */
-    public static final Tag stringToTag(final String str) {
-        final String tagValue;
-        if (str.equalsIgnoreCase(PrimaryPos.Unknown.name())) {
-            tagValue = str;
-        } else {
-            tagValue = PrimaryPos.valueOf(str).getStringForm();
-        }
-        return new Tag(tagValue.toUpperCase(), TAG_TYPE);
-    }
-
 }

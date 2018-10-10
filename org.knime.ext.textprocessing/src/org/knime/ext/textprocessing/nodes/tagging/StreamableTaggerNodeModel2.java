@@ -144,17 +144,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      */
     public StreamableTaggerNodeModel2(final int dataInPorts, final InputPortRole[] roles) {
         super(dataInPorts, 1);
-
-        if (roles.length != dataInPorts - 1) {
-            throw new IllegalArgumentException(
-                "Number of input port roles must be equal to number of data in ports -1!");
-        }
-        m_roles = new InputPortRole[dataInPorts];
-        m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
-        for (int i = 1; i < m_roles.length; i++) {
-            m_roles[i] = roles[i - 1];
-        }
-
+        setInportRoles(dataInPorts, roles);
         m_replaceOldDocModel.addChangeListener(e -> checkSettings());
     }
 
@@ -178,18 +168,20 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
     public StreamableTaggerNodeModel2(final PortType[] inPortTypes, final InputPortRole[] roles,
         final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
+        setInportRoles(inPortTypes.length, roles);
+        m_replaceOldDocModel.addChangeListener(e -> checkSettings());
+    }
 
-        if (roles.length != inPortTypes.length - 1) {
+    private void setInportRoles(final int dataInPorts, final InputPortRole[] roles) {
+        if (roles.length != dataInPorts - 1) {
             throw new IllegalArgumentException(
                 "Number of input port roles must be equal to number of data in ports -1!");
         }
-        m_roles = new InputPortRole[inPortTypes.length];
+        m_roles = new InputPortRole[dataInPorts];
         m_roles[0] = InputPortRole.DISTRIBUTED_STREAMABLE;
         for (int i = 1; i < m_roles.length; i++) {
             m_roles[i] = roles[i - 1];
         }
-
-        m_replaceOldDocModel.addChangeListener(e -> checkSettings());
     }
 
     /**
@@ -199,7 +191,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         prepareTagger(inObjects, exec);
 
-        BufferedDataTable inDataDocumentTable = (BufferedDataTable)inObjects[0];
+        final BufferedDataTable inDataDocumentTable = (BufferedDataTable)inObjects[0];
         final ColumnRearranger rearranger = createColumnRearranger(inDataDocumentTable.getDataTableSpec());
         return new BufferedDataTable[]{exec.createColumnRearrangeTable(inDataDocumentTable, rearranger, exec)};
     }
@@ -209,11 +201,12 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        final DataTableSpec[] inDataTableSpecs = Arrays.stream(inSpecs)//
+                .filter(spec -> spec instanceof DataTableSpec)//
+                .map(spec -> (DataTableSpec)spec)//
+                .toArray(DataTableSpec[]::new);
 
-        DataTableSpec[] inDataTableSpecs = Arrays.stream(inSpecs).filter(spec -> spec instanceof DataTableSpec)
-            .map(spec -> (DataTableSpec)spec).toArray(DataTableSpec[]::new);
-
-        DataTableSpec in = inDataTableSpecs[0];
+        final DataTableSpec in = inDataTableSpecs[0];
 
         // auto guess settings if document column has not been set
         ColumnSelectionVerifier.verifyColumn(m_documentColModel, in, DocumentValue.class, null)
@@ -228,11 +221,8 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
             throw new MissingTokenizerException(m_tokenizer.getStringValue());
         }
 
-        ColumnRearranger r = createColumnRearranger(in);
-        DataTableSpec out = r.createSpec();
-
         checkSettings();
-        return new DataTableSpec[]{out};
+        return new DataTableSpec[]{createColumnRearranger(in).createSpec()};
     }
 
     /**
@@ -257,11 +247,12 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * Method to check tokenizer settings from incoming document column.
      *
      * @param inSpecs Specs of the input data tables.
+     * @since 3.7
      */
-    private void checkDocColTokenizerSettings(final DataTableSpec[] inSpecs) {
-        DataTableSpec inSpec = inSpecs[0];
-        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpec);
-        String tokenizerFromInput = dataTableSpecVerifier
+    protected void checkDocColTokenizerSettings(final DataTableSpec[] inSpecs) {
+        final DataTableSpec inSpec = inSpecs[0];
+        final DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpec);
+        final String tokenizerFromInput = dataTableSpecVerifier
             .getTokenizerFromInputDocCol(inSpec.findColumnIndex(m_documentColModel.getStringValue()));
         if (m_tokenizer.getStringValue().isEmpty()) {
             if (tokenizerFromInput != null) {
@@ -297,9 +288,9 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @throws Exception If tagger cannot be prepared.
      */
     protected void prepareTagger(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        BufferedDataTable[] inData =
-            Arrays.stream(inObjects).map(po -> po instanceof BufferedDataTable ? (BufferedDataTable)po : null)
-                .toArray(BufferedDataTable[]::new);
+        final BufferedDataTable[] inData = Arrays.stream(inObjects)//
+                                           .map(po -> po instanceof BufferedDataTable ? (BufferedDataTable)po : null)//
+                                           .toArray(BufferedDataTable[]::new);
         prepareTagger(inData, exec);
     }
 
@@ -311,12 +302,10 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      * @throws InvalidSettingsException If tagger instance cannot be created.
      */
     protected final ColumnRearranger createColumnRearranger(final DataTableSpec in) throws InvalidSettingsException {
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(in);
+        final DataTableSpecVerifier verifier = new DataTableSpecVerifier(in);
         verifier.verifyMinimumDocumentCells(1, true);
-        String docColName = m_documentColModel.getStringValue();
-
-        docColName = m_documentColModel.getStringValue();
-        int docColIndex = in.findColumnIndex(docColName);
+        final String docColName = m_documentColModel.getStringValue();
+        final int docColIndex = in.findColumnIndex(docColName);
 
         // check new column name
         String newColName = m_newDocumentColModel.getStringValue();
@@ -330,17 +319,13 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
         }
 
         final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        DataColumnSpecCreator docColSpecCreator = new DataColumnSpecCreator(newColName, docFactory.getDataType());
+        final DataColumnSpecCreator docColSpecCreator = new DataColumnSpecCreator(newColName, docFactory.getDataType());
         docColSpecCreator.setProperties(new DataColumnProperties(
             Collections.singletonMap(DocumentDataTableBuilder.WORD_TOKENIZER_KEY, m_tokenizer.getStringValue())));
-        DataColumnSpec docCol = docColSpecCreator.createSpec();
+        final DataColumnSpec docCol = docColSpecCreator.createSpec();
 
-        final int maxNumberOfParallelThreads;
-        if (getMaxNumberOfParallelThreads() <= 0) {
-            maxNumberOfParallelThreads = 1;
-        } else {
-            maxNumberOfParallelThreads = getMaxNumberOfParallelThreads();
-        }
+        final int maxNumberOfParallelThreads =
+            getMaxNumberOfParallelThreads() <= 0 ? 1 : getMaxNumberOfParallelThreads();
 
         final TaggerCellFactory cellFac = new TaggerCellFactory(this, docColIndex, docCol, maxNumberOfParallelThreads);
         final ColumnRearranger rearranger = new ColumnRearranger(in);
@@ -363,7 +348,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
     /** {@inheritDoc} */
     @Override
     public OutputPortRole[] getOutputPortRoles() {
-        OutputPortRole out = OutputPortRole.DISTRIBUTED;
+        final OutputPortRole out = OutputPortRole.DISTRIBUTED;
         return new OutputPortRole[]{out};
     }
 
@@ -380,7 +365,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
                 throws Exception {
 
                 // covert non streamable in ports to PortObject
-                PortObject[] inData = new PortObject[inputs.length];
+                final PortObject[] inData = new PortObject[inputs.length];
                 for (int i = 0; i < inputs.length; i++) {
                     if (m_roles[i].equals(InputPortRole.DISTRIBUTED_STREAMABLE)
                         || m_roles[i].equals(InputPortRole.NONDISTRIBUTED_STREAMABLE)) {
@@ -394,7 +379,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
                 }
 
                 prepareTagger(inData, exec);
-                ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
+                final ColumnRearranger colre = createColumnRearranger((DataTableSpec)inSpecs[0]);
                 colre.createStreamableFunction().runFinal(inputs, outputs, exec);
             }
         };
@@ -412,6 +397,17 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
      */
     protected String getTokenizerName() {
         return m_tokenizer.getStringValue();
+    }
+
+    /**
+     * Sets the tokenizer.
+     * Note: This method should only be used if a tagger node has to be forced to use a specific tokenizer.
+     *
+     * @param tokenizer The name of the tokenizer to set
+     * @since 3.7
+     */
+    protected void setTokenizerName(final String tokenizer) {
+        m_tokenizer.setStringValue(tokenizer);
     }
 
     /** {@inheritDoc} */
