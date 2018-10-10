@@ -14,4 +14,10 @@
             TokenizerFactory="org.knime.ext.textprocessing.language.turkish.nodes.tokenization.tokenizer.word.ZemberekTurkishTokenizerFactory">
       	</TokenizerFactory>
    </extension>
+   <extension
+         point="org.knime.ext.textprocessing.TagSet">
+      <TagSet
+            TagBuilder="org.knime.ext.textprocessing.language.turkish.data.ZemberekBasicTurkishPOSTag">
+      </TagSet>
+   </extension>
 </plugin>
