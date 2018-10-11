@@ -46,9 +46,9 @@
         <option name="Document column">
             The column containing the documents to tag.
         </option>
-        <option name="Replace documents">
-            If checked, the documents will be replaced by the new tagged documents. Otherwise the tagged
-            documents will be appended as new column. 
+        <option name="Replace column">
+            If checked, the documents of the selected document column will be replaced by the new tagged documents.
+            Otherwise the tagged documents will be appended as new column. 
         </option>
         <option name="Append column">
             The name of the new appended column, containing the tagged documents.            
