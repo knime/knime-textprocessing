@@ -60,9 +60,9 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.process.TokenizerFactory;
 
 /**
- * This class is an abstract super class for integrated StandfordNLP tokenizer that have to be handled the same way.
- * E.g. the {@code StanfordNlpPTBTokenizer} and the {@code StanfordNlpSpanishTokenizer} both need a specific handling of
- * HTML entities which is provided by this class.
+ * This class is an abstract super class for integrated StanfordNLP tokenizer that have to be handled the same way. E.g.
+ * the {@code StanfordNlpPTBTokenizer} and the {@code StanfordNlpSpanishTokenizer} both need a specific handling of HTML
+ * entities which is provided by this class.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.7
@@ -137,7 +137,7 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
         // the normalized word exists in the text. in other cases (normWordStart < 0 or normWordStart >
         // wordStart) the tokenized word will be used for checking.
         if (((wordStart >= 0) && (normWordStart >= 0) && (wordStart > normWordStart))
-                || ((wordStart < 0) && (normWordStart >= 0))) {
+            || ((wordStart < 0) && (normWordStart >= 0))) {
             wordStart = normWordStart;
             token = normalizedToken;
         } else if ((wordStart < 0) && (normWordStart < 0)) {
@@ -155,7 +155,12 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
         return sentence.substring(wordStart + token.length());
     }
 
-    // split by whitespace and ;& for the case of html entities
+    /**
+     * Splits a string around matches of whitespace or ;& (html) and adds them to the provided token list.
+     *
+     * @param skippedWord the skipped word to be split
+     * @param tokenList the list the split strings are added to
+     */
     private static void splitSkippedWordAndAdd(final String skippedWord, final List<String> tokenList) {
         final String[] split = skippedWord.split("\\s+");
         for (final String token : split) {
@@ -167,6 +172,11 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
         }
     }
 
+    /**
+     * Rebuilds a html entity from a given array of tokens.
+     * @param tokens the array of tokens
+     * @return a list containing the re-constructed html entries
+     */
     private static List<String> rebuildHTMLEntity(final String[] tokens) {
         for (int i = 0; i < tokens.length; i++) {
             if (i == 0) {
