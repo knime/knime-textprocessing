@@ -63,7 +63,7 @@ public class StanfordNlpPTBTokenizer extends StanfordNlpHtmlHandlingSupportedTok
     private static final String OPTIONS = "ptb3Escaping=false,strictTreebank3=true";
 
     /**
-     * Creates a new instance of {@code StanfordNlpPTBTokenizer}
+     * Creates a new instance of {@code StanfordNlpPTBTokenizer}.
      */
     public StanfordNlpPTBTokenizer() {
         super(PTBTokenizerFactory.newCoreLabelTokenizerFactory(OPTIONS));

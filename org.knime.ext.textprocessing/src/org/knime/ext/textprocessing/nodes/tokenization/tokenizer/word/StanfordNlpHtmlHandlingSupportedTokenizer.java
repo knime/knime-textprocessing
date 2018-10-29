@@ -75,7 +75,7 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
     private final TokenizerFactory<CoreLabel> m_tokenizer;
 
     /**
-     * Creates a new instance of {@code StanfordNLPSharedTokenizer}.
+     * Creates a new instance of {@code StanfordNlpHtmlHandlingSupportedTokenizer}.
      *
      * @param tokenizer The {@code TokenizerFactory}.
      */
