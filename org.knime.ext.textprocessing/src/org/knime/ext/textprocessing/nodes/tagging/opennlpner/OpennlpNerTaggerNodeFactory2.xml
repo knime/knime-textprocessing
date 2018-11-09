@@ -3,14 +3,17 @@
 <knimeNode icon="../../../icons/TextProcEnrichment.png" type="Manipulator">
     <name>OpenNLP NE Tagger</name>
     <shortDescription>Assigs named entity tags, such as "PERSON" or "LOCATION".
-    </shortDescription>
+    </shortDescription> 
     <fullDescription>
         <intro>
-            This node recognizes named enities based on opennlp models version 
-            1.8.4 and assigns the corresponding tags to them. The following 
-            entities are recognized: Persons, Locations, Organizations, Money, 
-            Date, and Time. For more details of the OpenNlp natural language 
-            processing toolkit, click <a href="http://opennlp.apache.org/docs/">here</a>.
+            This node recognizes named entities based on <i>OpenNLP Name Finder</i> models and assigns the corresponding tags to them. 
+            The version of the underlying OpenNLP framework is 1.8.4. The built-in models are pre-trained models from OpenNLP version 1.5.<br/>
+            It is also possible to tag documents with other models than the built-in models.
+            To do so, the model has to be read with the <i>OpenNLP NER Model Reader</i> node.<br/>
+            <i>Note:</i> Models trained with OpenNLP versions lower than 1.5 or higher than 1.8.4 might not work correctly.<br/>
+            The following entities are recognized: Persons, Locations, Organizations, Money, 
+            Date, and Time.<br/>
+            For more details of the OpenNLP natural language processing toolkit, click <a href="http://opennlp.apache.org/docs/">here</a>.
         </intro>
         <tab name="General options">
         <option name="Document column">
@@ -38,16 +41,23 @@
         <option name="Set named entities unmodifiable">
             Sets recognized named entity terms unmodifiable.
         </option>
-        <option name="OpenNlp model">
+        <option name="Built-in OpenNLP model">
             Specifies the OpenNLP model to use. Each model is able to recognize
             a certain type of named entities.
+        </option>
+		<option name="Use model from input port">
+            If checked, the model from the second input port will be used for tagging.
+        </option>
+       	<option name="Tag value">
+            Specifies the named-entity tag to be used for tagging with the model from the input port.
         </option>
         </tab>
     </fullDescription>
         
     <ports>
         <inPort name="Documents input table" index="0">The input table
-        containing the documents to tag.</inPort>    
+        containing the documents to tag.</inPort>
+        <inPort name="Model input" index="1">The port object containing the OpenNLP model.</inPort>    
         <outPort name="Documents output table" index="0">An output table
         containing the tagged documents.</outPort>
     </ports>

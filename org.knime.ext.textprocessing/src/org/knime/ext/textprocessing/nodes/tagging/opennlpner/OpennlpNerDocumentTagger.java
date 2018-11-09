@@ -66,69 +66,61 @@ import opennlp.tools.namefind.TokenNameFinder;
 import opennlp.tools.util.Span;
 
 /**
- * @author Kilian Thiel, University of Konstanz
+ * A document tagger class used for tagging based on OpenNLP NER models.
  *
+ * @author Kilian Thiel, University of Konstanz
  */
 public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
 
+    /** The specific tagger class. */
     private TokenNameFinder m_tagger;
 
+    /** The OpenNLP model. */
     private OpenNlpModel m_model;
 
     /**
-     * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
-     * given unmodifiable flag and the model file to use.
+     * Creates a new instance of {@code OpennlpNerDocumentTagger} with given unmodifiable flag, model type and model
+     * file path.
      *
-     * @param setNeUnmodifiable The flag specifying whether found named entities
-     * will be set unmodifiable or not.
-     * @param modelType The type of the specified model (person, time,
-     * organization, etc.).
-     * @param modelFileName Use of model file.
+     * @param setNeUnmodifiable The flag specifying whether found named entities will be set unmodifiable or not.
+     * @param modelType The type of the specified model (person, time, organization, etc.).
+     * @param modelFileName The model file path.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws IOException If something happens.
      * @since 3.3
      */
-    public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
-            final String modelType, final String modelFileName, final String tokenizerName)
-    throws IOException {
+    public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable, final String modelType, final String modelFileName,
+        final String tokenizerName) throws IOException {
         super(setNeUnmodifiable, tokenizerName);
         if (modelType == null) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model type may not be null!");
+            throw new IllegalArgumentException("The specified OpenNLP model type may not be null!");
         }
         if (modelFileName == null) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model file may not be null!");
+            throw new IllegalArgumentException("The specified OpenNLP model file may not be null!");
         }
         File f = new File(modelFileName);
         if (!f.exists() || !f.canRead() || !f.isFile()) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model file is not valid!");
+            throw new IllegalArgumentException("The specified OpenNLP model file is not valid!");
         }
 
-        m_model = new OpenNlpModel(modelType, modelFileName,
-                    OpenNlpModelFactory.getInstance().getTagByName(modelType));
+        m_model = new OpenNlpModel(modelType, modelFileName, OpenNlpModelFactory.getInstance().getTagByName(modelType));
         m_tagger = new NameFinderME(m_model.getModel());
     }
 
     /**
-     * Creates a new instance of <code>OpennlpNerDocumentTagger</code> with
-     * given unmodifiable flag and model to tag with.
+     * Creates a new instance of {@code OpennlpNerDocumentTagger} with given unmodifiable flag and model to tag with.
      *
-     * @param setNeUnmodifiable The flag specifying whether found named entities
-     * will be set unmodifiable or not.
+     * @param setNeUnmodifiable The flag specifying whether found named entities will be set unmodifiable or not.
      * @param model The model to tag with.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @throws IOException If something happens.
      * @since 2.7
      */
-    public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable,
-            final OpenNlpModel model, final String tokenizerName)
-    throws IOException {
+    public OpennlpNerDocumentTagger(final boolean setNeUnmodifiable, final OpenNlpModel model,
+        final String tokenizerName) throws IOException {
         super(setNeUnmodifiable, tokenizerName);
         if (model == null) {
-            throw new IllegalArgumentException(
-                    "The specified OpenNLP model may not be null!");
+            throw new IllegalArgumentException("The specified OpenNLP model may not be null!");
         }
         m_model = model;
         m_tagger = new NameFinderME(m_model.getModel());
@@ -163,7 +155,7 @@ public class OpennlpNerDocumentTagger extends AbstractDocumentTagger {
                 words.add(w.getWord());
             }
         }
-        String [] wordsArr = words.toArray(new String[0]);
+        String[] wordsArr = words.toArray(new String[0]);
 
         Span[] spans = m_tagger.find(wordsArr);
         List<TaggedEntity> nes = new ArrayList<TaggedEntity>();

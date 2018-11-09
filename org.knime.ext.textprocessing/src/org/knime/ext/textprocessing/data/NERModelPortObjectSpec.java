@@ -49,7 +49,6 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 
@@ -87,17 +86,14 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
         @Override
         public NERModelPortObjectSpec loadPortObjectSpec(final PortObjectSpecZipInputStream in) throws IOException {
             in.getNextEntry();
-            ModelContentRO config;
-            try (InputStream is = new NonClosableInputStream.Zip(in)) {
-                config = ModelContent.loadFromXML(in);
-            }
-            final String nameOfUsedTokenizer;
+            final ModelContentRO config = ModelContent.loadFromXML(new NonClosableInputStream.Zip(in));
             try {
-                nameOfUsedTokenizer = config.getString("tokenizerName");
+                final String nameOfUsedTokenizer = config.getString("tokenizerName");
+                return new NERModelPortObjectSpec(nameOfUsedTokenizer);
             } catch (final InvalidSettingsException e) {
                 throw new IOException("Failed to deserialize port object spec", e);
             }
-            return new NERModelPortObjectSpec(nameOfUsedTokenizer);
+
         }
 
         /**

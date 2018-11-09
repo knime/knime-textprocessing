@@ -53,36 +53,40 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
-import opennlp.tools.namefind.TokenNameFinderModel;
-
 import org.knime.core.node.NodeLogger;
 
+import opennlp.tools.namefind.TokenNameFinderModel;
+
 /**
- * @author Kilian Thiel, University of Konstanz
+ * Wrapper class for OpenNLP NER models.
  *
+ * @author Kilian Thiel, University of Konstanz
  */
 public class OpenNlpModel {
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(OpenNlpModel.class);
+    /** Node logger for this class. */
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(OpenNlpModel.class);
 
+    /** The name of the model. */
     private String m_name;
 
+    /** The model. */
     private SoftReference<TokenNameFinderModel> m_model;
 
+    /** The filename. */
     private String m_fileName;
 
+    /** The tag used for tagging. */
     private String m_tag;
 
     /**
-     * Creates new instance of <code>OpenNlpModel</code> with given name, model
-     * and tag to set.
+     * Creates new instance of <code>OpenNlpModel</code> with given name, model and tag to set.
+     *
      * @param name The model's name.
      * @param fileName The name of the file containing the maxent model.
      * @param tag The corresponding tag.
      */
-    public OpenNlpModel(final String name, final String fileName,
-            final String tag) {
+    public OpenNlpModel(final String name, final String fileName, final String tag) {
         m_name = name;
         m_fileName = fileName;
         m_tag = tag;
@@ -90,6 +94,20 @@ public class OpenNlpModel {
     }
 
     /**
+     * Creates a new instance of {@code OpenNlpModel} holding the {@code TokenNameFinderModel} and the tag used
+     * for tagging.
+     *
+     * @param model The {@code TokenNameFinderModel}.
+     * @param tag The tag used for tagging.
+     */
+    OpenNlpModel(final TokenNameFinderModel model, final String tag) {
+        m_model = new SoftReference<>(model);
+        m_tag = tag;
+    }
+
+    /**
+     * Returns the name of the model. Might be null.
+     *
      * @return The name of the model.
      */
     public String getName() {
@@ -105,19 +123,16 @@ public class OpenNlpModel {
         if (m == null) {
             File f = new File(m_fileName);
             if (!f.exists() || !f.isFile() || !f.canRead()) {
-                LOGGER.warn("Maxent model file [" + m_fileName
-                        + "] is not valid!");
+                LOGGER.warn("Maxent model file [" + m_fileName + "] is not valid!");
+                return m;
             }
 
-            try {
-                LOGGER.info("Loading Maxent model ["
-                        + f.getName() + "].");
-                InputStream is = new FileInputStream(f);
+            try (final InputStream is = new FileInputStream(f)) {
+                LOGGER.info("Loading Maxent model [" + f.getName() + "].");
                 m = new TokenNameFinderModel(is);
-                m_model = new SoftReference<TokenNameFinderModel>(m);
+                m_model = new SoftReference<>(m);
             } catch (IOException e) {
-                LOGGER.warn("Maxent model could not be loeded from file ["
-                        + m_fileName + "]!", e);
+                LOGGER.warn("Maxent model could not be loaded from file [" + m_fileName + "]!", e);
             }
         }
         return m;
@@ -131,6 +146,8 @@ public class OpenNlpModel {
     }
 
     /**
+     * Returns the name of the file. Might be null.
+     *
      * @return The name of the file containing the maxent model.
      */
     public String getFileName() {

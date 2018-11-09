@@ -50,15 +50,26 @@ package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 import java.io.File;
 import java.io.IOException;
 
+import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.PortTypeRegistry;
+import org.knime.core.node.streamable.InputPortRole;
+import org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject;
 import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
+import org.knime.ext.textprocessing.nodes.tagging.MissingTaggerModelException;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeModel2;
+import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel2;
+import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSettingModels;
 
 /**
  * The node model of the OpenNLP NER tagger node. This node extends {@link StreamableFunctionTaggerNodeModel2} which
@@ -67,27 +78,106 @@ import org.knime.ext.textprocessing.nodes.tagging.StreamableFunctionTaggerNodeMo
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
-class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
+final class OpennlpNerTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
+
+    /** The configuration key for the OpenNLP tagging model. */
+    private static final String CFGKEY_MODEL = "OPENNLP Model";
+
+    /** The configuration key for the model from inport option. */
+    private static final String CFGKEY_USE_MODEL_FROM_INPORT = "Use Model From Inport";
+
+    /** The default model. */
+    private static final String DEF_OPENNLPMODEL = OpenNlpModelFactory.getInstance().getDefaultName();
+
+    /** The default value for the "use input model" option. */
+    private static final boolean DEF_USE_INPORT_MODEL = false;
+
+    /** The index of the optional model input port. */
+    private static final int MODEL_PORT_IDX = 1;
 
     /**
-     * The default value for the unmodifiable flag.
+     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the name of
+     * the OpenNLP tagging model to use.
+     *
+     * @return A {@code SettingsModelString} containing the the name of the OpenNLP tagging model to use.
      */
-    static final boolean DEFAULT_UNMODIFIABLE = true;
+    static final SettingsModelString createOpenNlpModelModel() {
+        return new SettingsModelString(CFGKEY_MODEL, DEF_OPENNLPMODEL);
+    }
 
     /**
-     * The default model.
+     * Creates and returns a {@link SettingsModelBoolean} for the inport model flag.
+     *
+     * @return Returns a {@code SettingsModelBoolean} for the inport model flag.
      */
-    static final String DEF_OPENNLPMODEL = OpenNlpModelFactory.getInstance().getDefaultName();
+    static final SettingsModelBoolean createUseInportModelModel() {
+        return new SettingsModelBoolean(CFGKEY_USE_MODEL_FROM_INPORT, DEF_USE_INPORT_MODEL);
+    }
 
-    private final SettingsModelBoolean m_unmodifiableModel = OpenNlpNerNodeDialog2.createSetUnmodifiableModel();
+    /**
+     * A {@code SettingsModelBoolean} for the "set unmodifiable" option.
+     */
+    private final SettingsModelBoolean m_unmodifiableModel =
+        CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel();
 
-    private final SettingsModelString m_modelNameModel = OpenNlpNerNodeDialog2.createOpenNlpModelModel();
+    /**
+     * A {@code SettingsModelString} that keeps the name of the selected OpenNLP model.
+     */
+    private final SettingsModelString m_modelNameModel = createOpenNlpModelModel();
+
+    /**
+     * A {@code SettingsModelBoolean} for the "use input model" option.
+     */
+    private final SettingsModelBoolean m_useInportModel = createUseInportModelModel();
+
+    /**
+     * A {@code SettingsModelString} that keeps the name of the selected named-entity tag value.
+     */
+    private final SettingsModelString m_tagValueModel = CommonDictionaryTaggerSettingModels.createTagModel();
+
+    /**
+     * A String to save the path of the connected model.
+     */
+    private OpenNlpModel m_inputModel;
 
     /**
      * Creates new instance of {@code OpennlpNerTaggerNodeModel2}.
      */
     OpennlpNerTaggerNodeModel2() {
-        super();
+        super(
+            new PortType[]{BufferedDataTable.TYPE,
+                PortTypeRegistry.getInstance().getPortType(OpenNlpNerTaggerModelPortObject.class, true)},
+            new InputPortRole[]{InputPortRole.NONDISTRIBUTED_NONSTREAMABLE});
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void checkInputPortSpecs(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        // check for optional model input and enable/disable "own model" flag.
+        final boolean hasModelInput = inSpecs[MODEL_PORT_IDX] != null;
+        if (useInputPortModel() && !hasModelInput) {
+            throw new InvalidSettingsException(
+                "No input model port connected. Can not use model from input model port!");
+        }
+
+        // check if tagger model exists in current installation
+        if ((!hasModelInput || !useInputPortModel())
+            && (!OpenNlpModelFactory.getInstance().getModelNames().contains(m_modelNameModel.getStringValue()))) {
+            throw new MissingTaggerModelException(m_modelNameModel.getStringValue());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void prepareTagger(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        m_inputModel = useInputPortModel()
+            ? new OpenNlpModel(((OpenNlpNerTaggerModelPortObject)inObjects[MODEL_PORT_IDX]).getModel(),
+                m_tagValueModel.getStringValue())
+            : OpenNlpModelFactory.getInstance().getModelByName(m_modelNameModel.getStringValue());
     }
 
     /**
@@ -95,8 +185,7 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      */
     @Override
     public DocumentTagger createTagger() throws Exception {
-        return new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(),
-            OpenNlpModelFactory.getInstance().getModelByName(m_modelNameModel.getStringValue()), getTokenizerName());
+        return new OpennlpNerDocumentTagger(m_unmodifiableModel.getBooleanValue(), m_inputModel, getTokenizerName());
     }
 
     /**
@@ -104,16 +193,7 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
      */
     @Override
     protected void reset() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadValidatedSettingsFrom(settings);
-        m_unmodifiableModel.loadSettingsFrom(settings);
-        m_modelNameModel.loadSettingsFrom(settings);
+        // Nothing to do here...
     }
 
     /**
@@ -122,8 +202,26 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         super.saveSettingsTo(settings);
+        m_useInportModel.saveSettingsTo(settings);
         m_modelNameModel.saveSettingsTo(settings);
         m_unmodifiableModel.saveSettingsTo(settings);
+        m_tagValueModel.saveSettingsTo(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadValidatedSettingsFrom(settings);
+        if (settings.containsKey(m_useInportModel.getConfigName())) {
+            m_useInportModel.loadSettingsFrom(settings);
+        }
+        if (settings.containsKey(m_tagValueModel.getKey())) {
+            m_tagValueModel.loadSettingsFrom(settings);
+        }
+        m_modelNameModel.loadSettingsFrom(settings);
+        m_unmodifiableModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -132,8 +230,23 @@ class OpennlpNerTaggerNodeModel2 extends StreamableFunctionTaggerNodeModel2 {
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.validateSettings(settings);
+        if (settings.containsKey(m_useInportModel.getConfigName())) {
+            m_useInportModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_tagValueModel.getKey())) {
+            m_tagValueModel.validateSettings(settings);
+        }
         m_modelNameModel.validateSettings(settings);
         m_unmodifiableModel.validateSettings(settings);
+    }
+
+    /**
+     * Checks if the input model should be used.
+     *
+     * @return True, if the input model should be used.
+     */
+    private final boolean useInputPortModel() {
+        return m_useInportModel.isEnabled() && m_useInportModel.getBooleanValue();
     }
 
     /**

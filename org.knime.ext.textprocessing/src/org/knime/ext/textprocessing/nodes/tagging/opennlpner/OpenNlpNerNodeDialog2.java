@@ -47,11 +47,17 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.ext.textprocessing.data.NamedEntityTag;
+import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
+import org.knime.ext.textprocessing.nodes.tagging.dict.CommonDictionaryTaggerSettingModels;
 
 /**
  * The node dialog class for the OpenNLP NER tagger node.
@@ -59,42 +65,75 @@ import org.knime.ext.textprocessing.nodes.tagging.TaggerNodeSettingsPane2;
  * @author Kilian Thiel, KNIME.com GmbH, Berlin, Germany
  * @since 3.5
  */
-class OpenNlpNerNodeDialog2 extends TaggerNodeSettingsPane2 {
+final class OpenNlpNerNodeDialog2 extends TaggerNodeSettingsPane2 {
+
+    /** SettingsModelBoolean to store the value for the "use inport model" option. */
+    private final SettingsModelBoolean m_useInportModel = OpennlpNerTaggerNodeModel2.createUseInportModelModel();
+
+    /** SettingsModelString to store the name of the OpenNLP model to use. */
+    private final SettingsModelString m_modelNameModel = OpennlpNerTaggerNodeModel2.createOpenNlpModelModel();
+
+    /** SettingsModelString to store the tag value to be used. */
+    private final SettingsModelString m_tagValueModel = CommonDictionaryTaggerSettingModels.createTagModel();
+
+    /** Boolean to keep track whether an input model is available or not. */
+    private boolean m_hasModelInput;
 
     /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelBoolean} containing the user
-     * settings whether terms representing named entities have to be set unmodifiable or not.
-     *
-     * @return A {@code SettingsModelBoolean} containing the terms unmodifiable flag.
-     */
-    static SettingsModelBoolean createSetUnmodifiableModel() {
-        return new SettingsModelBoolean(OpenNlpTaggerConfigKeys2.CFGKEY_UNMODIFIABLE,
-            OpennlpNerTaggerNodeModel2.DEFAULT_UNMODIFIABLE);
-    }
-
-    /**
-     * Creates and returns a {@link org.knime.core.node.defaultnodesettings.SettingsModelString} containing the name of
-     * the OPNENLP tagging model to use.
-     *
-     * @return A {@code SettingsModelString} containing the the name of the ABNER tagging model to use.
-     */
-    static SettingsModelString createOpenNlpModelModel() {
-        return new SettingsModelString(OpenNlpTaggerConfigKeys2.CFGKEY_MODEL,
-            OpennlpNerTaggerNodeModel2.DEF_OPENNLPMODEL);
-    }
-
-    /**
-     * Creates a new instance of {@code OpenNlpNerNodeDialog2} providing a checkbox enabling the user to specify whether
-     * terms representing named entities have to be set unmodifiable or not.
+     * Creates a new instance of {@code OpenNlpNerNodeDialog2}.
      */
     OpenNlpNerNodeDialog2() {
         super();
+        m_useInportModel.addChangeListener(e -> checkSettingsModels());
+
         createNewTab("Tagger options");
         setSelected("Tagger options");
 
-        addDialogComponent(new DialogComponentBoolean(createSetUnmodifiableModel(), "Set named entities unmodifiable"));
+        addDialogComponent(new DialogComponentBoolean(CommonDictionaryTaggerSettingModels.createSetUnmodifiableModel(),
+            "Set named entities unmodifiable"));
 
-        addDialogComponent(new DialogComponentStringSelection(createOpenNlpModelModel(), "OpenNlp model",
+        addDialogComponent(new DialogComponentStringSelection(m_modelNameModel, "Built-in OpenNLP models",
             OpenNlpModelFactory.getInstance().getModelNames()));
+
+        addDialogComponent(new DialogComponentBoolean(m_useInportModel, "Use model from input port"));
+
+        addDialogComponent(new DialogComponentStringSelection(m_tagValueModel, "Tag value",
+            TagFactory.getInstance().getTagSetByType(NamedEntityTag.TAG_TYPE).asStringList()));
+
+        checkSettingsModels();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+        throws NotConfigurableException {
+        super.loadAdditionalSettingsFrom(settings, specs);
+        m_hasModelInput = (specs[1] != null);
+        checkInputModel();
+    }
+
+    /**
+     * Method to automatically enable/disable SettingsModels after un-/checking the use input model option.
+     */
+    private void checkSettingsModels() {
+        final boolean useInport = m_useInportModel.isEnabled() && m_useInportModel.getBooleanValue();
+        m_modelNameModel.setEnabled(!useInport);
+        m_tagValueModel.setEnabled(useInport);
+    }
+
+    /**
+     * Method to enable/disable SettingsModels regarding if there is a model connected to the node.
+     */
+    private void checkInputModel() {
+        if (!m_hasModelInput) {
+            m_useInportModel.setBooleanValue(false);
+            m_useInportModel.setEnabled(false);
+            m_tagValueModel.setEnabled(false);
+        } else {
+            m_useInportModel.setEnabled(true);
+            checkSettingsModels();
+        }
     }
 }

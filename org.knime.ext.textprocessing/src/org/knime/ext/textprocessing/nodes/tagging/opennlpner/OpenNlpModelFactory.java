@@ -48,7 +48,6 @@
 package org.knime.ext.textprocessing.nodes.tagging.opennlpner;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,31 +56,32 @@ import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.util.OpenNlpModelPaths;
 
 /**
+ * Factory class for built-in OpenNLP NER models.
+ *
  * @author Kilian Thiel, University of Konstanz
  *
  */
 public final class OpenNlpModelFactory {
 
-    private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(OpenNlpModelFactory.class);
+    /** NodeLogger for this class. */
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(OpenNlpModelFactory.class);
 
+    /** Static factory instance. */
     private static OpenNlpModelFactory instance = null;
 
-    private Hashtable<String, OpenNlpModel> m_models =
-        new Hashtable<String, OpenNlpModel>();
+    /** Map of model names and their associated {@code OpenNlpModels}. */
+    private HashMap<String, OpenNlpModel> m_models = new HashMap<>();
 
-    private Map<String, String> m_modelTypeTagMapping =
-            new HashMap<String, String>();
+    /** Map of model names and their named-entity tag value. */
+    private Map<String, String> m_modelTypeTagMapping = new HashMap<>();
 
-    private Map<String, String> m_modelTypeFileMapping =
-            new HashMap<String, String>();
-
+    /** Map of model names and their associated file paths. */
+    private Map<String, String> m_modelTypeFileMapping = new HashMap<>();
 
     /**
-     * Creates and returns a singleton instance of
-     * <code>OpenNlpModelFactory</code>.
+     * Creates and returns a singleton instance of {@code OpenNlpModelFactory}.
      *
-     * @return a singleton instance of <code>OpenNlpModelFactory</code>.
+     * @return a singleton instance of {@code OpenNlpModelFactory}.
      */
     public static final OpenNlpModelFactory getInstance() {
         if (instance == null) {
@@ -90,6 +90,7 @@ public final class OpenNlpModelFactory {
         return instance;
     }
 
+    /** Creates a new instance of {@code OpenNlpModelFactory}. */
     private OpenNlpModelFactory() {
         LOGGER.debug("Registering Maxent Models ...");
 
@@ -120,15 +121,14 @@ public final class OpenNlpModelFactory {
         m_modelTypeFileMapping.put(name, paths.getTimeNERModelFile());
 
         for (String type : m_modelTypeTagMapping.keySet()) {
-            OpenNlpModel m = new OpenNlpModel(type,
-                                   m_modelTypeFileMapping.get(type),
-                                   m_modelTypeTagMapping.get(type));
+            OpenNlpModel m = new OpenNlpModel(type, m_modelTypeFileMapping.get(type), m_modelTypeTagMapping.get(type));
             m_models.put(type, m);
         }
     }
 
     /**
      * Returns the named entity tag by name.
+     *
      * @param name the name to get the tag for.
      * @return the tag corresponding to the given name.
      * @since 2.7
@@ -139,6 +139,7 @@ public final class OpenNlpModelFactory {
 
     /**
      * Returns the model related to the given name.
+     *
      * @param name The name to get the model for.
      * @return The related model.
      */
