@@ -44,116 +44,111 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   08.07.2016 (Julian Bunzel): created
+ *   Oct 11, 2018 (Julian Bunzel): created
  */
 package org.knime.ext.textprocessing.data;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 
-import org.knime.core.data.util.NonClosableInputStream;
-import org.knime.core.data.util.NonClosableOutputStream;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.ModelContent;
 import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObjectSpec;
 import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.port.PortObjectSpecZipInputStream;
-import org.knime.core.node.port.PortObjectSpecZipOutputStream;
+import org.knime.core.node.port.PortObjectZipInputStream;
+import org.knime.core.node.port.PortObjectZipOutputStream;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.PortTypeRegistry;
+
+import opennlp.tools.namefind.TokenNameFinderModel;
 
 /**
- * The port object spec of the {@code NERModelPortObject} keeping the tokenizer name.
+ * This port object is a specific implementation of {@code TaggerModelPortObject} used for OpenNLP NER models.
  *
- * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @since 3.3
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+ * @since 3.7
  */
-public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
-
-    /** The name of the tokenizer user for word tokenization. */
-    private final String m_tokenizerName;
+public final class OpenNlpNerTaggerModelPortObject extends TaggerModelPortObject<TokenNameFinderModel> {
 
     /**
-     * Serializer to write/load the port object specifications.
+     * The {@link TokenNameFinderModel}.
      */
-    public static final class Serializer extends AbstractSimplePortObjectSpecSerializer<NERModelPortObjectSpec> {
+    private final TokenNameFinderModel m_model;
+
+    /**
+     * Define port type of objects of this class when used as PortObjects.
+     */
+    @SuppressWarnings("hiding")
+    public static final PortType TYPE =
+        PortTypeRegistry.getInstance().getPortType(OpenNlpNerTaggerModelPortObject.class);
+
+    /**
+     * The serializer used to save/load the port object.
+     *
+     * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+     */
+    public static final class Serializer extends AbstractSimplePortObjectSerializer<OpenNlpNerTaggerModelPortObject> {
+
+        /** The name of the file to write the model to. */
+        private static final String MODEL_FILE_NAME = "outputmodel.bin";
+
         /**
          * {@inheritDoc}
-         *
-         * @since 3.3
          */
         @Override
-        public NERModelPortObjectSpec loadPortObjectSpec(final PortObjectSpecZipInputStream in) throws IOException {
+        public OpenNlpNerTaggerModelPortObject loadPortObject(final PortObjectZipInputStream in,
+            final PortObjectSpec spec, final ExecutionMonitor exec) throws IOException, CanceledExecutionException {
             in.getNextEntry();
-            ModelContentRO config;
-            try (InputStream is = new NonClosableInputStream.Zip(in)) {
-                config = ModelContent.loadFromXML(in);
-            }
-            final String nameOfUsedTokenizer;
-            try {
-                nameOfUsedTokenizer = config.getString("tokenizerName");
-            } catch (final InvalidSettingsException e) {
-                throw new IOException("Failed to deserialize port object spec", e);
-            }
-            return new NERModelPortObjectSpec(nameOfUsedTokenizer);
+            final TokenNameFinderModel model = new TokenNameFinderModel(in);
+            return new OpenNlpNerTaggerModelPortObject(model);
         }
 
         /**
          * {@inheritDoc}
-         *
-         * @since 3.3
          */
         @Override
-        public void savePortObjectSpec(final NERModelPortObjectSpec portObject, final PortObjectSpecZipOutputStream out)
-            throws IOException {
-            final String XML_CONFIG_NAME = "content.xml";
-            out.putNextEntry(new ZipEntry(XML_CONFIG_NAME));
-            final ModelContent spec = new ModelContent(XML_CONFIG_NAME);
-            spec.addString("tokenizerName", portObject.getTokenizerName());
-            try (OutputStream os = new NonClosableOutputStream.Zip(out)) {
-                spec.saveToXML(os);
-            }
+        public void savePortObject(final OpenNlpNerTaggerModelPortObject portObject,
+            final PortObjectZipOutputStream out, final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+            out.putNextEntry(new ZipEntry(MODEL_FILE_NAME));
+            portObject.getModel().serialize(out);
+            out.close();
         }
     }
 
     /**
-     * Creates a new instance of {NERModelPortObjectSpec}
+     * Creates a new instance of {@code OpenNlpNerTaggerModelPortObject} given a
      *
-     * @param tokenizerName The tokenizer used for word tokenization.
-     * @since 3.3
+     * @param model The {@code TokenNameFinderModel}.
      */
-    public NERModelPortObjectSpec(final String tokenizerName) {
-        super();
-        m_tokenizerName = tokenizerName;
-    }
-
-    /**
-     * Returns the name of the used word tokenizer.
-     *
-     * @return Returns the name of the used word tokenizer.
-     * @since 3.3
-     */
-    public String getTokenizerName() {
-        return m_tokenizerName;
-    }
-
-    /**
-     * Validates the spec.
-     *
-     * @param spec The data table spec to validate.
-     * @return {@code true} if given spec is compatible to the model port spec, otherwise {@code false}.
-     */
-    public boolean validateSpec(final PortObjectSpec spec) {
-        return spec == null ? false : true;
+    public OpenNlpNerTaggerModelPortObject(final TokenNameFinderModel model) {
+        super(new OpenNlpNerTaggerModelPortObjectSpec(model));
+        m_model = model;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void save(final ModelContentWO model) {
+    public String getSummary() {
+        return "This is an OpenNlpNerTaggerModelPortObject";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TokenNameFinderModel getModel() {
+        return m_model;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void save(final ModelContentWO model, final ExecutionMonitor exec) throws CanceledExecutionException {
         // Nothing to do here...
     }
 
@@ -161,8 +156,8 @@ public class NERModelPortObjectSpec extends AbstractSimplePortObjectSpec {
      * {@inheritDoc}
      */
     @Override
-    protected void load(final ModelContentRO model) throws InvalidSettingsException {
+    protected void load(final ModelContentRO model, final PortObjectSpec spec, final ExecutionMonitor exec)
+        throws InvalidSettingsException, CanceledExecutionException {
         // Nothing to do here...
     }
-
 }

@@ -866,6 +866,15 @@
             specClass="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec"
             specSerializer="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec$Serializer">
       </portType>
+      <portType
+            color="#BE2043"
+            hidden="false"
+            name="OpenNlpNerTaggerModelPortObject"
+            objectClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject"
+            objectSerializer="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject$Serializer"
+            specClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObjectSpec"
+            specSerializer="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObjectSpec$Serializer">
+      </portType>
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TokenizerFactory">

@@ -51,7 +51,9 @@ package org.knime.ext.textprocessing.data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -74,6 +76,8 @@ import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 
 /**
+ * This port object is a specific implementation of {@code NERModelPortObject} used for models trained by the
+ * StanfordNLP NE Learner node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  * @since 3.3
@@ -87,6 +91,7 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
     public static final PortType TYPE = PortTypeRegistry.getInstance().getPortType(StanfordNERModelPortObject.class);
 
     /**
+     * The serializer used to save/load the port object.
      *
      * @author Julian Bunzel, KNIME.com, Berlin, Germany
      */
@@ -98,12 +103,12 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
         @Override
         public void savePortObject(final StanfordNERModelPortObject portObject, final PortObjectZipOutputStream out,
             final ExecutionMonitor exec) throws IOException, CanceledExecutionException {
-            String MODEL_FILE_NAME = "outputmodel" + portObject.getFileExtension();
-            String XML_CONFIG_NAME = "config.xml";
-            String DICT_FILE_NAME = "dict.bin";
+            final String MODEL_FILE_NAME = "outputmodel" + portObject.getFileExtension();
+            final String XML_CONFIG_NAME = "config.xml";
+            final String DICT_FILE_NAME = "dict.bin";
 
             out.putNextEntry(new ZipEntry(XML_CONFIG_NAME));
-            ModelContent config = new ModelContent(XML_CONFIG_NAME);
+            final ModelContent config = new ModelContent(XML_CONFIG_NAME);
             config.addString("tagValue", portObject.getTagValue());
             config.addString("tagType", portObject.getTagType());
             config.addString("tokenizerName", portObject.getTokenizerName());
@@ -113,8 +118,8 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             out.putNextEntry(new ZipEntry(DICT_FILE_NAME));
             try {
                 out.write(portObject.getDictAsByteArray());
-            } catch (Exception e) {
-                throw new IOException("Could not convert dictionary to byte array");
+            } catch (final IOException e) {
+                throw new IOException("Could not convert dictionary to byte array", e);
             }
         }
 
@@ -126,59 +131,52 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
             final ExecutionMonitor exec) throws IOException, CanceledExecutionException {
             // get xml entry
             in.getNextEntry();
-            ModelContentRO config = ModelContent.loadFromXML(new NonClosableInputStream.Zip(in));
-            Tag usedTag;
-            String usedTagValue;
-            String usedTagType;
-            String nameOfUsedTokenizer;
-            try {
-                usedTagValue = config.getString("tagValue");
-                usedTagType = config.getString("tagType");
-                try {
-                    nameOfUsedTokenizer = config.getString("tokenizerName");
-                } catch (InvalidSettingsException e) {
-                    // use old standard tokenizer for backwards compatibility
-                    nameOfUsedTokenizer = "OpenNLP English WordTokenizer";
-                }
-                usedTag = new Tag(usedTagValue, usedTagType);
-            } catch (InvalidSettingsException e) {
-                throw new IOException("Failed to deserialize port object", e);
-            }
+            final ModelContentRO config;
+            final InputStream is = new NonClosableInputStream.Zip(in);
+            config = ModelContent.loadFromXML(is);
 
             // get model byte array
             in.getNextEntry();
-            byte[] outputModelByteArray = IOUtils.toByteArray(in);
+            final byte[] outputModelByteArray = IOUtils.toByteArray(in);
 
+            // get dict set
             in.getNextEntry();
-            byte[] dictByteArray = IOUtils.toByteArray(in);
-            String dict = new String(dictByteArray);
-            BufferedReader stringReader = new BufferedReader(new StringReader(dict));
+            final byte[] dictByteArray = IOUtils.toByteArray(in);
+            final String dict = new String(dictByteArray);
+            final BufferedReader stringReader = new BufferedReader(new StringReader(dict));
             String line = null;
-            Set<String> dictSet = new LinkedHashSet<String>();
+            final Set<String> dictSet = new LinkedHashSet<>();
             while ((line = stringReader.readLine()) != null) {
                 dictSet.add(line);
             }
+
+            // get settings
             try {
+                final String usedTagValue = config.getString("tagValue");
+                final String usedTagType = config.getString("tagType");
+                final String nameOfUsedTokenizer = config.containsKey("tokenizerName")
+                    ? config.getString("tokenizerName") : "OpenNLP English WordTokenizer";
+                final Tag usedTag = new Tag(usedTagValue, usedTagType);
                 return new StanfordNERModelPortObject(outputModelByteArray, usedTag, dictSet, nameOfUsedTokenizer);
-            } catch (Exception e) {
+            } catch (final InvalidSettingsException e) {
+                throw new IOException("Failed to deserialize port object", e);
+            } catch (final Exception e) {
                 throw new IOException("Could not create NLPModelPortObject");
             }
         }
-
     }
 
     /**
-     *
      * Creates an instance of {@code StanfordNERModelPortObject}.
+     *
      * @param outputBuffer The byte array containing the NER model.
      * @param tag The used tag.
      * @param dict The used dictionary.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
-     * @throws Exception
      * @since 3.3
      */
     public StanfordNERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict,
-        final String tokenizerName) throws Exception {
+        final String tokenizerName) {
         super(outputBuffer, tag, dict, tokenizerName);
     }
 
@@ -190,11 +188,11 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
      * @throws ClassCastException If there are problems interpreting the serialized data.
      */
     @Override
-    public CRFClassifier<CoreLabel> getNERModel() throws IOException, ClassCastException, ClassNotFoundException {
+    public CRFClassifier<CoreLabel> getNERModel() throws IOException, ClassNotFoundException {
         File file;
         file = getModelFile();
-        CRFClassifier<CoreLabel> crf = CRFClassifier.getClassifier(file);
-        file.delete();
+        final CRFClassifier<CoreLabel> crf = CRFClassifier.getClassifier(file);
+        Files.delete(file.toPath());
         return crf;
     }
 

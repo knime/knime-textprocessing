@@ -49,10 +49,10 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,92 +62,117 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.ModelContentWO;
-import org.knime.core.node.port.AbstractSimplePortObject;
 import org.knime.core.node.port.PortObjectSpec;
 
 import com.google.common.io.Files;
 
 /**
+ * This is a {@code TaggerModelPortObject} for models trained by any named entity model learner node. It keeps specific
+ * information that was used to train the model like the tag type, tag value, the named entity dictionary and the
+ * tokenizer used to tokenize the training data.
+ *
+ * An example is the {@code StandfordNERModelPortObject}.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
- * @param <T>
+ * @param <T> T is a specific implementation of the model class that is serialized through this port object.
  * @since 3.3
  */
-public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
-    private PortObjectSpec m_spec;
+public abstract class NERModelPortObject<T> extends TaggerModelPortObject<T> {
 
-    private final byte[] m_outputByteArray;
-
+    /** The tag used to train the model. */
     private final Tag m_tag;
 
+    /** The tag type used to train the model. */
     private final String m_tagType;
 
+    /** The tag value used to train the model. */
     private final String m_tagValue;
 
+    /** The dictionary used to train the model. */
     private final Set<String> m_dict;
 
+    /** The name of the tokenizer used to train the model. */
     private final String m_tokenizerName;
 
+    /** The byte array holding the model. */
+    private final byte[] m_byteArray;
+
     /**
+     * Creates a new instance of {@code NERModelPortObject}.
+     *
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
      * @param tag The tag that has been used to build the model.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @since 3.3
      */
     public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final String tokenizerName) {
-        m_outputByteArray = outputBuffer;
+        super(new NERModelPortObjectSpec(tokenizerName));
+        m_byteArray = outputBuffer.clone();
         m_tag = tag;
-        m_tagType = tag.getTagType() ;
-        m_tagValue = tag.getTagValue() ;
+        m_tagType = tag.getTagType();
+        m_tagValue = tag.getTagValue();
         m_dict = null;
         m_tokenizerName = tokenizerName;
-        m_spec = new NERModelPortObjectSpec(tokenizerName);
     }
 
     /**
+     * Creates a new instance of {@code NERModelPortObject}.
+     *
      * @param outputBuffer The byte array which will be used to write the binary file in the {@code Serializer}.
      * @param tag The tag that has been used to build the model.
      * @param dict The dictionary, a set of Strings used for validation in the StanfordNLP tagger.
      * @param tokenizerName The name of the tokenizer used for word tokenization.
      * @since 3.3
      */
-    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict, final String tokenizerName) {
-        m_outputByteArray = outputBuffer;
+    public NERModelPortObject(final byte[] outputBuffer, final Tag tag, final Set<String> dict,
+        final String tokenizerName) {
+        super(new NERModelPortObjectSpec(tokenizerName));
+        m_byteArray = outputBuffer.clone();
         m_tag = tag;
-        m_tagType = tag.getTagType() ;
-        m_tagValue = tag.getTagValue() ;
-        m_dict = dict;
+        m_tagType = tag.getTagType();
+        m_tagValue = tag.getTagValue();
+        m_dict = new HashSet<>(dict);
         m_tokenizerName = tokenizerName;
-        m_spec = new NERModelPortObjectSpec(tokenizerName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T getModel() throws Exception {
+        return getNERModel();
     }
 
     /**
      * @return Returns the specific NER model.
-     * @throws IOException If there are problems accessing the input stream.
-     * @throws ClassNotFoundException If there are problems interpreting the serialized data.
-     * @throws ClassCastException If there are problems interpreting the serialized data.
+     * @throws Exception Thrown if named-entity model could not be initialized.
      */
-    public abstract T getNERModel() throws IOException, ClassCastException, ClassNotFoundException;
+    public abstract T getNERModel() throws Exception;
 
     /**
-     * @return Returns the specific file extension.
-     */
-    public abstract String getFileExtension();
-
-    /**
+     * Creates and returns a {@link File} based on the byte array stored as a member of this class.
+     *
      * @return Returns the model file.
-     * @throws IOException If the file could not be created.
+     * @throws IOException Thrown if the model file could not be written.
      */
     public File getModelFile() throws IOException {
-        String tempDir = KNIMEConstants.getKNIMETempDir();
-        String outputModel = tempDir + "/outputmodel_" + UUID.randomUUID().toString() + getFileExtension();
-        File file = new File(outputModel);
+        final String tempDir = KNIMEConstants.getKNIMETempDir();
+        final String outputModel = tempDir + "/outputmodel_" + UUID.randomUUID().toString() + getFileExtension();
+        final File file = new File(outputModel);
         Files.write(getByteArray(), file);
         return file;
     }
 
     /**
-     * @return Returns a summary of the PortObject.
+     * Method to return the file extension of the model to load/read. The defined extension must contain a preceding
+     * dot.
+     *
+     * @return Returns the file extension of the model to load/read. The defined extension must contain a preceding dot.
+     */
+    public abstract String getFileExtension();
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String getSummary() {
@@ -155,13 +180,17 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
     }
 
     /**
-     * @return Returns the name of the used tag model.
+     * Returns the tag.
+     *
+     * @return Returns the name of the tag used to train the model.
      */
     public Tag getTag() {
         return m_tag;
     }
 
     /**
+     * Returns the tag value.
+     *
      * @return Returns the tag value (e.g. PERSON).
      */
     public String getTagValue() {
@@ -169,6 +198,8 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
     }
 
     /**
+     * Returns the tag type.
+     *
      * @return Returns the tag type (e.g. NE).
      */
     public String getTagType() {
@@ -176,49 +207,48 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
     }
 
     /**
-     * @return Returns the byte array.
+     * Returns the byte array containing the model.
+     *
+     * @return Returns the byte array containing the model.
      */
     public byte[] getByteArray() {
-        return m_outputByteArray;
+        return m_byteArray.clone();
     }
 
     /**
+     * Returns the dictionary as a String set.
+     *
      * @return Returns the dictionary as a String set.
      */
     public Set<String> getDictSet() {
-        return m_dict;
+        return Collections.unmodifiableSet(m_dict);
     }
 
     /**
+     * Returns the dictionary as a byte array to serialize it.
+     *
      * @return Converts the dictionary as a byte array to serialize it.
-     * @throws UnsupportedEncodingException If the specified character encoding for the PrintWriter is not supported.
-     * @throws FileNotFoundException If the PrintWriter could not find the specified file.
-     * @throws IOException If the file could not be written to a byte array.
+     * @throws IOException Thrown if the dictionary could not be written as a byte array.
      */
-    public byte[] getDictAsByteArray() throws FileNotFoundException, UnsupportedEncodingException, IOException {
-        StringBuilder dict = new StringBuilder();
-        String dictTempDir = KNIMEConstants.getKNIMETempDir() + "/tempDict" + UUID.randomUUID() + ".txt";
-        File dictFile = new File(dictTempDir);
-        for (String entity : m_dict) {
+    public byte[] getDictAsByteArray() throws IOException {
+        final StringBuilder dict = new StringBuilder();
+        final String dictTempDir = KNIMEConstants.getKNIMETempDir() + "/tempDict" + UUID.randomUUID() + ".txt";
+        final File dictFile = new File(dictTempDir);
+        for (final String entity : m_dict) {
             dict.append(entity + "\n");
         }
-        PrintWriter dictFileWriter = new PrintWriter(dictFile, "UTF-8");
-        dictFileWriter.println(dict.toString());
-        dictFileWriter.close();
-        byte[] dictAsBytes = Files.toByteArray(dictFile);
+        byte[] dictAsBytes;
+        try (PrintWriter dictFileWriter = new PrintWriter(dictFile, "UTF-8")) {
+            dictFileWriter.println(dict.toString());
+            dictAsBytes = Files.toByteArray(dictFile);
+        }
         dictFile.delete();
         return dictAsBytes;
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PortObjectSpec getSpec() {
-        return m_spec;
-    }
-
-    /**
+     * Returns the name of the tokenizer used for word tokenization
+     *
      * @return Returns the name of the tokenizer used for word tokenization.
      * @since 3.3
      */
@@ -226,6 +256,9 @@ public abstract class NERModelPortObject<T> extends AbstractSimplePortObject {
         return m_tokenizerName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void save(final ModelContentWO model, final ExecutionMonitor exec) throws CanceledExecutionException {
         // Is not used, because the Serializer saves and passes all data
