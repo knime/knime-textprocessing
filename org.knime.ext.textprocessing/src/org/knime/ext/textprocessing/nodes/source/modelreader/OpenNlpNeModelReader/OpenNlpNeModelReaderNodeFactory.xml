@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcSource.png" type="Source">
+    <name>OpenNLP NER Model Reader</name>
+    <shortDescription>Reads OpenNLP models for named entity tagging.</shortDescription>
+    <fullDescription>
+        <intro>
+			Reads OpenNLP models for named entity tagging. This node can be used
+			to make externally trained models available in KNIME. The models then can be used with the OpenNLP NE Tagger node.
+			<br/>
+			A list of pre-trained OpenNLP models can be found here: <br/>
+			<a href="http://opennlp.sourceforge.net/models-1.5/">http://opennlp.sourceforge.net/models-1.5/</a><br/>
+			(<i>Note:</i> Only <i>Name Finder</i> models can be read with this node.)
+		</intro>
+		<option name="Selected File">
+			Specifiy the model file.
+		</option>
+	</fullDescription>
+	<ports>
+        <outPort name="Model output port" index="0">
+        	An output port containing the OpenNLP NER model.
+        </outPort>
+	</ports>
+</knimeNode>

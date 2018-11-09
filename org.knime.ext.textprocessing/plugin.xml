@@ -691,6 +691,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.DictionaryTaggerMultiColumnNodeFactory">
       </node>
+      <node
+            category-path="/applications/textprocessing/io"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.source.modelreader.OpenNlpNeModelReader.OpenNlpNeModelReaderNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
