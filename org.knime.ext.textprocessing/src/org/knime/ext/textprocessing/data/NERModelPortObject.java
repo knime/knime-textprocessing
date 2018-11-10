@@ -237,11 +237,10 @@ public abstract class NERModelPortObject<T> extends TaggerModelPortObject<T> {
         for (final String entity : m_dict) {
             dict.append(entity + "\n");
         }
-        byte[] dictAsBytes;
-        try (PrintWriter dictFileWriter = new PrintWriter(dictFile, "UTF-8")) {
+        try (final PrintWriter dictFileWriter = new PrintWriter(dictFile, "UTF-8")) {
             dictFileWriter.println(dict.toString());
-            dictAsBytes = Files.toByteArray(dictFile);
         }
+        final byte[] dictAsBytes = Files.toByteArray(dictFile);
         dictFile.delete();
         return dictAsBytes;
     }
