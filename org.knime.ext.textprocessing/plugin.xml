@@ -872,7 +872,7 @@
             specSerializer="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec$Serializer">
       </portType>
       <portType
-            color="#BE2043"
+            color="#be24d2"
             hidden="false"
             name="OpenNlpNerTaggerModelPortObject"
             objectClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject"
