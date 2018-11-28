@@ -67,7 +67,7 @@ import org.knime.base.node.util.DataArray;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.property.ColorAttr;
+import org.knime.core.data.property.ColorHandler;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.ModelContent;
 import org.knime.core.node.ModelContentRO;
@@ -383,8 +383,8 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements HiLit
                 } else {
                     m_hashi.put(termwithouttags, createTagCloudData(termwithouttags, i, rowk));
                     termtags.put(termwithouttags, term);
-                    Color c = data.getDataTableSpec().getRowColor(row).getColor();
-                    if (!c.equals(ColorAttr.DEFAULT.getColor())) {
+                    if (hasColorHandler(data)) {
+                        Color c = data.getDataTableSpec().getRowColor(row).getColor();
                         m_hashi.get(termwithouttags).setColorPrefixed(c);
                     }
                 }
@@ -424,7 +424,7 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements HiLit
 
         for (final DataRow row : data) {
             if (!row.getCell(termColumn).isMissing() && !row.getCell(valueColumn).isMissing()) {
-                 Term term = ((TermValue)row.getCell(termColumn)).getTermValue();
+                Term term = ((TermValue)row.getCell(termColumn)).getTermValue();
                 double i = ((DoubleValue)row.getCell(valueColumn)).getDoubleValue();
                 RowKey rowk = row.getKey();
 
@@ -432,8 +432,8 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements HiLit
                     i = m_hashi.get(term).addFreq(i, rowk);
                 } else {
                     m_hashi.put(term, createTagCloudData(term, i, rowk));
-                    Color c = data.getDataTableSpec().getRowColor(row).getColor();
-                    if (!c.equals(ColorAttr.DEFAULT.getColor())) {
+                    if (hasColorHandler(data)) {
+                        Color c = data.getDataTableSpec().getRowColor(row).getColor();
                         m_hashi.get(term).setColorPrefixed(c);
                     }
                 }
@@ -1075,5 +1075,23 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements HiLit
                 }
             }
         }
+    }
+
+    /**
+     * Returns true, if the {@link DataArray} contains a {@link ColorHandler}.
+     *
+     * @param data Data array containing data and data table specs.
+     * @return Returns true, if the {@code DataArray} contains a {@code ColorHandler}.
+     */
+    private static boolean hasColorHandler(final DataArray data) {
+        ColorHandler ch = null;
+
+        for (int i = 0; i < data.getDataTableSpec().getNumColumns(); i++) {
+            ch = data.getDataTableSpec().getColumnSpec(i).getColorHandler();
+            if (ch != null) {
+                return true;
+            }
+        }
+        return false;
     }
 }
