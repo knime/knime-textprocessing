@@ -64,6 +64,7 @@ import java.util.Set;
 import javax.swing.JLabel;
 
 import org.knime.base.node.util.DataArray;
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.RowKey;
@@ -1078,17 +1079,14 @@ public abstract class AbstractTagCloud<TC extends TagCloudData> implements HiLit
     }
 
     /**
-     * Returns true, if the {@link DataArray} contains a {@link ColorHandler}.
+     * Helper method for determining whether a the {@link DataArray} contains a {@link ColorHandler}.
      *
-     * @param data Data array containing data and data table specs.
-     * @return Returns true, if the {@code DataArray} contains a {@code ColorHandler}.
+     * @param data data array containing data and data table spec
+     * @return returns true, if the {@code DataArray} contains a {@code ColorHandler}
      */
     private static boolean hasColorHandler(final DataArray data) {
-        ColorHandler ch = null;
-
-        for (int i = 0; i < data.getDataTableSpec().getNumColumns(); i++) {
-            ch = data.getDataTableSpec().getColumnSpec(i).getColorHandler();
-            if (ch != null) {
+        for (DataColumnSpec cs : data.getDataTableSpec()) {
+            if (cs.getColorHandler() != null) {
                 return true;
             }
         }
