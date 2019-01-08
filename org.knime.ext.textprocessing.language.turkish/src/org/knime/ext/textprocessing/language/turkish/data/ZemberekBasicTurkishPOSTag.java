@@ -86,8 +86,7 @@ public class ZemberekBasicTurkishPOSTag implements TagBuilder {
     @Override
     public List<String> asStringList() {
         return Stream.of(PrimaryPos.values())//
-            .map(e -> e.name().equals(PrimaryPos.Unknown.name()) ? e.name().toUpperCase()
-                : e.getStringForm().toUpperCase())//
+            .map(e -> getShortForm(e.name()))//
             .collect(Collectors.toList());
     }
 
@@ -116,13 +115,27 @@ public class ZemberekBasicTurkishPOSTag implements TagBuilder {
      * @return Returns the corresponding {@code Tag}.
      */
     public static final Tag stringToTag(final String str) {
-        final String tagValue;
-        if (str.equalsIgnoreCase(PrimaryPos.Unknown.name())) {
-            tagValue = str;
-        } else {
-            tagValue = PrimaryPos.valueOf(str).getStringForm();
-        }
-        return new Tag(tagValue.toUpperCase(), TAG_TYPE);
+        return new Tag(getShortForm(str), TAG_TYPE);
     }
 
+    /**
+     * Returns the short form of the original {@link PrimaryPos} enum value.
+     *
+     * @param tag The tag value as {@code String}.
+     * @return The short form of the original {@link PrimaryPos} enum value.
+     */
+    private static final String getShortForm(final String tag) {
+        // tag is already in short form
+        if (PrimaryPos.exists(tag)) {
+            return tag.toUpperCase();
+        }
+        // tag is according to .name() except for PrimaryPos.Unknown which never is shortened
+        try {
+            final PrimaryPos enumValue = PrimaryPos.valueOf(tag);
+            return enumValue.name().equalsIgnoreCase(PrimaryPos.Unknown.name())
+                ? PrimaryPos.Unknown.name().toUpperCase() : enumValue.getStringForm().toUpperCase();
+        } catch (final IllegalArgumentException e) {
+            return PrimaryPos.Unknown.name().toUpperCase();
+        }
+    }
 }
