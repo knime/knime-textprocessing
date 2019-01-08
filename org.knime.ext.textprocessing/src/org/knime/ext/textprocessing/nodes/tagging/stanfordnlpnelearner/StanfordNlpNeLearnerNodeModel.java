@@ -190,6 +190,11 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
      */
     static final boolean DEF_USE_DISJUNCTIVE = true;
 
+    /**
+     * The default value for the "case sensitivity" flag.
+     */
+    static final boolean DEF_CASE_SENSITIVITY = true;
+
     private SettingsModelString m_docColumnModel = StanfordNlpNeLearnerNodeDialog.createDocumentColumnModel();
 
     private SettingsModelString m_knownEntitiesColumnModel =
@@ -235,6 +240,8 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
 
     private SettingsModelString m_tokenizer = StanfordNlpNeLearnerNodeDialog.createTokenizerModel();
 
+    private SettingsModelBoolean m_caseSensitivity = StanfordNlpNeLearnerNodeDialog.createCaseSensitivityModel();
+
     /**
      *
      */
@@ -264,12 +271,12 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
 
         // verifying the selected string column or select the first suitable column if none has been set yet
         ColumnSelectionVerifier.verifyColumn(m_knownEntitiesColumnModel, spec2, StringValue.class, null)
-        .ifPresent(a -> setWarningMessage(a));
+            .ifPresent(a -> setWarningMessage(a));
 
         // check tokenizer settings from incoming document column
         DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
-        String tokenizerFromInput = dataTableSpecVerifier
-            .getTokenizerFromInputDocCol(spec.findColumnIndex(m_docColumnModel.getStringValue()));
+        String tokenizerFromInput =
+            dataTableSpecVerifier.getTokenizerFromInputDocCol(spec.findColumnIndex(m_docColumnModel.getStringValue()));
         if (m_tokenizer.getStringValue().isEmpty()) {
             if (tokenizerFromInput != null) {
                 m_tokenizer.setStringValue(tokenizerFromInput);
@@ -311,8 +318,8 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                 for (DataRow row : knownEntitiesDataInput) {
                     if (!row.getCell(i).isMissing()) {
                         // add every known entity to the specified array list
-                        String cellText = row.getCell(i).toString();
-                        // TODO: Add case sensitivity
+                        String cellText = m_caseSensitivity.getBooleanValue() ? row.getCell(i).toString()
+                            : row.getCell(i).toString().toLowerCase();
                         if (!cellText.trim().isEmpty()) {
                             knownEntitiesStringSet.add(cellText);
                             knownEntitiesPatternSet.add(Pattern.compile(cellText));
@@ -330,9 +337,8 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_tag = new Tag(m_tagValueModel.getStringValue(), m_tagTypeModel.getStringValue());
 
         // create tagger based on known entities
-        // TODO: Case sensitivity!
-        MultiTermRegexDocumentTagger tagger =
-            new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag, true, m_tokenizer.getStringValue());
+        MultiTermRegexDocumentTagger tagger = new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag,
+            m_caseSensitivity.getBooleanValue(), m_tokenizer.getStringValue());
 
         // create UUID to add them to the file path to avoid cases where two instances of the node model used the same file path at the same time
         String tempDir = KNIMEConstants.getKNIMETempDir() + "/";
@@ -369,8 +375,10 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                                 Term t = ti.next();
                                 String termText = t.getText();
                                 String termTextWithWsSuffix = t.getTextWithWsSuffix();
-                                if (knownEntitiesStringSet.contains(termText)
-                                    || knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
+                                if (knownEntitiesStringSet
+                                    .contains(m_caseSensitivity.getBooleanValue() ? termText : termText.toLowerCase())
+                                    || knownEntitiesStringSet.contains(m_caseSensitivity.getBooleanValue()
+                                        ? termTextWithWsSuffix : termTextWithWsSuffix.toLowerCase())) {
                                     if (t.getWords().size() > 1) {
                                         for (Word w : t.getWords()) {
                                             sentenceFileWriter
@@ -472,6 +480,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         m_maxLeft.saveSettingsTo(settings);
         m_maxNGramLeng.saveSettingsTo(settings);
         m_tokenizer.saveSettingsTo(settings);
+        m_caseSensitivity.saveSettingsTo(settings);
     }
 
     /**
@@ -503,6 +512,10 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.validateSettings(settings);
         }
+        if (settings.containsKey(m_caseSensitivity.getConfigName())) {
+            m_caseSensitivity.validateSettings(settings);
+        }
+
     }
 
     /**
@@ -533,6 +546,9 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         // only load settings if settings contain SettingsModel key (for backwards compatibility)
         if (settings.containsKey(m_tokenizer.getKey())) {
             m_tokenizer.loadSettingsFrom(settings);
+        }
+        if (settings.containsKey(m_caseSensitivity.getConfigName())) {
+            m_caseSensitivity.loadSettingsFrom(settings);
         }
     }
 

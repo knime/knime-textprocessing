@@ -49,6 +49,7 @@
 package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner;
 
 /**
+ * The config keys for the StanfordNLP NE Learner node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
@@ -97,5 +98,7 @@ class StanfordNlpNeLearnerConfigKeys {
     static final String CFGKEY_USE_DISJUNCTIVE = "Use disjunctive";
 
     static final String CFGKEY_TOKENIZER = "Word Tokenizer";
+
+    static final String CFG_KEY_CASE_SENSITIVITY = "Case sensitivity";
 
 }

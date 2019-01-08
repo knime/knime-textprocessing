@@ -69,6 +69,7 @@ import org.knime.ext.textprocessing.data.TagFactory;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 
 /**
+ * The node dialog for the StanfordNLP NE Learner node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
@@ -108,9 +109,9 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * @return Creates and returns the boolean settings model for the "use class feature" flag. For more information
-     *         about this option, check the <a href=
-     *         "http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/ie/NERFeatureFactory.html">NERFeatureFactory</a>
-     *         Java documentation from StanfordNLP.
+     *         about this option, check the
+     *         <a href="http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/ie/NERFeatureFactory.html">
+     *         NERFeatureFactory</a> Java documentation from StanfordNLP.
      */
     public static final SettingsModelBoolean createUseClassFeatureModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_CLASS_FEATURE,
@@ -233,16 +234,27 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      * @return Creates and returns the boolean settings model for the "use disjunctive" flag.
      */
     public static final SettingsModelString createTokenizerModel() {
-        return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_TOKENIZER,
-            "");
+        return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_TOKENIZER, "");
     }
 
-    private SettingsModelString m_tagtypemodel;
+    /**
+     * @return Creates and returns the boolean settings model for the "case sensitivity" flag.
+     */
+    static final SettingsModelBoolean createCaseSensitivityModel() {
+        return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFG_KEY_CASE_SENSITIVITY,
+            StanfordNlpNeLearnerNodeModel.DEF_CASE_SENSITIVITY);
+    }
 
-    private DialogComponentStringSelection m_tagSelection;
+    private final SettingsModelString m_tagtypemodel;
+
+    private final DialogComponentStringSelection m_tagSelection;
+
+    private static final List<String> m_wordShapes =
+        Arrays.asList(("none,dan1,chris1,dan2,dan2useLC,dan2bio,dan2bioUseLC,jenny1,"
+            + "jenny1useLC,chris2,chris2useLC,chris3,chris3useLC,chris4").split(","));
 
     /**
-     *
+     * Creates an new instance of {@code StanfordNlpNeLearnerNodeDialog}.
      */
     @SuppressWarnings("unchecked")
     public StanfordNlpNeLearnerNodeDialog() {
@@ -250,15 +262,15 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
         renameTab("Options", "Learner Options");
         selectTab("Learner Options");
         setHorizontalPlacement(true);
-        SettingsModelString docColModel = createDocumentColumnModel();
-        DialogComponentColumnNameSelection docComp =
+        final SettingsModelString docColModel = createDocumentColumnModel();
+        final DialogComponentColumnNameSelection docComp =
             new DialogComponentColumnNameSelection(docColModel, "Document column", 0, DocumentValue.class);
         docComp.setToolTipText("The documents to train the model with.");
         addDialogComponent(docComp);
         setHorizontalPlacement(true);
 
-        SettingsModelString knownEntitiesColModel = createKnownEntitiesColumnModel();
-        DialogComponentColumnNameSelection knownEntitiesComp =
+        final SettingsModelString knownEntitiesColModel = createKnownEntitiesColumnModel();
+        final DialogComponentColumnNameSelection knownEntitiesComp =
             new DialogComponentColumnNameSelection(knownEntitiesColModel, "Dictionary column", 1, StringValue.class);
         docComp.setToolTipText("The dictionary to train the model with.");
         addDialogComponent(knownEntitiesComp);
@@ -270,8 +282,8 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
 
         // tag list
 
-        String selectedTagType = m_tagtypemodel.getStringValue();
-        List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
+        final String selectedTagType = m_tagtypemodel.getStringValue();
+        final List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
         m_tagSelection = new DialogComponentStringSelection(createTagValueModel(), "Tag value", tags);
         setHorizontalPlacement(true);
         addDialogComponent(
@@ -280,14 +292,11 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(false);
 
-        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
+        final Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().keySet();
         addDialogComponent(new DialogComponentStringSelection(createTokenizerModel(), "Word tokenizer", tokenizerList));
 
         createNewTab("Learner Properties");
         selectTab("Learner Properties");
-        String wordShapes =
-            "none,dan1,chris1,dan2,dan2useLC,dan2bio,dan2bioUseLC,jenny1,jenny1useLC,chris2,chris2useLC,chris3,chris3useLC,chris4";
-        List<String> wordShapeList = Arrays.asList(wordShapes.split(","));
         createNewGroup("Order of the CRF");
         addDialogComponent(new DialogComponentNumberEdit(createMaxLeftModel(), "Max Left"));
 
@@ -317,9 +326,11 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentBoolean(createUseTypeSeqs2Model(), "Use Type Seqs2"));
         addDialogComponent(new DialogComponentBoolean(createUseTypeYSeqsModel(), "Use Type Y Seqs"));
         setHorizontalPlacement(false);
-        addDialogComponent(new DialogComponentStringSelection(createWordShapeModel(), "Word Shape", wordShapeList));
-
-
+        addDialogComponent(new DialogComponentStringSelection(createWordShapeModel(), "Word Shape", m_wordShapes));
+        final DialogComponentBoolean caseSensComp =
+                new DialogComponentBoolean(createCaseSensitivityModel(), "Case Sensitivity");
+        caseSensComp.setToolTipText("Select if words from dictionary should be handled in a case sensitive manner.");
+        addDialogComponent(caseSensComp);
     }
 
     /**
@@ -333,8 +344,8 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
          */
         @Override
         public void stateChanged(final ChangeEvent e) {
-            String selectedTagType = m_tagtypemodel.getStringValue();
-            List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
+            final String selectedTagType = m_tagtypemodel.getStringValue();
+            final List<String> tags = TagFactory.getInstance().getTagSetByType(selectedTagType).asStringList();
             m_tagSelection.replaceListItems(tags, "");
         }
     }

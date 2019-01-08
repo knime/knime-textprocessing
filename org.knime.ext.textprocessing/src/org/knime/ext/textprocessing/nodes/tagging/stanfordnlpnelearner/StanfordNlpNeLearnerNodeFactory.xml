@@ -95,6 +95,9 @@
         <option name="Word Shape">
         	Either "none" for no wordShape use, or the name of a word shape function
         </option>
+		<option name="Case Sensitivity">
+        	Select to handle the words from the dictionary in a case sensitive manner. 
+        </option>
         </tab>
     </fullDescription>
         
