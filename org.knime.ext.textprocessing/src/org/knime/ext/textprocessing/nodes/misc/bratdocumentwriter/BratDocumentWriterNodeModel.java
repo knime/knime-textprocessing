@@ -66,7 +66,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowIterator;
+import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -82,7 +82,7 @@ import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.IndexedTerm;
+import org.knime.ext.textprocessing.data.IndexedTerm;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentUtil;
@@ -175,39 +175,38 @@ final class BratDocumentWriterNodeModel extends NodeModel {
         checkDataTableSpec(inputSpec);
         final int docColIndex = inputSpec.findColumnIndex(m_docColModel.getStringValue());
 
-        final long rowCount = inData[0].size();
-        long currRow = 1;
-        final RowIterator it = inData[0].iterator();
-        int countMissing = 0;
+        final double rowCount = inData[0].size();
+        long currRow = 0;
+        try (final CloseableRowIterator it = inData[0].iterator()) {
+            int countMissing = 0;
 
-        while (it.hasNext()) {
-            final DataRow row = it.next();
-            // get document cell from original data table
-            final DataCell docCell = row.getCell(docColIndex);
-            // if cell is not missing, try to read the doc and write to files
-            if (!docCell.isMissing()) {
-                final Document doc = ((DocumentValue)docCell).getDocument();
-                // add prefix and suffix to filename if available
-                // and verify that the filename does not contain forbidden symbols
-                // if it is okay, try to write to files
-                writeDocumentToFiles(doc, buildFilename(row.getKey().getString()));
-            } else { // otherwise count as missing
-                countMissing++;
-                LOGGER.debug("Skipping row " + row.getKey().getString() + " since the cell is missing.");
+            while (it.hasNext()) {
+                final DataRow row = it.next();
+                // get document cell from original data table
+                final DataCell docCell = row.getCell(docColIndex);
+                // if cell is not missing, try to read the doc and write to files
+                if (!docCell.isMissing()) {
+                    final Document doc = ((DocumentValue)docCell).getDocument();
+                    // add prefix and suffix to filename if available
+                    // and verify that the filename does not contain forbidden symbols
+                    // if it is okay, try to write to files
+                    writeDocumentToFiles(doc, buildFilename(row.getKey().getString()));
+                } else { // otherwise count as missing
+                    countMissing++;
+                    LOGGER.debug("Skipping row " + row.getKey().getString() + " since the cell is missing.");
+                }
+                // report status
+                final long fCurrRow = ++currRow;
+                exec.setProgress(currRow / rowCount, () -> "Processing document " + fCurrRow + " of " + rowCount);
+                exec.checkCanceled();
             }
-            // report status
-            double progress = (double)currRow / (double)rowCount;
-            exec.setProgress(progress, "Processing document " + currRow + " of " + rowCount);
-            exec.checkCanceled();
-            currRow++;
+            if (countMissing > 0) {
+                setWarningMessage("Skipped " + countMissing + " rows due to missing values.");
+            }
+            if (rowCount == 0) {
+                setWarningMessage("Input table is empty.");
+            }
         }
-        if (countMissing > 0) {
-            setWarningMessage("Skipped " + countMissing + " rows due to missing values.");
-        }
-        if (rowCount == 0) {
-            setWarningMessage("Input table is empty.");
-        }
-
         return new BufferedDataTable[]{};
     }
 
@@ -350,11 +349,9 @@ final class BratDocumentWriterNodeModel extends NodeModel {
      * @throws IOException if an I/O error occurs
      */
     private static void writeToFile(final OutputStream out, final String content) throws IOException {
-        if (out != null) {
             out.write(content.getBytes());
             out.flush();
             out.close();
-        }
     }
 
     /**

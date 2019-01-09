@@ -17,9 +17,9 @@
 			<br />
 			<br />
 			<i>Note for file name</i>: Some special characters, such as /, \, ?, *, :, &lt;, 	&gt;, &quot;, | will be rejected. 
-			For Windows platform, a name that resembles any forbidden windows filename will also be rejected. 
-			For more information about the forbidden windows filename, please check the Microsoft 
-			<a href="https://docs.microsoft.com/de-de/windows/desktop/FileIO/naming-a-file">website</a>.
+			For Windows platform, a name that resembles any forbidden Windows filename will also be rejected. 
+			For more information about the forbidden Windows filename, please check the 
+			<a href="https://docs.microsoft.com/de-de/windows/desktop/FileIO/naming-a-file">Microsoft website</a>.
 		</intro>
 		<option name="Output directory">Select the output directory location.</option>
 		<option name="Prefix">Specify prefix for the file name (optional).</option>
