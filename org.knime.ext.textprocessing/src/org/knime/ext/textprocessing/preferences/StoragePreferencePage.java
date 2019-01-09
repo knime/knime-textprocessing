@@ -84,7 +84,7 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
       + "in a single\nfile store file. The larger the number, the less files "
       + "will be created to store the documents,\nwhich increases processing "
       + "speed. For the smallest possible number 1, a file will be created\n"
-      + "for each document, which solws down processing speed.";
+      + "for each document, which slows down processing speed.";
 
     /**
      * Constructor for class {@link StoragePreferencePage}. Creates a new preference page for cell storage settings.
