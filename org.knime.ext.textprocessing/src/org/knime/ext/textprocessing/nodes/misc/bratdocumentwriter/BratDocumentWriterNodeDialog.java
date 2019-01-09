@@ -55,6 +55,7 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.workflow.FlowVariable.Type;
@@ -65,18 +66,81 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Andisa Dewi, KNIME AG, Berlin, Germany
  */
-public class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
+final class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
 
+    /**
+     * The default target directory.
+     */
+    private static final String DEF_DIR = System.getProperty("user.home");
+
+    /**
+     * The configuration key for the column name of the doc column.
+     */
+    private static final String CFG_DOC_COLNAME = "DocColName";
+
+    /**
+     * The configuration key for the path to directory.
+     */
+    private static final String CFG_DIR_PATH = "DirPath";
+
+    /**
+     * The configuration key for overwrite flag.
+     */
+    private static final String CFG_OVERWRITE_FILES = "OverwriteFiles";
+
+    /**
+     * The configuration key for file name prefix.
+     */
+    private static final String CFG_PREFIX = "PrefixFilename";
+
+    /**
+     * The configuration key for file name suffix.
+     */
+    private static final String CFG_SUFFIX = "SuffixFilename";
+
+    /**
+     * Get the document column SettingsModel.
+     *
+     * @return the SettingsModelString for document column
+     */
     static final SettingsModelString getDocColModel() {
-        return new SettingsModelString(BratDocumentWriterConfigKeys.DOC_COLNAME, "");
+        return new SettingsModelString(CFG_DOC_COLNAME, "");
     }
 
+    /**
+     * Get the directory path SettingsModel.
+     *
+     * @return the SettingsModelString for the directory path
+     */
     static final SettingsModelString getDirectoryModel() {
-        return new SettingsModelString(BratDocumentWriterConfigKeys.DIR_PATH, BratDocumentWriterNodeModel.DEF_DIR);
+        return new SettingsModelString(CFG_DIR_PATH, DEF_DIR);
     }
 
+    /**
+     * Get the overwrite flag SettingsModel.
+     *
+     * @return the SettingsModelBoolean for the overwrite flag
+     */
     static final SettingsModelBoolean getOverwriteModel() {
-        return new SettingsModelBoolean(BratDocumentWriterConfigKeys.OVERWRITE_FILES, false);
+        return new SettingsModelBoolean(CFG_OVERWRITE_FILES, false);
+    }
+
+    /**
+     * Get the file name prefix.
+     *
+     * @return the SettingsModelString for the file name prefix
+     */
+    static final SettingsModelString getPrefixModel() {
+        return new SettingsModelString(CFG_PREFIX, "");
+    }
+
+    /**
+     * Get the file name suffix.
+     *
+     * @return the SettingsModelString for the file name suffix
+     */
+    static final SettingsModelString getSuffixModel() {
+        return new SettingsModelString(CFG_SUFFIX, "");
     }
 
     /**
@@ -85,11 +149,18 @@ public class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
      */
     @SuppressWarnings("unchecked")
     public BratDocumentWriterNodeDialog() {
-        DialogComponentFileChooser selectDir = new DialogComponentFileChooser(getDirectoryModel(),
-            BratDocumentWriterNodeDialog.class.toString(), JFileChooser.SAVE_DIALOG, true,
-            createFlowVariableModel(BratDocumentWriterConfigKeys.DIR_PATH, Type.STRING));
+        final DialogComponentFileChooser selectDir =
+            new DialogComponentFileChooser(getDirectoryModel(), BratDocumentWriterNodeDialog.class.toString(),
+                JFileChooser.SAVE_DIALOG, true, createFlowVariableModel(CFG_DIR_PATH, Type.STRING));
         selectDir.setBorderTitle("Output directory");
         addDialogComponent(selectDir);
+
+        createNewGroup("Filename settings (optional)");
+        setHorizontalPlacement(true);
+        addDialogComponent(new DialogComponentString(getPrefixModel(), "Prefix"));
+        addDialogComponent(new DialogComponentString(getSuffixModel(), "Suffix"));
+        setHorizontalPlacement(false);
+        closeCurrentGroup();
 
         addDialogComponent(new DialogComponentBoolean(getOverwriteModel(), "Overwrite existing files"));
 

@@ -57,7 +57,7 @@ import org.knime.core.node.NodeView;
  *
  * @author Andisa Dewi, KNIME AG, Berlin, Germany
  */
-public class BratDocumentWriterNodeFactory extends NodeFactory<BratDocumentWriterNodeModel> {
+public final class BratDocumentWriterNodeFactory extends NodeFactory<BratDocumentWriterNodeModel> {
 
     /**
      * {@inheritDoc}

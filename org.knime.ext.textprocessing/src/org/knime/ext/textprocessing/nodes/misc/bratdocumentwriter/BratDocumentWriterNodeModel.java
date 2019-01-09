@@ -52,12 +52,17 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.json.JSONObject;
+import org.apache.commons.lang.SystemUtils;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -75,12 +80,12 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.core.util.PathUtils;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.BratDocumentViewerNodeModel;
+import org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.IndexedTerm;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.DocumentUtil;
 
 /**
  * The {@link NodeModel} for the Brat Document Writer. This node writes document tags and terms in an .ann file and the
@@ -88,22 +93,42 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  *
  * @author Andisa Dewi, KNIME AG, Berlin, Germany
  */
-public class BratDocumentWriterNodeModel extends NodeModel {
+final class BratDocumentWriterNodeModel extends NodeModel {
 
     /**
-     * The default target directory.
+     * Boolean to check whether the OS is windows.
      */
-    public static final String DEF_DIR = System.getProperty("user.home");
+    private static final boolean IS_WINDOWS = SystemUtils.IS_OS_WINDOWS;
 
+    /**
+     * The Logger for BratDocumentWriterNodeModel.
+     */
     private static final NodeLogger LOGGER = NodeLogger.getLogger(BratDocumentWriterNodeModel.class);
 
-    private SettingsModelString m_docColModel = BratDocumentWriterNodeDialog.getDocColModel();
+    /**
+     * The SettingsModelString for the document column.
+     */
+    private final SettingsModelString m_docColModel = BratDocumentWriterNodeDialog.getDocColModel();
 
-    private SettingsModelString m_directoryModel = BratDocumentWriterNodeDialog.getDirectoryModel();
+    /**
+     * The SettingsModelString for the directory path.
+     */
+    private final SettingsModelString m_directoryModel = BratDocumentWriterNodeDialog.getDirectoryModel();
 
-    private SettingsModelBoolean m_overwriteModel = BratDocumentWriterNodeDialog.getOverwriteModel();
+    /**
+     * The SettingsModelBoolean for the overwrite flag.
+     */
+    private final SettingsModelBoolean m_overwriteModel = BratDocumentWriterNodeDialog.getOverwriteModel();
 
-    private int m_docColIndex = -1;
+    /**
+     * The SettingsModelString for the file name prefix.
+     */
+    private final SettingsModelString m_prefixModel = BratDocumentWriterNodeDialog.getPrefixModel();
+
+    /**
+     * The SettingsModelString for the file name suffix.
+     */
+    private final SettingsModelString m_suffixModel = BratDocumentWriterNodeDialog.getSuffixModel();
 
     /**
      * The constructor of the Brat Document Writer node. The node has one input and no output port.
@@ -122,13 +147,13 @@ public class BratDocumentWriterNodeModel extends NodeModel {
     }
 
     /**
-     * Check the input data table spec
+     * Check the input data table spec.
      *
-     * @param spec the data table spec
+     * @param spec the data table spec to be checked
      * @throws InvalidSettingsException
      */
     private final void checkDataTableSpec(final DataTableSpec spec) throws InvalidSettingsException {
-        // check input spec
+        // check that input spec has at least 1 document column
         DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
         verifier.verifyMinimumDocumentCells(1, true);
 
@@ -137,32 +162,36 @@ public class BratDocumentWriterNodeModel extends NodeModel {
 
         // check target directory
         CheckUtils.checkDestinationDirectory(m_directoryModel.getStringValue());
-
-        m_docColIndex = spec.findColumnIndex(m_docColModel.getStringValue());
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("resource")
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-
-        DataTableSpec inputSpec = inData[0].getDataTableSpec();
+        final DataTableSpec inputSpec = inData[0].getDataTableSpec();
         checkDataTableSpec(inputSpec);
+        final int docColIndex = inputSpec.findColumnIndex(m_docColModel.getStringValue());
 
         final long rowCount = inData[0].size();
         long currRow = 1;
         final RowIterator it = inData[0].iterator();
         int countMissing = 0;
+
         while (it.hasNext()) {
-            DataRow row = it.next();
-            // get cell from original data table
-            DataCell docCell = row.getCell(m_docColIndex);
+            final DataRow row = it.next();
+            // get document cell from original data table
+            final DataCell docCell = row.getCell(docColIndex);
+            // if cell is not missing, try to read the doc and write to files
             if (!docCell.isMissing()) {
-                Document doc = ((DocumentValue)docCell).getDocument();
-                writeDocumentToFiles(doc, row.getKey().getString());
-            } else {
+                final Document doc = ((DocumentValue)docCell).getDocument();
+                // add prefix and suffix to filename if available
+                // and verify that the filename does not contain forbidden symbols
+                // if it is okay, try to write to files
+                writeDocumentToFiles(doc, buildFilename(row.getKey().getString()));
+            } else { // otherwise count as missing
                 countMissing++;
                 LOGGER.debug("Skipping row " + row.getKey().getString() + " since the cell is missing.");
             }
@@ -183,72 +212,142 @@ public class BratDocumentWriterNodeModel extends NodeModel {
     }
 
     /**
-     * Write the document text and its tags and terms to .txt and .ann files
+     * Write the document text and its tags and terms to .txt and .ann files. If there is an error while writing, it
+     * will first try to delete both of the files, and then throw an exception.
      *
      * @param doc the document to be stored
-     * @param filename the supposed name of the file
-     * @throws InvalidSettingsException
-     * @throws IOException
+     * @param filename the supposed name of the file to be written
+     * @throws InvalidSettingsException if the file path is problematic
+     * @throws InvalidPathException if the file path looks like a file system path but is invalid
+     * @throws URISyntaxException if the passed URL does not conform with RFC2396 for URIs
+     * @throws IOException if an I/O error occurs
      */
-    private void writeDocumentToFiles(final Document doc, final String filename) throws Exception {
-        synchronized (this) {
-            // try to resolve the dir path
-            URL remoteBaseUrl = FileUtil.toURL(m_directoryModel.getStringValue());
-            Path localDir = FileUtil.resolveToPath(remoteBaseUrl);
-
-            Path file = null;
-            URL url = null;
-
-            try {
-                // build the filename for the .txt file
-                String txtFilename = filename + ".txt";
-
-                // check if path is local or remote
-                if (localDir != null) {
-                    file = PathUtils.resolvePath(localDir, txtFilename);
-                    checkOverwriteOption(file);
-                } else {
-                    url = new URL(remoteBaseUrl.toString() + "/" + txtFilename);
-                }
-
-                // write document text to txt file
-                writeToFile(openOutputStream(url, file), doc.getText());
-
-                // build the filename for the .ann file
-                String annFilename = filename + ".ann";
-
-                // check if path is local or remote
-                if (localDir != null) {
-                    file = PathUtils.resolvePath(localDir, annFilename);
-                    checkOverwriteOption(file);
-                } else {
-                    url = new URL(remoteBaseUrl.toString() + "/" + annFilename);
-                }
-
-                // fetch and write the tags and terms
-                List<JSONObject> list = BratDocumentViewerNodeModel.processTagsAndTerms(doc);
-                // write tags and terms to ann file
-                writeToFile(openOutputStream(url, file), packInString(list));
-            } catch (Exception e) {
-                // if an error happens mid writing, try to delete the file
-                if (Files.exists(file)) {
-                    Files.delete(file);
-                }
-                // nothing can be done with remote url?
-                // throw the error with the error message
-                throw new Exception(e.getMessage());
-            }
-
+    private void writeDocumentToFiles(final Document doc, final String filename)
+        throws InvalidSettingsException, InvalidPathException, URISyntaxException, IOException {
+        final String dirPath = m_directoryModel.getStringValue();
+        // check the directory path
+        final String dirWarning = CheckUtils.checkDestinationDirectory(dirPath);
+        // set a warning message if there is one
+        if (dirWarning != null) {
+            setWarningMessage(dirWarning);
         }
+        // add extensions to the filename
+        final String txtFilename = dirPath + "/" + filename + ".txt";
+        final String annFilename = dirPath + "/" + filename + ".ann";
 
+        try {
+            // write document text to txt file
+            writeToFile(createOutputStream(txtFilename), doc.getText());
+
+            // fetch and write the tags and terms
+            writeToFile(createOutputStream(annFilename), convertToString(DocumentUtil.getIndexedTerms(doc)));
+        } catch (final IOException e) {
+            // if something is wrong mid writing, try to delete both files
+            try {
+                deleteFile(txtFilename);
+                deleteFile(annFilename);
+            } catch (final IOException ex) {
+                // if an error occurs while deleting the files then
+                // nothing we can do
+            }
+            throw e;
+            // for remote files nothing will be done
+        }
     }
 
     /**
-     * Write strings to the output stream
+     * Add prefix and suffix to filename if exist and then check the filename if it contains any forbidden symbol.
+     *
+     * @param filename the file name
+     * @return verified file name with its suffix and prefix
+     * @throws InvalidSettingsException if the file name contains forbidden symbol
+     */
+    private String buildFilename(final String filename) throws InvalidSettingsException {
+        String result = filename;
+        if (!m_prefixModel.getStringValue().isEmpty()) {
+            result = m_prefixModel.getStringValue() + filename;
+        }
+        if (!m_suffixModel.getStringValue().isEmpty()) {
+            result += m_suffixModel.getStringValue();
+        }
+        verifyFilename(result);
+        return result;
+    }
+
+    /**
+     * Verify the file name to make sure it does not contain any forbidden symbol.
+     *
+     * @param filename the file name
+     * @throws InvalidSettingsException if the file name contains forbidden symbol
+     */
+    private static void verifyFilename(final String filename) throws InvalidSettingsException {
+        if (IS_WINDOWS) {
+            Pattern forbiddenWindowsNames =
+                Pattern.compile("^(?:(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\\.[^.]*)?|[ \\.])$");
+            Matcher matcher = forbiddenWindowsNames.matcher(filename);
+            if (matcher.find()) {
+                throw new InvalidSettingsException(
+                    "\"Invalid file name: Filename might contain names that are forbidden in Windows platform.");
+            }
+        } else {
+            // in Linux or Mac forbid /:?<>*"|\
+            Pattern pattern = Pattern.compile("[/:?<>*\"|\\\\]");
+            Matcher matcher = pattern.matcher(filename);
+            if (matcher.find()) {
+                final int invalidIdx = matcher.start();
+                throw new InvalidSettingsException(
+                    "Invalid file name: " + filename.charAt(invalidIdx) + " at position " + invalidIdx + ".");
+            }
+        }
+    }
+
+    /**
+     * Delete local file.
+     *
+     * @param filepath the to be deleted file path
+     * @throws IOException if an I/O error occurs
+     */
+    private static void deleteFile(final String filepath) throws IOException {
+        final Path path = Paths.get(filepath);
+        // check if file exists, if yes then delete
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
+        // if file does not exist anyway, do nothing
+    }
+
+    /**
+     * Open an output stream based on a given file path.
+     *
+     * @param filepath the input file path
+     * @throws InvalidSettingsException if the file path is problematic
+     * @throws InvalidPathException if the file path looks like a file system path but is invalid
+     * @throws URISyntaxException if the passed URL does not conform with RFC2396 for URIs
+     * @throws IOException if an I/O error occurs
+     */
+    private OutputStream createOutputStream(final String filepath)
+        throws InvalidSettingsException, InvalidPathException, IOException, URISyntaxException {
+        // check the validity of file path
+        final String warning = CheckUtils.checkDestinationFile(filepath, m_overwriteModel.getBooleanValue());
+        // set a warning message if there is one
+        if (warning != null) {
+            setWarningMessage(warning);
+        }
+        final URL url = FileUtil.toURL(filepath);
+        final Path localPath = FileUtil.resolveToPath(url);
+        if (localPath != null) {
+            return new BufferedOutputStream(Files.newOutputStream(localPath));
+        } else {
+            return new BufferedOutputStream(FileUtil.openOutputConnection(url, "PUT").getOutputStream());
+        }
+    }
+
+    /**
+     * Write strings to the output stream.
      *
      * @param out the output stream
      * @param content the string to be written
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      */
     private static void writeToFile(final OutputStream out, final String content) throws IOException {
         if (out != null) {
@@ -259,53 +358,36 @@ public class BratDocumentWriterNodeModel extends NodeModel {
     }
 
     /**
-     * Check the overwrite option. If the overwrite flag is false and the file exists, then throw an error
+     * Concatenate all the terms and tags into one string. Each line contains one term with one particular tag. So if a
+     * term has multiple tags, each one will be written in one line.
      *
-     * @param path the file
-     * @throws IOException
+     * An example of a line is like this: T1<tab>Location 61 69<tab>Germany
+     *
+     * Where T1 is the term index (Brat-style), Location is the tag, both 61 and 69 are start and stop index of the term
+     * respectively, while Germany is the term.
+     *
+     * @param list the list of the terms
+     * @return the string containing all the terms
      */
-    private void checkOverwriteOption(final Path path) throws IOException {
-        if (!m_overwriteModel.getBooleanValue()) {
-            if (Files.exists(path)) {
-                throw new IOException(
-                    "Output file '" + path + "' exists and must not be overwritten due to user settings");
+    private static String convertToString(final List<IndexedTerm> list) {
+        StringBuilder out = new StringBuilder();
+        int idx = 1;
+        for (IndexedTerm obj : list) {
+            List<String> tags = obj.getTagValues();
+            for (String tag : tags) {
+                out.append("T" + idx++);
+                out.append("\t");
+                out.append(tag);
+                out.append(" ");
+                out.append(obj.getStartIndex());
+                out.append(" ");
+                out.append(obj.getStopIndex());
+                out.append("\t");
+                out.append(obj.getTermValue());
+                out.append("\n");
             }
         }
-    }
-
-    /**
-     * Put all the JSON objects into one string. Each line contains one JSON object.
-     *
-     * @param list the list of the JSON objects
-     * @return the string containing the JSONs
-     */
-    private static String packInString(final List<JSONObject> list) {
-        String out = "";
-        for (JSONObject obj : list) {
-            out += obj.getString(BratDocumentViewerNodeModel.ID_KEY) + "\t"
-                + obj.getString(BratDocumentViewerNodeModel.TAG_KEY) + " "
-                + obj.getInt(BratDocumentViewerNodeModel.FIRSTPOS_KEY) + " "
-                + obj.getInt(BratDocumentViewerNodeModel.LASTPOS_KEY) + "\t"
-                + obj.getString(BratDocumentViewerNodeModel.TERM_KEY);
-            out += "\n";
-        }
-        return out;
-    }
-
-    /**
-     * Open an output stream based on the input URL (remote) or path (local)
-     *
-     * @param url the url
-     * @param file the path
-     * @return the output streams
-     * @throws IOException
-     */
-    private static OutputStream openOutputStream(final URL url, final Path file) throws IOException {
-        if (file != null) {
-            return new BufferedOutputStream(Files.newOutputStream(file));
-        } else {
-            return new BufferedOutputStream(FileUtil.openOutputConnection(url, "PUT").getOutputStream());
-        }
+        return out.toString();
     }
 
     /**
@@ -315,7 +397,6 @@ public class BratDocumentWriterNodeModel extends NodeModel {
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // nothing to do
-
     }
 
     /**
@@ -325,7 +406,6 @@ public class BratDocumentWriterNodeModel extends NodeModel {
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // nothing to do
-
     }
 
     /**
@@ -336,7 +416,8 @@ public class BratDocumentWriterNodeModel extends NodeModel {
         m_docColModel.saveSettingsTo(settings);
         m_directoryModel.saveSettingsTo(settings);
         m_overwriteModel.saveSettingsTo(settings);
-
+        m_prefixModel.saveSettingsTo(settings);
+        m_suffixModel.saveSettingsTo(settings);
     }
 
     /**
@@ -347,6 +428,8 @@ public class BratDocumentWriterNodeModel extends NodeModel {
         m_docColModel.validateSettings(settings);
         m_directoryModel.validateSettings(settings);
         m_overwriteModel.validateSettings(settings);
+        m_prefixModel.validateSettings(settings);
+        m_suffixModel.validateSettings(settings);
     }
 
     /**
@@ -357,6 +440,8 @@ public class BratDocumentWriterNodeModel extends NodeModel {
         m_docColModel.loadSettingsFrom(settings);
         m_directoryModel.loadSettingsFrom(settings);
         m_overwriteModel.loadSettingsFrom(settings);
+        m_prefixModel.loadSettingsFrom(settings);
+        m_suffixModel.loadSettingsFrom(settings);
     }
 
     /**
@@ -365,7 +450,6 @@ public class BratDocumentWriterNodeModel extends NodeModel {
     @Override
     protected void reset() {
         // nothing to do
-
     }
 
 }
