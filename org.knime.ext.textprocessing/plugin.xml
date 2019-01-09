@@ -696,6 +696,16 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.source.modelreader.OpenNlpNeModelReader.OpenNlpNeModelReaderNodeFactory">
       </node>
+      <node
+            category-path="/applications/textprocessing/misc"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.BratDocumentViewerNodeFactory">
+      </node>
+      <node
+            category-path="/applications/textprocessing/misc"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.misc.bratdocumentwriter.BratDocumentWriterNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

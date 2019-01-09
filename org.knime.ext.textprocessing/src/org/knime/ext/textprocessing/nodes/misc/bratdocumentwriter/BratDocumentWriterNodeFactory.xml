@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/io.png" type="Sink">
+	<name>Brat Document Writer</name>
+	<shortDescription>Writes
+		input documents into two files (.txt and
+		.ann),
+		which are readable by the annotation tool Brat.
+	</shortDescription>
+	<fullDescription>
+		<intro>
+			This node takes the documents in the selected column and writes
+			them,
+			each as two files (.txt and .ann), into the selected directory.
+			The
+			.txt file will contain the document text, and the .ann file the terms
+			and tags in the document.
+			Both
+			files will be named after the table's
+			row keys. The created files can then be
+			imported into the annotation
+			tool
+			<a href="http://brat.nlplab.org/index.html">Brat</a>.
+		</intro>
+		<option name="Select directory">Select the output directory location.</option>
+		<option name="Overwrite existing files">Choose if existing files should be overwritten
+			here. If this option is unchecked, the node will fail if a file
+			already exists.
+		</option>
+		<option name="Document column">The column containing the documents.</option>
+	</fullDescription>
+
+	<ports>
+		<inPort name="Documents input table" index="0">
+			The input table
+			which contains the documents.
+		</inPort>
+	</ports>
+</knimeNode>
