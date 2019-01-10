@@ -76,6 +76,96 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
 
     /**
+     * The default value for the tag type SettingsModel.
+     */
+    private static final String DEF_TAG_TYPE = "NE";
+
+    /**
+     * The default value for the tag value SettingsModel.
+     */
+    private static final String DEF_TAG_VALUE = "UNKNOWN";
+
+    /**
+     * The default value for the "use class feature" flag.
+     */
+    private static final boolean DEF_USE_CLASS_FEATURE = true;
+
+    /**
+     * The default value for the "use word" flag.
+     */
+    private static final boolean DEF_USE_WORD = true;
+
+    /**
+     * The default value for the "use n-grams" flag.
+     */
+    private static final boolean DEF_USE_NGRAMS = true;
+
+    /**
+     * The default value for the "no mid n-grams" flag.
+     */
+    private static final boolean DEF_NO_MID_NGRAMS = true;
+
+    /**
+     * The default value for the "max n-gram length".
+     */
+    private static final int DEF_MAX_NGRAM_LENG = 6;
+
+    /**
+     * The default value for the "use prev" flag.
+     */
+    private static final boolean DEF_USE_PREV = true;
+
+    /**
+     * The default value for the "use next" flag.
+     */
+    private static final boolean DEF_USE_NEXT = true;
+
+    /**
+     * The default value for the "use sequences" flag.
+     */
+    private static final boolean DEF_USE_SEQUENCES = true;
+
+    /**
+     * The default value for the "use prev sequences" flag.
+     */
+    private static final boolean DEF_USE_PREV_SEQUENCES = true;
+
+    /**
+     * The default value for the "max left" option.
+     */
+    private static final int DEF_MAX_LEFT = 1;
+
+    /**
+     * The default value for the "use type sequences" flag.
+     */
+    private static final boolean DEF_USE_TYPE_SEQS = true;
+
+    /**
+     * The default value for the "use type sequences 2" flag.
+     */
+    private static final boolean DEF_USE_TYPE_SEQS2 = true;
+
+    /**
+     * The default value for the "use type y sequences" flag.
+     */
+    private static final boolean DEF_USE_TYPE_Y_SEQS = true;
+
+    /**
+     * The default value for the "word shape" option.
+     */
+    private static final String DEF_WORDSHAPE = "chris2useLC";
+
+    /**
+     * The default value for the "use disjunctive" flag.
+     */
+    private static final boolean DEF_USE_DISJUNCTIVE = true;
+
+    /**
+     * The default value for the "case sensitivity" flag.
+     */
+    private static final boolean DEF_CASE_SENSITIVITY = true;
+
+    /**
      * @return Creates and returns the string settings model containing the name of the column with the documents to
      *         learn the model with.
      */
@@ -96,7 +186,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString createTagTypeModel() {
         return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_TAG_TYPE,
-            StanfordNlpNeLearnerNodeModel.DEF_TAG_TYPE);
+            DEF_TAG_TYPE);
     }
 
     /**
@@ -104,7 +194,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString createTagValueModel() {
         return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_TAG_VALUE,
-            StanfordNlpNeLearnerNodeModel.DEF_TAG_VALUE);
+            DEF_TAG_VALUE);
     }
 
     /**
@@ -115,7 +205,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseClassFeatureModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_CLASS_FEATURE,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_CLASS_FEATURE);
+            DEF_USE_CLASS_FEATURE);
     }
 
     /**
@@ -123,7 +213,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseWordModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_WORD,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_WORD);
+            DEF_USE_WORD);
     }
 
     /**
@@ -131,7 +221,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseNGramsModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_NGRAMS,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_NGRAMS);
+            DEF_USE_NGRAMS);
     }
 
     /**
@@ -139,7 +229,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createNoMidNGramsModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_NO_MID_NGRAMS,
-            StanfordNlpNeLearnerNodeModel.DEF_NO_MID_NGRAMS);
+            DEF_NO_MID_NGRAMS);
     }
 
     /**
@@ -147,7 +237,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUsePrevModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_PREV,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_PREV);
+            DEF_USE_PREV);
     }
 
     /**
@@ -155,7 +245,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelIntegerBounded createMaxNGramLengthModel() {
         return new SettingsModelIntegerBounded(StanfordNlpNeLearnerConfigKeys.CFGKEY_MAX_NGRAM_LENG,
-            StanfordNlpNeLearnerNodeModel.DEF_MAX_NGRAM_LENG, 0, Integer.MAX_VALUE);
+            DEF_MAX_NGRAM_LENG, 0, Integer.MAX_VALUE);
     }
 
     /**
@@ -163,7 +253,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseNextModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_NEXT,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_NEXT);
+            DEF_USE_NEXT);
     }
 
     /**
@@ -171,7 +261,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseSequencesModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_SEQUENCES,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_SEQUENCES);
+            DEF_USE_SEQUENCES);
     }
 
     /**
@@ -179,7 +269,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUsePrevSequencesModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_PREV_SEQUENCES,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_PREV_SEQUENCES);
+            DEF_USE_PREV_SEQUENCES);
     }
 
     /**
@@ -187,7 +277,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelIntegerBounded createMaxLeftModel() {
         return new SettingsModelIntegerBounded(StanfordNlpNeLearnerConfigKeys.CFGKEY_MAX_LEFT,
-            StanfordNlpNeLearnerNodeModel.DEF_MAX_LEFT, -1, Integer.MAX_VALUE);
+            DEF_MAX_LEFT, -1, Integer.MAX_VALUE);
     }
 
     /**
@@ -195,7 +285,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseTypeSeqsModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_TYPE_SEQS,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_TYPE_SEQS);
+            DEF_USE_TYPE_SEQS);
     }
 
     /**
@@ -203,7 +293,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseTypeSeqs2Model() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_TYPE_SEQS2,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_TYPE_SEQS2);
+            DEF_USE_TYPE_SEQS2);
     }
 
     /**
@@ -211,7 +301,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseTypeYSeqsModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_TYPE_Y_SEQS,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_TYPE_Y_SEQS);
+            DEF_USE_TYPE_Y_SEQS);
     }
 
     /**
@@ -219,7 +309,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString createWordShapeModel() {
         return new SettingsModelString(StanfordNlpNeLearnerConfigKeys.CFGKEY_WORDSHAPE,
-            StanfordNlpNeLearnerNodeModel.DEF_WORDSHAPE);
+            DEF_WORDSHAPE);
     }
 
     /**
@@ -227,7 +317,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelBoolean createUseDisjunctiveModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFGKEY_USE_DISJUNCTIVE,
-            StanfordNlpNeLearnerNodeModel.DEF_USE_DISJUNCTIVE);
+            DEF_USE_DISJUNCTIVE);
     }
 
     /**
@@ -242,7 +332,7 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelBoolean createCaseSensitivityModel() {
         return new SettingsModelBoolean(StanfordNlpNeLearnerConfigKeys.CFG_KEY_CASE_SENSITIVITY,
-            StanfordNlpNeLearnerNodeModel.DEF_CASE_SENSITIVITY);
+            DEF_CASE_SENSITIVITY);
     }
 
     private final SettingsModelString m_tagtypemodel;
@@ -250,8 +340,8 @@ public class StanfordNlpNeLearnerNodeDialog extends DefaultNodeSettingsPane {
     private final DialogComponentStringSelection m_tagSelection;
 
     private static final List<String> m_wordShapes =
-        Arrays.asList(("none,dan1,chris1,dan2,dan2useLC,dan2bio,dan2bioUseLC,jenny1,"
-            + "jenny1useLC,chris2,chris2useLC,chris3,chris3useLC,chris4").split(","));
+        Arrays.asList("none", "dan1", "chris1", "dan2", "dan2useLC", "dan2bio", "dan2bioUseLC", "jenny1",
+            "jenny1useLC", "chris2", "chris2useLC", "chris3", "chris3useLC", "chris4");
 
     /**
      * Creates an new instance of {@code StanfordNlpNeLearnerNodeDialog}.

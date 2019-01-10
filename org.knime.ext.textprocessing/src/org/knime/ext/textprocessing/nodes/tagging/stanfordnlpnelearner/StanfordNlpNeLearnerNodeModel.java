@@ -53,11 +53,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -85,7 +85,6 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.StanfordNERModelPortObject;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
-import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
@@ -100,150 +99,61 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.sequences.SeqClassifierFlags;
 
 /**
+ * The {@code NodeModel} for the StanfordNLP NE Learner node.
  *
  * @author Julian Bunzel, KNIME.com, Berlin, Germany
  */
 public class StanfordNlpNeLearnerNodeModel extends NodeModel {
 
-    /**
-     * The default value for the tag type SettingsModel.
-     */
-    static final String DEF_TAG_TYPE = "NE";
+    private final SettingsModelString m_docColumnModel = StanfordNlpNeLearnerNodeDialog.createDocumentColumnModel();
 
-    /**
-     * The default value for the tag value SettingsModel.
-     */
-    static final String DEF_TAG_VALUE = "UNKNOWN";
-
-    /**
-     * The default value for the "use class feature" flag.
-     */
-    static final boolean DEF_USE_CLASS_FEATURE = true;
-
-    /**
-     * The default value for the "use word" flag.
-     */
-    static final boolean DEF_USE_WORD = true;
-
-    /**
-     * The default value for the "use n-grams" flag.
-     */
-    static final boolean DEF_USE_NGRAMS = true;
-
-    /**
-     * The default value for the "no mid n-grams" flag.
-     */
-    static final boolean DEF_NO_MID_NGRAMS = true;
-
-    /**
-     * The default value for the "max n-gram length".
-     */
-    static final int DEF_MAX_NGRAM_LENG = 6;
-
-    /**
-     * The default value for the "use prev" flag.
-     */
-    static final boolean DEF_USE_PREV = true;
-
-    /**
-     * The default value for the "use next" flag.
-     */
-    static final boolean DEF_USE_NEXT = true;
-
-    /**
-     * The default value for the "use sequences" flag.
-     */
-    static final boolean DEF_USE_SEQUENCES = true;
-
-    /**
-     * The default value for the "use prev sequences" flag.
-     */
-    static final boolean DEF_USE_PREV_SEQUENCES = true;
-
-    /**
-     * The default value for the "max left" option.
-     */
-    static final int DEF_MAX_LEFT = 1;
-
-    /**
-     * The default value for the "use type sequences" flag.
-     */
-    static final boolean DEF_USE_TYPE_SEQS = true;
-
-    /**
-     * The default value for the "use type sequences 2" flag.
-     */
-    static final boolean DEF_USE_TYPE_SEQS2 = true;
-
-    /**
-     * The default value for the "use type y sequences" flag.
-     */
-    static final boolean DEF_USE_TYPE_Y_SEQS = true;
-
-    /**
-     * The default value for the "word shape" option.
-     */
-    static final String DEF_WORDSHAPE = "chris2useLC";
-
-    /**
-     * The default value for the "use disjunctive" flag.
-     */
-    static final boolean DEF_USE_DISJUNCTIVE = true;
-
-    /**
-     * The default value for the "case sensitivity" flag.
-     */
-    static final boolean DEF_CASE_SENSITIVITY = true;
-
-    private SettingsModelString m_docColumnModel = StanfordNlpNeLearnerNodeDialog.createDocumentColumnModel();
-
-    private SettingsModelString m_knownEntitiesColumnModel =
+    private final SettingsModelString m_knownEntitiesColumnModel =
         StanfordNlpNeLearnerNodeDialog.createKnownEntitiesColumnModel();
 
-    private SettingsModelString m_tagValueModel = StanfordNlpNeLearnerNodeDialog.createTagValueModel();
+    private final SettingsModelString m_tagValueModel = StanfordNlpNeLearnerNodeDialog.createTagValueModel();
 
-    private SettingsModelString m_tagTypeModel = StanfordNlpNeLearnerNodeDialog.createTagTypeModel();
-
-    private Tag m_tag;
+    private final SettingsModelString m_tagTypeModel = StanfordNlpNeLearnerNodeDialog.createTagTypeModel();
 
     // Properties settings models
 
-    private SettingsModelBoolean m_useClassFeature = StanfordNlpNeLearnerNodeDialog.createUseClassFeatureModel();
+    private final SettingsModelBoolean m_useClassFeature = StanfordNlpNeLearnerNodeDialog.createUseClassFeatureModel();
 
-    private SettingsModelBoolean m_useWord = StanfordNlpNeLearnerNodeDialog.createUseWordModel();
+    private final SettingsModelBoolean m_useWord = StanfordNlpNeLearnerNodeDialog.createUseWordModel();
 
-    private SettingsModelBoolean m_useNGrams = StanfordNlpNeLearnerNodeDialog.createUseNGramsModel();
+    private final SettingsModelBoolean m_useNGrams = StanfordNlpNeLearnerNodeDialog.createUseNGramsModel();
 
-    private SettingsModelBoolean m_noMidNGrams = StanfordNlpNeLearnerNodeDialog.createNoMidNGramsModel();
+    private final SettingsModelBoolean m_noMidNGrams = StanfordNlpNeLearnerNodeDialog.createNoMidNGramsModel();
 
-    private SettingsModelBoolean m_usePrev = StanfordNlpNeLearnerNodeDialog.createUsePrevModel();
+    private final SettingsModelBoolean m_usePrev = StanfordNlpNeLearnerNodeDialog.createUsePrevModel();
 
-    private SettingsModelBoolean m_useNext = StanfordNlpNeLearnerNodeDialog.createUseNextModel();
+    private final SettingsModelBoolean m_useNext = StanfordNlpNeLearnerNodeDialog.createUseNextModel();
 
-    private SettingsModelBoolean m_useSequences = StanfordNlpNeLearnerNodeDialog.createUseSequencesModel();
+    private final SettingsModelBoolean m_useSequences = StanfordNlpNeLearnerNodeDialog.createUseSequencesModel();
 
-    private SettingsModelBoolean m_usePrevSequences = StanfordNlpNeLearnerNodeDialog.createUsePrevSequencesModel();
+    private final SettingsModelBoolean m_usePrevSequences =
+        StanfordNlpNeLearnerNodeDialog.createUsePrevSequencesModel();
 
-    private SettingsModelBoolean m_useTypeSeqs = StanfordNlpNeLearnerNodeDialog.createUseTypeSeqsModel();
+    private final SettingsModelBoolean m_useTypeSeqs = StanfordNlpNeLearnerNodeDialog.createUseTypeSeqsModel();
 
-    private SettingsModelBoolean m_useTypeSeqs2 = StanfordNlpNeLearnerNodeDialog.createUseTypeSeqs2Model();
+    private final SettingsModelBoolean m_useTypeSeqs2 = StanfordNlpNeLearnerNodeDialog.createUseTypeSeqs2Model();
 
-    private SettingsModelBoolean m_useTypeySequences = StanfordNlpNeLearnerNodeDialog.createUseTypeYSeqsModel();
+    private final SettingsModelBoolean m_useTypeySequences = StanfordNlpNeLearnerNodeDialog.createUseTypeYSeqsModel();
 
-    private SettingsModelBoolean m_useDisjunctive = StanfordNlpNeLearnerNodeDialog.createUseDisjunctiveModel();
+    private final SettingsModelBoolean m_useDisjunctive = StanfordNlpNeLearnerNodeDialog.createUseDisjunctiveModel();
 
-    private SettingsModelString m_wordShape = StanfordNlpNeLearnerNodeDialog.createWordShapeModel();
+    private final SettingsModelString m_wordShape = StanfordNlpNeLearnerNodeDialog.createWordShapeModel();
 
-    private SettingsModelIntegerBounded m_maxLeft = StanfordNlpNeLearnerNodeDialog.createMaxLeftModel();
+    private final SettingsModelIntegerBounded m_maxLeft = StanfordNlpNeLearnerNodeDialog.createMaxLeftModel();
 
-    private SettingsModelIntegerBounded m_maxNGramLeng = StanfordNlpNeLearnerNodeDialog.createMaxNGramLengthModel();
+    private final SettingsModelIntegerBounded m_maxNGramLeng =
+        StanfordNlpNeLearnerNodeDialog.createMaxNGramLengthModel();
 
-    private SettingsModelString m_tokenizer = StanfordNlpNeLearnerNodeDialog.createTokenizerModel();
+    private final SettingsModelString m_tokenizer = StanfordNlpNeLearnerNodeDialog.createTokenizerModel();
 
-    private SettingsModelBoolean m_caseSensitivity = StanfordNlpNeLearnerNodeDialog.createCaseSensitivityModel();
+    private final SettingsModelBoolean m_caseSensitivity = StanfordNlpNeLearnerNodeDialog.createCaseSensitivityModel();
 
     /**
-     *
+     * Creates a new instance of {@code StanfordNlpNeLearnerNodeModel}.
      */
     protected StanfordNlpNeLearnerNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE},
@@ -257,10 +167,10 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 
         // checking for document column in first input table and string column in second input table
-        DataTableSpec spec = (DataTableSpec)inSpecs[0];
-        DataTableSpec spec2 = (DataTableSpec)inSpecs[1];
-        DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
-        DataTableSpecVerifier verifier2 = new DataTableSpecVerifier((DataTableSpec)inSpecs[1]);
+        final DataTableSpec spec = (DataTableSpec)inSpecs[0];
+        final DataTableSpec spec2 = (DataTableSpec)inSpecs[1];
+        final DataTableSpecVerifier verifier = new DataTableSpecVerifier(spec);
+        final DataTableSpecVerifier verifier2 = new DataTableSpecVerifier((DataTableSpec)inSpecs[1]);
         verifier.verifyMinimumDocumentCells(1, true);
         verifier2.verifyMinimumStringCells(1, true);
 
@@ -274,8 +184,8 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
             .ifPresent(a -> setWarningMessage(a));
 
         // check tokenizer settings from incoming document column
-        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
-        String tokenizerFromInput =
+        final DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(spec);
+        final String tokenizerFromInput =
             dataTableSpecVerifier.getTokenizerFromInputDocCol(spec.findColumnIndex(m_docColumnModel.getStringValue()));
         if (m_tokenizer.getStringValue().isEmpty()) {
             if (tokenizerFromInput != null) {
@@ -298,141 +208,147 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         return new PortObjectSpec[]{new NERModelPortObjectSpec(m_tokenizer.getStringValue())};
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected PortObject[] execute(final PortObject[] data, final ExecutionContext exec) throws Exception {
         // check input data
-        assert (data != null && data[0] != null);
+        assert ((data != null) && (data[0] != null));
 
-        // get specs and data tables
-        final DataTableSpec docTableSpec = (DataTableSpec)data[0].getSpec();
-        final DataTableSpec knownEntitiesTableSpec = (DataTableSpec)data[1].getSpec();
-        final BufferedDataTable docDataInput = (BufferedDataTable)data[0];
-        final BufferedDataTable knownEntitiesDataInput = (BufferedDataTable)data[1];
-        final Set<Pattern> knownEntitiesPatternSet = new LinkedHashSet<Pattern>();
-        final Set<String> knownEntitiesStringSet = new LinkedHashSet<String>();
+        // get data table
+        final BufferedDataTable docTable = (BufferedDataTable)data[0];
 
-        // iterate through columns
-        for (int i = 0; i < knownEntitiesTableSpec.getNumColumns(); i++) {
-            // iterate through rows if column with correct name has been found
-            if (knownEntitiesTableSpec.getColumnSpec(i).getName().equals(m_knownEntitiesColumnModel.getStringValue())) {
-                for (DataRow row : knownEntitiesDataInput) {
-                    if (!row.getCell(i).isMissing()) {
-                        // add every known entity to the specified array list
-                        String cellText = m_caseSensitivity.getBooleanValue() ? row.getCell(i).toString()
-                            : row.getCell(i).toString().toLowerCase();
-                        if (!cellText.trim().isEmpty()) {
-                            knownEntitiesStringSet.add(cellText);
-                            knownEntitiesPatternSet.add(Pattern.compile(cellText));
-                        }
-                    }
-                }
-            }
-        }
-
-        if (knownEntitiesPatternSet.size() == 0) {
-            setWarningMessage("Trained model on empty dictionary.");
-        }
+        // get dictionary as string and regex pattern
+        final Set<String> knownEntitiesStringSet = getDictionary((BufferedDataTable)data[1]);
+        final Set<Pattern> knownEntitiesPatternSet = knownEntitiesStringSet.stream()//
+            .map(s -> Pattern.compile(s))//
+            .collect(Collectors.toSet());
 
         // create tag for document tagger
-        m_tag = new Tag(m_tagValueModel.getStringValue(), m_tagTypeModel.getStringValue());
+        final Tag tag = new Tag(m_tagValueModel.getStringValue(), m_tagTypeModel.getStringValue());
 
         // create tagger based on known entities
-        MultiTermRegexDocumentTagger tagger = new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, m_tag,
+        final MultiTermRegexDocumentTagger tagger = new MultiTermRegexDocumentTagger(true, knownEntitiesPatternSet, tag,
             m_caseSensitivity.getBooleanValue(), m_tokenizer.getStringValue());
 
-        // create UUID to add them to the file path to avoid cases where two instances of the node model used the same file path at the same time
-        String tempDir = KNIMEConstants.getKNIMETempDir() + "/";
-        String m_modelPath = tempDir + "oM-" + UUID.randomUUID().toString() + ".crf.ser.gz";
-        String m_annotatedDocPath = tempDir + "aD-" + UUID.randomUUID().toString() + ".tsv";
+        // create UUID to add them to the file path to avoid cases..
+        // .. where two instances of the node model used the same file path at the same time
+        final String tempDir = KNIMEConstants.getKNIMETempDir() + "/";
+        final String modelPath = tempDir + "oM-" + UUID.randomUUID().toString() + ".crf.ser.gz";
+        final String annotatedDocPath = tempDir + "aD-" + UUID.randomUUID().toString() + ".tsv";
 
         // create files based on sentence list and known entities
-        File m_annotatedDocFile = new File(m_annotatedDocPath);
-        PrintWriter sentenceFileWriter = new PrintWriter(m_annotatedDocFile, "UTF-8");
-
+        final File annotatedDocFile = new File(annotatedDocPath);
+        int rowCounter = 0;
         int missingValueCounter = 0;
+        try (final PrintWriter sentenceFileWriter = new PrintWriter(annotatedDocFile, "UTF-8")) {
+            final int colIndex = docTable.getDataTableSpec().findColumnIndex(m_docColumnModel.getStringValue());
+            // tag documents and transform sentences to strings while tagged terms get stanfordnlp annotation
+            for (final DataRow row : docTable) {
+                //set progress bar
+                rowCounter++;
+                final double progress = (rowCounter / (double)docTable.size()) / (2.0);
+                exec.setProgress(progress, "Preparing documents");
 
-        // tag documents and transform sentences to strings while tagged terms get stanfordnlp annotation
-        // iterate through columns
-        for (int i = 0; i < docTableSpec.getNumColumns(); i++) {
-            // iterate through rows if column with correct name has been found
-            if (docTableSpec.getColumnSpec(i).getName().equals(m_docColumnModel.getStringValue())) {
-                int counter = 0;
-                for (DataRow row : docDataInput) {
-                    //set progress bar
-                    counter++;
-                    double progress = (counter / (double)docDataInput.size()) / (2.0);
-                    exec.setProgress(progress, "Preparing documents");
-
-                    if (!row.getCell(i).isMissing() && row.getCell(i).getType().isCompatible(DocumentValue.class)) {
-                        Document doc = ((DocumentValue)row.getCell(i)).getDocument();
-                        Document taggedDoc = tagger.tag(doc);
-                        Iterator<Sentence> si = taggedDoc.sentenceIterator();
-                        while (si.hasNext()) {
-                            Sentence s = si.next();
-                            List<Term> termList = s.getTerms();
-                            Iterator<Term> ti = termList.iterator();
-                            while (ti.hasNext()) {
-                                Term t = ti.next();
-                                String termText = t.getText();
-                                String termTextWithWsSuffix = t.getTextWithWsSuffix();
-                                if (knownEntitiesStringSet
-                                    .contains(m_caseSensitivity.getBooleanValue() ? termText : termText.toLowerCase())
-                                    || knownEntitiesStringSet.contains(m_caseSensitivity.getBooleanValue()
-                                        ? termTextWithWsSuffix : termTextWithWsSuffix.toLowerCase())) {
-                                    if (t.getWords().size() > 1) {
-                                        for (Word w : t.getWords()) {
-                                            sentenceFileWriter
-                                                .println(w.getText() + "\t" + m_tagValueModel.getStringValue());
-                                        }
-                                    } else {
-                                        sentenceFileWriter.println(termText + "\t" + m_tagValueModel.getStringValue());
-                                    }
-                                } else if (!knownEntitiesStringSet.contains(termText)
-                                    || !knownEntitiesStringSet.contains(termTextWithWsSuffix)) {
-                                    sentenceFileWriter.println(termText + "\tO");
-                                }
-                            }
-                        }
-                    } else {
-                        missingValueCounter++;
-                    }
-                }
-                if (counter == 0) {
-                    setWarningMessage("Node created an empty model.");
+                if (!row.getCell(colIndex).isMissing()
+                    && row.getCell(colIndex).getType().isCompatible(DocumentValue.class)) {
+                    final Document doc = ((DocumentValue)row.getCell(colIndex)).getDocument();
+                    final Document taggedDoc = tagger.tag(doc);
+                    taggedDoc.sentenceIterator()
+                        .forEachRemaining(s -> writeAnnotationData(s, knownEntitiesStringSet, sentenceFileWriter));
+                } else {
+                    missingValueCounter++;
                 }
             }
         }
 
-        sentenceFileWriter.close();
-
+        // train model
         exec.setProgress(0.75, "Learning model.");
 
-        Properties props = new StanfordNlpNeLearnerPropFileGenerator(m_annotatedDocPath,
+        final Properties props = new StanfordNlpNeLearnerPropFileGenerator(annotatedDocPath,
             m_useClassFeature.getBooleanValue(), m_useWord.getBooleanValue(), m_useNGrams.getBooleanValue(),
             m_noMidNGrams.getBooleanValue(), m_maxNGramLeng.getIntValue(), m_usePrev.getBooleanValue(),
             m_useNext.getBooleanValue(), m_useDisjunctive.getBooleanValue(), m_useSequences.getBooleanValue(),
             m_usePrevSequences.getBooleanValue(), m_maxLeft.getIntValue(), m_useTypeSeqs.getBooleanValue(),
             m_useTypeSeqs2.getBooleanValue(), m_useTypeySequences.getBooleanValue(), m_wordShape.getStringValue())
                 .getPropFile();
-        SeqClassifierFlags flags = new SeqClassifierFlags(props);
-        CRFClassifier<CoreLabel> crf = new CRFClassifier<CoreLabel>(flags);
+        final SeqClassifierFlags flags = new SeqClassifierFlags(props);
+        final CRFClassifier<CoreLabel> crf = new CRFClassifier<>(flags);
         crf.train();
-        crf.serializeClassifier(m_modelPath);
+        crf.serializeClassifier(modelPath);
 
-        File outputModel = new File(m_modelPath);
-        byte[] modelOutputBuffer = Files.toByteArray(outputModel);
+        final File outputModel = new File(modelPath);
+        final byte[] modelOutputBuffer = Files.toByteArray(outputModel);
 
-        outputModel.delete();
-        m_annotatedDocFile.delete();
+        // delete temporary files
+        java.nio.file.Files.delete(outputModel.toPath());
+        java.nio.file.Files.delete(annotatedDocFile.toPath());
 
-        if (missingValueCounter == 1) {
+        // set warning messages if necessary
+        if (knownEntitiesPatternSet.isEmpty()) {
+            setWarningMessage("Trained model on empty dictionary.");
+        } else if (rowCounter == 0) {
+            setWarningMessage("Node created an empty model.");
+        } else if (missingValueCounter == 1) {
             setWarningMessage(missingValueCounter + " row has been ignored due to missing value.");
         } else if (missingValueCounter > 1) {
             setWarningMessage(missingValueCounter + " rows have been ignored due to missing values.");
         }
 
-        return new PortObject[]{new StanfordNERModelPortObject(modelOutputBuffer, m_tag, knownEntitiesStringSet,
+        return new PortObject[]{new StanfordNERModelPortObject(modelOutputBuffer, tag, knownEntitiesStringSet,
             m_tokenizer.getStringValue())};
+    }
+
+    /**
+     * Writes annotation data for each term of sentence to a specified {@link PrintWriter}.
+     * Terms contained in the known entities set are annotated with the specified tag value.
+     * Other terms are annotated with 'O' meaning that the term could not be found in the known entities set.
+     *
+     * @param sentence The {@code sentence}.
+     * @param knownEntitiesStringSet The set of known entities from the dictionary.
+     * @param sentenceFileWriter The {@code PrintWriter} to write the terms to.
+     */
+    private final void writeAnnotationData(final Sentence sentence, final Set<String> knownEntitiesStringSet,
+        final PrintWriter sentenceFileWriter) {
+        final Iterator<Term> termIterator = sentence.getTerms().iterator();
+        while (termIterator.hasNext()) {
+            final Term t = termIterator.next();
+            final String termText = t.getText();
+            final String termTextWithWsSuffix = t.getTextWithWsSuffix();
+            if (knownEntitiesStringSet.contains(m_caseSensitivity.getBooleanValue() ? termText : termText.toLowerCase())
+                || knownEntitiesStringSet.contains(
+                    m_caseSensitivity.getBooleanValue() ? termTextWithWsSuffix : termTextWithWsSuffix.toLowerCase())) {
+                t.getWords().stream()//
+                    .forEach(w -> sentenceFileWriter.println(w.getText() + "\t" + m_tagValueModel.getStringValue()));
+            } else {
+                sentenceFileWriter.println(termText + "\tO");
+            }
+        }
+    }
+
+    /**
+     * Creates a {@link Set} of known entities from the specified dictionary column.
+     *
+     * @param dataTable The data table.
+     */
+    private final Set<String> getDictionary(final BufferedDataTable dataTable) {
+        final Set<String> knownEntitiesStringSet = new LinkedHashSet<>();
+        final int colIndex = dataTable.getDataTableSpec().findColumnIndex(m_knownEntitiesColumnModel.getStringValue());
+        if (colIndex < 0) {
+            return knownEntitiesStringSet;
+        }
+        for (final DataRow row : dataTable) {
+            if (!row.getCell(colIndex).isMissing()) {
+                // add every known entity to the specified array list
+                final String cellText = m_caseSensitivity.getBooleanValue() ? row.getCell(colIndex).toString()
+                    : row.getCell(colIndex).toString().toLowerCase();
+                if (!cellText.trim().isEmpty()) {
+                    knownEntitiesStringSet.add(cellText);
+                }
+            }
+        }
+        return knownEntitiesStringSet;
     }
 
     /**
@@ -441,8 +357,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
-
+        // Nothing to do here...
     }
 
     /**
@@ -451,8 +366,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
-        // TODO Auto-generated method stub
-
+        // Nothing to do here...
     }
 
     /**
@@ -557,7 +471,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        // TODO Auto-generated method stub
+        // Nothing to do here...
     }
 
 }
