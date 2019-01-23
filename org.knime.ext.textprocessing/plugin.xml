@@ -697,7 +697,7 @@
             factory-class="org.knime.ext.textprocessing.nodes.source.modelreader.OpenNlpNeModelReader.OpenNlpNeModelReaderNodeFactory">
       </node>
       <node
-            category-path="/applications/textprocessing/misc"
+            category-path="/applications/textprocessing/io"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.misc.bratdocumentwriter.BratDocumentWriterNodeFactory">
       </node>
