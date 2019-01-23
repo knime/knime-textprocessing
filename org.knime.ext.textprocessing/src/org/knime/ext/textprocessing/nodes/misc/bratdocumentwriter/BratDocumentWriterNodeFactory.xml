@@ -12,11 +12,12 @@
 			them, each as two files (.txt and .ann), into the selected directory.
 			The .txt file will contain the document text, and the .ann file the terms
 			and tags in the document. Both files will be named after the table's
-			row keys. The created files can then be imported into the annotation
+			row keys. Users can also add an optional prefix and suffix to the file name. 
+			The created files can then be imported into the annotation
 			tool <a href="http://brat.nlplab.org/index.html">Brat</a>.
 			<br />
 			<br />
-			<i>Note for file name</i>: Some special characters, such as /, \, ?, *, :, &lt;, 	&gt;, &quot;, | will be rejected. 
+			<i>Note for file name</i>: Special characters, such as /, \, ?, *, :, &lt;, 	&gt;, &quot;, | will be rejected. 
 			For Windows platform, a name that resembles any forbidden Windows filename will also be rejected. 
 			For more information about the forbidden Windows filename, please check the 
 			<a href="https://docs.microsoft.com/de-de/windows/desktop/FileIO/naming-a-file">Microsoft website</a>.
