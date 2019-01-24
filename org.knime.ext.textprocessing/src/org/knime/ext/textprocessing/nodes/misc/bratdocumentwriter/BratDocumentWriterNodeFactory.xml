@@ -17,7 +17,7 @@
 			tool <a href="http://brat.nlplab.org/index.html">Brat</a>.
 			<br />
 			<br />
-			<i>Note for file name</i>: Special characters, such as /, \, ?, *, :, &lt;, 	&gt;, &quot;, | will be rejected. 
+			<i>Note for file name</i>: Special characters such as /, \, ?, *, :, &lt;, 	&gt;, &quot;, | will be rejected. 
 			For Windows platform, a name that resembles any forbidden Windows filename will also be rejected. 
 			For more information about the forbidden Windows filename, please check the 
 			<a href="https://docs.microsoft.com/de-de/windows/desktop/FileIO/naming-a-file">Microsoft website</a>.

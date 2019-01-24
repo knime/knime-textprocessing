@@ -143,6 +143,14 @@ final class BratDocumentWriterNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
+
+        // check target directory
+        CheckUtils.checkDestinationDirectory(m_directoryModel.getStringValue());
+
+        // check suffix and prefix for invalid chars
+        BratDocumentWriterNodeModel.verifyFilename(m_prefixModel.getStringValue());
+        BratDocumentWriterNodeModel.verifyFilename(m_suffixModel.getStringValue());
+
         return new DataTableSpec[]{};
     }
 
@@ -159,9 +167,6 @@ final class BratDocumentWriterNodeModel extends NodeModel {
 
         ColumnSelectionVerifier.verifyColumn(m_docColModel, spec, DocumentValue.class, null)
             .ifPresent(msg -> setWarningMessage(msg));
-
-        // check target directory
-        CheckUtils.checkDestinationDirectory(m_directoryModel.getStringValue());
     }
 
     /**
@@ -279,14 +284,14 @@ final class BratDocumentWriterNodeModel extends NodeModel {
      * @param filename the file name
      * @throws InvalidSettingsException if the file name contains forbidden symbol
      */
-    private static void verifyFilename(final String filename) throws InvalidSettingsException {
+    protected static void verifyFilename(final String filename) throws InvalidSettingsException {
         if (IS_WINDOWS) {
             Pattern forbiddenWindowsNames =
                 Pattern.compile("^(?:(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\\.[^.]*)?|[ \\.])$");
             Matcher matcher = forbiddenWindowsNames.matcher(filename);
             if (matcher.find()) {
                 throw new InvalidSettingsException(
-                    "\"Invalid file name: Filename might contain names that are forbidden in Windows platform.");
+                    "Invalid file name: might contain names that are forbidden in Windows platform.");
             }
         } else {
             // in Linux or Mac forbid /:?<>*"|\
@@ -295,7 +300,7 @@ final class BratDocumentWriterNodeModel extends NodeModel {
             if (matcher.find()) {
                 final int invalidIdx = matcher.start();
                 throw new InvalidSettingsException(
-                    "Invalid file name: " + filename.charAt(invalidIdx) + " at position " + invalidIdx + ".");
+                    "Invalid file name: contains invalid char " + filename.charAt(invalidIdx));
             }
         }
     }

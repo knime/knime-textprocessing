@@ -48,13 +48,21 @@
  */
 package org.knime.ext.textprocessing.nodes.misc.bratdocumentwriter;
 
-import javax.swing.JFileChooser;
+import java.awt.Color;
+import java.awt.Component;
 
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialog;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentLabel;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -143,9 +151,16 @@ final class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
         return new SettingsModelString(CFG_SUFFIX, "");
     }
 
+    final private SettingsModelString m_prefixModel;
+
+    final private SettingsModelString m_suffixModel;
+
+    final private DialogComponentLabel m_errorLabel;
+
     /**
-     * The node dialog for Brat Document Writer. It contains a directory chooser, an overwrite option checkbox, and a
-     * column name selection to choose a document column.
+     * The node dialog for Brat Document Writer. It contains a directory chooser, two dialog component strings for the
+     * optional prefix and suffix with an error label, an overwrite option checkbox, and a column name selection to
+     * choose a document column.
      */
     @SuppressWarnings("unchecked")
     public BratDocumentWriterNodeDialog() {
@@ -157,14 +172,79 @@ final class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
 
         createNewGroup("Filename settings (optional)");
         setHorizontalPlacement(true);
-        addDialogComponent(new DialogComponentString(getPrefixModel(), "Prefix"));
-        addDialogComponent(new DialogComponentString(getSuffixModel(), "Suffix"));
+
+        m_prefixModel = getPrefixModel();
+        // validate the value every time the model is updated
+        m_prefixModel.addChangeListener(new ValidateTextListener());
+        addDialogComponent(new DialogComponentString(m_prefixModel, "Prefix"));
+
+        m_suffixModel = getSuffixModel();
+        m_suffixModel.addChangeListener(new ValidateTextListener());
+        addDialogComponent(new DialogComponentString(m_suffixModel, "Suffix"));
+
         setHorizontalPlacement(false);
+
+        // label to place the prefix and suffix error validation message
+        m_errorLabel = new DialogComponentLabel("");
+        setErrorColor(m_errorLabel);
+        addDialogComponent(m_errorLabel);
+
         closeCurrentGroup();
 
         addDialogComponent(new DialogComponentBoolean(getOverwriteModel(), "Overwrite existing files"));
 
         addDialogComponent(
             new DialogComponentColumnNameSelection(getDocColModel(), "Document column", 0, DocumentValue.class));
+    }
+
+    /**
+     * Set the error message to red color.
+     *
+     * @param errorLabel the label to be set to red
+     */
+    private static void setErrorColor(final DialogComponentLabel errorLabel) {
+        // find the JLabel in the list of components and set its color to red
+        for (Component c : errorLabel.getComponentPanel().getComponents()) {
+            if (c instanceof JLabel) {
+                ((JLabel)c).setForeground(Color.RED);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Validate the prefix and suffix model values. If an invalid char is found, show the error message in the node
+     * dialog.
+     */
+    private void validate() {
+        String errorMsg = "";
+
+        try {
+            BratDocumentWriterNodeModel.verifyFilename(m_prefixModel.getStringValue());
+        } catch (InvalidSettingsException e) {
+            errorMsg += "Error: prefix contains invalid char(s)";
+        }
+        try {
+            BratDocumentWriterNodeModel.verifyFilename(m_suffixModel.getStringValue());
+        } catch (InvalidSettingsException e) {
+            if (errorMsg.isEmpty()) {
+                errorMsg += "Error: suffix contains invalid char(s)";
+            } else {
+                errorMsg = "Error: prefix and suffix contain invalid char(s)";
+            }
+        }
+        m_errorLabel.setText(errorMsg);
+    }
+
+    private class ValidateTextListener implements ChangeListener {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            // validate both prefix and suffix models every time a change occurs
+            validate();
+        }
     }
 }
