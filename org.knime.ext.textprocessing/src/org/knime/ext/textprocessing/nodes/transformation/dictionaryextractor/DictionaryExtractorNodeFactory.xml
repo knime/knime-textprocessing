@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+    <name>Dictionary Extractor</name>
+    <shortDescription>Creates a global dictionary over all documents.</shortDescription>
+    <fullDescription>
+        <intro>
+            This node creates a global dictionary over all documents. Additionally, it creates three frequency columns:
+            Term frequency, document frequency and inverse document frequency.
+            It is possible to create a data table containing only the most frequent terms based on the selected
+            frequency count.
+            The node also provides an index column with numbers which can be used for replacing words with numbers
+            while preprocessing documents for deep learning.
+        </intro>
+        <option name="Document column">
+            Select the document column to extract the document from.
+    	</option>
+    	<option name="Keep top X most frequent terms">
+            The number of terms in the data table will be restricted based on the set value. Only the most frequent
+            terms will be shown. 
+    	</option>
+    	<option name="Filter terms by">
+            If the 'Keep top X most frequent terms' option is checked, select the frequency method used to filter the 
+            terms.
+    	</option>
+    	<option name="Number of threads">
+			The number of threads used to process the documents.
+		</option>
+    </fullDescription>
+        
+    <ports>
+        <inPort name="Documents input table" index="0">The input table
+        containing the documents.</inPort>    
+        <outPort name="Dictionary output table" index="0">An output table
+        containing a dictionary column, frequency columns and an index column.</outPort>
+    </ports>
+</knimeNode>

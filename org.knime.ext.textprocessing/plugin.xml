@@ -711,6 +711,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.mining.relations.relationextractor.StanfordNlpRelationExtractorNodeFactory">
       </node>
+      <node
+            category-path="/applications/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor.DictionaryExtractorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
