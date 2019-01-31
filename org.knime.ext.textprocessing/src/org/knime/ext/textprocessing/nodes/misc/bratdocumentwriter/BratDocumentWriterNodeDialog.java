@@ -58,6 +58,7 @@ import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialog;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -213,27 +214,15 @@ final class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
     }
 
     /**
-     * Validate the prefix and suffix model values. If an invalid char is found, show the error message in the node
-     * dialog.
+     * {@inheritDoc}
      */
-    private void validate() {
-        String errorMsg = "";
+    @Override
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        super.saveAdditionalSettingsTo(settings);
 
-        try {
-            BratDocumentWriterNodeModel.verifyFilename(m_prefixModel.getStringValue());
-        } catch (InvalidSettingsException e) {
-            errorMsg += "Error: prefix contains invalid char(s)";
-        }
-        try {
-            BratDocumentWriterNodeModel.verifyFilename(m_suffixModel.getStringValue());
-        } catch (InvalidSettingsException e) {
-            if (errorMsg.isEmpty()) {
-                errorMsg += "Error: suffix contains invalid char(s)";
-            } else {
-                errorMsg = "Error: prefix and suffix contain invalid char(s)";
-            }
-        }
-        m_errorLabel.setText(errorMsg);
+        // verify prefix and suffix again before closing the dialog
+        BratDocumentWriterNodeModel.checkForInvalidChars(m_prefixModel.getStringValue());
+        BratDocumentWriterNodeModel.checkForInvalidChars(m_suffixModel.getStringValue());
     }
 
     private class ValidateTextListener implements ChangeListener {
@@ -244,7 +233,25 @@ final class BratDocumentWriterNodeDialog extends DefaultNodeSettingsPane {
         @Override
         public void stateChanged(final ChangeEvent e) {
             // validate both prefix and suffix models every time a change occurs
-            validate();
+            // If an invalid char is found, show the error message in the node
+            // dialog.
+            String errorMsg = "";
+
+            try {
+                BratDocumentWriterNodeModel.checkForInvalidChars(m_prefixModel.getStringValue());
+            } catch (InvalidSettingsException ex) {
+                errorMsg = "Error: prefix contains invalid char(s)";
+            }
+            try {
+                BratDocumentWriterNodeModel.checkForInvalidChars(m_suffixModel.getStringValue());
+            } catch (InvalidSettingsException ex) {
+                if (errorMsg.isEmpty()) {
+                    errorMsg = "Error: suffix contains invalid char(s)";
+                } else {
+                    errorMsg = "Error: prefix and suffix contain invalid char(s)";
+                }
+            }
+            m_errorLabel.setText(errorMsg);
         }
     }
 }

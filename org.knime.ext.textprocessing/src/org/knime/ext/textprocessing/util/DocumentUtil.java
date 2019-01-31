@@ -431,18 +431,31 @@ public final class DocumentUtil {
     }
 
     /**
-     * Get terms from the input documents and find their position in the document text (start and stop indexes). The
-     * document text is fetched from <code>Document.getText()</code> method. Only terms that have at least one tag are
-     * included in the result.
+     * Get terms from the input documents and find their position in the document text (start and stop indexes). Only
+     * terms that have at least one tag are included in the result.
      *
      * @param doc the document
+     * @param inclTitle true if title should be included
+     * @param delimiter adds the specified delimiter between the title and the text. This option is ignored if inclTitle
+     *            is set to {@code false}.
      * @return a list of indexed terms where all terms have at least one tag
      * @since 3.8
      */
-    public static List<IndexedTerm> getIndexedTerms(final Document doc) {
+    public static List<IndexedTerm> getIndexedTerms(final Document doc, final boolean inclTitle,
+        final String delimiter) {
         final List<IndexedTerm> result = new ArrayList<IndexedTerm>();
+        String text = "";
         // include doc title
-        final String text = doc.getText();
+        if (inclTitle && !doc.getTitle().isEmpty()) {
+            // insert a whitespace between the title and the text
+            if (delimiter != null) {
+                text = String.join(delimiter, doc.getTitle(), doc.getDocumentBodyText());
+            } else {
+                text = doc.getText();
+            }
+        } else {
+            text = doc.getDocumentBodyText();
+        }
         // mark the start position to search a term in the text
         int stopIndex = 0;
         final Iterator<Sentence> it = doc.sentenceIterator();

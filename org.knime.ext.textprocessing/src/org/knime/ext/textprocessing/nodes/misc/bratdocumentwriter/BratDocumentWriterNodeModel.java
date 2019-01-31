@@ -96,6 +96,11 @@ import org.knime.ext.textprocessing.util.DocumentUtil;
 final class BratDocumentWriterNodeModel extends NodeModel {
 
     /**
+     * The delimiter splitting the document title from its body.
+     */
+    private static final String TITLE_DELIMITER = "\n";
+
+    /**
      * Boolean to check whether the OS is windows.
      */
     private static final boolean IS_WINDOWS = SystemUtils.IS_OS_WINDOWS;
@@ -148,8 +153,8 @@ final class BratDocumentWriterNodeModel extends NodeModel {
         CheckUtils.checkDestinationDirectory(m_directoryModel.getStringValue());
 
         // check suffix and prefix for invalid chars
-        BratDocumentWriterNodeModel.verifyFilename(m_prefixModel.getStringValue());
-        BratDocumentWriterNodeModel.verifyFilename(m_suffixModel.getStringValue());
+        checkForInvalidChars(m_prefixModel.getStringValue());
+        checkForInvalidChars(m_suffixModel.getStringValue());
 
         return new DataTableSpec[]{};
     }
@@ -172,7 +177,6 @@ final class BratDocumentWriterNodeModel extends NodeModel {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("resource")
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
@@ -241,10 +245,12 @@ final class BratDocumentWriterNodeModel extends NodeModel {
 
         try {
             // write document text to txt file
-            writeToFile(createOutputStream(txtFilename), doc.getText());
+            writeToFile(createOutputStream(txtFilename), doc.getTitle().isEmpty() ? doc.getText()
+                : String.join(TITLE_DELIMITER, doc.getTitle(), doc.getDocumentBodyText()));
 
             // fetch and write the tags and terms
-            writeToFile(createOutputStream(annFilename), convertToString(DocumentUtil.getIndexedTerms(doc)));
+            writeToFile(createOutputStream(annFilename),
+                convertToString(DocumentUtil.getIndexedTerms(doc, true, TITLE_DELIMITER)));
         } catch (final IOException e) {
             // if something is wrong mid writing, try to delete both files
             try {
@@ -274,7 +280,9 @@ final class BratDocumentWriterNodeModel extends NodeModel {
         if (!m_suffixModel.getStringValue().isEmpty()) {
             result += m_suffixModel.getStringValue();
         }
-        verifyFilename(result);
+        checkForInvalidChars(result);
+        checkReservedNamesInWindows(result);
+
         return result;
     }
 
@@ -284,23 +292,30 @@ final class BratDocumentWriterNodeModel extends NodeModel {
      * @param filename the file name
      * @throws InvalidSettingsException if the file name contains forbidden symbol
      */
-    protected static void verifyFilename(final String filename) throws InvalidSettingsException {
+    static void checkForInvalidChars(final String filename) throws InvalidSettingsException {
+        // forbid /:?<>*"|\
+        Pattern pattern = Pattern.compile("[/:?<>*\"|\\\\]");
+        Matcher matcher = pattern.matcher(filename);
+        if (matcher.find()) {
+            final int invalidIdx = matcher.start();
+            throw new InvalidSettingsException(
+                "Invalid file name: contains invalid char " + filename.charAt(invalidIdx));
+        }
+    }
+
+    /**
+     * Check if the filename is the same as any filenames that are reserved in Windows.
+     *
+     * @param filename the filename to be checked
+     * @throws InvalidSettingsException if the filename is a reserved name in Windows
+     */
+    private static void checkReservedNamesInWindows(final String filename) throws InvalidSettingsException {
         if (IS_WINDOWS) {
-            Pattern forbiddenWindowsNames =
-                Pattern.compile("^(?:(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\\.[^.]*)?|[ \\.])$");
+            Pattern forbiddenWindowsNames = Pattern.compile("^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$");
             Matcher matcher = forbiddenWindowsNames.matcher(filename);
             if (matcher.find()) {
                 throw new InvalidSettingsException(
-                    "Invalid file name: might contain names that are forbidden in Windows platform.");
-            }
-        } else {
-            // in Linux or Mac forbid /:?<>*"|\
-            Pattern pattern = Pattern.compile("[/:?<>*\"|\\\\]");
-            Matcher matcher = pattern.matcher(filename);
-            if (matcher.find()) {
-                final int invalidIdx = matcher.start();
-                throw new InvalidSettingsException(
-                    "Invalid file name: contains invalid char " + filename.charAt(invalidIdx));
+                    "Invalid file name: the file name " + filename + " is forbidden on Windows.");
             }
         }
     }
@@ -354,9 +369,9 @@ final class BratDocumentWriterNodeModel extends NodeModel {
      * @throws IOException if an I/O error occurs
      */
     private static void writeToFile(final OutputStream out, final String content) throws IOException {
-            out.write(content.getBytes());
-            out.flush();
-            out.close();
+        out.write(content.getBytes());
+        out.flush();
+        out.close();
     }
 
     /**
