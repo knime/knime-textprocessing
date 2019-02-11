@@ -81,9 +81,7 @@ public class DocumentViewerTablePanel extends AbstractDocumentTablePanel {
     @Override
     protected void onClick(final int rowIndex, final Document document) {
         JFrame detailsFrame = new JFrame(document.getTitle());
-        if (KNIMEConstants.KNIME16X16 != null) {
-            detailsFrame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
-        }
+        KNIMEConstants.getKNIMEIcon16X16().ifPresent(i -> detailsFrame.setIconImage(i.getImage()));
 
         detailsFrame.setContentPane(new DocumentViewPanel(document, this));
         detailsFrame.pack();

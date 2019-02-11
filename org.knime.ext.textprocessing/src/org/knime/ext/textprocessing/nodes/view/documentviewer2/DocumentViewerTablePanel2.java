@@ -77,9 +77,7 @@ class DocumentViewerTablePanel2 extends AbstractDocumentTablePanel2 {
     public DocumentViewerTablePanel2(final List<Document> documents) {
         super(documents);
         frame = new JFrame();
-        if (KNIMEConstants.KNIME16X16 != null) {
-            frame.setIconImage(KNIMEConstants.KNIME16X16.getImage());
-        }
+        KNIMEConstants.getKNIMEIcon16X16().ifPresent(i -> frame.setIconImage(i.getImage()));
         frame.setVisible(false);
     }
 
