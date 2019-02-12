@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcDoc2String.png" type="Manipulator">
+    <name>StanfordNLP Relation Extractor</name>
+    <shortDescription>Extracts relation triplets from documents.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Extracts relations triplets contained in sentences of a document by investigating relations of tagged named-entities.
+			The node needs part-of-speech and named-entity tagged documents. 
+			Additionally, there has to be a second document column containing lemmatized documents.<br/>
+			
+			However, this node can also be used with plain documents by using the <i>Apply preprocessing</i> option.
+			If this option is selected, part-of-speech tagging, named-entity tagging and lemmatizing will be done 
+			by this node. The Stanford CoreNLP default settings are used in this case.<br/>
+			
+			<i>Note</i>: Relation Extraction is a computationally expensive operation. For the usage of this
+            node it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
+            the -Xmx setting in the knime.ini file.<br/>
+            
+            This node is based on Stanford CoreNLP 3.9.1.<br/>
+            For more information about StanfordNLP and Relation Extraction, click <a href="https://stanfordnlp.github.io/CoreNLP/relation.html">here</a>.
+		</intro>
+		<option name="Document column">The document column to use.<br/> <i>Note</i>: If the <i>Apply preprocessing</i>
+		option is unchecked, the documents have to be tagged by a part-of-speech tagger and a named-entity tagger (optionally). </option>
+		<option name="Lemmatized document column">The document column containing the lemmatized documents.</option>
+		<option name="Apply preprocessing">If checked, part-of-speech tagging, named-entity tagging and lemmatizing will be done by this node.</option>
+		<option name="Number of threads">The number of threads to use.</option>
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents and lemmatized documents (if needed).</inPort>
+        <outPort name="Documents and extracted relation." index="0">
+        The output table which contains data from the input table and extracted relations.</outPort>
+	</ports>
+</knimeNode>

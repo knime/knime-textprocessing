@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../../icons/TextProcDoc2String.png" type="Manipulator">
+    <name>StanfordNLP Open Information Extractor</name>
+    <shortDescription>Extracts relation triplets from documents.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Extracts relations triplets contained in sentences of a document.
+			The node needs part-of-speech tagged documents. Using a tagger for named-entity recognition might enhance 
+			the results. Additionally, there has to be a second document column containing lemmatized documents.<br/>
+			
+			However, this node can also be used with plain documents by using the <i>Apply preprocessing</i> option.
+			If this option is selected, part-of-speech tagging, named-entity tagging and lemmatizing will be done 
+			by this node. The Stanford CoreNLP default settings are used in this case.<br/>
+			
+			<i>Note</i>: Open Information Extraction is a computationally expensive operation. For the usage of this
+            node it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
+            the -Xmx setting in the knime.ini file.<br/>
+            
+            This node is based on Stanford CoreNLP 3.9.1.<br/>
+            For more information about StanfordNLP and Open Information Extraction, click <a href="https://stanfordnlp.github.io/CoreNLP/openie.html">here</a>.<br/>
+		</intro>
+		<option name="Document column">The document column to use.<br/> <i>Note</i>: If the <i>Apply preprocessing</i>
+		option is unchecked, the documents have to be tagged by a part-of-speech tagger and a named-entity tagger (optionally). </option>
+		<option name="Lemmatized document column">The document column containing the lemmatized documents.</option>
+		<option name="Number of threads">The number of threads to use.</option>
+		<option name="Results as lemma">If checked, results will be returned as lemma.</option>
+		<option name="Resolve co-references">If checked, co-reference solution will be applied. Pronomial mentions will be replaced with their canonical mention in the text.</option>
+		<option name="Affinity probability cap">The affinity value above which confidence of the extraction is taken as 1.0.</option>
+		<option name="Strict triple extraction">If checked, extract triples only if they consume the entire fragment. This is useful for ensuring that only logically warranted triples are extracted, but puts more burden on the entailment system to find minimal phrases (see -max_entailments_per_clause).</option>
+		<option name="Always extract nominal relations">If checked, extract nominal relations always and not only when a named entity tag warrants it. This greatly overproduces such triples, but can be useful in certain situations.</option>
+
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents and lemmatized documents (if needed).</inPort>
+        <outPort name="Documents and extracted relation." index="0">
+        The output table which contains data from the input table and extracted relations.</outPort>
+	</ports>
+</knimeNode>

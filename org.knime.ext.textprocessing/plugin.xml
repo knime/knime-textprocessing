@@ -701,6 +701,16 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.misc.bratdocumentwriter.BratDocumentWriterNodeFactory">
       </node>
+      <node
+            category-path="/applications/textprocessing/mining"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.mining.relations.openinformationextractor.StanfordNlpOpenInformationExtractorNodeFactory">
+      </node>
+      <node
+            category-path="/applications/textprocessing/mining"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.mining.relations.relationextractor.StanfordNlpRelationExtractorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
