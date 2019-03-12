@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.knime.maven</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.knime</groupId>
+	<artifactId>knime-textprocessing</artifactId>
+	<version>3.8.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<!--
+			Use Jenkins's project parameterization capabilities to set a string 
+			parameter named KNIME_TARGET_PLATFORM_P2 to the desired P2 update site value. 
+			For building locally you can set KNIME_TARGET_PLATFORM_P2 in the respective 
+			run configuration 'Environment' tab with a file:// or http:// URL value pointing 
+			to the desired P2 update site.
+		-->
+		<knime.base.p2>${env.KNIME_BASE_P2}</knime.base.p2>
+		<knime.core.p2>${env.KNIME_CORE_P2}</knime.core.p2>
+		<knime.expressions.p2>${env.KNIME_EXPRESSIONS_P2}</knime.expressions.p2>
+		<knime.shared.p2>${env.KNIME_SHARED_P2}</knime.shared.p2>
+		<knime.tp.p2>${env.KNIME_TP_P2}</knime.tp.p2>
+		<knime.javasnippet.p2>${env.KNIME_JAVASNIPPET_P2}</knime.javasnippet.p2>
+		<knime.dl4j.p2>${env.KNIME_DL4J_P2}</knime.dl4j.p2>
+	</properties>
+
+	<modules>
+        <module>org.knime.ext.textprocessing</module>
+        <module>org.knime.ext.textprocessing.dl4j</module>
+        <module>org.knime.ext.textprocessing.language.chinese</module>
+        <module>org.knime.ext.textprocessing.language.french</module>
+        <module>org.knime.ext.textprocessing.language.german</module>
+        <module>org.knime.ext.textprocessing.language.spanish</module>
+        <module>org.knime.ext.textprocessing.language.turkish</module>
+        <module>org.knime.ext.textprocessing.language.turkish.libs</module>
+        <module>org.knime.ext.textprocessing.models</module>
+        <module>org.knime.features.ext.textprocessing</module>
+        <module>org.knime.features.ext.textprocessing.dl4j</module>
+        <module>org.knime.features.ext.textprocessing.language.chinese</module>
+        <module>org.knime.features.ext.textprocessing.language.french</module>
+        <module>org.knime.features.ext.textprocessing.language.german</module>
+        <module>org.knime.features.ext.textprocessing.language.spanish</module>
+        <module>org.knime.features.ext.textprocessing.language.turkish</module>
+        <module>org.knime.update.ext.textprocessing</module>
+	</modules>
+
+	<repositories>
+		<repository>
+			<id>knime.base.p2</id>
+			<layout>p2</layout>
+			<url>${knime.base.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.core.p2</id>
+			<layout>p2</layout>
+			<url>${knime.core.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.expressions.p2</id>
+			<layout>p2</layout>
+			<url>${knime.expressions.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.shared.p2</id>
+			<layout>p2</layout>
+			<url>${knime.shared.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.tp.p2</id>
+			<layout>p2</layout>
+			<url>${knime.tp.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.javasnippet.p2</id>
+			<layout>p2</layout>
+			<url>${knime.javasnippet.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.dl4j.p2</id>
+			<layout>p2</layout>
+			<url>${knime.dl4j.p2}</url>
+		</repository>
+	</repositories>
+</project>

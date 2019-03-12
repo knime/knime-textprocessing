@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.knime.features.ext.textprocessing_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing" version="3.8.0.qualifier"/>
+   <feature url="features/org.knime.features.ext.textprocessing.language.chinese_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.chinese" version="3.8.0.qualifier"/>
+   <feature url="features/org.knime.features.ext.textprocessing.language.french_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.french" version="3.8.0.qualifier"/>
+   <feature url="features/org.knime.features.ext.textprocessing.language.german_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.german" version="3.8.0.qualifier"/>
+   <feature url="features/org.knime.features.ext.textprocessing.language.spanish_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.spanish" version="3.8.0.qualifier"/>
+   <feature url="features/org.knime.features.ext.textprocessing.language.turkish_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.turkish" version="3.8.0.qualifier"/>
+</site>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing German Language Pack
 Bundle-SymbolicName: org.knime.ext.textprocessing.language.german;singleton:=true
-Bundle-Version: 2017.06.30.qualifier
+Bundle-Version: 2017.6.30.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.language.german.TextprocessingGermanLanguagePack
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.eclipse.ui,
