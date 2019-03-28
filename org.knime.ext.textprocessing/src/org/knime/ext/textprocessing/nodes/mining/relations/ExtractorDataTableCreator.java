@@ -50,10 +50,7 @@ package org.knime.ext.textprocessing.nodes.mining.relations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -115,11 +112,6 @@ public abstract class ExtractorDataTableCreator {
     private final long m_threadNo;
 
     /**
-     * A map containing a {@link DataRow} and a list of {@link ExtractionResults}.
-     */
-    private final Map<DataRow, List<ExtractionResult>> m_results = new LinkedHashMap<>();
-
-    /**
      * Creates and returns a new instance of {@code ExtratorDataTableCreator}.
      *
      * @param inputSpec The {@link DataTableSpec} of the input data table.
@@ -127,14 +119,20 @@ public abstract class ExtractorDataTableCreator {
      * @param lemmaDocColIdx The index of the lemmatized document column.
      * @param annotationPipeline The {@link AnnotationPipeline} to process documents.
      * @param queueIdx The queue index used to create unique row keys.
+     * @param exec The {@link ExecutionContext}.
      */
     public ExtractorDataTableCreator(final DataTableSpec inputSpec, final int docColIdx, final int lemmaDocColIdx,
-        final AnnotationPipeline annotationPipeline, final long queueIdx) {
+        final AnnotationPipeline annotationPipeline, final long queueIdx, final ExecutionContext exec) {
         m_inputSpec = inputSpec;
         m_docColIdx = docColIdx;
         m_lemmaDocColIdx = lemmaDocColIdx;
         m_annotationPipeline = annotationPipeline;
         m_threadNo = queueIdx;
+
+        // Open data container
+        if (exec != null && m_dataContainer == null) {
+            m_dataContainer = exec.createDataContainer(createDataTableSpec());
+        }
     }
 
     /**
@@ -180,8 +178,6 @@ public abstract class ExtractorDataTableCreator {
      * @return A {@code BufferedDataTable}.
      */
     BufferedDataTable createDataTable(final ExecutionContext exec) {
-        openDataContainer(exec);
-        addResultsToDataContainer();
         m_dataContainer.close();
         return m_dataContainer.getTable();
     }
@@ -192,7 +188,7 @@ public abstract class ExtractorDataTableCreator {
      * @return Creates an empty {@code BufferedDataTable}.
      */
     static final BufferedDataTable createEmptyTable(final DataTableSpec spec, final ExecutionContext exec) {
-        BufferedDataContainer dataContainer = exec.createDataContainer(spec);
+        final BufferedDataContainer dataContainer = exec.createDataContainer(spec);
         dataContainer.close();
         return dataContainer.getTable();
     }
@@ -208,29 +204,17 @@ public abstract class ExtractorDataTableCreator {
             m_lemmaDocColIdx >= 0 ? dataRow.getCell(m_lemmaDocColIdx) : DataType.getMissingCell();
         if (!dataCell.isMissing()) {
             final Document doc = ((DocumentValue)dataRow.getCell(m_docColIdx)).getDocument();
-            final Document lemmaDoc = !lemmaDataCell.isMissing() ? ((DocumentValue)lemmaDataCell).getDocument() : null;
-            final Annotation annotation =
-                lemmaDoc != null ? DocumentToAnnotationConverter.convert(doc, lemmaDoc, true, true)
-                    : DocumentToAnnotationConverter.convert(doc);
+            final Annotation annotation = !lemmaDataCell.isMissing()
+                ? DocumentToAnnotationConverter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument(), true, true)
+                : DocumentToAnnotationConverter.convert(doc);
             try {
                 m_annotationPipeline.annotate(annotation);
-                m_results.put(dataRow, extractRelations(annotation));
+                addResultToDataContainer(dataRow, extractRelations(annotation));
             } catch (final AssertionError | NullPointerException e) {
-                m_results.put(dataRow, Arrays.asList(ExtractionResult.getEmptyResult()));
+                addResultToDataContainer(dataRow, Arrays.asList(ExtractionResult.getEmptyResult()));
             }
         } else {
-            m_results.put(dataRow, Arrays.asList(ExtractionResult.getEmptyResult()));
-        }
-    }
-
-    /**
-     * Opens the {@code BufferedDataContainer} if necessary.
-     *
-     * @param exec The {@code ExecutionContext}.
-     */
-    private synchronized void openDataContainer(final ExecutionContext exec) {
-        if (m_dataContainer == null) {
-            m_dataContainer = exec.createDataContainer(createDataTableSpec());
+            addResultToDataContainer(dataRow, Arrays.asList(ExtractionResult.getEmptyResult()));
         }
     }
 
@@ -238,18 +222,15 @@ public abstract class ExtractorDataTableCreator {
      * Adds new {@link DataRow DataRows} to the {@code BufferedDataContainer} based on the input {@code DataRow} and
      * related {@link ExtractionResult ExtractionResults}.
      */
-    private synchronized void addResultsToDataContainer() {
-        for (final Entry<DataRow, List<ExtractionResult>> entry : m_results.entrySet()) {
-            final DataRow dataRow = entry.getKey();
-            final List<DataCell> dataCells = Arrays.asList(dataRow.stream().toArray(DataCell[]::new));
-            for (final ExtractionResult result : entry.getValue()) {
-                final List<DataCell> combined = new ArrayList<>(dataCells);
-                combined.addAll(result.asDataCells());
-                final RowKey key = new RowKey("Row" + m_rowCount + "_" + m_threadNo);
-                final DataRow newRow = new DefaultRow(key, combined);
-                m_dataContainer.addRowToTable(newRow);
-                m_rowCount++;
-            }
+    private void addResultToDataContainer(final DataRow dataRow, final List<ExtractionResult> results) {
+        final List<DataCell> dataCells = Arrays.asList(dataRow.stream().toArray(DataCell[]::new));
+        for (final ExtractionResult result : results) {
+            final List<DataCell> combined = new ArrayList<>(dataCells);
+            combined.addAll(result.getDataCells());
+            final RowKey key = new RowKey("Row" + m_threadNo + "_" + m_rowCount);
+            final DataRow newRow = new DefaultRow(key, combined);
+            m_dataContainer.addRowToTable(newRow);
+            m_rowCount++;
         }
     }
 

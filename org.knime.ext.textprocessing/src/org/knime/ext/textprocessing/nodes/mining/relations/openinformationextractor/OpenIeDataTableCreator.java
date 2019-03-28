@@ -57,6 +57,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.nodes.mining.relations.ExtractionResult;
 import org.knime.ext.textprocessing.nodes.mining.relations.ExtractorDataTableCreator;
 
@@ -109,17 +110,17 @@ final class OpenIeDataTableCreator extends ExtractorDataTableCreator {
      * @param lemmatizedResults Set true, if results should be returned as lemmas.
      * @param annotationPipeline The {@link AnnotationPipeline} to process documents.
      * @param queueIdx The queue index used to generate unique {@link RowKey RowKeys}.
+     * @param exec The ExecutionContext.
      */
     OpenIeDataTableCreator(final DataTableSpec inputSpec, final int docColIdx, final int lemmaDocColIdx,
-        final boolean lemmatizedResults, final AnnotationPipeline annotationPipeline, final long queueIdx) {
-        super(inputSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx);
+        final boolean lemmatizedResults, final AnnotationPipeline annotationPipeline, final long queueIdx,
+        final ExecutionContext exec) {
+        super(inputSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx, exec);
         m_lemmatizedResults = lemmatizedResults;
     }
 
     /**
-     * Creates a new {@link DataTableSpec}.
-     *
-     * @return A {@code DataTableSpec}.
+     * {@inheritDoc}
      */
     @Override
     protected final DataTableSpec createDataTableSpec() {
@@ -139,7 +140,6 @@ final class OpenIeDataTableCreator extends ExtractorDataTableCreator {
     @Override
     protected final List<ExtractionResult> extractRelations(final Annotation annotation) {
         final List<ExtractionResult> results = new LinkedList<>();
-        boolean noResults = true;
         for (final CoreMap sentenceCM : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
             // Get the OpenIE triples for the sentence
             final Collection<RelationTriple> triples =
@@ -151,10 +151,10 @@ final class OpenIeDataTableCreator extends ExtractorDataTableCreator {
                 final String object = m_lemmatizedResults ? triple.objectLemmaGloss() : triple.objectGloss();
                 final Double confidence = Double.parseDouble(triple.confidenceGloss());
                 results.add(new ExtractionResult(subject, relation, object, confidence));
-                noResults = false;
             }
         }
-        if (noResults) {
+
+        if (results.isEmpty()) {
             results.add(ExtractionResult.getEmptyResult());
         }
 

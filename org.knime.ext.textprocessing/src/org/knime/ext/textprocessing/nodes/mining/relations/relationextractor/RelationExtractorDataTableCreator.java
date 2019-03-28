@@ -48,15 +48,18 @@
  */
 package org.knime.ext.textprocessing.nodes.mining.relations.relationextractor;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.nodes.mining.relations.ExtractionResult;
 import org.knime.ext.textprocessing.nodes.mining.relations.ExtractorDataTableCreator;
 
@@ -105,10 +108,11 @@ final class RelationExtractorDataTableCreator extends ExtractorDataTableCreator 
      * @param lemmaDocColIdx The index of the lemmatized document column.
      * @param annotationPipeline The {@link AnnotationPipeline} to process documents.
      * @param queueIdx The queue index used to generate unique {@link RowKey RowKeys}.
+     * @param exec The {@link ExecutionContext}.
      */
     RelationExtractorDataTableCreator(final DataTableSpec inputSpec, final int docColIdx, final int lemmaDocColIdx,
-        final AnnotationPipeline annotationPipeline, final long queueIdx) {
-        super(inputSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx);
+        final AnnotationPipeline annotationPipeline, final long queueIdx, final ExecutionContext exec) {
+        super(inputSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx, exec);
     }
 
     /**
@@ -132,7 +136,6 @@ final class RelationExtractorDataTableCreator extends ExtractorDataTableCreator 
     @Override
     protected final List<ExtractionResult> extractRelations(final Annotation annotation) {
         final List<ExtractionResult> results = new LinkedList<>();
-        boolean noResults = true;
         for (final CoreMap sentenceCM : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
 
             // Get the relation extraction triples for the sentence
@@ -145,20 +148,15 @@ final class RelationExtractorDataTableCreator extends ExtractorDataTableCreator 
                 final String object2 = mentions.get(1).getFullValue();
                 final String relation = triple.getType();
                 final Counter<String> probas = triple.getTypeProbabilities();
-                Double confidence = 0.0;
-                for (final Entry<String, Double> entry : probas.entrySet()) {
-                    if (entry.getValue() >= confidence) {
-                        confidence = entry.getValue();
-                    }
-                }
+                final Double confidence =
+                    Collections.max(probas.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue();
                 results.add(new ExtractionResult(object1, relation, object2, confidence));
-                noResults = false;
             }
         }
-        if (noResults) {
+
+        if (results.isEmpty()) {
             results.add(ExtractionResult.getEmptyResult());
         }
-
         return results;
     }
 }

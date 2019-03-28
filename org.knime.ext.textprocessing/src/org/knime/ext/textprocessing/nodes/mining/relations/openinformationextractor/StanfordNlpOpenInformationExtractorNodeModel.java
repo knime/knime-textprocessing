@@ -48,13 +48,11 @@
  */
 package org.knime.ext.textprocessing.nodes.mining.relations.openinformationextractor;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
@@ -191,103 +189,103 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
         TextprocessingCorePlugin.resolvePath("stanfordmodels/affinity_models").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_ANIMATE_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/animate.unigrams.txt").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_INANIMATE_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/inanimate.unigrams.txt").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_DEMONYMS_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/demonyms.txt").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATES_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/state-abbreviations.txt").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_COUNTRIES_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/countries").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATESANDPROVINCES_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/statesandprovinces").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_DICT1_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/coref.dict1.tsv").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_DICT2_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/coref.dict2.tsv").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_DICT3_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/coref.dict3.tsv").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_DICT4_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/coref.dict4.tsv").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_GENDER_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/dcoref/gender.data.gz").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATISTICAL_CLASSIFICATION_MODEL_PATH = TextprocessingCorePlugin
         .resolvePath("stanfordmodels/coref/statistical/classification_model.ser.gz").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATISTICAL_RANKING_MODEL_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/coref/statistical/ranking_model.ser.gz").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATISTICAL_ANAPHORICITY_MODEL_PATH = TextprocessingCorePlugin
         .resolvePath("stanfordmodels/coref/statistical/anaphoricity_model.ser.gz").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATISTICAL_CLUSTERING_MODEL_PATH = TextprocessingCorePlugin
         .resolvePath("stanfordmodels/coref/statistical/clustering_model.ser.gz").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_STATISTICAL_WORD_COUNTS_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/coref/statistical/word_counts.ser.gz").getAbsolutePath();
 
     /**
-     * The path to the dependecy parsing model.
+     * The path to the dependency parsing model.
      */
     private static final String COREF_MD_DEP_MODEL_PATH =
         TextprocessingCorePlugin.resolvePath("stanfordmodels/coref/md-model-dep.ser.gz").getAbsolutePath();
@@ -334,7 +332,7 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
      */
     @Override
     protected final DataTableSpec createDataTableSpec(final DataTableSpec spec) {
-        return new OpenIeDataTableCreator(spec, 0, 0, false, null, 0).createDataTableSpec();
+        return new OpenIeDataTableCreator(spec, 0, 0, false, null, 0, null).createDataTableSpec();
     }
 
     /**
@@ -426,35 +424,17 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
      */
     @Override
     protected final ExtractorDataTableCreator createDataTableCreator(final DataTableSpec inSpec, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx) {
+        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx,
+        final ExecutionContext exec) {
         return new OpenIeDataTableCreator(inSpec, docColIdx, lemmaDocColIdx, m_lemmatizedResultsModel.getBooleanValue(),
-            annotationPipeline, queueIdx);
+            annotationPipeline, queueIdx, exec);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void saveSettingsTo(final NodeSettingsWO settings) {
-        super.saveSettingsTo(settings);
+    protected final void saveAdditionalSettingsTo(final NodeSettingsWO settings) {
         m_lemmatizedResultsModel.saveSettingsTo(settings);
         m_allNominalsModel.saveSettingsTo(settings);
         m_resolveCorefModel.saveSettingsTo(settings);
@@ -479,21 +459,11 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
      * {@inheritDoc}
      */
     @Override
-    protected final void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadValidatedSettingsFrom(settings);
+    protected final void loadAdditionalSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_lemmatizedResultsModel.loadSettingsFrom(settings);
         m_allNominalsModel.loadSettingsFrom(settings);
         m_resolveCorefModel.loadSettingsFrom(settings);
         m_tripleStrictModel.loadSettingsFrom(settings);
         m_affinityProbCapModel.loadSettingsFrom(settings);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void reset() {
-        // Nothing to do here...
-    }
-
 }

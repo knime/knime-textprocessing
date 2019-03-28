@@ -273,7 +273,7 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
         int queueIdx = 0;
 
         ExtractorDataTableCreator extractorTableCreator =
-            createDataTableCreator(dataTableSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx);
+            createDataTableCreator(dataTableSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx, exec);
         // iterating through urls
         for (final DataRow row : inputData) {
             exec.checkCanceled();
@@ -288,8 +288,8 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
                     docCount, totalNoOfRows)));
                 dataRowChunk = new ArrayList<>(chunkSize);
                 queueIdx++;
-                extractorTableCreator =
-                    createDataTableCreator(dataTableSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx);
+                extractorTableCreator = createDataTableCreator(dataTableSpec, docColIdx, lemmaDocColIdx,
+                    annotationPipeline, queueIdx, exec);
             }
         }
 
@@ -336,7 +336,7 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
                         final long processedDocs = docCount.addAndGet(1);
                         final double progress = (double)processedDocs / (double)totalNoOfRows;
                         exec.setProgress(progress,
-                            "Extracted relations from " + processedDocs + "/" + totalNoOfRows + " documents.");
+                            () -> "Extracted relations from " + processedDocs + "/" + totalNoOfRows + " documents.");
                     }
                     dataTables[queueIdx] = extractorTableCreator.createDataTable(exec);
                 } catch (final CanceledExecutionException e) {
@@ -354,11 +354,13 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * @param lemmaDocColIdx The index of the lemmatized document column.
      * @param annotationPipeline The annotation pipeline.
      * @param queueIdx The queue index. Used to create unique row keys.
+     * @param exec The ExecutionContext.
      *
      * @return Returns a new instance of {@link ExtractorDataTableCreator}.
      */
     protected abstract ExtractorDataTableCreator createDataTableCreator(final DataTableSpec inSpec, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx);
+        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx,
+        final ExecutionContext exec);
 
     /**
      * Creates and returns an {@link AnnotationPipeline} for the specified tasks.
@@ -373,29 +375,12 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
+    protected final void saveSettingsTo(final NodeSettingsWO settings) {
         m_docColModel.saveSettingsTo(settings);
         m_lemmaDocColModel.saveSettingsTo(settings);
         m_applyReqPreprocModel.saveSettingsTo(settings);
         m_noOfThreadsModel.saveSettingsTo(settings);
+        saveAdditionalSettingsTo(settings);
     }
 
     /**
@@ -413,11 +398,44 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+    protected final void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.loadSettingsFrom(settings);
         m_lemmaDocColModel.loadSettingsFrom(settings);
         m_applyReqPreprocModel.loadSettingsFrom(settings);
         m_noOfThreadsModel.loadSettingsFrom(settings);
+        loadAdditionalSettingsFrom(settings);
+    }
+
+    /**
+     * Load additional settings. Override this method if needed.
+     *
+     * @param settings A settings object.
+     * @throws InvalidSettingsException Thrown if invalid settings are loaded.
+     */
+    protected void loadAdditionalSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {}
+
+    /**
+     * Saves additional settings. Override this method if needed.
+     * @param settings A settings object.
+     */
+    protected void saveAdditionalSettingsTo(final NodeSettingsWO settings) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+        // Nothing to do here...
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
+        // Nothing to do here...
     }
 
     /**

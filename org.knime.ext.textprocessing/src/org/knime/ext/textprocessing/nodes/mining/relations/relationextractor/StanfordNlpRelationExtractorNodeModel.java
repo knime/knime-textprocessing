@@ -48,13 +48,11 @@
  */
 package org.knime.ext.textprocessing.nodes.mining.relations.relationextractor;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeModel;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.nodes.mining.relations.ExtractorDataTableCreator;
@@ -94,7 +92,7 @@ final class StanfordNlpRelationExtractorNodeModel extends ParallelExtractorNodeM
      */
     @Override
     protected final DataTableSpec createDataTableSpec(final DataTableSpec spec) {
-        return new RelationExtractorDataTableCreator(spec, 0, 0, null, 0).createDataTableSpec();
+        return new RelationExtractorDataTableCreator(spec, 0, 0, null, 0, null).createDataTableSpec();
     }
 
     /**
@@ -127,34 +125,9 @@ final class StanfordNlpRelationExtractorNodeModel extends ParallelExtractorNodeM
      */
     @Override
     protected final ExtractorDataTableCreator createDataTableCreator(final DataTableSpec inSpec, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx) {
-        return new RelationExtractorDataTableCreator(inSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx);
+        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx,
+        final ExecutionContext exec) {
+        return new RelationExtractorDataTableCreator(inSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx,
+            exec);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-        throws IOException, CanceledExecutionException {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void reset() {
-        // Nothing to do here...
-    }
-
 }

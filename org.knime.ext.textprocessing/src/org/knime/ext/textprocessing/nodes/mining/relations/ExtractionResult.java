@@ -49,8 +49,10 @@
 package org.knime.ext.textprocessing.nodes.mining.relations;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
@@ -58,31 +60,28 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 
 /**
- * Class to store results from relation extraction.
+ * Class to store results from relation extraction and convert them to DataCells.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
 public class ExtractionResult {
 
     /**
-     * The subject.
+     * List of {@link DataCell DataCells} from relation extraction.
      */
-    private final String m_subject;
+    private final List<DataCell> m_dataCells = new ArrayList<>(4);
 
     /**
-     * The relation/predicate.
+     * Static instance of {@code ExtractionResult} holding missing cells only.
      */
-    private final String m_relation;
+    private static final ExtractionResult EMPTY_INSTANCE = new ExtractionResult();
 
     /**
-     * The object.
+     * Creates a new instance of {@code ExtractionResult} with missing cells only.
      */
-    private final String m_object;
-
-    /**
-     * The confidence.
-     */
-    private final Double m_confidence;
+    private ExtractionResult() {
+        m_dataCells.addAll(Stream.generate(() -> DataType.getMissingCell()).limit(4).collect(Collectors.toList()));
+    }
 
     /**
      * Creates a new instance of {@code ExtractionResult} containing the results from relation extraction.
@@ -93,38 +92,10 @@ public class ExtractionResult {
      * @param confidence The confidence.
      */
     public ExtractionResult(final String subject, final String relation, final String object, final Double confidence) {
-        m_subject = subject;
-        m_relation = relation;
-        m_object = object;
-        m_confidence = confidence;
-    }
-
-    /**
-     * True if all results are null.
-     *
-     * @return Returns true, if all results are null.
-     */
-    private final boolean isEmpty() {
-        return (m_subject == null) && (m_relation == null) && (m_object == null) && (m_confidence == null);
-    }
-
-    /**
-     * Creates and returns a list of {@link DataCell DataCells} based on extraction results.
-     *
-     * @return List of {@code DataCells}
-     */
-    List<DataCell> asDataCells() {
-        final List<DataCell> dataCells = new ArrayList<>();
-        if (!isEmpty()) {
-            dataCells.add(new StringCell(m_subject));
-            dataCells.add(new StringCell(m_relation));
-            dataCells.add(new StringCell(m_object));
-            dataCells.add(new DoubleCell(m_confidence));
-        } else {
-            dataCells.addAll(Arrays.asList(DataType.getMissingCell(), DataType.getMissingCell(),
-                DataType.getMissingCell(), DataType.getMissingCell()));
-        }
-        return dataCells;
+        m_dataCells.add(subject != null ? new StringCell(subject) : DataType.getMissingCell());
+        m_dataCells.add(relation != null ? new StringCell(relation) : DataType.getMissingCell());
+        m_dataCells.add(object != null ? new StringCell(object) : DataType.getMissingCell());
+        m_dataCells.add(confidence != null ? new DoubleCell(confidence) : DataType.getMissingCell());
     }
 
     /**
@@ -133,6 +104,15 @@ public class ExtractionResult {
      * @return A new instance of {@code ExtractionResult} without any data.
      */
     public static final ExtractionResult getEmptyResult() {
-        return new ExtractionResult(null, null, null, null);
+        return EMPTY_INSTANCE;
+    }
+
+    /**
+     * Returns the relation extraction results as unmodifiable list of {@link DataCell DataCells}.
+     *
+     * @return An unmodifiable list of {@code DataCells}.
+     */
+    public final List<DataCell> getDataCells() {
+        return Collections.unmodifiableList(new ArrayList<>(m_dataCells));
     }
 }
