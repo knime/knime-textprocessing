@@ -52,10 +52,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeModel;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
-import org.knime.ext.textprocessing.nodes.mining.relations.ExtractorDataTableCreator;
+import org.knime.ext.textprocessing.nodes.mining.relations.MultiThreadRelationExtractor;
 import org.knime.ext.textprocessing.nodes.mining.relations.ParallelExtractorNodeModel;
 
 import edu.stanford.nlp.pipeline.AnnotationPipeline;
@@ -92,7 +93,7 @@ final class StanfordNlpRelationExtractorNodeModel extends ParallelExtractorNodeM
      */
     @Override
     protected final DataTableSpec createDataTableSpec(final DataTableSpec spec) {
-        return new RelationExtractorDataTableCreator(spec, 0, 0, null, 0, null).createDataTableSpec();
+        return StanfordRelationExtractor.createDataTableSpec(spec);
     }
 
     /**
@@ -124,10 +125,10 @@ final class StanfordNlpRelationExtractorNodeModel extends ParallelExtractorNodeM
      * {@inheritDoc}
      */
     @Override
-    protected final ExtractorDataTableCreator createDataTableCreator(final DataTableSpec inSpec, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx,
-        final ExecutionContext exec) {
-        return new RelationExtractorDataTableCreator(inSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx,
-            exec);
+    protected final MultiThreadRelationExtractor createExtractor(final BufferedDataContainer container,
+        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
+        final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec) {
+        return new StanfordRelationExtractor(container, docColIdx, lemmaDocColIdx, annotationPipeline, maxQueueSize,
+            maxActiveInstanceSize, exec);
     }
 }

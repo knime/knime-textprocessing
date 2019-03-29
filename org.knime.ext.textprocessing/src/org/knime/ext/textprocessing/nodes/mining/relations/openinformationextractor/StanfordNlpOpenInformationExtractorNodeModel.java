@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
@@ -61,7 +62,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
-import org.knime.ext.textprocessing.nodes.mining.relations.ExtractorDataTableCreator;
+import org.knime.ext.textprocessing.nodes.mining.relations.MultiThreadRelationExtractor;
 import org.knime.ext.textprocessing.nodes.mining.relations.ParallelExtractorNodeModel;
 
 import edu.stanford.nlp.pipeline.AnnotationPipeline;
@@ -332,7 +333,7 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
      */
     @Override
     protected final DataTableSpec createDataTableSpec(final DataTableSpec spec) {
-        return new OpenIeDataTableCreator(spec, 0, 0, false, null, 0, null).createDataTableSpec();
+        return StanfordOpenInformationExtractor.createDataTableSpec(spec);
     }
 
     /**
@@ -423,11 +424,11 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
      * {@inheritDoc}
      */
     @Override
-    protected final ExtractorDataTableCreator createDataTableCreator(final DataTableSpec inSpec, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx,
-        final ExecutionContext exec) {
-        return new OpenIeDataTableCreator(inSpec, docColIdx, lemmaDocColIdx, m_lemmatizedResultsModel.getBooleanValue(),
-            annotationPipeline, queueIdx, exec);
+    protected final MultiThreadRelationExtractor createExtractor(final BufferedDataContainer container,
+        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
+        final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec) {
+        return new StanfordOpenInformationExtractor(container, docColIdx, lemmaDocColIdx,
+            m_lemmatizedResultsModel.getBooleanValue(), annotationPipeline, maxQueueSize, maxActiveInstanceSize, exec);
     }
 
     /**

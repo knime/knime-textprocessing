@@ -48,7 +48,7 @@
  */
 package org.knime.ext.textprocessing.nodes.mining.relations;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,7 +69,7 @@ public class ExtractionResult {
     /**
      * List of {@link DataCell DataCells} from relation extraction.
      */
-    private final List<DataCell> m_dataCells = new ArrayList<>(4);
+    private final List<DataCell> m_dataCells;
 
     /**
      * Static instance of {@code ExtractionResult} holding missing cells only.
@@ -80,7 +80,8 @@ public class ExtractionResult {
      * Creates a new instance of {@code ExtractionResult} with missing cells only.
      */
     private ExtractionResult() {
-        m_dataCells.addAll(Stream.generate(() -> DataType.getMissingCell()).limit(4).collect(Collectors.toList()));
+        m_dataCells = Collections
+            .unmodifiableList(Stream.generate(() -> DataType.getMissingCell()).limit(4).collect(Collectors.toList()));
     }
 
     /**
@@ -92,10 +93,11 @@ public class ExtractionResult {
      * @param confidence The confidence.
      */
     public ExtractionResult(final String subject, final String relation, final String object, final Double confidence) {
-        m_dataCells.add(subject != null ? new StringCell(subject) : DataType.getMissingCell());
-        m_dataCells.add(relation != null ? new StringCell(relation) : DataType.getMissingCell());
-        m_dataCells.add(object != null ? new StringCell(object) : DataType.getMissingCell());
-        m_dataCells.add(confidence != null ? new DoubleCell(confidence) : DataType.getMissingCell());
+        m_dataCells = Collections
+            .unmodifiableList(Arrays.asList(subject != null ? new StringCell(subject) : DataType.getMissingCell(),
+                relation != null ? new StringCell(relation) : DataType.getMissingCell(),
+                object != null ? new StringCell(object) : DataType.getMissingCell(),
+                confidence != null ? new DoubleCell(confidence) : DataType.getMissingCell()));
     }
 
     /**
@@ -113,6 +115,6 @@ public class ExtractionResult {
      * @return An unmodifiable list of {@code DataCells}.
      */
     public final List<DataCell> getDataCells() {
-        return Collections.unmodifiableList(new ArrayList<>(m_dataCells));
+        return m_dataCells;
     }
 }

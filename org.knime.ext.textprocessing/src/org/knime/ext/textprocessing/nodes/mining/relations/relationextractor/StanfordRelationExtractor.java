@@ -48,20 +48,20 @@
  */
 package org.knime.ext.textprocessing.nodes.mining.relations.relationextractor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.ExecutionContext;
 import org.knime.ext.textprocessing.nodes.mining.relations.ExtractionResult;
-import org.knime.ext.textprocessing.nodes.mining.relations.ExtractorDataTableCreator;
+import org.knime.ext.textprocessing.nodes.mining.relations.MultiThreadRelationExtractor;
 
 import edu.stanford.nlp.ie.machinereading.structure.EntityMention;
 import edu.stanford.nlp.ie.machinereading.structure.MachineReadingAnnotations;
@@ -78,7 +78,7 @@ import edu.stanford.nlp.util.CoreMap;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class RelationExtractorDataTableCreator extends ExtractorDataTableCreator {
+final class StanfordRelationExtractor extends MultiThreadRelationExtractor {
 
     /**
      * The name of the subject column to create.
@@ -101,32 +101,39 @@ final class RelationExtractorDataTableCreator extends ExtractorDataTableCreator 
     private static final String CONFIDENCE_COL_NAME = "Confidence";
 
     /**
-     * Creates and returns a new instance of {@code RelationExtractorDataTableCreator}.
+     * Creates and returns a new instance of {@code StanfordRelationExtractor}.
      *
-     * @param inputSpec The {@link DataTableSpec} of the input data table.
-     * @param docColIdx The index of the document column.
-     * @param lemmaDocColIdx The index of the lemmatized document column.
-     * @param annotationPipeline The {@link AnnotationPipeline} to process documents.
-     * @param queueIdx The queue index used to generate unique {@link RowKey RowKeys}.
+     * @param container The {@link BufferedDataContainer} used to create a data table.
+     * @param docColIdx The document column index.
+     * @param lemmaDocColIdx The lemmatized document column index.
+     * @param annotationPipeline The {@link AnnotationPipeline}.
+     * @param maxQueueSize Maximum queue size of finished jobs (finished computations might be cached in order to ensure
+     *            the proper output ordering). If this queue is full (because the next-to-be-processed computation is
+     *            still ongoing), no further tasks are submitted.
+     * @param maxActiveInstanceSize The maximum number of simultaneously running computations (unless otherwise bound by
+     *            the used executor).
      * @param exec The {@link ExecutionContext}.
      */
-    RelationExtractorDataTableCreator(final DataTableSpec inputSpec, final int docColIdx, final int lemmaDocColIdx,
-        final AnnotationPipeline annotationPipeline, final long queueIdx, final ExecutionContext exec) {
-        super(inputSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx, exec);
+    StanfordRelationExtractor(final BufferedDataContainer container, final int docColIdx, final int lemmaDocColIdx,
+        final AnnotationPipeline annotationPipeline, final int maxQueueSize, final int maxActiveInstanceSize,
+        final ExecutionContext exec) {
+        super(container, docColIdx, lemmaDocColIdx, annotationPipeline, maxQueueSize, maxActiveInstanceSize, exec);
     }
 
     /**
-     * {@inheritDoc}
+     * Creates a new {@link DataTableSpec}.
+     *
+     * @param spec {@code DataTableSpec} from incoming {@code BufferedDataTable}.
+     * @return Returns a new {@code DataTableSpec}.
      */
-    @Override
-    protected final DataTableSpec createDataTableSpec() {
+    protected static final DataTableSpec createDataTableSpec(final DataTableSpec spec) {
         final DataColumnSpecCreator value1 = new DataColumnSpecCreator(OBJECT1_COL_NAME, StringCell.TYPE);
         final DataColumnSpecCreator value2 = new DataColumnSpecCreator(BEST_RELATION_COL_NAME, StringCell.TYPE);
         final DataColumnSpecCreator bestRelation = new DataColumnSpecCreator(OBJECT2_COL_NAME, StringCell.TYPE);
         final DataColumnSpecCreator confidence = new DataColumnSpecCreator(CONFIDENCE_COL_NAME, DoubleCell.TYPE);
 
         // create new data table with selected columns and term column
-        return new DataTableSpec(getInputSpec(), new DataTableSpec(value1.createSpec(), value2.createSpec(),
+        return new DataTableSpec(spec, new DataTableSpec(value1.createSpec(), value2.createSpec(),
             bestRelation.createSpec(), confidence.createSpec()));
     }
 
@@ -135,7 +142,7 @@ final class RelationExtractorDataTableCreator extends ExtractorDataTableCreator 
      */
     @Override
     protected final List<ExtractionResult> extractRelations(final Annotation annotation) {
-        final List<ExtractionResult> results = new LinkedList<>();
+        final List<ExtractionResult> results = new ArrayList<>();
         for (final CoreMap sentenceCM : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
 
             // Get the relation extraction triples for the sentence

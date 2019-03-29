@@ -44,13 +44,15 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 7, 2019 (julian): created
+ *   Mar 29, 2019 (julian): created
  */
 package org.knime.ext.textprocessing.nodes.mining.relations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -61,6 +63,7 @@ import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.util.MultiThreadWorker;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.DocumentToAnnotationConverter;
@@ -69,27 +72,21 @@ import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.AnnotationPipeline;
 
 /**
- * This class provides functionality to extract relations from data rows, collect results and create a data table based
- * on the results.
+ * Abstract class that provides functionality to run multi-threaded relation extraction.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-public abstract class ExtractorDataTableCreator {
+public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<DataRow, List<ExtractionResult>> {
 
     /**
      * The {@link BufferedDataContainer} to add rows and create the data table from.
      */
-    private BufferedDataContainer m_dataContainer;
+    private final BufferedDataContainer m_dataContainer;
 
     /**
      * The {@link AnnotationPipeline} to process the documents.
      */
     private final AnnotationPipeline m_annotationPipeline;
-
-    /**
-     * The {@link DataTableSpec} of the input data table.
-     */
-    private final DataTableSpec m_inputSpec;
 
     /**
      * The document column index.
@@ -102,73 +99,84 @@ public abstract class ExtractorDataTableCreator {
     private final int m_lemmaDocColIdx;
 
     /**
-     * The row count to generate {@link RowKey RowKeys} from.
+     * The {@link ExecutionContext} used to set the execution progress message.
      */
-    private long m_rowCount = 0;
+    private final ExecutionContext m_exec;
 
     /**
-     * The number of the thread to create unique {@link RowKey Rowkeys}.
+     * Maximum queue size.
      */
-    private final long m_threadNo;
+    private final int m_maxQueueSize;
 
     /**
-     * Creates and returns a new instance of {@code ExtratorDataTableCreator}.
+     * Creates a new instance of {@link MultiThreadRelationExtractor}.
      *
-     * @param inputSpec The {@link DataTableSpec} of the input data table.
-     * @param docColIdx The index of the document column.
-     * @param lemmaDocColIdx The index of the lemmatized document column.
-     * @param annotationPipeline The {@link AnnotationPipeline} to process documents.
-     * @param queueIdx The queue index used to create unique row keys.
-     * @param exec The {@link ExecutionContext}.
+     * @param container The {@link BufferedDataContainer} used to create a data table.
+     * @param docColIdx The document column index.
+     * @param lemmaDocColIdx The lemmatized document column index.
+     * @param annotationPipeline The {@link AnnotationPipeline}.
+     * @param maxQueueSize Maximum queue size of finished jobs (finished computations might be cached in order to ensure
+     *            the proper output ordering). If this queue is full (because the next-to-be-processed computation is
+     *            still ongoing), no further tasks are submitted.
+     * @param maxActiveInstanceSize The maximum number of simultaneously running computations (unless otherwise bound by
+     *            the used executor).
+     * @param exec ExecutionContext
      */
-    public ExtractorDataTableCreator(final DataTableSpec inputSpec, final int docColIdx, final int lemmaDocColIdx,
-        final AnnotationPipeline annotationPipeline, final long queueIdx, final ExecutionContext exec) {
-        m_inputSpec = inputSpec;
+    protected MultiThreadRelationExtractor(final BufferedDataContainer container,
+        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
+        final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec) {
+        super(maxQueueSize, maxActiveInstanceSize);
+        m_dataContainer = container;
         m_docColIdx = docColIdx;
         m_lemmaDocColIdx = lemmaDocColIdx;
         m_annotationPipeline = annotationPipeline;
-        m_threadNo = queueIdx;
+        m_exec = exec;
+        m_maxQueueSize = maxQueueSize;
+    }
 
-        // Open data container
-        if (exec != null && m_dataContainer == null) {
-            m_dataContainer = exec.createDataContainer(createDataTableSpec());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<ExtractionResult> compute(final DataRow in, final long index) throws Exception {
+        final DataCell dataCell = in.getCell(m_docColIdx);
+        final DataCell lemmaDataCell = m_lemmaDocColIdx >= 0 ? in.getCell(m_lemmaDocColIdx) : DataType.getMissingCell();
+        List<ExtractionResult> extractionResults;
+        if (!dataCell.isMissing()) {
+            final Document doc = ((DocumentValue)in.getCell(m_docColIdx)).getDocument();
+            final Annotation annotation = !lemmaDataCell.isMissing()
+                ? DocumentToAnnotationConverter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument(), true, true)
+                : DocumentToAnnotationConverter.convert(doc);
+            try {
+                m_annotationPipeline.annotate(annotation);
+                extractionResults = extractRelations(annotation);
+            } catch (final AssertionError | NullPointerException e) {
+                extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());
+            }
+        } else {
+            extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());
         }
+        m_exec.setProgress(index / (double)m_maxQueueSize,
+            () -> "Extracted relations for " + index + "/" + m_maxQueueSize + "documents.");
+        return extractionResults;
     }
 
     /**
-     * Returns the input spec.
-     *
-     * @return The input {@code DataTableSpec}.
+     * {@inheritDoc}
      */
-    protected DataTableSpec getInputSpec() {
-        return m_inputSpec;
-    }
-
-    /**
-     * Returns the index of the document column.
-     *
-     * @return The index of the document column.
-     */
-    protected int getDocColIdx() {
-        return m_docColIdx;
-    }
-
-    /**
-     * Returns the index of the lemmatized document column.
-     *
-     * @return The index of the lemmatized document column.
-     */
-    protected int getLemmaDocColIdx() {
-        return m_lemmaDocColIdx;
-    }
-
-    /**
-     * Returns the {@link AnnotationPipeline} used for annotating the documents.
-     *
-     * @return An {@code AnnotationPipeline}.
-     */
-    protected AnnotationPipeline getAnnotationPipeline() {
-        return m_annotationPipeline;
+    @Override
+    protected void processFinished(final MultiThreadWorker<DataRow, List<ExtractionResult>>.ComputationTask task)
+        throws ExecutionException, CancellationException, InterruptedException {
+        final List<DataCell> dataCells = Arrays.asList(task.getInput().stream().toArray(DataCell[]::new));
+        int rowCount = 0;
+        for (final ExtractionResult result : task.get()) {
+            final List<DataCell> combined = new ArrayList<>(dataCells);
+            combined.addAll(result.getDataCells());
+            final RowKey key = new RowKey("Row" + task.getIndex() + "_" + rowCount);
+            final DataRow newRow = new DefaultRow(key, combined);
+            m_dataContainer.addRowToTable(newRow);
+            rowCount++;
+        }
     }
 
     /**
@@ -194,58 +202,11 @@ public abstract class ExtractorDataTableCreator {
     }
 
     /**
-     * Processes a {@link DataRow} and stores the results.
-     *
-     * @param dataRow The {@code DataRow} to process.
-     */
-    void processDataRow(final DataRow dataRow) {
-        final DataCell dataCell = dataRow.getCell(m_docColIdx);
-        final DataCell lemmaDataCell =
-            m_lemmaDocColIdx >= 0 ? dataRow.getCell(m_lemmaDocColIdx) : DataType.getMissingCell();
-        if (!dataCell.isMissing()) {
-            final Document doc = ((DocumentValue)dataRow.getCell(m_docColIdx)).getDocument();
-            final Annotation annotation = !lemmaDataCell.isMissing()
-                ? DocumentToAnnotationConverter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument(), true, true)
-                : DocumentToAnnotationConverter.convert(doc);
-            try {
-                m_annotationPipeline.annotate(annotation);
-                addResultToDataContainer(dataRow, extractRelations(annotation));
-            } catch (final AssertionError | NullPointerException e) {
-                addResultToDataContainer(dataRow, Arrays.asList(ExtractionResult.getEmptyResult()));
-            }
-        } else {
-            addResultToDataContainer(dataRow, Arrays.asList(ExtractionResult.getEmptyResult()));
-        }
-    }
-
-    /**
-     * Adds new {@link DataRow DataRows} to the {@code BufferedDataContainer} based on the input {@code DataRow} and
-     * related {@link ExtractionResult ExtractionResults}.
-     */
-    private void addResultToDataContainer(final DataRow dataRow, final List<ExtractionResult> results) {
-        final List<DataCell> dataCells = Arrays.asList(dataRow.stream().toArray(DataCell[]::new));
-        for (final ExtractionResult result : results) {
-            final List<DataCell> combined = new ArrayList<>(dataCells);
-            combined.addAll(result.getDataCells());
-            final RowKey key = new RowKey("Row" + m_threadNo + "_" + m_rowCount);
-            final DataRow newRow = new DefaultRow(key, combined);
-            m_dataContainer.addRowToTable(newRow);
-            m_rowCount++;
-        }
-    }
-
-    /**
-     * Creates a new {@link DataTableSpec}.
-     *
-     * @return A {@code DataTableSpec}.
-     */
-    protected abstract DataTableSpec createDataTableSpec();
-
-    /**
      * Creates a list of {@link ExtractionResult ExtractionResults} for an {@link Annotation}.
      *
      * @param annotation The {@code Annotation} to extract the results from.
      * @return A list of {@code ExtractionResults}.
      */
     protected abstract List<ExtractionResult> extractRelations(final Annotation annotation);
+
 }

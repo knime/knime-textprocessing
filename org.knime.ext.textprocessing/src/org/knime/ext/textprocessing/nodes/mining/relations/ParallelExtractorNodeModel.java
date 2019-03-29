@@ -50,26 +50,20 @@ package org.knime.ext.textprocessing.nodes.mining.relations;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 
-import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
@@ -79,7 +73,7 @@ import edu.stanford.nlp.pipeline.AnnotationPipeline;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 /**
- * The {@link NodeModel} for the StanfordNLP Extractor nodes.
+ * The abstract {@link NodeModel} for the StanfordNLP Extractor nodes.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
@@ -245,122 +239,47 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
         final long totalNoOfRows = inputData.size();
         if (totalNoOfRows == 0) {
             return new BufferedDataTable[]{
-                ExtractorDataTableCreator.createEmptyTable(createDataTableSpec(dataTableSpec), exec)};
+                MultiThreadRelationExtractor.createEmptyTable(createDataTableSpec(dataTableSpec), exec)};
         }
 
         final int docColIdx = dataTableSpec.findColumnIndex(m_docColModel.getStringValue());
         final int lemmaDocColIdx =
             m_lemmaDocColModel.isEnabled() ? dataTableSpec.findColumnIndex(m_lemmaDocColModel.getStringValue()) : -1;
 
-        // creating thread pool and chunk size
-        final int noOfThreads = m_noOfThreadsModel.getIntValue();
-        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool(noOfThreads);
-        final int chunkSize =
-            noOfThreads > totalNoOfRows ? 1 : (int)Math.min(totalNoOfRows / noOfThreads, Integer.MAX_VALUE);
-        final int numberOfChunks =
-            (int)(noOfThreads + Math.ceil((totalNoOfRows - (noOfThreads * chunkSize)) / (double)chunkSize));
-
         // create annotation pipeline and a data table creator instance, which collects the results
         exec.setProgress(0.01, "Load models...");
         StanfordCoreNLP.clearAnnotatorPool();
         final StanfordCoreNLP annotationPipeline = createAnnotationPipeline(m_applyReqPreprocModel.getBooleanValue());
 
-        // create chunks
-        List<DataRow> dataRowChunk = new ArrayList<>(chunkSize);
-        final AtomicLong docCount = new AtomicLong(0);
-        final List<Future<?>> futures = new ArrayList<>();
-        final BufferedDataTable[] dataTables = new BufferedDataTable[numberOfChunks];
-        int queueIdx = 0;
+        // Open data container
+        final BufferedDataContainer dataContainer = exec.createDataContainer(createDataTableSpec(dataTableSpec));
+        final MultiThreadRelationExtractor extractor = createExtractor(dataContainer, docColIdx, lemmaDocColIdx,
+            annotationPipeline, (int)totalNoOfRows, m_noOfThreadsModel.getIntValue(), exec);
+        extractor.run(inputData);
+        dataContainer.close();
 
-        ExtractorDataTableCreator extractorTableCreator =
-            createDataTableCreator(dataTableSpec, docColIdx, lemmaDocColIdx, annotationPipeline, queueIdx, exec);
-        // iterating through urls
-        for (final DataRow row : inputData) {
-            exec.checkCanceled();
-
-            // add urls to chunk
-            if (dataRowChunk.size() < (chunkSize - 1)) {
-                dataRowChunk.add(row);
-                // chunk is full, process and clear
-            } else {
-                dataRowChunk.add(row);
-                futures.add(pool.enqueue(processChunk(dataRowChunk, extractorTableCreator, dataTables, queueIdx, exec,
-                    docCount, totalNoOfRows)));
-                dataRowChunk = new ArrayList<>(chunkSize);
-                queueIdx++;
-                extractorTableCreator = createDataTableCreator(dataTableSpec, docColIdx, lemmaDocColIdx,
-                    annotationPipeline, queueIdx, exec);
-            }
-        }
-
-        // enqueue the last chunk and wait
-        if (!dataRowChunk.isEmpty()) {
-            futures.add(pool.enqueue(processChunk(dataRowChunk, extractorTableCreator, dataTables, queueIdx, exec,
-                docCount, totalNoOfRows)));
-        }
-
-        for (final Future<?> f : futures) {
-            f.get();
-        }
-
-        return new BufferedDataTable[]{exec.createConcatenateTable(exec, dataTables)};
+        return new BufferedDataTable[]{dataContainer.getTable()};
     }
 
     /**
-     * Creates and returns a {@link Runnable} processing a chunk of {@link DataRow DataRows}.
+     * Creates and returns a new instance of {@link MultiThreadRelationExtractor}.
      *
-     * @param dataRowChunk A list of {@code DataRows} to process.
-     * @param extractorTableCreator An {@link ExtractorDataTableCreator} to collect results and create a data table.
-     * @param dataTables An array of {@link BufferedDataTable BufferedDataTables} storing the resulting tables of each
-     *            thread.
-     * @param queueIdx The queue index used to generate unique {@code RowKeys}.
-     * @param exec The {@link ExecutionContext}.
-     * @param docCount An {@link AtomicLong} counting the number of processed documents.
-     * @param totalNoOfRows Total number of rows of the input data table.
-     * @return A {@code Runnable}.
-     * @throws CanceledExecutionException Thrown if the execution was cancelled by the user.
+     * @param container The {@link BufferedDataContainer} used to create a data table.
+     * @param docColIdx The document column index.
+     * @param lemmaDocColIdx The lemmatized document column index.
+     * @param annotationPipeline The {@link AnnotationPipeline}.
+     * @param maxQueueSize Maximum queue size of finished jobs (finished computations might be cached in order to ensure
+     *            the proper output ordering). If this queue is full (because the next-to-be-processed computation is
+     *            still ongoing), no further tasks are submitted.
+     * @param maxActiveInstanceSize The maximum number of simultaneously running computations (unless otherwise bound by
+     *            the used executor).
+     * @param exec ExecutionContext
+     *
+     * @return Returns a new instance of {@link MultiThreadRelationExtractor}.
      */
-    private static Runnable processChunk(final List<DataRow> dataRowChunk,
-        final ExtractorDataTableCreator extractorTableCreator, final BufferedDataTable[] dataTables, final int queueIdx,
-        final ExecutionContext exec, final AtomicLong docCount, final long totalNoOfRows)
-        throws CanceledExecutionException {
-        exec.checkCanceled();
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    for (final DataRow dataRow : dataRowChunk) {
-                        exec.checkCanceled();
-                        extractorTableCreator.processDataRow(dataRow);
-                        final long processedDocs = docCount.addAndGet(1);
-                        final double progress = (double)processedDocs / (double)totalNoOfRows;
-                        exec.setProgress(progress,
-                            () -> "Extracted relations from " + processedDocs + "/" + totalNoOfRows + " documents.");
-                    }
-                    dataTables[queueIdx] = extractorTableCreator.createDataTable(exec);
-                } catch (final CanceledExecutionException e) {
-                    // handled in main executer thread
-                }
-            }
-        };
-    }
-
-    /**
-     * Creates and returns a new instance of {@link ExtractorDataTableCreator}.
-     *
-     * @param inSpec The input data table spec.
-     * @param docColIdx The index of the document column.
-     * @param lemmaDocColIdx The index of the lemmatized document column.
-     * @param annotationPipeline The annotation pipeline.
-     * @param queueIdx The queue index. Used to create unique row keys.
-     * @param exec The ExecutionContext.
-     *
-     * @return Returns a new instance of {@link ExtractorDataTableCreator}.
-     */
-    protected abstract ExtractorDataTableCreator createDataTableCreator(final DataTableSpec inSpec, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final long queueIdx,
-        final ExecutionContext exec);
+    protected abstract MultiThreadRelationExtractor createExtractor(final BufferedDataContainer container,
+        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
+        final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec);
 
     /**
      * Creates and returns an {@link AnnotationPipeline} for the specified tasks.
@@ -412,13 +331,16 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * @param settings A settings object.
      * @throws InvalidSettingsException Thrown if invalid settings are loaded.
      */
-    protected void loadAdditionalSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {}
+    protected void loadAdditionalSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+    }
 
     /**
      * Saves additional settings. Override this method if needed.
+     *
      * @param settings A settings object.
      */
-    protected void saveAdditionalSettingsTo(final NodeSettingsWO settings) {}
+    protected void saveAdditionalSettingsTo(final NodeSettingsWO settings) {
+    }
 
     /**
      * {@inheritDoc}
