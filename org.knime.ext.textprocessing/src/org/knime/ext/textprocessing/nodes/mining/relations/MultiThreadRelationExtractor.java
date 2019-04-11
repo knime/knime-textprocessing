@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -109,6 +110,11 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
     private final int m_maxQueueSize;
 
     /**
+     * AtomicLong to count ignored missing values.
+     */
+    private final AtomicLong m_missingValueCount = new AtomicLong(0);
+
+    /**
      * Creates a new instance of {@link MultiThreadRelationExtractor}.
      *
      * @param container The {@link BufferedDataContainer} used to create a data table.
@@ -155,6 +161,7 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
             }
         } else {
             extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());
+            m_missingValueCount.addAndGet(1);
         }
         m_exec.setProgress(index / (double)m_maxQueueSize,
             () -> "Extracted relations for " + index + "/" + m_maxQueueSize + "documents.");
@@ -208,5 +215,15 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      * @return A list of {@code ExtractionResults}.
      */
     protected abstract List<ExtractionResult> extractRelations(final Annotation annotation);
+
+
+    /**
+     * Returns the number of processed documents cells which contained missing values.
+     *
+     * @return Returns the number of processed documents cells which contained missing values.
+     */
+    final long getMissingValueCount() {
+        return m_missingValueCount.get();
+    }
 
 }

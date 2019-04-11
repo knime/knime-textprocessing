@@ -8,11 +8,21 @@
         <intro>
 			Extracts relations triplets contained in sentences of a document by investigating relations of tagged named-entities.
 			The node needs part-of-speech and named-entity tagged documents. 
-			Additionally, there has to be a second document column containing lemmatized documents.<br/>
+			Additionally, there has to be a second document column containing lemmatized documents, meaning that all
+			words are converted to their canonical form, dictionary form or citation form.<br/>
 			
 			However, this node can also be used with plain documents by using the <i>Apply preprocessing</i> option.
 			If this option is selected, part-of-speech tagging, named-entity tagging and lemmatizing will be done 
-			by this node. The Stanford CoreNLP default settings are used in this case.<br/>
+			by this node. The Stanford CoreNLP default settings are used in this case. These task will be applied internally 
+			and will not affect the documents in the document column. Extracting tags and lemmas produced by checking this option
+			is not possible.<br/>
+			
+			The node creates four new columns: two object columns containing named-entities, a relation type column and 
+			a confidence column. Currently, the node only handles classic named-entities like PERSON, LOCATION and
+			ORGANIZATION.<br/>
+			Relation types that can be extracted are <i>Live_In</i>, <i>OrgBased_In</i>, <i>Located_In</i>, <i>Work_For</i> 
+			and <i>_NR</i> for no relation between two entities. <br/>
+			The confidence refers to the relation type with the highest probability of these five classes.
 			
 			<i>Note</i>: Relation Extraction is a computationally expensive operation. For the usage of this
             node it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
@@ -32,6 +42,6 @@
         <inPort name="Documents input table" index="0">
         The input table which contains the documents and lemmatized documents (if needed).</inPort>
         <outPort name="Documents and extracted relation." index="0">
-        The output table which contains data from the input table and extracted relations.</outPort>
+        The output table which contains data from the input table, extracted relations and a relation confidence.</outPort>
 	</ports>
 </knimeNode>

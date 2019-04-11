@@ -8,11 +8,16 @@
         <intro>
 			Extracts relations triplets contained in sentences of a document.
 			The node needs part-of-speech tagged documents. Using a tagger for named-entity recognition might enhance 
-			the results. Additionally, there has to be a second document column containing lemmatized documents.<br/>
+			the results. Additionally, there has to be a second document column containing lemmatized documents, meaning that all
+			words are converted to their canonical form, dictionary form or citation form.<br/>
 			
 			However, this node can also be used with plain documents by using the <i>Apply preprocessing</i> option.
 			If this option is selected, part-of-speech tagging, named-entity tagging and lemmatizing will be done 
-			by this node. The Stanford CoreNLP default settings are used in this case.<br/>
+			by this node. The Stanford CoreNLP default settings are used in this case. These task will be applied internally 
+			and will not affect the documents in the document column. Extracting tags and lemmas produced by checking this option
+			is not possible.<br/>
+			
+			The node creates four new columns: a subject column, an object column, a predicate column and a confidence column.
 			
 			<i>Note</i>: Open Information Extraction is a computationally expensive operation. For the usage of this
             node it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
@@ -22,7 +27,7 @@
             For more information about StanfordNLP and Open Information Extraction, click <a href="https://stanfordnlp.github.io/CoreNLP/openie.html">here</a>.<br/>
 		</intro>
 		<option name="Document column">The document column to use.<br/> <i>Note</i>: If the <i>Apply preprocessing</i>
-		option is unchecked, the documents have to be tagged by a part-of-speech tagger and a named-entity tagger (optionally). </option>
+		option is unchecked, the documents have to be tagged by a part-of-speech tagger. Named-entity tagging is also recommended, but optional. </option>
 		<option name="Lemmatized document column">The document column containing the lemmatized documents.</option>
 		<option name="Number of threads">The number of threads to use.</option>
 		<option name="Results as lemma">If checked, results will be returned as lemma.</option>
@@ -37,6 +42,6 @@
         <inPort name="Documents input table" index="0">
         The input table which contains the documents and lemmatized documents (if needed).</inPort>
         <outPort name="Documents and extracted relation." index="0">
-        The output table which contains data from the input table and extracted relations.</outPort>
+        The output table which contains data from the input table, extracted relations and a relation confidence.</outPort>
 	</ports>
 </knimeNode>

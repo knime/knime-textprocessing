@@ -258,6 +258,10 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
         extractor.run(inputData);
         dataContainer.close();
 
+        if (extractor.getMissingValueCount() > 0 ) {
+            setWarningMessage("Ignored " + extractor.getMissingValueCount() + " rows with missing values.");
+        }
+
         return new BufferedDataTable[]{dataContainer.getTable()};
     }
 
