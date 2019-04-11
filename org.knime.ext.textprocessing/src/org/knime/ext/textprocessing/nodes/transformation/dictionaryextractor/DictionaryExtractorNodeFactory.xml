@@ -15,12 +15,11 @@
         <option name="Document column">
             Select the document column to extract the document from.
     	</option>
-    	<option name="Keep top X most frequent terms">
-            The number of terms in the data table will be restricted based on the set value. Only the most frequent
-            terms will be shown. 
+    	<option name="Most frequent terms (k)"> 
+    		Check, if the data table should be restricted on the top k most frequent terms.
     	</option>
     	<option name="Filter terms by">
-            If the 'Keep top X most frequent terms' option is checked, select the frequency method used to filter the 
+            If the 'Most frequent terms (k)' option is checked, select the frequency method used to filter the 
             terms.
     	</option>
     	<option name="Number of threads">

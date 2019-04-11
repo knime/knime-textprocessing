@@ -60,6 +60,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -84,9 +85,9 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     private static final String CFG_KEY_NUMBER_OF_THREADS = "number_of_threads";
 
     /**
-     * Configuration key for the top X terms option.
+     * Configuration key for the top k terms option.
      */
-    private static final String CFG_KEY_TOP_X_TERMS = "top_x_terms";
+    private static final String CFG_KEY_TOP_K_TERMS = "top_k_terms";
 
     /**
      * Configuration key for the filter by option.
@@ -94,9 +95,19 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     private static final String CFG_KEY_FILTER_BY = "filter_by";
 
     /**
-     * Default value for the frequency threshold.
+     * Configuration key for the filter option.
      */
-    private static final int DEF_TOP_X_TERMS = 0;
+    private static final String CFG_KEY_ENABLE_FILTERING = "enable_filtering";
+
+    /**
+     * Default value for the top k most frequent terms.
+     */
+    private static final int DEF_TOP_K_TERMS = 20000;
+
+    /**
+     * Default value for enabling the term filter.
+     */
+    private static final boolean DEF_ENABLE_FILTERING = false;
 
     /**
      * Creates and returns a {@link SettingsModelString} containing the name of the column with the documents to create
@@ -118,18 +129,27 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     }
 
     /**
-     * Creates and returns a {@link SettingsModelIntegerBounded} containing the value for the 'top x terms' option.
+     * Creates and returns a {@link SettingsModelBoolean} containing the boolean value to enable/disable the 'top k
+     * terms' option.
      *
-     * @return {@code SettingsModelIntegerBounded} containing the value for the 'top x terms' option.
+     * @return {@code SettingsModelBoolean} containing the boolean value to enable/disable the 'top k terms' option.
      */
-    static final SettingsModelIntegerBounded getTopXTermsModel() {
-        return new SettingsModelIntegerBounded(CFG_KEY_TOP_X_TERMS, DEF_TOP_X_TERMS, DEF_TOP_X_TERMS,
-            Integer.MAX_VALUE);
+    static final SettingsModelBoolean getFilterTermsModel() {
+        return new SettingsModelBoolean(CFG_KEY_ENABLE_FILTERING, DEF_ENABLE_FILTERING);
+    }
+
+    /**
+     * Creates and returns a {@link SettingsModelIntegerBounded} containing the value for the 'top k terms' option.
+     *
+     * @return {@code SettingsModelIntegerBounded} containing the value for the 'top k terms' option.
+     */
+    static final SettingsModelIntegerBounded getTopKTermsModel() {
+        return new SettingsModelIntegerBounded(CFG_KEY_TOP_K_TERMS, DEF_TOP_K_TERMS, 1, Integer.MAX_VALUE);
     }
 
     /**
      * Creates and returns a {@link SettingsModelString} containing the name of the frequency method used to filter the
-     * terms to get the top X most frequent terms only.
+     * terms to get the top k most frequent terms only.
      *
      * @return Creates and returns a {@link SettingsModelString} containing the name of the frequency method.
      */
@@ -148,13 +168,18 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     private final SettingsModelIntegerBounded m_numberOfThreadsModel = getNumberOfThreadsModel();
 
     /**
-     * The {@link SettingsModelIntegerBounded} containing the frequency threshold.
+     * The {@link SettingsModelIntegerBounded} containing the value for the top k terms option.
      */
-    private final SettingsModelIntegerBounded m_frequencyThresholdModel = getTopXTermsModel();
+    private final SettingsModelIntegerBounded m_topKTermsModel = getTopKTermsModel();
+
+    /**
+     * The {@link SettingsModelBoolean} containing the boolean value to enable/disable the 'top k terms' option.
+     */
+    private final SettingsModelBoolean m_enableFilteringModel = getFilterTermsModel();
 
     /**
      * Creates and returns a {@link SettingsModelString} containing the name of the frequency method used to filter the
-     * terms to get the top X most frequent terms only.
+     * terms to get the top k most frequent terms only.
      */
     private final SettingsModelString m_filterByModel = getFilterByModel();
 
@@ -207,8 +232,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
         final int numberOfThreads = numberOfRows > m_numberOfThreadsModel.getIntValue()
             ? m_numberOfThreadsModel.getIntValue() : (int)numberOfRows;
         final MultiThreadDictionaryExtractor extractor =
-            new MultiThreadDictionaryExtractor(documentColIndex, m_frequencyThresholdModel.getIntValue(), numberOfRows,
-                m_filterByModel.getStringValue(), numberOfThreads, exec);
+            new MultiThreadDictionaryExtractor(documentColIndex, m_enableFilteringModel.getBooleanValue(),
+                m_topKTermsModel.getIntValue(), numberOfRows, m_filterByModel.getStringValue(), numberOfThreads, exec);
 
         // Only run if table is not empty
         if (numberOfRows > 0) {
@@ -251,8 +276,9 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_docColModel.saveSettingsTo(settings);
         m_numberOfThreadsModel.saveSettingsTo(settings);
-        m_frequencyThresholdModel.saveSettingsTo(settings);
+        m_topKTermsModel.saveSettingsTo(settings);
         m_filterByModel.saveSettingsTo(settings);
+        m_enableFilteringModel.saveSettingsTo(settings);
     }
 
     /**
@@ -262,8 +288,9 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.validateSettings(settings);
         m_numberOfThreadsModel.validateSettings(settings);
-        m_frequencyThresholdModel.validateSettings(settings);
+        m_topKTermsModel.validateSettings(settings);
         m_filterByModel.validateSettings(settings);
+        m_enableFilteringModel.validateSettings(settings);
     }
 
     /**
@@ -273,7 +300,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.loadSettingsFrom(settings);
         m_numberOfThreadsModel.loadSettingsFrom(settings);
-        m_frequencyThresholdModel.loadSettingsFrom(settings);
+        m_topKTermsModel.loadSettingsFrom(settings);
+        m_enableFilteringModel.loadSettingsFrom(settings);
         m_filterByModel.loadSettingsFrom(settings);
     }
 

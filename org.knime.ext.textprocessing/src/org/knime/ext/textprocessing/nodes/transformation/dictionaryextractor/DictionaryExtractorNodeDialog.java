@@ -48,16 +48,24 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
 
-import org.knime.core.data.DataTableSpec;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import javax.swing.JPanel;
+
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialog;
+import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponent;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentButtonGroup;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
-import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
@@ -65,73 +73,113 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class DictionaryExtractorNodeDialog extends DefaultNodeSettingsPane {
+final class DictionaryExtractorNodeDialog extends NodeDialogPane {
 
-    /**
-     * A {@link SettingsModelIntegerBounded} to store the threshold to keep the top X frequent terms.
-     */
-    private final SettingsModelIntegerBounded m_keepXTopFreqTermsModel =
-        DictionaryExtractorNodeModel.getTopXTermsModel();
+    /** Dialog containing the document column to process. */
+    private final DialogComponentColumnNameSelection m_colNameSelectionDialog;
 
-    /**
-     * A {@link SettingsModelIntegerBounded} to store the number of threads used to process the documents.
-     */
-    private final SettingsModelIntegerBounded m_numberOfThreadsModel =
-        DictionaryExtractorNodeModel.getNumberOfThreadsModel();
+    /** Dialog indicating whether the node should only keep the top k most frequent terms. */
+    private final DialogComponentBoolean m_enableFilteringDialog;
 
-    /**
-     * A {@link SettingsModelString} to store the frequency method used to filter the terms.
-     */
-    private final SettingsModelString m_filterByModel = DictionaryExtractorNodeModel.getFilterByModel();
+    /** Dialog holding the k value used to filter the most frequent terms. */
+    private final DialogComponentNumber m_topKTermsDialog;
+
+    /** Dialog storing three different frequency options used to filter the top k most terms.*/
+    private final DialogComponentButtonGroup m_filterByDialog;
+
+    /** Dialog holding the number of threads. */
+    private final DialogComponentNumber m_noOfThreadsDialog;
+
+    /** Array holding all dialog components. */
+    private final DialogComponent[] m_diagComps;
 
     /**
      * Constructor for class {@link DictionaryExtractorNodeDialog}.
      */
     @SuppressWarnings("unchecked")
     DictionaryExtractorNodeDialog() {
-        // document col to create bow from
-        final DialogComponentColumnNameSelection docColSelectionComp = new DialogComponentColumnNameSelection(
-            DictionaryExtractorNodeModel.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
-        docColSelectionComp.setToolTipText("Column containing the documents to create dictionary from");
-        addDialogComponent(docColSelectionComp);
-        setHorizontalPlacement(false);
-        setHorizontalPlacement(true);
+        final JPanel panel = new JPanel(new GridBagLayout());
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.BOTH;
 
-        // keep top x most frequent terms
-        m_keepXTopFreqTermsModel.addChangeListener(e -> updateModel());
-        final DialogComponentNumber keepXTerms =
-            new DialogComponentNumber(m_keepXTopFreqTermsModel, "Keep top X most frequent terms", 1);
-        keepXTerms.setToolTipText("Keep only the top frequent terms based on the set value and filter method.");
-        addDialogComponent(keepXTerms);
-        setHorizontalPlacement(false);
+        // document column selection
+        m_colNameSelectionDialog = new DialogComponentColumnNameSelection(
+            DictionaryExtractorNodeModel.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
+        m_colNameSelectionDialog.setToolTipText("Column containing the documents to create dictionary from");
+        panel.add(m_colNameSelectionDialog.getComponentPanel(), gbc);
+        ++gbc.gridy;
+
+        // enable top k filtering and top k b
+        final JPanel topKPanel = new JPanel(new GridBagLayout());
+        m_enableFilteringDialog =
+            new DialogComponentBoolean(DictionaryExtractorNodeModel.getFilterTermsModel(), "Most frequent terms (k)");
+        m_enableFilteringDialog.getModel().addChangeListener(e -> updateModel());
+        m_topKTermsDialog = new DialogComponentNumber(DictionaryExtractorNodeModel.getTopKTermsModel(), "", 1, 6);
+        m_topKTermsDialog
+            .setToolTipText("Keep only the top k frequent terms based on the set value and filter method.");
+
+        topKPanel.add(m_enableFilteringDialog.getComponentPanel());
+        topKPanel.add(m_topKTermsDialog.getComponentPanel());
+        panel.add(topKPanel, gbc);
+        ++gbc.gridy;
 
         // filter method
-        final DialogComponentButtonGroup filterBy = new DialogComponentButtonGroup(m_filterByModel, false,
+        m_filterByDialog = new DialogComponentButtonGroup(DictionaryExtractorNodeModel.getFilterByModel(), false,
             "Filter terms by", MultiThreadDictionaryExtractor.TF, MultiThreadDictionaryExtractor.DF,
             MultiThreadDictionaryExtractor.IDF);
-        filterBy.setToolTipText("Keep the X top terms regarding the selected frequency method.");
-        addDialogComponent(filterBy);
+        m_filterByDialog.setToolTipText("Keep the k top terms regarding the selected frequency method.");
+        panel.add(m_filterByDialog.getComponentPanel(), gbc);
+        ++gbc.gridy;
 
         // Number of threads component to select output columns
-        addDialogComponent(new DialogComponentNumber(m_numberOfThreadsModel, "Number of threads", 1));
+        m_noOfThreadsDialog = new DialogComponentNumber(DictionaryExtractorNodeModel.getNumberOfThreadsModel(),
+            "Number of threads", 1, 5);
+        panel.add(m_noOfThreadsDialog.getComponentPanel(), gbc);
+
+        m_diagComps = new DialogComponent[]{m_colNameSelectionDialog, m_enableFilteringDialog, m_topKTermsDialog,
+            m_filterByDialog, m_noOfThreadsDialog};
+
+        addTab("Options", panel);
         updateModel();
+    }
+
+    /**
+     * Enables/disables the filtering model option in case that the value of the 'keep top k most frequent terms' option
+     * changes.
+     */
+    private void updateModel() {
+        m_filterByDialog.getModel()
+            .setEnabled(((SettingsModelBoolean)m_enableFilteringDialog.getModel()).getBooleanValue());
+        m_topKTermsDialog.getModel()
+            .setEnabled(((SettingsModelBoolean)m_enableFilteringDialog.getModel()).getBooleanValue());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
-        throws NotConfigurableException {
-        updateModel();
+    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        for (final DialogComponent dia : m_diagComps) {
+            dia.saveSettingsTo(settings);
+        }
     }
 
     /**
-     * Enables/disables the filtering model option in case that the value of the 'keep top X most frequent terms' option
-     * changes.
+     * {@inheritDoc}
      */
-    private void updateModel() {
-        m_filterByModel.setEnabled(m_keepXTopFreqTermsModel.getIntValue() > 0);
+    @Override
+    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+        throws NotConfigurableException {
+        assert (settings != null && specs != null);
+        for (final DialogComponent dia : m_diagComps) {
+            dia.loadSettingsFrom(settings, specs);
+        }
+        updateModel();
     }
 
 }

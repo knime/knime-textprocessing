@@ -122,6 +122,11 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
     private Map<String, FrequencyPair> m_frequencyMap = new HashMap<>();
 
     /**
+     * True, if only the top k terms should be returned.
+     */
+    private final boolean m_enableFiltering;
+
+    /**
      * Number of top frequent terms to be displayed in the output table.
      */
     private final int m_numberOfTerms;
@@ -161,11 +166,12 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @param maxActiveInstanceSize Number of threads.
      * @param exec The ExecutionContext.
      */
-    MultiThreadDictionaryExtractor(final int docColIdx, final int numberOfTerms, final long totalNoOfRows,
-        final String filterBy, final int maxActiveInstanceSize, final ExecutionContext exec) {
+    MultiThreadDictionaryExtractor(final int docColIdx, final boolean filterTerms, final int numberOfTerms,
+        final long totalNoOfRows, final String filterBy, final int maxActiveInstanceSize, final ExecutionContext exec) {
         super(totalNoOfRows >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)totalNoOfRows, maxActiveInstanceSize);
         m_docColIdx = docColIdx;
         m_numberOfTerms = numberOfTerms;
+        m_enableFiltering = filterTerms;
         m_totalNoOfRows = totalNoOfRows;
         m_filterBy = filterBy;
         m_exec = exec;
@@ -209,7 +215,7 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @return Returns a new {@link BufferedDataTable} based on the processed data.
      */
     BufferedDataTable createDataTable() {
-        if ((m_numberOfTerms != 0) && (m_numberOfTerms < m_frequencyMap.size())) {
+        if (m_enableFiltering && (m_numberOfTerms < m_frequencyMap.size())) {
             filterTerms();
         }
 
@@ -223,9 +229,6 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
                 new LongCell(freqs.getTF()), new LongCell(freqs.getDF()), new DoubleCell(freqs.getIDF()));
             dataContainer.addRowToTable(row);
             rowCount++;
-            if (m_numberOfTerms != 0 && rowCount == m_numberOfTerms) {
-                break;
-            }
         }
         dataContainer.close();
 
@@ -236,8 +239,9 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * Filters and sorts the map to keep only the top X most frequent terms.
      */
     private void filterTerms() {
-        m_frequencyMap = m_frequencyMap.entrySet().stream()
-            .sorted(Entry.<String, FrequencyPair> comparingByValue(new FrequencyPairComparator(m_filterBy)).reversed())
+        m_frequencyMap = m_frequencyMap.entrySet().stream()//
+            .sorted(Entry.<String, FrequencyPair> comparingByValue(new FrequencyPairComparator(m_filterBy)).reversed())//
+            .limit(m_numberOfTerms)//
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue, FrequencyPair::sum, LinkedHashMap::new));
     }
 
