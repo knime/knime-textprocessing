@@ -7,6 +7,12 @@
         <intro>
             This node creates a global dictionary over all documents. Additionally, it creates three frequency columns:
             Term frequency, document frequency and inverse document frequency.
+            The term frequency is the count of a term in all documents. The document frequency specifies the
+            number of documents in which a term occurs.<br/> The inverse document frequency is used to measure how much 
+            information a term provides. To calculate the frequency, the total number of all documents is divided by the number of documents in which the term occurs.
+            Afterwards the fraction is logarithmically scaled: <br/><tt>idf(t) = log(f(D) / f(d,t))</tt><br/> 
+            More information about term frequencies can be found <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">here</a>.<br/>
+            <br/>
             It is possible to create a data table containing only the most frequent terms based on the selected
             frequency count.
             The node also provides an index column with numbers which can be used for replacing words with numbers
@@ -19,8 +25,9 @@
     		Check, if the data table should be restricted on the top k most frequent terms.
     	</option>
     	<option name="Filter terms by">
-            If the 'Most frequent terms (k)' option is checked, select the frequency method used to filter the 
-            terms.
+            If the 'Most frequent terms (k)' option is checked, the terms are sorted by the selected frequency method 
+            (<tt>TF</tt>, <tt>DF</tt> or <tt>IDF</tt>). Only the top-k most frequent terms are then added to the data 
+            table. 
     	</option>
     	<option name="Number of threads">
 			The number of threads used to process the documents.

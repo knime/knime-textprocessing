@@ -51,7 +51,6 @@ package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
@@ -215,34 +214,47 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @return Returns a new {@link BufferedDataTable} based on the processed data.
      */
     BufferedDataTable createDataTable() {
-        if (m_enableFiltering && (m_numberOfTerms < m_frequencyMap.size())) {
-            filterTerms();
-        }
-
         final BufferedDataContainer dataContainer = m_exec.createDataContainer(createDataTableSpec());
+        final AtomicLong rowCount = new AtomicLong(0);
 
-        long rowCount = 0;
-        for (final Entry<String, FrequencyPair> entry : m_frequencyMap.entrySet()) {
-            final FrequencyPair freqs = entry.getValue();
-            final RowKey key = RowKey.createRowKey(rowCount);
-            final DataRow row = new DefaultRow(key, new StringCell(entry.getKey()), new IntCell((int)rowCount + 1),
-                new LongCell(freqs.getTF()), new LongCell(freqs.getDF()), new DoubleCell(freqs.getIDF()));
-            dataContainer.addRowToTable(row);
-            rowCount++;
+        if (m_enableFiltering) {
+            filterTerms(rowCount, dataContainer);
+        } else {
+            m_frequencyMap.entrySet().stream()//
+                .forEach(e -> addRowToDataContainer(e.getKey(), e.getValue(), rowCount.getAndAdd(1), dataContainer));
         }
-        dataContainer.close();
 
+        dataContainer.close();
         return dataContainer.getTable();
     }
 
     /**
-     * Filters and sorts the map to keep only the top X most frequent terms.
+     * Adds a new {@link DataRow} to a {@link BufferedDataContainer}.
+     *
+     * @param term The term/word.
+     * @param freqPair The {@link FrequencyPair} storing TF, DF and IDF values.
+     * @param rowCount The row count of the {@link DataRow} to create.
+     * @param dataContainer A {@link BufferedDataContainer} to add the data row to.
      */
-    private void filterTerms() {
-        m_frequencyMap = m_frequencyMap.entrySet().stream()//
+    private static final void addRowToDataContainer(final String term, final FrequencyPair freqPair,
+        final long rowCount, final BufferedDataContainer dataContainer) {
+        final RowKey key = RowKey.createRowKey(rowCount);
+        final DataRow row = new DefaultRow(key, new StringCell(term), new IntCell((int)rowCount + 1),
+            new LongCell(freqPair.getTF()), new LongCell(freqPair.getDF()), new DoubleCell(freqPair.getIDF()));
+        dataContainer.addRowToTable(row);
+    }
+
+    /**
+     * Filters and sorts the map to keep only the top X most frequent terms.
+     *
+     * @param rowCount An {@link AtomicLong} taking care of the row count.
+     * @param container A {@link BufferedDataContainer} which stores the data.
+     */
+    private final void filterTerms(final AtomicLong rowCount, final BufferedDataContainer container) {
+        m_frequencyMap.entrySet().stream()//
             .sorted(Entry.<String, FrequencyPair> comparingByValue(new FrequencyPairComparator(m_filterBy)).reversed())//
             .limit(m_numberOfTerms)//
-            .collect(Collectors.toMap(Entry::getKey, Entry::getValue, FrequencyPair::sum, LinkedHashMap::new));
+            .forEachOrdered(e -> addRowToDataContainer(e.getKey(), e.getValue(), rowCount.getAndAdd(1), container));
     }
 
     /**

@@ -175,7 +175,6 @@ final class DictionaryExtractorNodeDialog extends NodeDialogPane {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
-        assert (settings != null && specs != null);
         for (final DialogComponent dia : m_diagComps) {
             dia.loadSettingsFrom(settings, specs);
         }

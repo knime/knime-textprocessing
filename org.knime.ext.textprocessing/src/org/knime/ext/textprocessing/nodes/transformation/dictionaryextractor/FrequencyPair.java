@@ -129,6 +129,6 @@ final class FrequencyPair {
      * @return Returns the inverse document frequency.
      */
     final double getIDF() {
-        return Frequencies.inverseDocumentFrequency((int)m_noOfDocs, (int)m_df);
+        return Frequencies.normalizedInverseDocumentFrequency((int)m_noOfDocs, (int)m_df);
     }
 }
