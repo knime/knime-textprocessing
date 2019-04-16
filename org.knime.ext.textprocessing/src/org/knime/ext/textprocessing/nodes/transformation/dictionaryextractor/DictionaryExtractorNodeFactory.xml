@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="../../../icons/TextProcDefault.png" type="Manipulator">
+<knimeNode xmlns="http://knime.org/node/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v3.1 http://knime.org/node/v3.1"
+	icon="../../../icons/TextProcDefault.png" type="Manipulator">
     <name>Dictionary Extractor</name>
     <shortDescription>Creates a global dictionary over all documents.</shortDescription>
     <fullDescription>
         <intro>
-            This node creates a global dictionary over all documents. Additionally, it creates three frequency columns:
-            Term frequency, document frequency and inverse document frequency.
-            The term frequency is the count of a term in all documents. The document frequency specifies the
-            number of documents in which a term occurs.<br/> The inverse document frequency is used to measure how much 
-            information a term provides. To calculate the frequency, the total number of all documents is divided by the number of documents in which the term occurs.
-            Afterwards the fraction is logarithmically scaled: <br/><tt>idf(t) = log(f(D) / f(d,t))</tt><br/> 
+            This node creates a global dictionary over all documents. Optionally, it is possible to filter the top-k 
+            words in terms of frequencies. There are three different frequencies to choose from for filtering: the term frequency,
+            the document frequency and the inverse document frequency. <br/>
+            <ul>
+                <li>Term Frequency (<tt>TF</tt>): Overall count of a term in all documents. </li>
+                <li>Document Frequency (<tt>DF</tt>): Number of documents in which a term occurs.</li>
+				<li>Inverse Document Frequency (<tt>IDF</tt>): The logarithm of the total number of documents divided by the <tt>DF</tt>.</li>
+            </ul>
             More information about term frequencies can be found <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">here</a>.<br/>
             <br/>
-            It is possible to create a data table containing only the most frequent terms based on the selected
-            frequency count.
-            The node also provides an index column with numbers which can be used for replacing words with numbers
-            while preprocessing documents for deep learning.
         </intro>
         <option name="Document column">
             Select the document column to extract the document from.
@@ -28,6 +27,13 @@
             If the 'Most frequent terms (k)' option is checked, the terms are sorted by the selected frequency method 
             (<tt>TF</tt>, <tt>DF</tt> or <tt>IDF</tt>). Only the top-k most frequent terms are then added to the data 
             table. 
+    	</option>
+    	<option name="Append index column">
+            If checked, the node appends an index column containing a unique index for each term. This is especially useful
+            for replacing words with numbers while preparing documents for deep learning.
+    	</option>
+    	 <option name="Append frequency columns">
+            If checked, the node appends a term frequency (<tt>TF</tt>), document frequency (<tt>DF</tt>) and inverse document frequency (<tt>IDF</tt>) column.
     	</option>
     	<option name="Number of threads">
 			The number of threads used to process the documents.

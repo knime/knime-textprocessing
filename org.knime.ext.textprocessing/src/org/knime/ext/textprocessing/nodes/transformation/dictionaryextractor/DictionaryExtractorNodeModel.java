@@ -95,6 +95,16 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     private static final String CFG_KEY_FILTER_BY = "filter_by";
 
     /**
+     * Configuration key for the option to append frequency columns.
+     */
+    private static final String CFG_KEY_APPEND_FREQ_COL = "append_freq_cols";
+
+    /**
+     * Configuration key for the option to append indices column.
+     */
+    private static final String CFG_KEY_APPEND_IDX_COL = "append_idx_col";
+
+    /**
      * Configuration key for the filter option.
      */
     private static final String CFG_KEY_ENABLE_FILTERING = "enable_filtering";
@@ -108,6 +118,16 @@ final class DictionaryExtractorNodeModel extends NodeModel {
      * Default value for enabling the term filter.
      */
     private static final boolean DEF_ENABLE_FILTERING = false;
+
+    /**
+     * Default value for appending index column.
+     */
+    private static final boolean DEF_APPEND_IDX_COLUMN = false;
+
+    /**
+     * Default value for appending frequency columns.
+     */
+    private static final boolean DEF_APPEND_FREQ_COLUMNS = false;
 
     /**
      * Creates and returns a {@link SettingsModelString} containing the name of the column with the documents to create
@@ -158,6 +178,28 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     }
 
     /**
+     * Creates and returns a {@link SettingsModelBoolean} containing the boolean value that indicates whether frequency
+     * columns should be appended or not.
+     *
+     * @return Creates and returns a {@link SettingsModelBoolean} containing the boolean value that indicates whether
+     *         frequency columns should be appended or not.
+     */
+    static final SettingsModelBoolean getAppendFreqColModel() {
+        return new SettingsModelBoolean(CFG_KEY_APPEND_FREQ_COL, DEF_APPEND_FREQ_COLUMNS);
+    }
+
+    /**
+     * Creates and returns a {@link SettingsModelBoolean} containing the boolean value that indicates whether an index
+     * column should be appended or not.
+     *
+     * @return Creates and returns a {@link SettingsModelBoolean} containing the boolean value that indicates whether an
+     *         index column should be appended or not.
+     */
+    static final SettingsModelBoolean getAppendIdxColModel() {
+        return new SettingsModelBoolean(CFG_KEY_APPEND_IDX_COL, DEF_APPEND_IDX_COLUMN);
+    }
+
+    /**
      * The {@link SettingsModelString} containing the name of the document column.
      */
     private final SettingsModelString m_docColModel = getDocumentColumnModel();
@@ -178,10 +220,20 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     private final SettingsModelBoolean m_enableFilteringModel = getFilterTermsModel();
 
     /**
-     * Creates and returns a {@link SettingsModelString} containing the name of the frequency method used to filter the
-     * terms to get the top k most frequent terms only.
+     * The {@link SettingsModelString} containing the name of the frequency method used to filter the terms to get the
+     * top k most frequent terms only.
      */
     private final SettingsModelString m_filterByModel = getFilterByModel();
+
+    /**
+     * The {@link SettingsModelBoolean} containing the boolean value to enable/disable appending frequency columns.
+     */
+    private final SettingsModelBoolean m_appendFreqColsModel = getAppendFreqColModel();
+
+    /**
+     * The {@link SettingsModelBoolean} containing the boolean value to enable/disable appending a unique index column.
+     */
+    private final SettingsModelBoolean m_appendIdxColModel = getAppendIdxColModel();
 
     /**
      * Creates a new instance of {@code DocumentToDictionaryNodeModel}.
@@ -196,7 +248,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{MultiThreadDictionaryExtractor.createDataTableSpec()};
+        return new DataTableSpec[]{MultiThreadDictionaryExtractor
+            .createDataTableSpec(m_appendFreqColsModel.getBooleanValue(), m_appendIdxColModel.getBooleanValue())};
     }
 
     /**
@@ -233,7 +286,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
             ? m_numberOfThreadsModel.getIntValue() : (int)numberOfRows;
         final MultiThreadDictionaryExtractor extractor =
             new MultiThreadDictionaryExtractor(documentColIndex, m_enableFilteringModel.getBooleanValue(),
-                m_topKTermsModel.getIntValue(), numberOfRows, m_filterByModel.getStringValue(), numberOfThreads, exec);
+                m_topKTermsModel.getIntValue(), numberOfRows, m_filterByModel.getStringValue(),
+                m_appendIdxColModel.getBooleanValue(), m_appendFreqColsModel.getBooleanValue(), numberOfThreads, exec);
 
         // Only run if table is not empty
         if (numberOfRows > 0) {
@@ -278,6 +332,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
         m_numberOfThreadsModel.saveSettingsTo(settings);
         m_topKTermsModel.saveSettingsTo(settings);
         m_filterByModel.saveSettingsTo(settings);
+        m_appendFreqColsModel.saveSettingsTo(settings);
+        m_appendIdxColModel.saveSettingsTo(settings);
         m_enableFilteringModel.saveSettingsTo(settings);
     }
 
@@ -290,6 +346,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
         m_numberOfThreadsModel.validateSettings(settings);
         m_topKTermsModel.validateSettings(settings);
         m_filterByModel.validateSettings(settings);
+        m_appendFreqColsModel.validateSettings(settings);
+        m_appendIdxColModel.validateSettings(settings);
         m_enableFilteringModel.validateSettings(settings);
     }
 
@@ -302,6 +360,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
         m_numberOfThreadsModel.loadSettingsFrom(settings);
         m_topKTermsModel.loadSettingsFrom(settings);
         m_enableFilteringModel.loadSettingsFrom(settings);
+        m_appendFreqColsModel.loadSettingsFrom(settings);
+        m_appendIdxColModel.loadSettingsFrom(settings);
         m_filterByModel.loadSettingsFrom(settings);
     }
 

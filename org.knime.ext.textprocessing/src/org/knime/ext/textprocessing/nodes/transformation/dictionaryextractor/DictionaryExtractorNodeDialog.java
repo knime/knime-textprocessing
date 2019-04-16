@@ -84,8 +84,14 @@ final class DictionaryExtractorNodeDialog extends NodeDialogPane {
     /** Dialog holding the k value used to filter the most frequent terms. */
     private final DialogComponentNumber m_topKTermsDialog;
 
-    /** Dialog storing three different frequency options used to filter the top k most terms.*/
+    /** Dialog storing three different frequency options used to filter the top k most terms. */
     private final DialogComponentButtonGroup m_filterByDialog;
+
+    /** Dialog indicating whether the node should append frequency columns. */
+    private final DialogComponentBoolean m_includeFreqColumnsDialog;
+
+    /** Dialog indicating whether the node should append a unique indices column. */
+    private final DialogComponentBoolean m_includeIdxColumnDialog;
 
     /** Dialog holding the number of threads. */
     private final DialogComponentNumber m_noOfThreadsDialog;
@@ -136,13 +142,23 @@ final class DictionaryExtractorNodeDialog extends NodeDialogPane {
         panel.add(m_filterByDialog.getComponentPanel(), gbc);
         ++gbc.gridy;
 
+        // enable cols
+        m_includeIdxColumnDialog =
+                new DialogComponentBoolean(DictionaryExtractorNodeModel.getAppendIdxColModel(), "Append index column");
+            panel.add(m_includeIdxColumnDialog.getComponentPanel(), gbc);
+            ++gbc.gridy;
+        m_includeFreqColumnsDialog = new DialogComponentBoolean(DictionaryExtractorNodeModel.getAppendFreqColModel(),
+            "Append frequency columns");
+        panel.add(m_includeFreqColumnsDialog.getComponentPanel(), gbc);
+        ++gbc.gridy;
+
         // Number of threads component to select output columns
         m_noOfThreadsDialog = new DialogComponentNumber(DictionaryExtractorNodeModel.getNumberOfThreadsModel(),
             "Number of threads", 1, 5);
         panel.add(m_noOfThreadsDialog.getComponentPanel(), gbc);
 
         m_diagComps = new DialogComponent[]{m_colNameSelectionDialog, m_enableFilteringDialog, m_topKTermsDialog,
-            m_filterByDialog, m_noOfThreadsDialog};
+            m_filterByDialog, m_includeFreqColumnsDialog, m_includeIdxColumnDialog, m_noOfThreadsDialog};
 
         addTab("Options", panel);
         updateModel();

@@ -141,6 +141,16 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
     private final String m_filterBy;
 
     /**
+     * True, if frequency columns should be appended.
+     */
+    private final boolean m_appendFreqColumns;
+
+    /**
+     * True, if indices columns should be appended.
+     */
+    private final boolean m_appendIdxColumn;
+
+    /**
      * Number of processed rows.
      */
     private final AtomicLong m_processedRowCount = new AtomicLong(0);
@@ -162,17 +172,22 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @param numberOfTerms Number of top frequent terms to be displayed in the output table.
      * @param totalNoOfRows Total number of documents.
      * @param filterBy Name of the frequency method which is used to sort the data to get the top X most frequent terms.
+     * @param appendIdxCol Set true to append a unique indices column.
+     * @param appendFreqCols Set true to append frequency columns.
      * @param maxActiveInstanceSize Number of threads.
      * @param exec The ExecutionContext.
      */
     MultiThreadDictionaryExtractor(final int docColIdx, final boolean filterTerms, final int numberOfTerms,
-        final long totalNoOfRows, final String filterBy, final int maxActiveInstanceSize, final ExecutionContext exec) {
+        final long totalNoOfRows, final String filterBy, final boolean appendIdxCol, final boolean appendFreqCols,
+        final int maxActiveInstanceSize, final ExecutionContext exec) {
         super(totalNoOfRows >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)totalNoOfRows, maxActiveInstanceSize);
         m_docColIdx = docColIdx;
         m_numberOfTerms = numberOfTerms;
         m_enableFiltering = filterTerms;
         m_totalNoOfRows = totalNoOfRows;
         m_filterBy = filterBy;
+        m_appendFreqColumns = appendFreqCols;
+        m_appendIdxColumn = appendIdxCol;
         m_exec = exec;
     }
 
@@ -214,14 +229,16 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @return Returns a new {@link BufferedDataTable} based on the processed data.
      */
     BufferedDataTable createDataTable() {
-        final BufferedDataContainer dataContainer = m_exec.createDataContainer(createDataTableSpec());
+        final BufferedDataContainer dataContainer =
+            m_exec.createDataContainer(createDataTableSpec(m_appendFreqColumns, m_appendIdxColumn));
         final AtomicLong rowCount = new AtomicLong(0);
 
         if (m_enableFiltering) {
             filterTerms(rowCount, dataContainer);
         } else {
             m_frequencyMap.entrySet().stream()//
-                .forEach(e -> addRowToDataContainer(e.getKey(), e.getValue(), rowCount.getAndAdd(1), dataContainer));
+                .forEach(
+                    e -> addRowToDataContainer(e.getKey(), e.getValue(), rowCount.getAndIncrement(), dataContainer));
         }
 
         dataContainer.close();
@@ -236,11 +253,22 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @param rowCount The row count of the {@link DataRow} to create.
      * @param dataContainer A {@link BufferedDataContainer} to add the data row to.
      */
-    private static final void addRowToDataContainer(final String term, final FrequencyPair freqPair,
+    private final void addRowToDataContainer(final String term, final FrequencyPair freqPair,
         final long rowCount, final BufferedDataContainer dataContainer) {
         final RowKey key = RowKey.createRowKey(rowCount);
-        final DataRow row = new DefaultRow(key, new StringCell(term), new IntCell((int)rowCount + 1),
-            new LongCell(freqPair.getTF()), new LongCell(freqPair.getDF()), new DoubleCell(freqPair.getIDF()));
+        final DataRow row;
+        if (m_appendFreqColumns && m_appendIdxColumn) {
+            row = new DefaultRow(key, new StringCell(term), new IntCell((int)rowCount + 1),
+                new LongCell(freqPair.getTF()), new LongCell(freqPair.getDF()), new DoubleCell(freqPair.getIDF()));
+        } else if (m_appendIdxColumn) {
+            row = new DefaultRow(key, new StringCell(term), new IntCell((int)rowCount + 1));
+        } else if (m_appendFreqColumns) {
+            row = new DefaultRow(key, new StringCell(term), new LongCell(freqPair.getTF()),
+                new LongCell(freqPair.getDF()), new DoubleCell(freqPair.getIDF()));
+        } else {
+            row = new DefaultRow(key, new StringCell(term));
+        }
+
         dataContainer.addRowToTable(row);
     }
 
@@ -254,7 +282,8 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
         m_frequencyMap.entrySet().stream()//
             .sorted(Entry.<String, FrequencyPair> comparingByValue(new FrequencyPairComparator(m_filterBy)).reversed())//
             .limit(m_numberOfTerms)//
-            .forEachOrdered(e -> addRowToDataContainer(e.getKey(), e.getValue(), rowCount.getAndAdd(1), container));
+            .forEachOrdered(
+                e -> addRowToDataContainer(e.getKey(), e.getValue(), rowCount.getAndIncrement(), container));
     }
 
     /**
@@ -262,17 +291,32 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      *
      * @return Returns the {@link DataTableSpec}.
      */
-    static final DataTableSpec createDataTableSpec() {
+    static final DataTableSpec createDataTableSpec(final boolean appendFreqCols, final boolean appendIdxCol) {
         // create dict and occurrence column spec
         final DataColumnSpecCreator dictionaryColumn = new DataColumnSpecCreator(TERM_COL_NAME, StringCell.TYPE);
-        final DataColumnSpecCreator indexColumn = new DataColumnSpecCreator(IDX, IntCell.TYPE);
-        final DataColumnSpecCreator tfColumn = new DataColumnSpecCreator(TF, LongCell.TYPE);
-        final DataColumnSpecCreator dfColumn = new DataColumnSpecCreator(DF, LongCell.TYPE);
-        final DataColumnSpecCreator idfColumn = new DataColumnSpecCreator(IDF, DoubleCell.TYPE);
+        final DataColumnSpecCreator indexColumn;
+        final DataColumnSpecCreator tfColumn;
+        final DataColumnSpecCreator dfColumn;
+        final DataColumnSpecCreator idfColumn;
+        if (appendIdxCol && appendFreqCols) {
+            indexColumn = new DataColumnSpecCreator(IDX, IntCell.TYPE);
+            tfColumn = new DataColumnSpecCreator(TF, LongCell.TYPE);
+            dfColumn = new DataColumnSpecCreator(DF, LongCell.TYPE);
+            idfColumn = new DataColumnSpecCreator(IDF, DoubleCell.TYPE);
+            return new DataTableSpec(dictionaryColumn.createSpec(), indexColumn.createSpec(), tfColumn.createSpec(),
+                dfColumn.createSpec(), idfColumn.createSpec());
+        } else if (appendIdxCol) {
+            indexColumn = new DataColumnSpecCreator(IDX, IntCell.TYPE);
+            return new DataTableSpec(dictionaryColumn.createSpec(), indexColumn.createSpec());
+        } else if (appendFreqCols) {
+            tfColumn = new DataColumnSpecCreator(TF, LongCell.TYPE);
+            dfColumn = new DataColumnSpecCreator(DF, LongCell.TYPE);
+            idfColumn = new DataColumnSpecCreator(IDF, DoubleCell.TYPE);
+            return new DataTableSpec(dictionaryColumn.createSpec(), tfColumn.createSpec(), dfColumn.createSpec(),
+                idfColumn.createSpec());
+        } // create new data table with selected columns and term column
 
-        // create new data table with selected columns and term column
-        return new DataTableSpec(dictionaryColumn.createSpec(), indexColumn.createSpec(), tfColumn.createSpec(),
-            dfColumn.createSpec(), idfColumn.createSpec());
+        return new DataTableSpec(dictionaryColumn.createSpec());
     }
 
     /**
