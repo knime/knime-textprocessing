@@ -67,8 +67,10 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.util.MultiThreadWorker;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
-import org.knime.ext.textprocessing.util.DocumentToAnnotationConverter;
 
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.CoreLabel.OutputFormat;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.AnnotationPipeline;
 
@@ -128,10 +130,10 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      *            the used executor).
      * @param exec ExecutionContext
      */
-    protected MultiThreadRelationExtractor(final BufferedDataContainer container,
-        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
-        final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec) {
-        super(maxQueueSize, maxActiveInstanceSize);
+    protected MultiThreadRelationExtractor(final BufferedDataContainer container, final int docColIdx,
+        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final int maxQueueSize,
+        final int maxActiveInstanceSize, final ExecutionContext exec) {
+        super(maxQueueSize >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)maxQueueSize, maxActiveInstanceSize);
         m_dataContainer = container;
         m_docColIdx = docColIdx;
         m_lemmaDocColIdx = lemmaDocColIdx;
@@ -151,10 +153,14 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
         if (!dataCell.isMissing()) {
             final Document doc = ((DocumentValue)in.getCell(m_docColIdx)).getDocument();
             final Annotation annotation = !lemmaDataCell.isMissing()
-                ? DocumentToAnnotationConverter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument(), true, true)
+                ? DocumentToAnnotationConverter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument())
                 : DocumentToAnnotationConverter.convert(doc);
             try {
                 m_annotationPipeline.annotate(annotation);
+                List<CoreLabel> labels = annotation.get(CoreAnnotations.TokensAnnotation.class);
+                labels.stream().forEach(cl -> System.out.println(cl.toString(OutputFormat.ALL)));
+                System.out
+                    .print(((Annotation)annotation.get(CoreAnnotations.SentencesAnnotation.class).get(0)).toShortString('\n'));
                 extractionResults = extractRelations(annotation);
             } catch (final AssertionError | NullPointerException e) {
                 extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());
@@ -215,7 +221,6 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      * @return A list of {@code ExtractionResults}.
      */
     protected abstract List<ExtractionResult> extractRelations(final Annotation annotation);
-
 
     /**
      * Returns the number of processed documents cells which contained missing values.

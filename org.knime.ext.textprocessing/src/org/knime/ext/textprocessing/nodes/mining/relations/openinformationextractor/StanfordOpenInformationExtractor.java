@@ -149,7 +149,7 @@ final class StanfordOpenInformationExtractor extends MultiThreadRelationExtracto
                 final String subject = m_lemmatizedResults ? triple.subjectLemmaGloss() : triple.subjectGloss();
                 final String relation = m_lemmatizedResults ? triple.relationLemmaGloss() : triple.relationGloss();
                 final String object = m_lemmatizedResults ? triple.objectLemmaGloss() : triple.objectGloss();
-                final Double confidence = Double.parseDouble(triple.confidenceGloss());
+                final Double confidence = triple.confidence;
                 results.add(new ExtractionResult(subject, relation, object, confidence));
             }
         }

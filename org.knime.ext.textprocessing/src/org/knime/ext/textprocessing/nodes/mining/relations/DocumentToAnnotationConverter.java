@@ -46,11 +46,12 @@
  * History
  *   Jan 10, 2019 (julian): created
  */
-package org.knime.ext.textprocessing.util;
+package org.knime.ext.textprocessing.nodes.mining.relations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.knime.ext.textprocessing.data.Document;
@@ -74,7 +75,7 @@ import edu.stanford.nlp.util.CoreMap;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  * @since 3.8
  */
-public final class DocumentToAnnotationConverter {
+final class DocumentToAnnotationConverter {
 
     /**
      * Unknown tag value.
@@ -82,9 +83,24 @@ public final class DocumentToAnnotationConverter {
     private static final String UNKNOWN = "UNKNOWN";
 
     /**
+     * Symbol tag value.
+     */
+    private static final String SYM = "SYM";
+
+    /**
      * String used as backup part-of-speech tag for untagged terms, since no tag might crash StanfordNLP annotators.
      */
     private static final String POS_FALLBACK_TAG = " ";
+
+    /**
+     * CoreNLP's quotation part-of-speech tag.
+     */
+    private static final String QUOTATION_POS_TAG = "''";
+
+    /**
+     * Different types of quotation marks.
+     */
+    private static final Pattern quotePattern = Pattern.compile("['\"`´]+");
 
     /**
      * Empty constructor.
@@ -99,7 +115,7 @@ public final class DocumentToAnnotationConverter {
      * @param document {@code Document} to convert.
      * @return Returns an {@code Annotation} object.
      */
-    public static final Annotation convert(final Document document) {
+    static final Annotation convert(final Document document) {
         final List<CoreMap> coreMap = new ArrayList<>(10);
         final Iterator<Sentence> sentenceIterator = document.sentenceIterator();
         int sentenceCount = 1;
@@ -114,7 +130,7 @@ public final class DocumentToAnnotationConverter {
             for (final Term term : terms) {
                 final List<Word> words = term.getWords();
                 for (final Word word : words) {
-                    labels.add(wordToCoreLabel(word, null, wordCount++, sentenceCount, null, null));
+                    labels.add(wordToCoreLabel(word, wordCount++, sentenceCount));
                 }
             }
             sentenceCount++;
@@ -130,12 +146,9 @@ public final class DocumentToAnnotationConverter {
      *
      * @param document {@code Document} to convert.
      * @param lemmatizedDoc The lemmatized {@code Document}.
-     * @param setPosTags Set true, if part-of-speech tags should be set.
-     * @param setNeTags Set true, if named entity tags should be set.
      * @return Returns an {@code Annotation}.
      */
-    public static final Annotation convert(final Document document, final Document lemmatizedDoc,
-        final boolean setPosTags, final boolean setNeTags) {
+    static final Annotation convert(final Document document, final Document lemmatizedDoc) {
         final List<CoreMap> coreMap = new ArrayList<>();
         final Iterator<Sentence> sentenceIterator = document.sentenceIterator();
         final Iterator<Sentence> lemmatizedSentenceIterator = lemmatizedDoc.sentenceIterator();
@@ -155,16 +168,10 @@ public final class DocumentToAnnotationConverter {
                 final Term term = terms.get(i);
                 final List<Word> words = term.getWords();
                 final List<Word> lemmaWords = lemmatizedTerms.get(i).getWords();
+                final List<Tag> tags = term.getTags();
                 assert words.size() == lemmaWords.size();
-                final List<Tag> posTags = setPosTags ? term.getTags().stream()//
-                    .filter(t -> t.getTagType().equals(PartOfSpeechTag.TAG_TYPE))//
-                    .collect(Collectors.toList()) : null;
-                final List<Tag> neTags = setNeTags ? term.getTags().stream()//
-                    .filter(t -> t.getTagType().equals(NamedEntityTag.TAG_TYPE))//
-                    .collect(Collectors.toList()) : null;
                 for (int j = 0; j < words.size(); j++) {
-                    labels.add(
-                        wordToCoreLabel(words.get(j), lemmaWords.get(j), wordCount++, sentenceCount, posTags, neTags));
+                    labels.add(wordToCoreLabel(words.get(j), lemmaWords.get(j), wordCount++, sentenceCount, tags));
                 }
             }
             sentenceCount++;
@@ -179,28 +186,53 @@ public final class DocumentToAnnotationConverter {
      * Converts a {@link Word} to a {@link CoreLabel}.
      *
      * @param word The {@code Word} to convert. Must not be {@code null}.
+     * @param wordIndex The index of the word within the sentence.
+     * @param sentenceIndex The index of the current sentence within the document.
+     * @return A {@code CoreLabel}
+     */
+    private static final CoreLabel wordToCoreLabel(final Word word, final int wordIndex, final int sentenceIndex) {
+        return wordToCoreLabel(word, null, wordIndex, sentenceIndex, null);
+    }
+
+    /**
+     * Converts a {@link Word} to a {@link CoreLabel}.
+     *
+     * @param word The {@code Word} to convert. Must not be {@code null}.
      * @param lemma The {@code Word} as lemma. Will not be set, if {@code null}.
      * @param wordIndex The index of the word within the sentence.
      * @param sentenceIndex The index of the current sentence within the document.
-     * @param posTags List of part-of-speech {@link Tag Tags}. Will not be set, if {@code null}.
-     * @param neTags List of named-entity {@code Tags}. Will not be set, if {@code null}.
+     * @param tags List of {@link Tag Tags}. Will not be set, if {@code null}.
      * @return A {@code CoreLabel}
      */
     private static final CoreLabel wordToCoreLabel(final Word word, final Word lemma, final int wordIndex,
-        final int sentenceIndex, final List<Tag> posTags, final List<Tag> neTags) {
+        final int sentenceIndex, final List<Tag> tags) {
         // Set word information
         final CoreLabel cl = CoreLabel.wordFromString(word.getText());
         cl.setAfter(word.getWhitespaceSuffix());
         cl.setIndex(wordIndex);
         cl.setSentIndex(sentenceIndex);
 
-        // Set lemma
-        if (lemma != null) {
-            cl.setLemma(word.getText());
+        // Set tags
+        if (tags != null) {
+            final List<Tag> posTags = tags.stream()//
+                .filter(t -> t.getTagType().equals(PartOfSpeechTag.TAG_TYPE))//
+                .collect(Collectors.toList());
+            final List<Tag> neTags = tags.stream()//
+                .filter(t -> t.getTagType().equals(NamedEntityTag.TAG_TYPE))//
+                .collect(Collectors.toList());
+            setTags(posTags, neTags, cl);
         }
 
-        // Set tags
-        setTags(posTags, neTags, cl);
+        // Set lemma
+        if (lemma != null) {
+            if (cl.get(CoreAnnotations.NamedEntityTagAnnotation.class)
+                .equals(SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL)) {
+                cl.setLemma(lemma.getText().toLowerCase());
+            } else {
+                cl.setLemma(lemma.getText());
+            }
+        }
+
         return cl;
     }
 
@@ -212,26 +244,58 @@ public final class DocumentToAnnotationConverter {
      * @param cl The CoreLabel.
      */
     private static void setTags(final List<Tag> posTags, final List<Tag> nerTags, final CoreLabel cl) {
-        if (posTags != null) {
-            if (!posTags.isEmpty()) {
-                for (final Tag tag : posTags) {
-                    final String tagValue = tag.getTagValue();
-                    cl.setTag(!tagValue.equals(UNKNOWN) ? tagValue : POS_FALLBACK_TAG);
-                }
-            } else {
-                cl.setTag(POS_FALLBACK_TAG);
+        if (!posTags.isEmpty()) {
+            for (final Tag tag : posTags) {
+                cl.setTag(createPosTag(cl.originalText().trim(), tag.getTagValue()));
             }
+        } else {
+            cl.setTag(POS_FALLBACK_TAG);
         }
 
-        if (nerTags != null) {
-            if (!nerTags.isEmpty()) {
-                for (final Tag tag : nerTags) {
-                    final String tagValue = tag.getTagValue();
-                    cl.setNER(!tagValue.equals(UNKNOWN) ? tagValue : POS_FALLBACK_TAG);
-                }
-            } else {
-                cl.setNER(SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL);
+        if (!nerTags.isEmpty()) {
+            for (final Tag tag : nerTags) {
+                final String tagValue = tag.getTagValue();
+                cl.setNER(!tagValue.equals(UNKNOWN) ? tagValue : SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL);
+                cl.set(CoreAnnotations.CoarseNamedEntityTagAnnotation.class,
+                    !tagValue.equals(UNKNOWN) ? tagValue : SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL);
             }
+        } else {
+            cl.setNER(SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL);
+            cl.set(CoreAnnotations.CoarseNamedEntityTagAnnotation.class, SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL);
         }
+    }
+
+    /**
+     * Creates a proper Stanford part-of-speech tag.
+     *
+     * @param text The text of a word.
+     * @param tagValue The part-of-speech tag value.
+     * @return Returns a proper Stanford part-of-speech tag.
+     */
+    private static final String createPosTag(final String text, final String tagValue) {
+        if (!tagValue.equals(SYM) && !tagValue.equals(UNKNOWN)) {
+            return tagValue;
+        }
+        return convertQuotation(text, tagValue.equals(SYM) ? text : POS_FALLBACK_TAG);
+    }
+
+    /**
+     * Checks, whether the string consists of quotation marks only.
+     *
+     * @param str A string.
+     * @return True, if the String consists of quotation marks only.
+     */
+    private static final boolean isQuotation(final String str) {
+        return quotePattern.matcher(str).matches();
+    }
+
+    /**
+     * Returns the corresponding Stanford part-of-speech tag for quotation marks or the given fallback string.
+     *
+     * @param str A string.
+     * @return Returns the corresponding Stanford part-of-speech tag for quotation marks or the given fallback string.
+     */
+    private static final String convertQuotation(final String str, final String fallback) {
+        return isQuotation(str) ? QUOTATION_POS_TAG : fallback;
     }
 }
