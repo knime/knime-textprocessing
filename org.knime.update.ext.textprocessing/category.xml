@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.knime.features.ext.textprocessing_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing" version="3.8.0.qualifier"/>
-   <feature url="features/org.knime.features.ext.textprocessing.language.chinese_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.chinese" version="3.8.0.qualifier"/>
-   <feature url="features/org.knime.features.ext.textprocessing.language.french_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.french" version="3.8.0.qualifier"/>
-   <feature url="features/org.knime.features.ext.textprocessing.language.german_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.german" version="3.8.0.qualifier"/>
-   <feature url="features/org.knime.features.ext.textprocessing.language.spanish_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.spanish" version="3.8.0.qualifier"/>
-   <feature url="features/org.knime.features.ext.textprocessing.language.turkish_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.language.turkish" version="3.8.0.qualifier"/>
-   <feature url="features/org.knime.features.ext.textprocessing.dl4j_3.8.0.qualifier.jar" id="org.knime.features.ext.textprocessing.dl4j" version="3.8.0.qualifier"/>
+   <feature id="org.knime.features.ext.textprocessing" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.source" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.language.chinese" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.language.french" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.language.german" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.language.spanish" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.language.turkish" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.dl4j" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.dl4j.source" version="0.0.0"/>
+
+   <category-def name="knime-textprocessing" label="Build artifacts from knime-textprocessing">
+       <description>Build artifacts from knime-textprocessing</description>
+       <query><expression type="match">id ~= /.+/</expression></query>
+   </category-def>
 </site>

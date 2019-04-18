@@ -5,12 +5,12 @@
 
 	<parent>
 		<groupId>org.knime</groupId>
-		<artifactId>knime-dl4j</artifactId>
-		<version>3.8.0-SNAPSHOT</version>
+    <artifactId>knime-textprocessing</artifactId>
+    <version>${revision}${changelist}</version>
       <relativePath>../pom.xml</relativePath>
   </parent>
+
   <artifactId>org.knime.ext.textprocessing.dl4j</artifactId>
-  <version>4.2.0</version>
   <packaging>eclipse-plugin</packaging>
   <build>
     <plugins>
