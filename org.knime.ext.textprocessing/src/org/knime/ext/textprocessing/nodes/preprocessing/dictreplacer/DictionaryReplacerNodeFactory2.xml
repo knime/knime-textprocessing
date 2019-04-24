@@ -11,29 +11,28 @@
              dictionary file must contain a key and a value. If the key matches with a term, the term is replaced by
             the value. The key and value pairs must be separated by ",".
 		</intro>
-
-        <tab name="Converter options">
-        <option name="Dictionary file">
-              The path of the dictionary file to use.
-        </option>
-        </tab>
-
         <tab name="Preprocessing options">
         <option name="Document column">
             The column containing the documents to preprocess.
         </option>
-        
         <option name="Replace documents">
             If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
             documents will be appended as new column. 
         </option>
-
         <option name="Append column">
             The name of the new appended column, containing the preprocessed documents.            
         </option>
-        
         <option name="Ignore unmodifiable tag">
             If checked, unmodifiable terms will be preprocessed too.
+        </option>
+        </tab>
+        <tab name="Dictionary options">
+        <option name="Dictionary file">
+              The path of the dictionary file to use.
+        </option>
+        <option name="Replace words not in the dictionary by">
+              If checked, all words that are not available in the dictionary are replaced by the string entered in the 
+              text field.
         </option>
         <option name="Word tokenizer">
             Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>

@@ -70,12 +70,14 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
+ * The {@code NodeModel} for the Dict Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
 public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPreprocessingNodeModel {
 
+    /** Node logger. */
     private static final NodeLogger LOGGER = NodeLogger.getLogger(DictionaryReplacerNodeModel2.class);
 
     /** The default dictionary file path. */
@@ -87,10 +89,13 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
     /** The default separator. */
     public static final String DEFAULT_SEPARATOR = ",";
 
-    private SettingsModelString m_fileModel = DictionaryReplacerNodeDialog2.getDictionaryFileModel();
+    /** {@link SettingsModelString} storing the path of the file containing the dictionary. */
+    private final SettingsModelString m_fileModel = DictionaryReplacerNodeDialog2.getDictionaryFileModel();
 
-    private SettingsModelString m_tokenizerModel = DictionaryReplacerNodeDialog2.getTokenizerModel();
+    /** {@link SettingsModelString} storing the name of the word tokenizer. */
+    private final SettingsModelString m_tokenizerModel = DictionaryReplacerNodeDialog2.getTokenizerModel();
 
+    /** {@link SettingsModelOptionalString} storing a String used to replace words not available in the dictionary. */
     private final SettingsModelOptionalString m_replaceUnknownWordsModel =
         DictionaryReplacerNodeDialog2.getReplaceUnknownWordsModel();
 
@@ -99,22 +104,20 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
      */
     @Override
     protected TermPreprocessing createPreprocessing() throws Exception {
-        Map<String, String> dictionary = new HashMap<String, String>();
-        File f = new File(m_fileModel.getStringValue());
+        final Map<String, String> dictionary = new HashMap<>();
+        final File f = new File(m_fileModel.getStringValue());
         if (f.exists() && f.canRead() && f.isFile()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(f));
+            try (final BufferedReader reader = new BufferedReader(new FileReader(f))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    String[] keyVal = line.trim().split(DEFAULT_SEPARATOR);
+                    final String[] keyVal = line.trim().split(DEFAULT_SEPARATOR);
                     if (keyVal.length == 2) {
                         dictionary.put(keyVal[0], keyVal[1]);
                     }
                 }
-                reader.close();
-            } catch (FileNotFoundException e) {
+            } catch (final FileNotFoundException e) {
                 LOGGER.warn("Not such file !");
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOGGER.warn("Cant read from file");
             }
         }
@@ -130,7 +133,7 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
      */
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        final DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
         // check if specific tokenizer is installed
         if (!TokenizerFactoryRegistry.getTokenizerFactoryMap().containsKey(m_tokenizerModel.getStringValue())) {
             throw new MissingTokenizerException(m_tokenizerModel.getStringValue());

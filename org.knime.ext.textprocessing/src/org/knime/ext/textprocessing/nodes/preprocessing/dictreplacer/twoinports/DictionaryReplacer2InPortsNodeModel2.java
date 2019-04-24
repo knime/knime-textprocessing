@@ -71,22 +71,39 @@ import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
+ * The {@code NodeModel} for the Dict Replacer (2 In-Ports) node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
 public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePreprocessingNodeModel {
 
+    /**
+     * {@link SettingsModelString} storing the name of column containing words to replace.
+     */
     private final SettingsModelString m_replaceColumModel =
         DictionaryReplacer2InPortsNodeDialog2.getReplaceColumnModel();
 
+    /**
+     * {@link SettingsModelString} storing the name of column containing words used as replacements.
+     */
     private final SettingsModelString m_replacementColumModel =
         DictionaryReplacer2InPortsNodeDialog2.getReplacementColumnModel();
 
+    /**
+     * Dictionary of words to replace and their replacement strings.
+     */
     private HashMap<String, String> m_replacementDict;
 
+    /**
+     * {@link SettingsModelString} storing the name of the word tokenizer.
+     */
     private final SettingsModelString m_tokenizerModel = DictionaryReplacer2InPortsNodeDialog2.getTokenizerModel();
 
+    /**
+     * {@link SettingsModelOptionalString} storing a String used to replace words that are not available in the
+     * dictionary.
+     */
     private final SettingsModelOptionalString m_replaceUnknownWordsModel =
         DictionaryReplacer2InPortsNodeDialog2.getReplaceUnknownWordsModel();
 
@@ -111,12 +128,12 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
 
         m_replacementDict = new HashMap<>();
 
-        RowIterator it = inData[1].iterator();
+        final RowIterator it = inData[1].iterator();
         while (it.hasNext()) {
-            DataRow row = it.next();
+            final DataRow row = it.next();
             if (!row.getCell(replaceColIndex).isMissing() && !row.getCell(replacementColIndex).isMissing()) {
-                String key = ((StringValue)row.getCell(replaceColIndex)).toString();
-                String value = ((StringValue)row.getCell(replacementColIndex)).toString();
+                final String key = ((StringValue)row.getCell(replaceColIndex)).toString();
+                final String value = ((StringValue)row.getCell(replacementColIndex)).toString();
                 m_replacementDict.put(key, value);
             }
         }
@@ -127,12 +144,12 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
      */
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
-        DataTableSpecVerifier dictTableSpecVerifier = new DataTableSpecVerifier(inSpecs[1]);
+        final DataTableSpecVerifier dataTableSpecVerifier = new DataTableSpecVerifier(inSpecs[0]);
+        final DataTableSpecVerifier dictTableSpecVerifier = new DataTableSpecVerifier(inSpecs[1]);
         dataTableSpecVerifier.verifyMinimumDocumentCells(1, true);
         dictTableSpecVerifier.verifyMinimumStringCells(2, true);
 
-        DataTableSpec dictTableSpec = inSpecs[1];
+        final DataTableSpec dictTableSpec = inSpecs[1];
 
         // initialize search string and replacement string columns
         ColumnSelectionVerifier.verifyColumn(m_replaceColumModel, dictTableSpec, StringValue.class,
@@ -219,9 +236,9 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         if (settings.containsKey(m_replaceUnknownWordsModel.getKey())) {
             m_replaceUnknownWordsModel.validateSettings(settings);
         }
-        String replaceColName =
+        final String replaceColName =
             ((SettingsModelString)m_replaceColumModel.createCloneWithValidatedValue(settings)).getStringValue();
-        String replacementColName =
+        final String replacementColName =
             ((SettingsModelString)m_replacementColumModel.createCloneWithValidatedValue(settings)).getStringValue();
         if (replaceColName.equals(replacementColName)) {
             throw new InvalidSettingsException("Lookup column cannot be replacement column at the same time. "

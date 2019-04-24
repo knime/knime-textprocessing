@@ -62,6 +62,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
+ * The {@code NodeDialog} for the Dict Replacer (2 In-Ports) node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
@@ -69,6 +70,9 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
 public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNodeSettingsPane2 {
 
     /**
+     * Creates and returns a new instance of {@link SettingsModelString} containing the name of the column with the
+     * strings to replace.
+     *
      * @return Creates and returns a new instance of {@link SettingsModelString} containing the name of the column with
      *         the strings to replace.
      */
@@ -77,6 +81,9 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
     }
 
     /**
+     * Creates and returns a new instance of {@link SettingsModelString} containing the name of the column with the
+     * strings to use as replacement.
+     *
      * @return Creates and returns a new instance of {@link SettingsModelString} containing the name of the column with
      *         the strings to use as replacement.
      */
@@ -85,6 +92,9 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
     }
 
     /**
+     * Creates and returns a new instance of {@link SettingsModelString} containing the name of the tokenizer used for
+     * word tokenization.
+     *
      * @return Creates and returns a new instance of {@link SettingsModelString} containing the name of the tokenizer
      *         used for word tokenization.
      * @since 3.3
@@ -95,14 +105,21 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
     }
 
     /**
+     * Creates and returns a new instance of {@link SettingsModelOptionalString} containing a replacement string that is
+     * used to replace terms that are not available in the dictionary.
      *
-     * @return
+     * @return Creates and returns a new instance of {@link SettingsModelOptionalString} containing a replacement string
+     *         that is used to replace terms that are not available in the dictionary.
      */
     static final SettingsModelOptionalString getReplaceUnknownWordsModel() {
         return new SettingsModelOptionalString(DictionaryReplacer2InPortsConfigKeys2.CFGKEY_REPLACE_UNKNOWN_WORDS, "0",
             false);
     }
 
+    /**
+     * {@link SettingsModelOptionalString} containing a replacement string that is used to replace terms that are not
+     * available in the dictionary.
+     */
     private final SettingsModelOptionalString m_replaceUnknownWordsModel = getReplaceUnknownWordsModel();
 
     /**
@@ -122,10 +139,10 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
             "Column containing the replacement strings", 1, true, StringValue.class));
 
         addDialogComponent(
-            new DialogComponentOptionalString(m_replaceUnknownWordsModel, "Replace words not in vocabulary"));
+            new DialogComponentOptionalString(m_replaceUnknownWordsModel, "Replace words not in dictionary by"));
 
-        Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
-            .map(e -> e.getKey()).collect(Collectors.toList());
+        final Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
+                .map(e -> e.getKey()).collect(Collectors.toList());
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));
     }
 }

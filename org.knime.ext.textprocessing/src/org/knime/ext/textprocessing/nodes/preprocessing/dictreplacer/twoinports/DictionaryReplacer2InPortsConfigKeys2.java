@@ -49,7 +49,7 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports;
 
 /**
- * Configuration keys for Dictionary Replacer (2 in-ports).
+ * Configuration keys for Dictionary Replacer (2 In-Ports).
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
@@ -57,6 +57,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports
 public final class DictionaryReplacer2InPortsConfigKeys2 {
 
     private DictionaryReplacer2InPortsConfigKeys2() {
+        // Empty constructor...
     }
 
     /**

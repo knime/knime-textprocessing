@@ -13,7 +13,21 @@
             string columns. One string column contains the strings to replace (keys) the other string column contains 
             the replacement strings (values). The columns can be specified in the dialog. 
 		</intro>
-
+        <tab name="Preprocessing options">
+        <option name="Document column">
+            The column containing the documents to preprocess.
+        </option>
+        <option name="Replace documents">
+            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
+            documents will be appended as new column. 
+        </option>
+        <option name="Append column">
+            The name of the new appended column, containing the preprocessed documents.            
+        </option>
+        <option name="Ignore unmodifiable tag">
+              If checked, unmodifiable terms will be preprocessed too.
+        </option> 
+        </tab>
         <tab name="Dictionary">
         <option name="Column containing the strings to replace">
               The column containing the strings (words/terms) to replace (keys). 
@@ -21,29 +35,14 @@
         <option name="Column containing the replacement strings">
               The column containing the replacement strings (values). 
         </option>
-        </tab>
-
-        <tab name="Preprocessing options">
-        <option name="Document column">
-            The column containing the documents to preprocess.
-        </option>
-        
-        <option name="Replace documents">
-            If checked, the documents will be replaced by the new preprocessed documents. Otherwise the preprocessed
-            documents will be appended as new column. 
-        </option>
-
-        <option name="Append column">
-            The name of the new appended column, containing the preprocessed documents.            
-        </option>
-        
-        <option name="Ignore unmodifiable tag">
-              If checked, unmodifiable terms will be preprocessed too.
+		<option name="Replace words not in the dictionary by">
+              If checked, all words that are not available in the dictionary are replaced by the string entered in the 
+              text field.
         </option>
         <option name="Word tokenizer">
             Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>
             to read the description for each tokenizer.
-        </option>   
+        </option>  
         </tab>
     </fullDescription>
 

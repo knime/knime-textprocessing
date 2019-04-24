@@ -63,22 +63,39 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * @author Kilian Thiel, University of Konstanz
+ * Class used to replace strings or terms in documents.
  *
+ * @author Kilian Thiel, University of Konstanz
  */
 public class DictionaryReplacer implements TermPreprocessing, StringPreprocessing {
-    private Map<String, String> m_replaceDict;
 
-    private Tokenizer m_wordTokenizer;
+    /**
+     * Map containing the words to replaces and their replacement strings.
+     */
+    private final Map<String, String> m_replaceDict;
 
+    /**
+     * The tokenizer used for word tokenization.
+     */
+    private final Tokenizer m_wordTokenizer;
+
+    /**
+     * True, if words that are not available in the replacement dictionary should be replaced by a default value.
+     */
     private final boolean m_replaceUnknownWords;
 
+    /**
+     * String used to replace words that are not available in the replacement dictionary.
+     */
     private final String m_replacement;
 
+    /**
+     * Default whitespace suffix.
+     */
     private static final String DEFAULT_WHITESPACE_SUFFIX = " ";
 
     /**
-     * Creates new instance of <code>DictionaryReplacer</code> with give dictionary, containing key value pairs for
+     * Creates new instance of {@code DictionaryReplacer} with give dictionary, containing key value pairs for
      * replacement.
      *
      * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
@@ -131,11 +148,11 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      */
     @Override
     public Term preprocessTerm(final Term term) {
-        String word = term.getText();
-        String newWord = m_replaceDict.get(word);
+        final String word = term.getText();
+        final String newWord = m_replaceDict.get(word);
         if (newWord != null) {
             return createTerm(newWord, term.getTags(), term.isUnmodifiable());
-        } else if (m_replaceUnknownWords && m_replacement != null) {
+        } else if (m_replaceUnknownWords && (m_replacement != null)) {
             return createTerm(m_replacement, new ArrayList<>(), false);
         }
         return term;
@@ -150,10 +167,13 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      * @return A new term.
      */
     private Term createTerm(final String word, final List<Tag> tags, final boolean unmodifiable) {
-        List<String> tokenizedWords = m_wordTokenizer.tokenize(word);
+        if (word.isEmpty()) {
+            return null;
+        }
+        final List<String> tokenizedWords = m_wordTokenizer.tokenize(word);
 
-        List<Word> newWords = new ArrayList<>();
-        for (String s : tokenizedWords) {
+        final List<Word> newWords = new ArrayList<>();
+        for (final String s : tokenizedWords) {
             // TODO here the original white space suffix of the term should be added as suffix of last word.
             newWords.add(new Word(s, DEFAULT_WHITESPACE_SUFFIX));
         }
@@ -165,10 +185,10 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      */
     @Override
     public String preprocessString(final String str) {
-        String newStr = m_replaceDict.get(str);
+        final String newStr = m_replaceDict.get(str);
         if (newStr != null) {
             return newStr;
-        } else if (m_replaceUnknownWords && m_replacement != null) {
+        } else if (m_replaceUnknownWords && (m_replacement != null)) {
             return m_replacement;
         }
         return str;

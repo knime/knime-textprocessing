@@ -66,6 +66,7 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
 import com.google.common.collect.ImmutableMap;
 
 /**
+ * The {@code NodeDialog} for the Dict Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
@@ -73,6 +74,8 @@ import com.google.common.collect.ImmutableMap;
 public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettingsPane2 {
 
     /**
+     * Creates and returns a new instance of {@link SettingsModelString} containing the path to the dictionary file.
+     *
      * @return Creates and returns a new instance of {@link SettingsModelString} containing the path to the dictionary
      *         file.
      */
@@ -82,6 +85,9 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
     }
 
     /**
+     * Creates and returns a new instance of {@link SettingsModelString} containing the name of the tokenizer used for
+     * word tokenization.
+     *
      * @return Creates and returns a new instance of {@link SettingsModelString} containing the name of the tokenizer
      *         used for word tokenization.
      * @since 3.3
@@ -92,15 +98,21 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
     }
 
     /**
-    *
-    * @return
-    */
-   static final SettingsModelOptionalString getReplaceUnknownWordsModel() {
-       return new SettingsModelOptionalString(DictionaryReplacerConfigKeys2.CFGKEY_REPLACE_UNKNOWN_WORDS, "0",
-           false);
-   }
+     * Creates and returns a new instance of {@link SettingsModelOptionalString} containing a replacement string that is
+     * used to replace terms that are not available in the dictionary.
+     *
+     * @return Creates and returns a new instance of {@link SettingsModelOptionalString} containing a replacement string
+     *         that is used to replace terms that are not available in the dictionary.
+     */
+    static final SettingsModelOptionalString getReplaceUnknownWordsModel() {
+        return new SettingsModelOptionalString(DictionaryReplacerConfigKeys2.CFGKEY_REPLACE_UNKNOWN_WORDS, "0", false);
+    }
 
-   private final SettingsModelOptionalString m_replaceUnknownWordsModel = getReplaceUnknownWordsModel();
+    /**
+     * {@link SettingsModelOptionalString} containing a replacement string that is used to replace terms that are not
+     * available in the dictionary.
+     */
+    private final SettingsModelOptionalString m_replaceUnknownWordsModel = getReplaceUnknownWordsModel();
 
     /**
      * Creates new instance of {@link DictionaryReplacerNodeDialog2}.
@@ -116,11 +128,11 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
                 JFileChooser.FILES_ONLY, DictionaryReplacerNodeModel2.VALID_DICTFILE_EXTENIONS));
 
         addDialogComponent(
-            new DialogComponentOptionalString(m_replaceUnknownWordsModel, "Replace words not in vocabulary"));
+            new DialogComponentOptionalString(m_replaceUnknownWordsModel, "Replace words not in dictionary by"));
 
-        Set<String> tokenizerList = new TreeSet<String>();
-        for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap()
-            .entrySet()) {
+        final Set<String> tokenizerList = new TreeSet<>();
+        for (final ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry
+            .getTokenizerFactoryMap().entrySet()) {
             tokenizerList.add(entry.getKey());
         }
         addDialogComponent(new DialogComponentStringSelection(getTokenizerModel(), "Word tokenizer", tokenizerList));

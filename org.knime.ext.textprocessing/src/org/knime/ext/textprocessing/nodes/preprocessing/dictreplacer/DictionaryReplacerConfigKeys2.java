@@ -49,18 +49,25 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
 /**
+ * Configuration keys for the Dict Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
 public final class DictionaryReplacerConfigKeys2 {
 
-    private DictionaryReplacerConfigKeys2() { }
+    private DictionaryReplacerConfigKeys2() {
+        // Empty constructor...
+    }
 
-    /** Config key for the dictionary file. */
+    /**
+     * Config key for the dictionary file.
+     */
     public static final String CFGKEY_DICTFILE = "Dictionary File";
 
-    /** Config key for the word tokenizer.
+    /**
+     * Config key for the word tokenizer.
+     *
      * @since 3.3
      */
     public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
