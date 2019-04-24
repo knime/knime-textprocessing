@@ -53,6 +53,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
@@ -69,6 +70,10 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
     private Map<String, String> m_replaceDict;
 
     private Tokenizer m_wordTokenizer;
+
+    private final boolean m_replaceUnknownWords;
+
+    private final String m_replacement;
 
     private static final String DEFAULT_WHITESPACE_SUFFIX = " ";
 
@@ -98,8 +103,27 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      * @since 3.3
      */
     public DictionaryReplacer(final Map<String, String> replaceDict, final String tokenizerName) {
+        this(replaceDict, false, null, tokenizerName);
+    }
+
+    /**
+     * Creates new instance of {@link DictionaryReplacer} with give dictionary, containing key value pairs for
+     * replacement.
+     *
+     * @param replaceDict The dictionary consisting of key value pairs for replacement (keys will be replaced by their
+     *            corresponding values).
+     * @param replaceUnknownWords True, if words not contained in the dictionary should be replaced by replacement
+     *            string.
+     * @param replacement The string used to replace words that are not contained in the dictionary.
+     * @param tokenizerName The tokenizer used for word tokenization.
+     * @since 3.8
+     */
+    public DictionaryReplacer(final Map<String, String> replaceDict, final boolean replaceUnknownWords,
+        final String replacement, final String tokenizerName) {
         m_replaceDict = new HashMap<>(replaceDict);
         m_wordTokenizer = DefaultTokenization.getWordTokenizer(tokenizerName);
+        m_replaceUnknownWords = replaceUnknownWords;
+        m_replacement = replacement;
     }
 
     /**
@@ -110,16 +134,30 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
         String word = term.getText();
         String newWord = m_replaceDict.get(word);
         if (newWord != null) {
-            List<String> tokenizedWords = m_wordTokenizer.tokenize(newWord);
-
-            List<Word> newWords = new ArrayList<Word>();
-            for (String s : tokenizedWords) {
-                // TODO here the original white space suffix of the term should be added as suffix of last word.
-                newWords.add(new Word(s, DEFAULT_WHITESPACE_SUFFIX));
-            }
-            return new Term(newWords, term.getTags(), term.isUnmodifiable());
+            return createTerm(newWord, term.getTags(), term.isUnmodifiable());
+        } else if (m_replaceUnknownWords && m_replacement != null) {
+            return createTerm(m_replacement, new ArrayList<>(), false);
         }
         return term;
+    }
+
+    /**
+     * Creates a new {@link Term}.
+     *
+     * @param word The word.
+     * @param tags List of {@link Tag Tags} from replaced term.
+     * @param unmodifiable Modifiability of the new term.
+     * @return A new term.
+     */
+    private Term createTerm(final String word, final List<Tag> tags, final boolean unmodifiable) {
+        List<String> tokenizedWords = m_wordTokenizer.tokenize(word);
+
+        List<Word> newWords = new ArrayList<>();
+        for (String s : tokenizedWords) {
+            // TODO here the original white space suffix of the term should be added as suffix of last word.
+            newWords.add(new Word(s, DEFAULT_WHITESPACE_SUFFIX));
+        }
+        return new Term(newWords, tags, unmodifiable);
     }
 
     /**
@@ -130,6 +168,8 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
         String newStr = m_replaceDict.get(str);
         if (newStr != null) {
             return newStr;
+        } else if (m_replaceUnknownWords && m_replacement != null) {
+            return m_replacement;
         }
         return str;
     }

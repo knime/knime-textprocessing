@@ -53,7 +53,9 @@ import java.util.stream.Collectors;
 
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentOptionalString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelOptionalString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
@@ -93,6 +95,17 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
     }
 
     /**
+     *
+     * @return
+     */
+    static final SettingsModelOptionalString getReplaceUnknownWordsModel() {
+        return new SettingsModelOptionalString(DictionaryReplacer2InPortsConfigKeys2.CFGKEY_REPLACE_UNKNOWN_WORDS, "0",
+            false);
+    }
+
+    private final SettingsModelOptionalString m_replaceUnknownWordsModel = getReplaceUnknownWordsModel();
+
+    /**
      * Constructor of {@link DictionaryReplacer2InPortsNodeDialog2}.
      */
     @SuppressWarnings("unchecked")
@@ -107,6 +120,9 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
 
         addDialogComponent(new DialogComponentColumnNameSelection(getReplacementColumnModel(),
             "Column containing the replacement strings", 1, true, StringValue.class));
+
+        addDialogComponent(
+            new DialogComponentOptionalString(m_replaceUnknownWordsModel, "Replace words not in vocabulary"));
 
         Collection<String> tokenizerList = TokenizerFactoryRegistry.getTokenizerFactoryMap().entrySet().stream()
             .map(e -> e.getKey()).collect(Collectors.toList());

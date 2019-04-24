@@ -61,6 +61,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelOptionalString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
@@ -90,6 +91,9 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
 
     private SettingsModelString m_tokenizerModel = DictionaryReplacerNodeDialog2.getTokenizerModel();
 
+    private final SettingsModelOptionalString m_replaceUnknownWordsModel =
+        DictionaryReplacerNodeDialog2.getReplaceUnknownWordsModel();
+
     /**
      * {@inheritDoc}
      */
@@ -114,7 +118,11 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
                 LOGGER.warn("Cant read from file");
             }
         }
-        return new DictionaryReplacer(dictionary, m_tokenizerModel.getStringValue());
+        if (!m_replaceUnknownWordsModel.isActive()) {
+            return new DictionaryReplacer(dictionary, m_tokenizerModel.getStringValue());
+        }
+        return new DictionaryReplacer(dictionary, true, m_replaceUnknownWordsModel.getStringValue(),
+            m_tokenizerModel.getStringValue());
     }
 
     /**
@@ -143,6 +151,9 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
         if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.loadSettingsFrom(settings);
         }
+        if (settings.containsKey(m_replaceUnknownWordsModel.getKey())) {
+            m_replaceUnknownWordsModel.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -153,6 +164,7 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
         super.saveSettingsTo(settings);
         m_fileModel.saveSettingsTo(settings);
         m_tokenizerModel.saveSettingsTo(settings);
+        m_replaceUnknownWordsModel.saveSettingsTo(settings);
     }
 
     /**
@@ -165,6 +177,9 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
         // only validate if key is contained in settings (for backwards compatibility)
         if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_replaceUnknownWordsModel.getKey())) {
+            m_replaceUnknownWordsModel.validateSettings(settings);
         }
     }
 }

@@ -54,7 +54,9 @@ import java.util.TreeSet;
 import javax.swing.JFileChooser;
 
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentOptionalString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelOptionalString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
@@ -90,6 +92,17 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
     }
 
     /**
+    *
+    * @return
+    */
+   static final SettingsModelOptionalString getReplaceUnknownWordsModel() {
+       return new SettingsModelOptionalString(DictionaryReplacerConfigKeys2.CFGKEY_REPLACE_UNKNOWN_WORDS, "0",
+           false);
+   }
+
+   private final SettingsModelOptionalString m_replaceUnknownWordsModel = getReplaceUnknownWordsModel();
+
+    /**
      * Creates new instance of {@link DictionaryReplacerNodeDialog2}.
      */
     public DictionaryReplacerNodeDialog2() {
@@ -101,6 +114,9 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
         addDialogComponent(
             new DialogComponentFileChooser(getDictionaryFileModel(), DictionaryReplacerNodeDialog2.class.toString(),
                 JFileChooser.FILES_ONLY, DictionaryReplacerNodeModel2.VALID_DICTFILE_EXTENIONS));
+
+        addDialogComponent(
+            new DialogComponentOptionalString(m_replaceUnknownWordsModel, "Replace words not in vocabulary"));
 
         Set<String> tokenizerList = new TreeSet<String>();
         for (ImmutableMap.Entry<String, TokenizerFactory> entry : TokenizerFactoryRegistry.getTokenizerFactoryMap()

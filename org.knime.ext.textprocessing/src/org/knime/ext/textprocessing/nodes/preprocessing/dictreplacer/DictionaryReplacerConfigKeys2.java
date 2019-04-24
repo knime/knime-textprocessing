@@ -64,4 +64,9 @@ public final class DictionaryReplacerConfigKeys2 {
      * @since 3.3
      */
     public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
+
+    /**
+     * Config key for replacing unknown words;
+     */
+    static final String CFGKEY_REPLACE_UNKNOWN_WORDS = "Replace unknown words";
 }

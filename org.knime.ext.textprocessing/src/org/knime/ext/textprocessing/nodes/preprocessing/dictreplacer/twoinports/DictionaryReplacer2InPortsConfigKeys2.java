@@ -49,22 +49,35 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer.twoinports;
 
 /**
+ * Configuration keys for Dictionary Replacer (2 in-ports).
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1
  */
 public final class DictionaryReplacer2InPortsConfigKeys2 {
 
-    private DictionaryReplacer2InPortsConfigKeys2() { }
+    private DictionaryReplacer2InPortsConfigKeys2() {
+    }
 
-    /** Config key for the key column. */
+    /**
+     * Config key for the key column.
+     */
     public static final String CFGKEY_KEYCOLUMN = "Replace column";
 
-    /** Config key for the key column. */
+    /**
+     * Config key for the key column.
+     */
     public static final String CFGKEY_VALUECOLUMN = "Replacement column";
 
-    /** Config key for the word tokenizer.
+    /**
+     * Config key for the word tokenizer.
+     *
      * @since 3.3
      */
     public static final String CFGKEY_TOKENIZER = "Word Tokenizer";
+
+    /**
+     * Config key for replacing unknown words;
+     */
+    static final String CFGKEY_REPLACE_UNKNOWN_WORDS = "Replace unknown words";
 }

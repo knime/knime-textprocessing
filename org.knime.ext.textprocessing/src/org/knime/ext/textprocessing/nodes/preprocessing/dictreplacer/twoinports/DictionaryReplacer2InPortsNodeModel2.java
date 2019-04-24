@@ -59,6 +59,7 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelOptionalString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.streamable.InputPortRole;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel;
@@ -85,6 +86,9 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
     private HashMap<String, String> m_replacementDict;
 
     private final SettingsModelString m_tokenizerModel = DictionaryReplacer2InPortsNodeDialog2.getTokenizerModel();
+
+    private final SettingsModelOptionalString m_replaceUnknownWordsModel =
+        DictionaryReplacer2InPortsNodeDialog2.getReplaceUnknownWordsModel();
 
     /**
      * Constructor of {@link DictionaryReplacer2InPortsNodeModel2}.
@@ -155,7 +159,11 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
      */
     @Override
     protected TermPreprocessing createPreprocessing() throws Exception {
-        return new DictionaryReplacer(m_replacementDict, m_tokenizerModel.getStringValue());
+        if (!m_replaceUnknownWordsModel.isActive()) {
+            return new DictionaryReplacer(m_replacementDict, m_tokenizerModel.getStringValue());
+        }
+        return new DictionaryReplacer(m_replacementDict, true, m_replaceUnknownWordsModel.getStringValue(),
+            m_tokenizerModel.getStringValue());
     }
 
     /**
@@ -179,6 +187,9 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.loadSettingsFrom(settings);
         }
+        if (settings.containsKey(m_replaceUnknownWordsModel.getKey())) {
+            m_replaceUnknownWordsModel.loadSettingsFrom(settings);
+        }
     }
 
     /**
@@ -190,6 +201,7 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         m_replaceColumModel.saveSettingsTo(settings);
         m_replacementColumModel.saveSettingsTo(settings);
         m_tokenizerModel.saveSettingsTo(settings);
+        m_replaceUnknownWordsModel.saveSettingsTo(settings);
     }
 
     /**
@@ -203,6 +215,9 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         // only validate if key is contained in settings (for backwards compatibility)
         if (settings.containsKey(m_tokenizerModel.getKey())) {
             m_tokenizerModel.validateSettings(settings);
+        }
+        if (settings.containsKey(m_replaceUnknownWordsModel.getKey())) {
+            m_replaceUnknownWordsModel.validateSettings(settings);
         }
         String replaceColName =
             ((SettingsModelString)m_replaceColumModel.createCloneWithValidatedValue(settings)).getStringValue();
