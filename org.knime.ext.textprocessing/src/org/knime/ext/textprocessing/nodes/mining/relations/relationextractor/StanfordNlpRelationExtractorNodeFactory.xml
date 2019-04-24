@@ -12,13 +12,15 @@
 			<br/>
 			However, this node can also be used with plain documents by using the <i>Apply preprocessing</i> option.
 			If this option is selected, part-of-speech tagging, named-entity tagging and lemmatizing will be done 
-			by this node. The Stanford CoreNLP default settings are used in this case.<br/>
+			by this node. The Stanford CoreNLP default settings are used in this case. Creating the same pipeline by using KNIME's Stanford nodes with default settings 
+			will not necessarily lead to the same results as using the <i>Apply preprocessing</i> option, since KNIME is using the Penn-Treebank (PTB) tag set. This tag set uses the <tt>SYM</tt> tag for
+			any kind of punctuation and quotation marks. However, Stanford CoreNLP uses a modified version of the PTB tag set to distinguish these symbols, since they are important for dependency parsing and natural logic annotation.<br/>
 			<br/>
 			The node creates four new columns: two object columns containing named-entities, one column containing the type of relation with the highest confidence and 
 			a column containing the confidence for this relation. The node handles classic named-entities like <tt>PERSON</tt>, <tt>LOCATION</tt> and
 			<tt>ORGANIZATION</tt>.<br/>
 			Relation types that can be extracted are <tt>Live_In</tt>, <tt>OrgBased_In</tt>, <tt>Located_In</tt>, <tt>Work_For</tt> 
-			and <tt>_NR</tt>. <br/> <tt>_NR</tt> specifies no relation between two entities. <br/>
+			and <tt>_NR</tt>. <br/> <tt>_NR</tt> specifies no relation between two entities. A detailed explanation of StanfordNLP's approach for relation extraction can be found in <a href="https://nlp.stanford.edu/pubs/relms2011.pdf">this article</a>.<br/>
 			<br/>
 			<i>Note</i>: Relation Extraction is a computationally expensive operation. For the usage of this
             node it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
