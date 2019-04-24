@@ -46,7 +46,7 @@
  * History
  *   Jan 25, 2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
+package org.knime.ext.textprocessing.nodes.transformation.uniquetermextractor;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -69,11 +69,11 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
- * The {@link NodeDialog} for the Dictionary Extractor node.
+ * The {@link NodeDialog} for the Unique Term Extractor node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class DictionaryExtractorNodeDialog extends NodeDialogPane {
+final class UniqueTermExtractorNodeDialog extends NodeDialogPane {
 
     /** Dialog containing the document column to process. */
     private final DialogComponentColumnNameSelection m_colNameSelectionDialog;
@@ -100,10 +100,10 @@ final class DictionaryExtractorNodeDialog extends NodeDialogPane {
     private final DialogComponent[] m_diagComps;
 
     /**
-     * Constructor for class {@link DictionaryExtractorNodeDialog}.
+     * Constructor for class {@link UniqueTermExtractorNodeDialog}.
      */
     @SuppressWarnings("unchecked")
-    DictionaryExtractorNodeDialog() {
+    UniqueTermExtractorNodeDialog() {
         final JPanel panel = new JPanel(new GridBagLayout());
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -115,17 +115,17 @@ final class DictionaryExtractorNodeDialog extends NodeDialogPane {
 
         // document column selection
         m_colNameSelectionDialog = new DialogComponentColumnNameSelection(
-            DictionaryExtractorNodeModel.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
-        m_colNameSelectionDialog.setToolTipText("Column containing the documents to create dictionary from");
+            UniqueTermExtractorNodeModel.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
+        m_colNameSelectionDialog.setToolTipText("Column containing the documents to create set of terms from");
         panel.add(m_colNameSelectionDialog.getComponentPanel(), gbc);
         ++gbc.gridy;
 
         // enable top k filtering and top k b
         final JPanel topKPanel = new JPanel(new GridBagLayout());
         m_enableFilteringDialog =
-            new DialogComponentBoolean(DictionaryExtractorNodeModel.getFilterTermsModel(), "Most frequent terms (k)");
+            new DialogComponentBoolean(UniqueTermExtractorNodeModel.getFilterTermsModel(), "Most frequent terms (k)");
         m_enableFilteringDialog.getModel().addChangeListener(e -> updateModel());
-        m_topKTermsDialog = new DialogComponentNumber(DictionaryExtractorNodeModel.getTopKTermsModel(), "", 1, 6);
+        m_topKTermsDialog = new DialogComponentNumber(UniqueTermExtractorNodeModel.getTopKTermsModel(), "", 1, 6);
         m_topKTermsDialog
             .setToolTipText("Keep only the top k frequent terms based on the set value and filter method.");
 
@@ -135,25 +135,25 @@ final class DictionaryExtractorNodeDialog extends NodeDialogPane {
         ++gbc.gridy;
 
         // filter method
-        m_filterByDialog = new DialogComponentButtonGroup(DictionaryExtractorNodeModel.getFilterByModel(), false,
-            "Filter terms by", MultiThreadDictionaryExtractor.TF, MultiThreadDictionaryExtractor.DF,
-            MultiThreadDictionaryExtractor.IDF);
+        m_filterByDialog = new DialogComponentButtonGroup(UniqueTermExtractorNodeModel.getFilterByModel(), false,
+            "Filter terms by", MultiThreadTermExtractor.TF, MultiThreadTermExtractor.DF,
+            MultiThreadTermExtractor.IDF);
         m_filterByDialog.setToolTipText("Keep the k top terms regarding the selected frequency method.");
         panel.add(m_filterByDialog.getComponentPanel(), gbc);
         ++gbc.gridy;
 
         // enable cols
         m_includeIdxColumnDialog =
-                new DialogComponentBoolean(DictionaryExtractorNodeModel.getAppendIdxColModel(), "Append index column");
+                new DialogComponentBoolean(UniqueTermExtractorNodeModel.getAppendIdxColModel(), "Append index column");
             panel.add(m_includeIdxColumnDialog.getComponentPanel(), gbc);
             ++gbc.gridy;
-        m_includeFreqColumnsDialog = new DialogComponentBoolean(DictionaryExtractorNodeModel.getAppendFreqColModel(),
+        m_includeFreqColumnsDialog = new DialogComponentBoolean(UniqueTermExtractorNodeModel.getAppendFreqColModel(),
             "Append frequency columns");
         panel.add(m_includeFreqColumnsDialog.getComponentPanel(), gbc);
         ++gbc.gridy;
 
         // Number of threads component to select output columns
-        m_noOfThreadsDialog = new DialogComponentNumber(DictionaryExtractorNodeModel.getNumberOfThreadsModel(),
+        m_noOfThreadsDialog = new DialogComponentNumber(UniqueTermExtractorNodeModel.getNumberOfThreadsModel(),
             "Number of threads", 1, 5);
         panel.add(m_noOfThreadsDialog.getComponentPanel(), gbc);
 

@@ -2,11 +2,11 @@
 <knimeNode xmlns="http://knime.org/node/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://knime.org/node/v3.1 http://knime.org/node/v3.1"
 	icon="../../../icons/TextProcDefault.png" type="Manipulator">
-    <name>Dictionary Extractor</name>
-    <shortDescription>Creates a global dictionary over all documents.</shortDescription>
+    <name>Unique Term Extractor</name>
+    <shortDescription>Creates a global set of terms over all documents.</shortDescription>
     <fullDescription>
         <intro>
-            This node creates a global dictionary over all documents. Optionally, it is possible to filter the top-k 
+            This node creates a global set of terms over all documents. Optionally, it is possible to filter the top-k 
             words in terms of frequencies. There are three different frequencies to choose from for filtering: the term frequency,
             the document frequency and the inverse document frequency. <br/>
             <ul>
@@ -18,7 +18,7 @@
             <br/>
         </intro>
         <option name="Document column">
-            Select the document column to extract the document from.
+            Select the document column to extract the terms from.
     	</option>
     	<option name="Most frequent terms (k)"> 
     		Check, if the data table should be restricted on the top k most frequent terms.
@@ -43,7 +43,7 @@
     <ports>
         <inPort name="Documents input table" index="0">The input table
         containing the documents.</inPort>    
-        <outPort name="Dictionary output table" index="0">An output table
-        containing a dictionary column, frequency columns and an index column.</outPort>
+        <outPort name="Terms output table" index="0">An output table
+        containing a unique term column, frequency columns and an index column.</outPort>
     </ports>
 </knimeNode>

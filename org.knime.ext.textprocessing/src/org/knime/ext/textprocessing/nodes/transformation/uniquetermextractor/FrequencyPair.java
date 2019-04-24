@@ -46,7 +46,7 @@
  * History
  *   Apr 4, 2019 (julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
+package org.knime.ext.textprocessing.nodes.transformation.uniquetermextractor;
 
 import org.knime.ext.textprocessing.nodes.frequencies.Frequencies;
 

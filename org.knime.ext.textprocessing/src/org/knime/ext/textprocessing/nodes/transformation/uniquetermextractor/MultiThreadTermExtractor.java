@@ -46,7 +46,7 @@
  * History
  *   Mar 29, 2019 (julian): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
+package org.knime.ext.textprocessing.nodes.transformation.uniquetermextractor;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -78,12 +78,12 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 
 /**
- * Multi-threaded dictionary extractor. Used to extract terms from documents, count frequencies and return a data table
+ * Multi-threaded term extractor. Used to extract unique terms from documents, count frequencies and return a data table
  * containing either all or the top X most frequent terms.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Map<String, FrequencyPair>> {
+final class MultiThreadTermExtractor extends MultiThreadWorker<DataRow, Map<String, FrequencyPair>> {
 
     /**
      * The name of the term column to create.
@@ -166,7 +166,7 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
     private final ExecutionContext m_exec;
 
     /**
-     * Creates a new instance of {@link MultiThreadDictionaryExtractor}.
+     * Creates a new instance of {@link MultiThreadTermExtractor}.
      *
      * @param docColIdx The document column index.
      * @param numberOfTerms Number of top frequent terms to be displayed in the output table.
@@ -177,7 +177,7 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @param maxActiveInstanceSize Number of threads.
      * @param exec The ExecutionContext.
      */
-    MultiThreadDictionaryExtractor(final int docColIdx, final boolean filterTerms, final int numberOfTerms,
+    MultiThreadTermExtractor(final int docColIdx, final boolean filterTerms, final int numberOfTerms,
         final long totalNoOfRows, final String filterBy, final boolean appendIdxCol, final boolean appendFreqCols,
         final int maxActiveInstanceSize, final ExecutionContext exec) {
         super(totalNoOfRows >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)totalNoOfRows, maxActiveInstanceSize);
@@ -292,8 +292,8 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
      * @return Returns the {@link DataTableSpec}.
      */
     static final DataTableSpec createDataTableSpec(final boolean appendFreqCols, final boolean appendIdxCol) {
-        // create dict and occurrence column spec
-        final DataColumnSpecCreator dictionaryColumn = new DataColumnSpecCreator(TERM_COL_NAME, StringCell.TYPE);
+        // create term, occurrence and index column spec
+        final DataColumnSpecCreator termColumn = new DataColumnSpecCreator(TERM_COL_NAME, StringCell.TYPE);
         final DataColumnSpecCreator indexColumn;
         final DataColumnSpecCreator tfColumn;
         final DataColumnSpecCreator dfColumn;
@@ -303,20 +303,20 @@ final class MultiThreadDictionaryExtractor extends MultiThreadWorker<DataRow, Ma
             tfColumn = new DataColumnSpecCreator(TF, LongCell.TYPE);
             dfColumn = new DataColumnSpecCreator(DF, LongCell.TYPE);
             idfColumn = new DataColumnSpecCreator(IDF, DoubleCell.TYPE);
-            return new DataTableSpec(dictionaryColumn.createSpec(), indexColumn.createSpec(), tfColumn.createSpec(),
+            return new DataTableSpec(termColumn.createSpec(), indexColumn.createSpec(), tfColumn.createSpec(),
                 dfColumn.createSpec(), idfColumn.createSpec());
         } else if (appendIdxCol) {
             indexColumn = new DataColumnSpecCreator(IDX, IntCell.TYPE);
-            return new DataTableSpec(dictionaryColumn.createSpec(), indexColumn.createSpec());
+            return new DataTableSpec(termColumn.createSpec(), indexColumn.createSpec());
         } else if (appendFreqCols) {
             tfColumn = new DataColumnSpecCreator(TF, LongCell.TYPE);
             dfColumn = new DataColumnSpecCreator(DF, LongCell.TYPE);
             idfColumn = new DataColumnSpecCreator(IDF, DoubleCell.TYPE);
-            return new DataTableSpec(dictionaryColumn.createSpec(), tfColumn.createSpec(), dfColumn.createSpec(),
+            return new DataTableSpec(termColumn.createSpec(), tfColumn.createSpec(), dfColumn.createSpec(),
                 idfColumn.createSpec());
         } // create new data table with selected columns and term column
 
-        return new DataTableSpec(dictionaryColumn.createSpec());
+        return new DataTableSpec(termColumn.createSpec());
     }
 
     /**

@@ -46,24 +46,24 @@
  * History
  *   Jan 25, 2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
+package org.knime.ext.textprocessing.nodes.transformation.uniquetermextractor;
 
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * The {@link NodeFactory} for the Dictionary Extractor node.
+ * The {@link NodeFactory} for the Unique Term Extractor node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-public class DictionaryExtractorNodeFactory extends NodeFactory<DictionaryExtractorNodeModel> {
+public class UniqueTermExtractorNodeFactory extends NodeFactory<UniqueTermExtractorNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DictionaryExtractorNodeModel createNodeModel() {
-        return new DictionaryExtractorNodeModel();
+    public UniqueTermExtractorNodeModel createNodeModel() {
+        return new UniqueTermExtractorNodeModel();
     }
 
     /**
@@ -78,8 +78,8 @@ public class DictionaryExtractorNodeFactory extends NodeFactory<DictionaryExtrac
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DictionaryExtractorNodeModel> createNodeView(final int viewIndex,
-        final DictionaryExtractorNodeModel nodeModel) {
+    public NodeView<UniqueTermExtractorNodeModel> createNodeView(final int viewIndex,
+        final UniqueTermExtractorNodeModel nodeModel) {
         return null;
     }
 
@@ -95,8 +95,8 @@ public class DictionaryExtractorNodeFactory extends NodeFactory<DictionaryExtrac
      * {@inheritDoc}
      */
     @Override
-    protected DictionaryExtractorNodeDialog createNodeDialogPane() {
-        return new DictionaryExtractorNodeDialog();
+    protected UniqueTermExtractorNodeDialog createNodeDialogPane() {
+        return new UniqueTermExtractorNodeDialog();
     }
 
 }

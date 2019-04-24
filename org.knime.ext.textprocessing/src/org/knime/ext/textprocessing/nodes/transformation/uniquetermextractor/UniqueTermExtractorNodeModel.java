@@ -46,7 +46,7 @@
  * History
  *   Jan 25, 2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
-package org.knime.ext.textprocessing.nodes.transformation.dictionaryextractor;
+package org.knime.ext.textprocessing.nodes.transformation.uniquetermextractor;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,11 +68,11 @@ import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
- * The {@link NodeModel} for the Dictionary Extractor node.
+ * The {@link NodeModel} for the Unique Term Extractor node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class DictionaryExtractorNodeModel extends NodeModel {
+final class UniqueTermExtractorNodeModel extends NodeModel {
 
     /**
      * Configuration key for the document column to select.
@@ -131,7 +131,7 @@ final class DictionaryExtractorNodeModel extends NodeModel {
 
     /**
      * Creates and returns a {@link SettingsModelString} containing the name of the column with the documents to create
-     * the dictionary from.
+     * the set of terms from.
      *
      * @return {@code SettingsModelString} containing the name of the document column.
      */
@@ -174,7 +174,7 @@ final class DictionaryExtractorNodeModel extends NodeModel {
      * @return Creates and returns a {@link SettingsModelString} containing the name of the frequency method.
      */
     static final SettingsModelString getFilterByModel() {
-        return new SettingsModelString(CFG_KEY_FILTER_BY, MultiThreadDictionaryExtractor.TF);
+        return new SettingsModelString(CFG_KEY_FILTER_BY, MultiThreadTermExtractor.TF);
     }
 
     /**
@@ -236,9 +236,9 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     private final SettingsModelBoolean m_appendIdxColModel = getAppendIdxColModel();
 
     /**
-     * Creates a new instance of {@code DocumentToDictionaryNodeModel}.
+     * Creates a new instance of {@code UniqueTermExtractorNodeModel}.
      */
-    protected DictionaryExtractorNodeModel() {
+    protected UniqueTermExtractorNodeModel() {
         super(1, 1);
     }
 
@@ -248,7 +248,7 @@ final class DictionaryExtractorNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         checkDataTableSpec(inSpecs[0]);
-        return new DataTableSpec[]{MultiThreadDictionaryExtractor
+        return new DataTableSpec[]{MultiThreadTermExtractor
             .createDataTableSpec(m_appendFreqColsModel.getBooleanValue(), m_appendIdxColModel.getBooleanValue())};
     }
 
@@ -284,8 +284,8 @@ final class DictionaryExtractorNodeModel extends NodeModel {
         // Create extractor
         final int numberOfThreads = numberOfRows > m_numberOfThreadsModel.getIntValue()
             ? m_numberOfThreadsModel.getIntValue() : (int)numberOfRows;
-        final MultiThreadDictionaryExtractor extractor =
-            new MultiThreadDictionaryExtractor(documentColIndex, m_enableFilteringModel.getBooleanValue(),
+        final MultiThreadTermExtractor extractor =
+            new MultiThreadTermExtractor(documentColIndex, m_enableFilteringModel.getBooleanValue(),
                 m_topKTermsModel.getIntValue(), numberOfRows, m_filterByModel.getStringValue(),
                 m_appendIdxColModel.getBooleanValue(), m_appendFreqColsModel.getBooleanValue(), numberOfThreads, exec);
 
