@@ -437,8 +437,8 @@
       </node>
       <node
             category-path="/applications/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory">
       </node>
       <node
             category-path="/applications/textprocessing/tagging"
@@ -715,6 +715,11 @@
             category-path="/applications/textprocessing/transformation"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.uniquetermextractor.UniqueTermExtractorNodeFactory">
+      </node>
+      <node
+            category-path="/applications/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory2">
       </node>
    </extension>
    <extension
