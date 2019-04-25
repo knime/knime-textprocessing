@@ -59,7 +59,9 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
+ * @deprecated Use custom cell factory instead.
  */
+@Deprecated
 public class MetaInfoCellFactory extends SingleCellFactory {
 
     private int m_docColIndx;

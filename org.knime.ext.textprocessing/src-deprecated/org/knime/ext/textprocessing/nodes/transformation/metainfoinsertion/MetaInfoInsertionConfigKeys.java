@@ -40,69 +40,40 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
+ *
+ * Created on 30.03.2013 by kilian
  */
 package org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion;
 
-import org.knime.core.data.StringValue;
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-
 /**
+ *
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
+ * @since 2.8
+ * @deprecated Use custom configuration key class instead.
  */
-public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
+@Deprecated
+public final class MetaInfoInsertionConfigKeys {
+
+    private MetaInfoInsertionConfigKeys() { }
 
     /**
-     * @return The settings model containing the document column name.
+     * Config key for the document column.
      */
-    public static SettingsModelString createDocumentColumnModel() {
-        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_DOCCOL,"");
-    }
+    public static final String CFGKEY_DOCCOL = "Document column";
 
     /**
-     * @return The settings model containing the key column name.
+     * Config key for the key column.
      */
-    public static SettingsModelString createKeyColumnModel() {
-        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_KEYCOL,"");
-    }
+    public static final String CFGKEY_KEYCOL = "Key column";
 
     /**
-     * @return The settings model containing the value column name.
+     * Config key for the value column.
      */
-    public static SettingsModelString createValueColumnModel() {
-        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_VALUECOL,"");
-    }
+    public static final String CFGKEY_VALUECOL = "Value column";
 
     /**
-     * @return The settings model containing the settings whether the key and value cols are kept.
+     * Config key for the setting whether key and value cols are kept.
      */
-    public static SettingsModelBoolean createKeepKeyValColsModel() {
-        return new SettingsModelBoolean(MetaInfoInsertionConfigKeys.CFGKEY_KEEPKEYVALCOLS,
-            MetaInfoInsertionNodeModel.DEF_KEEPKEYVALCOLS);
-    }
-
-    /**
-     * Constructor of {@link MetaInfoInsertionNodeDialog}.
-     */
-    @SuppressWarnings("unchecked")
-    public MetaInfoInsertionNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(createDocumentColumnModel(), "Document column", 0,
-            StringValue.class));
-
-        setHorizontalPlacement(true);
-
-        addDialogComponent(
-            new DialogComponentColumnNameSelection(createKeyColumnModel(), "Key column", 0, StringValue.class));
-
-        addDialogComponent(
-            new DialogComponentColumnNameSelection(createValueColumnModel(), "Value column", 0, StringValue.class));
-
-        setHorizontalPlacement(false);
-
-        addDialogComponent(new DialogComponentBoolean(createKeepKeyValColsModel(), "Keep key and value columns"));
-    }
+    public static final String CFGKEY_KEEPKEYVALCOLS = "Keep key, value cols";
 }

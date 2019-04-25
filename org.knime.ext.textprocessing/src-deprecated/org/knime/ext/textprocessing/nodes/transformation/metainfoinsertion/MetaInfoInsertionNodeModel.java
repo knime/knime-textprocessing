@@ -66,7 +66,9 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
+ * @deprecated Use custom node model instead.
  */
+@Deprecated
 public class MetaInfoInsertionNodeModel extends NodeModel {
 
     /**

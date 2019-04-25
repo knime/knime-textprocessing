@@ -40,38 +40,60 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
- *
- * Created on 30.03.2013 by kilian
+ * ------------------------------------------------------------------------
  */
 package org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion;
 
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+
 /**
- *
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
- * @since 2.8
+ * @deprecated Use custom node factory instead.
  */
-public final class MetaInfoInsertionConfigKeys {
+@Deprecated
+public class MetaInfoInsertionNodeFactory extends NodeFactory<MetaInfoInsertionNodeModel> {
 
-    private MetaInfoInsertionConfigKeys() { }
-
-    /**
-     * Config key for the document column.
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#createNodeModel()
      */
-    public static final String CFGKEY_DOCCOL = "Document column";
+    @Override
+    public MetaInfoInsertionNodeModel createNodeModel() {
+        return new MetaInfoInsertionNodeModel();
+    }
 
-    /**
-     * Config key for the key column.
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#getNrNodeViews()
      */
-    public static final String CFGKEY_KEYCOL = "Key column";
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
 
-    /**
-     * Config key for the value column.
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#createNodeView(int, org.knime.core.node.NodeModel)
      */
-    public static final String CFGKEY_VALUECOL = "Value column";
+    @Override
+    public NodeView<MetaInfoInsertionNodeModel> createNodeView(final int viewIndex,
+                                                               final MetaInfoInsertionNodeModel nodeModel) {
+        return null;
+    }
 
-    /**
-     * Config key for the setting whether key and value cols are kept.
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#hasDialog()
      */
-    public static final String CFGKEY_KEEPKEYVALCOLS = "Keep key, value cols";
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.knime.core.node.NodeFactory#createNodeDialogPane()
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new MetaInfoInsertionNodeDialog();
+    }
+
 }

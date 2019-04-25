@@ -44,54 +44,67 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.data.StringValue;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
+ * @deprecated Use custom node dialog instead.
  */
-public class MetaInfoInsertionNodeFactory extends NodeFactory<MetaInfoInsertionNodeModel> {
+@Deprecated
+public final class MetaInfoInsertionNodeDialog extends DefaultNodeSettingsPane {
 
-    /* (non-Javadoc)
-     * @see org.knime.core.node.NodeFactory#createNodeModel()
+    /**
+     * @return The settings model containing the document column name.
      */
-    @Override
-    public MetaInfoInsertionNodeModel createNodeModel() {
-        return new MetaInfoInsertionNodeModel();
+    public static SettingsModelString createDocumentColumnModel() {
+        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_DOCCOL,"");
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.core.node.NodeFactory#getNrNodeViews()
+    /**
+     * @return The settings model containing the key column name.
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
+    public static SettingsModelString createKeyColumnModel() {
+        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_KEYCOL,"");
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.core.node.NodeFactory#createNodeView(int, org.knime.core.node.NodeModel)
+    /**
+     * @return The settings model containing the value column name.
      */
-    @Override
-    public NodeView<MetaInfoInsertionNodeModel> createNodeView(final int viewIndex,
-                                                               final MetaInfoInsertionNodeModel nodeModel) {
-        return null;
+    public static SettingsModelString createValueColumnModel() {
+        return new SettingsModelString(MetaInfoInsertionConfigKeys.CFGKEY_VALUECOL,"");
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.core.node.NodeFactory#hasDialog()
+    /**
+     * @return The settings model containing the settings whether the key and value cols are kept.
      */
-    @Override
-    protected boolean hasDialog() {
-        return true;
+    public static SettingsModelBoolean createKeepKeyValColsModel() {
+        return new SettingsModelBoolean(MetaInfoInsertionConfigKeys.CFGKEY_KEEPKEYVALCOLS,
+            MetaInfoInsertionNodeModel.DEF_KEEPKEYVALCOLS);
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.core.node.NodeFactory#createNodeDialogPane()
+    /**
+     * Constructor of {@link MetaInfoInsertionNodeDialog}.
      */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new MetaInfoInsertionNodeDialog();
-    }
+    @SuppressWarnings("unchecked")
+    public MetaInfoInsertionNodeDialog() {
+        addDialogComponent(new DialogComponentColumnNameSelection(createDocumentColumnModel(), "Document column", 0,
+            StringValue.class));
 
+        setHorizontalPlacement(true);
+
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(createKeyColumnModel(), "Key column", 0, StringValue.class));
+
+        addDialogComponent(
+            new DialogComponentColumnNameSelection(createValueColumnModel(), "Value column", 0, StringValue.class));
+
+        setHorizontalPlacement(false);
+
+        addDialogComponent(new DialogComponentBoolean(createKeepKeyValColsModel(), "Keep key and value columns"));
+    }
 }
