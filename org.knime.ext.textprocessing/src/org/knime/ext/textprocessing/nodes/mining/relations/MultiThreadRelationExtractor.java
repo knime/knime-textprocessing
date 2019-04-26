@@ -68,9 +68,6 @@ import org.knime.core.util.MultiThreadWorker;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.CoreLabel.OutputFormat;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.AnnotationPipeline;
 
@@ -133,7 +130,7 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
     protected MultiThreadRelationExtractor(final BufferedDataContainer container, final int docColIdx,
         final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final int maxQueueSize,
         final int maxActiveInstanceSize, final ExecutionContext exec) {
-        super(maxQueueSize >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)maxQueueSize, maxActiveInstanceSize);
+        super(maxQueueSize, maxQueueSize > maxActiveInstanceSize ? maxActiveInstanceSize : maxQueueSize);
         m_dataContainer = container;
         m_docColIdx = docColIdx;
         m_lemmaDocColIdx = lemmaDocColIdx;
@@ -157,10 +154,6 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
                 : DocumentToAnnotationConverter.convert(doc);
             try {
                 m_annotationPipeline.annotate(annotation);
-                List<CoreLabel> labels = annotation.get(CoreAnnotations.TokensAnnotation.class);
-                labels.stream().forEach(cl -> System.out.println(cl.toString(OutputFormat.ALL)));
-                System.out
-                    .print(((Annotation)annotation.get(CoreAnnotations.SentencesAnnotation.class).get(0)).toShortString('\n'));
                 extractionResults = extractRelations(annotation);
             } catch (final AssertionError | NullPointerException e) {
                 extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());

@@ -275,27 +275,9 @@ final class DocumentToAnnotationConverter {
     private static final String createPosTag(final String text, final String tagValue) {
         if (!tagValue.equals(SYM) && !tagValue.equals(UNKNOWN)) {
             return tagValue;
+        } else if (quotePattern.matcher(text).matches()) {
+            return QUOTATION_POS_TAG;
         }
-        return convertQuotation(text, tagValue.equals(SYM) ? text : POS_FALLBACK_TAG);
-    }
-
-    /**
-     * Checks, whether the string consists of quotation marks only.
-     *
-     * @param str A string.
-     * @return True, if the String consists of quotation marks only.
-     */
-    private static final boolean isQuotation(final String str) {
-        return quotePattern.matcher(str).matches();
-    }
-
-    /**
-     * Returns the corresponding Stanford part-of-speech tag for quotation marks or the given fallback string.
-     *
-     * @param str A string.
-     * @return Returns the corresponding Stanford part-of-speech tag for quotation marks or the given fallback string.
-     */
-    private static final String convertQuotation(final String str, final String fallback) {
-        return isQuotation(str) ? QUOTATION_POS_TAG : fallback;
+        return tagValue.equals(SYM) ? text : POS_FALLBACK_TAG;
     }
 }

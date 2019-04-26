@@ -252,11 +252,9 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
         final StanfordCoreNLP annotationPipeline = createAnnotationPipeline(m_applyReqPreprocModel.getBooleanValue());
 
         // Open data container
-        final int numberOfThreads =
-            totalNoOfRows > m_noOfThreadsModel.getIntValue() ? m_noOfThreadsModel.getIntValue() : (int)totalNoOfRows;
         final BufferedDataContainer dataContainer = exec.createDataContainer(createDataTableSpec(dataTableSpec));
         final MultiThreadRelationExtractor extractor = createExtractor(dataContainer, docColIdx, lemmaDocColIdx,
-            annotationPipeline, (int)totalNoOfRows, numberOfThreads, exec);
+            annotationPipeline, (int)totalNoOfRows, m_noOfThreadsModel.getIntValue(), exec);
         extractor.run(inputData);
         dataContainer.close();
 
