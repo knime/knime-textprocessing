@@ -46,37 +46,59 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.metainfoextraction;
 
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+
 /**
  *
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
+ * @deprecated Use custom node factory instead.
  */
-public final class MetaInfoExtractionConfigKeys {
-
-    private MetaInfoExtractionConfigKeys() { }
-
-    /**
-     * Config key for the document column.
-     */
-    public static final String CFGKEY_DOCCOL = "Document column";
+@Deprecated
+public class MetaInfoExtractionNodeFactory extends
+NodeFactory<MetaInfoExtractionNodeModel> {
 
     /**
-     * Config key for append documents setting.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_APPENDDOCS = "Append documents";
+    @Override
+    public MetaInfoExtractionNodeModel createNodeModel() {
+        return new MetaInfoExtractionNodeModel();
+    }
 
     /**
-     * Config key for distinct documents setting.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_DISTINCTDOCS = "Distinct documents";
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
 
     /**
-     * Config key for only meta keys settings.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_KEYSONLY = "Only for keys";
+    @Override
+    public NodeView<MetaInfoExtractionNodeModel> createNodeView(
+        final int viewIndex, final MetaInfoExtractionNodeModel nodeModel) {
+        return null;
+    }
 
     /**
-     * Config key for meta info keys.
+     * {@inheritDoc}
      */
-    public static final String CFGKEY_KEYS = "Keys";
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new MetaInfoExtractionNodeDialog();
+    }
+
 }

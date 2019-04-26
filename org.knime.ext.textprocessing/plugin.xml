@@ -432,8 +432,8 @@
       </node>
       <node
             category-path="/applications/textprocessing/transformation"
-            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory">
       </node>
       <node
             category-path="/applications/textprocessing/transformation"

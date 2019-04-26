@@ -61,7 +61,9 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
+ * @deprecated Use custom node dialog instead.
  */
+@Deprecated
 public class MetaInfoExtractionNodeDialog extends DefaultNodeSettingsPane {
 
     /**
