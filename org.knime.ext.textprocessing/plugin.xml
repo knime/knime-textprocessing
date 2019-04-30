@@ -721,6 +721,11 @@
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion.MetaInfoInsertionNodeFactory2">
       </node>
+      <node
+            category-path="/applications/textprocessing/transformation"
+            deprecated="false"
+            factory-class="org.knime.ext.textprocessing.nodes.transformation.metainfoextraction.MetaInfoExtractionNodeFactory2">
+      </node>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator">
+    <name>Meta Info Extractor</name>
+    <shortDescription>Extracts the meta info key, value pairs of documents.
+    </shortDescription>
+    <fullDescription>
+        <intro>
+			Extracts the meta information key, value pairs of documents. For each key a column is created. 
+			The column contains the specific values for each document related to that key.<br/>
+			The output table contains the data from the input table as well as key columns containing the values (in case
+			there is meta information stored in the documents).
+		</intro>
+		<option name="Document column">The document column to use.</option>
+	</fullDescription>
+		
+	<ports>
+        <inPort name="Documents input table" index="0">
+        The input table which contains the documents.</inPort>
+        <outPort name="Documents and extracted meta info." index="0">
+        The output table which contains documents and the extracted meta information.</outPort>
+	</ports>
+</knimeNode>
