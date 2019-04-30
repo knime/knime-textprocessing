@@ -32,7 +32,9 @@
         </option>
         <option name="Replace words not in the dictionary by">
               If checked, all words that are not available in the dictionary are replaced by the string entered in the 
-              text field.
+              text field.<br/>
+              <i>Note:</i> Entering an empty string or a string consisting solely of whitespaces leads to the removal of 
+              all terms not contained in the dictionary.
         </option>
         <option name="Word tokenizer">
             Select the tokenizer used for word tokenization. Go to <i>Preferences -> KNIME -> Textprocessing</i>

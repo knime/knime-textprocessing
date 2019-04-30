@@ -179,7 +179,7 @@ public final class DictionaryReplacer2InPortsNodeModel2 extends StreamablePrepro
         if (!m_replaceUnknownWordsModel.isActive()) {
             return new DictionaryReplacer(m_replacementDict, m_tokenizerModel.getStringValue());
         }
-        return new DictionaryReplacer(m_replacementDict, true, m_replaceUnknownWordsModel.getStringValue(),
+        return new DictionaryReplacer(m_replacementDict, m_replaceUnknownWordsModel.getStringValue(),
             m_tokenizerModel.getStringValue());
     }
 

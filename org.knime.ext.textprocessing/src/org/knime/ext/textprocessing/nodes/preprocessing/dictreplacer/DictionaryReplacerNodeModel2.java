@@ -124,7 +124,7 @@ public final class DictionaryReplacerNodeModel2 extends StreamableFunctionPrepro
         if (!m_replaceUnknownWordsModel.isActive()) {
             return new DictionaryReplacer(dictionary, m_tokenizerModel.getStringValue());
         }
-        return new DictionaryReplacer(dictionary, true, m_replaceUnknownWordsModel.getStringValue(),
+        return new DictionaryReplacer(dictionary, m_replaceUnknownWordsModel.getStringValue(),
             m_tokenizerModel.getStringValue());
     }
 
