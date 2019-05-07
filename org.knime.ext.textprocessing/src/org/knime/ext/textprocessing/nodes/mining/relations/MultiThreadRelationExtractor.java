@@ -69,7 +69,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.AnnotationPipeline;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 /**
  * Abstract class that provides functionality to run multi-threaded relation extraction.
@@ -84,9 +84,9 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
     private final BufferedDataContainer m_dataContainer;
 
     /**
-     * The {@link AnnotationPipeline} to process the documents.
+     * The {@link StanfordCoreNLP} to process the documents.
      */
-    private final AnnotationPipeline m_annotationPipeline;
+    private final StanfordCoreNLP m_annotationPipeline;
 
     /**
      * The document column index.
@@ -119,7 +119,7 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      * @param container The {@link BufferedDataContainer} used to create a data table.
      * @param docColIdx The document column index.
      * @param lemmaDocColIdx The lemmatized document column index.
-     * @param annotationPipeline The {@link AnnotationPipeline}.
+     * @param annotationPipeline The {@link StanfordCoreNLP}.
      * @param maxQueueSize Maximum queue size of finished jobs (finished computations might be cached in order to ensure
      *            the proper output ordering). If this queue is full (because the next-to-be-processed computation is
      *            still ongoing), no further tasks are submitted.
@@ -128,7 +128,7 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      * @param exec ExecutionContext
      */
     protected MultiThreadRelationExtractor(final BufferedDataContainer container, final int docColIdx,
-        final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline, final int maxQueueSize,
+        final int lemmaDocColIdx, final StanfordCoreNLP annotationPipeline, final int maxQueueSize,
         final int maxActiveInstanceSize, final ExecutionContext exec) {
         super(maxQueueSize, maxQueueSize > maxActiveInstanceSize ? maxActiveInstanceSize : maxQueueSize);
         m_dataContainer = container;
@@ -193,6 +193,7 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      */
     BufferedDataTable createDataTable(final ExecutionContext exec) {
         m_dataContainer.close();
+        StanfordCoreNLP.clearAnnotatorPool();
         return m_dataContainer.getTable();
     }
 

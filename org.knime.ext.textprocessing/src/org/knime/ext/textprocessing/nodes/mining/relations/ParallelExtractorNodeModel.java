@@ -69,7 +69,6 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
-import edu.stanford.nlp.pipeline.AnnotationPipeline;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 /**
@@ -248,7 +247,6 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
 
         // create annotation pipeline and a data table creator instance, which collects the results
         exec.setProgress(0.01, "Load models...");
-        StanfordCoreNLP.clearAnnotatorPool();
         final StanfordCoreNLP annotationPipeline = createAnnotationPipeline(m_applyReqPreprocModel.getBooleanValue());
 
         // Open data container
@@ -262,6 +260,8 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
             setWarningMessage("Ignored " + extractor.getMissingValueCount() + " rows with missing values.");
         }
 
+        // free memory
+        StanfordCoreNLP.clearAnnotatorPool();
         return new BufferedDataTable[]{dataContainer.getTable()};
     }
 
@@ -271,7 +271,7 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * @param container The {@link BufferedDataContainer} used to create a data table.
      * @param docColIdx The document column index.
      * @param lemmaDocColIdx The lemmatized document column index.
-     * @param annotationPipeline The {@link AnnotationPipeline}.
+     * @param annotationPipeline The {@link StanfordCoreNLP} object.
      * @param maxQueueSize Maximum queue size of finished jobs (finished computations might be cached in order to ensure
      *            the proper output ordering). If this queue is full (because the next-to-be-processed computation is
      *            still ongoing), no further tasks are submitted.
@@ -282,14 +282,14 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * @return Returns a new instance of {@link MultiThreadRelationExtractor}.
      */
     protected abstract MultiThreadRelationExtractor createExtractor(final BufferedDataContainer container,
-        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
+        final int docColIdx, final int lemmaDocColIdx, final StanfordCoreNLP annotationPipeline,
         final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec);
 
     /**
-     * Creates and returns an {@link AnnotationPipeline} for the specified tasks.
+     * Creates and returns an {@link StanfordCoreNLP} object for the specified tasks.
      *
      * @param applyPreprocessing Set true, if pos, ne tagging and lemmatizing should be done beforehand.
-     * @return An {@code AnnotationPipeline} for the specified tasks
+     * @return An {@code StanfordCoreNLP} object for the specified tasks
      * @throws IOException Thrown if model could not be load.
      */
     protected abstract StanfordCoreNLP createAnnotationPipeline(final boolean applyPreprocessing) throws IOException;

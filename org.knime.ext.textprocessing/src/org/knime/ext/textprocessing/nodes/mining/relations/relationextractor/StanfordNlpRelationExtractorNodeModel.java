@@ -59,7 +59,6 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.nodes.mining.relations.MultiThreadRelationExtractor;
 import org.knime.ext.textprocessing.nodes.mining.relations.ParallelExtractorNodeModel;
 
-import edu.stanford.nlp.pipeline.AnnotationPipeline;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 /**
@@ -126,7 +125,7 @@ final class StanfordNlpRelationExtractorNodeModel extends ParallelExtractorNodeM
      */
     @Override
     protected final MultiThreadRelationExtractor createExtractor(final BufferedDataContainer container,
-        final int docColIdx, final int lemmaDocColIdx, final AnnotationPipeline annotationPipeline,
+        final int docColIdx, final int lemmaDocColIdx, final StanfordCoreNLP annotationPipeline,
         final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec) {
         return new StanfordRelationExtractor(container, docColIdx, lemmaDocColIdx, annotationPipeline, maxQueueSize,
             maxActiveInstanceSize, exec);

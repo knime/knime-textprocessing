@@ -68,7 +68,7 @@ import edu.stanford.nlp.ie.machinereading.structure.MachineReadingAnnotations;
 import edu.stanford.nlp.ie.machinereading.structure.RelationMention;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.AnnotationPipeline;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.CoreMap;
 
@@ -106,7 +106,7 @@ final class StanfordRelationExtractor extends MultiThreadRelationExtractor {
      * @param container The {@link BufferedDataContainer} used to create a data table.
      * @param docColIdx The document column index.
      * @param lemmaDocColIdx The lemmatized document column index.
-     * @param annotationPipeline The {@link AnnotationPipeline}.
+     * @param annotationPipeline The {@link StanfordCoreNLP} object.
      * @param maxQueueSize Maximum queue size of finished jobs (finished computations might be cached in order to ensure
      *            the proper output ordering). If this queue is full (because the next-to-be-processed computation is
      *            still ongoing), no further tasks are submitted.
@@ -115,7 +115,7 @@ final class StanfordRelationExtractor extends MultiThreadRelationExtractor {
      * @param exec The {@link ExecutionContext}.
      */
     StanfordRelationExtractor(final BufferedDataContainer container, final int docColIdx, final int lemmaDocColIdx,
-        final AnnotationPipeline annotationPipeline, final int maxQueueSize, final int maxActiveInstanceSize,
+        final StanfordCoreNLP annotationPipeline, final int maxQueueSize, final int maxActiveInstanceSize,
         final ExecutionContext exec) {
         super(container, docColIdx, lemmaDocColIdx, annotationPipeline, maxQueueSize, maxActiveInstanceSize, exec);
     }
