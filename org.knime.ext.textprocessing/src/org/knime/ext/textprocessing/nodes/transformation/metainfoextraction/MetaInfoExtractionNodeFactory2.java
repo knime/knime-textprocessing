@@ -58,42 +58,27 @@ import org.knime.core.node.NodeView;
  */
 public final class MetaInfoExtractionNodeFactory2 extends NodeFactory<MetaInfoExtractionNodeModel2> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MetaInfoExtractionNodeModel2 createNodeModel() {
         return new MetaInfoExtractionNodeModel2();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected int getNrNodeViews() {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NodeView<MetaInfoExtractionNodeModel2> createNodeView(final int viewIndex,
         final MetaInfoExtractionNodeModel2 nodeModel) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean hasDialog() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected MetaInfoExtractionNodeDialog2 createNodeDialogPane() {
         return new MetaInfoExtractionNodeDialog2();

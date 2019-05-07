@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator">
+<knimeNode icon="../../../icons/TextProcDoc2String.png" type="Manipulator" deprecated="true">
     <name>Meta Info Extractor</name>
     <shortDescription>Extracts the meta info key, value pairs of documents.
     </shortDescription>

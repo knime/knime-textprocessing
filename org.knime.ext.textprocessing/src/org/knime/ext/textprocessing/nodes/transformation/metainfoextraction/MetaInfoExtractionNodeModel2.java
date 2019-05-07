@@ -50,18 +50,31 @@ package org.knime.ext.textprocessing.nodes.transformation.metainfoextraction;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
+import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentMetaInfo;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
@@ -71,7 +84,7 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class MetaInfoExtractionNodeModel2 extends NodeModel {
+final class MetaInfoExtractionNodeModel2 extends SimpleStreamableFunctionNodeModel {
 
     /**
      * Config key for the document column.
@@ -101,12 +114,9 @@ final class MetaInfoExtractionNodeModel2 extends NodeModel {
      * Creates a new instance of {@code MetaInfoExtractionNodeModel2} with one in- and one output port.
      */
     MetaInfoExtractionNodeModel2() {
-        super(1, 1);
+        super();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec inSpec = inSpecs[0];
@@ -128,78 +138,118 @@ final class MetaInfoExtractionNodeModel2 extends NodeModel {
             .ifPresent(a -> setWarningMessage(a));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-
         final BufferedDataTable dataTable = inData[0];
         final DataTableSpec spec = dataTable.getDataTableSpec();
         final int docColIdx = spec.findColumnIndex(m_docColModel.getStringValue());
-        checkDataTableSpec(dataTable.getDataTableSpec());
 
-        final ColumnRearranger rearranger = new ColumnRearranger(spec);
-        final MetaInfoExtractionCellFactory cellFac = new MetaInfoExtractionCellFactory(dataTable, docColIdx);
-        rearranger.append(new MetaInfoExtractionCellFactory(dataTable, docColIdx));
-
-        if (!cellFac.metaInfoAvailable() && dataTable.size() > 0) {
-            setWarningMessage("No meta information extracted, as the documents don't contain any.");
+        if (dataTable.size() == 0) {
+            return inData;
         }
 
+        // get keys
+        final Map<String, Integer> keys = extractKeys(dataTable, docColIdx);
+
+        // return input table if documents do not contain any meta information
+        if (keys.isEmpty()) {
+            setWarningMessage("No meta information extracted, as the documents don't contain any.");
+            return inData;
+        }
+
+        final ColumnRearranger rearranger = createColumnRearranger(spec);
+        rearranger.append(new AbstractCellFactory() {
+
+            @Override
+            public DataCell[] getCells(final DataRow row) {
+                final DataCell docCell = row.getCell(docColIdx);
+                final DataCell[] newCells =
+                    Stream.generate(DataType::getMissingCell).limit(keys.size()).toArray(DataCell[]::new);
+                if (!docCell.isMissing()) {
+                    final Document doc = ((DocumentValue)docCell).getDocument();
+                    final DocumentMetaInfo metaInfo = doc.getMetaInformation();
+                    final Set<String> docKeys = metaInfo.getMetaInfoKeys();
+                    // look up position for each meta info key from the document in the total key set and
+                    // add a new StringCell with the corresponding value
+                    for (final String key : docKeys) {
+                        newCells[keys.get(key)] = new StringCell(metaInfo.getMetaInfoValue(key));
+                    }
+                }
+                return newCells;
+            }
+
+            @Override
+            public DataColumnSpec[] getColumnSpecs() {
+                return keys.entrySet().stream()//
+                    .map(e -> new DataColumnSpecCreator(e.getKey(), StringCell.TYPE).createSpec())//
+                    .toArray(DataColumnSpec[]::new);
+            }
+        });
         return new BufferedDataTable[]{
             exec.createColumnRearrangeTable(dataTable, rearranger, exec.createSubProgress(1.0))};
     }
 
     /**
-     * {@inheritDoc}
+     * Extracts all keys for meta information in documents of a specified column.
+     *
+     * @param dataTable The data table
+     * @param docColIdx The document column index.
+     * @return A map of keys and an index.
      */
+    private static final Map<String, Integer> extractKeys(final BufferedDataTable dataTable, final int docColIdx) {
+        final Map<String, Integer> keys = new LinkedHashMap<>();
+        int index = 0;
+        for (final DataRow row : dataTable) {
+            final DataCell cell = row.getCell(docColIdx);
+            if (!cell.isMissing()) {
+                final Set<String> metaInfoKeys =
+                    ((DocumentValue)cell).getDocument().getMetaInformation().getMetaInfoKeys();
+                for (final String key : metaInfoKeys) {
+                    if (!keys.containsKey(key)) {
+                        keys.put(key, index);
+                        index++;
+                    }
+                }
+            }
+        }
+        return keys;
+    }
+
+    @Override
+    protected ColumnRearranger createColumnRearranger(final DataTableSpec spec) throws InvalidSettingsException {
+        return new ColumnRearranger(spec);
+    }
+
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_docColModel.saveSettingsTo(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.validateSettings(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.loadSettingsFrom(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // Nothing to do here...
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // Nothing to do here...
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void reset() {
         // Nothing to do here...
     }
-
 }
