@@ -50,12 +50,21 @@ package org.knime.ext.textprocessing.nodes.transformation.metainfoinsertion;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.container.SingleCellFactory;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.data.filestore.FileStoreFactory;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -67,18 +76,23 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.streamable.simple.SimpleStreamableFunctionNodeModel;
 import org.knime.core.node.util.filter.InputFilter;
 import org.knime.core.node.util.filter.NameFilterConfiguration;
+import org.knime.ext.textprocessing.data.Document;
+import org.knime.ext.textprocessing.data.DocumentBuilder;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
+import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
  * The {@link NodeModel} for the Meta Info Inserter node.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-final class MetaInfoInsertionNodeModel2 extends NodeModel {
+final class MetaInfoInsertionNodeModel2 extends SimpleStreamableFunctionNodeModel {
 
     /** Configuration key for the document column. */
     private static final String CFG_KEY_DOCUMENT_COLUMN = "document_column";
@@ -149,20 +163,17 @@ final class MetaInfoInsertionNodeModel2 extends NodeModel {
      * Creates a new instance of {@code MetaInfoInserterNodeModel}.
      */
     MetaInfoInsertionNodeModel2() {
-        super(1, 1);
+        super();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         final DataTableSpec inSpec = inSpecs[0];
         checkDataTableSpec(inSpec);
-        final ColumnRearranger rearranger = new ColumnRearranger(inSpec);
-        if (m_removeMetaInfoColsModel.getBooleanValue()) {
-            rearranger.remove(m_columnFilterModel.applyTo(inSpec).getIncludes());
+        if (m_columnFilterModel.applyTo(inSpec).getIncludes().length == 0) {
+            throw new InvalidSettingsException("Please select at least one key column.");
         }
+        final ColumnRearranger rearranger = createColumnRearranger(inSpec);
         return new DataTableSpec[]{rearranger.createSpec()};
     }
 
@@ -181,48 +192,40 @@ final class MetaInfoInsertionNodeModel2 extends NodeModel {
             .ifPresent(a -> setWarningMessage(a));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-
         final DataTableSpec inSpec = inData[0].getDataTableSpec();
         final int docColIdx = inSpec.findColumnIndex(m_docColModel.getStringValue());
-        checkDataTableSpec(inSpec);
         final String[] metaInfCols = m_columnFilterModel.applyTo(inSpec).getIncludes();
-        final ColumnRearranger rearranger = new ColumnRearranger(inSpec);
-        rearranger.replace(new MetaInfoCellFactory2(inSpec, docColIdx, metaInfCols, exec), docColIdx);
-        if (m_removeMetaInfoColsModel.getBooleanValue()) {
-            rearranger.remove(metaInfCols);
-        }
+        final ColumnRearranger rearranger = createColumnRearranger(inSpec);
+        rearranger.replace(new MetaInfoCellFactory(inSpec, docColIdx, metaInfCols, exec), docColIdx);
 
         return new BufferedDataTable[]{
             exec.createColumnRearrangeTable(inData[0], rearranger, exec.createSubExecutionContext(1.0))};
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    protected ColumnRearranger createColumnRearranger(final DataTableSpec spec) throws InvalidSettingsException {
+        final ColumnRearranger rearranger = new ColumnRearranger(spec);
+        if (m_removeMetaInfoColsModel.getBooleanValue()) {
+            rearranger.remove(m_columnFilterModel.applyTo(spec).getIncludes());
+        }
+        return rearranger;
+    }
+
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // Nothing to do here...
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
         // Nothing to do here...
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_docColModel.saveSettingsTo(settings);
@@ -230,9 +233,6 @@ final class MetaInfoInsertionNodeModel2 extends NodeModel {
         m_removeMetaInfoColsModel.saveSettingsTo(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.validateSettings(settings);
@@ -240,9 +240,6 @@ final class MetaInfoInsertionNodeModel2 extends NodeModel {
         m_removeMetaInfoColsModel.validateSettings(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_docColModel.loadSettingsFrom(settings);
@@ -250,12 +247,77 @@ final class MetaInfoInsertionNodeModel2 extends NodeModel {
         m_removeMetaInfoColsModel.loadSettingsFrom(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void reset() {
         // Nothing to do here...
     }
 
+    /**
+     * Cell factory to add meta information from multiple columns to a single {@link Document}.
+     *
+     * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
+     */
+    private static final class MetaInfoCellFactory extends SingleCellFactory {
+
+        /** The document column index. */
+        private final int m_docColIdx;
+
+        /** A map with column names and indices of meta info columns. */
+        private final Map<String, Integer> m_colNamesAndIdx;
+
+        /** The document cell factory. */
+        private final TextContainerDataCellFactory m_documentCellFac;
+
+        /**
+         * Creates a new instance of {@link MetaInfoCellFactory2}.
+         *
+         * @param spec The {@link DataTableSpec}.
+         * @param docColIdx The document column index.
+         * @param metaInfoColNames An array of columns names containing meta information.
+         * @param exec The {@link ExecutionContext}.
+         */
+        MetaInfoCellFactory(final DataTableSpec spec, final int docColIdx, final String[] metaInfoColNames,
+            final ExecutionContext exec) {
+            super(true, spec.getColumnSpec(docColIdx));
+            m_docColIdx = docColIdx;
+            m_colNamesAndIdx = Stream.of(metaInfoColNames)//
+                .collect(Collectors.toMap(Function.identity(), colName -> spec.findColumnIndex(colName)));
+            m_documentCellFac = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+            if (exec != null) {
+                m_documentCellFac.prepare(FileStoreFactory.createWorkflowFileStoreFactory(exec));
+            }
+        }
+
+        @Override
+        public DataCell getCell(final DataRow row) {
+            final DataCell cell = row.getCell(m_docColIdx);
+            if (!cell.isMissing()) {
+                final Document d = ((DocumentValue)cell).getDocument();
+                final DocumentBuilder db = new DocumentBuilder(d);
+                db.setSections(d.getSections());
+                m_colNamesAndIdx.entrySet().stream()//
+                    .forEach(e -> addMetaInformation(row, db, e.getKey(), e.getValue()));
+                final Document newDoc = db.createDocument();
+                return m_documentCellFac.createDataCell(newDoc);
+            }
+            return cell;
+        }
+
+        /**
+         * Adds meta information to a {@link DocumentBuilder} in case there is no missing value.
+         *
+         * @param row The {@link DataRow}.
+         * @param db The {@link DocumentBuilder} to add the meta information to.
+         * @param key The key.
+         * @param metaInfColIdx The column index of the column containing the value.
+         */
+        private static final void addMetaInformation(final DataRow row, final DocumentBuilder db, final String key,
+            final int metaInfColIdx) {
+            final DataCell cell = row.getCell(metaInfColIdx);
+            if (!cell.isMissing()) {
+                db.addMetaInformation(key, ((StringValue)cell).getStringValue());
+            }
+        }
+
+    }
 }

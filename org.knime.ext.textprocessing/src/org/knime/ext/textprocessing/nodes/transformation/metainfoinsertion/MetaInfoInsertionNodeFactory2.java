@@ -58,42 +58,27 @@ import org.knime.core.node.NodeView;
  */
 public final class MetaInfoInsertionNodeFactory2 extends NodeFactory<MetaInfoInsertionNodeModel2> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MetaInfoInsertionNodeModel2 createNodeModel() {
         return new MetaInfoInsertionNodeModel2();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected int getNrNodeViews() {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NodeView<MetaInfoInsertionNodeModel2> createNodeView(final int viewIndex,
         final MetaInfoInsertionNodeModel2 nodeModel) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean hasDialog() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected MetaInfoInsertionNodeDialog2 createNodeDialogPane() {
         return new MetaInfoInsertionNodeDialog2();

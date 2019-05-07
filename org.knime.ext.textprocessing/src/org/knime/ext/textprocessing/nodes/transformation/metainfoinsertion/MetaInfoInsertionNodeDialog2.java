@@ -52,7 +52,6 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter2;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelColumnFilter2;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
 /**
@@ -61,10 +60,6 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
 final class MetaInfoInsertionNodeDialog2 extends DefaultNodeSettingsPane {
-
-    /** A {@link SettingsModelColumnFilter2} used to store column names of columns containing meta information. */
-    private final SettingsModelColumnFilter2 m_colSelectionModel =
-        MetaInfoInsertionNodeModel2.getColumnSelectionModel();
 
     /** Creates a new instance of {@link MetaInfoInsertionNodeDialog2}. */
     @SuppressWarnings("unchecked")
@@ -83,6 +78,6 @@ final class MetaInfoInsertionNodeDialog2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
 
         // column filter component to select output columns
-        addDialogComponent(new DialogComponentColumnFilter2(m_colSelectionModel, 0));
+        addDialogComponent(new DialogComponentColumnFilter2(MetaInfoInsertionNodeModel2.getColumnSelectionModel(), 0));
     }
 }
