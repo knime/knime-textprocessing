@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -155,21 +156,34 @@ public enum DocumentDataExtractor2 {
             @Override
             public DataCell getValue(final Document doc) {
                 final Set<Author> authors = doc.getAuthors();
-                if (authors == null || authors.size() == 0) {
+                if (authors == null || authors.isEmpty()) {
                     return DataType.getMissingCell();
                 }
                 final StringBuilder buf = new StringBuilder();
-                boolean first = true;
-                for (final Author author : authors) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        buf.append(", ");
+                final Iterator<Author> iter = authors.iterator();
+                while (iter.hasNext()) {
+                    final Author author = iter.next();
+                    final boolean hasFirstName = !author.getFirstName().isEmpty();
+                    final boolean hasLastName = !author.getLastName().isEmpty();
+                    if (hasFirstName && hasLastName) {
+                        buf.append(author.getFirstName());
+                        buf.append(' ');
+                        buf.append(author.getLastName());
+                    } else if (hasFirstName) {
+                        buf.append(author.getFirstName());
+                    } else if (hasLastName) {
+                        buf.append(author.getLastName());
                     }
-                    buf.append(author.getFirstName());
-                    buf.append(' ');
-                    buf.append(author.getLastName());
+
+
+                    if (iter.hasNext() && (hasFirstName || hasLastName)) {
+                        buf.append(", ");
+                    } else if (!iter.hasNext() && buf.length() > 0 && !hasFirstName && !hasLastName) {
+                        // in case the last author only contains empty strings, delete the separating comma
+                        buf.delete(buf.length() - 2, buf.length() - 1);
+                    }
                 }
+
                 return new StringCell(buf.toString());
             }
         }),

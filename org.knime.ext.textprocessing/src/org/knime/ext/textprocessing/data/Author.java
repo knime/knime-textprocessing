@@ -1,4 +1,4 @@
-/* 
+/*
 ========================================================================
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 18, 2006 (Kilian Thiel): created
  */
@@ -55,17 +55,19 @@ import java.io.ObjectOutput;
 /**
  * Contains the first and last name of an author. Authors can be assigned to
  * {@link org.knime.ext.textprocessing.data.Document}
- * 
+ *
  * @author Kilian Thiel, University of Konstanz
  */
 public class Author implements Externalizable {
 
-    private String m_lastName = "-";
+    private String m_lastName;
 
-    private String m_firstName = "-";
+    private String m_firstName;
+
+    private static final String DEFAULT_AUTHOR_NAME = "-";
 
     /**
-     * Creates empty instance of <code>Author</code> with empty strings.
+     * Creates an instance of {@code Author} with empty strings.
      */
     public Author() {
         m_firstName = "";
@@ -74,19 +76,13 @@ public class Author implements Externalizable {
 
     /**
      * Creates new instance of Author with given first and last name.
-     * 
-     * @param firstName First name to set.
-     * @param lastName Last name to set.
+     *
+     * @param firstName First name to set. If argument is null, "-" is set.
+     * @param lastName Last name to set. If argument is null, "-" is set.
      */
     public Author(final String firstName, final String lastName) {
-        super();
-
-        if (lastName != null && lastName.length() > 0) {
-            m_lastName = lastName;
-        }
-        if (firstName != null && firstName.length() > 0) {
-            m_firstName = firstName;
-        }
+        m_lastName = lastName != null ? lastName : DEFAULT_AUTHOR_NAME;
+        m_firstName = firstName != null ? firstName : DEFAULT_AUTHOR_NAME;
     }
 
     /**
@@ -116,12 +112,7 @@ public class Author implements Externalizable {
         }
 
         Author da = (Author)o;
-        if (!m_firstName.equals(da.getFirstName())) {
-            return false;
-        } else if (!m_lastName.equals(da.getLastName())) {
-            return false;
-        }
-        return true;
+        return m_firstName.equals(da.getFirstName()) && m_lastName.equals(da.getLastName());
     }
 
     /**
@@ -148,8 +139,7 @@ public class Author implements Externalizable {
      * {@inheritDoc}
      */
     @Override
-    public void readExternal(final ObjectInput in) throws IOException,
-            ClassNotFoundException {
+    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
         m_firstName = in.readUTF();
         m_lastName = in.readUTF();
     }
