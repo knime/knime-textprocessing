@@ -71,7 +71,7 @@ import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
- * The {@code NodeModel} for the Dict Replacer (2 In-Ports) node.
+ * The {@code NodeModel} for the Dictionay Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1

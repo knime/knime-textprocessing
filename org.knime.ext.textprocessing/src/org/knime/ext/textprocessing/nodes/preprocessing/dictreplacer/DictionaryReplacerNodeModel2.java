@@ -70,7 +70,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 /**
- * The {@code NodeModel} for the Dict Replacer node.
+ * The {@code NodeModel} for the file-based Dictionary Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1

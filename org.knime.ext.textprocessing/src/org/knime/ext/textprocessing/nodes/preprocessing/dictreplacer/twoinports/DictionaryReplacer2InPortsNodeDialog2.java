@@ -62,7 +62,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * The {@code NodeDialog} for the Dict Replacer (2 In-Ports) node.
+ * The {@code NodeDialog} for the Dictionary Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1

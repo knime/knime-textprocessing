@@ -66,7 +66,7 @@ import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitiali
 import com.google.common.collect.ImmutableMap;
 
 /**
- * The {@code NodeDialog} for the Dict Replacer node.
+ * The {@code NodeDialog} for the file-based Dictionary Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1

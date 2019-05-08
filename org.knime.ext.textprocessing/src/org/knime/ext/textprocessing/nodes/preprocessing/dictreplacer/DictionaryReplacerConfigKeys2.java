@@ -49,7 +49,7 @@
 package org.knime.ext.textprocessing.nodes.preprocessing.dictreplacer;
 
 /**
- * Configuration keys for the Dict Replacer node.
+ * Configuration keys for the file-based Dictionary Replacer node.
  *
  * @author Kilian Thiel, KNIME.com, Berlin, Germany
  * @since 3.1

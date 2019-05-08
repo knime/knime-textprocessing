@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="../../../../icons/TextProcDefault.png" type="Manipulator">
-    <name>Dict Replacer (2 In-Ports)</name>
+    <name>Dictionary Replacer</name>
     <shortDescription>Replaces complete document terms that match with dictionary keys by corresponding specified values.
     </shortDescription>
     <fullDescription>
@@ -9,7 +9,7 @@
             Replaces complete terms contained in the input documents that match with specified dictionary terms
             with a corresponding specified value. 
             
-            The dictionary is provided by a additional data table at the second data port, consisting of at least two
+            The dictionary is provided by an additional data table at the second data port, consisting of at least two
             string columns. One string column contains the strings to replace (keys) the other string column contains 
             the replacement strings (values). The columns can be specified in the dialog. 
 		</intro>
