@@ -114,6 +114,16 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
     private final AtomicLong m_missingValueCount = new AtomicLong(0);
 
     /**
+     * True, if documents contained part-of-speech tags.
+     */
+    private boolean m_posTagsAvailable = false;
+
+    /**
+     * True, if documents contained named-entity tags.
+     */
+    private boolean m_neTagsAvailable = false;
+
+    /**
      * Creates a new instance of {@link MultiThreadRelationExtractor}.
      *
      * @param container The {@link BufferedDataContainer} used to create a data table.
@@ -149,17 +159,20 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
         List<ExtractionResult> extractionResults;
         if (!dataCell.isMissing()) {
             final Document doc = ((DocumentValue)in.getCell(m_docColIdx)).getDocument();
+            final DocumentToAnnotationConverter converter = new DocumentToAnnotationConverter();
             final Annotation annotation = !lemmaDataCell.isMissing()
-                ? DocumentToAnnotationConverter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument())
-                : DocumentToAnnotationConverter.convert(doc);
+                ? converter.convert(doc, ((DocumentValue)lemmaDataCell).getDocument()) : converter.convert(doc);
+            m_posTagsAvailable = !m_posTagsAvailable ? converter.posTagsAvailable() : m_posTagsAvailable;
+            m_neTagsAvailable = !m_neTagsAvailable ? converter.neTagsAvailable() : m_neTagsAvailable;
             try {
                 m_annotationPipeline.annotate(annotation);
                 extractionResults = extractRelations(annotation);
             } catch (final AssertionError | NullPointerException e) {
-                extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());
+                extractionResults = Arrays.asList(ExtractionResult.getEmptyResult("Extraction failed."));
             }
         } else {
-            extractionResults = Arrays.asList(ExtractionResult.getEmptyResult());
+            extractionResults = Arrays
+                .asList(ExtractionResult.getEmptyResult("Nothing could be extracted due to a missing document cell."));
             m_missingValueCount.addAndGet(1);
         }
         m_exec.setProgress(index / (double)m_maxQueueSize,
@@ -223,6 +236,22 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
      */
     final long getMissingValueCount() {
         return m_missingValueCount.get();
+    }
+
+    /**
+     * Returns a warning message regarding missing part-of-speech and named-entity tags.
+     *
+     * @return Returns a warning message regarding missing part-of-speech and named-entity tags.
+     */
+    final String getWarningMessage() {
+        if (!m_posTagsAvailable && !m_neTagsAvailable) {
+            return "Documents did not contain any part-of-speech and named-entity tags. Please check preceding nodes.";
+        } else if (!m_posTagsAvailable) {
+            return "Documents did not contain any part-of-speech tags. Please check preceding nodes.";
+        } else if (!m_neTagsAvailable) {
+            return "Documents did not contain any named-entity tags. Please check preceding nodes.";
+        }
+        return "";
     }
 
 }

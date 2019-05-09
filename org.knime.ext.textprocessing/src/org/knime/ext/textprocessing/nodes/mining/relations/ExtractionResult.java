@@ -56,6 +56,7 @@ import java.util.stream.Stream;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 
@@ -72,16 +73,13 @@ public class ExtractionResult {
     private final List<DataCell> m_dataCells;
 
     /**
-     * Static instance of {@code ExtractionResult} holding missing cells only.
-     */
-    private static final ExtractionResult EMPTY_INSTANCE = new ExtractionResult();
-
-    /**
      * Creates a new instance of {@code ExtractionResult} with missing cells only.
+     *
+     * @param message Message shown as tool tip for missing values.
      */
-    private ExtractionResult() {
-        m_dataCells = Collections
-            .unmodifiableList(Stream.generate(() -> DataType.getMissingCell()).limit(4).collect(Collectors.toList()));
+    private ExtractionResult(final String message) {
+        m_dataCells = Collections.unmodifiableList(
+            Stream.generate(() -> new MissingCell(message)).limit(4).collect(Collectors.toList()));
     }
 
     /**
@@ -103,10 +101,11 @@ public class ExtractionResult {
     /**
      * Returns an {@code ExtractionResult} without any data.
      *
+     * @param message Message shown as tool tip for missing values.
      * @return A new instance of {@code ExtractionResult} without any data.
      */
-    public static final ExtractionResult getEmptyResult() {
-        return EMPTY_INSTANCE;
+    public static final ExtractionResult getEmptyResult(final String message) {
+        return new ExtractionResult(message);
     }
 
     /**

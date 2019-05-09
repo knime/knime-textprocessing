@@ -162,7 +162,8 @@ final class StanfordRelationExtractor extends MultiThreadRelationExtractor {
         }
 
         if (results.isEmpty()) {
-            results.add(ExtractionResult.getEmptyResult());
+            results.add(ExtractionResult
+                .getEmptyResult("The document did not contain any relations between two named-entities."));
         }
         return results;
     }

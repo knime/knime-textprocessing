@@ -103,9 +103,19 @@ final class DocumentToAnnotationConverter {
     private static final Pattern quotePattern = Pattern.compile("['\"`´]+");
 
     /**
+     * True, if document contained POS tags.
+     */
+    private boolean m_posTagsAvailable;
+
+    /**
+     * True, if document contained NE tags.
+     */
+    private boolean m_neTagsAvailable;
+
+    /**
      * Empty constructor.
      */
-    private DocumentToAnnotationConverter() {
+    DocumentToAnnotationConverter() {
         // Nothing to do here..
     }
 
@@ -115,7 +125,7 @@ final class DocumentToAnnotationConverter {
      * @param document {@code Document} to convert.
      * @return Returns an {@code Annotation} object.
      */
-    static final Annotation convert(final Document document) {
+    final Annotation convert(final Document document) {
         final List<CoreMap> coreMap = new ArrayList<>(10);
         final Iterator<Sentence> sentenceIterator = document.sentenceIterator();
         int sentenceCount = 1;
@@ -148,7 +158,7 @@ final class DocumentToAnnotationConverter {
      * @param lemmatizedDoc The lemmatized {@code Document}.
      * @return Returns an {@code Annotation}.
      */
-    static final Annotation convert(final Document document, final Document lemmatizedDoc) {
+    final Annotation convert(final Document document, final Document lemmatizedDoc) {
         final List<CoreMap> coreMap = new ArrayList<>();
         final Iterator<Sentence> sentenceIterator = document.sentenceIterator();
         final Iterator<Sentence> lemmatizedSentenceIterator = lemmatizedDoc.sentenceIterator();
@@ -190,7 +200,7 @@ final class DocumentToAnnotationConverter {
      * @param sentenceIndex The index of the current sentence within the document.
      * @return A {@code CoreLabel}
      */
-    private static final CoreLabel wordToCoreLabel(final Word word, final int wordIndex, final int sentenceIndex) {
+    private final CoreLabel wordToCoreLabel(final Word word, final int wordIndex, final int sentenceIndex) {
         return wordToCoreLabel(word, null, wordIndex, sentenceIndex, null);
     }
 
@@ -204,7 +214,7 @@ final class DocumentToAnnotationConverter {
      * @param tags List of {@link Tag Tags}. Will not be set, if {@code null}.
      * @return A {@code CoreLabel}
      */
-    private static final CoreLabel wordToCoreLabel(final Word word, final Word lemma, final int wordIndex,
+    private final CoreLabel wordToCoreLabel(final Word word, final Word lemma, final int wordIndex,
         final int sentenceIndex, final List<Tag> tags) {
         // Set word information
         final CoreLabel cl = CoreLabel.wordFromString(word.getText());
@@ -243,8 +253,9 @@ final class DocumentToAnnotationConverter {
      * @param nerTags The ner tags to set.
      * @param cl The CoreLabel.
      */
-    private static void setTags(final List<Tag> posTags, final List<Tag> nerTags, final CoreLabel cl) {
+    private void setTags(final List<Tag> posTags, final List<Tag> nerTags, final CoreLabel cl) {
         if (!posTags.isEmpty()) {
+            m_posTagsAvailable = true;
             for (final Tag tag : posTags) {
                 cl.setTag(createPosTag(cl.originalText().trim(), tag.getTagValue()));
             }
@@ -253,6 +264,7 @@ final class DocumentToAnnotationConverter {
         }
 
         if (!nerTags.isEmpty()) {
+            m_neTagsAvailable = true;
             for (final Tag tag : nerTags) {
                 final String tagValue = tag.getTagValue();
                 cl.setNER(!tagValue.equals(UNKNOWN) ? tagValue : SeqClassifierFlags.DEFAULT_BACKGROUND_SYMBOL);
@@ -279,5 +291,23 @@ final class DocumentToAnnotationConverter {
             return QUOTATION_POS_TAG;
         }
         return tagValue.equals(SYM) ? text : POS_FALLBACK_TAG;
+    }
+
+    /**
+     * Returns true, if POS tags were available in the converted document.
+     *
+     * @return true, if POS tags were available in the converted document.
+     */
+    final boolean posTagsAvailable() {
+        return m_posTagsAvailable;
+    }
+
+    /**
+     * Returns true, if NE tags were available in the converted document.
+     *
+     * @return true, if NE tags were available in the converted document.
+     */
+    final boolean neTagsAvailable() {
+        return m_neTagsAvailable;
     }
 }

@@ -102,6 +102,11 @@ final class StanfordOpenInformationExtractor extends MultiThreadRelationExtracto
     private final boolean m_lemmatizedResults;
 
     /**
+     * Tool tip message for missing values.
+     */
+    private static final String TOOLTIP_MESSAGE = "No positive clauses could be extracted from the document.";
+
+    /**
      * Creates and returns a new instance of {@code StanfordOpenInformationExtractor}.
      *
      * @param container The {@link BufferedDataContainer} used to create a data table.
@@ -155,7 +160,7 @@ final class StanfordOpenInformationExtractor extends MultiThreadRelationExtracto
         }
 
         if (results.isEmpty()) {
-            results.add(ExtractionResult.getEmptyResult());
+            results.add(ExtractionResult.getEmptyResult(TOOLTIP_MESSAGE));
         }
 
         return results;
