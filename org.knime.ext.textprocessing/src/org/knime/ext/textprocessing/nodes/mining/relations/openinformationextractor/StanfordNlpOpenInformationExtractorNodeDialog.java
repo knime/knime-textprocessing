@@ -71,8 +71,9 @@ final class StanfordNlpOpenInformationExtractorNodeDialog extends ParallelExtrac
         addDialogComponent(new DialogComponentBoolean(
             StanfordNlpOpenInformationExtractorNodeModel.getResolveCorefModel(), "Resolve co-references"));
 
-        addDialogComponent(new DialogComponentNumber(
-            StanfordNlpOpenInformationExtractorNodeModel.getAffinityProbCapModel(), "Affinity probability cap", 0.01));
+        addDialogComponent(
+            new DialogComponentNumber(StanfordNlpOpenInformationExtractorNodeModel.getAffinityProbCapModel(),
+                "Affinity probability cap", 0.01, 4));
 
         addDialogComponent(new DialogComponentBoolean(
             StanfordNlpOpenInformationExtractorNodeModel.getTripleStrictModel(), "Strict triple extraction"));

@@ -112,7 +112,7 @@ final class StanfordNlpOpenInformationExtractorNodeModel extends ParallelExtract
     /**
      * Default value for the affinity probability cap.
      */
-    private static final double DEF_AFFINITY_PROB_CAP = 1.0 / 3.0;
+    private static final double DEF_AFFINITY_PROB_CAP = 0.33;
 
     /**
      * Default value for the triple strict option.
