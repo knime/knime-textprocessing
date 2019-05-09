@@ -67,7 +67,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
-import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
@@ -209,19 +208,31 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * @throws InvalidSettingsException Thrown if no document columns can be found.
      */
     private void checkDataTableSpec(final DataTableSpec dataTableSpec) throws InvalidSettingsException {
-        // verify that the incoming DataTableSpec contains at least one Document column
-        final DataTableSpecVerifier verifier = new DataTableSpecVerifier(dataTableSpec);
-        if (m_applyReqPreprocModel.getBooleanValue()) {
-            verifier.verifyMinimumDocumentCells(1, true);
-        } else {
-            verifier.verifyMinimumDocumentCells(2, true);
+        // verify that the incoming DataTableSpec contains the minimum number of document columns
+        final long numDocCols = dataTableSpec.stream()//
+            .filter(colSpec -> colSpec.getType().isCompatible(DocumentValue.class))//
+            .count();
+        if (m_applyReqPreprocModel.getBooleanValue() && numDocCols < 1) {
+            throw new InvalidSettingsException(
+                "There has to be at least one column containing DocumentCells to extract relations from!");
+        } else if (!m_applyReqPreprocModel.getBooleanValue() && numDocCols < 2) {
+            throw new InvalidSettingsException("There have to be at least two columns containing DocumentCells. "
+                + "One containing POS and NE tagged documents and one containing lemmatized documents.");
         }
 
+        // Verify document columns and auto-guess columns
         ColumnSelectionVerifier.verifyColumn(m_docColModel, dataTableSpec, DocumentValue.class, null)
             .ifPresent(msg -> setWarningMessage(msg));
-        if (m_lemmaDocColModel.isEnabled()) {
-            ColumnSelectionVerifier.verifyColumn(m_lemmaDocColModel, dataTableSpec, DocumentValue.class, null)
+        if (numDocCols >= 2) {
+            ColumnSelectionVerifier
+                .verifyColumn(m_lemmaDocColModel, dataTableSpec, DocumentValue.class, m_docColModel.getStringValue())
                 .ifPresent(msg -> setWarningMessage(msg));
+        }
+
+        // Throw exception if doc column and lemmatized document column are the same.
+        if (!m_applyReqPreprocModel.getBooleanValue()
+            && (m_docColModel.getStringValue().equals(m_lemmaDocColModel.getStringValue()))) {
+            throw new InvalidSettingsException("Document column and lemmatized document column cannot be the same!");
         }
     }
 
@@ -259,6 +270,9 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
         if (extractor.getMissingValueCount() > 0) {
             setWarningMessage("Ignored " + extractor.getMissingValueCount() + " rows with missing values.");
         }
+        if (!m_applyReqPreprocModel.getBooleanValue() && !extractor.getWarningMessage().isEmpty()) {
+            setWarningMessage(extractor.getWarningMessage());
+        }
 
         // free memory
         StanfordCoreNLP.clearAnnotatorPool();
@@ -282,8 +296,8 @@ public abstract class ParallelExtractorNodeModel extends NodeModel {
      * @return Returns a new instance of {@link MultiThreadRelationExtractor}.
      */
     protected abstract MultiThreadRelationExtractor createExtractor(final BufferedDataContainer container,
-        final int docColIdx, final int lemmaDocColIdx, final StanfordCoreNLP annotationPipeline,
-        final int maxQueueSize, final int maxActiveInstanceSize, final ExecutionContext exec);
+        final int docColIdx, final int lemmaDocColIdx, final StanfordCoreNLP annotationPipeline, final int maxQueueSize,
+        final int maxActiveInstanceSize, final ExecutionContext exec);
 
     /**
      * Creates and returns an {@link StanfordCoreNLP} object for the specified tasks.

@@ -49,7 +49,9 @@
 package org.knime.ext.textprocessing.nodes.mining.relations;
 
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
@@ -67,7 +69,12 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 public class ParallelExtractorNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * The {@link SettingsModelString} storing the column name of the lemmatized document.
+     * The {@link SettingsModelString} storing the column name of the document column.
+     */
+    private final SettingsModelString m_documentColModel = ParallelExtractorNodeModel.getDocumentColumnModel();
+
+    /**
+     * The {@link SettingsModelString} storing the column name of the lemmatized document column.
      */
     private final SettingsModelString m_lemmatizedDocumentColModel =
         ParallelExtractorNodeModel.getLemmatizedDocumentColumnModel();
@@ -85,8 +92,8 @@ public class ParallelExtractorNodeDialog extends DefaultNodeSettingsPane {
 
         setHorizontalPlacement(true);
         // document col
-        final DialogComponentColumnNameSelection docColSelectionComp = new DialogComponentColumnNameSelection(
-            ParallelExtractorNodeModel.getDocumentColumnModel(), "Document column", 0, DocumentValue.class);
+        final DialogComponentColumnNameSelection docColSelectionComp =
+            new DialogComponentColumnNameSelection(m_documentColModel, "Document column", 0, DocumentValue.class);
         docColSelectionComp.setToolTipText("Column containing the documents to extract relations from.");
         addDialogComponent(docColSelectionComp);
 
@@ -118,6 +125,17 @@ public class ParallelExtractorNodeDialog extends DefaultNodeSettingsPane {
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
         update();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveAdditionalSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        if (!m_applyReqPreprocModel.getBooleanValue()
+            && (m_documentColModel.getStringValue().equals(m_lemmatizedDocumentColModel.getStringValue()))) {
+            throw new InvalidSettingsException("Document column and lemmatized document column cannot be the same!");
+        }
     }
 
     /**
