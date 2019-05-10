@@ -174,6 +174,9 @@ final class MetaInfoInsertionNodeModel2 extends SimpleStreamableFunctionNodeMode
             throw new InvalidSettingsException("Please select at least one key column.");
         }
         final ColumnRearranger rearranger = createColumnRearranger(inSpec);
+        if (m_removeMetaInfoColsModel.getBooleanValue()) {
+            rearranger.remove(m_columnFilterModel.applyTo(inSpec).getIncludes());
+        }
         return new DataTableSpec[]{rearranger.createSpec()};
     }
 
@@ -200,6 +203,9 @@ final class MetaInfoInsertionNodeModel2 extends SimpleStreamableFunctionNodeMode
         final String[] metaInfCols = m_columnFilterModel.applyTo(inSpec).getIncludes();
         final ColumnRearranger rearranger = createColumnRearranger(inSpec);
         rearranger.replace(new MetaInfoCellFactory(inSpec, docColIdx, metaInfCols, exec), docColIdx);
+        if (m_removeMetaInfoColsModel.getBooleanValue()) {
+            rearranger.remove(m_columnFilterModel.applyTo(inSpec).getIncludes());
+        }
 
         return new BufferedDataTable[]{
             exec.createColumnRearrangeTable(inData[0], rearranger, exec.createSubExecutionContext(1.0))};
@@ -207,11 +213,7 @@ final class MetaInfoInsertionNodeModel2 extends SimpleStreamableFunctionNodeMode
 
     @Override
     protected ColumnRearranger createColumnRearranger(final DataTableSpec spec) throws InvalidSettingsException {
-        final ColumnRearranger rearranger = new ColumnRearranger(spec);
-        if (m_removeMetaInfoColsModel.getBooleanValue()) {
-            rearranger.remove(m_columnFilterModel.applyTo(spec).getIncludes());
-        }
-        return rearranger;
+        return new ColumnRearranger(spec);
     }
 
     @Override

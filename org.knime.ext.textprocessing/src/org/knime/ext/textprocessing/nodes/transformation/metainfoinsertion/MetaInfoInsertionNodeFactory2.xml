@@ -6,8 +6,7 @@
     </shortDescription>
     <fullDescription>
         <intro>
-			Inserts key, values pairs as meta information to documents. The names of the selected meta info columns are used as keys 
-			while the values are provided in the cells of a selected column.
+			Inserts key, values pairs as meta information to documents. The column headers are used as keys while the values are provided in the cells of the selected columns.
 		</intro>
 		<option name="Document column">The document column to use.</option>
 		<option name="Remove selected meta info columns">Check, if meta info columns should be removed after insertion.</option>
@@ -15,7 +14,7 @@
 	</fullDescription>
 	<ports>
         <inPort name="Documents input table" index="0">
-        The input table which contains the documents.</inPort>
+        The input table which contains the documents and the meta information in additional columns.</inPort>
         <outPort name="Documents with inserted meta info." index="0">
         The output table which contains documents with the meta info inserted.</outPort>
 	</ports>

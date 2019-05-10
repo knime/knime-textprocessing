@@ -78,6 +78,7 @@ final class MetaInfoInsertionNodeDialog2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
 
         // column filter component to select output columns
+        createNewGroup("Meta Info Column Selection");
         addDialogComponent(new DialogComponentColumnFilter2(MetaInfoInsertionNodeModel2.getColumnSelectionModel(), 0));
     }
 }
