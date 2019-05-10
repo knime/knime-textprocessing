@@ -6,29 +6,43 @@
     </shortDescription>
     <fullDescription>
         <intro>
-			Extracts relations triplets contained in sentences of a document.
-			The node needs part-of-speech tagged documents. Using a tagger for named-entity recognition might enhance 
-			the results. Additionally, there has to be a second document column containing lemmatized documents, which consist of terms converted to their canonical, dictionary or citation form.<br/>
+			Extracts relation triplets contained in sentences of a document. While the <i>StanfordNLP Relation Extractor</i>
+			node extracts pre-defined types of relations between two named-entities, this node extracts entailed clauses 
+			which then are reduced to their main statement and split into subject, predicate and object. <br/>
 			<br/>
-			However, this node can also be used with plain documents by using the <i>Apply preprocessing</i> option.
-			If this option is selected, part-of-speech tagging, named-entity tagging and lemmatizing are done 
-			by this node. The Stanford CoreNLP default settings are used in this case.<br/> Creating the same pipeline by using KNIME's Stanford nodes with default settings 
-			will not necessarily lead to the same results as using the <i>Apply preprocessing</i> option, since KNIME is using the Penn-Treebank (PTB) tag set. This tag set uses the <tt>SYM</tt> tag for
-			any kind of punctuation and quotation marks. However, Stanford CoreNLP uses a modified version of the PTB tag set to distinguish these symbols, since they are important for dependency parsing and natural logic annotation.<br/>
+			The node can be used in two different ways by either checking the <i>Apply preprocessing</i> option or not. 
+			If the option is selected, the node takes care of part-of-speech (POS) and named-entity (NE) tagging as well as lemmatizing.
+			Stanford CoreNLP standard settings are used in this case. However, tags are not applied to the documents, 
+			since the preprocessing is only applied internally. If the option is unchecked, it is necessary 
+			to provide a column with (at least POS) tagged documents as well as a column containing lemmatized documents. 
+			Lemmatized documents consist of terms that were converted to their canonical, dictionary or citation form.<br/>
+			<i>Note:</i> Creating the same pipeline by using KNIME's Stanford nodes with default settings 
+			will not necessarily lead to the same results as using the <i>Apply preprocessing</i> option, 
+			since KNIME is using the Penn-Treebank (PTB) tag set. This tag set uses the <tt>SYM</tt> tag for
+			any kind of punctuation and quotation marks. However, Stanford CoreNLP uses a modified version of the 
+			PTB tag set to distinguish these symbols, since they are important for dependency parsing and 
+			natural logic annotation.<br/>
 			<br/>
-			The node creates four new columns: a subject column, an object column, a predicate column and a column containing the confidence for the relation between the subject and the object.
-			A detailed explanation of the  StanfordNLP's OpenIE implementation can be found in <a href="https://nlp.stanford.edu/pubs/2015angeli-openie.pdf">this article</a>.<br/>
+			The node creates four new columns: a subject column, an object column, a predicate column and 
+			a column containing the confidence for the relation between the subject and the object.
+			It is possbile that the node cannot extract a relation from a document, because it only extracts <i>positive 
+			sequences</i>. For example, for the sentence "<i>No house cats have rabies.</i> no relation is extracted.
+			A detailed explanation of how clauses are extracted and shortened and how the confidence is calculated can be
+			found in <a href="https://nlp.stanford.edu/pubs/2015angeli-openie.pdf">this paper</a> from the StanfordNLP 
+			group.<br/>
 			<br/>
 			<i>Note</i>: Open Information Extraction is a computationally expensive operation. For the usage of this
-            node it is recommended to run KNIME with at least 2GB of heap space. To increase the heap space, change
+            node it is recommended to run KNIME with at least 4GB of heap space. To increase the heap space, change
             the -Xmx setting in the knime.ini file.<br/>
             <br/>
             This node is based on Stanford CoreNLP 3.9.1.<br/>
-            For more information about StanfordNLP and Open Information Extraction, click <a href="https://stanfordnlp.github.io/CoreNLP/openie.html">here</a>.<br/>
+            For more information about StanfordNLP and Open Information Extraction, click 
+            <a href="https://stanfordnlp.github.io/CoreNLP/openie.html">here</a>.<br/>
 		</intro>
 		<option name="Document column">The document column to use.<br/> <i>Note</i>: If the <i>Apply preprocessing</i>
 		option is unchecked, the documents have to be tagged by a part-of-speech tagger. Named-entity tagging is recommended as well, but optional. </option>
-		<option name="Lemmatized document column">The document column containing the lemmatized documents.</option>
+		<option name="Lemmatized document column">The document column containing the lemmatized documents.<br/> 
+		<i>Note:</i> If the <i>Apply preprocessing</i> option is checked, this option is not necessary.</option>
 		<option name="Apply preprocessing">If checked, part-of-speech tagging, named-entity tagging and lemmatizing will be done by this node.
 			These tasks are applied internally and do not affect the documents in the document column. Extracting tags and lemmas produced by checking this option
 			is not possible.
@@ -36,8 +50,8 @@
 		<option name="Number of threads">The number of threads to use.</option>
 		<option name="Results as lemma">If checked, results will be returned as lemma.</option>
 		<option name="Resolve co-references">If checked, co-reference solution will be applied. Pronomial mentions will be replaced with their canonical mention in the text.</option>
-		<option name="Affinity probability cap">The affinity value above which confidence of the extraction is taken as 1.0.</option>
-		<option name="Strict triple extraction">If checked, extract triples only if they consume the entire fragment. This is useful for ensuring that only logically warranted triples are extracted, but puts more burden on the entailment system to find minimal phrases (see -max_entailments_per_clause).</option>
+		<option name="Affinity probability cap">The affinity value above which confidence of the extraction is regarded as 1.0.</option>
+		<option name="Strict triple extraction">If checked, extract triples only if they consume the entire fragment. This is useful for ensuring that only logically warranted triples are extracted, but puts more burden on the entailment system to find minimal phrases.</option>
 		<option name="Always extract nominal relations">If checked, extract nominal relations always and not only when a named entity tag warrants it. This greatly overproduces such triples, but can be useful in certain situations.</option>
 	</fullDescription>
 		
