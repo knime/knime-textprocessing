@@ -167,4 +167,22 @@ final class StanfordRelationExtractor extends MultiThreadRelationExtractor {
         }
         return results;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getWarningMessage() {
+        if (!posTagsAvailable() && !neTagsAvailable()) {
+            return "Documents did not contain any part-of-speech and named-entity tags."
+                + " This leads to incorrect results. Please check preceding nodes.";
+        } else if (!posTagsAvailable()) {
+            return "Documents did not contain any part-of-speech tags."
+                + " This leads to incorrect results. Please check preceding nodes.";
+        } else if (!neTagsAvailable()) {
+            return "Documents did not contain any named-entity tags."
+                + " Relations cannot be extracted in this case. Please check preceding nodes.";
+        }
+        return "";
+    }
 }

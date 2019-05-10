@@ -239,19 +239,27 @@ public abstract class MultiThreadRelationExtractor extends MultiThreadWorker<Dat
     }
 
     /**
+     * True, if part-of-speech tags are available in documents.
+     *
+     * @return Returns true, if part-of-speech tags are available in documents.
+     */
+    protected boolean posTagsAvailable() {
+        return m_posTagsAvailable;
+    }
+
+    /**
+     * True, if named-entity tags are available in documents.
+     *
+     * @return Returns true, if named-entity tags are available in documents.
+     */
+    protected boolean neTagsAvailable() {
+        return m_neTagsAvailable;
+    }
+
+    /**
      * Returns a warning message regarding missing part-of-speech and named-entity tags.
      *
      * @return Returns a warning message regarding missing part-of-speech and named-entity tags.
      */
-    final String getWarningMessage() {
-        if (!m_posTagsAvailable && !m_neTagsAvailable) {
-            return "Documents did not contain any part-of-speech and named-entity tags. Please check preceding nodes.";
-        } else if (!m_posTagsAvailable) {
-            return "Documents did not contain any part-of-speech tags. Please check preceding nodes.";
-        } else if (!m_neTagsAvailable) {
-            return "Documents did not contain any named-entity tags. Please check preceding nodes.";
-        }
-        return "";
-    }
-
+    protected abstract String getWarningMessage();
 }

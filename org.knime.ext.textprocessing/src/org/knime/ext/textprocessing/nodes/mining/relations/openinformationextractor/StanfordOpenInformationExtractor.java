@@ -166,4 +166,24 @@ final class StanfordOpenInformationExtractor extends MultiThreadRelationExtracto
         return results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getWarningMessage() {
+        if (!posTagsAvailable() && !neTagsAvailable()) {
+            return "Documents did not contain any part-of-speech and named-entity tags."
+                + " Extracting information without part-of speech tagged documents leads to incorrect results."
+                + " Named-entity tags can enhance the results, but are optional."
+                + " Please check preceding nodes.";
+        } else if (!posTagsAvailable()) {
+            return "Documents did not contain any part-of-speech tags."
+                + " Extracting information without part-of speech tagged documents leads to incorrect results."
+                + " Please check preceding nodes.";
+        } else if (!neTagsAvailable()) {
+            return "Documents did not contain any named-entity tags. Named-entity tags can enhance the results."
+                + " Please check preceding nodes.";
+        }
+        return "";
+    }
 }
