@@ -257,6 +257,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                     final Document taggedDoc = tagger.tag(doc);
                     taggedDoc.sentenceIterator()
                         .forEachRemaining(s -> writeAnnotationData(s, knownEntitiesStringSet, sentenceFileWriter));
+                    sentenceFileWriter.println();
                 } else {
                     missingValueCounter++;
                 }
@@ -275,15 +276,18 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                 .getPropFile();
         final SeqClassifierFlags flags = new SeqClassifierFlags(props);
         final CRFClassifier<CoreLabel> crf = new CRFClassifier<>(flags);
-        crf.train();
-        crf.serializeClassifier(modelPath);
+        try {
+            crf.train();
+        } finally {
+            java.nio.file.Files.delete(annotatedDocFile.toPath());
+        }
 
+        crf.serializeClassifier(modelPath);
         final File outputModel = new File(modelPath);
         final byte[] modelOutputBuffer = Files.toByteArray(outputModel);
 
         // delete temporary files
         java.nio.file.Files.delete(outputModel.toPath());
-        java.nio.file.Files.delete(annotatedDocFile.toPath());
 
         // set warning messages if necessary
         if (knownEntitiesPatternSet.isEmpty()) {
