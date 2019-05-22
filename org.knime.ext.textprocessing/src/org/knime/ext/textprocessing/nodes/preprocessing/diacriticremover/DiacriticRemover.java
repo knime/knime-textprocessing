@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.diacriticremover;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -65,10 +66,15 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class DiacriticRemover implements TermPreprocessing, StringPreprocessing {
 
+    private static final Pattern DIACRITICS = Pattern.compile("[\\p{InCombiningDiacriticalMarks}]");
+
+    private static final String REPLACEMENT = "";
+
     /**
      * Creates new instance of DiacriticRemover.
      */
     public DiacriticRemover() {
+        // Nothing to do here...
     }
 
     /**
@@ -76,7 +82,7 @@ public class DiacriticRemover implements TermPreprocessing, StringPreprocessing 
      */
     @Override
     public String preprocessString(final String str) {
-        return removeDiacriticMarks(str);
+        return DIACRITICS.matcher(Normalizer.normalize(str, Normalizer.Form.NFD)).replaceAll(REPLACEMENT);
     }
 
     /**
@@ -85,18 +91,10 @@ public class DiacriticRemover implements TermPreprocessing, StringPreprocessing 
     @Override
     public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
-        List<Word> newWords = new ArrayList<Word>();
+        List<Word> newWords = new ArrayList<>();
         for (Word w : words) {
-            newWords.add(new Word(removeDiacriticMarks(w.getWord()), w.getWhitespaceSuffix()));
+            newWords.add(new Word(preprocessString(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
     }
-
-    private String removeDiacriticMarks(final String str) {
-        String output;
-        output = Normalizer.normalize(str, Normalizer.Form.NFD);
-        output = output.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
-        return output;
-    }
-
 }

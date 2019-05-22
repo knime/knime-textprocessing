@@ -44,6 +44,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/replacer/RegExReplacer.java" type="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacer">
+        <filter comment="Unnecessary method" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.replacer.RegExReplacer"/>
+                <message_argument value="replaceAll(String, String, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/snowballstemmer/SnowballStemmerFactory.java" type="org.knime.ext.textprocessing.nodes.preprocessing.snowballstemmer.SnowballStemmerFactory">
         <filter id="643842064">
             <message_arguments>

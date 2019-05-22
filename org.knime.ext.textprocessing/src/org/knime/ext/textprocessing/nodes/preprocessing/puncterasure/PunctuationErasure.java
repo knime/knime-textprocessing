@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.puncterasure;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -63,13 +64,16 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class PunctuationErasure implements TermPreprocessing, StringPreprocessing {
 
-    private static String punctMarks = "[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]+";
-    private static String replacement = "";
+    private static final Pattern PUNCTMARKS = Pattern.compile("[!#$%&'\"()*+,./\\:;<=>?@^_`{|}~\\[\\]]+");
+
+    private static final String REPLACEMENT = "";
 
     /**
      * Creates new instance of <code>PunctuationErasure</code>.
      */
-    public PunctuationErasure() { }
+    public PunctuationErasure() {
+        // Nothing to do here...
+    }
 
     /**
      * {@inheritDoc}
@@ -77,21 +81,11 @@ public class PunctuationErasure implements TermPreprocessing, StringPreprocessin
     @Override
     public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
-        List<Word> newWords = new ArrayList<Word>();
+        List<Word> newWords = new ArrayList<>();
         for (Word w : words) {
-            newWords.add(new Word(punctuationFilter(w.getWord()), w.getWhitespaceSuffix()));
+            newWords.add(new Word(preprocessString(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
-    }
-
-    /**
-     * Filters all punctuation marks and replaces them with "". The filtered
-     * String is returend.
-     * @param str String to filter punctuation marks from.
-     * @return Filtered String.
-     */
-    private String punctuationFilter(final String str) {
-        return str.replaceAll(punctMarks, replacement);
     }
 
     /**
@@ -99,6 +93,6 @@ public class PunctuationErasure implements TermPreprocessing, StringPreprocessin
      */
     @Override
     public String preprocessString(final String str) {
-        return punctuationFilter(str);
+        return PUNCTMARKS.matcher(str).replaceAll(REPLACEMENT);
     }
 }

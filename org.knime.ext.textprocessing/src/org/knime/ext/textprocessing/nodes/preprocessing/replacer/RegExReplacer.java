@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.preprocessing.replacer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
@@ -63,18 +64,19 @@ import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
  */
 public class RegExReplacer implements TermPreprocessing, StringPreprocessing {
 
-    private String m_regEx;
-    private String m_replacement;
+    private final Pattern m_regEx;
+
+    private final String m_replacement;
 
     /**
-     * Creates new instance of <code>RegExReplacer</code> with the given
-     * regular expression to find patterns to replace with the given
-     * replacement.
+     * Creates new instance of <code>RegExReplacer</code> with the given regular expression to find patterns to replace
+     * with the given replacement.
+     *
      * @param regEx The regular expression to find pattern.
      * @param replacement The replacement pattern.
      */
     public RegExReplacer(final String regEx, final String replacement) {
-        m_regEx = regEx;
+        m_regEx = Pattern.compile(regEx);
         m_replacement = replacement;
     }
 
@@ -84,25 +86,11 @@ public class RegExReplacer implements TermPreprocessing, StringPreprocessing {
     @Override
     public Term preprocessTerm(final Term term) {
         List<Word> words = term.getWords();
-        List<Word> newWords = new ArrayList<Word>();
+        List<Word> newWords = new ArrayList<>();
         for (Word w : words) {
-            newWords.add(new Word(RegExReplacer.replaceAll(w.getWord(), m_regEx, m_replacement),
-                w.getWhitespaceSuffix()));
+            newWords.add(new Word(preprocessString(w.getWord()), w.getWhitespaceSuffix()));
         }
         return new Term(newWords, term.getTags(), term.isUnmodifiable());
-    }
-
-    /**
-     * Replaces all pattern in <code>str</code> matching given regular
-     * expression with the specified replacement.
-     * @param str String to replace patterns.
-     * @param regEx The regular expression specifying the pattern to replace.
-     * @param replacement The String to replace matching pattern with.
-     * @return replaced String.
-     */
-    public static String replaceAll(final String str, final String regEx,
-            final String replacement) {
-        return str.replaceAll(regEx, replacement);
     }
 
     /**
@@ -110,6 +98,6 @@ public class RegExReplacer implements TermPreprocessing, StringPreprocessing {
      */
     @Override
     public String preprocessString(final String str) {
-        return RegExReplacer.replaceAll(str, m_regEx, m_replacement);
+        return m_regEx.matcher(str).replaceAll(m_replacement);
     }
 }
