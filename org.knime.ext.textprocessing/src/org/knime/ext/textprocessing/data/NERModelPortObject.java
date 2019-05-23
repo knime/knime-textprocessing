@@ -154,7 +154,9 @@ public abstract class NERModelPortObject<T> extends TaggerModelPortObject<T> {
      *
      * @return Returns the model file.
      * @throws IOException Thrown if the model file could not be written.
+     * @deprecated Get model directly by using {@link #getNERModel()} instead of using {@link File Files}.
      */
+    @Deprecated
     public File getModelFile() throws IOException {
         final String tempDir = KNIMEConstants.getKNIMETempDir();
         final String outputModel = tempDir + "/outputmodel_" + UUID.randomUUID().toString() + getFileExtension();

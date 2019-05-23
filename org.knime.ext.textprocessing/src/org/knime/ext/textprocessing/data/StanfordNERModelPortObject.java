@@ -49,13 +49,13 @@
 package org.knime.ext.textprocessing.data;
 
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.nio.file.Files;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
@@ -189,11 +189,9 @@ public class StanfordNERModelPortObject extends NERModelPortObject<CRFClassifier
      */
     @Override
     public CRFClassifier<CoreLabel> getNERModel() throws IOException, ClassNotFoundException {
-        File file;
-        file = getModelFile();
-        final CRFClassifier<CoreLabel> crf = CRFClassifier.getClassifier(file);
-        Files.delete(file.toPath());
-        return crf;
+        final ByteArrayInputStream is = new ByteArrayInputStream(getByteArray());
+        final GZIPInputStream gzis = new GZIPInputStream(is);
+        return CRFClassifier.getClassifier(gzis);
     }
 
     /**

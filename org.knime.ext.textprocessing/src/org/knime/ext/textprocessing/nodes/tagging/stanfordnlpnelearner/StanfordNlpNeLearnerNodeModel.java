@@ -48,8 +48,10 @@
  */
 package org.knime.ext.textprocessing.nodes.tagging.stanfordnlpnelearner;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -58,6 +60,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPOutputStream;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -91,8 +94,6 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-
-import com.google.common.io.Files;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -235,7 +236,6 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
         // create UUID to add them to the file path to avoid cases..
         // .. where two instances of the node model used the same file path at the same time
         final String tempDir = KNIMEConstants.getKNIMETempDir() + "/";
-        final String modelPath = tempDir + "oM-" + UUID.randomUUID().toString() + ".crf.ser.gz";
         final String annotatedDocPath = tempDir + "aD-" + UUID.randomUUID().toString() + ".tsv";
 
         // create files based on sentence list and known entities
@@ -282,12 +282,14 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
             java.nio.file.Files.delete(annotatedDocFile.toPath());
         }
 
-        crf.serializeClassifier(modelPath);
-        final File outputModel = new File(modelPath);
-        final byte[] modelOutputBuffer = Files.toByteArray(outputModel);
-
-        // delete temporary files
-        java.nio.file.Files.delete(outputModel.toPath());
+        // Serialize model to byte array
+        byte[] modelOutputBuffer;
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (final ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(baos))) {
+                crf.serializeClassifier(oos);
+            }
+            modelOutputBuffer = baos.toByteArray();
+        }
 
         // set warning messages if necessary
         if (knownEntitiesPatternSet.isEmpty()) {
