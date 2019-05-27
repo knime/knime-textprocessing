@@ -36,7 +36,8 @@
 		</intro>
 		<option name="Document column">The document column to use.<br/> <i>Note</i>: If the <i>Apply preprocessing</i>
 		option is unchecked, the documents have to be tagged by a part-of-speech tagger and a named-entity tagger (optionally). </option>
-		<option name="Lemmatized document column">The document column containing the lemmatized documents.</option>
+		<option name="Lemmatized document column">The document column containing the lemmatized documents.<br/>
+		<i>Note:</i> If the <i>Apply preprocessing</i> option is checked, this option is not necessary.</option>
 		<option name="Apply preprocessing">If checked, part-of-speech tagging, named-entity tagging and lemmatizing will be done by this node.</option>
 		<option name="Number of threads">The number of threads to use.</option>
 	</fullDescription>
