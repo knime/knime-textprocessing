@@ -416,7 +416,7 @@ public final class DocumentUtil {
      *
      * @param doc the document
      * @return the list of terms, or <code>Null</code> if no terms are found
-     * @since 3.8
+     * @since 4.0
      */
     public static List<Term> getTerms(final Document doc) {
         List<Term> terms = null;
@@ -439,7 +439,7 @@ public final class DocumentUtil {
      * @param delimiter adds the specified delimiter between the title and the text. This option is ignored if inclTitle
      *            is set to {@code false}.
      * @return a list of indexed terms where all terms have at least one tag
-     * @since 3.8
+     * @since 4.0
      */
     public static List<IndexedTerm> getIndexedTerms(final Document doc, final boolean inclTitle,
         final String delimiter) {

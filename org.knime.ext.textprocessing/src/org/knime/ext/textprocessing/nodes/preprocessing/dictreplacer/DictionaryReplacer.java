@@ -126,7 +126,7 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
      *            corresponding values).
      * @param replacement The string used to replace words that are not contained in the dictionary.
      * @param tokenizerName The tokenizer used for word tokenization.
-     * @since 3.8
+     * @since 4.0
      */
     public DictionaryReplacer(final Map<String, String> replaceDict, final String replacement,
         final String tokenizerName) {

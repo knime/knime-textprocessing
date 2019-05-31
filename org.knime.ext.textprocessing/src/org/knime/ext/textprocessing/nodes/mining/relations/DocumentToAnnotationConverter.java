@@ -73,7 +73,7 @@ import edu.stanford.nlp.util.CoreMap;
  * structure.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
- * @since 3.8
+ * @since 4.0
  */
 final class DocumentToAnnotationConverter {
 

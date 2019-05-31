@@ -57,7 +57,7 @@ import org.apache.commons.lang3.StringUtils;
  * This class stores a term name, its list of tags, and the position of the term in a document text.
  *
  * @author Andisa Dewi, KNIME AG, Berlin, Germany
- * @since 3.8
+ * @since 4.0
  */
 public class IndexedTerm {
 
