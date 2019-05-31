@@ -73,6 +73,9 @@ public enum UniversalDependenciesPOSTagSet {
     ADV,
     /** Auxiliary. */
     AUX,
+    /** Conjunction (fallback).
+     * @since 4.0*/
+    CONJ,
     /** Coordinating conjunction. */
     CCONJ,
     /** Determiner. */
