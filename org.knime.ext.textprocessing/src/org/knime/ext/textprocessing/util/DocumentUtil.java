@@ -466,7 +466,11 @@ public final class DocumentUtil {
                     final String term = t.getText();
                     // get the start and stop index of the term in the text
                     final int startIndex = text.indexOf(term, stopIndex);
-                    stopIndex = startIndex + term.length();
+                    if(startIndex >= 0) {
+                        stopIndex = startIndex + term.length();
+                    } else {
+                        // nothing to do
+                    }
                     result.add(new IndexedTerm(t, startIndex, stopIndex));
                 }
             }
