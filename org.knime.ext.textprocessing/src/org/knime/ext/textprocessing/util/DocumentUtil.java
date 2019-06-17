@@ -446,7 +446,7 @@ public final class DocumentUtil {
         final List<IndexedTerm> result = new ArrayList<IndexedTerm>();
         String text = "";
         // include doc title
-        if (inclTitle && !doc.getTitle().isEmpty()) {
+        if (!doc.getTitle().isEmpty()) {
             // insert a whitespace between the title and the text
             if (delimiter != null) {
                 text = String.join(delimiter, doc.getTitle(), doc.getDocumentBodyText());
@@ -465,13 +465,19 @@ public final class DocumentUtil {
                 if (!t.getTags().isEmpty()) {
                     final String term = t.getText();
                     // get the start and stop index of the term in the text
-                    final int startIndex = text.indexOf(term, stopIndex);
+                    int startIndex = text.indexOf(term, stopIndex);
                     if(startIndex >= 0) {
-                        stopIndex = startIndex + term.length();
+                        if(inclTitle) {
+                            stopIndex = startIndex + term.length();
+                            result.add(new IndexedTerm(t, startIndex, stopIndex));
+                        } else if(startIndex >= doc.getTitle().length()) {
+                            startIndex -= doc.getTitle().length()+1;
+                            stopIndex = startIndex + term.length();
+                            result.add(new IndexedTerm(t, startIndex, stopIndex));
+                        }
                     } else {
                         // nothing to do
                     }
-                    result.add(new IndexedTerm(t, startIndex, stopIndex));
                 }
             }
         }
