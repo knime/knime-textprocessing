@@ -69,6 +69,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.Document;
@@ -188,7 +189,15 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         if (directory != null && query != null) {
             if (directory.exists() && directory.isDirectory()) {
 
-                fetchDocuments(directory, query);
+                try {
+                    fetchDocuments(directory, query);
+                } catch (final Exception e) {
+                    // Clean directory after parsing
+                    if (getDeleteFiles()) {
+                        FileUtils.cleanDirectory(directory);
+                    }
+                    throw e;
+                }
 
                 try {
                     parseDocumentsAndNotify(directory);
@@ -199,6 +208,11 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
                 } catch (Exception e) {
                     LOGGER.warn("Could not parse PubMed documents!");
                     throw(e);
+                } finally {
+                    // Clean directory after parsing
+                    if (getDeleteFiles()) {
+                        FileUtils.cleanDirectory(directory);
+                    }
                 }
             }
         }
