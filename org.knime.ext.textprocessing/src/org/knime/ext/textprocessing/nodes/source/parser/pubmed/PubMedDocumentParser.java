@@ -98,6 +98,16 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     public static final String PUBMEDARTICLE = "pubmedarticle";
 
     /**
+     * The name of the book article tag.
+     */
+    private static final String PUBMEDBOOKARTICLE = "pubmedbookarticle";
+
+    /**
+     * The name of the delete citation tag.
+     */
+    private static final String DELETECITATION = "deletecitation";
+
+    /**
      * The name of the abstract text tag.
      */
     public static final String ABSTRACTTEXT = "abstracttext";
@@ -420,7 +430,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
 
         m_lastTag = qName.toLowerCase();
 
-        if (m_lastTag.equals(PUBMEDARTICLE)) {
+        if (m_lastTag.equals(PUBMEDARTICLE) || m_lastTag.equals(PUBMEDBOOKARTICLE)) {
             m_currentDoc = new DocumentBuilder(m_tokenizerName);
             if (m_category != null) {
                 m_currentDoc.addDocumentCategory(m_category);
@@ -476,7 +486,8 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     @Override
     public void endElement(final String uri, final String localName, final String qName) {
         String name = qName.toLowerCase();
-        if (name.equals(PUBMEDARTICLE) && m_currentDoc != null) {
+        if ((name.equals(PUBMEDARTICLE) || name.equals(PUBMEDBOOKARTICLE))
+            && m_currentDoc != null) {
             Document doc = m_currentDoc.createDocument();
 
             // due to memory issues documents are not all stored in list anymore
@@ -501,6 +512,9 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
             m_chemicalEntry = "";
             m_meshEntry = "";
             m_pmidIsSet = false;
+        } else if (name.equals(DELETECITATION)) {
+            LOGGER.debug("Last document (PMID:" + m_pmid.trim()
+                + ") was not parsed, since it contains the \"DeleteCitation\" tag.");
         } else if (name.equals(ABSTRACTTEXT)) {
             if (m_currentDoc != null) {
                 m_currentDoc.addSection(m_abstract.trim(), SectionAnnotation.ABSTRACT);
