@@ -19,3 +19,4 @@ Export-Package: org.knime.ext.textprocessing.language.german,
  org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels,
  org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels,
  org.knime.ext.textprocessing.language.german.nodes.tokenization.tokenizer.word
+Eclipse-BundleShape: dir

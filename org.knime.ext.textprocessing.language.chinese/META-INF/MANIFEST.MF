@@ -16,3 +16,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.knime.ext.textprocessing.language.chinese,
  org.knime.ext.textprocessing.language.chinese.nodes.tokenization.tokenizer.word
 Bundle-ClassPath: knime-textprocessing-chinese.jar
+Eclipse-BundleShape: dir

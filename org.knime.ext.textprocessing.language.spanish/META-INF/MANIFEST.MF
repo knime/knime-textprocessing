@@ -17,3 +17,4 @@ Bundle-ClassPath: knime-textprocessing-spanish.jar
 Export-Package: org.knime.ext.textprocessing.language.spanish,
  org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanfordnlpnetagger.nermodels,
  org.knime.ext.textprocessing.language.spanish.nodes.tokenization.tokenizer.word
+Eclipse-BundleShape: dir

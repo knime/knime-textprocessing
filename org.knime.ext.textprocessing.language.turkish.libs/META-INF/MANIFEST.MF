@@ -13,3 +13,4 @@ Export-Package: zemberek.core.turkish,
  zemberek.morphology.analysis,
  zemberek.morphology.lexicon,
  zemberek.tokenization
+Eclipse-BundleShape: dir
