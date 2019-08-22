@@ -465,6 +465,15 @@ public final class DocumentUtil {
                 if (!t.getTags().isEmpty()) {
                     final String term = t.getText();
                     // get the start and stop index of the term in the text
+                    // TODO we should get rid of this part and use a logic similar to this one
+                    //
+                    // for(Term t : …)
+                    // if(hasTag) { results.add(new IndexTerm(t, startIndex, startIndex + term.length)) }
+                    // startIndex += t.getTextWithWs().length;
+                    //
+                    // Problem with that is, that there are some meta information we need to consider which are
+                    // not easily accessible (Subtitle of Publication).
+
                     int startIndex = text.indexOf(term, stopIndex);
                     if(startIndex >= 0) {
                         if(inclTitle) {
@@ -478,6 +487,9 @@ public final class DocumentUtil {
                     } else {
                         // nothing to do
                     }
+                } else {
+                    // if the term does not contain a tag, increase stopIndex to search for the next word.
+                   stopIndex = text.indexOf(t.getText(), stopIndex) + t.getText().length();
                 }
             }
         }
