@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.language.spanish"
       label="KNIME Textprocessing Spanish Language Pack"
-      version="4.0.0.qualifier"
+      version="4.1.0.qualifier"
       provider-name="KNIME Gmbh, Konstanz, Germany"
       plugin="org.knime.ext.textprocessing.language.spanish">
 

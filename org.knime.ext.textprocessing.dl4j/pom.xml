@@ -10,7 +10,7 @@
       <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.knime.ext.textprocessing.dl4j</artifactId>
-  <version>4.0.0</version>
+  <version>4.1.0</version>
   <packaging>eclipse-plugin</packaging>
   <build>
     <plugins>
