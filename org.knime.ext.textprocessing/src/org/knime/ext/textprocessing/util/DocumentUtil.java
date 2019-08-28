@@ -480,7 +480,10 @@ public final class DocumentUtil {
                             stopIndex = startIndex + term.length();
                             result.add(new IndexedTerm(t, startIndex, stopIndex));
                         } else if(startIndex >= doc.getTitle().length()) {
-                            startIndex -= doc.getTitle().length()+1;
+                            if(doc.getTitle().length() > 0) {
+                                // Subtract title length +1 (to get before the title) from the startIndex
+                                startIndex -= doc.getTitle().length()+1;
+                            }
                             stopIndex = startIndex + term.length();
                             result.add(new IndexedTerm(t, startIndex, stopIndex));
                         }
