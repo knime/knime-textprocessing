@@ -204,7 +204,8 @@ final class MultiThreadTermExtractor extends MultiThreadWorker<DataRow, Map<Stri
             while (sentenceIterator.hasNext()) {
                 sentenceIterator.next().getTerms().stream()//
                     .collect(Collectors.groupingBy(Term::getText, Collectors.counting()))//
-                    .forEach((k, v) -> counts.merge(k, new FrequencyPair(m_totalNoOfRows, v, 1), FrequencyPair::sum));
+                    .forEach((k, v) -> counts.merge(k,
+                        new FrequencyPair(m_totalNoOfRows, v, counts.containsKey(k) ? 0 : 1), FrequencyPair::sum));
             }
         } else {
             m_missingRowCount.incrementAndGet();
