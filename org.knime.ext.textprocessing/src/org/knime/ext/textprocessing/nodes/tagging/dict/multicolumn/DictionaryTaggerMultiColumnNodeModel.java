@@ -52,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -100,6 +101,11 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
     private final Map<DictionaryTaggerSettings, List<String>> m_validSettingsAndDicts = new LinkedHashMap<>();
 
     /**
+     * Counts how many threads initialized the settings.
+     */
+    private AtomicInteger m_settingsInitCount;
+
+    /**
      * A {@link SettingsModelBoolean} containing the flag specifying whether the terms should be set unmodifiable after
      * being tagged or not.
      */
@@ -133,6 +139,7 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
         }
 
         // Check for invalid dictionary columns
+        m_settingsInitCount = new AtomicInteger(0);
         m_validSettingsAndDicts.clear();
         for (DictionaryTaggerSettings settings : m_settings.getSettings()) {
             int dictTableIndex = dictTableSpec.findColumnIndex(settings.getColumnName());
@@ -165,7 +172,10 @@ final class DictionaryTaggerMultiColumnNodeModel extends StreamableTaggerNodeMod
                 multiDictTagger.add(new SingleDictionaryTagger(entry.getKey(), entry.getValue()));
             }
         }
-        m_validSettingsAndDicts.clear();
+        // Clear settings map if MultipleDictionarySentenceTagger has been initialized for all threads
+        if (m_settingsInitCount.addAndGet(1) == getMaxNumberOfParallelThreads()) {
+            m_validSettingsAndDicts.clear();
+        }
         return new MultipleTagsetDocumentTagger(m_setUnmodifiableModel.getBooleanValue(), multiDictTagger,
             getTokenizerName());
     }
