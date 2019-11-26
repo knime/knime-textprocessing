@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+         point="org.knime.ext.textprocessing.StanfordTaggerModel">
+    <StanfordTaggerModel
+          StanfordTaggerModel="org.knime.ext.textprocessing.language.arabic.nodes.tagging.stanford.posmodels.ArabicModel"
+          name="org.knime.ext.textprocessing.language.arabic.nodes.tagging.stanford.posmodels.ArabicModel"
+          type="Part-Of-Speech">
+    </StanfordTaggerModel>
+	</extension>
+ <extension
+       point="org.knime.ext.textprocessing.TokenizerFactory">
+    <TokenizerFactory
+          TokenizerFactory="org.knime.ext.textprocessing.language.arabic.nodes.tokenization.tokenizer.word.StanfordNlpArabicTokenizerFactory">
+    </TokenizerFactory>
+ </extension>
+ <extension
+       point="org.knime.ext.textprocessing.TagSet">
+    <TagSet
+          TagBuilder="org.knime.ext.textprocessing.language.arabic.data.StanfordNlpArabicPOSTag">
+     </TagSet>
+ </extension> 
+</plugin>
