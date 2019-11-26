@@ -75,14 +75,23 @@ public final class SnowballStemmerFactory {
      * @since 2.8
      */
     public SnowballStemmerFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        m_stemmerNames.add("Arabic");
+        m_stemmerNames.add("Basque");
+        m_stemmerNames.add("Catalan");
         m_stemmerNames.add("Danish");
         m_stemmerNames.add("Dutch");
         m_stemmerNames.add("English");
         m_stemmerNames.add("Finnish");
         m_stemmerNames.add("French");
         m_stemmerNames.add("German");
+        m_stemmerNames.add("Greek");
+        m_stemmerNames.add("Hindi");
         m_stemmerNames.add("Hungarian");
+        m_stemmerNames.add("Indonesian");
+        m_stemmerNames.add("Irish");
         m_stemmerNames.add("Italian");
+        m_stemmerNames.add("Lithuanian");
+        m_stemmerNames.add("Nepali");
         m_stemmerNames.add("Norwegian");
         m_stemmerNames.add("Porter");
         m_stemmerNames.add("Portuguese");
@@ -90,6 +99,7 @@ public final class SnowballStemmerFactory {
         m_stemmerNames.add("Russian");
         m_stemmerNames.add("Spanish");
         m_stemmerNames.add("Swedish");
+        m_stemmerNames.add("Tamil");
         m_stemmerNames.add("Turkish");
     }
 
