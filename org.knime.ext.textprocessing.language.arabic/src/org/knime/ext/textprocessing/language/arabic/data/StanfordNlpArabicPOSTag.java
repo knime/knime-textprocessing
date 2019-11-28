@@ -48,6 +48,8 @@
  */
 package org.knime.ext.textprocessing.language.arabic.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +59,8 @@ import java.util.stream.Stream;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.TagBuilder;
 
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
 /**
  * This class provides methods given by the {@link TagBuilder} interface to use the StanfordNLP Arabic tag set.
  *
@@ -64,75 +68,20 @@ import org.knime.ext.textprocessing.data.TagBuilder;
  */
 public final class StanfordNlpArabicPOSTag implements TagBuilder {
 
-    private enum StanfordNlpArabicTagSet {
-        /** Unkown type. */
-        UNKNOWN,
-        /** Determiner. */
-        DT,
-        /** Coordinating conjunction. */
-        CC,
-        /** Preposition or subordinating conjunction. */
-        IN,
-        /** Adjective. */
-        JJ,
-        /** Noun, singular or mass. */
-        NN,
-        /** Noun, plural. */
-        NNS,
-        /** Proper noun, singular. */
-        NNP,
-        /** Proper noun, plural. */
-        NNPS,
-        /** Personal pronoun. */
-        PRP,
-        /** Possessive pronoun. */
-        PRP$,
-        /** Adverb. */
-        RB,
-        /** Particle. */
-        RP,
-        /** Symbol. */
-        SYM,
-        /** Interjection. */
-        UH,
-        /** Imperative. */
-        VB,
-        /** Verb, past tense. */
-        VBD,
-        /** Verbal nouns/gerund. */
-        VBG,
-        /** Passive verb. */
-        VBN,
-        /** Imperfect verbs, present tense. */
-        VBP,
-        /** Cardinal Number. **/
-        CD,
-        /** Adjective, comparative. **/
-        JJR,
-        /** Wh-pronoun. **/
-        WP,
-        /** Wh-adverb. **/
-        WRB,
-        /** Ordinal number/numerical adjective. */
-        ADJ_NUM,
-        /** Determinant noun, singular or mass. */
-        DTNN,
-        /** Determinant noun, plural. */
-        DTNNS,
-        /** Determinant proper noun, singular. */
-        DTNNP,
-        /** Determinant proper noun, plural. */
-        DTNNPS,
-        /** Determinant adjective. */
-        DTJJ,
-        /** Determinant comparative adjective. */
-        DTJJR,
-        /** Nominal quantifier. */
-        NOUN_QUANT,
-        /** Verbal nominal/active or passive participles. */
-        VN,
-        /** Punctuation. */
-        PUNC;
+    /**
+     * The tag set is from StanfordNLP's {@link MaxentTagger#readModelAndInit} class which creates a TTags object
+     * holding all available tags for the specific language.
+     *
+     * TODO: Whenever the StanfordNLP library/models are updated, we need to check that the we still provide the correct
+     * tag set.
+     */
+    private static final Set<String> TAG_SET;
+    static {
+        TAG_SET = Collections.unmodifiableSet(Stream
+            .of(".$$.", "ADJ_NUM", "CC", "CD", "CPRP$", "DT", "DTJJ", "DTJJR", "DTNN", "DTNNP", "DTNNPS", "DTNNS", "IN",
+                "JJ", "JJR", "NN", "NNP", "NNPS", "NNS", "NOUN_QUANT", "PRP", "PRP$", "PUNC", "RB", "RP", "UH",
+                "UNKNOWN", "VB", "VBD", "VBG", "VBN", "VBP", "VN", "WP", "WRB")
+            .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     /**
@@ -142,23 +91,18 @@ public final class StanfordNlpArabicPOSTag implements TagBuilder {
 
     @Override
     public Tag buildTag(final String value) {
-        for (final StanfordNlpArabicTagSet pos : StanfordNlpArabicTagSet.values()) {
-            if (pos.name().equals(value)) {
-                return new Tag(pos.name(), TAG_TYPE);
-            }
-        }
-        return new Tag(StanfordNlpArabicTagSet.UNKNOWN.name(), TAG_TYPE);
+        return TAG_SET.contains(value) ? new Tag(value, TAG_TYPE) : new Tag("UNKNOWN", TAG_TYPE);
     }
 
     @Override
     public List<String> asStringList() {
-        return Stream.of(StanfordNlpArabicTagSet.values()).map(Enum::name).collect(Collectors.toList());
+        return new ArrayList<>(TAG_SET);
     }
 
     @Override
     public Set<Tag> getTags() {
-        return Stream.of(StanfordNlpArabicTagSet.values())//
-            .map(e -> new Tag(e.name(), TAG_TYPE))//
+        return (TAG_SET).stream()//
+            .map(tv -> new Tag(tv, TAG_TYPE))//
             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
