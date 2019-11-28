@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Nov 26, 2019 (julian): created
+ *   Nov 26, 2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
 package org.knime.ext.textprocessing.language.arabic.data;
 
@@ -67,7 +67,6 @@ public final class StanfordNlpArabicPOSTag implements TagBuilder {
     private enum StanfordNlpArabicTagSet {
         /** Unkown type. */
         UNKNOWN,
-
         /** Determiner. */
         DT,
         /** Coordinating conjunction. */

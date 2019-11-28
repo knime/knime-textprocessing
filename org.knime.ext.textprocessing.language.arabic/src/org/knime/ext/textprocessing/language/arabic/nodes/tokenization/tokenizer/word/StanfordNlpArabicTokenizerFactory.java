@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   22.11.2019 (Julian Bunzel): created
+ *   22.11.2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
 package org.knime.ext.textprocessing.language.arabic.nodes.tokenization.tokenizer.word;
 
@@ -52,6 +52,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 
 /**
+ * This factory class creates instances of the Arabic word tokenizer {@code StanfordNlpArabicTokenizer}.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */

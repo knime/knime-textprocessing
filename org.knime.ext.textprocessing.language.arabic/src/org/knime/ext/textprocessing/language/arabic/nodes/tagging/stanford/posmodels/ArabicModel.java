@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   22.11.2019 (Julian Bunzel): created
+ *   22.11.2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
 package org.knime.ext.textprocessing.language.arabic.nodes.tagging.stanford.posmodels;
 

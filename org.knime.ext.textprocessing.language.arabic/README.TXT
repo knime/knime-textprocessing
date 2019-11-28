@@ -1,4 +1,4 @@
-This plugin project provides functionality and models for Chinese language as an extension for KNIME.
+This plugin project provides functionality and models for Arabic language as an extension for KNIME.
 
 It is released under the General Public License (GPL) (see the file 
 LICENSE.TXT, which should be located in the same directory as this file). 

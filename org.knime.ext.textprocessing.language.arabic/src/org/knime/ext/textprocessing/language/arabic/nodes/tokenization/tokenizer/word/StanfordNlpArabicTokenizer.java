@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   22.11.2019 (Julian): created
+ *   22.11.2019 (Julian Bunzel, KNIME GmbH, Berlin, Germany): created
  */
 package org.knime.ext.textprocessing.language.arabic.nodes.tokenization.tokenizer.word;
 
@@ -59,6 +59,8 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.process.TokenizerFactory;
 
 /**
+ * A tokenizer that detects Arabic words. It provides each word as one token.
+ * This word tokenizer is based on the "StanfordNLP Arabic Tokenizer" model.
  *
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
