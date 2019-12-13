@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.language.arabic"
       label="KNIME Textprocessing Arabic Language Pack"
-      version="4.1.0.qualifier"
+      version="4.2.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland"
       plugin="org.knime.ext.textprocessing.language.arabic">
 
