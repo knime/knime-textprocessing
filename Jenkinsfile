@@ -13,7 +13,7 @@ properties([
 ])
 
 try {
-	knimetools.defaultTychoBuild('org.knime.update.textprocessing')
+	knimetools.defaultTychoBuild('org.knime.update.ext.textprocessing')
 
 	/* workflowTests.runTests( */
 	/* 	"org.knime.features.core.testing.feature.group", */
