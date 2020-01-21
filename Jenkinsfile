@@ -4,50 +4,31 @@ def BN = BRANCH_NAME == "master" || BRANCH_NAME.startsWith("releases/") ? BRANCH
 library "knime-pipeline@$BN"
 
 properties([
-	pipelineTriggers([
-		upstream('knime-base/' + env.BRANCH_NAME.replaceAll('/', '%2F'))
-	]),
+	// provide a list of upstream jobs which should trigger a rebuild of this job
+	pipelineTriggers([upstream(
+		'knime-base/' + env.BRANCH_NAME.replaceAll('/', '%2F')
+	)]),
 	buildDiscarder(logRotator(numToKeepStr: '5')),
 	disableConcurrentBuilds()
 ])
 
+try {
+	knimetools.defaultTychoBuild('org.knime.update.textprocessing')
 
-node('maven') {
-     stage('Checkout Sources') {
-        checkout scm
+	/* workflowTests.runTests( */
+	/* 	"org.knime.features.core.testing.feature.group", */
+	/* 	false, */
+	/* 	["knime-core", "knime-shared", "knime-tp"], */
+	/* ) */
+
+	stage('Sonarqube analysis') {
+		env.lastStage = env.STAGE_NAME
+		workflowTests.runSonar([])
 	}
-
-	try {
-		stage('Tycho Build') {
-			withMavenJarsignerCredentials {
-				sh '''
-					export TEMP="${WORKSPACE}/tmp"
-					rm -rf "${TEMP}"; mkdir "${TEMP}"
-					mvn -Dmaven.test.failure.ignore=true -Dknime.p2.repo=${P2_REPO} clean verify
-					rm -rf "${TEMP}"
-				'''
-			}
-
-			// junit '**/target/test-reports/*/TEST-*.xml'
-		}
-
-
-		if (currentBuild.result != 'UNSTABLE') {
-			stage('Deploy p2') {
-				p2Tools.deploy("${WORKSPACE}/org.knime.update.ext.textprocessing/target/repository/")
-			}
-		} else {
-			echo "==============================================\n" +
-				 "| Build unstable, not deploying p2 artifacts.|\n" +
-				 "=============================================="
-		}
-
-
-    } catch (ex) {
-		currentBuild.result = 'FAILED'
-		throw ex
-	} finally {
-		notifications.notifyBuild(currentBuild.result);
-	}
- }
-/* vim: set ts=4: */
+} catch (ex) {
+	currentBuild.result = 'FAILED'
+	throw ex
+} finally {
+	notifications.notifyBuild(currentBuild.result);
+}
+ /* vim: set ts=4: */
