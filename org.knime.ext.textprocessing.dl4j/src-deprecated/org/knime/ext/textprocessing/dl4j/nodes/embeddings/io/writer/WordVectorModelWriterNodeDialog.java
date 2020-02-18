@@ -52,7 +52,9 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  * @author David Kolb, KNIME.com GmbH
+ * @deprecated
  */
+@Deprecated
 public class WordVectorModelWriterNodeDialog extends DefaultNodeSettingsPane {
 
     /**

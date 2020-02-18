@@ -48,7 +48,9 @@ import org.knime.core.node.NodeView;
 
 /**
  * @author David Kolb, KNIME.com GmbH
+ * @deprecated
  */
+@Deprecated
 public class WordVectorModelWriterNodeFactory extends NodeFactory<WordVectorModelWriterNodeModel> {
 
     /**

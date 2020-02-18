@@ -70,7 +70,9 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
  * Node to write word vector models.
  *
  * @author David Kolb, KNIME.com GmbH
+ * @deprecated
  */
+@Deprecated
 public class WordVectorModelWriterNodeModel extends AbstractDLNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(WordVectorModelWriterNodeModel.class);
