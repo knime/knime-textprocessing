@@ -47,19 +47,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.models.paragraphvectors.ParagraphVectors;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
+import org.knime.core.data.util.CancellableReportingInputStream;
+import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorPortObject;
@@ -73,6 +79,8 @@ import org.knime.ext.textprocessing.dl4j.settings.enumerate.WordVectorTrainingMo
  * @author David Kolb, KNIME.com GmbH
  */
 public class WordVectorPortObjectUtils {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(WordVectorPortObjectUtils.class);
 
     private WordVectorPortObjectUtils() {
         // Utility class
@@ -146,14 +154,11 @@ public class WordVectorPortObjectUtils {
                         try {
                             tmp = copyInputStreamToTmpFile(in);
                             model = WordVectorSerializer.readWord2VecModel(tmp);
-                        } catch (Exception e) {
-                            throw e;
                         } finally {
                             if (tmp != null && tmp.exists()) {
-                                tmp.delete();
+                                deleteTmpFile(tmp.toPath(), "The temporary copy of the model could not be deleted");
                             }
                         }
-
                         return model;
                     default:
                         throw new IllegalStateException(
@@ -162,7 +167,29 @@ public class WordVectorPortObjectUtils {
             }
         }
         throw new IllegalArgumentException(
-            "WordVectors entry not found. ZipInputStream seems not to contain ZipEntry " + "with name 'word_vectors'!");
+            "WordVectors entry not found. ZipInputStream seems not to contain ZipEntry with name 'word_vectors'!");
+    }
+
+    /**
+     * @param path path of file to delete
+     * @param msg error to throw if file is not deleted.
+     */
+    public static void deleteTmpFile(final Path path, final String msg) {
+        try {
+            Files.delete(path);
+        } catch (Exception e) {
+            LOGGER.error(msg, e);
+        }
+    }
+
+    /**
+     * Reads the {@link WordVectors} from a temporary file, not writen in Knime File format.
+     *
+     * @param tmp temporary file holding {@link InputStream}.
+     * @return {@link WordVectors} loaded from temporary file.
+     */
+    public static WordVectors loadWordVectorsExternalFormat(final File tmp) {
+            return WordVectorSerializer.readWord2VecModel(tmp);
     }
 
     /**
@@ -196,8 +223,34 @@ public class WordVectorPortObjectUtils {
                 }
 
             default:
-                throw new IllegalStateException("No deserialization method defined for WordVectors of type: " + mode);
+                throw new IllegalStateException(
+                    "No deserialization method defined for WordVectors of type: " + mode);
         }
+    }
+
+    /**
+     * Reads the training mode of the temporary file.
+     *
+     * @param path the path of the file to read.
+     * @param exec {@link ExecutionContext}
+     * @return the training mode of the file.
+     * @throws IOException if fails to read the training mode from the file.
+     */
+    public static WordVectorTrainingMode readTrainingMode(final Path path, final ExecutionContext exec)
+        throws IOException {
+        WordVectorTrainingMode trainingMode = null;
+        try (final ZipInputStream zipTmpStream =
+            new ZipInputStream(new CancellableReportingInputStream(Files.newInputStream(path), exec));) {
+            exec.setMessage("Reading training mode...");
+            ZipEntry entry;
+            while ((entry = zipTmpStream.getNextEntry()) != null) {
+                if (entry.getName().matches("word_vector_trainings_mode")) {
+                    final String read = IOUtils.toString(zipTmpStream, StandardCharsets.UTF_8);
+                    trainingMode = WordVectorTrainingMode.valueOf(read);
+                }
+            }
+        }
+        return trainingMode;
     }
 
     /**
@@ -254,7 +307,7 @@ public class WordVectorPortObjectUtils {
         throws IOException {
         final ZipEntry entry = new ZipEntry("word_vector_trainings_mode");
         out.putNextEntry(entry);
-        out.write(mode.toString().getBytes(Charset.forName("UTF-8")));
+        out.write(mode.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -303,11 +356,22 @@ public class WordVectorPortObjectUtils {
      * @throws IOException
      */
     public static File copyInputStreamToTmpFile(final InputStream is) throws IOException {
-        File tmpFile = FileUtil.createTempFile(UUID.randomUUID().toString(), null);
+        return copyInputStreamToTmpFile(is, true);
+    }
+
+    /**
+     * Copies the content of the specified InputStream to a temp file.
+     *
+     * @param is stream to copy
+     * @param deleteOnExit wether to delete or not on exit.
+     * @return file pointing to stream content
+     * @throws IOException
+     */
+    public static File copyInputStreamToTmpFile(final InputStream is, final boolean deleteOnExit) throws IOException {
+        File tmpFile = FileUtil.createTempFile(UUID.randomUUID().toString(), null, deleteOnExit);
         FileUtils.copyInputStreamToFile(is, tmpFile);
         return tmpFile;
     }
-
     /**
      * Copies the content of the specified URL to a temp file.
      *
@@ -334,5 +398,4 @@ public class WordVectorPortObjectUtils {
         w2v.setVocab(wordVectors.vocab());
         return w2v;
     }
-
 }

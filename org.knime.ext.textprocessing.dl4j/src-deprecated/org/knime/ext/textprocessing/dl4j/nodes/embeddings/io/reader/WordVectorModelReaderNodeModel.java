@@ -78,7 +78,9 @@ import org.knime.ext.textprocessing.dl4j.util.WordVectorPortObjectUtils;
  * 3. Binary - e.g. Google news vectors
  *
  * @author David Kolb, KNIME.com GmbH
+ * @deprecated
  */
+@Deprecated
 public class WordVectorModelReaderNodeModel extends AbstractDLNodeModel {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(WordVectorModelReaderNodeModel.class);

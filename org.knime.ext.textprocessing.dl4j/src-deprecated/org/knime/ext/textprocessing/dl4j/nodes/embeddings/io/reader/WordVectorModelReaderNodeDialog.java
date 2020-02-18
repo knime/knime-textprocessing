@@ -42,54 +42,28 @@
  *******************************************************************************/
 package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.reader;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import javax.swing.JFileChooser;
+
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  * @author David Kolb, KNIME.com GmbH
+ * @deprecated
  */
-public class WordVectorModelReaderNodeFactory extends NodeFactory<WordVectorModelReaderNodeModel> {
+@Deprecated
+public class WordVectorModelReaderNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * {@inheritDoc}
+     * New pane for configuring the Dl4JModelReader node.
      */
-    @Override
-    public WordVectorModelReaderNodeModel createNodeModel() {
-        return new WordVectorModelReaderNodeModel();
+    protected WordVectorModelReaderNodeDialog() {
+        addDialogComponent(new DialogComponentFileChooser(createFileModel(), "word.vector.model.reader.history",
+            JFileChooser.OPEN_DIALOG, false, createFlowVariableModel(createFileModel())));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNrNodeViews() {
-        return 0;
+    static SettingsModelString createFileModel() {
+        return new SettingsModelString("word_vector_model_reader_file", "");
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<WordVectorModelReaderNodeModel> createNodeView(final int viewIndex,
-        final WordVectorModelReaderNodeModel nodeModel) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeDialogPane createNodeDialogPane() {
-        return new WordVectorModelReaderNodeDialog();
-    }
-
 }
