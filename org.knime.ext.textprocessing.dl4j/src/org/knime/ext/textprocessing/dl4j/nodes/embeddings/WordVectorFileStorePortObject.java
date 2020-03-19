@@ -175,7 +175,7 @@ public final class WordVectorFileStorePortObject extends FileStorePortObject {
      * {@inheritDoc}
      */
     @Override
-    public PortObjectSpec getSpec() {
+    public WordVectorPortObjectSpec getSpec() {
         return m_spec;
     }
 
