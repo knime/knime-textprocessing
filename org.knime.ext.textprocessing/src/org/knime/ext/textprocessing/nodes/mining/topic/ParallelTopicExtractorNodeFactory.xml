@@ -19,7 +19,7 @@
             <p>
             The node uses the <a href="http://mallet.cs.umass.edu/">"MALLET: A Machine Learning for Language Toolkit."</a> 
             topic modeling library.
-            <b>Note:</b> The current version of MALLET contains a known multi-threading bug that can cause the node to fail with an ArrayIndexOutOfBoundsExcetion.
+            <b>Note:</b> The current version of MALLET contains a known multi-threading bug that can cause the node to fail with an ArrayIndexOutOfBoundsException.
             Should you encounter this issue, setting the number of threads to one should solve the problem.
             </p>
         </intro>
