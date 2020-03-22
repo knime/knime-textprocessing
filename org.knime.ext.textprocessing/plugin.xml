@@ -393,6 +393,12 @@
       </node>
       <node
             category-path="/applications/textprocessing/misc"
+            factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory"
+            >
+      </node>
+      <node
+            category-path="/applications/textprocessing/misc"
+            deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
             >
       </node>
@@ -620,6 +626,11 @@
             category-path="/applications/textprocessing/tagging"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.nodes.tagging.abner.AbnerTaggerNodeFactory2">
+      </node>
+      <node
+            category-path="/applications/textprocessing/tagging"
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.DictionaryTaggerNodeFactory">
       </node>
       <node
             category-path="/applications/textprocessing/tagging"
