@@ -393,12 +393,11 @@
       </node>
       <node
             category-path="/applications/textprocessing/misc"
-            factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.TagCloudNodeFactory">
       </node>
       <node
             category-path="/applications/textprocessing/misc"
-            deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.view.tagcloud.outport.TagCloudNodeFactory"
             >
       </node>
