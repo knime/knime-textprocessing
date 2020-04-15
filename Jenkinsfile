@@ -15,15 +15,22 @@ properties([
 try {
 	knimetools.defaultTychoBuild('org.knime.update.ext.textprocessing')
 
-	/* workflowTests.runTests( */
-	/* 	"org.knime.features.core.testing.feature.group", */
-	/* 	false, */
-	/* 	["knime-core", "knime-shared", "knime-tp"], */
-	/* ) */
+	workflowTests.runTests(
+        dependencies: [
+			repositories: [
+				'knime-textprocessing',
+				'knime-filehandling',
+				'knime-datageneration',
+				'knime-productivity-oss',
+				'knime-jep',
+				'knime-streaming'
+			]
+		]
+	)
 
 	stage('Sonarqube analysis') {
 		env.lastStage = env.STAGE_NAME
-		workflowTests.runSonar([])
+		workflowTests.runSonar()
 	}
 } catch (ex) {
 	currentBuild.result = 'FAILED'
