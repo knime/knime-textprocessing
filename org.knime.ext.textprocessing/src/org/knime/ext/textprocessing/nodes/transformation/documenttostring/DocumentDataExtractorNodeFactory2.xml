@@ -13,6 +13,7 @@
 		</intro>
 		<option name="Document column">The document column to use</option>
 		<option name="Data extractors">The data to extract</option>
+		<option name="Separate terms by whitespaces">If checked, all terms are separated by a whitespace.</option>
 	</fullDescription>
 		
     <ports>

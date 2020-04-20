@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataType;
@@ -70,6 +71,8 @@ import org.knime.ext.textprocessing.data.DocumentMetaInfo;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
+import org.knime.ext.textprocessing.data.Section;
+import org.knime.ext.textprocessing.data.SectionAnnotation;
 
 /**
  *
@@ -93,6 +96,15 @@ public enum DocumentDataExtractor2 {
                 }
                 return new StringCell(title);
             }
+
+            @Override
+            public DataCell getValueWithSeparatedTerms(final Document doc) {
+                final List<Section> section = doc.getSection(SectionAnnotation.TITLE);
+                if (section.isEmpty()) {
+                    return DataType.getMissingCell();
+                }
+                return new StringCell(DocumentToStringHelper.createSeparatedString(section));
+            }
         }),
         /** Returns the abstract of a document. */
         ABSTRACT("Abstract", new Extractor() {
@@ -109,6 +121,15 @@ public enum DocumentDataExtractor2 {
                 }
                 return new StringCell(text);
             }
+
+            @Override
+            public DataCell getValueWithSeparatedTerms(final Document doc) {
+                final List<Section> section = doc.getSection(SectionAnnotation.ABSTRACT);
+                if (section.isEmpty()) {
+                    return DataType.getMissingCell();
+                }
+                return new StringCell(DocumentToStringHelper.createSeparatedString(section));
+            }
         }),
         /** Returns the text of a document. */
         TEXT("Text", new Extractor() {
@@ -124,6 +145,15 @@ public enum DocumentDataExtractor2 {
                     return DataType.getMissingCell();
                 }
                 return new StringCell(text);
+            }
+
+            @Override
+            public DataCell getValueWithSeparatedTerms(final Document doc) {
+                final List<Section> sections = doc.getSections();
+                if (sections.isEmpty()) {
+                    return DataType.getMissingCell();
+                }
+                return new StringCell(DocumentToStringHelper.createSeparatedString(sections));
             }
         }),
         /**
@@ -144,6 +174,20 @@ public enum DocumentDataExtractor2 {
                     return DataType.getMissingCell();
                 }
                 return new StringCell(text);
+            }
+
+            @Override
+            public DataCell getValueWithSeparatedTerms(final Document doc) {
+                final List<Section> sections = doc.getSections()//
+                    .stream()//
+                    .filter(sec -> sec.getAnnotation().equals(SectionAnnotation.UNKNOWN)
+                        || sec.getAnnotation().equals(SectionAnnotation.CHAPTER)
+                        || sec.getAnnotation().equals(SectionAnnotation.ABSTRACT))//
+                    .collect(Collectors.toList());
+                if (sections.isEmpty()) {
+                    return DataType.getMissingCell();
+                }
+                return new StringCell(DocumentToStringHelper.createSeparatedString(sections));
             }
         }),
         /** Returns the authors of a document as string. */
@@ -395,6 +439,17 @@ public enum DocumentDataExtractor2 {
         public DataCell getValue(final Document doc);
 
         /**
+         * Returns the extracted data as {@link DataCell}. Specific extractors need an own implementation, so that
+         * terms are separated by whitespaces.
+         *
+         * @param doc the {@link Document} to extract the data from
+         * @return the extracted data as {@link DataCell}
+         */
+        public default DataCell getValueWithSeparatedTerms(final Document doc) {
+            return getValue(doc);
+        }
+
+        /**
          * @return the {@link DataType}
          */
         public DataType getDataType();
@@ -440,6 +495,14 @@ public enum DocumentDataExtractor2 {
      */
     public DataCell getValue(final Document doc) {
         return m_extractor.getValue(doc);
+    }
+
+    /**
+     * @param doc the {@link Document} to extract the data from
+     * @return the extracted data as {@link DataCell}
+     */
+    DataCell getValueWithSeparatedTerms(final Document doc) {
+        return m_extractor.getValueWithSeparatedTerms(doc);
     }
 
     /**

@@ -59,10 +59,9 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentValue;
 
-
 /**
- * The {@link CellFactory} implementation of the DocumentDataExtractor node
- * that creates a cell for each selected document property.
+ * The {@link CellFactory} implementation of the DocumentDataExtractor node that creates a cell for each selected
+ * document property.
  *
  * @author Tobias Koetter, University of Konstanz
  * @since 3.4
@@ -70,21 +69,37 @@ import org.knime.ext.textprocessing.data.DocumentValue;
 public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
 
     private final DocumentDataExtractor2[] m_extractors;
+
     private final int m_docColIdx;
+
     private final DataColumnSpec[] m_columnSpecs;
 
-    /**Constructor for class DocumentExtractorCellFactory.
+    private final boolean m_forceWhiteSpaceSeparation;
+
+    /**
+     * Constructor for class DocumentExtractorCellFactory.
+     *
      * @param docColIdx the index of the document column
-     * @param columnSpecs the {@link DataColumnSpec}s to return in the same
-     * order as the extractors
+     * @param columnSpecs the {@link DataColumnSpec}s to return in the same order as the extractors
      * @param extractors the {@link DocumentDataExtractor}s to use
      */
-    public DocumentDataExtractorCellFactory2(final int docColIdx,
-            final DataColumnSpec[] columnSpecs,
-            final DocumentDataExtractor2[] extractors) {
+    public DocumentDataExtractorCellFactory2(final int docColIdx, final DataColumnSpec[] columnSpecs,
+        final DocumentDataExtractor2[] extractors) {
+        this(docColIdx, columnSpecs, extractors, false);
+    }
+
+    /**
+     * Constructor for class DocumentExtractorCellFactory.
+     *
+     * @param docColIdx the index of the document column
+     * @param columnSpecs the {@link DataColumnSpec}s to return in the same order as the extractors
+     * @param extractors the {@link DocumentDataExtractor}s to use
+     * @param forceWhiteSpaceSeparation set true, if terms should always be separated
+     */
+    DocumentDataExtractorCellFactory2(final int docColIdx, final DataColumnSpec[] columnSpecs,
+        final DocumentDataExtractor2[] extractors, final boolean forceWhiteSpaceSeparation) {
         if (columnSpecs == null || columnSpecs.length < 1) {
-            throw new NullPointerException(
-                    "column specs must not be empty");
+            throw new NullPointerException("column specs must not be empty");
         }
         if (docColIdx < 0) {
             throw new IllegalArgumentException("Invalid document column");
@@ -93,13 +108,12 @@ public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
             throw new IllegalArgumentException("extractors must not be empty");
         }
         if (columnSpecs.length != extractors.length) {
-            throw new IllegalArgumentException(
-                    "Column specs and extractors must have the same sice");
+            throw new IllegalArgumentException("Column specs and extractors must have the same sice");
         }
         m_columnSpecs = columnSpecs;
         m_docColIdx = docColIdx;
         m_extractors = extractors;
-
+        m_forceWhiteSpaceSeparation = forceWhiteSpaceSeparation;
     }
 
     /**
@@ -114,7 +128,11 @@ public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
             final DocumentValue docCell = (DocumentValue)cell;
             doc = docCell.getDocument();
             for (int i = 0; i < m_extractors.length; i++) {
-                cells[i] = m_extractors[i].getValue(doc);
+                if (m_forceWhiteSpaceSeparation) {
+                    cells[i] = m_extractors[i].getValueWithSeparatedTerms(doc);
+                } else {
+                    cells[i] = m_extractors[i].getValue(doc);
+                }
             }
         } else {
             for (int i = 0; i < m_extractors.length; i++) {
@@ -124,6 +142,7 @@ public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
         }
         return cells;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -138,10 +157,9 @@ public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
      * @since 3.5
      */
     @Override
-    public void setProgress(final long curRowNr, final long rowCount,
-            final RowKey lastKey, final ExecutionMonitor exec) {
-        exec.setProgress(1.0 / rowCount * curRowNr,
-                "Processing row " + curRowNr + " of " + rowCount);
+    public void setProgress(final long curRowNr, final long rowCount, final RowKey lastKey,
+        final ExecutionMonitor exec) {
+        exec.setProgress(1.0 / rowCount * curRowNr, "Processing row " + curRowNr + " of " + rowCount);
     }
 
     /**
@@ -152,9 +170,7 @@ public class DocumentDataExtractorCellFactory2 extends AbstractCellFactory {
      */
     @Deprecated
     @Override
-    public void setProgress(final int curRowNr, final int rowCount,
-            final RowKey lastKey, final ExecutionMonitor exec) {
-        exec.setProgress(1.0 / rowCount * curRowNr,
-                "Processing row " + curRowNr + " of " + rowCount);
+    public void setProgress(final int curRowNr, final int rowCount, final RowKey lastKey, final ExecutionMonitor exec) {
+        exec.setProgress(1.0 / rowCount * curRowNr, "Processing row " + curRowNr + " of " + rowCount);
     }
 }
