@@ -63,6 +63,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -77,9 +78,13 @@ import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
  */
 public class DocumentDataExtractorNodeModel2 extends NodeModel {
 
+    private final static String CFG_FORCE_WHITE_SPACE_SEPARATION = "forceWhiteSpaceSeparation";
+
     private final SettingsModelString m_documentCol = getDocumentColConfigObj();
 
     private final SettingsModelStringArray m_extractorNames = getExtractorNamesConfigObj();
+
+    private final SettingsModelBoolean m_forceWhiteSpaceSeparation = getForceWhiteSpaceSeparationConfigObj();
 
     private DataColumnSpec[] m_extractorColumnSpecs = null;
 
@@ -141,8 +146,8 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
             resultTable = table;
         } else {
             final ColumnRearranger rearranger = new ColumnRearranger(inSpec);
-            final CellFactory factory =
-                new DocumentDataExtractorCellFactory2(docColIdx, m_extractorColumnSpecs, extractors);
+            final CellFactory factory = new DocumentDataExtractorCellFactory2(docColIdx, m_extractorColumnSpecs,
+                extractors, m_forceWhiteSpaceSeparation.getBooleanValue());
             rearranger.append(factory);
             resultTable = exec.createColumnRearrangeTable(table, rearranger, exec);
         }
@@ -188,6 +193,7 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_documentCol.saveSettingsTo(settings);
         m_extractorNames.saveSettingsTo(settings);
+        m_forceWhiteSpaceSeparation.saveSettingsTo(settings);
     }
 
     /**
@@ -197,6 +203,10 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentCol.validateSettings(settings);
         m_extractorNames.validateSettings(settings);
+        // added with 4.1.3 see AP-13920
+        if (settings.containsKey(CFG_FORCE_WHITE_SPACE_SEPARATION)) {
+            m_forceWhiteSpaceSeparation.validateSettings(settings);
+        }
     }
 
     /**
@@ -206,6 +216,13 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_documentCol.loadSettingsFrom(settings);
         m_extractorNames.loadSettingsFrom(settings);
+        // added with 4.1.3 see AP-13920
+        if (settings.containsKey(CFG_FORCE_WHITE_SPACE_SEPARATION)) {
+            m_forceWhiteSpaceSeparation.loadSettingsFrom(settings);
+        } else {
+            // ensure backwards compatibility
+            m_forceWhiteSpaceSeparation.setBooleanValue(false);
+        }
     }
 
     /**
@@ -244,6 +261,14 @@ public class DocumentDataExtractorNodeModel2 extends NodeModel {
      */
     protected static SettingsModelStringArray getExtractorNamesConfigObj() {
         return new SettingsModelStringArray("extractorNames", null);
+    }
+
+    /**
+     * @return Creates and returns {@code SettingsModelBoolean} containing the option whether terms should be separated
+     * by white spaces or not
+     */
+    static final SettingsModelBoolean getForceWhiteSpaceSeparationConfigObj() {
+        return new SettingsModelBoolean (CFG_FORCE_WHITE_SPACE_SEPARATION, true);
     }
 
 }

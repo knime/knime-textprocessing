@@ -1,5 +1,6 @@
 /*
-========================================================================
+ * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -40,57 +41,55 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * -------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *    09.12.2008 (Tobias Koetter): created
+ *   Mar 26, 2020 (Julian Bunzel): created
  */
-
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponent;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.ext.textprocessing.data.DocumentValue;
+import java.util.List;
 
+import org.knime.ext.textprocessing.data.Paragraph;
+import org.knime.ext.textprocessing.data.Section;
+import org.knime.ext.textprocessing.data.Sentence;
+import org.knime.ext.textprocessing.data.Term;
 
 /**
- * The NodeDialog implementation of the DocumentDataExtractor node.
+ * Helper class to convert a document into a string of whitespace-separated terms.
  *
- * @author Tobias Koetter, University of Konstanz
+ * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
-public class DocumentDataExtractorNodeDialog extends DefaultNodeSettingsPane {
+final class DocumentToStringHelper {
 
-    private final SettingsModelString m_documentCol =
-        DocumentDataExtractorNodeModel2.getDocumentColConfigObj();
+    /** Whitespace separator */
+    private static final String WHITESPACE = " ";
 
-    private final SettingsModelStringArray m_extractorNames =
-        DocumentDataExtractorNodeModel2.getExtractorNamesConfigObj();
-
-    private final SettingsModelBoolean m_forceWhiteSpaceSeparation =
-            DocumentDataExtractorNodeModel2.getForceWhiteSpaceSeparationConfigObj();
-
-    /**Constructor for class DocumentDataExtractorNodeDialog.
+    /**
+     * Empty constructor.
      */
-    @SuppressWarnings("unchecked")
-    public DocumentDataExtractorNodeDialog() {
-        final DialogComponent colName = new DialogComponentColumnNameSelection(
-                m_documentCol, "Document column: ", 0, true,
-                DocumentValue.class);
-        final DialogComponent extractors =
-            new DialogComponentStringListSelection(m_extractorNames,
-                    "Data extractors: ",
-                    DocumentDataExtractor2.getExtractorNames());
-        final DialogComponent forceSeparatedTerms =
-                new DialogComponentBoolean(m_forceWhiteSpaceSeparation, "Separate terms by whitespaces");
-        addDialogComponent(colName);
-        addDialogComponent(extractors);
-        setHorizontalPlacement(false);
-        addDialogComponent(forceSeparatedTerms);
+    private DocumentToStringHelper() {
+        // nothing to do here...
+    }
+
+    /**
+     * Creates and returns a String built from a list of sections. All terms are separated by a whitespace character.
+     *
+     * @param sections list of sections
+     * @return Returns a string of whitespace-separated terms
+     */
+    protected static final String createSeparatedString(final List<Section> sections) {
+        final StringBuilder sb = new StringBuilder();
+        for (final Section section : sections) {
+            for (final Paragraph paragraph : section.getParagraphs()) {
+                for (final Sentence sentence : paragraph.getSentences()) {
+                    for (final Term term : sentence.getTerms()) {
+                        sb.append(term.getText());
+                        sb.append(WHITESPACE);
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 }
