@@ -2,6 +2,7 @@
 <site>
    <feature id="org.knime.features.ext.textprocessing" version="0.0.0"/>
    <feature id="org.knime.features.ext.textprocessing.source" version="0.0.0"/>
+   <feature id="org.knime.features.ext.textprocessing.language.arabic" version="0.0.0"/>
    <feature id="org.knime.features.ext.textprocessing.language.chinese" version="0.0.0"/>
    <feature id="org.knime.features.ext.textprocessing.language.french" version="0.0.0"/>
    <feature id="org.knime.features.ext.textprocessing.language.german" version="0.0.0"/>
