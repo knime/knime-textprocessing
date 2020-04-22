@@ -220,6 +220,7 @@ public class TagCloudNodeModel extends NodeModel {
 
         TagCloudImageExportPanel panel;
         if (numofRows <= 0) {
+            m_tagcloud = null;
             setWarningMessage("Empty data table, nothing to display.");
             panel = new TagCloudImageExportPanel(null);
         } else {
@@ -313,7 +314,7 @@ public class TagCloudNodeModel extends NodeModel {
      */
     @Override
     protected void reset() {
-        // nothing to reset
+        m_tagcloud = null;
     }
 
     /**
@@ -322,16 +323,17 @@ public class TagCloudNodeModel extends NodeModel {
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
+        // AP-14023 only save internals if tagcloud not null
+        if (m_tagcloud != null) {
+            // Save tagcloud content
+            ModelContent modelContent = new ModelContent(INTERNAL_MODEL);
+            m_tagcloud.saveTo(modelContent);
 
-        // Save tagcloud content
-        ModelContent modelContent = new ModelContent(INTERNAL_MODEL);
-        m_tagcloud.saveTo(modelContent);
-
-        File file = new File(nodeInternDir, DATA_FILE_NAME);
-        FileOutputStream fos = new FileOutputStream(file);
-        modelContent.saveToXML(fos);
-        fos.close();
-
+            File file = new File(nodeInternDir, DATA_FILE_NAME);
+            try (final FileOutputStream fos = new FileOutputStream(file)) {
+                modelContent.saveToXML(fos);
+            }
+        }
     }
 
     /**
@@ -343,20 +345,20 @@ public class TagCloudNodeModel extends NodeModel {
             CanceledExecutionException {
 
         File file = new File(nodeInternDir, DATA_FILE_NAME);
-        FileInputStream fis = new FileInputStream(file);
-        ModelContentRO modelContent = ModelContent.loadFromXML(fis);
-
-        try {
-          m_tagcloud = new TagCloud();
-          m_tagcloud.loadFrom(modelContent);
-        } catch (InvalidSettingsException e1) {
-            IOException ioe = new IOException("Could not load settings, due to invalid settings in model content!");
-            ioe.initCause(e1);
-            fis.close();
-            throw ioe;
+        // AP-14023 only load internals if the file has been written
+        if (file.exists()) {
+            try (final FileInputStream fis = new FileInputStream(file)) {
+                ModelContentRO modelContent = ModelContent.loadFromXML(fis);
+                m_tagcloud = new TagCloud();
+                m_tagcloud.loadFrom(modelContent);
+            } catch (InvalidSettingsException e1) {
+                IOException ioe = new IOException("Could not load settings, due to invalid settings in model content!");
+                ioe.initCause(e1);
+                throw ioe;
+            }
         }
-        fis.close();
     }
+
     /**
      * {@inheritDoc}
      */
