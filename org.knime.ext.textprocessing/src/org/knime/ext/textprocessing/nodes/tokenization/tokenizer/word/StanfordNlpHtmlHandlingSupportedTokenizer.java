@@ -106,7 +106,8 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
                     // else normalize the word
                     final String normToken = StringEscapeUtils.escapeHtml4(token);
                     // check if the next part of the sentence is the normalized word and add it if it is the case
-                    if (normToken.equals(cpySentence.substring(0, normToken.length()))) {
+                    if (normToken.length() <= cpySentence.length()
+                        && normToken.equals(cpySentence.substring(0, normToken.length()))) {
                         tokenList.add(normToken);
                         cpySentence = cpySentence.substring(normToken.length(), cpySentence.length());
                     } else {
@@ -174,6 +175,7 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
 
     /**
      * Rebuilds a html entity from a given array of tokens.
+     *
      * @param tokens the array of tokens
      * @return a list containing the re-constructed html entries
      */
