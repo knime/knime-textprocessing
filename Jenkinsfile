@@ -23,7 +23,8 @@ try {
 				'knime-datageneration',
 				'knime-productivity-oss',
 				'knime-jep',
-				'knime-streaming'
+				'knime-streaming',
+				'knime-dl4j'
 			]
 		]
 	)
