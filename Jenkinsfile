@@ -24,7 +24,8 @@ try {
 				'knime-productivity-oss',
 				'knime-jep',
 				'knime-streaming',
-				'knime-dl4j'
+				'knime-dl4j',
+				'knime-reporting'
 			]
 		]
 	)
