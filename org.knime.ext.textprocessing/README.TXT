@@ -24,10 +24,6 @@ Apache PDFBox
 Homepage: https://pdfbox.apache.org/
 Apache PDFBox is licensed under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
 
-dom4j
-Homepage: https://dom4j.github.io/
-dom4j is licensed under an Apache-style License (https://github.com/dom4j/dom4j/blob/master/LICENSE)
-
 guava
 Homepage: https://github.com/google/guava
 guava is licensed under the Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
