@@ -48,8 +48,6 @@
  */
 package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.filehandling.wordVector.reader;
 
-import javax.swing.JFileChooser;
-
 import org.knime.core.node.context.NodeCreationConfiguration;
 import org.knime.core.node.port.PortType;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
@@ -76,13 +74,12 @@ public class WordVectorModelReader2NodeFactory extends
     @Override
     protected PortObjectReaderNodeDialog<PortObjectReaderNodeConfig>
         createDialog(final NodeCreationConfiguration creationConfig) {
-        return new PortObjectReaderNodeDialog<>(creationConfig.getPortConfig().get(), new PortObjectReaderNodeConfig(),
-            HISTORY_ID, JFileChooser.FILES_ONLY);
+        return new PortObjectReaderNodeDialog<>(new PortObjectReaderNodeConfig(creationConfig), HISTORY_ID);
     }
 
     @Override
     protected WordVectorModelReader2NodeModel createNodeModel(final NodeCreationConfiguration creationConfig) {
-        return new WordVectorModelReader2NodeModel(creationConfig, new PortObjectReaderNodeConfig());
+        return new WordVectorModelReader2NodeModel(creationConfig, new PortObjectReaderNodeConfig(creationConfig));
     }
 
 }

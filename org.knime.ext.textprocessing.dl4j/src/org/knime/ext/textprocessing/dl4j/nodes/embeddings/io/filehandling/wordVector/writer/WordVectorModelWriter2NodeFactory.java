@@ -48,8 +48,6 @@
  */
 package org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.filehandling.wordVector.writer;
 
-import javax.swing.JFileChooser;
-
 import org.knime.core.node.context.NodeCreationConfiguration;
 import org.knime.core.node.port.PortType;
 import org.knime.ext.textprocessing.dl4j.nodes.embeddings.WordVectorFileStorePortObject;
@@ -65,30 +63,20 @@ import org.knime.filehandling.core.node.portobject.writer.PortObjectWriterNodeFa
 public class WordVectorModelWriter2NodeFactory extends
     PortObjectWriterNodeFactory<WordVectorModelWriter2NodeModel, PortObjectWriterNodeDialog<PortObjectWriterNodeConfig>> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected PortType getInputPortType() {
         return WordVectorFileStorePortObject.TYPE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected PortObjectWriterNodeDialog<PortObjectWriterNodeConfig>
         createDialog(final NodeCreationConfiguration creationConfig) {
-        return new PortObjectWriterNodeDialog<>(creationConfig.getPortConfig().get(), new PortObjectWriterNodeConfig(),
-            "word_vector_writer", JFileChooser.FILES_ONLY);
+        return new PortObjectWriterNodeDialog<>(new PortObjectWriterNodeConfig(creationConfig), "word_vector_writer");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected WordVectorModelWriter2NodeModel createNodeModel(final NodeCreationConfiguration creationConfig) {
-        return new WordVectorModelWriter2NodeModel(creationConfig, new PortObjectWriterNodeConfig());
+        return new WordVectorModelWriter2NodeModel(creationConfig, new PortObjectWriterNodeConfig(creationConfig));
     }
 
 }
