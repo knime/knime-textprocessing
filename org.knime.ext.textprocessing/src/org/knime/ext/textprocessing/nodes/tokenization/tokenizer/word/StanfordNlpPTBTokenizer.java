@@ -60,7 +60,9 @@ import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
 public class StanfordNlpPTBTokenizer extends StanfordNlpHtmlHandlingSupportedTokenizer {
 
     /** The options for the tokenizer. */
-    private static final String OPTIONS = "ptb3Escaping=false,strictTreebank3=true";
+    private static final String OPTIONS = "invertible=true,"
+            + "ptb3Escaping=false,"
+            + "strictTreebank3=true";
 
     /**
      * Creates a new instance of {@code StanfordNlpPTBTokenizer}.

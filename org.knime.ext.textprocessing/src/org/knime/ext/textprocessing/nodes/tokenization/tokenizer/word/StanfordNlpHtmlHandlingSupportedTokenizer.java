@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 
 import edu.stanford.nlp.ling.CoreLabel;
@@ -103,19 +102,10 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
                     tokenList.add(token);
                     cpySentence = cpySentence.substring(token.length(), cpySentence.length());
                 } else {
-                    // else normalize the word
-                    final String normToken = StringEscapeUtils.escapeHtml4(token);
-                    // check if the next part of the sentence is the normalized word and add it if it is the case
-                    if (normToken.length() <= cpySentence.length()
-                        && normToken.equals(cpySentence.substring(0, normToken.length()))) {
-                        tokenList.add(normToken);
-                        cpySentence = cpySentence.substring(normToken.length(), cpySentence.length());
-                    } else {
-                        // if the sentence doesn't start with the tokenized word or the normalized word, look up the
+                        // if the sentence doesn't start with the tokenized word, look up the
                         // position of the word / normalized word add the skipped part as tokens as well as token that
                         // has been found behind the skipped part
-                        cpySentence = handleSkippedParts(readString, tokenList, cpySentence, token, normToken);
-                    }
+                        cpySentence = handleSkippedParts(readString, tokenList, cpySentence, token);
                 }
             }
             return tokenList;
@@ -125,27 +115,19 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
     }
 
     private static String handleSkippedParts(final StringReader sr, final List<String> tokenList, final String sentence,
-        String token, final String normalizedToken) {
+        final String token) {
         // add untokenized parts as token (this happens if there is a whitespace HTML entity in the text
         // e.g. "&nbsp;" - the tokenizer will detect it as a whitespace and will not add to the word
-        // list, but we want it as a token, so we add the skipped part manually)
-        // -> get indices of word and normalized word
+        // list, but we want it as a token, so we add the skipped part manually // another case would be
+        // tokens that are left out by the tokenizer because they cannot be handled)
+        // -> get indices of word
         int wordStart = sentence.indexOf(token);
-        final int normWordStart = sentence.indexOf(normalizedToken);
 
-        // if normalized word exists in sentence and its index is smaller than the index of the
-        // tokenized word, check for the normalized word. also check for the normalized word, if only
-        // the normalized word exists in the text. in other cases (normWordStart < 0 or normWordStart >
-        // wordStart) the tokenized word will be used for checking.
-        if (((wordStart >= 0) && (normWordStart >= 0) && (wordStart > normWordStart))
-            || ((wordStart < 0) && (normWordStart >= 0))) {
-            wordStart = normWordStart;
-            token = normalizedToken;
-        } else if ((wordStart < 0) && (normWordStart < 0)) {
-            // if neither the tokenized word nor the normalized word could be found throw an exception
+        if (wordStart < 0) {
+            // if the tokenized word could be found throw an exception
             sr.close();
-            throw new RuntimeException("The token " + token + " / " + normalizedToken
-                + " cannot be found in the sentence: \"" + sentence + "\"!");
+            throw new RuntimeException(
+                "The token " + token + " cannot be found in the sentence: \"" + sentence + "\"!");
         }
         // get the skipped part
         final String skippedWord = sentence.substring(0, wordStart).trim();

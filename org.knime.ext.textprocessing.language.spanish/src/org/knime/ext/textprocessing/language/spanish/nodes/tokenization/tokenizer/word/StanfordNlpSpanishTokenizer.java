@@ -64,7 +64,8 @@ import edu.stanford.nlp.process.TokenizerFactory;
 public final class StanfordNlpSpanishTokenizer extends StanfordNlpHtmlHandlingSupportedTokenizer {
     
     /** The options for the tokenizer. */
-    private static final String OPTIONS = "normalizeAmpersandEntity=false,"
+    private static final String OPTIONS = "invertible=true,"
+            + "normalizeAmpersandEntity=false,"
             + "normalizeFractions=false,"
             + "normalizeParentheses=false," 
             + "normalizeOtherBrackets=false," 
