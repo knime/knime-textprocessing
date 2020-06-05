@@ -15,7 +15,7 @@
       </node>
       <node
             category-path="/labs/deeplearning/dl4j/embeddings/io"
-            deprecated="true"
+            deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.writer.WordVectorModelWriterNodeFactory">
       </node>
       <node
@@ -56,7 +56,7 @@
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.filehandling.wordVector.reader.WordVectorModelReader2NodeFactory">
       </node>
       <node
-            category-path="/labs/deeplearning/dl4j/embeddings/io"
+            category-path="/labs/file-handling-prototype/file-handling-IO/file-handling-Write"
             deprecated="false"
             factory-class="org.knime.ext.textprocessing.dl4j.nodes.embeddings.io.filehandling.wordVector.writer.WordVectorModelWriter2NodeFactory">
       </node>
