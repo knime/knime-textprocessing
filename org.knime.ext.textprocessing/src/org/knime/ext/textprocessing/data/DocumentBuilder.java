@@ -61,13 +61,11 @@ import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
 import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
- * A utility class which helps building up a
- * {@link org.knime.ext.textprocessing.data.Document} by providing methods which
- * allow to add sections, paragraphs and sentences in an easy way, create the a
- * documents word cache and much more.<br/>
+ * A utility class which helps building up a {@link org.knime.ext.textprocessing.data.Document} by providing methods
+ * which allow to add sections, paragraphs and sentences in an easy way, create the a documents word cache and much
+ * more.<br/>
  * <br/>
- * Example for building up a {@link org.knime.ext.textprocessing.data.Document}:
- * <br/>
+ * Example for building up a {@link org.knime.ext.textprocessing.data.Document}: <br/>
  * <code>
  * DocumentBuilder db = new DocumentBuilder();<br/>
  * db.addAuthor(new Author("John", "Public"));<br/>
@@ -118,6 +116,7 @@ public class DocumentBuilder {
 
     /**
      * Creates new empty instance of {@code DocumentBuilder}.
+     *
      * @deprecated Use {@link #DocumentBuilder(String)} instead for tokenizer selection support.
      */
     @Deprecated
@@ -128,6 +127,7 @@ public class DocumentBuilder {
 
     /**
      * Creates new instance of {@code DocumentBuilder} with specified word tokenizer.
+     *
      * @param tokenizerName The tokenizer used for word tokenization.
      * @since 3.3
      */
@@ -137,14 +137,13 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates new instance of {@code DocumentBuilder} and sets the meta
-     * information of the given {@code Document}.<br/>
-     * The meta information to copy is: the documents authors, the source, the
-     * category, the type, the file and the publication date.<br/>
-     * The text data like title or sections are not copied.
-     * Only use this constructor if you want to create a document based on another document.
-     * If you want to add new content based on Strings (e.g. with {@link #addSentence(String sentence)})
-     * use {@link #DocumentBuilder(Document doc, String tokenizerName)}
+     * Creates new instance of {@code DocumentBuilder} and sets the meta information of the given {@code Document}.<br/>
+     * The meta information to copy is: the documents authors, the source, the category, the type, the file and the
+     * publication date.<br/>
+     * The text data like title or sections are not copied. Only use this constructor if you want to create a document
+     * based on another document. If you want to add new content based on Strings (e.g. with
+     * {@link #addSentence(String sentence)}) use {@link #DocumentBuilder(Document doc, String tokenizerName)}
+     *
      * @param doc The document containing the meta information to copy.
      */
     public DocumentBuilder(final Document doc) {
@@ -153,13 +152,12 @@ public class DocumentBuilder {
     }
 
     /**
-     * Creates new instance of {@code DocumentBuilder} and sets the meta
-     * information of the given {@code Document}.<br/>
-     * The meta information to copy is: the documents authors, the source, the
-     * category, the type, the file and the publication date.<br/>
-     * The text data like title or sections are not copied.
-     * Use this constructor if you are willing to add new information based on strings
-     * (e.g. with {@link #addSentence(String sentence)}).
+     * Creates new instance of {@code DocumentBuilder} and sets the meta information of the given {@code Document}.<br/>
+     * The meta information to copy is: the documents authors, the source, the category, the type, the file and the
+     * publication date.<br/>
+     * The text data like title or sections are not copied. Use this constructor if you are willing to add new
+     * information based on strings (e.g. with {@link #addSentence(String sentence)}).
+     *
      * @param doc The document containing the meta information to copy.
      * @param tokenizerName The tokenizer used for word tokenization.
      * @since 3.3
@@ -167,17 +165,17 @@ public class DocumentBuilder {
     public DocumentBuilder(final Document doc, final String tokenizerName) {
         this(tokenizerName);
         // Add authors
-        for (Author a : doc.getAuthors()) {
+        for (final Author a : doc.getAuthors()) {
             addAuthor(a);
         }
 
         // Add source
-        for (DocumentSource s : doc.getSources()) {
+        for (final DocumentSource s : doc.getSources()) {
             addDocumentSource(s);
         }
 
         // Add categories
-        for (DocumentCategory c : doc.getCategories()) {
+        for (final DocumentCategory c : doc.getCategories()) {
             addDocumentCategory(c);
         }
 
@@ -197,6 +195,7 @@ public class DocumentBuilder {
     /**
      * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance containing the given data, such as
      * authors, sections, etc.
+     *
      * @param sections the section to set
      * @param type the type to set
      * @param authors the authors to set
@@ -215,49 +214,46 @@ public class DocumentBuilder {
     }
 
     /**
-     * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance
-     * with the specified data, like authors, sections, etc.
+     * Builds a new {@link org.knime.ext.textprocessing.data.Document} instance with the specified data, like authors,
+     * sections, etc.
      *
-     * @return a new {@link org.knime.ext.textprocessing.data.Document} instance
-     *         with the specified data.
+     * @return a new {@link org.knime.ext.textprocessing.data.Document} instance with the specified data.
      */
     public Document createDocument() {
-        return new Document(m_sections, m_type, m_authors, m_sources,
-                m_categories, m_date, m_docFile,
-                new DocumentMetaInfo(m_metaInfo));
+        return new Document(m_sections, m_type, m_authors, m_sources, m_categories, m_date, m_docFile,
+            new DocumentMetaInfo(m_metaInfo));
     }
 
     /**
      * Adds the key value pair to the meta information of the document.
+     *
      * @param key The key of the meta information.
      * @param value The value of the meta information.
      * @since 2.8
      */
     public void addMetaInformation(final String key, final String value) {
-        if (key != null && value != null) {
+        if ((key != null) && (value != null)) {
             m_metaInfo.put(key, value);
         }
     }
 
     /**
-     * Adds all the key value pairs of the given {@link DocumentMetaInfo} to the
-     * meta info section of the current document to build.
-     * @param metaInfo The {@link DocumentMetaInfo} containing the key value
-     * pairs to add.
+     * Adds all the key value pairs of the given {@link DocumentMetaInfo} to the meta info section of the current
+     * document to build.
+     *
+     * @param metaInfo The {@link DocumentMetaInfo} containing the key value pairs to add.
      * @since 2.8
      */
     public void addMetaInformation(final DocumentMetaInfo metaInfo) {
-        if (metaInfo != null && metaInfo.getClass() != null
-                && metaInfo.getMetaInfoKeys().size() > 0) {
-            for (String key : metaInfo.getMetaInfoKeys()) {
+        if ((metaInfo != null) && (metaInfo.getClass() != null) && (metaInfo.getMetaInfoKeys().size() > 0)) {
+            for (final String key : metaInfo.getMetaInfoKeys()) {
                 addMetaInformation(key, metaInfo.getMetaInfoValue(key));
             }
         }
     }
 
     /**
-     * Adds the given {@link org.knime.ext.textprocessing.data.Author} to the
-     * list of authors.
+     * Adds the given {@link org.knime.ext.textprocessing.data.Author} to the list of authors.
      *
      * @param author the author to add to the authors list.
      */
@@ -268,8 +264,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentSource}
-     * to the list of sources.
+     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentSource} to the list of sources.
      *
      * @param source the source to add to the sources list.
      */
@@ -280,8 +275,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentCategory}
-     * to the list of categories.
+     * Adds the given {@link org.knime.ext.textprocessing.data.DocumentCategory} to the list of categories.
      *
      * @param category the category to add to the categories list.
      */
@@ -292,8 +286,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * @param date The date to set as
-     *            {@link org.knime.ext.textprocessing.data.PublicationDate}.
+     * @param date The date to set as {@link org.knime.ext.textprocessing.data.PublicationDate}.
      */
     public void setPublicationDate(final PublicationDate date) {
         if (date != null) {
@@ -311,8 +304,7 @@ public class DocumentBuilder {
     }
 
     /**
-     * @param type The type to set as
-     *            {@link org.knime.ext.textprocessing.data.DocumentType}.
+     * @param type The type to set as {@link org.knime.ext.textprocessing.data.DocumentType}.
      */
     public void setDocumentType(final DocumentType type) {
         if (type != null) {
@@ -321,69 +313,61 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given title and add it as a
-     * {@link org.knime.ext.textprocessing.data.Section} with <code>TITLE</code>
-     * annotation to the list of sections.
+     * Tokenizes the given title and add it as a {@link org.knime.ext.textprocessing.data.Section} with
+     * <code>TITLE</code> annotation to the list of sections.
      *
      * @param title The title to tokenize and to add as section.
      */
     public void addTitle(final String title) {
-        if (title != null && title.length() > 0) {
-            Sentence s = internalAddSentence(title);
-            List<Sentence> sentences = new ArrayList<Sentence>();
+        if ((title != null) && (title.length() > 0)) {
+            final Sentence s = internalAddSentence(title);
+            final List<Sentence> sentences = new ArrayList<Sentence>();
             sentences.add(s);
-            Paragraph p = new Paragraph(sentences);
-            List<Paragraph> paragraphs = new ArrayList<Paragraph>();
+            final Paragraph p = new Paragraph(sentences);
+            final List<Paragraph> paragraphs = new ArrayList<Paragraph>();
             paragraphs.add(p);
-            Section section = new Section(paragraphs, SectionAnnotation.TITLE);
+            final Section section = new Section(paragraphs, SectionAnnotation.TITLE);
             m_sections.add(section);
         }
     }
 
     /**
-     * Creates a new {@link org.knime.ext.textprocessing.data.Sentence} out of
-     * the current list of {@link org.knime.ext.textprocessing.data.Term}s and
-     * adds it to the current list of sentences. After adding the current list
-     * of term to the new sentences a new empty term list is created.
+     * Creates a new {@link org.knime.ext.textprocessing.data.Sentence} out of the current list of
+     * {@link org.knime.ext.textprocessing.data.Term}s and adds it to the current list of sentences. After adding the
+     * current list of term to the new sentences a new empty term list is created.
      */
     public void createNewSentence() {
-        if (m_terms != null && m_terms.size() > 0) {
-            Sentence s = new Sentence(m_terms);
+        if ((m_terms != null) && (m_terms.size() > 0)) {
+            final Sentence s = new Sentence(m_terms);
             m_sentences.add(s);
         }
         m_terms = new ArrayList<Term>();
     }
 
     /**
-     * Creates a new {@link org.knime.ext.textprocessing.data.Paragraph} out of
-     * the current list of {@link org.knime.ext.textprocessing.data.Sentence}s
-     * and adds it to the current list of paragraphs. After adding the current
-     * list of sentences to the new paragraph a new empty sentence list is
-     * created.
+     * Creates a new {@link org.knime.ext.textprocessing.data.Paragraph} out of the current list of
+     * {@link org.knime.ext.textprocessing.data.Sentence}s and adds it to the current list of paragraphs. After adding
+     * the current list of sentences to the new paragraph a new empty sentence list is created.
      */
     public void createNewParagraph() {
-        if (m_sentences != null && m_sentences.size() > 0) {
-            Paragraph p = new Paragraph(m_sentences);
+        if ((m_sentences != null) && (m_sentences.size() > 0)) {
+            final Paragraph p = new Paragraph(m_sentences);
             m_paragraphs.add(p);
         }
         m_sentences = new ArrayList<Sentence>();
     }
 
     /**
-     * Creates a new {@link org.knime.ext.textprocessing.data.Section} out of
-     * the current list of {@link org.knime.ext.textprocessing.data.Paragraph}s
-     * and ads it to the current list of sections. After adding the current list
-     * of paragraphs to the new section a new empty list is created. The given
-     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is added to
-     * the section and specifies its role.
+     * Creates a new {@link org.knime.ext.textprocessing.data.Section} out of the current list of
+     * {@link org.knime.ext.textprocessing.data.Paragraph}s and ads it to the current list of sections. After adding the
+     * current list of paragraphs to the new section a new empty list is created. The given
+     * {@link org.knime.ext.textprocessing.data.SectionAnnotation} is added to the section and specifies its role.
      *
-     * @param annotation The
-     *            {@link org.knime.ext.textprocessing.data.SectionAnnotation} to
-     *            add to the section.
+     * @param annotation The {@link org.knime.ext.textprocessing.data.SectionAnnotation} to add to the section.
      */
     public void createNewSection(final SectionAnnotation annotation) {
-        if (m_paragraphs != null && m_paragraphs.size() > 0) {
-            Section s = new Section(m_paragraphs, annotation);
+        if ((m_paragraphs != null) && (m_paragraphs.size() > 0)) {
+            final Section s = new Section(m_paragraphs, annotation);
             m_sections.add(s);
         }
         m_paragraphs = new ArrayList<Paragraph>();
@@ -395,7 +379,7 @@ public class DocumentBuilder {
      * @param term The term to add to add to the current list of terms.
      */
     public void addTerm(final Term term) {
-        if (term != null && m_terms != null) {
+        if ((term != null) && (m_terms != null)) {
             m_terms.add(term);
         } else if (m_terms == null) {
             m_terms = new ArrayList<Term>();
@@ -404,15 +388,13 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given sentence and adds it as
-     * {@link org.knime.ext.textprocessing.data.Sentence} to the current list of
-     * sentences.
+     * Tokenizes the given sentence and adds it as {@link org.knime.ext.textprocessing.data.Sentence} to the current
+     * list of sentences.
      *
-     * @param sentence The sentence to tokenize and to add to the current list
-     *            of sentences.
+     * @param sentence The sentence to tokenize and to add to the current list of sentences.
      */
     public void addSentence(final String sentence) {
-        Sentence s = internalAddSentence(sentence);
+        final Sentence s = internalAddSentence(sentence);
         if (m_sentences == null) {
             m_sentences = new ArrayList<Sentence>();
         }
@@ -424,25 +406,22 @@ public class DocumentBuilder {
     /**
      * Adds the given sentence to the list of sentences.
      *
-     * @param sentence The sentence to add to add to the current list of
-     *            sentences.
+     * @param sentence The sentence to add to add to the current list of sentences.
      */
     public void addSentence(final Sentence sentence) {
-        if (sentence != null && m_sentences != null) {
+        if ((sentence != null) && (m_sentences != null)) {
             m_sentences.add(sentence);
         }
     }
 
     /**
-     * Tokenizes the given paragraph and adds it as a
-     * {@link org.knime.ext.textprocessing.data.Paragraph} to the current list
-     * of paragraphs.
+     * Tokenizes the given paragraph and adds it as a {@link org.knime.ext.textprocessing.data.Paragraph} to the current
+     * list of paragraphs.
      *
-     * @param paragraph The paragraph to tokenize and to add to the current list
-     *            of paragraphs.
+     * @param paragraph The paragraph to tokenize and to add to the current list of paragraphs.
      */
     public void addParagraph(final String paragraph) {
-        Paragraph p = internalAddParagraph(paragraph);
+        final Paragraph p = internalAddParagraph(paragraph);
         if (m_paragraphs == null) {
             m_paragraphs = new ArrayList<Paragraph>();
         }
@@ -457,23 +436,20 @@ public class DocumentBuilder {
      * @param paragraph The paragraph to add to the current list of paragraphs.
      */
     public void addParagraph(final Paragraph paragraph) {
-        if (paragraph != null && m_paragraphs != null) {
+        if ((paragraph != null) && (m_paragraphs != null)) {
             m_paragraphs.add(paragraph);
         }
     }
 
     /**
-     * Tokenizes the given section and adds it as a instance of
-     * {@link org.knime.ext.textprocessing.data.Section} to the current list of
-     * sections.
+     * Tokenizes the given section and adds it as a instance of {@link org.knime.ext.textprocessing.data.Section} to the
+     * current list of sections.
      *
-     * @param section The section to tokenize and to add to the current section
-     *            list.
+     * @param section The section to tokenize and to add to the current section list.
      * @param annotation The annotation of the section to create.
      */
-    public void addSection(final String section,
-            final SectionAnnotation annotation) {
-        Section s = internalAddSection(section, annotation);
+    public void addSection(final String section, final SectionAnnotation annotation) {
+        final Section s = internalAddSection(section, annotation);
         if (m_sections == null) {
             m_sections = new ArrayList<Section>();
         }
@@ -488,13 +464,14 @@ public class DocumentBuilder {
      * @param section The section to add to the current section list.
      */
     public void addSection(final Section section) {
-        if (section != null && m_sections != null) {
+        if ((section != null) && (m_sections != null)) {
             m_sections.add(section);
         }
     }
 
     /**
      * Sets the given sections as sections to add to the document.
+     *
      * @param sections The sections to add to the document.
      * @since 2.8
      */
@@ -503,20 +480,18 @@ public class DocumentBuilder {
     }
 
     /**
-     * Tokenizes the given string and creates a section out of it. The given
-     * annotation represents the sections annotation.
+     * Tokenizes the given string and creates a section out of it. The given annotation represents the sections
+     * annotation.
      *
      * @param section The string representing the text of the section.
      * @param annotation The annotation representing the role of the section.
-     * @return The created instance of
-     *         {@link org.knime.ext.textprocessing.data.Section}.
+     * @return The created instance of {@link org.knime.ext.textprocessing.data.Section}.
      */
-    private Section internalAddSection(final String section,
-            final SectionAnnotation annotation) {
-        if (section != null && section.length() > 0 && !section.equals("")) {
-            List<Sentence> sentences = createSentenceList(section);
-            Paragraph p = new Paragraph(sentences);
-            List<Paragraph> paragraphs = new ArrayList<Paragraph>();
+    private Section internalAddSection(final String section, final SectionAnnotation annotation) {
+        if ((section != null) && (section.length() > 0) && !section.equals("")) {
+            final List<Sentence> sentences = createSentenceList(section);
+            final Paragraph p = new Paragraph(sentences);
+            final List<Paragraph> paragraphs = new ArrayList<Paragraph>();
             paragraphs.add(p);
             return new Section(paragraphs, annotation);
         }
@@ -527,12 +502,11 @@ public class DocumentBuilder {
      * Tokenizes the given string and creates a paragraph out of it.
      *
      * @param paragraph The string representing the text of the paragraph.
-     * @return The created instance of
-     *         {@link org.knime.ext.textprocessing.data.Paragraph}.
+     * @return The created instance of {@link org.knime.ext.textprocessing.data.Paragraph}.
      */
     private Paragraph internalAddParagraph(final String paragraph) {
-        if (paragraph != null && paragraph.length() > 0) {
-            List<Sentence> sentences = createSentenceList(paragraph);
+        if ((paragraph != null) && (paragraph.length() > 0)) {
+            final List<Sentence> sentences = createSentenceList(paragraph);
             return new Paragraph(sentences);
         }
         return null;
@@ -540,40 +514,37 @@ public class DocumentBuilder {
 
     /**
      * Creates and returns list of sentences from given text.
+     *
      * @param text The text to create a list of sentences from
      * @return A list of sentences.
      */
     private List<Sentence> createSentenceList(final String text) {
-        if (text != null && !text.isEmpty()) {
-            List<String> strSentences = m_sentenceTokenizer.tokenize(text);
-            List<Sentence> sentences = new ArrayList<Sentence>();
+        if ((text != null) && !text.isEmpty()) {
+            final List<String> strSentences = m_sentenceTokenizer.tokenize(text);
+            final List<Sentence> sentences = new ArrayList<Sentence>();
 
-            String cpyText = text;
+            int currentSentenceStart = 0;
+
             for (int i = 0; i < strSentences.size(); i++) {
                 final String sentence = strSentences.get(i);
                 final String whiteSpaceSuffix;
                 String nextSentence = null;
-                if (i < strSentences.size() - 1) {
+                if (i < (strSentences.size() - 1)) {
                     nextSentence = strSentences.get(i + 1);
                 }
 
                 //
                 // extract whitespace suffix characters
                 //
-
-                int tokenStart = cpyText.indexOf(sentence);
-                cpyText = cpyText.substring(tokenStart + sentence.length());
+                currentSentenceStart = text.indexOf(sentence, currentSentenceStart);
+                final int currentSentenceEnd = currentSentenceStart + sentence.length();
 
                 if (nextSentence != null) {
-                    int nextTokenStart = cpyText.indexOf(nextSentence);
-                    whiteSpaceSuffix = cpyText.substring(0, nextTokenStart);
-                    cpyText = cpyText.substring(nextTokenStart);
+                    final int nextSentenceStart = text.indexOf(nextSentence, currentSentenceEnd);
+                    whiteSpaceSuffix = text.substring(currentSentenceEnd, nextSentenceStart);
+                    currentSentenceStart = nextSentenceStart;
                 } else {
-                    if (cpyText.length() > 0) {
-                        whiteSpaceSuffix = cpyText;
-                    } else {
-                        whiteSpaceSuffix = "";
-                    }
+                    whiteSpaceSuffix = text.substring(currentSentenceEnd);
                 }
 
                 sentences.add(internalAddSentence(sentence + whiteSpaceSuffix));
@@ -588,50 +559,45 @@ public class DocumentBuilder {
      * Tokenizes the given string and creates a sentence out of it.
      *
      * @param sentence The string representing the text of the sentence.
-     * @return The created instance of
-     *         {@link org.knime.ext.textprocessing.data.Sentence}.
+     * @return The created instance of {@link org.knime.ext.textprocessing.data.Sentence}.
      */
     private Sentence internalAddSentence(final String sentence) {
         if (sentence != null) {
             // get tokens
-            List<String> tokens = m_wordTokenizer.tokenize(sentence);
+            final List<String> tokens = m_wordTokenizer.tokenize(sentence);
 
             if (tokens != null) {
-                List<Term> terms = new ArrayList<Term>(tokens.size());
-                String cpySentence = sentence;
+                final List<Term> terms = new ArrayList<Term>(tokens.size());
+
+                int currentTokenStart = 0;
 
                 for (int i = 0; i < tokens.size(); i++) {
                     final String token = tokens.get(i);
                     final String whiteSpaceSuffix;
                     String nextToken = null;
-                    if (i < tokens.size() - 1) {
+                    if (i < (tokens.size() - 1)) {
                         nextToken = tokens.get(i + 1);
                     }
 
                     //
                     // extract whitespace suffix characters
                     //
-
-                    int tokenStart = cpySentence.indexOf(token);
-                    cpySentence = cpySentence.substring(tokenStart + token.length());
+                    currentTokenStart = sentence.indexOf(token, currentTokenStart);
+                    final int currentTokenEnd = currentTokenStart + token.length();
 
                     if (nextToken != null) {
-                        int nextTokenStart = cpySentence.indexOf(nextToken);
-                        whiteSpaceSuffix = cpySentence.substring(0, nextTokenStart);
-                        cpySentence = cpySentence.substring(nextTokenStart);
+                        final int nextTokenStart = sentence.indexOf(nextToken, currentTokenEnd);
+                        whiteSpaceSuffix = sentence.substring(currentTokenEnd, nextTokenStart);
+                        currentTokenStart = nextTokenStart;
                     } else {
-                        if (cpySentence.length() > 0) {
-                            whiteSpaceSuffix = cpySentence;
-                        } else {
-                            whiteSpaceSuffix = "";
-                        }
+                        whiteSpaceSuffix = sentence.substring(currentTokenEnd);
                     }
 
                     // create word with token and whitespace suffix characters
-                    Word w = new Word(token, whiteSpaceSuffix);
-                    List<Word> termWords = new ArrayList<Word>(1);
+                    final Word w = new Word(token, whiteSpaceSuffix);
+                    final List<Word> termWords = new ArrayList<Word>(1);
                     termWords.add(w);
-                    Term t = new Term(termWords, new ArrayList<Tag>(1), false);
+                    final Term t = new Term(termWords, new ArrayList<Tag>(1), false);
                     terms.add(t);
                 }
                 return new Sentence(terms);

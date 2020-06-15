@@ -88,54 +88,35 @@ public abstract class StanfordNlpHtmlHandlingSupportedTokenizer implements Token
     @Override
     public List<String> tokenize(final String sentence) {
         if (m_tokenizer != null) {
-            final StringReader readString = new StringReader(sentence);
-            final edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
-            final List<CoreLabel> tokList = tokenizer.tokenize();
-            final List<String> tokenList = new ArrayList<>();
-            String cpySentence = sentence;
-            for (final CoreLabel tok : tokList) {
-                final String token = tok.originalText();
-                cpySentence = cpySentence.trim();
+            try (final StringReader readString = new StringReader(sentence)) {
+                final edu.stanford.nlp.process.Tokenizer<CoreLabel> tokenizer = m_tokenizer.getTokenizer(readString);
+                final List<CoreLabel> tokList = tokenizer.tokenize();
+                final List<String> tokenList = new ArrayList<>();
+                int previousTokenEnd = 0;
+                for (final CoreLabel tok : tokList) {
+                    final String token = tok.originalText();
+                    final int currentTokenStart = sentence.indexOf(token, previousTokenEnd);
+                    if (currentTokenStart < 0) {
+                        throw new RuntimeException(
+                            "The token " + token + " cannot be found in the sentence: \"" + sentence + "\"!");
+                    }
 
-                // check if the next part of the sentence is the current word and add it if it is the case
-                if (token.equals(cpySentence.substring(0, token.length()))) {
+                    // check if there is an untokenized part in front of the current token
+                    if (currentTokenStart > previousTokenEnd) {
+                        final String skippedPart = sentence.substring(previousTokenEnd, currentTokenStart);
+                        if (!skippedPart.trim().isEmpty()) {
+                            // process the skipped part if it is not just a whitespace
+                            splitSkippedWordAndAdd(skippedPart, tokenList);
+                        }
+                    }
                     tokenList.add(token);
-                    cpySentence = cpySentence.substring(token.length(), cpySentence.length());
-                } else {
-                        // if the sentence doesn't start with the tokenized word, look up the
-                        // position of the word / normalized word add the skipped part as tokens as well as token that
-                        // has been found behind the skipped part
-                        cpySentence = handleSkippedParts(readString, tokenList, cpySentence, token);
+                    previousTokenEnd = currentTokenStart + token.length();
                 }
+                return tokenList;
             }
-            return tokenList;
         } else {
             return null;
         }
-    }
-
-    private static String handleSkippedParts(final StringReader sr, final List<String> tokenList, final String sentence,
-        final String token) {
-        // add untokenized parts as token (this happens if there is a whitespace HTML entity in the text
-        // e.g. "&nbsp;" - the tokenizer will detect it as a whitespace and will not add to the word
-        // list, but we want it as a token, so we add the skipped part manually // another case would be
-        // tokens that are left out by the tokenizer because they cannot be handled)
-        // -> get indices of word
-        int wordStart = sentence.indexOf(token);
-
-        if (wordStart < 0) {
-            // if the tokenized word could be found throw an exception
-            sr.close();
-            throw new RuntimeException(
-                "The token " + token + " cannot be found in the sentence: \"" + sentence + "\"!");
-        }
-        // get the skipped part
-        final String skippedWord = sentence.substring(0, wordStart).trim();
-        // transform the skipped part into useful tokens and add them to the token list
-        splitSkippedWordAndAdd(skippedWord, tokenList);
-
-        tokenList.add(token);
-        return sentence.substring(wordStart + token.length());
     }
 
     /**
