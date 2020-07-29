@@ -357,7 +357,7 @@ final class BratDocumentWriterNodeModel extends NodeModel {
         if (localPath != null) {
             return new BufferedOutputStream(Files.newOutputStream(localPath));
         } else {
-            return new BufferedOutputStream(FileUtil.openOutputConnection(url, "PUT").getOutputStream());
+            return new BufferedOutputStream(FileUtil.openOutputStream(url, "PUT"));
         }
     }
 
