@@ -178,7 +178,11 @@ public class WordVectorPortObjectUtils {
         try {
             Files.delete(path);
         } catch (Exception e) {
-            LOGGER.error(msg, e);
+            /* DL4J is not very vigilant when it comes to closing resources which is why
+               it is quite common that temp files can't be deleted on windows.
+               We used to log this as an error but this causes our testflows to fail with an unexpected
+               log and since temp files are deleted when the JVM is shutdown, this isn't as big of a problem */
+            LOGGER.debug(msg, e);
         }
     }
 
@@ -319,7 +323,7 @@ public class WordVectorPortObjectUtils {
      */
     public static void writeFileStorePortObject(final WordVectorFileStorePortObject port, final ZipOutputStream out)
         throws IOException {
-        WordVectorPortObjectSpec spec = (WordVectorPortObjectSpec)port.getSpec();
+        WordVectorPortObjectSpec spec = port.getSpec();
         saveSpecOnly(spec, out);
         writeWordVectors(port.getWordVectors(), out);
     }
