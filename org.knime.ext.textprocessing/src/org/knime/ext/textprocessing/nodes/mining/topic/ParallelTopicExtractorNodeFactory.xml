@@ -12,9 +12,9 @@
             Simple parallel threaded implementation of 
             <a href="http://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">LDA</a>, 
             following Newman, Asuncion, Smyth and Welling, 
-            <a href="http://machinelearning.wustl.edu/mlpapers/paper_files/jmlr10_newman09a.pdf">
+            <a href="https://www.jmlr.org/papers/volume10/newman09a/newman09a.pdf">
             Distributed Algorithms for Topic Models JMLR (2009), with SparseLDA sampling scheme and data structure</a> 
-            from Yao, Mimno and McCallum, <a href="http://www.cs.umass.edu/~lmyao/papers/fast-topic-model10.pdf">
+            from Yao, Mimno and McCallum, <a href="https://dl.acm.org/doi/abs/10.1145/1557019.1557121">
             Efficient Methods for Topic Model Inference on Streaming Document Collections,</a> KDD (2009).
             <p>
             The node uses the <a href="http://mallet.cs.umass.edu/">"MALLET: A Machine Learning for Language Toolkit."</a> 
