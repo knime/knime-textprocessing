@@ -81,7 +81,7 @@ public final class StanfordNlpArabicPOSTag implements TagBuilder {
             .of(".$$.", "ADJ_NUM", "CC", "CD", "CPRP$", "DT", "DTJJ", "DTJJR", "DTNN", "DTNNP", "DTNNPS", "DTNNS", "IN",
                 "JJ", "JJR", "NN", "NNP", "NNPS", "NNS", "NOUN_QUANT", "PRP", "PRP$", "PUNC", "RB", "RP", "UH",
                 "UNKNOWN", "VB", "VBD", "VBG", "VBN", "VBP", "VN", "WP", "WRB")
-            .collect(Collectors.toCollection(LinkedHashSet::new)));
+            .collect(Collectors.toSet()));
     }
 
     /**
