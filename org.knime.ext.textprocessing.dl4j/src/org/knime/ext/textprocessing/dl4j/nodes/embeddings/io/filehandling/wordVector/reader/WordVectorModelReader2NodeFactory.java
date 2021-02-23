@@ -74,12 +74,13 @@ public class WordVectorModelReader2NodeFactory extends
     @Override
     protected PortObjectReaderNodeDialog<PortObjectReaderNodeConfig>
         createDialog(final NodeCreationConfiguration creationConfig) {
-        return new PortObjectReaderNodeDialog<>(new PortObjectReaderNodeConfig(creationConfig), HISTORY_ID);
+        return new PortObjectReaderNodeDialog<>(PortObjectReaderNodeConfig.builder(creationConfig).build(), HISTORY_ID);
     }
 
     @Override
     protected WordVectorModelReader2NodeModel createNodeModel(final NodeCreationConfiguration creationConfig) {
-        return new WordVectorModelReader2NodeModel(creationConfig, new PortObjectReaderNodeConfig(creationConfig));
+        return new WordVectorModelReader2NodeModel(creationConfig,
+            PortObjectReaderNodeConfig.builder(creationConfig).build());
     }
 
 }

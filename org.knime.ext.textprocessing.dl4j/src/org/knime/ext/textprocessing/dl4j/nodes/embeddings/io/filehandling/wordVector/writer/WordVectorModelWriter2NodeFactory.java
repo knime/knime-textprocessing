@@ -71,12 +71,16 @@ public class WordVectorModelWriter2NodeFactory extends
     @Override
     protected PortObjectWriterNodeDialog<PortObjectWriterNodeConfig>
         createDialog(final NodeCreationConfiguration creationConfig) {
-        return new PortObjectWriterNodeDialog<>(new PortObjectWriterNodeConfig(creationConfig), "word_vector_writer");
+        return new PortObjectWriterNodeDialog<>(createConfig(creationConfig), "word_vector_writer");
+    }
+
+    private static PortObjectWriterNodeConfig createConfig(final NodeCreationConfiguration creationConfig) {
+        return PortObjectWriterNodeConfig.builder(creationConfig).build();
     }
 
     @Override
     protected WordVectorModelWriter2NodeModel createNodeModel(final NodeCreationConfiguration creationConfig) {
-        return new WordVectorModelWriter2NodeModel(creationConfig, new PortObjectWriterNodeConfig(creationConfig));
+        return new WordVectorModelWriter2NodeModel(creationConfig, createConfig(creationConfig));
     }
 
 }
