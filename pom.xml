@@ -22,7 +22,6 @@
 
 	<modules>
         <module>org.knime.ext.textprocessing</module>
-        <module>org.knime.ext.textprocessing.dl4j</module>
         <module>org.knime.ext.textprocessing.language.arabic</module>
         <module>org.knime.ext.textprocessing.language.chinese</module>
         <module>org.knime.ext.textprocessing.language.french</module>
@@ -32,7 +31,6 @@
         <module>org.knime.ext.textprocessing.language.turkish.libs</module>
         <module>org.knime.ext.textprocessing.models</module>
         <module>org.knime.features.ext.textprocessing</module>
-        <module>org.knime.features.ext.textprocessing.dl4j</module>
         <module>org.knime.features.ext.textprocessing.language.arabic</module>
         <module>org.knime.features.ext.textprocessing.language.chinese</module>
         <module>org.knime.features.ext.textprocessing.language.french</module>
