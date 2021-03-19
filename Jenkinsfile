@@ -26,7 +26,6 @@ try {
                         'knime-productivity-oss',
                         'knime-jep',
                         'knime-streaming',
-                        'knime-dl4j',
                         'knime-reporting'
                     ]
                 ]
@@ -36,7 +35,7 @@ try {
             workflowTests.runFilehandlingTests (
                 dependencies: [
                     repositories: [
-                        "knime-textprocessing", "knime-dl4j", "knime-js-base", 'knime-datageneration', 'knime-r', 'knime-database', 'knime-kerberos'
+                        "knime-textprocessing", "knime-js-base", 'knime-datageneration', 'knime-r', 'knime-database', 'knime-kerberos'
                     ]
                 ],
             )
