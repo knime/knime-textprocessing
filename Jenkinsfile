@@ -15,34 +15,19 @@ properties([
 try {
     knimetools.defaultTychoBuild('org.knime.update.ext.textprocessing')
 
-    testConfigs = [
-        WorkflowTests: {
-            workflowTests.runTests(
-                dependencies: [
-                    repositories: [
-                        'knime-textprocessing',
-                        'knime-filehandling',
-                        'knime-datageneration',
-                        'knime-productivity-oss',
-                        'knime-jep',
-                        'knime-streaming',
-                        'knime-reporting'
-                    ]
-                ]
-            )
-        },
-        FilehandlingTests: {
-            workflowTests.runFilehandlingTests (
-                dependencies: [
-                    repositories: [
-                        "knime-textprocessing", "knime-js-base", 'knime-datageneration', 'knime-r', 'knime-database', 'knime-kerberos'
-                    ]
-                ],
-            )
-        }
-    ]
-
-    parallel testConfigs
+    workflowTests.runTests(
+        dependencies: [
+            repositories: [
+                'knime-textprocessing',
+                'knime-filehandling',
+                'knime-datageneration',
+                'knime-productivity-oss',
+                'knime-jep',
+                'knime-streaming',
+                'knime-reporting'
+            ]
+        ]
+    )
 
     stage('Sonarqube analysis') {
         env.lastStage = env.STAGE_NAME
