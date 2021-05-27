@@ -20,6 +20,7 @@ try {
             repositories: [
                 'knime-textprocessing',
                 'knime-filehandling',
+                'knime-kerberos',
                 'knime-datageneration',
                 'knime-productivity-oss',
                 'knime-jep',
