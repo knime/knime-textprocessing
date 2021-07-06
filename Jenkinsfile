@@ -26,7 +26,8 @@ try {
                 'knime-jep',
                 'knime-streaming',
                 'knime-reporting'
-            ]
+            ],
+            ius: [ 'org.knime.features.ext.textprocessing.language.arabic.feature.group' ]
         ]
     )
 
