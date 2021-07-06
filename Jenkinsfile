@@ -27,7 +27,13 @@ try {
                 'knime-streaming',
                 'knime-reporting'
             ],
-            ius: [ 'org.knime.features.ext.textprocessing.language.arabic.feature.group' ]
+            ius: [
+                'org.knime.features.ext.textprocessing.language.arabic.feature.group',
+                'org.knime.features.ext.textprocessing.language.chinese.feature.group',
+                'org.knime.features.ext.textprocessing.language.spanish.feature.group',
+                'org.knime.features.ext.textprocessing.language.german.feature.group',
+                'org.knime.features.ext.textprocessing.language.french.feature.group'
+            ]
         ]
     )
 
