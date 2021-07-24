@@ -118,7 +118,7 @@ class StringsToDocumentConfig2 {
     /**
      * The default "use authors column" setting.
      */
-    static final boolean DEF_USE_AUTHORSCOLUMN = true;
+    static final boolean DEF_USE_AUTHORSCOLUMN = false;
 
     /**
      * The default column name for the new document column.
