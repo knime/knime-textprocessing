@@ -47,6 +47,7 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.stringstodocument;
 
+import java.io.DataOutput;
 import java.text.ParseException;
 import java.time.LocalDate;
 
@@ -55,6 +56,7 @@ import org.apache.commons.lang3.concurrent.LazyInitializer;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
+import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.container.CellFactory;
@@ -75,6 +77,8 @@ import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
+import com.google.common.base.Utf8;
+
 /**
  * A {@link CellFactory} implementation to build a document for each data row. The given
  * {@code StringsToDocumentConfig2} instance specifies which columns of the row to use as title, text authors, etc.
@@ -93,6 +97,13 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
     private boolean m_cacheCreated = false;
 
     private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
+
+    /**
+     *  Strings that require more than 65535 bytes to be represented in UTF cannot be written via writeUTF in the method
+     *  {@link org.knime.textprocessing.util.TermDocumentDeSerializationUtil#fastSerializeDocument}.
+     *  See {@link DataOutput#writeUTF(String)}
+     */
+    private static final int MAX_ENCODED_STRING_SIZE =  65535;
 
     /**
      * Creates new instance of {@code StringsToDocumentCellFactory2} with given configuration.
@@ -155,7 +166,9 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         if (m_config.getUseTitleColumn()) {
             final DataCell titleCell = row.getCell(m_config.getTitleColumnIndex());
             if (!titleCell.isMissing()) {
-                docBuilder.addTitle(((StringValue)titleCell).getStringValue());
+                var title = ((StringValue)titleCell).getStringValue();
+                checkLength(title, "title", row.getKey());
+                docBuilder.addTitle(title);
             }
         } else if (m_config.getTitleMode().contentEquals(StringsToDocumentConfig2.TITLEMODE_ROWID)) {
             docBuilder.addTitle(row.getKey().toString());
@@ -168,40 +181,16 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         }
 
         // Set authors
-        if (m_config.getUseAuthorsColumn()) {
-            final DataCell authorsCell = row.getCell(m_config.getAuthorsColumnIndex());
-            if (!authorsCell.isMissing()) {
-                final String authors = ((StringValue)authorsCell).getStringValue();
-                final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
-                for (String author : authorsArr) {
-                    String firstName = "";
-                    String lastName = "";
+        setAuthors(docBuilder, row);
 
-                    final String[] names = author.split(" ");
-                    if (names.length > 1) {
-                        final StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < names.length - 1; i++) {
-                            sb.append(names[i]);
-                            sb.append(" ");
-                        }
-                        firstName = sb.toString();
-                        lastName = names[names.length - 1];
-                    } else if (names.length == 1) {
-                        lastName = names[0];
-                    }
-
-                    docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
-                }
-            }
-        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()) {
-            docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
-        }
 
         // set document source
         if (m_config.getUseSourceColumn()) {
             final DataCell sourceCell = row.getCell(m_config.getSourceColumnIndex());
             if (!sourceCell.isMissing()) {
-                docBuilder.addDocumentSource(new DocumentSource(((StringValue)sourceCell).getStringValue()));
+                var source = ((StringValue)sourceCell).getStringValue();
+                checkLength(source, "document source", row.getKey());
+                docBuilder.addDocumentSource(new DocumentSource(source));
             }
         } else if (m_config.getDocSource().length() > 0) {
             docBuilder.addDocumentSource(new DocumentSource(m_config.getDocSource()));
@@ -211,7 +200,9 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         if (m_config.getUseCatColumn()) {
             final DataCell catCell = row.getCell(m_config.getCategoryColumnIndex());
             if (!catCell.isMissing()) {
-                docBuilder.addDocumentCategory(new DocumentCategory(((StringValue)catCell).getStringValue()));
+                var category = ((StringValue)catCell).getStringValue();
+                checkLength(category, "document category", row.getKey());
+                docBuilder.addDocumentCategory(new DocumentCategory(category));
             }
         } else if (m_config.getDocCat().length() > 0) {
             docBuilder.addDocumentCategory(new DocumentCategory(m_config.getDocCat()));
@@ -236,6 +227,52 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
         return new DataCell[]{getDataCellCache().getInstance(docBuilder.createDocument())};
     }
 
+    private void setAuthors(final DocumentBuilder docBuilder, final DataRow row) {
+
+        if (m_config.getUseAuthorsColumn()) {
+
+            final DataCell authorsCell = row.getCell(m_config.getAuthorsColumnIndex());
+
+            if (!authorsCell.isMissing()) {
+                final String authors = ((StringValue)authorsCell).getStringValue();
+                final String[] authorsArr = authors.split(m_config.getAuthorsSplitChar());
+                setAuthors(docBuilder, row.getKey(), authorsArr);
+            }
+        } else if (!m_config.getAuthorFirstName().isEmpty() || !m_config.getAuthorLastName().isEmpty()) {
+            docBuilder.addAuthor(new Author(m_config.getAuthorFirstName(), m_config.getAuthorLastName()));
+        }
+    }
+
+    private static void setAuthors(final DocumentBuilder docBuilder, final RowKey rowKey, final String[] authorsArr) {
+        for (String author : authorsArr) {
+            String firstName = "";
+            String lastName = "";
+
+            final String[] names = author.split(" ");
+            if (names.length > 1) {
+                final StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < names.length - 1; i++) {
+                    sb.append(names[i]);
+                    sb.append(" ");
+                }
+                firstName = sb.toString();
+                checkLength(firstName, "first name of an author", rowKey);
+                lastName = names[names.length - 1];
+                checkLength(lastName, "last name of an author", rowKey);
+            } else if (names.length == 1) {
+                lastName = names[0];
+            }
+
+            docBuilder.addAuthor(new Author(firstName.trim(), lastName.trim()));
+        }
+    }
+
+    private static void checkLength(final String stringToCheck, final String stringName, final RowKey rowKey) {
+        final int encodedLength = Utf8.encodedLength(stringToCheck);
+        CheckUtils.checkArgument(encodedLength < MAX_ENCODED_STRING_SIZE, "The %s in row '%s' is too long.", stringName,
+            rowKey.getString());
+    }
+
     /**
      * Closes data cell cache.
      */
@@ -248,7 +285,7 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
     }
 
     // sets the publication date to the document builder
-    private void setPublicationDate(final DocumentBuilder docBuilder, final int year, final int month, final int day) {
+    private static void setPublicationDate(final DocumentBuilder docBuilder, final int year, final int month, final int day) {
         try {
             docBuilder.setPublicationDate(new PublicationDate(year, month, day));
         } catch (ParseException e) {
