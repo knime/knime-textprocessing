@@ -70,7 +70,10 @@ public enum NamedEntityTag implements TagBuilder {
     /** A time. */
     TIME,
     /** Money. */
-    MONEY;
+    MONEY,
+	/** Percent.
+	 * @since 4.5*/
+	PERCENT;
 
     private final Tag m_tag;
 
