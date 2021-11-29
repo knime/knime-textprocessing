@@ -52,7 +52,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,6 +76,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.util.FileUtil;
 import org.knime.core.util.ThreadPool;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
@@ -134,6 +138,7 @@ public class DocumentParserNodeModel extends NodeModel {
      */
     public static final DocumentType DEFAULT_DOCTYPE = DocumentType.UNKNOWN;
 
+
     /** The default setting to use the filepath as title
      * @since 3.1*/
     public static final boolean DEFAULT_FILENAME_TITLE = false;
@@ -193,10 +198,15 @@ public class DocumentParserNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         // check selected directory
-        final String dir = m_pathModel.getStringValue();
-        final File f = new File(dir);
+        URL url = null;
+        try {
+            url = FileUtil.toURL(m_pathModel.getStringValue());
+        } catch (InvalidPathException | MalformedURLException e) {
+            throwInvalidURL(e);
+        }
+        final var f = FileUtil.getFileFromURL(url);
         if (!f.isDirectory() || !f.exists() || !f.canRead()) {
-            throw new InvalidSettingsException("Selected directory: " + dir + " is not valid!");
+            throwInvalidURL(null);
         }
 
         // check if specific tokenizer is installed
@@ -206,6 +216,11 @@ public class DocumentParserNodeModel extends NodeModel {
 
         m_dtBuilder = new DocumentDataTableBuilder(m_tokenizerModel.getStringValue());
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
+    }
+
+    private void throwInvalidURL(final Exception e) throws InvalidSettingsException {
+        var dir = m_pathModel.getStringValue();
+        throw new InvalidSettingsException(String.format("Selected directory:  %s is not valid!", dir), e);
     }
 
     /**
@@ -244,11 +259,17 @@ public class DocumentParserNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-        final File dir = new File(m_pathModel.getStringValue());
+        URL url = null;
+        try {
+            url = FileUtil.toURL(m_pathModel.getStringValue());
+        } catch (InvalidPathException | MalformedURLException e) {
+            throwInvalidURL(e);
+        }
+        final File file = FileUtil.getFileFromURL(url);
         final boolean recursive = m_recursiveModel.getBooleanValue();
         final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
 
-        final FileCollector fc = new FileCollector(dir, m_validExtensions, recursive, ignoreHiddenFiles);
+        final FileCollector fc = new FileCollector(file, m_validExtensions, recursive, ignoreHiddenFiles);
         final List<File> files = fc.getFiles();
         final int numberOfFiles = files.size();
 
@@ -284,6 +305,7 @@ public class DocumentParserNodeModel extends NodeModel {
 
     /**
      * Creates and returns new anonymous {@link Runnable} instance that parses the given chunk of files.
+     *
      * @param files The files to parse.
      * @param exec The exection context.
      * @param semaphore Semaphore to accquire.
