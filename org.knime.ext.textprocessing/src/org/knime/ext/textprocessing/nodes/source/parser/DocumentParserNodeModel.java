@@ -53,7 +53,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
@@ -198,15 +197,9 @@ public class DocumentParserNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         // check selected directory
-        URL url = null;
-        try {
-            url = FileUtil.toURL(m_pathModel.getStringValue());
-        } catch (InvalidPathException | MalformedURLException e) {
-            throwInvalidURL(e);
-        }
-        final var f = FileUtil.getFileFromURL(url);
+        final var f = getFile();
         if (!f.isDirectory() || !f.exists() || !f.canRead()) {
-            throwInvalidURL(null);
+            throw createInvalidUrlException();
         }
 
         // check if specific tokenizer is installed
@@ -218,9 +211,28 @@ public class DocumentParserNodeModel extends NodeModel {
         return new DataTableSpec[]{m_dtBuilder.createDataTableSpec()};
     }
 
-    private void throwInvalidURL(final Exception e) throws InvalidSettingsException {
+    private File getFile() {
+        final var path = m_pathModel.getStringValue();
+        try {
+            final var url = FileUtil.toURL(path);
+
+            final var fileFromUrl = FileUtil.getFileFromURL(url);
+            if (fileFromUrl != null) {
+                return fileFromUrl;
+            }
+        } catch (InvalidPathException | MalformedURLException e) {//NOSONAR
+            // Fallback to the old behavior and let the the file system resolve the path.
+            // This allows to also resolve malformed Windows paths that the file system
+            // can resolve but not the FileUtil class.
+            // Example: "/C:/Users/"
+            // NOTE this is only done for backwards compatibility
+        }
+        return new File(path);
+    }
+
+    private InvalidSettingsException createInvalidUrlException() throws InvalidSettingsException {
         var dir = m_pathModel.getStringValue();
-        throw new InvalidSettingsException(String.format("Selected directory:  %s is not valid!", dir), e);
+        throw new InvalidSettingsException(String.format("Selected directory:  %s is not valid!", dir));
     }
 
     /**
@@ -259,13 +271,7 @@ public class DocumentParserNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-        URL url = null;
-        try {
-            url = FileUtil.toURL(m_pathModel.getStringValue());
-        } catch (InvalidPathException | MalformedURLException e) {
-            throwInvalidURL(e);
-        }
-        final File file = FileUtil.getFileFromURL(url);
+        final File file = getFile();
         final boolean recursive = m_recursiveModel.getBooleanValue();
         final boolean ignoreHiddenFiles = m_ignoreHiddenFilesModel.getBooleanValue();
 
