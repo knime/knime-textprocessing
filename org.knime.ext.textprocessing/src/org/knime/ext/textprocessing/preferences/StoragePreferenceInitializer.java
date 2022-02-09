@@ -84,7 +84,12 @@ public class StoragePreferenceInitializer extends AbstractPreferenceInitializer 
      * @return The specified number of documents to store in a single file store file.
      */
     public static final int fileStoreChunkSize() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            // this might be the case only in weird race conditions (repo loading while KNIME is closed), see AP-18250
+            return DEFAULT_FILESTORE_CHUNKSIZE;
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         if (!pStore.contains(PREF_FILESTORE_CHUNKSIZE)) {
             return DEFAULT_FILESTORE_CHUNKSIZE;
         }
