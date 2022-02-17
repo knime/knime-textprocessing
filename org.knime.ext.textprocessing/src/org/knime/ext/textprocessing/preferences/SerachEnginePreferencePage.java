@@ -74,7 +74,10 @@ public class SerachEnginePreferencePage extends FieldEditorPreferencePage implem
      */
     @Override
     public void init(final IWorkbench workbench) {
-        setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            setPreferenceStore(plugin.getPreferenceStore());
+        }
     }
 
     /* (non-Javadoc)

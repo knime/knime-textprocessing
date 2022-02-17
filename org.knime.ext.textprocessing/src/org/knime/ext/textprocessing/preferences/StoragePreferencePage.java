@@ -92,7 +92,10 @@ public class StoragePreferencePage extends PreferencePage implements IWorkbenchP
     public StoragePreferencePage() {
         super();
         setDescription("Textprocessing Storage Preferences");
-        setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            setPreferenceStore(plugin.getPreferenceStore());
+        }
     }
 
     /**

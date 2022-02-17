@@ -70,10 +70,13 @@ public class SearchEnginePreferenceInitializer extends AbstractPreferenceInitial
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
 
-        //set default values
-        store.setDefault(PREF_SEARCHENGINES, getDefaultSearchEnginesSettingsString());
+            //set default values
+            store.setDefault(PREF_SEARCHENGINES, getDefaultSearchEnginesSettingsString());
+        }
     }
 
     /**
@@ -82,7 +85,11 @@ public class SearchEnginePreferenceInitializer extends AbstractPreferenceInitial
      * @return the search engines settings string
      */
     public static String getSearchEnginesSettingsString() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            return getDefaultSearchEnginesSettingsString();
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         if (!existsSearchEnginesSettings()) {
             return getDefaultSearchEnginesSettingsString();
         }
@@ -93,7 +100,11 @@ public class SearchEnginePreferenceInitializer extends AbstractPreferenceInitial
      * @return {@code true} if search engine settings exist, otherwise {@code false}.
      */
     public static boolean existsSearchEnginesSettings() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            return false;
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         return pStore.contains(PREF_SEARCHENGINES);
     }
 

@@ -89,8 +89,11 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
      * in one file store file.
      */
     public DocumentFileStoreDataCellFactory() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        m_maxCellsInFileStore = pStore.getInt(StoragePreferenceInitializer.PREF_FILESTORE_CHUNKSIZE);
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            final IPreferenceStore pStore = plugin.getPreferenceStore();
+            m_maxCellsInFileStore = pStore.getInt(StoragePreferenceInitializer.PREF_FILESTORE_CHUNKSIZE);
+        }
     }
 
     /**

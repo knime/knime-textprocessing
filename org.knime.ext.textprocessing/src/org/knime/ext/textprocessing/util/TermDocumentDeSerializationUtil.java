@@ -122,8 +122,11 @@ public final class TermDocumentDeSerializationUtil {
 
     private TermDocumentDeSerializationUtil() {
         m_dmlDeserialization = TextprocessingPreferenceInitializer.DEFAULT_DML_DESERIALIZATION;
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-        pStore.addPropertyChangeListener(new TextprocessingPropertyChangeListener());
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            final IPreferenceStore pStore = plugin.getPreferenceStore();
+            pStore.addPropertyChangeListener(new TextprocessingPropertyChangeListener());
+        }
     }
 
     /**

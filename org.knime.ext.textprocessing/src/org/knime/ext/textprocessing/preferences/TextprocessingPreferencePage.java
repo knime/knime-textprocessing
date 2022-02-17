@@ -104,7 +104,10 @@ public class TextprocessingPreferencePage extends PreferencePage implements IWor
      */
     public TextprocessingPreferencePage() {
         super();
-        setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            setPreferenceStore(TextprocessingCorePlugin.getDefault().getPreferenceStore());
+        }
         setDescription("KNIME Textprocessing Preferences");
     }
 

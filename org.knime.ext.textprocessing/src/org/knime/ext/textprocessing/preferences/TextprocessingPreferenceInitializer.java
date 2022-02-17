@@ -71,7 +71,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
 
     /** The default setting whether tokenizer pool is initialized on startup. */
     public static final boolean DEFAULT_TOKENIZER_INIT_ONSTARTUP = true;
-    
+
     /*** The maximum size of the tokenizer pool. */
     public static final int MAX_TOKENIZER_POOLSIZE = 1000;
 
@@ -89,7 +89,7 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
 
     /** Preference key setting whether tokenizer pool is initialized on startup. */
     public static final String PREF_TOKENIZER_INIT_ONSTARTUP = "knime.textprocessing.tokenizer.initonstartup";
-    
+
     /**
      * Preference key for the tokenizer.
      */
@@ -100,13 +100,15 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
-
-        //set default values
-        store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
-        store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
-        store.setDefault(PREF_TOKENIZER_POOLSIZE, DEFAULT_TOKENIZER_POOLSIZE);
-        store.setDefault(PREF_TOKENIZER, DEFAULT_TOKENIZER);
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            IPreferenceStore store = plugin.getPreferenceStore();
+            //set default values
+            store.setDefault(PREF_DML_DESERIALIZATION, DEFAULT_DML_DESERIALIZATION);
+            store.setDefault(PREF_ROW_PREPROCESSING, DEFAULT_ROW_PREPROCESSING);
+            store.setDefault(PREF_TOKENIZER_POOLSIZE, DEFAULT_TOKENIZER_POOLSIZE);
+            store.setDefault(PREF_TOKENIZER, DEFAULT_TOKENIZER);
+        }
     }
 
     /**
@@ -115,7 +117,11 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      * @return the dml deserialization setting
      */
     public static boolean useDmlDeserialization() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            return DEFAULT_DML_DESERIALIZATION;
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         if (!pStore.contains(PREF_DML_DESERIALIZATION)) {
             return DEFAULT_DML_DESERIALIZATION;
         }
@@ -130,7 +136,11 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      */
     @Deprecated
     public static boolean useRowPreprocessing() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            return DEFAULT_ROW_PREPROCESSING;
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         if (!pStore.contains(PREF_ROW_PREPROCESSING)) {
             return DEFAULT_ROW_PREPROCESSING;
         }
@@ -143,7 +153,11 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      * @return the size of the tokenizer pool.
      */
     public static int tokenizerPoolSize() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            return DEFAULT_TOKENIZER_POOLSIZE;
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         if (!pStore.contains(PREF_TOKENIZER_POOLSIZE)) {
             return DEFAULT_TOKENIZER_POOLSIZE;
         }
@@ -156,7 +170,11 @@ public class TextprocessingPreferenceInitializer extends AbstractPreferenceIniti
      * @return a tokenizer name
      */
     public static String tokenizerName() {
-        final IPreferenceStore pStore = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin == null) {
+            return DEFAULT_TOKENIZER;
+        }
+        final IPreferenceStore pStore = plugin.getPreferenceStore();
         if(!pStore.contains(PREF_TOKENIZER)) {
             return DEFAULT_TOKENIZER;
         }

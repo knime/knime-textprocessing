@@ -74,10 +74,13 @@ public class StoragePreferenceInitializer extends AbstractPreferenceInitializer 
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = TextprocessingCorePlugin.getDefault().getPreferenceStore();
+        var plugin = TextprocessingCorePlugin.getDefault();
+        if (plugin != null) {
+            IPreferenceStore store = plugin.getPreferenceStore();
 
-        //set default values
-        store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
+            //set default values
+            store.setDefault(PREF_FILESTORE_CHUNKSIZE, DEFAULT_FILESTORE_CHUNKSIZE);
+        }
     }
 
     /**
