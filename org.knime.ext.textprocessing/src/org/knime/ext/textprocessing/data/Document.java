@@ -57,7 +57,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import org.knime.ext.textprocessing.data.tag.Tagged;
 import org.knime.ext.textprocessing.util.TextContainers;
 
 /**
@@ -83,7 +85,7 @@ import org.knime.ext.textprocessing.util.TextContainers;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Document implements TextContainer, Serializable {
+public class Document implements TextContainer, Serializable, Tagged {
 
     /**
      * Serial Version ID.
@@ -606,5 +608,13 @@ public class Document implements TextContainer, Serializable {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+    }
+
+    /**
+     * @since 4.6
+     */
+    @Override
+    public Stream<Tag> getTagStream() {
+        return Tagged.getTagSetStream(m_sections);
     }
 }

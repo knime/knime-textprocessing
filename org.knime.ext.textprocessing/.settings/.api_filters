@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.ext.textprocessing" version="2">
+    <resource path="src/org/knime/ext/textprocessing/data/tag/TaggedValueMetaData.java" type="org.knime.ext.textprocessing.data.tag.TaggedValueMetaData">
+        <filter comment="We are allowed to use the API" id="574619656">
+            <message_arguments>
+                <message_argument value="DataColumnMetaData"/>
+                <message_argument value="TaggedValueMetaData"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/data/tag/TaggedValueMetaDataCreator.java" type="org.knime.ext.textprocessing.data.tag.TaggedValueMetaDataCreator">
+        <filter comment="We are allowed to use our own API." id="640712815">
+            <message_arguments>
+                <message_argument value="DataColumnMetaDataCreator&lt;T&gt;"/>
+                <message_argument value="TaggedValueMetaDataCreator"/>
+                <message_argument value="create()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/data/tag/TaggedValueMetaDataExtension.java" type="org.knime.ext.textprocessing.data.tag.TaggedValueMetaDataExtension">
+        <filter comment="We are allowed to use the API" id="574619656">
+            <message_arguments>
+                <message_argument value="DataColumnMetaDataExtension&lt;T&gt;"/>
+                <message_argument value="TaggedValueMetaDataExtension"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/data/tag/TaggedValueMetaDataSerializer.java" type="org.knime.ext.textprocessing.data.tag.TaggedValueMetaDataSerializer">
+        <filter comment="We are allowed to use the API" id="574619656">
+            <message_arguments>
+                <message_argument value="DataColumnMetaDataSerializer&lt;T&gt;"/>
+                <message_argument value="TaggedValueMetaDataSerializer"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/StreamablePreprocessingNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel">
+        <filter comment="The super type defines the method" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel"/>
+                <message_argument value="createPreprocessing()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

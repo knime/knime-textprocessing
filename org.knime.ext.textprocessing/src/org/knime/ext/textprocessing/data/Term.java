@@ -54,7 +54,9 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.knime.ext.textprocessing.data.tag.Tagged;
 import org.knime.ext.textprocessing.util.TextContainers;
 
 /**
@@ -69,7 +71,7 @@ import org.knime.ext.textprocessing.util.TextContainers;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Term implements TextContainer, Externalizable {
+public class Term implements TextContainer, Externalizable, Tagged {
 
     /**
      * The default string which separates the words, which is used e.g. in {@link Term#toString()}.
@@ -191,27 +193,18 @@ public class Term implements TextContainer, Externalizable {
      */
     @Override
     public boolean equals(final Object o) {
-        if (o == null) {
-            return false;
-        } else if (!(o instanceof Term)) {
-            return false;
-        }
-        Term t = (Term)o;
-        if (this == t) {
+        if (this == o) {
             return true;
-        }
-
-        if (!t.getWords().equals(getWords())) {
+        } else if (o == null) {
+            return false;
+        } else if (getClass().equals(o.getClass())) {
+            var other = (Term)o;
+            return m_unmodifiable == other.m_unmodifiable//
+                && m_words.equals(other.m_words)//
+                && m_tags.equals(other.m_tags);
+        } else {
             return false;
         }
-        if (!t.getTags().equals(getTags())) {
-            return false;
-        }
-        if (t.isUnmodifiable() != m_unmodifiable) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -303,5 +296,13 @@ public class Term implements TextContainer, Externalizable {
         for (int i = 0; i < size; i++) {
             m_tags.add((Tag)in.readObject());
         }
+    }
+
+    /**
+     * @since 4.6
+     */
+    @Override
+    public Stream<Tag> getTagStream() {
+        return m_tags.stream();
     }
 }

@@ -54,7 +54,9 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.knime.ext.textprocessing.data.tag.Tagged;
 import org.knime.ext.textprocessing.util.TextContainers;
 
 /**
@@ -63,7 +65,7 @@ import org.knime.ext.textprocessing.util.TextContainers;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Paragraph implements TextContainer, Externalizable {
+public class Paragraph implements TextContainer, Externalizable, Tagged {
 
     private static final long serialVersionUID = 8317307915043783911L;
 
@@ -120,6 +122,14 @@ public class Paragraph implements TextContainer, Externalizable {
     @Override
     public String getTextWithWsSuffix() {
         return TextContainers.getTextWithWsSuffix(m_sentences);
+    }
+
+    /**
+     * @since 4.6
+     */
+    @Override
+    public Stream<Tag> getTagStream() {
+       return Tagged.getTagSetStream(m_sentences);
     }
 
     /**

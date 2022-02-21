@@ -54,7 +54,9 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.knime.ext.textprocessing.data.tag.Tagged;
 import org.knime.ext.textprocessing.util.TextContainers;
 
 /**
@@ -66,7 +68,7 @@ import org.knime.ext.textprocessing.util.TextContainers;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class Section implements TextContainer, Externalizable {
+public class Section implements TextContainer, Externalizable, Tagged {
 
     private static final long serialVersionUID = 4227750560050399781L;
 
@@ -231,5 +233,13 @@ public class Section implements TextContainer, Externalizable {
             m_paragraphs.add((Paragraph)in.readObject());
         }
         m_annotation = (SectionAnnotation)in.readObject();
+    }
+
+    /**
+     * @since 4.6
+     */
+    @Override
+    public Stream<Tag> getTagStream() {
+        return Tagged.getTagSetStream(m_paragraphs);
     }
 }

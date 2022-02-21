@@ -1046,4 +1046,10 @@
             TagBuilder="org.knime.ext.textprocessing.data.ExtendedFTBCrabbeCanditeTag">
       </TagSet>
    </extension>
+   <extension
+         point="org.knime.core.DataColumnMetaDataType">
+      <DataColumnMetaData
+            dataColumnMetaDataExtension="org.knime.ext.textprocessing.data.tag.TaggedValueMetaDataExtension">
+      </DataColumnMetaData>
+   </extension>
 </plugin>

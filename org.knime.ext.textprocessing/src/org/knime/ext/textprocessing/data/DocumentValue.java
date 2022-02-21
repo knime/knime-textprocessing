@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.data;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -55,17 +56,26 @@ import javax.swing.ImageIcon;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DataValueComparator;
 import org.knime.core.data.ExtensibleUtilityFactory;
+import org.knime.ext.textprocessing.data.tag.TaggedValue;
 
 /**
  * Interface for the document values.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public interface DocumentValue extends DataValue {
+public interface DocumentValue extends TaggedValue {
     /**
      * @return The document.
      */
     Document getDocument();
+
+    /**
+     * @since 4.6
+     */
+    @Override
+    default Stream<Tag> getTagStream() {
+        return getDocument().getTagStream();
+    }
 
     /**
      * Meta information to this value type.

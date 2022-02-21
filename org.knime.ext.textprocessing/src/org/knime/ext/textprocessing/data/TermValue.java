@@ -48,6 +48,7 @@
 package org.knime.ext.textprocessing.data;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -55,17 +56,26 @@ import javax.swing.ImageIcon;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DataValueComparator;
 import org.knime.core.data.ExtensibleUtilityFactory;
+import org.knime.ext.textprocessing.data.tag.TaggedValue;
 
 /**
  * Interface supporting the term values.
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public interface TermValue extends DataValue {
+public interface TermValue extends TaggedValue {
     /**
      * @return The {@link org.knime.ext.textprocessing.data.Term} instance.
      */
     Term getTermValue();
+
+    /**
+     * @since 4.6
+     */
+    @Override
+    default Stream<Tag> getTagStream() {
+        return getTermValue().getTagStream();
+    }
 
     /**
      * Meta information to this value type.
