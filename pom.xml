@@ -22,6 +22,7 @@
 
 	<modules>
         <module>org.knime.ext.textprocessing</module>
+        <module>org.knime.ext.textprocessing.tests</module>
         <module>org.knime.ext.textprocessing.language.arabic</module>
         <module>org.knime.ext.textprocessing.language.chinese</module>
         <module>org.knime.ext.textprocessing.language.french</module>
