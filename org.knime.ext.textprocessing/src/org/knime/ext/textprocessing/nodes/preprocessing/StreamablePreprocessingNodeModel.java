@@ -97,12 +97,6 @@ public abstract class StreamablePreprocessingNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected abstract TermPreprocessing createPreprocessing() throws Exception;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected TermPreprocessing createPreprocessingWithInternals(final StreamableOperatorInternals internals)
         throws Exception {
         throw new UnsupportedOperationException("Not implemented");

@@ -54,6 +54,7 @@ import java.io.IOException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
@@ -81,7 +82,6 @@ import org.knime.core.node.streamable.PortOutput;
 import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.core.node.streamable.StreamableOperatorInternals;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
-import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
 
 /**
@@ -229,7 +229,24 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
      *         the input documents.
      * @throws Exception If preprocessing instance cannot be created.
      */
-    protected abstract T createPreprocessing() throws Exception;
+    protected T createPreprocessing() throws Exception {
+        throw new NotImplementedException(
+            "Either createPreprocessing() or createPreprocessing(DataTableSpec) must be implemented in subclasses of "
+                + GenericStreamablePreprocessingNodeModel.class.getSimpleName());
+    }
+
+    /**
+     * Creates a new instance of an implementation of {@link Preprocessing} that will be used to preprocess the terms of
+     * the input documents. Extending classes need to create the corresponding preprocessing instance here.
+     *
+     * @param columnSpec the {@link DataColumnSpec} of the document column for which the preprocessing is created
+     * @return A new instance of an implementation of {@link Preprocessing} that will be used to preprocess the terms of
+     *         the input documents.
+     * @throws Exception If preprocessing instance cannot be created.
+     */
+    protected T createPreprocessing(final DataColumnSpec columnSpec) throws Exception {
+        return createPreprocessing();
+    }
 
     /**
      * Creates a new instance of an implementation of {@link Preprocessing} that will be used to preprocess the terms of
@@ -334,13 +351,17 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
 
         // create new column spec
-        final TextContainerDataCellFactory docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
-        final DataColumnSpec docCol = new DataColumnSpecCreator(newColName, docFactory.getDataType()).createSpec();
+        final var docFactory = TextContainerDataCellFactoryBuilder.createDocumentCellFactory();
+        final var selectedDocCol = in.getColumnSpec(docColIndex);
+        var docColCreator = new DataColumnSpecCreator(selectedDocCol);
+        docColCreator.setType(docFactory.getDataType());
+        docColCreator.setName(newColName);
+        final DataColumnSpec docCol = docColCreator.createSpec();
 
         // create cell factory and column rearranger
         try {
 
-            T preprocessing = createPreprocessing();
+            T preprocessing = createPreprocessing(selectedDocCol);
             if (preprocessing == null) {
                 preprocessing = createPreprocessingWithInternals(internals);
             }

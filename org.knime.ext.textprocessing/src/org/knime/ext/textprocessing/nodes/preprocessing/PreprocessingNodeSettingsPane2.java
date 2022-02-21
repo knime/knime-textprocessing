@@ -72,7 +72,7 @@ public class PreprocessingNodeSettingsPane2 extends DefaultNodeSettingsPane {
      */
     public static SettingsModelBoolean getReplaceDocumentModel() {
         return new SettingsModelBoolean(PreprocessingConfigKeys2.CFG_KEY_REPLACE_DOC,
-            StreamablePreprocessingNodeModel.DEF_REPLACE);
+            GenericStreamablePreprocessingNodeModel.DEF_REPLACE);
     }
 
     /**
@@ -89,7 +89,7 @@ public class PreprocessingNodeSettingsPane2 extends DefaultNodeSettingsPane {
      */
     public static SettingsModelString getNewDocumentColumnModel() {
         return new SettingsModelString(PreprocessingConfigKeys2.CFG_KEY_NEW_DOCUMENT_COL,
-            StreamablePreprocessingNodeModel.DEF_NEW_DOCUMENT_COL);
+            GenericStreamablePreprocessingNodeModel.DEF_NEW_DOCUMENT_COL);
     }
 
     /**
@@ -98,12 +98,14 @@ public class PreprocessingNodeSettingsPane2 extends DefaultNodeSettingsPane {
      */
     public static SettingsModelBoolean getPreprocessUnmodifiableModel() {
         return new SettingsModelBoolean(PreprocessingConfigKeys2.CFG_KEY_PREPRO_UNMODIFIABLE,
-            StreamablePreprocessingNodeModel.DEF_PREPRO_UNMODIFIABLE);
+            GenericStreamablePreprocessingNodeModel.DEF_PREPRO_UNMODIFIABLE);
     }
 
     private final SettingsModelBoolean m_replaceDocModel = getReplaceDocumentModel();
 
     private final SettingsModelString m_newDocumentColModel =  getNewDocumentColumnModel();
+
+    private final SettingsModelString m_docColModel = getDocumentColumnModel();
 
     /**
      * Creates new instance of {@code PreprocessingNodeSettingsPane}.
@@ -113,9 +115,8 @@ public class PreprocessingNodeSettingsPane2 extends DefaultNodeSettingsPane {
         removeTab("Options");
         createNewTabAt("Preprocessing", 1);
 
-        SettingsModelString documentColModel = getDocumentColumnModel();
         DialogComponentColumnNameSelection docComp =
-            new DialogComponentColumnNameSelection(documentColModel, "Document column", 0, DocumentValue.class);
+            new DialogComponentColumnNameSelection(m_docColModel, "Document column", 0, DocumentValue.class);
         docComp.setToolTipText("The documents to preprocess.");
         addDialogComponent(docComp);
 
@@ -134,6 +135,14 @@ public class PreprocessingNodeSettingsPane2 extends DefaultNodeSettingsPane {
         setHorizontalPlacement(false);
 
         addDialogComponent(new DialogComponentBoolean(getPreprocessUnmodifiableModel(), "Ignore unmodifiable flag"));
+    }
+
+    /**
+     * @return the model holding the document column
+     * @since 4.6
+     */
+    protected final SettingsModelString getDocumentColumnSettingsModel() {
+        return m_docColModel;
     }
 
     private final class ColumnHandlingListener implements ChangeListener {
