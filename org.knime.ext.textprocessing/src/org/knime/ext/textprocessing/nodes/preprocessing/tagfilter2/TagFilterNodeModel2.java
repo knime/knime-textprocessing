@@ -48,9 +48,11 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter2;
 
-import java.util.HashSet;
+import static java.util.stream.Collectors.toSet;
+
 import java.util.Set;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -58,9 +60,10 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagBuilder;
-import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.data.tag.TagSet;
+import org.knime.ext.textprocessing.data.tag.TagSets;
 import org.knime.ext.textprocessing.nodes.preprocessing.StreamableFunctionPreprocessingNodeModel;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 
@@ -85,22 +88,19 @@ public class TagFilterNodeModel2 extends StreamableFunctionPreprocessingNodeMode
 
     private final SettingsModelStringArray m_validTagsModel = TagFilterNodeDialog2.getValidTagsModel();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected TermPreprocessing createPreprocessing() throws Exception {
-        final TagBuilder tb = TagFactory.getInstance().getTagSetByType(m_tagTypeModel.getStringValue());
-        final Set<Tag> validTags = new HashSet<>(m_validTagsModel.getStringArrayValue().length);
-
-        for (final String s : m_validTagsModel.getStringArrayValue()) {
-            final Tag t = tb.buildTag(s);
-            if (t != null) {
-                validTags.add(t);
-            }
-        }
-
-        return new TagFilter(validTags, tb.getType(), m_strictFilteringModel.getBooleanValue(),
+    protected TermPreprocessing createPreprocessing(final DataColumnSpec docCol) throws Exception {
+        final var tagType = m_tagTypeModel.getStringValue();
+        final var tagSet = TagSets.getTagSets(docCol).stream()//
+            .filter(t -> tagType.equals(t.getType()))//
+            .findFirst()//
+            .orElseThrow(() -> new InvalidSettingsException(
+                String.format("The selected tag type '%s' is not among the tagsets used in %s.", tagType, docCol)));
+        final Set<String> validTagValues = Set.of(m_validTagsModel.getStringArrayValue());
+        final Set<Tag> validTags = tagSet.getTags().stream()//
+            .filter(t -> validTagValues.contains(t.getTagValue()))//
+            .collect(toSet());
+        return new TagFilter(validTags, tagSet.getType(), m_strictFilteringModel.getBooleanValue(),
             m_filterMatchingModel.getBooleanValue());
     }
 
@@ -109,12 +109,18 @@ public class TagFilterNodeModel2 extends StreamableFunctionPreprocessingNodeMode
      */
     @Override
     protected void internalConfigure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        final TagBuilder tb = TagFactory.getInstance().getTagSetByType(m_tagTypeModel.getStringValue());
-        if (tb == null) {
-            throw new InvalidSettingsException("Selected tag type \"" + m_tagTypeModel.getStringValue()
-                + "\" could not be found, due to missing language extension!\n"
-                + "Install additional language extensions at File->Install KNIME Extensions.");
-        }
+        var tableSpec = inSpecs[0];
+        var docColumn = getDocumentColumn();
+        var columnSpec = tableSpec.getColumnSpec(docColumn);
+        CheckUtils.checkSettingNotNull(columnSpec, "The selectedColumn '%s' is missing from the input table.",
+            docColumn);
+        var selectedTagType = m_tagTypeModel.getStringValue();
+        CheckUtils.checkSetting(
+            TagSets.getTagSets(columnSpec).stream().map(TagSet::getType).anyMatch(selectedTagType::equals),
+            "Selected tag type \"%s\" could not be found.\n"
+            + "This might happend because it is either a dynamic TagSet that is undefined for the selected column '%s'\n"
+            + "or it is a TagSet defined by a missing language extension!\n"
+            + "Install additional language extensions at File->Install KNIME Extensions.", selectedTagType, docColumn);
     }
 
     /**

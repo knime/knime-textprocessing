@@ -48,24 +48,31 @@
  */
 package org.knime.ext.textprocessing.nodes.preprocessing.tagfilter2;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.TagFactory;
+import org.knime.ext.textprocessing.data.tag.TagSet;
+import org.knime.ext.textprocessing.data.tag.TagSets;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 
 /**
@@ -108,9 +115,15 @@ public class TagFilterNodeDialog2 extends PreprocessingNodeSettingsPane2 {
         return new SettingsModelStringArray(TagFilterConfigKeys2.CFGKEY_VALIDTAGS, new String[]{});
     }
 
-    private SettingsModelString m_tagtypemodel;
+    private final SettingsModelString m_tagtypemodel;
 
-    private DialogComponentStringListSelection m_tagValuesSelectionList;
+    private final DialogComponentStringListSelection m_tagValuesSelectionList;
+
+    private final DialogComponentStringSelection m_tagTypes;
+
+    private DataTableSpec m_lastTableSpec;
+
+    private Map<String, TagSet> m_currentTagSets = toTagSetMap(TagSets.getInstalledTagSets());
 
     /**
      * Creates a new instance of {@link TagFilterNodeDialog2}
@@ -125,41 +138,66 @@ public class TagFilterNodeDialog2 extends PreprocessingNodeSettingsPane2 {
         addDialogComponent(new DialogComponentBoolean(getFilterMatchingModel(), "Filter matching"));
 
         m_tagtypemodel = getTagTypeModel();
-        m_tagtypemodel.addChangeListener(new InternalChangeListener());
 
-        addDialogComponent(
-            new DialogComponentStringSelection(m_tagtypemodel, "Tag type", TagFactory.getInstance().getTagTypes()));
+        getDocumentColumnSettingsModel().addChangeListener(e -> updateTagModels());
+
+        m_tagTypes = new DialogComponentStringSelection(m_tagtypemodel, "Tag type", m_currentTagSets.keySet());
+
+        addDialogComponent(m_tagTypes);
 
         m_tagValuesSelectionList = new DialogComponentStringListSelection(getValidTagsModel(), "Tags", getTagList(),
             ListSelectionModel.MULTIPLE_INTERVAL_SELECTION, true, 10);
 
+        m_tagtypemodel.addChangeListener(e -> m_tagValuesSelectionList.replaceListItems(getTagList(), ""));
         addDialogComponent(m_tagValuesSelectionList);
     }
 
+    private static Map<String, TagSet> toTagSetMap(final Set<TagSet> tagSets) {
+        return tagSets.stream().collect(Collectors.toMap(TagSet::getType, Function.identity()));
+    }
+
+    private boolean updateTagModels() {
+        if (m_lastTableSpec != null) {
+            var columnName = getDocumentColumnSettingsModel().getStringValue();
+            var column = m_lastTableSpec.getColumnSpec(columnName);
+            var tagSets = TagSets.getTagSets(column);
+            var newTagSets = toTagSetMap(tagSets);
+            boolean tagSetsChanged = !m_currentTagSets.equals(newTagSets);
+            m_currentTagSets = toTagSetMap(tagSets);
+            var selectedType = m_tagtypemodel.getStringValue();
+            var tagTypes = m_currentTagSets.keySet();
+            final var newSelection = tagTypes.contains(selectedType) ? selectedType : tagTypes.iterator().next();
+            m_tagTypes.replaceListItems(tagTypes, newSelection);
+            m_tagtypemodel.setStringValue(newSelection);
+            return tagSetsChanged;
+        }
+        return false;
+    }
+
     private List<String> getTagList() {
-        final String selectedTagType = m_tagtypemodel.getStringValue();
-        final Set<Tag> validTags = TagFactory.getInstance().getTagSetByType(selectedTagType).getTags();
-        final List<String> tagStrs = new ArrayList<String>();
-        for (final Tag t : validTags) {
-            tagStrs.add(t.getTagValue());
-        }
-        Collections.sort(tagStrs);
-
-        return tagStrs;
-    }
-
-    /**
-     *
-     * @author Kilian Thiel, KNIME.com, Berlin, Germany
-     */
-    class InternalChangeListener implements ChangeListener {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            m_tagValuesSelectionList.replaceListItems(getTagList(), "");
+        final var selectedTagType = m_tagtypemodel.getStringValue();
+        final var tagSet = m_currentTagSets.get(selectedTagType);
+        // might be null during load
+        if (tagSet == null) {
+            return List.of("");
+        } else {
+            return tagSet.getTags().stream()//
+                .map(Tag::getTagValue)//
+                .sorted()//
+                .collect(toList());
         }
     }
+
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        super.loadAdditionalSettingsFrom(settings, specs);
+        m_lastTableSpec = specs[0];
+        if (updateTagModels()) {
+            // loads the settings again in case we have different tag sets available
+            var upcastedSpecs = Stream.of(specs).toArray(PortObjectSpec[]::new);
+            loadSettingsFrom(settings, upcastedSpecs);
+        }
+    }
+
 }
