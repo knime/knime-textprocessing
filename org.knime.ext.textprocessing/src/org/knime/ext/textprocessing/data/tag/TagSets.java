@@ -74,6 +74,7 @@ import org.knime.ext.textprocessing.data.TagFactory;
  * {@link DataColumnSpec}.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @since 4.6
  */
 public final class TagSets {
 
@@ -94,16 +95,30 @@ public final class TagSets {
     /**
      * Retrieves the installed TagSets as well as any dynamic TagSets that are stored as meta data in columnSpec.
      *
-     * @param columnSpec to retrieve tag sets from
-     * @return the tag sets in the meta data of columnSpec
+     * @param columnSpec to retrieve TagSets from
+     * @return the TagSets in the meta data of columnSpec
      */
     public static Set<TagSet> getTagSets(final DataColumnSpec columnSpec) {
         return Stream.concat(//
             INSTALLED_TAG_SETS.values().stream(), //
-            columnSpec.getMetaDataOfType(TaggedValueMetaData.class).stream()//
-                .map(TaggedValueMetaData::getTagSets)//
-                .flatMap(Set::stream))//
+            extractDynamicTagSets(columnSpec))//
             .collect(toCollection(LinkedHashSet::new));
+    }
+
+    /**
+     * Retrieves the dynamic TagSets that are stored as meta data in columnSpec.
+     *
+     * @param columnSpec to retrieve dynamic TagSets from
+     * @return the dynamic TagSets in the meta data of columnSpec
+     */
+    public static Set<TagSet> getDynamicTagSets(final DataColumnSpec columnSpec) {
+        return extractDynamicTagSets(columnSpec).collect(toCollection(LinkedHashSet::new));
+    }
+
+    private static Stream<TagSet> extractDynamicTagSets(final DataColumnSpec columnSpec) {
+        return columnSpec.getMetaDataOfType(TaggedValueMetaData.class).stream()//
+                .map(TaggedValueMetaData::getTagSets)//
+                .flatMap(Set::stream);
     }
 
     /**
