@@ -58,6 +58,7 @@ import org.knime.ext.textprocessing.data.Tag;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @noimplement This interface is not intended to be implemented by clients.
+ * @since 4.6
  */
 public interface TagSet {
 

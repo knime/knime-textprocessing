@@ -54,6 +54,7 @@ import org.knime.core.data.DataValue;
  * A DataValue that can be tagged.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @since 4.6
  */
 public interface TaggedValue extends Tagged, DataValue {
     // marker interface

@@ -57,6 +57,7 @@ import org.knime.core.data.meta.DataColumnMetaDataSerializer;
  * Ties together the TaggedValueMetaData with its creator and serializer.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @since 4.6
  */
 public final class TaggedValueMetaDataExtension implements DataColumnMetaDataExtension<TaggedValueMetaData> {
 
