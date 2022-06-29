@@ -48,7 +48,9 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.documenttostring;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
@@ -78,18 +80,16 @@ final class DocumentToStringHelper {
      * @param sections list of sections
      * @return Returns a string of whitespace-separated terms
      */
-    protected static final String createSeparatedString(final List<Section> sections) {
-        final StringBuilder sb = new StringBuilder();
-        for (final Section section : sections) {
-            for (final Paragraph paragraph : section.getParagraphs()) {
-                for (final Sentence sentence : paragraph.getSentences()) {
-                    for (final Term term : sentence.getTerms()) {
-                        sb.append(term.getText());
-                        sb.append(WHITESPACE);
-                    }
-                }
-            }
-        }
-        return sb.toString();
+    static final String createSeparatedString(final List<Section> sections) {
+        return sections.stream()//
+                .map(Section::getParagraphs)//
+                .flatMap(Collection::stream)//
+                .map(Paragraph::getSentences)//
+                .flatMap(Collection::stream)//
+                .map(Sentence::getTerms)//
+                .flatMap(Collection::stream)//
+                .map(Term::getText)//
+                .collect(Collectors.joining(WHITESPACE));
     }
+
 }
