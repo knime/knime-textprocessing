@@ -55,10 +55,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.ListSelectionModel;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NotConfigurableException;
@@ -68,7 +68,6 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
-import org.knime.core.node.port.PortObjectSpec;
 import org.knime.ext.textprocessing.data.NamedEntityTag;
 import org.knime.ext.textprocessing.data.Tag;
 import org.knime.ext.textprocessing.data.tag.TagSet;
@@ -119,6 +118,8 @@ public class TagFilterNodeDialog2 extends PreprocessingNodeSettingsPane2 {
 
     private final DialogComponentStringListSelection m_tagValuesSelectionList;
 
+    private final SettingsModelStringArray m_tagValuesModel = getValidTagsModel();
+
     private final DialogComponentStringSelection m_tagTypes;
 
     private DataTableSpec m_lastTableSpec;
@@ -145,7 +146,7 @@ public class TagFilterNodeDialog2 extends PreprocessingNodeSettingsPane2 {
 
         addDialogComponent(m_tagTypes);
 
-        m_tagValuesSelectionList = new DialogComponentStringListSelection(getValidTagsModel(), "Tags", getTagList(),
+        m_tagValuesSelectionList = new DialogComponentStringListSelection(m_tagValuesModel, "Tags", getTagList(),
             ListSelectionModel.MULTIPLE_INTERVAL_SELECTION, true, 10);
 
         m_tagtypemodel.addChangeListener(e -> m_tagValuesSelectionList.replaceListItems(getTagList(), ""));
@@ -156,22 +157,25 @@ public class TagFilterNodeDialog2 extends PreprocessingNodeSettingsPane2 {
         return tagSets.stream().collect(Collectors.toMap(TagSet::getType, Function.identity()));
     }
 
-    private boolean updateTagModels() {
+    private void updateTagModels() {
         if (m_lastTableSpec != null) {
-            var columnName = getDocumentColumnSettingsModel().getStringValue();
-            var column = m_lastTableSpec.getColumnSpec(columnName);
-            var tagSets = TagSets.getTagSets(column);
-            var newTagSets = toTagSetMap(tagSets);
-            boolean tagSetsChanged = !m_currentTagSets.equals(newTagSets);
+            var tagSets = TagSets.getTagSets(getSelectedColumn());
             m_currentTagSets = toTagSetMap(tagSets);
             var selectedType = m_tagtypemodel.getStringValue();
             var tagTypes = m_currentTagSets.keySet();
             final var newSelection = tagTypes.contains(selectedType) ? selectedType : tagTypes.iterator().next();
+            var tagSelection = m_tagValuesModel.getStringArrayValue();
             m_tagTypes.replaceListItems(tagTypes, newSelection);
             m_tagtypemodel.setStringValue(newSelection);
-            return tagSetsChanged;
+            if (selectedType.equals(newSelection)) {
+                // preserve tag selection if the tag type is the same
+                m_tagValuesModel.setStringArrayValue(tagSelection);
+            }
         }
-        return false;
+    }
+
+    private DataColumnSpec getSelectedColumn() {
+        return m_lastTableSpec.getColumnSpec(getDocumentColumnSettingsModel().getStringValue());
     }
 
     private List<String> getTagList() {
@@ -193,11 +197,7 @@ public class TagFilterNodeDialog2 extends PreprocessingNodeSettingsPane2 {
         throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
         m_lastTableSpec = specs[0];
-        if (updateTagModels()) {
-            // loads the settings again in case we have different tag sets available
-            var upcastedSpecs = Stream.of(specs).toArray(PortObjectSpec[]::new);
-            loadSettingsFrom(settings, upcastedSpecs);
-        }
+        updateTagModels();
     }
 
 }
