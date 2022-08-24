@@ -47,6 +47,12 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.tagtoString;
 
+import java.util.stream.Collectors;
+
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
@@ -54,6 +60,8 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringListSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.ext.textprocessing.data.TermValue;
+import org.knime.ext.textprocessing.data.tag.TagSet;
+import org.knime.ext.textprocessing.data.tag.TagSets;
 
 /**
  *
@@ -84,17 +92,50 @@ public class TagToStringNodeDialog extends DefaultNodeSettingsPane {
             TagToStringNodeModel.DEFAULT_MISSING_VALUE);
     }
 
+    private final SettingsModelString m_termCol = getTermColModel();
+
+    private final SettingsModelStringArray m_tagTypesModel = getTagTypesModel();
+
+    private final DialogComponentStringListSelection m_tagTypesList;
+
+    private DataTableSpec m_lastTableSpec;
+
     /**
      * Creates a new instance of <code>TagToStringNodeDialog</code>, providing the dialog components.
      */
     @SuppressWarnings("unchecked")
     public TagToStringNodeDialog() {
         addDialogComponent(
-            new DialogComponentColumnNameSelection(getTermColModel(), "Term column", 0, TermValue.class));
+            new DialogComponentColumnNameSelection(m_termCol, "Term column", 0, TermValue.class));
 
-        String[] allTagTypes = TagToStringNodeModel.ALL_TAG_TYPES.toArray(new String[0]);
-        addDialogComponent(new DialogComponentStringListSelection(getTagTypesModel(), "Tag types", allTagTypes));
+        m_termCol.addChangeListener(c -> updateTagModels());
+
+        String[] allTagTypes = TagSets.getInstalledTagSets().stream().map(TagSet::getType).toArray(String[]::new);
+        m_tagTypesList = new DialogComponentStringListSelection(m_tagTypesModel, "Tag types", allTagTypes);
+        addDialogComponent(m_tagTypesList);
 
         addDialogComponent(new DialogComponentString(getMissingTagModel(), "Missing tag value", false, 15));
+    }
+
+    @Override
+    public void loadAdditionalSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        super.loadAdditionalSettingsFrom(settings, specs);
+        m_lastTableSpec = specs[0];
+        updateTagModels();
+    }
+
+    private void updateTagModels() {
+        if (m_lastTableSpec != null) {
+            var availableTagTypes = TagSets.getTagSets(getSelectedColumn()).stream()//
+                    .map(TagSet::getType)//
+                    .collect(Collectors.toList());
+            // null means that the previous selection remains
+            m_tagTypesList.replaceListItems(availableTagTypes, (String[])null);
+        }
+    }
+
+    private DataColumnSpec getSelectedColumn() {
+        return m_lastTableSpec.getColumnSpec(m_termCol.getStringValue());
     }
 }

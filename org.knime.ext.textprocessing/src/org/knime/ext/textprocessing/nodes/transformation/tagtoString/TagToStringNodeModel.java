@@ -169,13 +169,10 @@ public class TagToStringNodeModel extends NodeModel {
         throws Exception {
         checkDataTableSpec(inData[0].getDataTableSpec());
 
-        List<String> tagTypes = new ArrayList<String>();
-        for (String tagType : m_tagTypesModel.getStringArrayValue()) {
-            tagTypes.add(tagType);
-        }
+        var tagTypes = List.of(m_tagTypesModel.getStringArrayValue());
         CellFactory cellFac = new TagToStringCellFactory(m_termColIndex, tagTypes, inData[0].getDataTableSpec(),
             m_missingTagValueModel.getStringValue());
-        ColumnRearranger rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
+        var rearranger = new ColumnRearranger(inData[0].getDataTableSpec());
         rearranger.append(cellFac);
 
         return new BufferedDataTable[]{exec.createColumnRearrangeTable(inData[0], rearranger, exec)};
