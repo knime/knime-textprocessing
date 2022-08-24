@@ -47,8 +47,9 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.tagtoString;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -60,7 +61,6 @@ import org.knime.core.data.container.AbstractCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.textprocessing.data.Tag;
-import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermValue;
 
 /**
@@ -117,27 +117,19 @@ public class TagToStringCellFactory extends AbstractCellFactory {
      */
     @Override
     public DataCell[] getCells(final DataRow row) {
-        if (!row.getCell(m_termColIndex).isMissing()) {
-            Term t = ((TermValue)row.getCell(m_termColIndex)).getTermValue();
+        final var cell = row.getCell(m_termColIndex);
+        if (!cell.isMissing()) {
+            var term = ((TermValue)cell).getTermValue();
             // get tag types and values
-            Hashtable<String, String> appliedTagTypes =
-                new Hashtable<String, String>();
-            for (Tag tag : t.getTags()) {
+            Map<String, String> appliedTagTypes = new HashMap<>();
+            for (Tag tag : term.getTags()) {
                 appliedTagTypes.put(tag.getTagType(), tag.getTagValue());
             }
             // create new data cells
-            DataCell[] newCells = new DataCell[m_tagTypes.size()];
-            int i = 0;
-            for (String tagType : m_tagTypes) {
-                String tagVal = appliedTagTypes.get(tagType);
-                if (tagVal != null) {
-                    newCells[i] = new StringCell(tagVal);
-                } else {
-                    newCells[i] = m_missingCell;
-                }
-                i++;
-            }
-            return newCells;
+            return m_tagTypes.stream()//
+                    .map(appliedTagTypes::get)//
+                    .map(t -> t != null ? new StringCell(t) : m_missingCell)
+                    .toArray(DataCell[]::new);
         } else {
             return new DataCell[]{DataType.getMissingCell()};
         }
