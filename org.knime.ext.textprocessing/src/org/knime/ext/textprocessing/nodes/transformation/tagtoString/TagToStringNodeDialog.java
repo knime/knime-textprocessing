@@ -123,6 +123,8 @@ public class TagToStringNodeDialog extends DefaultNodeSettingsPane {
         super.loadAdditionalSettingsFrom(settings, specs);
         m_lastTableSpec = specs[0];
         updateTagModels();
+        // needs to be loaded again because dynamic tag sets are only available after updateTagModels() has been called
+        m_tagTypesList.loadSettingsFrom(settings, specs);
     }
 
     private void updateTagModels() {
