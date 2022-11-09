@@ -7,7 +7,7 @@ Bundle-Activator: org.knime.ext.textprocessing.language.arabic.TextprocessingAra
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.knime.core;bundle-version="[4.1.0,5.0.0)",
+ org.knime.core;bundle-version="[4.7.0,5.0.0)",
  org.knime.ext.textprocessing;bundle-version="[4.1.0,5.0.0)",
  edu.stanford.nlp.stanford-corenlp;bundle-version="[3.9.1,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
