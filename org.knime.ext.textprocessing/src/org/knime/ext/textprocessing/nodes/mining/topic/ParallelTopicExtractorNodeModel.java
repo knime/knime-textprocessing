@@ -107,14 +107,6 @@ import cc.mallet.types.InstanceList;
 public class ParallelTopicExtractorNodeModel extends NodeModel {
 
     private final class LogTranslator extends Handler {
-        /**
-         * This constant is extracted from {@link LogRecord} where it is used to determine if the given thread id fits
-         * into int. "The default value of threadID will be the current thread's thread id, for ease of correlation,
-         * unless it is greater than MIN_SEQUENTIAL_THREAD_ID, in which case we try harder to keep our promise to keep
-         * threadIDs unique by avoiding collisions due to 32-bit wraparound. Unfortunately, LogRecord.getThreadID()
-         * returns int, while Thread.getId() returns long."
-         */
-        private static final int MIN_SEQUENTIAL_THREAD_ID = Integer.MAX_VALUE / 2;
 
         private final Pattern m_progressPattern = Pattern.compile("<([0-9]+)> .* (-?[0-9]*[,\\.]?[0-9]+)");
 
@@ -122,7 +114,7 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
 
         private final ExecutionMonitor m_exec;
 
-        private final long m_threadId;
+        private final int m_shortThreadId;
 
         private long m_rowidCounter = 0;
 
@@ -141,13 +133,9 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
             m_exec = exec;
             m_model = model;
             //use the thread id to distinguish between parallel executed threads
-            //this code is copied from LogRecord#defaultThreadID()
-            long tid = Thread.currentThread().getId();
-            if (tid < MIN_SEQUENTIAL_THREAD_ID) {
-                m_threadId = (int)tid;
-            } else {
-                m_threadId = -1;
-            }
+            //we use a temporary log record to get the integer thread id that all log records of this thread will have
+            var tmpLogRecord = new LogRecord(Level.FINEST, "Temporary log record for getting the thread id");
+            m_shortThreadId = tmpLogRecord.getThreadID();
             m_dc = exec.createDataContainer(createDetailedTableSpec());
         }
 
@@ -156,9 +144,8 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
          */
         @Override
         public void publish(final LogRecord record) {
-            final int threadID = record.getThreadID();
-            if (m_threadId < 0 || m_threadId != threadID) {
-                //this is either not the thread we are listen to or we couldn't determine the right thread id at all
+            if (m_shortThreadId != record.getThreadID()) {
+                //this is not the thread we listen to
                 return;
             }
             final Level level = record.getLevel();
