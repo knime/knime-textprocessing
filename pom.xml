@@ -54,6 +54,11 @@
 			<url>${knime.core.p2}</url>
 		</repository>
 		<repository>
+			<id>knime.core.ui.p2</id>
+			<layout>p2</layout>
+			<url>${knime.core.ui.p2}</url>
+		</repository>
+		<repository>
 			<id>knime.expressions.p2</id>
 			<layout>p2</layout>
 			<url>${knime.expressions.p2}</url>
