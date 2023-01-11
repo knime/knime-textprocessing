@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Turkish Language Pack
 Bundle-SymbolicName: org.knime.ext.textprocessing.language.turkish;singleton:=true
-Bundle-Version: 3.7.0.qualifier
+Bundle-Version: 5.0.0.qualifier
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Automatic-Module-Name: org.knime.ext.textprocessing.language.turkish
 Bundle-RequiredExecutionEnvironment: JavaSE-11
