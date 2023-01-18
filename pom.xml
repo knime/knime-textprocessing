@@ -79,11 +79,6 @@
 			<url>${knime.javasnippet.p2}</url>
 		</repository>
 		<repository>
-			<id>knime.dl4j.p2</id>
-			<layout>p2</layout>
-			<url>${knime.dl4j.p2}</url>
-		</repository>
-		<repository>
 			<id>knime-svg</id>
 			<layout>p2</layout>
 			<url>${knime.svg.p2}</url>
