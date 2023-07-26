@@ -41,11 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   04.01.2007 (thiel): created
  */
 package org.knime.ext.textprocessing.data;
+
+import java.util.Comparator;
+import java.util.List;
 
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DataValueComparator;
@@ -53,23 +56,56 @@ import org.knime.core.data.DataValueComparator;
 /**
  * Comparator returned by the
  * {@link org.knime.ext.textprocessing.data.TermValue} interface.
- * 
+ *
  * @see org.knime.ext.textprocessing.data.TermValue#UTILITY
  * @see org.knime.ext.textprocessing.data.TermValue.TermUtilityFactory
  * @author Kilian Thiel, University of Konstanz
  */
 public class TermValueComparator extends DataValueComparator {
 
+    private static final Comparator<Tag> TAG_CMP = (t1, t2) -> {
+        if (t1.equals(t2)) {
+            return 0;
+        }
+        final var tt1 = t1.getTagType();
+        final var tt2 = t2.getTagType();
+        if (tt1.equals(tt2)) {
+            return t1.getTagValue().compareTo(t2.getTagValue());
+        }
+        return tt1.compareTo(tt2);
+    };
+
+    private static final Comparator<List<Tag>> TAGS_CMP = (tags1, tags2) -> {
+        if (tags1.size() != tags2.size()) {
+            return tags1.size() - tags2.size();
+        }
+        for (var i = 0; i < tags1.size(); i++) {
+            final int cmp = TAG_CMP.compare(tags1.get(i), tags2.get(i));
+            if (cmp != 0) {
+                return cmp;
+            }
+        }
+        return 0;
+    };
+
     /**
      * Compares two {@link org.knime.ext.textprocessing.data.TermValue}s based
-     * on their words (tags are ignored).
-     * 
+     * on their words and tags.
+     *
      * {@inheritDoc}
      */
     @Override
     protected int compareDataValues(final DataValue v1, final DataValue v2) {
-        String str1 = ((TermValue)v1).getTermValue().getText();
-        String str2 = ((TermValue)v2).getTermValue().getText();
+        final var t1 = ((TermValue)v1).getTermValue();
+        final var t2 = ((TermValue)v2).getTermValue();
+        if (t1.equals(t2)) {
+            return 0;
+        }
+        final var str1 = t1.getText();
+        final var str2 = t2.getText();
+        if (str1.equals(str2)) {
+            return Comparator.comparing(Term::getTags, TAGS_CMP).compare(t1, t2);
+        }
         return str1.compareTo(str2);
     }
 
