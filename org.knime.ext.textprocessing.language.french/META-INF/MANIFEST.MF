@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing French Language Pack
 Bundle-SymbolicName: org.knime.ext.textprocessing.language.french;singleton:=true
-Bundle-Version: 5.0.0.qualifier
+Bundle-Version: 5.2.0.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.language.french.TextprocessingFrenchLanguagePack
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.knime.core;bundle-version="3.4.0",
- org.knime.ext.textprocessing;bundle-version="3.4.0",
+ org.knime.core;bundle-version="[5.2.0,6.0.0)",
+ org.knime.ext.textprocessing;bundle-version="[5.2.0,6.0.0)",
  org.apache.pdfbox.fontbox;bundle-version="2.0.7"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
