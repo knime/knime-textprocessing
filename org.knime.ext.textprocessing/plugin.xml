@@ -889,7 +889,7 @@
       <portType
             color="#2E9AFE"
             hidden="false"
-            name="StanfordNERModelPortObject"
+            name="Stanford NER Model"
             objectClass="org.knime.ext.textprocessing.data.StanfordNERModelPortObject"
             objectSerializer="org.knime.ext.textprocessing.data.StanfordNERModelPortObject$Serializer"
             specClass="org.knime.ext.textprocessing.data.NERModelPortObjectSpec"
@@ -897,7 +897,7 @@
       </portType>
       <portType
             hidden="false"
-            name="VectorHashingPortObject"
+            name="Vector Hashing"
             objectClass="org.knime.ext.textprocessing.data.VectorHashingPortObject"
             objectSerializer="org.knime.ext.textprocessing.data.VectorHashingPortObject$VectorHashingPortObjectSerializer"
             specClass="org.knime.ext.textprocessing.data.VectorHashingPortObjectSpec"
@@ -905,7 +905,7 @@
       </portType>
       <portType
             hidden="false"
-            name="DocumentVectorPortObject"
+            name="Document Vector"
             objectClass="org.knime.ext.textprocessing.data.DocumentVectorPortObject"
             objectSerializer="org.knime.ext.textprocessing.data.DocumentVectorPortObject$DocumentVectorPortObjectSerializer"
             specClass="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec"
@@ -914,7 +914,7 @@
       <portType
             color="#be24d2"
             hidden="false"
-            name="OpenNlpNerTaggerModelPortObject"
+            name="OpenNLP NER Model"
             objectClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject"
             objectSerializer="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject$Serializer"
             specClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObjectSpec"
