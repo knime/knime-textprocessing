@@ -79,6 +79,7 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.util.proxy.URLConnectionFactory;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
 import org.xml.sax.InputSource;
@@ -158,7 +159,7 @@ class RSSFeedReaderDataTableCreator2 {
                 SyndFeedInput feedInput = new SyndFeedInput();
                 URL url = new URL(urlAsString);
                 LOGGER.debug("Connect to " + urlAsString + " or load file.");
-                URLConnection conn = url.openConnection();
+                URLConnection conn = URLConnectionFactory.getConnection(url);
                 conn.setConnectTimeout(m_timeOut);
                 conn.setReadTimeout(m_timeOut);
 

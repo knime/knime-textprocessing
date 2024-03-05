@@ -72,6 +72,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.util.proxy.URLConnectionFactory;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
@@ -389,7 +390,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             dst.createNewFile();
         }
 
-        URLConnection conn = url.openConnection();
+        URLConnection conn = URLConnectionFactory.getConnection(url);
         conn.setConnectTimeout(60000);
         try {
             conn.connect();
