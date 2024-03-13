@@ -33,12 +33,4 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/knime/ext/textprocessing/nodes/preprocessing/StreamablePreprocessingNodeModel.java" type="org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel">
-        <filter comment="The super type defines the method" id="338792546">
-            <message_arguments>
-                <message_argument value="org.knime.ext.textprocessing.nodes.preprocessing.StreamablePreprocessingNodeModel"/>
-                <message_argument value="createPreprocessing()"/>
-            </message_arguments>
-        </filter>
-    </resource>
 </component>

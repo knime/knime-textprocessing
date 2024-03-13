@@ -68,7 +68,7 @@ import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Property;
-import org.apache.tika.metadata.TikaMetadataKeys;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -201,7 +201,7 @@ public class TikaParser {
             setPasswordToContext();
         }
 
-        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, FilenameUtils.getName(getStringRepresentation(url))); //getName
+        m_metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, FilenameUtils.getName(getStringRepresentation(url))); //getName
 
         try (BufferedInputStream str = new BufferedInputStream(FileUtil.openStreamWithTimeout(url))) {
             mime_type = m_parser.getDetector().detect(str, m_metadata).toString();

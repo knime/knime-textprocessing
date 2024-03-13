@@ -75,7 +75,6 @@ import org.apache.tika.io.TemporaryResources;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
-import org.apache.tika.metadata.TikaMetadataKeys;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.parser.AutoDetectParser;
@@ -131,7 +130,7 @@ public final class EmbeddedFilesExtractor {
     }
 
     private void extract(final InputStream is, final Path outputDir) throws SAXException, TikaException, IOException {
-        m_metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, m_filename);
+        m_metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, m_filename);
         if (m_extractInlineImages) {
             PDFParserConfig pdfConfig = m_context.get(PDFParserConfig.class);
             pdfConfig.setExtractInlineImages(m_extractInlineImages);
@@ -271,7 +270,7 @@ public final class EmbeddedFilesExtractor {
                 tisParse.close();
             }
 
-            String name = mdata.get(TikaMetadataKeys.RESOURCE_NAME_KEY);
+            String name = mdata.get(TikaCoreProperties.RESOURCE_NAME_KEY);
 
             if (name == null) {
                 if (!skippedContainer) {

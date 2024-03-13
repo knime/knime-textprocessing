@@ -51,6 +51,7 @@ package org.knime.ext.textprocessing.nodes.source.parser.tika;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import org.apache.tika.metadata.Office;
 import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
@@ -436,7 +437,7 @@ public class TikaParserConfig {
                     put(COL_CONTRIBUTOR, TikaCoreProperties.CONTRIBUTOR);
                     put(COL_CREATED, TikaCoreProperties.CREATED);
                     put(COL_DESCRIPTION, TikaCoreProperties.DESCRIPTION);
-                    put(COL_KEYWORDS, TikaCoreProperties.KEYWORDS);
+                    put(COL_KEYWORDS, Office.KEYWORDS);
                     put(COL_LANGUAGE, TikaCoreProperties.LANGUAGE);
                     put(COL_MODIFIED, TikaCoreProperties.MODIFIED);
                     put(COL_MODIFIER, TikaCoreProperties.MODIFIER);

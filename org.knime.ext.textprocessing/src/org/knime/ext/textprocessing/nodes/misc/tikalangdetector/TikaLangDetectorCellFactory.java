@@ -53,7 +53,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tika.langdetect.OptimaizeLangDetector;
+import org.apache.tika.langdetect.optimaize.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageDetector;
 import org.apache.tika.language.detect.LanguageResult;
 import org.knime.core.data.DataCell;
