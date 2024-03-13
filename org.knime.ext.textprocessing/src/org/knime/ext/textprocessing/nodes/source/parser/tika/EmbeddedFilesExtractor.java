@@ -81,6 +81,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.pdf.PDFParserConfig;
+import org.apache.tika.parser.pdf.PDFParserConfig.OCR_STRATEGY;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.EmbeddedContentHandler;
 import org.xml.sax.ContentHandler;
@@ -134,6 +135,7 @@ public final class EmbeddedFilesExtractor {
         if (m_extractInlineImages) {
             PDFParserConfig pdfConfig = m_context.get(PDFParserConfig.class);
             pdfConfig.setExtractInlineImages(m_extractInlineImages);
+            pdfConfig.setOcrStrategy(OCR_STRATEGY.NO_OCR);
             m_context.set(PDFParserConfig.class, pdfConfig);
         }
         CustomEmbeddedDocumentExtractor ex = new CustomEmbeddedDocumentExtractor(outputDir, m_context);

@@ -76,6 +76,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.PasswordProvider;
 import org.apache.tika.parser.pdf.PDFParserConfig;
+import org.apache.tika.parser.pdf.PDFParserConfig.OCR_STRATEGY;
 import org.apache.tika.sax.BodyContentHandler;
 import org.eclipse.core.runtime.CoreException;
 import org.knime.core.data.DataCell;
@@ -156,6 +157,7 @@ public class TikaParser {
         // sorts PDF sentences from left to right and up to down.
         PDFParserConfig pdfConfig = new PDFParserConfig();
         pdfConfig.setSortByPosition(true);
+        pdfConfig.setOcrStrategy(OCR_STRATEGY.NO_OCR); // on since Tika 2 but not backward compatible (TIKA-3258)
         m_context.set(PDFParserConfig.class, pdfConfig);
 
         File localFile;
