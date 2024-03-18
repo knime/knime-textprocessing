@@ -1,9 +1,0 @@
-# Added in 4.2.1 as part of AP-14809:
-# org.dom4j_1.6.1 is also available via orbit (https://download.eclipse.org/tools/orbit/downloads/drops/R20200224183213/)
-# but imports java.xml.bind, v2.2. This causes two version of the same package to be available in KNIME, which prevents
-# under certain conditions certain extensions not to load.
-# 
-# dom4j is indirectly used via apache.poi, which is used in textprocessing
-requires.0.name=org.dom4j
-requires.0.range=[1.6.1.v202007024-knime, 2.0.0)
-requires.0.namespace=osgi.bundle
