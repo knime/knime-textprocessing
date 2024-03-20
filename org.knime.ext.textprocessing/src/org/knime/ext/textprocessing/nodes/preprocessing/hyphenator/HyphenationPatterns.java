@@ -50,14 +50,17 @@ package org.knime.ext.textprocessing.nodes.preprocessing.hyphenator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
+
+import jakarta.json.Json;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 
 /**
  *
@@ -126,17 +129,16 @@ public class HyphenationPatterns {
     }
 
     private void parsePatterns() {
-        try {
-            LOGGER.info("Loading pattern file ["
-                    + m_patternFile.getAbsolutePath() + "] for language ["
-                    + m_language + "]");
+        try (final var fileReader = new FileReader(m_patternFile, StandardCharsets.UTF_8);
+                final var jsonReader = Json.createReader(fileReader)) {
+            LOGGER.debugWithFormat("Loading pattern file [%s] for language [%s]", m_patternFile.getAbsolutePath(),
+                m_language);
 
-            JSONTokener jt = new JSONTokener(new FileReader(m_patternFile));
-            JSONObject jo = new JSONObject(jt);
+            JsonObject jo = jsonReader.readObject();
 
             int shortest = jo.getInt(SHORTEST_PATTERN);
             int longest = jo.getInt(LONGEST_PATTERN);
-            JSONObject patternObj = jo.getJSONObject(PATTERNS);
+            JsonObject patternObj = jo.getJsonObject(PATTERNS);
 
             for (int i = shortest + 1; i < longest + 1; i++) {
                 String allPatterns = patternObj.getString(Integer.toString(i));
@@ -154,13 +156,12 @@ public class HyphenationPatterns {
                     }
                 }
             }
-        } catch (FileNotFoundException e) {
-            LOGGER.warn("Could not find pattern file ["
-                    + m_patternFile.getAbsolutePath() + "]!");
-        } catch (JSONException e) {
-            LOGGER.warn("Could not parse pattern file ["
-                    + m_patternFile.getAbsolutePath() + "]!");
-            e.printStackTrace();
+        } catch (FileNotFoundException e) { // NOSONAR
+            LOGGER.warn(String.format("Could not find pattern file [%s]!", m_patternFile.getAbsolutePath()));
+        } catch (IOException e) {
+            LOGGER.warn(String.format("Could not read pattern file [%s]!", m_patternFile.getAbsolutePath()), e);
+        } catch (JsonException e) {
+            LOGGER.warn(String.format("Could not parse pattern file [%s]!", m_patternFile.getAbsolutePath()), e);
         }
     }
 
