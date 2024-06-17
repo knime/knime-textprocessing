@@ -79,6 +79,7 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.util.ThreadLocalHTTPAuthenticator;
 import org.knime.core.util.proxy.URLConnectionFactory;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
@@ -163,13 +164,16 @@ class RSSFeedReaderDataTableCreator2 {
                 conn.setConnectTimeout(m_timeOut);
                 conn.setReadTimeout(m_timeOut);
 
-                try (InputStream is = conn.getInputStream()) {
+                try (final var c = ThreadLocalHTTPAuthenticator.suppressAuthenticationPopups();
+                        // nosemgrep: suppressPopups (doesn't recognize the suppressor in try-with-resource)
+                        InputStream is = conn.getInputStream()) {
                     feed = feedInput.build(new InputSource(is));
                 } catch (FeedException e) {
                     LOGGER.warn(
                         "Unknown feed type for URL " + urlAsString + " feed could not be parsed: " + e.getMessage(), e);
                 }
                 if (conn instanceof HttpURLConnection) {
+                    // nosemgrep: suppressPopups
                     m_httpCode = ((HttpURLConnection)conn).getResponseCode();
                     result.setHttpCode(m_httpCode);
                 }

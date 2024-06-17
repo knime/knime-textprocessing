@@ -62,6 +62,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -72,6 +73,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.util.ThreadLocalHTTPAuthenticator;
 import org.knime.core.util.proxy.URLConnectionFactory;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentSource;
@@ -392,7 +394,7 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
 
         URLConnection conn = URLConnectionFactory.getConnection(url);
         conn.setConnectTimeout(60000);
-        try {
+        try (final var c = ThreadLocalHTTPAuthenticator.suppressAuthenticationPopups()) {
             conn.connect();
         } catch (SocketTimeoutException e) {
             LOGGER.error("Timeout! Connection could not be established.");
@@ -401,26 +403,21 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             LOGGER.error("Connection could not be opened.");
             throw e;
         }
-        InputStreamReader isr = new InputStreamReader(conn.getInputStream(), "UTF-8");
-        BufferedReader in = new BufferedReader(isr);
-        OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
-        OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
 
-        // Transfer bytes from in to out
-        try {
+        try (final var c = ThreadLocalHTTPAuthenticator.suppressAuthenticationPopups();
+                // nosemgrep: suppressPopups (current system doesn't recognize the suppressor in try-with-resource)
+                final InputStreamReader isr = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8);
+                final BufferedReader in = new BufferedReader(isr);
+                final OutputStream out = new GZIPOutputStream(new FileOutputStream(dst));
+                final OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             String line;
             while ((line = in.readLine()) != null) {
                 writer.write(line);
             }
         } catch (IOException e) {
-            LOGGER.error("Documents could not be downloaded.");
-            writer.close();
+            LOGGER.error("Documents could not be downloaded.", e);
             throw e;
         }
-
-        in.close();
-        writer.close();
-        out.close();
     }
 
     private int getEnd(final int start, final int max) {
