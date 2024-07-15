@@ -48,6 +48,7 @@ package org.knime.ext.textprocessing.nodes.mining.topic;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -106,9 +107,12 @@ import cc.mallet.types.InstanceList;
  */
 public class ParallelTopicExtractorNodeModel extends NodeModel {
 
-    private final class LogTranslator extends Handler {
+    // Note that this pattern exactly matches the iteration log in `ParallelTopicModel.estimate`
+    // We do not expect a certain number formatting because it depends on the current locale
+    private static final Pattern ITERATION_LOG_PATTERN =
+        Pattern.compile("<(\\d+)> LL/token: ([^\\s]+)", Pattern.UNICODE_CHARACTER_CLASS);
 
-        private final Pattern m_progressPattern = Pattern.compile("<([0-9]+)> .* (-?[0-9]*[,\\.]?[0-9]+)");
+    private final class LogTranslator extends Handler {
 
         private final int m_maxNoOfIterations;
 
@@ -157,19 +161,22 @@ public class ParallelTopicExtractorNodeModel extends NodeModel {
             } else if (Level.SEVERE.equals(level)) {
                 LOGGER.error(msg);
             }
+
             //analyze only every 5th log message
-            final Matcher matcher = m_progressPattern.matcher(msg);
+            final Matcher matcher = ITERATION_LOG_PATTERN.matcher(msg);
             if (matcher.matches()) {
                 final String strIter = matcher.group(1);
-                final String strLl = matcher.group(2).replace(",", ".");
+                final String strLl = matcher.group(2);
                 try {
                     final int currentIteration = Integer.parseInt(strIter);
                     final RowKey key = RowKey.createRowKey(m_rowidCounter++);
                     final DataCell iterCell = new IntCell(currentIteration);
                     double logLikelihood = 0;
                     try {
-                        logLikelihood = Double.parseDouble(strLl);
-                    } catch (NumberFormatException e) {
+                        // NB: For parsing the number, we use the formatter that was
+                        // used to format it
+                        logLikelihood = m_model.formatter.parse(strLl).doubleValue();
+                    } catch (ParseException e) {
                         logLikelihood = m_model.modelLogLikelihood();
                     }
                     final DataCell llCell = new DoubleCell(logLikelihood);
