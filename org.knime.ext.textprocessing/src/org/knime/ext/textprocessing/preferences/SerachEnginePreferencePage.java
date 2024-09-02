@@ -56,7 +56,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
-public class SerachEnginePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+class SerachEnginePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private SearchEngineListEditor m_linkSources;
 

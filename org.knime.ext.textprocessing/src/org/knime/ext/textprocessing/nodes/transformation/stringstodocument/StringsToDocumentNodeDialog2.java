@@ -72,7 +72,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ButtonGroupEnumInterface;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 import org.knime.time.util.DialogComponentDateTimeSelection;
 import org.knime.time.util.DialogComponentDateTimeSelection.DisplayOption;
 import org.knime.time.util.SettingsModelDateTime;
@@ -279,7 +279,7 @@ final class StringsToDocumentNodeDialog2 extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys2.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            PreferenceUtil.tokenizerName());
     }
 
     /**

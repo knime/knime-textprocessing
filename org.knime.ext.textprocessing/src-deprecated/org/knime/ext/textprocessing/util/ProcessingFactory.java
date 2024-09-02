@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.util;
 import org.knime.ext.textprocessing.nodes.preprocessing.AbstractPreprocessor;
 import org.knime.ext.textprocessing.nodes.preprocessing.ChunkPreprocessor;
 import org.knime.ext.textprocessing.nodes.preprocessing.RowPreprocessor;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  *
@@ -66,7 +66,7 @@ public final class ProcessingFactory {
      * @return The specified processing policy.
      */
     public static final AbstractPreprocessor getPrecessing() {
-        if (TextprocessingPreferenceInitializer.useRowPreprocessing()) {
+        if (PreferenceUtil.useRowPreprocessing()) {
             return new RowPreprocessor();
         }
         return new ChunkPreprocessor();

@@ -31,6 +31,8 @@
         <module>org.knime.ext.textprocessing.language.spanish</module>
         <module>org.knime.ext.textprocessing.language.turkish</module>
         <module>org.knime.ext.textprocessing.language.turkish.libs</module>
+        <module>org.knime.ext.textprocessing.tika/lib/fetch_jars</module>
+        <module>org.knime.ext.textprocessing.tika</module>
         <module>org.knime.ext.textprocessing.models</module>
         <module>org.knime.features.ext.textprocessing</module>
         <module>org.knime.features.ext.textprocessing.language.arabic</module>

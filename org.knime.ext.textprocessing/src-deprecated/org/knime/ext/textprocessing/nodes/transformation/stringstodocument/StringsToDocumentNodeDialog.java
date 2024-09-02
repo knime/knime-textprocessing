@@ -75,7 +75,7 @@ import org.knime.core.node.util.ColumnFilter;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * Provides the dialog for the String to Document node with all necessary dialog components.
@@ -252,7 +252,7 @@ public class StringsToDocumentNodeDialog extends DefaultNodeSettingsPane {
      */
     static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(StringsToDocumentConfigKeys.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            PreferenceUtil.tokenizerName());
     }
 
     private SettingsModelString m_docCategoryModel;

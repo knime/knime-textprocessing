@@ -79,7 +79,7 @@ import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-public class TextprocessingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+class TextprocessingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
     private static NodeLogger LOGGER = NodeLogger.getLogger(TextprocessingPreferencePage.class);
 

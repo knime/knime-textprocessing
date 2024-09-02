@@ -59,7 +59,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelOptionalString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * The {@code NodeDialog} for the Dictionary Replacer node.
@@ -101,7 +101,7 @@ public final class DictionaryReplacer2InPortsNodeDialog2 extends PreprocessingNo
      */
     public static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(DictionaryReplacer2InPortsConfigKeys2.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            PreferenceUtil.tokenizerName());
     }
 
     /**

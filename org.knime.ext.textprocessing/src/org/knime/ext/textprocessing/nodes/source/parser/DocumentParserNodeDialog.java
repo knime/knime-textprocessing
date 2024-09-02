@@ -60,7 +60,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * Creates the dialog of the DocumentParserNode with a file chooser component, to specify the directory containing the
@@ -126,7 +126,7 @@ public class DocumentParserNodeDialog extends DefaultNodeSettingsPane {
 
     static SettingsModelString getTokenizerModel() {
         return new SettingsModelString(DocumentParserConfigKeys.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            PreferenceUtil.tokenizerName());
     }
 
     /**

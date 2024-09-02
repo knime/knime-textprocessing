@@ -59,7 +59,7 @@ import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
-public class SearchEnginePreferenceInitializer extends AbstractPreferenceInitializer {
+class SearchEnginePreferenceInitializer extends AbstractPreferenceInitializer {
 
     /** Preference key of the search engines. */
     public static final String PREF_SEARCHENGINES = "knime.textprocessing.searchengines";

@@ -323,16 +323,6 @@
             >
       </node>
       <node
-            category-path="/applications/textprocessing/misc"
-            factory-class="org.knime.ext.textprocessing.nodes.misc.tikalangdetector.TikaLangDetectorNodeFactory"
-            >
-      </node>
-      <node
-            category-path="/applications/textprocessing/misc"
-            factory-class="org.knime.ext.textprocessing.nodes.misc.tikaparserinput.TikaParserInputNodeFactory"
-            >
-      </node>
-      <node
             category-path="/applications/textprocessing/preprocessing"
             deprecated="true"
             factory-class="org.knime.ext.textprocessing.nodes.preprocessing.hyphenator.HyphenatorNodeFactory"
@@ -384,11 +374,6 @@
       <node
             category-path="/applications/textprocessing/io"
             factory-class="org.knime.ext.textprocessing.nodes.source.parser.word.WordDocumentParserNodeFactory"
-            >
-      </node>
-      <node
-            category-path="/applications/textprocessing/io"
-            factory-class="org.knime.ext.textprocessing.nodes.source.parser.tika.TikaParserNodeFactory"
             >
       </node>
       <node

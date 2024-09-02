@@ -67,7 +67,7 @@ import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
-public class SearchEngineListEditor extends ListEditor {
+class SearchEngineListEditor extends ListEditor {
 
     private final Map<String, SearchEngineSettings> m_searchEngineSettings;
 

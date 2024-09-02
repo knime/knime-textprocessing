@@ -57,7 +57,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.9
  */
-public class StoragePreferenceInitializer extends AbstractPreferenceInitializer {
+class StoragePreferenceInitializer extends AbstractPreferenceInitializer {
     /**
      * The default number of documents to store in a single file store file.
      */

@@ -69,7 +69,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.9
  */
-public class StoragePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, IPropertyChangeListener {
+class StoragePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, IPropertyChangeListener {
 
     private Composite m_mainComposite;
 

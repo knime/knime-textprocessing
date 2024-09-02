@@ -49,8 +49,9 @@ package org.knime.ext.textprocessing.data.filestore;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.knime.core.data.filestore.FileStore;
-import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * Singleton factory providing buffered file store writer for file stores.
@@ -87,7 +88,7 @@ final class BufferedFileStoreWriterFactory {
     BufferedFileStoreWriter getBufferedFileStoreWriter(final FileStore fileStore) {
         BufferedFileStoreWriter fileStoreWriter = m_bufferedWriter.get(fileStore.toString());
         if (fileStoreWriter == null) {
-            final int bufferSize = Math.min(DEFALT_BUFFER_SIZE, StoragePreferenceInitializer.fileStoreChunkSize());
+            final int bufferSize = Math.min(DEFALT_BUFFER_SIZE, PreferenceUtil.fileStoreChunkSize());
             fileStoreWriter = new BufferedFileStoreWriter(fileStore, bufferSize);
             m_bufferedWriter.put(fileStore.toString(), fileStoreWriter);
         }

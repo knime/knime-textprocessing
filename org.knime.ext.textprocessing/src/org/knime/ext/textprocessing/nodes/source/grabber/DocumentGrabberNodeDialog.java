@@ -72,7 +72,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  *
@@ -157,7 +157,7 @@ public class DocumentGrabberNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(DocumentGrabberConfigKeys.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            PreferenceUtil.tokenizerName());
     }
 
     private DialogComponentButtonLabel m_buttonLabel;

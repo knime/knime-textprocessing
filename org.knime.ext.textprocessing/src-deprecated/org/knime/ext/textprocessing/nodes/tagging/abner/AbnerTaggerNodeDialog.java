@@ -57,7 +57,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * Creates the dialog of the AbnerTaggerNode with a checkbox component, to specify whether recognized named entity terms
@@ -97,7 +97,7 @@ public class AbnerTaggerNodeDialog extends DefaultNodeSettingsPane {
      */
     public static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(AbnerTaggerConfigKeys.CFGKEY_TOKENIZER,
-            TextprocessingPreferenceInitializer.tokenizerName());
+            PreferenceUtil.tokenizerName());
     }
 
     /**

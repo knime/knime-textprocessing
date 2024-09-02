@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.nodes.tokenization;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * Is a utility class which provides methods for the default tokenization of
@@ -70,7 +70,7 @@ public final class DefaultTokenization {
      * @since 3.3
      */
     private static TokenizerPool createTokenizerPool(final String tokenizerName) {
-        return new TokenizerPool(TextprocessingPreferenceInitializer.tokenizerPoolSize(), tokenizerName);
+        return new TokenizerPool(PreferenceUtil.tokenizerPoolSize(), tokenizerName);
     }
 
     /**

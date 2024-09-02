@@ -58,7 +58,7 @@ import java.util.Set;
 
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  * A utility class which helps building up a {@link org.knime.ext.textprocessing.data.Document} by providing methods
@@ -122,7 +122,7 @@ public class DocumentBuilder {
     @Deprecated
     public DocumentBuilder() {
         // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-        this(TextprocessingPreferenceInitializer.tokenizerName());
+        this(PreferenceUtil.tokenizerName());
     }
 
     /**
@@ -148,7 +148,7 @@ public class DocumentBuilder {
      */
     public DocumentBuilder(final Document doc) {
         // initialize the tokenizer with the tokenizer from preference page
-        this(doc, TextprocessingPreferenceInitializer.tokenizerName());
+        this(doc, PreferenceUtil.tokenizerName());
     }
 
     /**

@@ -97,7 +97,7 @@ import org.knime.ext.textprocessing.data.TermCell2;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
 import org.knime.ext.textprocessing.nodes.source.parser.dml.DmlDocumentParser;
-import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
+import org.knime.ext.textprocessing.preferences.PreferenceUtil;
 
 /**
  *
@@ -121,7 +121,7 @@ public final class TermDocumentDeSerializationUtil {
     private boolean m_dmlDeserialization;
 
     private TermDocumentDeSerializationUtil() {
-        m_dmlDeserialization = TextprocessingPreferenceInitializer.DEFAULT_DML_DESERIALIZATION;
+        m_dmlDeserialization = PreferenceUtil.getDefaultDMLDeserialization();
         var plugin = TextprocessingCorePlugin.getDefault();
         if (plugin != null) {
             final IPreferenceStore pStore = plugin.getPreferenceStore();
@@ -828,7 +828,7 @@ public final class TermDocumentDeSerializationUtil {
          */
         @Override
         public void propertyChange(final PropertyChangeEvent event) {
-            m_dmlDeserialization = TextprocessingPreferenceInitializer.useDmlDeserialization();
+            m_dmlDeserialization = PreferenceUtil.useDmlDeserialization();
         }
     }
 }
