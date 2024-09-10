@@ -114,8 +114,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/metadata-extractor-2.19.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/parso-2.0.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/parso-2.0.14-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pdfbox-tools-2.0.31.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pdfbox-tools-2.0.31-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-2.1.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-utils-2.1.0.jar"/>
