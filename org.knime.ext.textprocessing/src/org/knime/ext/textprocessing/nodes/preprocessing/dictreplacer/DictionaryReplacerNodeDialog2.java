@@ -61,7 +61,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.preprocessing.PreprocessingNodeSettingsPane2;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactory;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -94,7 +94,7 @@ public final class DictionaryReplacerNodeDialog2 extends PreprocessingNodeSettin
      */
     public static final SettingsModelString getTokenizerModel() {
         return new SettingsModelString(DictionaryReplacerConfigKeys2.CFGKEY_TOKENIZER,
-            PreferenceUtil.tokenizerName());
+            TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

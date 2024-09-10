@@ -58,7 +58,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.TextprocessingCorePlugin;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.TextContainer;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 
 /**
@@ -92,7 +92,7 @@ public final class DocumentFileStoreDataCellFactory implements TextContainerData
         var plugin = TextprocessingCorePlugin.getDefault();
         if (plugin != null) {
             final IPreferenceStore pStore = plugin.getPreferenceStore();
-            m_maxCellsInFileStore = pStore.getInt(PreferenceUtil.getPrefFilestoreChunksize());
+            m_maxCellsInFileStore = pStore.getInt(StoragePreferenceInitializer.PREF_FILESTORE_CHUNKSIZE);
         }
     }
 

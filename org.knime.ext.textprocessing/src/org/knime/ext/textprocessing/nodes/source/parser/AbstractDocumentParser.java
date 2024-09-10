@@ -56,7 +56,7 @@ import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCategory;
 import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * This abstract class implements conveniently all setter methods of the interface
@@ -119,7 +119,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      * <code>null</code> by default.
      */
     public AbstractDocumentParser() {
-        this(null, null, null, PreferenceUtil.tokenizerName());
+        this(null, null, null, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
 
@@ -157,7 +157,7 @@ public abstract class AbstractDocumentParser implements DocumentParser {
      */
     @Deprecated
     public AbstractDocumentParser(final String docPath, final DocumentCategory category, final DocumentSource source) {
-        this(docPath, category, source, PreferenceUtil.tokenizerName());
+        this(docPath, category, source, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

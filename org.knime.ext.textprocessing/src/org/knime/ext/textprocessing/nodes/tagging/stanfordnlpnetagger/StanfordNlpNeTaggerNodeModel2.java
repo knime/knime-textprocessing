@@ -73,7 +73,7 @@ import org.knime.ext.textprocessing.nodes.tagging.DocumentTagger;
 import org.knime.ext.textprocessing.nodes.tagging.MissingTaggerModelException;
 import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModelRegistry;
 import org.knime.ext.textprocessing.nodes.tagging.StreamableTaggerNodeModel2;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -155,9 +155,9 @@ class StanfordNlpNeTaggerNodeModel2 extends StreamableTaggerNodeModel2 {
                     setWarningMessage("Tokenization of input model (" + tokenizer
                         + ") differs to selected tokenization (" + getTokenizerName() + ").");
                 }
-            } else if (!getTokenizerName().equals(PreferenceUtil.getDefaultTokenizer())) {
+            } else if (!getTokenizerName().equals(TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER)) {
                 setWarningMessage(
-                    "Tokenization of input model (" + PreferenceUtil.getDefaultTokenizer()
+                    "Tokenization of input model (" + TextprocessingPreferenceInitializer.DEFAULT_TOKENIZER
                         + ") differs to selected tokenization (" + getTokenizerName() + ").");
             }
         } else {

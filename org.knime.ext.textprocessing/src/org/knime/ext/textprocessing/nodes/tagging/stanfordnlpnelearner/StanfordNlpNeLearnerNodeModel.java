@@ -91,7 +91,7 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.nodes.tagging.dict.wildcard.MultiTermRegexDocumentTagger;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 
@@ -194,7 +194,7 @@ public class StanfordNlpNeLearnerNodeModel extends NodeModel {
                 setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
                     + "' as word tokenizer based on incoming documents.");
             } else {
-                m_tokenizer.setStringValue(PreferenceUtil.tokenizerName());
+                m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
             }
         }
         if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {

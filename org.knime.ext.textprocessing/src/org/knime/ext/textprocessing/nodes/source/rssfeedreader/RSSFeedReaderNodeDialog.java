@@ -64,7 +64,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -146,7 +146,7 @@ class RSSFeedReaderNodeDialog extends DefaultNodeSettingsPane {
 
     static SettingsModelString getTokenizerModel() {
         return new SettingsModelString(RSSFeedReaderConfigKeys.CFGKEY_TOKENIZER,
-            PreferenceUtil.tokenizerName());
+            TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     private final SettingsModelBoolean m_createDocCol = createDocumentColumnModel();

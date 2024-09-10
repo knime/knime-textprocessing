@@ -81,7 +81,7 @@ import org.knime.core.node.streamable.StreamableOperator;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.DocumentDataTableBuilder;
@@ -260,7 +260,7 @@ public abstract class StreamableTaggerNodeModel2 extends NodeModel implements Do
                 setWarningMessage("Auto select: Using  '" + m_tokenizer.getStringValue()
                     + "' as word tokenizer based on incoming documents.");
             } else {
-                m_tokenizer.setStringValue(PreferenceUtil.tokenizerName());
+                m_tokenizer.setStringValue(TextprocessingPreferenceInitializer.tokenizerName());
             }
         }
         if (!dataTableSpecVerifier.verifyTokenizer(m_tokenizer.getStringValue())) {

@@ -71,7 +71,7 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -96,7 +96,7 @@ final class StringsToDocumentCellFactory2 extends AbstractCellFactory {
 
     private boolean m_cacheCreated = false;
 
-    private String m_tokenizerName = PreferenceUtil.tokenizerName();
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
      *  Strings that require more than 65535 bytes to be represented in UTF cannot be written via writeUTF in the method

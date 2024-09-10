@@ -86,7 +86,7 @@ import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -285,7 +285,7 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
     private boolean m_storeInList = false;
 
     // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-    private String m_tokenizerName = PreferenceUtil.tokenizerName();
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
      * Creates a new instance of <code>DmlDocumentParser</code>. The documents source, category and file path will be
@@ -295,7 +295,7 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
      */
     @Deprecated
     public DmlDocumentParser() {
-        this(null, null, null, PreferenceUtil.tokenizerName());
+        this(null, null, null, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

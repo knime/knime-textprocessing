@@ -69,7 +69,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  *
@@ -119,7 +119,7 @@ class MarkupTagFilterNodeDialog extends DefaultNodeSettingsPane {
      */
     static SettingsModelString getTokenizerNameModel() {
         return new SettingsModelString(MarkupTagFilterConfigKeys.TOKENIZER_NAME,
-            PreferenceUtil.tokenizerName());
+            TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     private SettingsModelString m_suffixModel;

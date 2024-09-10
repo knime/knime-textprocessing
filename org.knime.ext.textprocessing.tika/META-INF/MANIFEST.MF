@@ -107,8 +107,7 @@ Bundle-ClassPath: knime-textprocessing-tika.jar,
  lib/poi-ooxml-lite-5.2.5.jar,
  lib/poi-scratchpad-5.2.5.jar
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
-Export-Package: org.knime.ext.textprocessing,
- org.knime.ext.textprocessing.nodes.misc.tikalangdetector,
+Export-Package: org.knime.ext.textprocessing.nodes.misc.tikalangdetector,
  org.knime.ext.textprocessing.nodes.misc.tikaparserinput,
  org.knime.ext.textprocessing.nodes.source.parser.tika
 Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",

@@ -66,7 +66,6 @@ Export-Package: org.knime.ext.textprocessing,
  org.knime.ext.textprocessing.nodes.view.documentviewer,
  org.knime.ext.textprocessing.nodes.view.tagcloud,
  org.knime.ext.textprocessing.nodes.view.tagcloud.tcfontsize,
- org.knime.ext.textprocessing.preferences,
  org.knime.ext.textprocessing.util,
  org.knime.ext.textprocessing.util.clustering,
  org.knime.ext.textprocessing.util.similarity

@@ -50,7 +50,7 @@ package org.knime.ext.textprocessing.util;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.textprocessing.data.filestore.DocumentBufferedFileStoreDataCellFactory;
 import org.knime.ext.textprocessing.data.filestore.DocumentFileStoreDataCellFactory;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.StoragePreferenceInitializer;
 
 /**
  * @author Kilian Thiel, University of Konstanz
@@ -69,7 +69,7 @@ public final class TextContainerDataCellFactoryBuilder {
     public static TextContainerDataCellFactory createDocumentCellFactory() {
         // create file store cells:
         // if more than 1 documents are stored in cell use buffered cell, else use regular file store cell.
-        if (PreferenceUtil.fileStoreChunkSize() >= 2) {
+        if (StoragePreferenceInitializer.fileStoreChunkSize() >= 2) {
             LOGGER.debug("Creating buffered document file store cell factory!");
             return new DocumentBufferedFileStoreDataCellFactory();
         } else {

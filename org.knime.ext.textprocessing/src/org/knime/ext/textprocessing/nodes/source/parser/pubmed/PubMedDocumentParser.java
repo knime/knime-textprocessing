@@ -69,7 +69,7 @@ import org.knime.ext.textprocessing.data.SectionAnnotation;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEvent;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParsedEventListener;
 import org.knime.ext.textprocessing.nodes.source.parser.DocumentParser;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -255,7 +255,7 @@ public class PubMedDocumentParser extends DefaultHandler implements DocumentPars
     private boolean m_extractMetaData = false;
 
     // initialize the tokenizer with the old standard tokenizer for backwards compatibility
-    private String m_tokenizerName = PreferenceUtil.tokenizerName();
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
      * Creates a new instance of <code>PubMedDocumentParser</code>. The document source is set to

@@ -70,7 +70,7 @@ import org.knime.ext.textprocessing.nodes.view.documentviewer.SearchEngines;
  * @author Kilian Thiel, KNIME AG, Zurich, Switzerland
  * @since 2.8
  */
-class NewSearchEngineDialog extends TitleAreaDialog {
+public class NewSearchEngineDialog extends TitleAreaDialog {
 
     private Text m_nameTextField;
 

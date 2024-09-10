@@ -52,7 +52,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.SearchEnginePreferenceInitializer;
 
 /**
  * Provides links to various search engines for given terms used as query terms.
@@ -114,8 +114,8 @@ public final class SearchEngines {
     }
 
     private void loadPreferenceSettings() {
-        if (PreferenceUtil.existsSearchEnginesSettings()) {
-            String settingsStr = PreferenceUtil.getSearchEnginesSettingsString();
+        if (SearchEnginePreferenceInitializer.existsSearchEnginesSettings()) {
+            String settingsStr = SearchEnginePreferenceInitializer.getSearchEnginesSettingsString();
             List<SearchEngineSettings> settings = SearchEngineSettings.parseSettings(settingsStr);
 
             clear();

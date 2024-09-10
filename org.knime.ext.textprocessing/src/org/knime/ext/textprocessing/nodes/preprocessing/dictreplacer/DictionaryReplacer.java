@@ -60,7 +60,7 @@ import org.knime.ext.textprocessing.nodes.preprocessing.StringPreprocessing;
 import org.knime.ext.textprocessing.nodes.preprocessing.TermPreprocessing;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * Class used to replace strings or terms in documents.
@@ -102,7 +102,7 @@ public class DictionaryReplacer implements TermPreprocessing, StringPreprocessin
     @Deprecated
     public DictionaryReplacer(final Hashtable<String, String> replaceDict) {
         // uses the tokenizer from preference page
-        this(replaceDict, PreferenceUtil.tokenizerName());
+        this(replaceDict, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

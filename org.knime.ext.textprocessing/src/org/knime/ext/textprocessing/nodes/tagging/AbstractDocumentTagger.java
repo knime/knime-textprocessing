@@ -61,7 +61,7 @@ import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.Word;
 import org.knime.ext.textprocessing.nodes.tokenization.DefaultTokenization;
 import org.knime.ext.textprocessing.nodes.tokenization.Tokenizer;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 
 /**
  * The abstract class <code>AbstractDocumentTagger</code> implements the interface
@@ -103,13 +103,13 @@ public abstract class AbstractDocumentTagger implements DocumentTagger {
      *
      * @since 3.3
      */
-    protected String m_tokenizerName = PreferenceUtil.tokenizerName();
+    protected String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
      * Initialize old standard word tokenizer for backwards compatibility.
      */
     protected Tokenizer m_wordTokenizer =
-        DefaultTokenization.getWordTokenizer(PreferenceUtil.tokenizerName());
+        DefaultTokenization.getWordTokenizer(TextprocessingPreferenceInitializer.tokenizerName());
 
     /**
      * Constructor of {@code AbstractDocumentTagger} with the given flag which specifies if recognized named entities

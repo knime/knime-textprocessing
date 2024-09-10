@@ -71,7 +71,7 @@ import org.knime.ext.textprocessing.data.DocumentSource;
 import org.knime.ext.textprocessing.data.DocumentType;
 import org.knime.ext.textprocessing.data.PublicationDate;
 import org.knime.ext.textprocessing.data.SectionAnnotation;
-import org.knime.ext.textprocessing.preferences.PreferenceUtil;
+import org.knime.ext.textprocessing.preferences.TextprocessingPreferenceInitializer;
 import org.knime.ext.textprocessing.util.DataCellCache;
 import org.knime.ext.textprocessing.util.LRUDataCellCache;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
@@ -99,7 +99,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     private boolean m_cacheCreated = false;
 
     // initializing the old standard word tokenizer for backwards compatibility
-    private String m_tokenizerName = PreferenceUtil.tokenizerName();
+    private String m_tokenizerName = TextprocessingPreferenceInitializer.tokenizerName();
 
     /**
      * Creates new instance of {@StringsToDocumentCellFactory} with given configuration.
@@ -115,7 +115,7 @@ public class StringsToDocumentCellFactory extends AbstractCellFactory {
     @Deprecated
     public StringsToDocumentCellFactory(final StringsToDocumentConfig config, final DataColumnSpec[] newColSpecs,
         final int numberOfThreads) throws IllegalArgumentException {
-        this(config, newColSpecs, numberOfThreads, PreferenceUtil.tokenizerName());
+        this(config, newColSpecs, numberOfThreads, TextprocessingPreferenceInitializer.tokenizerName());
     }
 
     /**

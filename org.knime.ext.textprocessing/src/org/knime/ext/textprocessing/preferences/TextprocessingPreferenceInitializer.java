@@ -55,7 +55,7 @@ import org.knime.ext.textprocessing.TextprocessingCorePlugin;
  *
  * @author Kilian Thiel, University of Konstanz
  */
-class TextprocessingPreferenceInitializer extends AbstractPreferenceInitializer {
+public class TextprocessingPreferenceInitializer extends AbstractPreferenceInitializer {
 
     /** The default serialization setting. */
     public static final boolean DEFAULT_DML_DESERIALIZATION = true;
