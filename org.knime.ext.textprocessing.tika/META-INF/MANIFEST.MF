@@ -59,7 +59,6 @@ Bundle-ClassPath: knime-textprocessing-tika.jar,
  lib/language-detector-0.6.jar,
  lib/metadata-extractor-2.19.0.jar,
  lib/parso-2.0.14.jar,
- lib/pdfbox-tools-2.0.31.jar,
  lib/rome-2.1.0.jar,
  lib/rome-utils-2.1.0.jar,
  lib/saaj-impl-1.5.3.jar,
@@ -121,7 +120,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  com.google.guava;bundle-version="[19.0.0,20.0.0)",
  org.apache.poi;bundle-version="[5.2.5,6.0.0)",
  org.apache.logging.log4j.api;bundle-version="[2.23.0,3.0.0)",
- org.apache.pdfbox;bundle-version="[2.0.32,3.0.0)"
+ org.apache.pdfbox;bundle-version="[2.0.32,3.0.0)",
+ org.apache.pdfbox.tools;bundle-version="[2.0.32,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir

@@ -57,7 +57,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/language-detector-0.6.jar" sourcepath="lib/language-detector-0.6-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/metadata-extractor-2.19.0.jar" sourcepath="lib/metadata-extractor-2.19.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/parso-2.0.14.jar" sourcepath="lib/parso-2.0.14-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pdfbox-tools-2.0.31.jar" sourcepath="lib/pdfbox-tools-2.0.31-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-2.1.0.jar" sourcepath="lib/rome-2.1.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-utils-2.1.0.jar" sourcepath="lib/rome-utils-2.1.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saaj-impl-1.5.3.jar" sourcepath="lib/saaj-impl-1.5.3-sources.jar"/>
