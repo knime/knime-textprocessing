@@ -435,16 +435,16 @@ public class LevenDamerau {
 
         int candidateLength = candidateWord.length;
         ArrayList<char[]> nearest = new ArrayList<>(3);
-        int longestDictWordPlusOne = dictWordsByLength.size();
-        int shortestKnownDist = candidateLength + longestDictWordPlusOne + 1;
+        int longestDictWord = dictWordsByLength.size() - 1;
+        int shortestKnownDist = Integer.MAX_VALUE;
         for (int i = 1; i <= 2 * candidateLength + 1; i++) {
             int nextDictWordLength = candidateLength + (int)Math.pow(-1, i) * Math.abs(i / 2);
-            if (nextDictWordLength >= 0 && nextDictWordLength < longestDictWordPlusOne) {
+            if (nextDictWordLength >= 0 && nextDictWordLength <= longestDictWord) {
                 if (
                         // if wordfromchar is shorter then word tochar the distance is at least the difference * m_wi
-                        !(candidateLength < nextDictWordLength + 1 && shortestKnownDist < (candidateLength - 1 - nextDictWordLength) * m_insertCost)
+                        !(nextDictWordLength < candidateLength && shortestKnownDist < (candidateLength - nextDictWordLength) * m_insertCost)
                         // if wordfromchar is longer then word tochar the distance is at least the difference * m_wd
-                        && !(candidateLength < nextDictWordLength + 1 && shortestKnownDist < (nextDictWordLength + 1 - candidateLength) * m_deleteCost)) {
+                        && !(candidateLength < nextDictWordLength && shortestKnownDist < (nextDictWordLength - candidateLength) * m_deleteCost)) {
                     final ArrayList<char[]> dictWordsOfLength = dictWordsByLength.get(nextDictWordLength);
                     for (int j = 0; j < dictWordsOfLength.size(); j++) {
                         final char[] dictWord = dictWordsOfLength.get(j);
