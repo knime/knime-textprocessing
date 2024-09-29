@@ -246,7 +246,7 @@ public class StringMatcherNodeModel extends NodeModel {
         }
 
         LevenDamerau ld = new LevenDamerau(inData[1], dictcol, m_sortInMemory.getBooleanValue(), exec);
-        ld.setweight(m_wd.getIntValue(), m_wi.getIntValue(), m_wc.getIntValue(), m_ws.getIntValue());
+        ld.setWeights(m_wd.getIntValue(), m_wi.getIntValue(), m_wc.getIntValue(), m_ws.getIntValue());
         ArrayList<char[]> words; // found words
 
         DataCell[] related;
@@ -286,7 +286,7 @@ public class StringMatcherNodeModel extends NodeModel {
                 words = ld.getNearestWord(((StringValue)related[0]).getStringValue().toCharArray());
 
                 if (m_showdist.getBooleanValue()) {
-                    related[1] = new IntCell(ld.getlastdistance());
+                    related[1] = new IntCell(ld.getLastDistance());
                 }
 
             } else {

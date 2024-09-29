@@ -74,16 +74,16 @@ import org.knime.ext.textprocessing.data.TermValue;
 public class LevenDamerau {
 
     /** Variable for the cost of one delete-operation. */
-    private int m_wd;
+    private int m_deleteCost;
 
     /** Variable for the cost of one insert-operation. */
-    private int m_wi;
+    private int m_insertCost;
 
     /** Variable for the cost of one change-operation. */
-    private int m_wc;
+    private int m_changeCost;
 
     /** Variable for the cost of one switch-operation. */
-    private int m_ws;
+    private int m_switchCost;
 
     /**
      * 1 if the class works with an sortedlist 2 if the class works with the datatable 0 otherwise .
@@ -91,16 +91,16 @@ public class LevenDamerau {
     private int m_sorted;
 
     /** Variable for the last found minimal distance. */
-    private int m_lastdist;
+    private int m_lastDist;
 
     /** stores the Datatable given, to search words. */
-    private DataTable m_bibdata;
+    private DataTable m_dictData;
 
     /** the desired colum in the datatable. */
-    private int m_bibcol;
+    private int m_dictCol;
 
     /** if the list is presorted. */
-    private ArrayList<ArrayList<char[]>> m_sortedbiblist;
+    private ArrayList<ArrayList<char[]>> m_groupedDictList;
 
     /** to give notice of the progress. */
     private ExecutionContext m_exec;
@@ -110,40 +110,40 @@ public class LevenDamerau {
      *
      */
     public LevenDamerau() {
-        m_wd = 1;
-        m_wi = 1;
-        m_wc = 1;
-        m_ws = 1;
+        m_deleteCost = 1;
+        m_insertCost = 1;
+        m_changeCost = 1;
+        m_switchCost = 1;
         m_sorted = 0;
-        m_lastdist = Integer.MAX_VALUE;
+        m_lastDist = Integer.MAX_VALUE;
     }
 
     /**
      * Constructor. Use this constructor to initialize the class you can get a list of the nearest words in the list to
      * a give one by the method getnearest word.
      *
-     * @param data the datatable which includes the word list in which should be searched
-     * @param col the column of the datatable
-     * @param workincache 1 if the user wishes to work in cache, it is much faster but can cause a
+     * @param dictData the datatable which includes the word list in which should be searched
+     * @param dictCol the column of the datatable
+     * @param cacheDictInMemory 1 if the user wishes to work in cache, it is much faster but can cause a
      *            java.lang.OutOfMemoryError
      * @param exec Executioncontext
      * @throws CanceledExecutionException if canceled by user
      */
-    public LevenDamerau(final DataTable data, final int col, final boolean workincache, final ExecutionContext exec)
-        throws CanceledExecutionException {
-        m_wd = 1;
-        m_wi = 1;
-        m_wc = 1;
-        m_ws = 1;
+    public LevenDamerau(final DataTable dictData, final int dictCol, final boolean cacheDictInMemory,
+            final ExecutionContext exec) throws CanceledExecutionException {
+        m_deleteCost = 1;
+        m_insertCost = 1;
+        m_changeCost = 1;
+        m_switchCost = 1;
         m_exec = exec;
-        m_lastdist = Integer.MAX_VALUE;
+        m_lastDist = Integer.MAX_VALUE;
 
-        if (workincache) {
-            m_sortedbiblist = sort(data, col);
+        if (cacheDictInMemory) {
+            m_groupedDictList = groupByLength(dictData, dictCol);
             m_sorted = 1;
         } else {
-            m_bibdata = data;
-            m_bibcol = col;
+            m_dictData = dictData;
+            m_dictCol = dictCol;
             m_sorted = 2;
         }
     }
@@ -152,8 +152,8 @@ public class LevenDamerau {
      *
      * @return the last found minimal distance
      */
-    public int getlastdistance() {
-        return m_lastdist;
+    public int getLastDistance() {
+        return m_lastDist;
     }
 
     /**
@@ -161,8 +161,8 @@ public class LevenDamerau {
      *
      * @param wd the int weight for one deletion
      */
-    public void setweightdelete(final int wd) {
-        m_wd = wd;
+    public void setWeightDelete(final int wd) {
+        m_deleteCost = wd;
     }
 
     /**
@@ -170,8 +170,8 @@ public class LevenDamerau {
      *
      * @param wi the int weight for one insertion
      */
-    public void setweightinsert(final int wi) {
-        m_wi = wi;
+    public void setWeightInsert(final int wi) {
+        m_insertCost = wi;
     }
 
     /**
@@ -179,8 +179,8 @@ public class LevenDamerau {
      *
      * @param wc the int weight for one change
      */
-    public void setweightchange(final int wc) {
-        m_wc = wc;
+    public void setWeightChange(final int wc) {
+        m_changeCost = wc;
     }
 
     /**
@@ -188,8 +188,8 @@ public class LevenDamerau {
      *
      * @param ws the int weight for one switch
      */
-    public void setweightswitch(final int ws) {
-        m_ws = ws;
+    public void setWeightSwitch(final int ws) {
+        m_switchCost = ws;
     }
 
     /**
@@ -200,11 +200,11 @@ public class LevenDamerau {
      * @param wc the int weight for one change
      * @param ws the int weight for one switch
      */
-    public void setweight(final int wd, final int wi, final int wc, final int ws) {
-        m_wd = wd;
-        m_wi = wi;
-        m_wc = wc;
-        m_ws = ws;
+    public void setWeights(final int wd, final int wi, final int wc, final int ws) {
+        m_deleteCost = wd;
+        m_insertCost = wi;
+        m_changeCost = wc;
+        m_switchCost = ws;
     }
 
     /**
@@ -216,7 +216,7 @@ public class LevenDamerau {
      * @param x4 fourth int value
      * @return min the minimum of the inputs
      */
-    private int min(final int x1, final int x2, final int x3, final int x4) {
+    private static int min(final int x1, final int x2, final int x3, final int x4) {
         int min = x1;
         if (x2 < min) {
             min = x2;
@@ -233,121 +233,128 @@ public class LevenDamerau {
     /**
      * Levenshtein-Damerau distance.
      *
-     * @param string1 the first string
-     * @param string2 the second string
+     * @param startWord the first string
+     * @param targetWord the second string
      * @return the distance of the two strings
      */
-    public int calculate(final String string1, final String string2) {
-        return calculate(string1.toCharArray(), string2.toCharArray());
+    public int calculate(final String startWord, final String targetWord) {
+        return calculate(startWord.toCharArray(), targetWord.toCharArray());
     }
 
     /**
      * Levenshtein-Damerau distance if smaller as k.
      *
-     * @param string1 the first string
-     * @param string2 the second string
-     * @param k the maximal value for the distance
+     * @param startWord the first string
+     * @param targetWord the second string
+     * @param distUpperBound the maximal value for the distance
      * @return the minimum of k+1 and the Levenshtein-Damerau distance of the two strings
      */
-    public int calculate(final String string1, final String string2, final int k) {
-        return calculate(string1.toCharArray(), string2.toCharArray(), k);
+    public int calculate(final String startWord, final String targetWord, final int distUpperBound) {
+        return calculate(startWord.toCharArray(), targetWord.toCharArray(), distUpperBound);
     }
 
     /**
      * Levenshtein-Damerau distance.
      *
-     * @param wordfromchar the first string
-     * @param wordtochar the second string
+     * @param startWord the first string
+     * @param targetWord the second string
      * @return the distance of the two strings
      */
-    private int calculate(final char[] wordfromchar, final char[] wordtochar) {
+    private int calculate(final char[] startWord, final char[] targetWord) {
 
         int max = 0;
-        for (char c : wordfromchar) {
+        for (char c : startWord) {
             max = c > max ? c : max;
         }
-        for (char c : wordtochar) {
+        for (char c : targetWord) {
             max = c > max ? c : max;
         }
-        //         LOGGER.info(max++);
         max++;
-        int n = wordfromchar.length;
-        int m = wordtochar.length;
-        int[][] h = new int[n + 2][m + 2]; // matrix for the
-        int[] da = new int[max]; // last position of letter * is stored
-        // in da[*]necessary to calculate the switch
-        int db, i1, j1, d;
-        int inf = n * m_wd + m * m_wi + 1; // maximal distance (delete all  letters and insert all other)
 
-        h[0][0] = inf; // initializes the matrix
-        for (int i = 0; i <= n; i++) {
-            h[i + 1][1] = i * m_wd;
-            h[i + 1][0] = inf;
+        final int startWordLength = startWord.length;
+        final int targetWordLength = targetWord.length;
+        // matrix for the last position of letter * is stored in da[*], necessary to calculate the switch
+        // maximal distance (delete all  letters and insert all other)
+        final int distUpperBound = startWordLength * m_deleteCost + targetWordLength * m_insertCost + 1;
+
+        final int[][] matrix = new int[startWordLength + 2][targetWordLength + 2];
+        matrix[0][0] = distUpperBound; // initializes the matrix
+        for (int i = 0; i <= startWordLength; i++) {
+            matrix[i + 1][1] = i * m_deleteCost;
+            matrix[i + 1][0] = distUpperBound;
         }
-        for (int j = 0; j <= m; j++) {
-            h[1][j + 1] = j * m_wi;
-            h[0][j + 1] = inf;
+        for (int j = 0; j <= targetWordLength; j++) {
+            matrix[1][j + 1] = j * m_insertCost;
+            matrix[0][j + 1] = distUpperBound;
         }
+
+        final int[] rightmostKnownPosition = new int[max];
         for (char c = 0; c < max; c++) {
-            da[c] = 0;
+            rightmostKnownPosition[c] = 0;
         }
 
-        for (int i = 1; i <= n; i++) {
+        int db;
+        int i1;
+        int j1;
+        int changeCostHere;
+        for (int i = 1; i <= startWordLength; i++) {
             db = 0;
-            for (int j = 1; j <= m; j++) {
+            for (int j = 1; j <= targetWordLength; j++) {
                 //TODO find a better way to get rid of chars above 256
                 // okay lets try to use max.
-                i1 = da[wordtochar[j - 1]];
+                i1 = rightmostKnownPosition[targetWord[j - 1]];
                 j1 = db;
-                if (wordfromchar[i - 1] == wordtochar[j - 1]) {
-                    d = 0;
+                if (startWord[i - 1] == targetWord[j - 1]) {
+                    changeCostHere = 0;
                     db = j;
                 } else {
-                    d = m_wc;
+                    changeCostHere = m_changeCost;
                 }
-                h[i + 1][j + 1] = min(h[i][j] + d, // if its cheapest to change  the letter or do nothing
-                    h[i + 1][j] + m_wi, // if its cheapest to insert the letter
-                    h[i][j + 1] + m_wd, // if its cheapest to delete the letter
-                    h[i1][j1] + (i - i1 - 1) // if its cheapest to delete all letters between(origin
-                                             // word), then swap, and than  insert the other
-                                             // letters(searched word)
-                        * m_wd + m_ws + (j - j1 - 1) * m_wi);
+                matrix[i + 1][j + 1] = min(
+                    // if its cheapest to change  the letter or do nothing
+                    matrix[i][j] + changeCostHere,
+                    // if its cheapest to insert the letter
+                    matrix[i + 1][j] + m_insertCost,
+                    // if its cheapest to delete the letter
+                    matrix[i][j + 1] + m_deleteCost,
+                    // if its cheapest to delete all letters between(origin word), then swap, and than  insert the other letters(searched word)
+                    matrix[i1][j1] + (i - i1 - 1) * m_deleteCost + m_switchCost + (j - j1 - 1) * m_insertCost);
             }
-            da[wordfromchar[(i - 1)]] = i; // stores the position of the last letter
+            rightmostKnownPosition[startWord[i - 1]] = i; // stores the position of the last letter
         }
-        return h[n + 1][m + 1]; // the minimal distance
+        return matrix[startWordLength + 1][targetWordLength + 1]; // the minimal distance
     }
 
     /**
      * Levenshtein-Damerau distance if smaller as k.
      *
-     * @param wordfromchar the first string
-     * @param wordtochar the second string
-     * @param k the maximal value for the distance
+     * @param startWord the first string
+     * @param targetWord the second string
+     * @param distUpperBound the maximal value for the distance
      * @return the minimum of k+1 and the Levenshtein-Damerau distance of the two strings
      */
-    private int calculate(final char[] wordfromchar, final char[] wordtochar, final int k) {
-        int n = wordfromchar.length;
-        int m = wordtochar.length;
+    private int calculate(final char[] startWord, final char[] targetWord, final int distUpperBound) {
+        int n = startWord.length;
+        int m = targetWord.length;
 
         /**
          * if wordfromchar is shorter then word tochar the distance is at least the difference * m_wi
          */
-        if (n < m && k < (m - n) * m_wi) {
-            return k + 1;
+        if (n < m && distUpperBound < (m - n) * m_insertCost) {
+            return distUpperBound + 1;
         }
 
         /**
          * if wordfromchar is longer then word tochar the distance is at least the difference * m_wd
          */
-        if (m < n && k < (n - m) * m_wd) {
-            return k + 1;
+        if (m < n && distUpperBound < (n - m) * m_deleteCost) {
+            return distUpperBound + 1;
         }
 
         /**
          * otherwise we use the standard algorithm
          */
-        return calculate(wordfromchar, wordtochar);
+        return calculate(startWord, targetWord);
     }
 
     /**
@@ -356,15 +363,15 @@ public class LevenDamerau {
      * There could be more than one word, which have the smallest distance the method uses the datatable given in the
      * initialization
      *
-     * @param word the string to be searched in the list t
+     * @param candidateWord the string to be searched in the list t
      * @return an List of all words which have the smallest distance to z if the list were set, otherwise NULL is
      *         returned
      */
-    public ArrayList<char[]> getNearestWord(final char[] word) {
+    public ArrayList<char[]> getNearestWord(final char[] candidateWord) {
         if (m_sorted == 1) {
-            return getNearestWord(this.m_sortedbiblist, word);
+            return getNearestWord(this.m_groupedDictList, candidateWord);
         } else if (m_sorted == 2) {
-            return getNearestWord(this.m_bibdata, this.m_bibcol, word);
+            return getNearestWord(this.m_dictData, this.m_dictCol, candidateWord);
         } else {
             return null;
         }
@@ -375,19 +382,19 @@ public class LevenDamerau {
      *
      * There could be more than one word, which have the smallest distance
      *
-     * @param bibdata an Datatable which contains an column of strings
-     * @param bibcol the column of the Datatable, which contains the strings
+     * @param dictTable an Datatable which contains an column of strings
+     * @param dictCol the column of the Datatable, which contains the strings
      *
-     * @param word the string to be searched in the list t
+     * @param candidateWord the string to be searched in the list t
      * @return an List of all words which have the smallest distance to z
      */
-    private ArrayList<char[]> getNearestWord(final DataTable bibdata, final int bibcol, final char[] word) {
-        int k = Integer.MAX_VALUE;
+    private ArrayList<char[]> getNearestWord(final DataTable dictTable, final int dictCol, final char[] candidateWord) {
+        int shortestKnownDist = Integer.MAX_VALUE;
 
-        ArrayList<char[]> nearest = new ArrayList<char[]>(3);
+        ArrayList<char[]> nearest = new ArrayList<>(3);
 
-        for (DataRow row : bibdata) {
-            DataCell cell = row.getCell(bibcol);
+        for (DataRow row : dictTable) {
+            DataCell cell = row.getCell(dictCol);
             String cellString;
             if (!cell.isMissing() && cell.getType().isCompatible(TermValue.class)) {
                 cellString = ((TermValue)cell).getTermValue().getText();
@@ -395,19 +402,18 @@ public class LevenDamerau {
                 cellString = cell.toString();
             }
             if (!cell.isMissing()) {
-                char[] t = cellString.toCharArray();
-                int kneu = calculate(word, t, k);
-                if (kneu == k) {
-                    nearest.add(t);
-                } else if (kneu < k) {
+                char[] dictWord = cellString.toCharArray();
+                int currentDist = calculate(candidateWord, dictWord, shortestKnownDist);
+                if (currentDist == shortestKnownDist) {
+                    nearest.add(dictWord);
+                } else if (currentDist < shortestKnownDist) {
                     nearest.clear();
-                    nearest.add(t);
-                    k = kneu;
-                    // if (k == 0) { return nearest; }
+                    nearest.add(dictWord);
+                    shortestKnownDist = currentDist;
                 }
             }
         }
-        m_lastdist = k;
+        m_lastDist = shortestKnownDist;
         return nearest;
     }
 
@@ -416,63 +422,68 @@ public class LevenDamerau {
      *
      * There could be more than one word, which have the smallest distance
      *
-     * @param t an by length sorted ArrayList (like the method sort produces)
-     * @param z the string to be searched in the list t
+     * @param dictWordsByLength an by length sorted ArrayList (like the method sort produces)
+     * @param candidateWord the string to be searched in the list t
      * @return an List of all words which have the smallest distance to z
      */
-    private ArrayList<char[]> getNearestWord(final ArrayList<ArrayList<char[]>> t, final char[] z) {
-        if (t.isEmpty()) {
-            m_lastdist = Integer.MAX_VALUE;
-            return new ArrayList<char[]>();
+    private ArrayList<char[]> getNearestWord(final ArrayList<ArrayList<char[]>> dictWordsByLength,
+            final char[] candidateWord) {
+        if (dictWordsByLength.isEmpty()) {
+            m_lastDist = Integer.MAX_VALUE;
+            return new ArrayList<>();
         }
-        int m = z.length;
-        ArrayList<char[]> nearest = new ArrayList<char[]>(3);
-        int k = m + t.size() + 1;
-        for (int i = 1; i <= 2 * m + 1; i++) {
-            int n = m + (int)Math.pow(-1, i) * Math.abs(i / 2);
-            if (n >= 0 && n < t.size()) {
-                /**
-                 * if wordfromchar is shorter then word tochar the distance is at least the difference * m_wi if
-                 * wordfromchar is longer then word tochar the distance is at least the difference * m_wd
-                 */
-                if (!(m < n + 1 && k < (m - 1 - n) * m_wi) && !(m < n + 1 && k < (n + 1 - m) * m_wd)) {
-                    for (int j = 0; j < t.get(n).size(); j++) {
-                        int kneu = calculate(t.get(n).get(j), z);
-                        if (kneu == k) {
-                            nearest.add(t.get(n).get(j));
-                        } else if (kneu < k) {
+
+        int candidateLength = candidateWord.length;
+        ArrayList<char[]> nearest = new ArrayList<>(3);
+        int longestDictWordPlusOne = dictWordsByLength.size();
+        int shortestKnownDist = candidateLength + longestDictWordPlusOne + 1;
+        for (int i = 1; i <= 2 * candidateLength + 1; i++) {
+            int nextDictWordLength = candidateLength + (int)Math.pow(-1, i) * Math.abs(i / 2);
+            if (nextDictWordLength >= 0 && nextDictWordLength < longestDictWordPlusOne) {
+                if (
+                        // if wordfromchar is shorter then word tochar the distance is at least the difference * m_wi
+                        !(candidateLength < nextDictWordLength + 1 && shortestKnownDist < (candidateLength - 1 - nextDictWordLength) * m_insertCost)
+                        // if wordfromchar is longer then word tochar the distance is at least the difference * m_wd
+                        && !(candidateLength < nextDictWordLength + 1 && shortestKnownDist < (nextDictWordLength + 1 - candidateLength) * m_deleteCost)) {
+                    final ArrayList<char[]> dictWordsOfLength = dictWordsByLength.get(nextDictWordLength);
+                    for (int j = 0; j < dictWordsOfLength.size(); j++) {
+                        final char[] dictWord = dictWordsOfLength.get(j);
+                        int currentDist = calculate(dictWord, candidateWord);
+                        if (currentDist == shortestKnownDist) {
+                            nearest.add(dictWord);
+                        } else if (currentDist < shortestKnownDist) {
                             nearest.clear();
-                            nearest.add(t.get(n).get(j));
-                            k = kneu;
-                            // if (k == 0) { return nearest; }
+                            nearest.add(dictWord);
+                            shortestKnownDist = currentDist;
                         }
                     }
                 }
             }
         }
-        m_lastdist = k;
+        m_lastDist = shortestKnownDist;
         return nearest;
     }
 
     /**
      * sorts one column of the table by stringlength.
      *
-     * @param data a DataTable which contains Strings
+     * @param dictTable a DataTable which contains Strings
      * @param col the column of the given DataTable, which you like to sort
      * @return an Arraylist with the following characteristics at the i. position of the list you find an list with all
      *         words of length i
      * @throws CanceledExecutionException
      *
      */
-    private ArrayList<ArrayList<char[]>> sort(final DataTable data, final int col) throws CanceledExecutionException {
+    private ArrayList<ArrayList<char[]>> groupByLength(final DataTable dictTable, final int col)
+            throws CanceledExecutionException {
 
-        int maxlength = 0;
-        ArrayList<ArrayList<char[]>> t = new ArrayList<ArrayList<char[]>>(16);
+        int maxLength = 0;
+        ArrayList<ArrayList<char[]>> dictWordsByLength = new ArrayList<ArrayList<char[]>>(16);
 
-        for (DataRow row : data) {
+        for (DataRow row : dictTable) {
             m_exec.checkCanceled();
 
-            DataCell cell = row.getCell(col);
+            final DataCell cell = row.getCell(col);
             String cellString;
             if (!cell.isMissing() && cell.getType().isCompatible(TermValue.class)) {
                 cellString = ((TermValue)cell).getTermValue().getText();
@@ -480,16 +491,15 @@ public class LevenDamerau {
                 cellString = cell.toString();
             }
             if (!cell.isMissing()) {
-                char[] b = cellString.toCharArray();
-                int l = b.length;
-                while (l >= maxlength) {
-                    t.add(new ArrayList<char[]>(100));
-                    maxlength++;
+                char[] word = cellString.toCharArray();
+                int wordLength = word.length;
+                while (wordLength >= maxLength) {
+                    dictWordsByLength.add(new ArrayList<>(100));
+                    maxLength++;
                 }
-                t.get(l).add(b);
+                dictWordsByLength.get(wordLength).add(word);
             }
-
         }
-        return t;
+        return dictWordsByLength;
     }
 }
