@@ -45,6 +45,9 @@
 package org.knime.ext.textprocessing.nodes.misc.stringmatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -100,7 +103,7 @@ public class LevenDamerau {
     private int m_dictCol;
 
     /** if the list is presorted. */
-    private ArrayList<ArrayList<char[]>> m_groupedDictList;
+    private final Map<Integer, List<char[]>> m_groupedDictList;
 
     /** to give notice of the progress. */
     private ExecutionContext m_exec;
@@ -115,6 +118,7 @@ public class LevenDamerau {
         m_changeCost = 1;
         m_switchCost = 1;
         m_sorted = 0;
+        m_groupedDictList = null;
         m_lastDist = Integer.MAX_VALUE;
     }
 
@@ -144,6 +148,7 @@ public class LevenDamerau {
         } else {
             m_dictData = dictData;
             m_dictCol = dictCol;
+            m_groupedDictList = null;
             m_sorted = 2;
         }
     }
@@ -367,7 +372,7 @@ public class LevenDamerau {
      * @return an List of all words which have the smallest distance to z if the list were set, otherwise NULL is
      *         returned
      */
-    public ArrayList<char[]> getNearestWord(final char[] candidateWord) {
+    public List<char[]> getNearestWord(final char[] candidateWord) {
         if (m_sorted == 1) {
             return getNearestWord(this.m_groupedDictList, candidateWord);
         } else if (m_sorted == 2) {
@@ -388,22 +393,16 @@ public class LevenDamerau {
      * @param candidateWord the string to be searched in the list t
      * @return an List of all words which have the smallest distance to z
      */
-    private ArrayList<char[]> getNearestWord(final DataTable dictTable, final int dictCol, final char[] candidateWord) {
+    private List<char[]> getNearestWord(final DataTable dictTable, final int dictCol, final char[] candidateWord) {
         int shortestKnownDist = Integer.MAX_VALUE;
 
-        ArrayList<char[]> nearest = new ArrayList<>(3);
+        final List<char[]> nearest = new ArrayList<>(3);
 
         for (DataRow row : dictTable) {
             DataCell cell = row.getCell(dictCol);
-            String cellString;
-            if (!cell.isMissing() && cell.getType().isCompatible(TermValue.class)) {
-                cellString = ((TermValue)cell).getTermValue().getText();
-            } else {
-                cellString = cell.toString();
-            }
             if (!cell.isMissing()) {
-                char[] dictWord = cellString.toCharArray();
-                int currentDist = calculate(candidateWord, dictWord, shortestKnownDist);
+                final char[] dictWord = getStringValue(cell).toCharArray();
+                final int currentDist = calculate(candidateWord, dictWord, shortestKnownDist);
                 if (currentDist == shortestKnownDist) {
                     nearest.add(dictWord);
                 } else if (currentDist < shortestKnownDist) {
@@ -422,38 +421,34 @@ public class LevenDamerau {
      *
      * There could be more than one word, which have the smallest distance
      *
-     * @param dictWordsByLength an by length sorted ArrayList (like the method sort produces)
+     * @param groupedDictList an by length sorted ArrayList (like the method sort produces)
      * @param candidateWord the string to be searched in the list t
      * @return an List of all words which have the smallest distance to z
      */
-    private ArrayList<char[]> getNearestWord(final ArrayList<ArrayList<char[]>> dictWordsByLength,
-            final char[] candidateWord) {
-        if (dictWordsByLength.isEmpty()) {
+    private List<char[]> getNearestWord(final Map<Integer, List<char[]>> groupedDictList, final char[] candidateWord) {
+        if (groupedDictList.isEmpty()) {
             m_lastDist = Integer.MAX_VALUE;
             return new ArrayList<>();
         }
 
         int candidateLength = candidateWord.length;
-        ArrayList<char[]> nearest = new ArrayList<>(3);
-        int longestDictWord = dictWordsByLength.size() - 1;
+        List<char[]> wordsWithShortestDist = new ArrayList<>(3);
         int shortestKnownDist = Integer.MAX_VALUE;
         for (int i = 1; i <= 2 * candidateLength + 1; i++) {
             int nextDictWordLength = candidateLength + (int)Math.pow(-1, i) * Math.abs(i / 2);
-            if (nextDictWordLength >= 0 && nextDictWordLength <= longestDictWord) {
+            if (groupedDictList.containsKey(nextDictWordLength)) {
                 if (
                         // if wordfromchar is shorter then word tochar the distance is at least the difference * m_wi
                         !(nextDictWordLength < candidateLength && shortestKnownDist < (candidateLength - nextDictWordLength) * m_insertCost)
                         // if wordfromchar is longer then word tochar the distance is at least the difference * m_wd
                         && !(candidateLength < nextDictWordLength && shortestKnownDist < (nextDictWordLength - candidateLength) * m_deleteCost)) {
-                    final ArrayList<char[]> dictWordsOfLength = dictWordsByLength.get(nextDictWordLength);
-                    for (int j = 0; j < dictWordsOfLength.size(); j++) {
-                        final char[] dictWord = dictWordsOfLength.get(j);
+                    for (final char[] dictWord : groupedDictList.get(nextDictWordLength)) {
                         int currentDist = calculate(dictWord, candidateWord);
                         if (currentDist == shortestKnownDist) {
-                            nearest.add(dictWord);
+                            wordsWithShortestDist.add(dictWord);
                         } else if (currentDist < shortestKnownDist) {
-                            nearest.clear();
-                            nearest.add(dictWord);
+                            wordsWithShortestDist.clear();
+                            wordsWithShortestDist.add(dictWord);
                             shortestKnownDist = currentDist;
                         }
                     }
@@ -461,7 +456,7 @@ public class LevenDamerau {
             }
         }
         m_lastDist = shortestKnownDist;
-        return nearest;
+        return wordsWithShortestDist;
     }
 
     /**
@@ -474,32 +469,23 @@ public class LevenDamerau {
      * @throws CanceledExecutionException
      *
      */
-    private ArrayList<ArrayList<char[]>> groupByLength(final DataTable dictTable, final int col)
+    private Map<Integer, List<char[]>> groupByLength(final DataTable dictTable, final int col)
             throws CanceledExecutionException {
-
-        int maxLength = 0;
-        ArrayList<ArrayList<char[]>> dictWordsByLength = new ArrayList<ArrayList<char[]>>(16);
+        final var dictWordsByLength = new HashMap<Integer, List<char[]>>();
 
         for (DataRow row : dictTable) {
             m_exec.checkCanceled();
 
             final DataCell cell = row.getCell(col);
-            String cellString;
-            if (!cell.isMissing() && cell.getType().isCompatible(TermValue.class)) {
-                cellString = ((TermValue)cell).getTermValue().getText();
-            } else {
-                cellString = cell.toString();
-            }
             if (!cell.isMissing()) {
-                char[] word = cellString.toCharArray();
-                int wordLength = word.length;
-                while (wordLength >= maxLength) {
-                    dictWordsByLength.add(new ArrayList<>(100));
-                    maxLength++;
-                }
-                dictWordsByLength.get(wordLength).add(word);
+                final char[] cellChars = getStringValue(cell).toCharArray();
+                dictWordsByLength.computeIfAbsent(cellChars.length, k -> new ArrayList<>()).add(cellChars);
             }
         }
         return dictWordsByLength;
+    }
+
+    private static String getStringValue(final DataCell cell) {
+        return cell instanceof TermValue term ? term.getTermValue().getText() : cell.toString();
     }
 }
