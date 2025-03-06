@@ -48,6 +48,7 @@
  */
 package org.knime.ext.textprocessing.data.tag;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.knime.core.data.meta.DataColumnMetaData;
@@ -71,4 +72,22 @@ final class TaggedValueMetaData implements DataColumnMetaData {
     Set<SnapshotTagSet> getTagSets() {
         return m_tagSets;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(m_tagSets);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof TaggedValueMetaData other) {
+            return Objects.equals(m_tagSets, other.m_tagSets);
+        }
+        return false;
+    }
+
+
 }
