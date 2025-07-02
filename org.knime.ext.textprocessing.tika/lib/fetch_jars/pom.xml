@@ -14,7 +14,7 @@
 
 	<properties>
 		<revision>4.5.0</revision>
-		<tika.version>2.9.2</tika.version>
+		<tika.version>2.9.4</tika.version>
 		<excludeArtifacts>commons-io, commons-lang3, commons-logging, fontbox, guava, log4j-api, log4j-core, log4j-slf4j2-impl, opennlp-tools, pdfbox, pdfbox-tools, poi, poi-ooxml, poi-ooxml-lite, poi-scratchpad, slf4j-api, xercesImpl, xml-apis, xmlbeans</excludeArtifacts>
 	</properties>
 
