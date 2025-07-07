@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.language.turkish"
       label="KNIME Textprocessing Turkish Language Pack"
-      version="5.5.0.qualifier"
+      version="5.6.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland">
 
    <description url="https://www.knime.com/knime-text-processing">
