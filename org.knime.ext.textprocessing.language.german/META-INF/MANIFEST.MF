@@ -7,8 +7,8 @@ Bundle-Activator: org.knime.ext.textprocessing.language.german.TextprocessingGer
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.knime.core;bundle-version="[5.5.0,6.0.0)",
- org.knime.ext.textprocessing;bundle-version="[5.5.0,6.0.0)",
+ org.knime.core;bundle-version="[5.6.0,6.0.0)",
+ org.knime.ext.textprocessing;bundle-version="[5.6.0,6.0.0)",
  edu.stanford.nlp.stanford-corenlp;bundle-version="3.6.0",
  org.apache.opennlp.tools;bundle-version="1.6.0",
  org.apache.pdfbox.fontbox;bundle-version="2.0.7"
