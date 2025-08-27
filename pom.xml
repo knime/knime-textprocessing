@@ -21,13 +21,18 @@
 		<knime.sonar-env>Sonarcloud</knime.sonar-env>
 	</properties> 
 
-	<modules>
+    <modules>
         <module>org.knime.ext.textprocessing</module>
         <module>org.knime.ext.textprocessing.tests</module>
+        <module>org.knime.ext.textprocessing.language.arabic.models</module>
         <module>org.knime.ext.textprocessing.language.arabic</module>
+        <module>org.knime.ext.textprocessing.language.chinese.models</module>
         <module>org.knime.ext.textprocessing.language.chinese</module>
+        <module>org.knime.ext.textprocessing.language.french.models</module>
         <module>org.knime.ext.textprocessing.language.french</module>
+        <module>org.knime.ext.textprocessing.language.german.models</module>
         <module>org.knime.ext.textprocessing.language.german</module>
+        <module>org.knime.ext.textprocessing.language.spanish.models</module>
         <module>org.knime.ext.textprocessing.language.spanish</module>
         <module>org.knime.ext.textprocessing.language.turkish</module>
         <module>org.knime.ext.textprocessing.language.turkish.libs</module>
@@ -42,7 +47,16 @@
         <module>org.knime.features.ext.textprocessing.language.spanish</module>
         <module>org.knime.features.ext.textprocessing.language.turkish</module>
         <module>org.knime.update.ext.textprocessing</module>
-	</modules>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-dependency-tools-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 	<repositories>
 		<repository>

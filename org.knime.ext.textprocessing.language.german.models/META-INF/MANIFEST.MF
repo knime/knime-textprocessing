@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing German Language Pack Models
+Bundle-SymbolicName: org.knime.ext.textprocessing.language.german.models;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Vendor: KNIME AG, Zurich, Switzerland
+Automatic-Module-Name: org.knime.ext.textprocessing.language.german.models
+Bundle-ClassPath: .
+Eclipse-BundleShape: dir

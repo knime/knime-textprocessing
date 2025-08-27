@@ -62,31 +62,22 @@ import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
  */
 public class GermanUdModel implements StanfordTaggerModel {
 
-	private static final String MODELNAME = "German UD";
+    private static final String MODELNAME = "German UD";
 
-	private static final String MODELPATH = "models/stanfordmodels/pos/german-ud.tagger";
+    private static final String MODELPATH = "models/stanfordmodels/pos/german-ud.tagger";
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModelName() {
-		return MODELNAME;
-	}
+    @Override
+    public String getModelName() {
+        return MODELNAME;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModelPath() {
-		return TextprocessingGermanLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
-	}
+    @Override
+    public String getModelPath() {
+        return TextprocessingGermanLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TagBuilder getTagBuilder() {
-		return new UniversalDependenciesPOSTag();
-	}
+    @Override
+    public TagBuilder getTagBuilder() {
+        return new UniversalDependenciesPOSTag();
+    }
 }
