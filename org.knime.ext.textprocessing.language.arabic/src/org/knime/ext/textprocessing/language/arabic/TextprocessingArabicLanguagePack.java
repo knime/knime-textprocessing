@@ -2,16 +2,16 @@ package org.knime.ext.textprocessing.language.arabic;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.NodeLogger;
-import org.osgi.framework.Bundle;
+import org.knime.core.util.FileUtil;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -22,6 +22,8 @@ public class TextprocessingArabicLanguagePack extends AbstractUIPlugin {
 
     // The plug-in ID
     private static final String PLUGIN_ID = "org.knime.features.ext.textprocessing.language.arabic";
+
+    private static final String MODELS_PLUGIN_ID = "org.knime.ext.textprocessing.language.arabic.assets";
 
     // The shared instance
     private static TextprocessingArabicLanguagePack plugin;
@@ -71,13 +73,13 @@ public class TextprocessingArabicLanguagePack extends AbstractUIPlugin {
      * @return the resolved absolute path
      */
     public static File resolvePath(final String relativePath) {
-        final Bundle myself = FrameworkUtil.getBundle(TextprocessingArabicLanguagePack.class);
+        final var modelsBundle = Platform.getBundle(MODELS_PLUGIN_ID);
         try {
-            final URL fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath), null));
-            return new File(fileUrl.getPath());
-        } catch (final IOException ex) {
+            final var bundleUrl = FileLocator.find(modelsBundle, new Path(relativePath), null);
+            return FileUtil.resolveToPath(FileLocator.toFileURL(bundleUrl)).toFile();
+        } catch (IOException | URISyntaxException ex) {
             NodeLogger.getLogger(TextprocessingArabicLanguagePack.class)
-                .error("Could not resolve relativ path '" + relativePath + "': " + ex.getMessage(), ex);
+                .error("Could not resolve relative path '" + relativePath + "': " + ex.getMessage(), ex);
             return new File("");
         }
     }

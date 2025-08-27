@@ -82,33 +82,21 @@ public class GermanHgcModel implements StanfordTaggerModel {
 
     private static final String MODELPATH = "models/stanfordmodels/nermodels/german.hgc_175m_600.crf.ser.gz";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getModelName() {
         return MODELNAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getModelPath() {
         return TextprocessingGermanLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TagBuilder getTagBuilder() {
         return NamedEntityTag.getDefault();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Tag> getTags(final String tag) {
         List<Tag> tags = new ArrayList<Tag>(1);

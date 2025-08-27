@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing Arabic Language Pack Static Assets
+Bundle-SymbolicName: org.knime.ext.textprocessing.language.arabic.assets;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Vendor: KNIME AG, Zurich, Switzerland
+Automatic-Module-Name: org.knime.ext.textprocessing.language.arabic.assets
+Bundle-ClassPath: .
+Eclipse-BundleShape: dir

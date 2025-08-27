@@ -66,25 +66,16 @@ public class GermanFastCaselessModel implements StanfordTaggerModel {
 
     private static final String MODELPATH = "models/stanfordmodels/pos/german-fast-caseless.tagger";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getModelName() {
         return MODELNAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getModelPath() {
         return TextprocessingGermanLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TagBuilder getTagBuilder() {
         return STTSPartOfSpeechTag.getDefault();

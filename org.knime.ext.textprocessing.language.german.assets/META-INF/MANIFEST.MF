@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Textprocessing German Language Pack Static Assets
+Bundle-SymbolicName: org.knime.ext.textprocessing.language.german.assets;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Vendor: KNIME AG, Zurich, Switzerland
+Automatic-Module-Name: org.knime.ext.textprocessing.language.german.assets
+Bundle-ClassPath: .
+Eclipse-BundleShape: dir

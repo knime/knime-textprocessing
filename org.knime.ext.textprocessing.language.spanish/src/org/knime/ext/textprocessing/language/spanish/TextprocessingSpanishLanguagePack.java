@@ -2,16 +2,16 @@ package org.knime.ext.textprocessing.language.spanish;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.NodeLogger;
-import org.osgi.framework.Bundle;
+import org.knime.core.util.FileUtil;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -21,18 +21,20 @@ import org.osgi.framework.FrameworkUtil;
  */
 public class TextprocessingSpanishLanguagePack extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.knime.ext.textprocessing.language.spanish";
+    // The plug-in ID
+    public static final String PLUGIN_ID = "org.knime.ext.textprocessing.language.spanish";
 
-	// The shared instance
-	private static TextprocessingSpanishLanguagePack plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public TextprocessingSpanishLanguagePack() {
-		plugin = this;
-	}
+    private static final String MODELS_PLUGIN_ID = "org.knime.ext.textprocessing.language.spanish.assets";
+
+    // The shared instance
+    private static TextprocessingSpanishLanguagePack plugin;
+
+    /**
+     * The constructor
+     */
+    public TextprocessingSpanishLanguagePack() {
+        plugin = this;
+    }
 
     /**
      * This method is called when the plug-in is stopped.
@@ -40,31 +42,31 @@ public class TextprocessingSpanishLanguagePack extends AbstractUIPlugin {
      * @throws Exception If cause by super class.
      */
     @Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    public void stop(final BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static TextprocessingSpanishLanguagePack getDefault() {
-		return plugin;
-	}
+    /**
+     * Returns the shared instance
+     *
+     * @return the shared instance
+     */
+    public static TextprocessingSpanishLanguagePack getDefault() {
+        return plugin;
+    }
 
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-	
+    /**
+     * Returns an image descriptor for the image file at the given
+     * plug-in relative path
+     *
+     * @param path the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(final String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
     /**
      * Resolves a path relative to the plug-in or any fragment's root into an absolute path.
      *
@@ -72,13 +74,13 @@ public class TextprocessingSpanishLanguagePack extends AbstractUIPlugin {
      * @return the resolved absolute path
      */
     public static File resolvePath(final String relativePath) {
-        Bundle myself = FrameworkUtil.getBundle(TextprocessingSpanishLanguagePack.class);
+        final var modelsBundle = Platform.getBundle(MODELS_PLUGIN_ID);
         try {
-            URL fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath), null));
-            return new File(fileUrl.getPath());
-        } catch (IOException ex) {
+            final var bundleUrl = FileLocator.find(modelsBundle, new Path(relativePath), null);
+            return FileUtil.resolveToPath(FileLocator.toFileURL(bundleUrl)).toFile();
+        } catch (IOException | URISyntaxException ex) {
             NodeLogger.getLogger(TextprocessingSpanishLanguagePack.class)
-                .error("Could not resolve relativ path '" + relativePath + "': " + ex.getMessage(), ex);
+                .error("Could not resolve relative path '" + relativePath + "': " + ex.getMessage(), ex);
             return new File("");
         }
     }

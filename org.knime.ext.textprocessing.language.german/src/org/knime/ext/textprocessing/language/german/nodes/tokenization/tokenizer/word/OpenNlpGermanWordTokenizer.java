@@ -89,9 +89,6 @@ public class OpenNlpGermanWordTokenizer implements Tokenizer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized List<String> tokenize(final String sentence) {
         if (m_tokenizer != null) {
