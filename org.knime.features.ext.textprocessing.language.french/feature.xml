@@ -365,7 +365,7 @@ Public License instead of this License.
          version="0.0.0"/>
 
    <plugin
-         id="org.knime.ext.textprocessing.language.french.models"
+         id="org.knime.ext.textprocessing.language.french.assets"
          version="0.0.0"/>
 
 </feature>
