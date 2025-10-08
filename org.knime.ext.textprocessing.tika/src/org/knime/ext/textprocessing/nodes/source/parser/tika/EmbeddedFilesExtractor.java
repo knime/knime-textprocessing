@@ -75,7 +75,6 @@ import org.apache.tika.io.TemporaryResources;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
-import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -88,6 +87,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
+ * Extractor of embedded files.
  *
  * @author Andisa Dewi, KNIME.com, Berlin, Germany
  */
@@ -124,7 +124,7 @@ public final class EmbeddedFilesExtractor {
         m_config = TikaConfig.getDefaultConfig();
         m_metadata = new Metadata();
         m_handler = new BodyContentHandler(-1);
-        m_outputFiles = new LinkedHashMap<String, String>();
+        m_outputFiles = new LinkedHashMap<>();
         m_hasError = false;
         m_context = new ParseContext();
         m_extractInlineImages = false;
@@ -138,7 +138,7 @@ public final class EmbeddedFilesExtractor {
             pdfConfig.setOcrStrategy(OCR_STRATEGY.NO_OCR);
             m_context.set(PDFParserConfig.class, pdfConfig);
         }
-        CustomEmbeddedDocumentExtractor ex = new CustomEmbeddedDocumentExtractor(outputDir, m_context);
+        final var ex = new CustomEmbeddedDocumentExtractor(outputDir, m_context);
         m_context.set(EmbeddedDocumentExtractor.class, ex);
 
         m_parser.parse(is, m_handler, m_metadata, m_context);
@@ -152,9 +152,9 @@ public final class EmbeddedFilesExtractor {
      * @param is input stream
      * @param outputDir directory to write the extracted files to
      * @param fname the name of the file
-     * @throws SAXException
-     * @throws TikaException
-     * @throws IOException
+     * @throws SAXException problems with the XML structure
+     * @throws TikaException general Tika exception
+     * @throws IOException I/O problem
      */
     public void extract(final InputStream is, final Path outputDir, final String fname)
         throws SAXException, TikaException, IOException {
@@ -218,33 +218,33 @@ public final class EmbeddedFilesExtractor {
         return m_hasError;
     }
 
-    private class CustomEmbeddedDocumentExtractor extends ParsingEmbeddedDocumentExtractor {
+    private final class CustomEmbeddedDocumentExtractor extends ParsingEmbeddedDocumentExtractor {
         private static final String UNKNOWN_EXT = ".bin";
 
         private static final String INLINE_IMG = "Inline Image";
 
         private static final String ATTACHMENT = "Attachment";
 
-        private final Path outputDir;
+        private final Path m_outputDir;
 
-        private int fileCount;
+        private int m_fileCount;
 
-        private Parser autoParser;
+        private Parser m_autoParser;
 
-        private boolean skippedContainer;
+        private boolean m_skippedContainer;
 
-        private boolean error;
+        private boolean m_error;
 
-        private Map<String, String> output;
+        private Map<String, String> m_output;
 
         private CustomEmbeddedDocumentExtractor(final Path outputDirectory, final ParseContext parseContext) {
             super(parseContext);
-            outputDir = outputDirectory;
-            fileCount = 0;
-            autoParser = new AutoDetectParser();
-            skippedContainer = false;
-            error = false;
-            output = new LinkedHashMap<String, String>();
+            m_outputDir = outputDirectory;
+            m_fileCount = 0;
+            m_autoParser = new AutoDetectParser();
+            m_skippedContainer = false;
+            m_error = false;
+            m_output = new LinkedHashMap<>();
         }
 
         @Override
@@ -259,31 +259,32 @@ public final class EmbeddedFilesExtractor {
             try (final var tmp = new TemporaryResources();
                  final var tis = TikaInputStream.get(stream, tmp, mdata)) {
 
-                MediaType contentType = m_detector.detect(tis, mdata);
+                final var contentType = m_detector.detect(tis, mdata); // NOSONAR detection should happen before others read (b/c they don't mark&reset)
 
                 byte[] byteArray = getBytes(tis, tis.available());
-                EmbeddedContentHandler embedH = new EmbeddedContentHandler(new BodyContentHandler(contentHandler));
+                final var embedH = new EmbeddedContentHandler(new BodyContentHandler(contentHandler));
                 try (final var tisParse = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp, mdata)) {
-                    autoParser.parse(tisParse, embedH, mdata, new ParseContext());
-                } catch (TikaException e1) {
+                    m_autoParser.parse(tisParse, embedH, mdata, new ParseContext());
+                } catch (final TikaException e) { // NOSONAR no problem if it can't be parsed
                     // no problem if it can't be parsed
                 }
 
-                String name = mdata.get(TikaCoreProperties.RESOURCE_NAME_KEY);
+                var name = mdata.get(TikaCoreProperties.RESOURCE_NAME_KEY);
 
                 if (name == null) {
-                    if (!skippedContainer) {
-                        skippedContainer = true;
+                    if (!m_skippedContainer) {
+                        m_skippedContainer = true;
                         return;
                     }
-                    name = m_filename + "_file_" + fileCount++;
+                    name = String.format("%s_file_%d", m_filename, m_fileCount);
+                    m_fileCount++;
                 } else {
-                    String outputName = FilenameUtils.normalize(name);
+                    var outputName = FilenameUtils.normalize(name);
                     if (outputName == null) {
                         outputName = FilenameUtils.normalize(FilenameUtils.getName(name));
                     }
                     if (!outputName.contains(m_filename)) {
-                        name = m_filename + "_" + outputName;
+                        name = String.format("%s_%s", m_filename, outputName);
                     }
                 }
 
@@ -293,21 +294,20 @@ public final class EmbeddedFilesExtractor {
                         if (name.indexOf('.') == -1) {
                             name += UNKNOWN_EXT;
                         }
-                    } catch (MimeTypeException e) {
+                    } catch (final MimeTypeException e) { // NOSONAR can happen if we don't know the MIME type
                         name += UNKNOWN_EXT;
                     }
                 } else if (name.indexOf('.') == -1 && contentType == null) {
                     name += UNKNOWN_EXT;
                 }
 
-                File outputFile = new File(outputDir.toFile(), name);
+                var outputFile = new File(m_outputDir.toFile(), name);
                 if (!m_dupFiles.containsKey(name)) {
                     m_dupFiles.put(name, 0);
                 } else {
                     m_dupFiles.replace(name, m_dupFiles.get(name) + 1);
-                    outputFile = new File(outputDir.toFile(), FilenameUtils.getBaseName(name) + "_"
-                        + String.valueOf(m_dupFiles.get(name)) + "." + FilenameUtils.getExtension(name));
-
+                    outputFile = new File(m_outputDir.toFile(), String.format("%s_%s.%s",
+                        FilenameUtils.getBaseName(name), m_dupFiles.get(name), FilenameUtils.getExtension(name)));
                 }
 
                 // check if inline images or attachments
@@ -319,33 +319,32 @@ public final class EmbeddedFilesExtractor {
                     type = ATTACHMENT;
                 }
 
-                output.put(outputFile.getAbsolutePath(), type);
-                File parent = outputFile.getParentFile();
-                if (!parent.exists()) {
-                    if (!parent.mkdirs()) {
-                        throw new IOException("Unable to create directory \"" + parent + "\"");
-                    }
+                m_output.put(outputFile.getAbsolutePath(), type);
+                final var parent = outputFile.getParentFile();
+                if (!parent.exists() && !parent.mkdirs()) {
+                    throw new IOException(String.format("Unable to create directory \"%s\"", parent));
                 }
 
+
                 try (final var tisExtract = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp, mdata);
-                        FileOutputStream os = new FileOutputStream(outputFile)) {
-                    if (tisExtract.getOpenContainer() != null && tisExtract.getOpenContainer() instanceof DirectoryEntry) {
-                        try (final POIFSFileSystem fs = new POIFSFileSystem()) {
-                            copy((DirectoryEntry)tisExtract.getOpenContainer(), fs.getRoot());
+                        final var os = new FileOutputStream(outputFile)) {
+                    if (tisExtract.getOpenContainer() instanceof DirectoryEntry dirEntry) {
+                        try (final var fs = new POIFSFileSystem()) {
+                            copy(dirEntry, fs.getRoot());
                             fs.writeFilesystem(os);
                         }
                     } else {
                         IOUtils.copy(tisExtract, os);
                     }
-                } catch (FileNotFoundException | SecurityException e) {
-                    error = true;
+                } catch (final FileNotFoundException | SecurityException e) {
+                    m_error = true;
                 }
             }
         }
 
         private byte[] getBytes(final InputStream input, final int size) throws IOException {
-            int read = 0;
-            byte[] bytes = new byte[size];
+            var read = 0;
+            var bytes = new byte[size];
 
             try (final var ostream = new ByteArrayOutputStream()) {
                 if (size != 0) {
@@ -353,24 +352,23 @@ public final class EmbeddedFilesExtractor {
                         ostream.write(bytes, 0, read);
                     }
                 }
-                byte[] res = ostream.toByteArray();
-                return res;
+                return ostream.toByteArray();
             }
         }
 
         public boolean hasError() {
-            return error;
+            return m_error;
         }
 
         public Map<String, String> getOutputFiles() {
-            return output;
+            return m_output;
         }
 
         private void copy(final DirectoryEntry sourceDir, final DirectoryEntry destDir) throws IOException {
             for (Entry entry : sourceDir) {
-                if (entry instanceof DirectoryEntry) {
+                if (entry instanceof DirectoryEntry dirEntry) {
                     DirectoryEntry newDir = destDir.createDirectory(entry.getName());
-                    copy((DirectoryEntry)entry, newDir);
+                    copy(dirEntry, newDir);
                 } else {
                     try (InputStream contents = new DocumentInputStream((DocumentEntry)entry)) {
                         destDir.createDocument(entry.getName(), contents);
