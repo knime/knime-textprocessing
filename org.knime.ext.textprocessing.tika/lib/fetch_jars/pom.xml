@@ -14,8 +14,41 @@
 
 	<properties>
 		<revision>4.5.0</revision>
-		<tika.version>2.9.2</tika.version>
-		<excludeArtifacts>commons-io, commons-lang3, commons-logging, fontbox, guava, log4j-api, log4j-core, log4j-slf4j2-impl, opennlp-tools, pdfbox, pdfbox-tools, poi, poi-ooxml, poi-ooxml-lite, poi-scratchpad, slf4j-api, xercesImpl, xml-apis, xmlbeans</excludeArtifacts>
+		<tika.version>3.2.3</tika.version>
+		<excludeArtifacts>
+		<!-- Exclude logging frameworks we don't use directly, for all of them we already include the APIs and bridges 
+		     to NodeLogger. Not including them here in fetch_jars will also make sure we don't see the "SLF4J noop" 
+		     warning _and_ importantly, the bridge is correctly configured only when using it from the TP. -->
+		log4j-core, log4j-api, log4j-slf4j-impl, log4j-slf4j2-impl, slf4j-api,
+		<!-- commons.lang3 3.18.0 is already in knime-tp -->
+		commons-lang3,
+		<!-- commons-logging 1.3.5 already in knime-tp -->
+		commons-logging,
+		<!-- guava 18 required, but it is from 2014 and has 3 CVEs, we just use the newer one from the TP -->
+		guava,
+		<!-- xmlbeans 5.3.0 is already in knime-tp -->
+		xmlbeans,
+		<!-- POI 5.4.1 already in knime-tp -->
+		poi, poi-ooxml, poi-ooxml-lite, poi-scratchpad,
+		<!-- CXF 4.0.9 is already in knime-tp -->
+		cxf-core, cxf-rt-frontend-jaxrs, cxf-rt-rs-client, cxf-rt-security, cxf-rt-transports-http
+		<!-- org.objectweb.asm 9.8 already in knime-tp-->
+		org.objectweb.asm,
+	    <!-- commons-collections4 4.5.0 already in knime-tp -->
+	    commons-collections4,
+	    <!-- commons-math3 3.6.1 already in knime-tp -->
+	    commons-math3,
+	    <!-- istack-commons-runtime 4.1.2 already in knime-tp-->
+	    istack-commons-runtime,
+	    <!-- jakarta-activation-api 2.1.3 already in knime-tp -->
+	    jakarta-activation-api,
+	    <!-- jakarta.xml.bind-api 4.0.2 already in knime-tp -->
+	    jakarta.xml.bind-api,
+	    <!-- stax2-api 4.2.2 already in knime-tp -->
+	    stax2-api,
+	    <!-- xz 1.10 already in knime-tp -->
+	    xz
+		</excludeArtifacts>
 	</properties>
 
 	<!-- NOTE ABOUT DEALING WITH DEPENDENCIES:
