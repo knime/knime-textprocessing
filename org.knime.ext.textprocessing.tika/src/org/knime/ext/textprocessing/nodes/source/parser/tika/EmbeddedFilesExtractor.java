@@ -257,12 +257,12 @@ public final class EmbeddedFilesExtractor {
             final boolean outputHtml) throws SAXException, IOException {
 
             TemporaryResources tmp = new TemporaryResources();
-            TikaInputStream tis = TikaInputStream.get(stream, tmp);
+            TikaInputStream tis = TikaInputStream.get(stream, tmp, mdata);
 
             MediaType contentType = m_detector.detect(tis, mdata);
 
             byte[] byteArray = getBytes(tis, tis.available());
-            TikaInputStream tisParse = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp);
+            TikaInputStream tisParse = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp, mdata);
             EmbeddedContentHandler embedH = new EmbeddedContentHandler(new BodyContentHandler(contentHandler));
             try {
                 autoParser.parse(tisParse, embedH, mdata, new ParseContext());
@@ -330,7 +330,7 @@ public final class EmbeddedFilesExtractor {
                 }
             }
 
-            TikaInputStream tisExtract = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp);
+            TikaInputStream tisExtract = TikaInputStream.get(new ByteArrayInputStream(byteArray), tmp, mdata);
 
             try (FileOutputStream os = new FileOutputStream(outputFile)) {
                 if (tisExtract.getOpenContainer() != null && tisExtract.getOpenContainer() instanceof DirectoryEntry) {
