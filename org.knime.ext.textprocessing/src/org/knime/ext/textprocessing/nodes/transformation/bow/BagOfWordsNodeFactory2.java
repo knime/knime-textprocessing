@@ -47,26 +47,38 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
  * The {@link org.knime.core.node.NodeFactory} of the bag of words creator, provides methods to create the model and the
  * dialog instance.
  *
  * @author Kilian Thiel, University of Konstanz
+ * @author Robin Gerling, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  * @since 3.5
  */
-public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new BagOfWordsNodeDialog2();
-    }
+@SuppressWarnings("restriction")
+public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
     /**
      * {@inheritDoc}
@@ -98,5 +110,56 @@ public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2> {
     @Override
     protected boolean hasDialog() {
         return true;
+    }
+
+    private static final String NODE_NAME = "Bag Of Words Creator";
+
+    private static final String NODE_ICON = "../../../icons/TextProcDefault.png";
+
+    private static final String SHORT_DESCRIPTION = "Bag of words creator.";
+
+    private static final String FULL_DESCRIPTION = """
+            This node creates a bag of words (BoW) of a set of documents. A BoW consists of at least one column
+            containing the terms occurring in the corresponding document. All term related columns like the document
+            column can be selected in the node dialog and will be copied to the output table.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS =
+        List.of(fixedPort("Documents input table", "The input table containing the documents."));
+
+    private static final List<PortDescription> OUTPUT_PORTS =
+        List.of(fixedPort("Documents output table", "An output table containing the bag of words."));
+
+    @Override
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, BagOfWordsNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(
+            NODE_NAME,
+            NODE_ICON,
+            INPUT_PORTS,
+            OUTPUT_PORTS,
+            SHORT_DESCRIPTION,
+            FULL_DESCRIPTION,
+            List.of(),
+            BagOfWordsNodeParameters.class,
+            null,
+            NodeType.Manipulator,
+            List.of(),
+            null
+        );
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, BagOfWordsNodeParameters.class));
     }
 }

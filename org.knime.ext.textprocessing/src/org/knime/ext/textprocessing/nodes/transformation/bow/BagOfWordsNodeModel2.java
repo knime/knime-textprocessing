@@ -49,8 +49,10 @@ package org.knime.ext.textprocessing.nodes.transformation.bow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -79,6 +81,7 @@ import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
 import org.knime.ext.textprocessing.data.TermCell2;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
+import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.ext.textprocessing.util.DataTableSpecVerifier;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactory;
 import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
@@ -93,11 +96,50 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  */
 class BagOfWordsNodeModel2 extends NodeModel {
 
-    private final SettingsModelString m_docColModel = BagOfWordsNodeDialog2.getDocumentColumnModel();
+    /**
+     * Creates and returns a {@link SettingsModelString} containing the name of the column with the documents to create
+     * the bag of words from.
+     *
+     * @return {@code SettingsModelString} containing the name of the document column.
+     */
+    static final SettingsModelString getDocumentColumnModel() {
+        return new SettingsModelString(BagOfWordsConfigKeys2.CFG_KEY_DOCUMENT_COL, "");
+    }
 
-    private final SettingsModelColumnFilter2 m_colFilterModel = BagOfWordsNodeDialog2.getColumnSelectionModel();
+    /**
+     * Creates and returns a {@link SettingsModelColumnFilter2} containing the name of the columns that will be carried
+     * over to the output table.
+     *
+     * @return {@code SettingsModelColumnFilter2} containing the name of the columns that will be carried over to the
+     *         output table.
+     */
+    static final SettingsModelColumnFilter2 getColumnSelectionModel() {
+        return new SettingsModelColumnFilter2(BagOfWordsConfigKeys2.CFG_KEY_COLUMN_FILTER);
+    }
 
-    private final SettingsModelString m_termColModel = BagOfWordsNodeDialog2.getTermColumnModel();
+    /**
+     * Creates and returns a {@link SettingsModelString} containing the name of the term column that will be created.
+     *
+     * @return {@code SettingsModelString} containing the name of the term column.
+     */
+    static final SettingsModelString getTermColumnModel() {
+        return new SettingsModelString(BagOfWordsConfigKeys2.CFG_KEY_TERM_COL, CommonColumnNames.DEF_TERM_COLNAME);
+    }
+
+    static boolean checkIncludes(final SettingsModelColumnFilter2 colFilter, final DataTableSpec spec,
+        final String colName) {
+        List<String> includes = Arrays.asList(colFilter.applyTo(spec).getIncludes());
+        if (includes.contains(colName.trim())) {
+            return true;
+        }
+        return false;
+    }
+
+    private final SettingsModelString m_docColModel = getDocumentColumnModel();
+
+    private final SettingsModelColumnFilter2 m_colFilterModel = getColumnSelectionModel();
+
+    private final SettingsModelString m_termColModel = getTermColumnModel();
 
     private final TextContainerDataCellFactory m_termFac = TextContainerDataCellFactoryBuilder.createTermCellFactory();
 
@@ -131,7 +173,7 @@ class BagOfWordsNodeModel2 extends NodeModel {
         m_documentColIndex = spec.findColumnIndex(m_docColModel.getStringValue());
 
         // check if there already is a column named like the specified term column name
-        if (BagOfWordsNodeDialog2.checkIncludes(m_colFilterModel, spec, m_termColModel.getStringValue())) {
+        if (checkIncludes(m_colFilterModel, spec, m_termColModel.getStringValue())) {
             throw new InvalidSettingsException("Can't create new column '" + m_termColModel.getStringValue()
                 + "' as input spec already contains column named '" + m_termColModel.getStringValue() + "'!");
         }
