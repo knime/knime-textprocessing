@@ -47,6 +47,12 @@
  */
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
@@ -54,17 +60,12 @@ import org.knime.core.webui.node.dialog.NodeDialog;
 import org.knime.core.webui.node.dialog.NodeDialogFactory;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.dialog.SettingsType;
-import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
 import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
-import org.knime.core.node.NodeFactory.NodeType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
 import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
 import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
-import org.knime.core.node.NodeDescription;
 import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
-import java.util.Map;
 import org.knime.node.impl.description.PortDescription;
-import java.util.List;
-import static org.knime.node.impl.description.PortDescription.fixedPort;
 
 /**
  * The {@link org.knime.core.node.NodeFactory} of the bag of words creator, provides methods to create the model and the
@@ -76,11 +77,8 @@ import static org.knime.node.impl.description.PortDescription.fixedPort;
  * @since 3.5
  */
 @SuppressWarnings("restriction")
-public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2> implements NodeDialogFactory, KaiNodeInterfaceFactory {
-
-    /**
-     * {@inheritDoc}
-     */
+public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
     /**
      * {@inheritDoc}
@@ -113,26 +111,24 @@ public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2> im
     protected boolean hasDialog() {
         return true;
     }
+
     private static final String NODE_NAME = "Bag Of Words Creator";
+
     private static final String NODE_ICON = "../../../icons/TextProcDefault.png";
-    private static final String SHORT_DESCRIPTION = """
-            Bag of words creator.
-            """;
+
+    private static final String SHORT_DESCRIPTION = "Bag of words creator.";
+
     private static final String FULL_DESCRIPTION = """
             This node creates a bag of words (BoW) of a set of documents. A BoW consists of at least one column
-                containing the terms occurring in the corresponding document. All term related columns like the document
-                column can be selected in the node dialog and will be copied to the output table.
+            containing the terms occurring in the corresponding document. All term related columns like the document
+            column can be selected in the node dialog and will be copied to the output table.
             """;
-    private static final List<PortDescription> INPUT_PORTS = List.of(
-            fixedPort("Documents input table", """
-                The input table containing the documents.
-                """)
-    );
-    private static final List<PortDescription> OUTPUT_PORTS = List.of(
-            fixedPort("Documents output table", """
-                An output table containing the bag of words.
-                """)
-    );
+
+    private static final List<PortDescription> INPUT_PORTS =
+        List.of(fixedPort("Documents input table", "The input table containing the documents."));
+
+    private static final List<PortDescription> OUTPUT_PORTS =
+        List.of(fixedPort("Documents output table", "An output table containing the bag of words."));
 
     @Override
     public NodeDialogPane createNodeDialogPane() {

@@ -128,7 +128,7 @@
                 "isInverted" : false
               },
               "manualFilter" : {
-                "manuallySelected" : [ ],
+                "manuallySelected" : [ "Document", "Column1", "Column2", "Column3", "Column4" ],
                 "manuallyDeselected" : [ ],
                 "includeUnknownColumns" : true
               },
@@ -142,7 +142,7 @@
             "type" : "string",
             "title" : "Document column",
             "description" : "Select the document column that is used for creating the bag of words.",
-            "default" : ""
+            "default" : "Document"
           },
           "termColumn" : {
             "type" : "string",

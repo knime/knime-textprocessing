@@ -46,9 +46,11 @@
 
 package org.knime.ext.textprocessing.nodes.transformation.bow;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.ext.textprocessing.data.DocumentValue;
 import org.knime.ext.textprocessing.util.CommonColumnNames;
 import org.knime.node.parameters.NodeParameters;
+import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 import org.knime.node.parameters.persistence.Persist;
@@ -57,6 +59,7 @@ import org.knime.node.parameters.persistence.legacy.LegacyColumnFilterPersistor;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
 import org.knime.node.parameters.widget.choices.filter.ColumnFilter;
 import org.knime.node.parameters.widget.choices.util.AllColumnsProvider;
+import org.knime.node.parameters.widget.choices.util.ColumnSelectionUtil;
 import org.knime.node.parameters.widget.choices.util.CompatibleColumnsProvider;
 
 /**
@@ -67,7 +70,17 @@ import org.knime.node.parameters.widget.choices.util.CompatibleColumnsProvider;
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-class BagOfWordsNodeFactory2Parameters implements NodeParameters {
+final class BagOfWordsNodeFactory2Parameters implements NodeParameters {
+
+    BagOfWordsNodeFactory2Parameters() {
+    }
+
+    BagOfWordsNodeFactory2Parameters(final NodeParametersInput input) {
+        m_documentColumn = ColumnSelectionUtil.getFirstCompatibleColumnOfFirstPort(input, DocumentValue.class)
+            .map(DataColumnSpec::getName).orElse("");
+        m_columnFilter =
+            new ColumnFilter(ColumnSelectionUtil.getAllColumnsOfFirstPort(input)).withIncludeUnknownColumns();
+    }
 
     @Persist(configKey = BagOfWordsConfigKeys2.CFG_KEY_DOCUMENT_COL)
     @Widget(title = "Document column",
@@ -87,14 +100,12 @@ class BagOfWordsNodeFactory2Parameters implements NodeParameters {
     ColumnFilter m_columnFilter = new ColumnFilter().withIncludeUnknownColumns();
 
     static final class DocumentColumnsProvider extends CompatibleColumnsProvider {
-
         protected DocumentColumnsProvider() {
             super(DocumentValue.class);
         }
     }
 
     static final class ColumnFilterLegacyPersistor extends LegacyColumnFilterPersistor {
-
         ColumnFilterLegacyPersistor() {
             super(BagOfWordsConfigKeys2.CFG_KEY_COLUMN_FILTER);
         }
