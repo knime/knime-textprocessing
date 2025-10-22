@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  edu.stanford.nlp.stanford-corenlp;bundle-version="3.6.0",
  org.apache.opennlp.tools;bundle-version="1.6.0",
  org.apache.pdfbox.fontbox;bundle-version="2.0.7"
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: knime-textprocessing-german.jar
 Export-Package: org.knime.ext.textprocessing.language.german,

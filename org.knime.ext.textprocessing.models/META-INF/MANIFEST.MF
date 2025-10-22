@@ -4,6 +4,6 @@ Bundle-Name: Static model files for the textprocessing extension
 Bundle-SymbolicName: org.knime.ext.textprocessing.models;singleton:=true
 Bundle-Version: 5.2.0.qualifier
 Fragment-Host: org.knime.ext.textprocessing;bundle-version="[5.2.0,6.0.0)"
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Eclipse-BundleShape: dir
