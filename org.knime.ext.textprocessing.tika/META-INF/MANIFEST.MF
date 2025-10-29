@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Tika Plug-in
 Bundle-SymbolicName: org.knime.ext.textprocessing.tika;singleton:=true
-Bundle-Version: 5.8.0.qualifier
+Bundle-Version: 5.9.0.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingTikaPlugin
 Bundle-ClassPath: knime-textprocessing-tika.jar,
  lib/annotations-24.1.0.jar,

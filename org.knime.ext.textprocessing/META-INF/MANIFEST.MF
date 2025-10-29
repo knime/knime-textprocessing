@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Plug-in
 Bundle-SymbolicName: org.knime.ext.textprocessing;singleton:=true
-Bundle-Version: 5.8.0.qualifier
+Bundle-Version: 5.9.0.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.TextprocessingCorePlugin
 Bundle-ClassPath: knime-textprocessing.jar,
  lib/abner.jar,
