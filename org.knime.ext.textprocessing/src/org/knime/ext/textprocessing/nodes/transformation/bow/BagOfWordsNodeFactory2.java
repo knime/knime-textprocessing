@@ -130,11 +130,21 @@ public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2>
     private static final List<PortDescription> OUTPUT_PORTS =
         List.of(fixedPort("Documents output table", "An output table containing the bag of words."));
 
+    /**
+     * {@inheritDoc}
+     *
+     * @since 5.9
+     */
     @Override
     public NodeDialogPane createNodeDialogPane() {
         return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @since 5.9
+     */
     @Override
     public NodeDialog createNodeDialog() {
         return new DefaultNodeDialog(SettingsType.MODEL, BagOfWordsNodeParameters.class);
@@ -158,6 +168,11 @@ public class BagOfWordsNodeFactory2 extends NodeFactory<BagOfWordsNodeModel2>
         );
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @since 5.9
+     */
     @Override
     public KaiNodeInterface createKaiNodeInterface() {
         return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, BagOfWordsNodeParameters.class));
