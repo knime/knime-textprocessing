@@ -49,14 +49,12 @@ package org.knime.ext.textprocessing;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.NodeLogger;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
@@ -66,6 +64,9 @@ import org.osgi.framework.FrameworkUtil;
  * @author Kilian Thiel, University of Konstanz
  */
 public class TextprocessingCorePlugin extends AbstractUIPlugin {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TextprocessingCorePlugin.class);
+
     // The shared instance.
     private static TextprocessingCorePlugin plugin;
 
@@ -116,14 +117,16 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
      * @since 3.3
      */
     public static File resolvePath(final String relativePath) {
-        Bundle myself = FrameworkUtil.getBundle(TextprocessingCorePlugin.class);
+        final var myself = FrameworkUtil.getBundle(TextprocessingCorePlugin.class);
+        String path;
         try {
-            URL fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath), null));
-            return new File(fileUrl.getPath());
-        } catch (IOException ex) {
-            NodeLogger.getLogger(TextprocessingCorePlugin.class)
-                .error("Could not resolve relativ path '" + relativePath + "': " + ex.getMessage(), ex);
-            return new File("");
+            final var fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath)));
+            path = fileUrl != null ? fileUrl.getPath() : "";
+        } catch (final IOException ex) {
+            final var msg = ex.getMessage() == null ? "reason unknown" : ex.getMessage();
+            LOGGER.error(() -> String.format("Could not resolve relative path '%s': %s", relativePath, msg), ex);
+            path = ""; // same as before, method never returns null
         }
+        return new File(path);
     }
 }
