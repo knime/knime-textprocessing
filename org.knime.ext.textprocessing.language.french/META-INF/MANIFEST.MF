@@ -15,4 +15,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Eclipse-BundleShape: jar
+Export-Package: org.knime.ext.textprocessing.language.french
 Automatic-Module-Name: org.knime.ext.textprocessing.language.french
