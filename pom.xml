@@ -21,19 +21,24 @@
 		<knime.sonar-env>Sonarcloud</knime.sonar-env>
 	</properties> 
 
-	<modules>
+    <modules>
+        <module>org.knime.ext.textprocessing.assets</module>
         <module>org.knime.ext.textprocessing</module>
         <module>org.knime.ext.textprocessing.tests</module>
+        <module>org.knime.ext.textprocessing.language.arabic.assets</module>
         <module>org.knime.ext.textprocessing.language.arabic</module>
+        <module>org.knime.ext.textprocessing.language.chinese.assets</module>
         <module>org.knime.ext.textprocessing.language.chinese</module>
+        <module>org.knime.ext.textprocessing.language.french.assets</module>
         <module>org.knime.ext.textprocessing.language.french</module>
+        <module>org.knime.ext.textprocessing.language.german.assets</module>
         <module>org.knime.ext.textprocessing.language.german</module>
+        <module>org.knime.ext.textprocessing.language.spanish.assets</module>
         <module>org.knime.ext.textprocessing.language.spanish</module>
-        <module>org.knime.ext.textprocessing.language.turkish</module>
         <module>org.knime.ext.textprocessing.language.turkish.libs</module>
+        <module>org.knime.ext.textprocessing.language.turkish</module>
         <module>org.knime.ext.textprocessing.tika/lib/fetch_jars</module>
         <module>org.knime.ext.textprocessing.tika</module>
-        <module>org.knime.ext.textprocessing.models</module>
         <module>org.knime.features.ext.textprocessing</module>
         <module>org.knime.features.ext.textprocessing.language.arabic</module>
         <module>org.knime.features.ext.textprocessing.language.chinese</module>
@@ -42,7 +47,10 @@
         <module>org.knime.features.ext.textprocessing.language.spanish</module>
         <module>org.knime.features.ext.textprocessing.language.turkish</module>
         <module>org.knime.update.ext.textprocessing</module>
-	</modules>
+    </modules>
+
+    <!-- Note: tycho-dependency-tools-plugin moved to individual modules that contain code,
+               otherwise we would need poms in all non-code modules to skip the analysis -->
 
 	<repositories>
 		<repository>

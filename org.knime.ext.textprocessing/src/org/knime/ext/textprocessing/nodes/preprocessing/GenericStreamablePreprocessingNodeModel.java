@@ -65,7 +65,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -92,9 +91,6 @@ import org.knime.ext.textprocessing.util.TextContainerDataCellFactoryBuilder;
  * @author Julian Bunzel, KNIME GmbH, Berlin, Germany
  */
 abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> extends NodeModel {
-
-    /** Node logger for this class. */
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(GenericStreamablePreprocessingNodeModel.class);
 
     /** The default settings for preprocessing unmodifiable terms. */
     public static final boolean DEF_PREPRO_UNMODIFIABLE = false;
@@ -380,8 +376,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
             return rearranger;
         } catch (final Exception e) {
-            LOGGER.error("Preprocessing instance could not be created!");
-            throw new InvalidSettingsException(e);
+            throw new InvalidSettingsException("Preprocessing instance could not be created", e);
         }
     }
 

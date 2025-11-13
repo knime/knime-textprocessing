@@ -82,9 +82,8 @@ public class OpenNlpEnglishWordTokenizer implements Tokenizer {
             InputStream is = new FileInputStream(new File(modelPath));
             TokenizerModel model = new TokenizerModel(is);
             m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);
-        } catch (IOException e) {
-            LOGGER.error("English word tokenizer model could not be read!");
-            LOGGER.error(e.getStackTrace());
+        } catch (final IOException e) {
+            LOGGER.error("English word tokenizer model could not be read!", e);
         }
     }
 

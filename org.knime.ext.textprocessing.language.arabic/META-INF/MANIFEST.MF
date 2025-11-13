@@ -2,20 +2,21 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Arabic Language Pack
 Bundle-SymbolicName: org.knime.ext.textprocessing.language.arabic;singleton:=true
-Bundle-Version: 5.2.0.qualifier
+Bundle-Version: 5.9.0.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.language.arabic.TextprocessingArabicLanguagePack
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.knime.ext.textprocessing.language.arabic.assets;bundle-version="[1.0.0,2.0.0)",
+ org.eclipse.ui;bundle-version="[3.205.0,4.0.0)",
+ org.eclipse.core.runtime;bundle-version="[3.31.0,4.0.0)",
  org.knime.core;bundle-version="[5.6.0,6.0.0)",
  org.knime.ext.textprocessing;bundle-version="[5.6.0,6.0.0)",
  edu.stanford.nlp.stanford-corenlp;bundle-version="[3.9.1,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: knime-textprocessing-arabic.jar
+Bundle-ClassPath: .
 Export-Package: org.knime.ext.textprocessing.language.arabic,
  org.knime.ext.textprocessing.language.arabic.data,
  org.knime.ext.textprocessing.language.arabic.nodes.tagging.stanford.posmodels,
  org.knime.ext.textprocessing.language.arabic.nodes.tokenization.tokenizer.word
-Eclipse-BundleShape: dir
+Eclipse-BundleShape: jar
 Automatic-Module-Name: org.knime.ext.textprocessing.language.arabic

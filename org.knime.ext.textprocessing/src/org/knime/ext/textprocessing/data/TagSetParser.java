@@ -110,15 +110,12 @@ public class TagSetParser extends DefaultHandler {
             SAXParserFactory fac = SAXParserFactory.newInstance();
             fac.setValidating(true);
             fac.newSAXParser().parse(file, this);
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("Could not instanciate parser");
-            LOGGER.info(e.getMessage());
-        } catch (SAXException e) {
-            LOGGER.error("Could not parse file");
-            LOGGER.info(e.getMessage());
-        } catch (IOException e) {
-            LOGGER.error("Could not read file");
-            LOGGER.info(e.getMessage());
+        } catch (final ParserConfigurationException e) {
+            LOGGER.error("Could not instanciate parser", e);
+        } catch (final SAXException e) {
+            LOGGER.error("Could not parse file", e);
+        } catch (final IOException e) {
+            LOGGER.error("Could not read file", e);
         }
         return m_tagClassNames;
     }

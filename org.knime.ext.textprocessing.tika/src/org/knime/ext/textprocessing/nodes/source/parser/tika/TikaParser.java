@@ -437,8 +437,9 @@ public class TikaParser {
                         }
                     }
                 }
-            } catch (MimeTypeException e) {
-                LOGGER.error("Could not fetch MIME type: " + mime, new MimeTypeException("Fetching MIME type failed!"));
+            } catch (final MimeTypeException e) {
+                LOGGER.error("Could not fetch MIME type: " + mime, new MimeTypeException("Fetching MIME type failed!",
+                    e));
             }
         }
         Collections.sort(result, String.CASE_INSENSITIVE_ORDER);

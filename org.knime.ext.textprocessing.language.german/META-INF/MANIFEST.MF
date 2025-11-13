@@ -2,22 +2,23 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing German Language Pack
 Bundle-SymbolicName: org.knime.ext.textprocessing.language.german;singleton:=true
-Bundle-Version: 5.2.0.qualifier
+Bundle-Version: 5.9.0.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.language.german.TextprocessingGermanLanguagePack
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.knime.ext.textprocessing.language.german.assets;bundle-version="[1.0.0,2.0.0)",
+ org.eclipse.ui;bundle-version="[3.205.0,4.0.0)",
+ org.eclipse.core.runtime;bundle-version="[3.31.0,4.0.0)",
  org.knime.core;bundle-version="[5.6.0,6.0.0)",
  org.knime.ext.textprocessing;bundle-version="[5.6.0,6.0.0)",
- edu.stanford.nlp.stanford-corenlp;bundle-version="3.6.0",
- org.apache.opennlp.tools;bundle-version="1.6.0",
- org.apache.pdfbox.fontbox;bundle-version="2.0.7"
+ edu.stanford.nlp.stanford-corenlp;bundle-version="[3.6.0,4.0.0)",
+ org.apache.opennlp.tools;bundle-version="[1.6.0,2.0.0)",
+ org.apache.pdfbox.fontbox;bundle-version="[2.0.7,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: knime-textprocessing-german.jar
+Bundle-ClassPath: .
 Export-Package: org.knime.ext.textprocessing.language.german,
  org.knime.ext.textprocessing.language.german.nodes.tagging.stanford.posmodels,
  org.knime.ext.textprocessing.language.german.nodes.tagging.stanfordnlpnetagger.nermodels,
  org.knime.ext.textprocessing.language.german.nodes.tokenization.tokenizer.word
-Eclipse-BundleShape: dir
+Eclipse-BundleShape: jar
 Automatic-Module-Name: org.knime.ext.textprocessing.language.german

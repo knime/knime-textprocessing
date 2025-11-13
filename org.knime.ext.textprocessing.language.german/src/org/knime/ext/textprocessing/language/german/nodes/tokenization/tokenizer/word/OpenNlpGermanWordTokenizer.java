@@ -79,19 +79,15 @@ public class OpenNlpGermanWordTokenizer implements Tokenizer {
      */
     public OpenNlpGermanWordTokenizer() {
         try {
-            String modelPath = OpenNlpModelPaths.getOpenNlpModelPaths().getDeTokenizerModelFile();
-            InputStream is = new FileInputStream(new File(modelPath));
-            TokenizerModel model = new TokenizerModel(is);
+            final var modelPath = OpenNlpModelPaths.getOpenNlpModelPaths().getDeTokenizerModelFile();
+            final InputStream is = new FileInputStream(new File(modelPath));
+            final var model = new TokenizerModel(is);
             m_tokenizer = new opennlp.tools.tokenize.TokenizerME(model);
-        } catch (IOException e) {
-            LOGGER.error("German word tokenizer model could not be read!");
-            LOGGER.error(e.getStackTrace());
+        } catch (final IOException e) {
+            LOGGER.error("German word tokenizer model could not be read!", e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized List<String> tokenize(final String sentence) {
         if (m_tokenizer != null) {

@@ -2,10 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Textprocessing Spanish Language Pack
 Bundle-SymbolicName: org.knime.ext.textprocessing.language.spanish;singleton:=true
-Bundle-Version: 5.0.0.qualifier
+Bundle-Version: 5.9.0.qualifier
 Bundle-Activator: org.knime.ext.textprocessing.language.spanish.TextprocessingSpanishLanguagePack
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
-Require-Bundle: org.eclipse.ui,
+Require-Bundle: org.knime.ext.textprocessing.language.spanish.assets;bundle-version="[1.0.0,2.0.0)",
+ org.eclipse.ui;bundle-version="[3.205.0,4.0.0)",
  org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
  org.knime.core;bundle-version="[5.6.0,6.0.0)",
  org.knime.ext.textprocessing;bundle-version="[5.6.0,6.0.0)",
@@ -13,9 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.apache.pdfbox.fontbox;bundle-version="[2.0.7,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: knime-textprocessing-spanish.jar
+Bundle-ClassPath: .
 Export-Package: org.knime.ext.textprocessing.language.spanish,
  org.knime.ext.textprocessing.language.spanish.nodes.tagging.stanfordnlpnetagger.nermodels,
  org.knime.ext.textprocessing.language.spanish.nodes.tokenization.tokenizer.word
-Eclipse-BundleShape: dir
+Eclipse-BundleShape: jar
 Automatic-Module-Name: org.knime.ext.textprocessing.language.spanish

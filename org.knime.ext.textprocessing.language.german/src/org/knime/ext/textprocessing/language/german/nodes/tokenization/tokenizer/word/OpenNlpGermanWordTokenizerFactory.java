@@ -65,25 +65,16 @@ public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
     public OpenNlpGermanWordTokenizerFactory() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tokenizer getTokenizer() {
         return new OpenNlpGermanWordTokenizer();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getTokenizerName() {
         return "OpenNLP German WordTokenizer";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getTokenizerDescription() {
         return "\"A maximum entropy tokenizer, detects token boundaries based on probability model\". \n"
@@ -91,12 +82,8 @@ public class OpenNlpGermanWordTokenizerFactory implements TokenizerFactory {
                 + "The model is provided by the OpenNLP group.";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getTokenizerDescLink() {
         return "https://opennlp.apache.org/documentation/1.6.0/manual/opennlp.html#tools.tokenizer.introduction";
     }
-
 }

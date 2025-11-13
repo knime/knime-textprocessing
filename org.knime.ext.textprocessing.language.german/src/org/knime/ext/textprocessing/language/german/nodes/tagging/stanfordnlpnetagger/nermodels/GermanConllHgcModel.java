@@ -68,54 +68,43 @@ import org.knime.ext.textprocessing.nodes.tagging.StanfordTaggerModel;
  */
 public class GermanConllHgcModel implements StanfordTaggerModel {
 
-	/**
-	 * This map stores tags used by the German Stanford ner models and maps them
-	 * to the tag naming used by KNIME.
-	 */
-	private static final Map<String, String> tagDictionary = new HashMap<String, String>();
+    /**
+     * This map stores tags used by the German Stanford ner models and maps them
+     * to the tag naming used by KNIME.
+     */
+    private static final Map<String, String> tagDictionary = new HashMap<String, String>();
 
-	static {
-		tagDictionary.put("I-LOC", NamedEntityTag.LOCATION.getTag().getTagValue());
-		tagDictionary.put("I-PER", NamedEntityTag.PERSON.getTag().getTagValue());
-		tagDictionary.put("I-ORG", NamedEntityTag.ORGANIZATION.getTag().getTagValue());
-	}
+    static {
+        tagDictionary.put("I-LOC", NamedEntityTag.LOCATION.getTag().getTagValue());
+        tagDictionary.put("I-PER", NamedEntityTag.PERSON.getTag().getTagValue());
+        tagDictionary.put("I-ORG", NamedEntityTag.ORGANIZATION.getTag().getTagValue());
+    }
 
-	private static final String MODELNAME = "German Conll GermEval 2014 hgc";
+    private static final String MODELNAME = "German Conll GermEval 2014 hgc";
 
-	private static final String MODELPATH = "models/stanfordmodels/nermodels/german.conll.germeval2014.hgc_175m_600.crf.ser.gz";
+    private static final String MODELPATH =
+        "models/stanfordmodels/nermodels/german.conll.germeval2014.hgc_175m_600.crf.ser.gz";
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModelName() {
-		return MODELNAME;
-	}
+    @Override
+    public String getModelName() {
+        return MODELNAME;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModelPath() {
-		return TextprocessingGermanLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
-	}
+    @Override
+    public String getModelPath() {
+        return TextprocessingGermanLanguagePack.resolvePath(MODELPATH).getAbsolutePath();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TagBuilder getTagBuilder() {
-		return NamedEntityTag.getDefault();
-	}
+    @Override
+    public TagBuilder getTagBuilder() {
+        return NamedEntityTag.getDefault();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<Tag> getTags(final String tag) {
-		List<Tag> tags = new ArrayList<Tag>(1);
-		final String normalizedTag = tagDictionary.getOrDefault(tag, tag);
-		tags.add(getTagBuilder().buildTag(normalizedTag));
-		return tags;
-	}
+    @Override
+    public List<Tag> getTags(final String tag) {
+        List<Tag> tags = new ArrayList<Tag>(1);
+        final String normalizedTag = tagDictionary.getOrDefault(tag, tag);
+        tags.add(getTagBuilder().buildTag(normalizedTag));
+        return tags;
+    }
 }

@@ -358,13 +358,15 @@ Public License instead of this License.
    </license>
 
    <requires>
-      <import feature="org.knime.features.ext.textprocessing" version="5.8.0" match="greaterOrEqual"/>
+      <import feature="org.knime.features.ext.textprocessing" version="5.9.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
          id="org.knime.ext.textprocessing.language.chinese"
-         download-size="0"
-         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.knime.ext.textprocessing.language.chinese.assets"
          version="0.0.0"/>
 
 </feature>

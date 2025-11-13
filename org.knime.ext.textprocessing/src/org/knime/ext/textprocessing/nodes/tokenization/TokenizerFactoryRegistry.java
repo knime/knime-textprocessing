@@ -133,7 +133,8 @@ public final class TokenizerFactoryRegistry {
                         (TokenizerFactory)elem.createExecutableExtension(EXT_POINT_ATTR_DF);
                     registerTokenizerFactory(factory);
                 } catch (final Throwable t) {
-                    LOGGER.error("Problems during initialization of tokenizer factory (with id '" + operator + "'.)");
+                    LOGGER.error("Problems during initialization of tokenizer factory (with id '" + operator + "'.)",
+                        t);
                     if (decl != null) {
                         LOGGER.error("Extension " + decl + "ignored.", t);
                     }
@@ -141,7 +142,7 @@ public final class TokenizerFactoryRegistry {
 
             }
         } catch (final Exception e) {
-            LOGGER.error("Exception while registering TokenizerFactory extensions");
+            LOGGER.error("Exception while registering TokenizerFactory extensions", e);
         }
     }
 

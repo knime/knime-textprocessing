@@ -86,10 +86,9 @@ public class OpenNlpSentenceTokenizer implements Tokenizer {
             InputStream is = new FileInputStream(new File(modelPath));
             SentenceModel model = new SentenceModel(is);
             m_tokenizer = new SentenceDetectorME(model);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error("Could not create OpenNlpSentenceTokenizer since"
-                    + "model could not be red!");
-            LOGGER.error(e.getStackTrace());
+                    + "model could not be red!", e);
         }
     }
 

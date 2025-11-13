@@ -57,7 +57,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -396,12 +395,6 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
         conn.setConnectTimeout(60000);
         try (final var c = ThreadLocalHTTPAuthenticator.suppressAuthenticationPopups()) {
             conn.connect();
-        } catch (SocketTimeoutException e) {
-            LOGGER.error("Timeout! Connection could not be established.");
-            throw e;
-        } catch (IOException e) {
-            LOGGER.error("Connection could not be opened.");
-            throw e;
         }
 
         try (final var c = ThreadLocalHTTPAuthenticator.suppressAuthenticationPopups();
@@ -414,9 +407,6 @@ public class PubMedDocumentGrabber extends AbstractDocumentGrabber {
             while ((line = in.readLine()) != null) {
                 writer.write(line);
             }
-        } catch (IOException e) {
-            LOGGER.error("Documents could not be downloaded.", e);
-            throw e;
         }
     }
 

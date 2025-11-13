@@ -2,14 +2,14 @@ package org.knime.ext.textprocessing.language.german;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.NodeLogger;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
@@ -20,19 +20,23 @@ import org.osgi.framework.FrameworkUtil;
  * @since 3.4
  */
 public class TextprocessingGermanLanguagePack extends AbstractUIPlugin {
+    
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TextprocessingGermanLanguagePack.class);
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.knime.ext.textprocessing.language.german";
+    // The plug-in ID
+    public static final String PLUGIN_ID = "org.knime.ext.textprocessing.language.german";
 
-	// The shared instance
-	private static TextprocessingGermanLanguagePack plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public TextprocessingGermanLanguagePack() {
-		plugin = this;
-	}
+    private static final String ASSETS_PLUGIN_ID = "org.knime.ext.textprocessing.language.german.assets";
+
+    // The shared instance
+    private static TextprocessingGermanLanguagePack plugin;
+
+    /**
+     * The constructor
+     */
+    public TextprocessingGermanLanguagePack() {
+        plugin = this;
+    }
 
     /**
      * This method is called when the plug-in is stopped.
@@ -40,31 +44,31 @@ public class TextprocessingGermanLanguagePack extends AbstractUIPlugin {
      * @throws Exception If cause by super class.
      */
     @Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    public void stop(final BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static TextprocessingGermanLanguagePack getDefault() {
-		return plugin;
-	}
+    /**
+     * Returns the shared instance
+     *
+     * @return the shared instance
+     */
+    public static TextprocessingGermanLanguagePack getDefault() {
+        return plugin;
+    }
 
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-	
+    /**
+     * Returns an image descriptor for the image file at the given
+     * plug-in relative path
+     *
+     * @param path the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(final String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
     /**
      * Resolves a path relative to the plug-in or any fragment's root into an absolute path.
      *
@@ -72,14 +76,21 @@ public class TextprocessingGermanLanguagePack extends AbstractUIPlugin {
      * @return the resolved absolute path
      */
     public static File resolvePath(final String relativePath) {
-        Bundle myself = FrameworkUtil.getBundle(TextprocessingGermanLanguagePack.class);
-        try {
-            URL fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath), null));
-            return new File(fileUrl.getPath());
-        } catch (IOException ex) {
-            NodeLogger.getLogger(TextprocessingGermanLanguagePack.class)
-                .error("Could not resolve relativ path '" + relativePath + "': " + ex.getMessage(), ex);
-            return new File("");
-        }
+        final var myself = FrameworkUtil.getBundle(TextprocessingGermanLanguagePack.class);
+        final var relPath = new Path(relativePath);
+
+        final var path = Optional.ofNullable(FileLocator.find(myself, relPath)) //
+            .or(() -> Optional.ofNullable(FileLocator.find(Platform.getBundle(ASSETS_PLUGIN_ID), relPath)))
+            .map(resourceUrl -> {
+                try {
+                    final var fileUrl = FileLocator.toFileURL(resourceUrl);
+                    return fileUrl != null ? fileUrl.getPath() : "";
+                } catch (final IOException e) {
+                    LOGGER.error(() -> String.format("Could not resolve relative path '%s' to file URL: %s",
+                        relativePath, e.getMessage() == null ? "reason unknown" : e.getMessage()), e);
+                    return null;
+                }
+            }).orElse(""); // same behavior as before, the resolvePath method never returned `null`
+        return new File(path);
     }
 }
