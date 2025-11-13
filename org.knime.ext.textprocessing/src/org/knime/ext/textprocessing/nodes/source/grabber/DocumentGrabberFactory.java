@@ -137,12 +137,10 @@ public final class DocumentGrabberFactory {
         // One singleton instance would either block or run into concurrency problems.
         try {
             newGrabberInstance = grabber.getClass().newInstance();
-        } catch (InstantiationException e) {
-            LOGGER.error("New DocumentGrabber instance " + grabber.getClass().toString() + " could not be created!");
-            LOGGER.error(e.getMessage());
-        } catch (IllegalAccessException e) {
-            LOGGER.error("Empty Consructor of " + grabber.getClass().toString() + " is not accessible.");
-            LOGGER.error(e.getMessage());
+        } catch (final InstantiationException e) {
+            LOGGER.error("New DocumentGrabber instance " + grabber.getClass().toString() + " could not be created!", e);
+        } catch (final IllegalAccessException e) {
+            LOGGER.error("Empty Consructor of " + grabber.getClass().toString() + " is not accessible.", e);
         }
 
         return newGrabberInstance;

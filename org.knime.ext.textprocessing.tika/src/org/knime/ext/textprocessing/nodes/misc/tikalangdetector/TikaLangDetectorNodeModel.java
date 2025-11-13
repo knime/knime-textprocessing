@@ -169,7 +169,7 @@ public class TikaLangDetectorNodeModel extends SimpleStreamableFunctionNodeModel
                 m_allLangsBooleanModel.getBooleanValue());
             c.append(factory);
         } catch (IOException e) {
-            LOGGER.error("Error while loading Tika language models");
+            LOGGER.error("Error while loading Tika language models", e);
         }
         return c;
     }

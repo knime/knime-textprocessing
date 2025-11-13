@@ -371,7 +371,7 @@ public class DocumentParserNodeModel extends NodeModel {
                     }
                     parser.clean();
                 } catch (InstantiationException e) {
-                    LOGGER.error("Parser instance could not be created.");
+                    LOGGER.error("Parser instance could not be created.", e);
                     setWarningMessage("Could not parse files!");
                 } catch (InterruptedException e) {
                     LOGGER.warn("Parser thread was interrupted, could not parse all files.");

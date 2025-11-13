@@ -722,19 +722,13 @@ public class DmlDocumentParser extends DefaultHandler implements DocumentParser 
             str = os.toString("UTF-8");
         } catch (SAXException e1) {
             LOGGER.error("Could not create xml output of documemnt " + "file:" + doc.getDocFile() + " / title:"
-                + doc.getTitle());
-            LOGGER.info(e1.getMessage());
-            e1.printStackTrace();
+                + doc.getTitle(), e1);
         } catch (IOException e2) {
             LOGGER.error("Could not write xml output to output stream " + "of document file:" + doc.getDocFile()
-                + " / title:" + doc.getTitle());
-            LOGGER.info(e2.getMessage());
-            e2.printStackTrace();
+                + " / title:" + doc.getTitle(), e2);
         } catch (TransformerConfigurationException ex) {
             LOGGER.error("Could not create xml output of documemnt " + "file:" + doc.getDocFile() + " / title:"
-                + doc.getTitle());
-            LOGGER.info(ex.getMessage());
-            ex.printStackTrace();
+                + doc.getTitle(), ex);
         }
 
         return str;

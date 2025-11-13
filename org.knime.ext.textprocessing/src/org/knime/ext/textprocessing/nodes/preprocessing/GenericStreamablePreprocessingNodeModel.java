@@ -380,8 +380,7 @@ abstract class GenericStreamablePreprocessingNodeModel<T extends Preprocessing> 
 
             return rearranger;
         } catch (final Exception e) {
-            LOGGER.error("Preprocessing instance could not be created!");
-            throw new InvalidSettingsException(e);
+            throw new InvalidSettingsException("Preprocessing instance could not be created", e);
         }
     }
 

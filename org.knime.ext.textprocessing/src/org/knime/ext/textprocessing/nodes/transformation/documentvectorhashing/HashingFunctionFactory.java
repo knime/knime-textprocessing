@@ -162,7 +162,7 @@ final class HashingFunctionFactory {
                 } catch (final Throwable t) {
                     LOGGER.error("Problems during initialization of " + operator + "'.)", t);
                     if (decl != null) {
-                        LOGGER.error("Extension " + decl + " ignored.");
+                        LOGGER.error("Extension " + decl + " ignored.", t);
                     }
                 }
             }
