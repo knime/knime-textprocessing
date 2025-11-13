@@ -366,6 +366,6 @@ Public License instead of this License.
 
    <plugin
          id="org.knime.ext.textprocessing.language.arabic.assets"
-         version="1.0.0"/>
+         version="0.0.0"/>
 
 </feature>

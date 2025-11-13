@@ -49,14 +49,8 @@
         <module>org.knime.update.ext.textprocessing</module>
     </modules>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.eclipse.tycho.extras</groupId>
-                <artifactId>tycho-dependency-tools-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- Note: tycho-dependency-tools-plugin moved to individual modules that contain code,
+               otherwise we would need poms in all non-code modules to skip the analysis -->
 
 	<repositories>
 		<repository>
