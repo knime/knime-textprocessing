@@ -49,9 +49,11 @@ package org.knime.ext.textprocessing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.NodeLogger;
@@ -66,6 +68,10 @@ import org.osgi.framework.FrameworkUtil;
 public class TextprocessingCorePlugin extends AbstractUIPlugin {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TextprocessingCorePlugin.class);
+
+    private static final String PLUGIN_ID = "org.knime.ext.textprocessing";
+
+    private static final String ASSETS_PLUGIN_ID = "org.knime.ext.textprocessing.assets";
 
     // The shared instance.
     private static TextprocessingCorePlugin plugin;
@@ -105,8 +111,7 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(final String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(
-                "org.knime.ext.textprocessing", path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     /**
@@ -118,15 +123,20 @@ public class TextprocessingCorePlugin extends AbstractUIPlugin {
      */
     public static File resolvePath(final String relativePath) {
         final var myself = FrameworkUtil.getBundle(TextprocessingCorePlugin.class);
-        String path;
-        try {
-            final var fileUrl = FileLocator.toFileURL(FileLocator.find(myself, new Path(relativePath)));
-            path = fileUrl != null ? fileUrl.getPath() : "";
-        } catch (final IOException ex) {
-            final var msg = ex.getMessage() == null ? "reason unknown" : ex.getMessage();
-            LOGGER.error(() -> String.format("Could not resolve relative path '%s': %s", relativePath, msg), ex);
-            path = ""; // same as before, method never returns null
-        }
+        final var relPath = new Path(relativePath);
+
+        final var path = Optional.ofNullable(FileLocator.find(myself, relPath)) //
+            .or(() -> Optional.ofNullable(FileLocator.find(Platform.getBundle(ASSETS_PLUGIN_ID), relPath)))
+            .map(resourceUrl -> {
+                try {
+                    final var fileUrl = FileLocator.toFileURL(resourceUrl);
+                    return fileUrl != null ? fileUrl.getPath() : "";
+                } catch (final IOException e) {
+                    LOGGER.error(() -> String.format("Could not resolve relative path '%s' to file URL: %s",
+                        relativePath, e.getMessage() == null ? "reason unknown" : e.getMessage()), e);
+                    return null;
+                }
+            }).orElse(""); // same behavior as before, the resolvePath method never returned `null`
         return new File(path);
     }
 }

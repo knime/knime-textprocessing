@@ -2,7 +2,7 @@ package org.knime.ext.textprocessing.language.chinese;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -10,8 +10,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.util.FileUtil;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -20,11 +20,13 @@ import org.osgi.framework.BundleContext;
  * @since 3.4
  */
 public class TextprocessingChineseLanguagePack extends AbstractUIPlugin {
+    
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TextprocessingChineseLanguagePack.class);
 
     // The plug-in ID
     public static final String PLUGIN_ID = "org.knime.features.ext.textprocessing.language.chinese";
 
-    private static final String MODELS_PLUGIN_ID = "org.knime.ext.textprocessing.language.chinese.assets";
+    private static final String ASSETS_PLUGIN_ID = "org.knime.ext.textprocessing.language.chinese.assets";
 
     // The shared instance
     private static TextprocessingChineseLanguagePack plugin;
@@ -74,14 +76,21 @@ public class TextprocessingChineseLanguagePack extends AbstractUIPlugin {
      * @return the resolved absolute path
      */
     public static File resolvePath(final String relativePath) {
-        final var modelsBundle = Platform.getBundle(MODELS_PLUGIN_ID);
-        try {
-            final var bundleUrl = FileLocator.find(modelsBundle, new Path(relativePath), null);
-            return FileUtil.resolveToPath(FileLocator.toFileURL(bundleUrl)).toFile();
-        } catch (IOException | URISyntaxException ex) {
-            NodeLogger.getLogger(TextprocessingChineseLanguagePack.class)
-                .error("Could not resolve relative path '" + relativePath + "': " + ex.getMessage(), ex);
-            return new File("");
-        }
+        final var myself = FrameworkUtil.getBundle(TextprocessingChineseLanguagePack.class);
+        final var relPath = new Path(relativePath);
+
+        final var path = Optional.ofNullable(FileLocator.find(myself, relPath)) //
+            .or(() -> Optional.ofNullable(FileLocator.find(Platform.getBundle(ASSETS_PLUGIN_ID), relPath)))
+            .map(resourceUrl -> {
+                try {
+                    final var fileUrl = FileLocator.toFileURL(resourceUrl);
+                    return fileUrl != null ? fileUrl.getPath() : "";
+                } catch (final IOException e) {
+                    LOGGER.error(() -> String.format("Could not resolve relative path '%s' to file URL: %s",
+                        relativePath, e.getMessage() == null ? "reason unknown" : e.getMessage()), e);
+                    return null;
+                }
+            }).orElse(""); // same behavior as before, the resolvePath method never returned `null`
+        return new File(path);
     }
 }
