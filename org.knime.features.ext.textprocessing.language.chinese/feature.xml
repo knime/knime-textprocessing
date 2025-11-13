@@ -358,7 +358,7 @@ Public License instead of this License.
    </license>
 
    <requires>
-      <import feature="org.knime.features.ext.textprocessing" version="5.8.0" match="greaterOrEqual"/>
+      <import feature="org.knime.features.ext.textprocessing" version="5.9.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -367,6 +367,6 @@ Public License instead of this License.
 
    <plugin
          id="org.knime.ext.textprocessing.language.chinese.assets"
-         version="0.0.0"/>
+         version="1.0.0"/>
 
 </feature>
