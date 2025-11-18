@@ -8,8 +8,8 @@ Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.knime.ext.textprocessing.language.spanish.assets;bundle-version="[1.0.0,2.0.0)",
  org.eclipse.ui;bundle-version="[3.205.0,4.0.0)",
  org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
- org.knime.core;bundle-version="[5.6.0,6.0.0)",
- org.knime.ext.textprocessing;bundle-version="[5.6.0,6.0.0)",
+ org.knime.core;bundle-version="[5.9.0,6.0.0)",
+ org.knime.ext.textprocessing;bundle-version="[5.9.0,6.0.0)",
  edu.stanford.nlp.stanford-corenlp;bundle-version="[3.9.1,4.0.0)",
  org.apache.pdfbox.fontbox;bundle-version="[2.0.7,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
