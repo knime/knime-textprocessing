@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.language.spanish"
       label="KNIME Textprocessing Spanish Language Pack"
-      version="5.9.0.qualifier"
+      version="5.10.0.qualifier"
       provider-name="KNIME Gmbh, Konstanz, Germany"
       plugin="org.knime.ext.textprocessing.language.spanish">
 
@@ -358,7 +358,7 @@ Public License instead of this License.
    </license>
 
    <requires>
-      <import feature="org.knime.features.ext.textprocessing" version="5.9.0" match="greaterOrEqual"/>
+      <import feature="org.knime.features.ext.textprocessing" version="5.10.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

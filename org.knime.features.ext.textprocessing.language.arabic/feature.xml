@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.textprocessing.language.arabic"
       label="KNIME Textprocessing Arabic Language Pack"
-      version="5.9.0.qualifier"
+      version="5.10.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland"
       plugin="org.knime.ext.textprocessing.language.arabic">
 
@@ -357,7 +357,7 @@ Public License instead of this License.
    </license>
 
    <requires>
-      <import feature="org.knime.features.ext.textprocessing" version="5.9.0" match="greaterOrEqual"/>
+      <import feature="org.knime.features.ext.textprocessing" version="5.10.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
