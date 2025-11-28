@@ -123,7 +123,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  com.sun.istack.commons-runtime;bundle-version="[4.1.2,5.0.0)",
  stax2-api;bundle-version="[4.2.2,5.0.0)",
  org.tukaani.xz;bundle-version="[1.10.0,2.0.0)",
- jakarta.xml.bind-api;bundle-version="[4.0.2,5.0.0)"
+ jakarta.xml.bind-api;bundle-version="[3.0.1,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
