@@ -40,6 +40,8 @@
 	    commons-math3,
 	    <!-- istack-commons-runtime 4.1.2 already in knime-tp-->
 	    istack-commons-runtime,
+	    <!-- com.fasterxml.jackson.core 2.19.0 already in knime-tp -->
+	    jackson-core, jackson-annotations, jackson-databind,
 	    <!-- jakarta-activation-api 2.1.3 already in knime-tp -->
 	    jakarta-activation-api,
 	    <!-- jakarta.xml.bind-api 4.0.2 already in knime-tp -->

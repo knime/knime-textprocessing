@@ -18,9 +18,6 @@
     <classpathentry exported="true" kind="lib" path="lib/fontbox-3.0.5.jar" sourcepath="lib/fontbox-3.0.5-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="lib/jackcess-4.0.8.jar" sourcepath="lib/jackcess-4.0.8-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="lib/jackcess-encrypt-4.0.3.jar" sourcepath="lib/jackcess-encrypt-4.0.3-sources.jar"/>
-    <classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.20.jar" sourcepath="lib/jackson-annotations-2.20-sources.jar"/>
-    <classpathentry exported="true" kind="lib" path="lib/jackson-core-2.20.0.jar" sourcepath="lib/jackson-core-2.20.0-sources.jar"/>
-    <classpathentry exported="true" kind="lib" path="lib/jackson-databind-2.20.0.jar" sourcepath="lib/jackson-databind-2.20.0-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="lib/jakarta.activation-api-2.1.3.jar" sourcepath="lib/jakarta.activation-api-2.1.3-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="lib/jakarta.annotation-api-2.1.1.jar" sourcepath="lib/jakarta.annotation-api-2.1.1-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="lib/jakarta.ws.rs-api-3.0.0.jar" sourcepath="lib/jakarta.ws.rs-api-3.0.0-sources.jar"/>

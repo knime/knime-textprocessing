@@ -26,9 +26,6 @@ Bundle-ClassPath: knime-textprocessing-tika.jar,
  lib/fontbox-3.0.5.jar,
  lib/jackcess-4.0.8.jar,
  lib/jackcess-encrypt-4.0.3.jar,
- lib/jackson-annotations-2.20.jar,
- lib/jackson-core-2.20.0.jar,
- lib/jackson-databind-2.20.0.jar,
  lib/jai-imageio-core-1.4.0.jar,
  lib/jakarta.activation-api-2.1.3.jar,
  lib/jakarta.annotation-api-2.1.1.jar,
@@ -123,7 +120,10 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.6.0,4.0.0)",
  com.sun.istack.commons-runtime;bundle-version="[4.1.2,5.0.0)",
  stax2-api;bundle-version="[4.2.2,5.0.0)",
  org.tukaani.xz;bundle-version="[1.10.0,2.0.0)",
- jakarta.xml.bind-api;bundle-version="[3.0.1,4.0.0)"
+ jakarta.xml.bind-api;bundle-version="[3.0.1,4.0.0)",
+ com.fasterxml.jackson.core.jackson-core;bundle-version="[2.19.0,3.0.0)",
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.19.0,3.0.0)",
+ com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.19.0,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
