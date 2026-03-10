@@ -58,6 +58,7 @@ import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
@@ -280,7 +281,8 @@ public class DocumentParserNodeModel extends NodeModel {
         final int numberOfFiles = files.size();
 
         final int numberOfThreads = KNIMEConstants.GLOBAL_THREAD_POOL.getMaxThreads();
-        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
+        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL;
+        final List<Future<?>> futures = new ArrayList<>();
         final Semaphore semaphore = new Semaphore(numberOfThreads);
         final int chunkSize = numberOfFiles / numberOfThreads;
         final AtomicInteger fileCount = new AtomicInteger(0);
@@ -292,16 +294,18 @@ public class DocumentParserNodeModel extends NodeModel {
             for (final File f : files) {
                 chunk.add(f);
                 if (chunk.size() >= chunkSize) {
-                    pool.enqueue(parseFiles(chunk, exec, semaphore, fileCount, numberOfFiles));
+                    futures.add(pool.enqueue(parseFiles(chunk, exec, semaphore, fileCount, numberOfFiles)));
                     chunk = new ArrayList<File>(chunkSize);
                 }
             }
             // process last chunk
             if (chunk.size() > 0) {
-                pool.enqueue(parseFiles(chunk, exec, semaphore, fileCount, numberOfFiles));
+                futures.add(pool.enqueue(parseFiles(chunk, exec, semaphore, fileCount, numberOfFiles)));
             }
 
-            pool.waitForTermination();
+            for (Future<?> f : futures) {
+                f.get();
+            }
 
             return new BufferedDataTable[]{m_dtBuilder.getAndCloseDataTable()};
         } finally {
