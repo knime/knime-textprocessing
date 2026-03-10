@@ -257,7 +257,7 @@ public class NGramNodeModel extends NodeModel {
 
         m_nGramDataTableCreator = createNGramCreator(exec);
 
-        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
+        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL;
         //The semaphore restricts the number of concurrent processes
         final Semaphore semaphore = new Semaphore(m_numberOfThreadsModel.getIntValue());
         final int chunkSize = m_chunkSizeModel.getIntValue();

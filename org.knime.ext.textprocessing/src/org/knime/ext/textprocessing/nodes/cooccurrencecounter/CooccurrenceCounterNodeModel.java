@@ -53,6 +53,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -84,6 +88,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.MutableInteger;
 import org.knime.core.util.ThreadPool;
+import org.knime.core.util.ThreadUtils;
 import org.knime.ext.textprocessing.data.Document;
 import org.knime.ext.textprocessing.data.DocumentCell;
 import org.knime.ext.textprocessing.data.DocumentValue;
@@ -233,10 +238,14 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         final AtomicInteger rowId = new AtomicInteger();
         final AtomicInteger progressCounter = new AtomicInteger();
         exec.setMessage("Processing documents...");
-        //initialize the thread pool
-        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool();
         //The semaphore restricts the number of concurrent processes
         final Semaphore semaphore = new Semaphore(m_procCount.getIntValue());
+        final ThreadPool pool = ThreadPool.currentPool(); // non-null in ordinary execution, null when streaming
+        final Executor executor = pool != null ? pool::enqueue
+            : f -> ForkJoinPool.commonPool().execute(ThreadUtils.runnableWithContext(f));
+        // The phaser starts at 1 (the main thread's own "party") so it won't reach zero until we arrive below.
+        // Each submitted task registers itself before submission and arrives-and-deregisters when done.
+        final Phaser phaser = new Phaser(1);
         for (final DataRow row : table) {
             docRowCounter++;
             totalRowCounter++;
@@ -259,8 +268,9 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
             if (previousDocCell.equals(docCell)) {
                 terms.addTerm(term);
             } else {
-                pool.enqueue(processDocument(myExec, rowCount, progressCounter, docRowCounter, semaphore, rowId, dc,
-                    previousDocCell, terms, skipMetaInfo, checkTags));
+                phaser.register();
+                executor.execute(processDocument(myExec, rowCount, progressCounter, docRowCounter,
+                        semaphore, rowId, dc, previousDocCell, terms, skipMetaInfo, checkTags, phaser));
                 previousDocCell = docCell;
                 terms = new TermChecker(checkTags);
                 terms.addTerm(term);
@@ -269,9 +279,15 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
         }
         //process the last document
         exec.setMessage("Processing documents...");
-        pool.enqueue(processDocument(myExec, rowCount, progressCounter, docRowCounter, semaphore, rowId, dc,
-            previousDocCell, terms, skipMetaInfo, checkTags));
-        pool.waitForTermination();
+        phaser.register();
+        executor.execute(processDocument(myExec, rowCount, progressCounter, docRowCounter,
+            semaphore, rowId, dc, previousDocCell, terms, skipMetaInfo, checkTags, phaser));
+
+        if (pool != null) {
+            pool.runInvisible(Executors.callable(phaser::arriveAndAwaitAdvance, null));
+        } else {
+            phaser.arriveAndAwaitAdvance();
+        }
         dc.close();
         return new BufferedDataTable[]{dc.getTable()};
     }
@@ -279,7 +295,8 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
     private Runnable processDocument(final ExecutionMonitor exec, final long totalRowCount,
         final AtomicInteger progressCounter, final int docRowCounter, final Semaphore semaphore,
         final AtomicInteger rowId, final BufferedDataContainer dc, final DataCell docCell, final TermChecker terms,
-        final boolean skipMetaInformation, final boolean checkTags) throws CanceledExecutionException {
+        final boolean skipMetaInformation, final boolean checkTags, final Phaser phaser)
+        throws CanceledExecutionException {
         exec.checkCanceled();
         return new Runnable() {
             @Override
@@ -371,6 +388,7 @@ public class CooccurrenceCounterNodeModel extends NodeModel {
                     throw new IllegalStateException(e);
                 } finally {
                     semaphore.release();
+                    phaser.arriveAndDeregister();
                 }
             }
         };
