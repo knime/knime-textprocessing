@@ -53,8 +53,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
@@ -66,7 +66,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
@@ -74,7 +73,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.util.ThreadPool;
+import org.knime.core.util.MultiThreadWorker;
 import org.knime.ext.textprocessing.nodes.tokenization.MissingTokenizerException;
 import org.knime.ext.textprocessing.nodes.tokenization.TokenizerFactoryRegistry;
 import org.knime.ext.textprocessing.util.ColumnSelectionVerifier;
@@ -143,92 +142,79 @@ class RSSFeedReaderNodeModel2 extends NodeModel {
         super(1, 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
 
-        BufferedDataTable inputTable = inData[0];
+        final BufferedDataTable inputTable = inData[0];
         final long rowCount = inputTable.size();
+        final int nThreads = m_numberOfThreadsModel.getIntValue();
 
-        // creating thread pool, semaphore and chunk size
-        final ThreadPool pool = KNIMEConstants.GLOBAL_THREAD_POOL.createSubPool(m_numberOfThreadsModel.getIntValue());
-        final int chunkSize = (int)Math.min(rowCount / m_numberOfThreadsModel.getIntValue(), Integer.MAX_VALUE);
-
-        RSSFeedReaderDataTableCreator2 joiner = new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(),
-            m_createXMLColumn.getBooleanValue(), m_getHttpResponseCodeColumn.getBooleanValue(),
-            m_timeOutModel.getIntValue(), m_docColName.getStringValue(), m_xmlColName.getStringValue(),
+        final RSSFeedReaderDataTableCreator2 joiner = new RSSFeedReaderDataTableCreator2(
+            m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
+            m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
+            m_docColName.getStringValue(), m_xmlColName.getStringValue(),
             m_httpColName.getStringValue(), m_tokenizerModel.getStringValue());
-
-        List<DataCell> dataCellChunk = new ArrayList<>(chunkSize);
-        AtomicLong urlCount = new AtomicLong(0);
-        List<Future<?>> futures = new ArrayList<>();
 
         final FileStoreFactory fsFactory = FileStoreFactory.createWorkflowFileStoreFactory(exec);
 
-        // iterating through urls
-        for (DataRow row : inputTable) {
-            exec.checkCanceled();
-
-            // add urls to chunk
-            if (dataCellChunk.size() < chunkSize) {
-                dataCellChunk.add(row.getCell(m_urlColIndex));
-                // dataCellChunk.add(((StringValue)row.getCell(m_urlColIndex)).getStringValue());
-                // chunk is full, process and clear
-            } else {
-                dataCellChunk.add(row.getCell(m_urlColIndex));
-                futures.add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, urlCount, rowCount, fsFactory)));
-                dataCellChunk = new ArrayList<>(chunkSize);
+        // Partition all URL cells into chunks of size rowCount/nThreads so that each worker
+        // thread processes a contiguous batch, matching the original chunking strategy.
+        final int chunkSize = (int)Math.min(rowCount / m_numberOfThreadsModel.getIntValue(), Integer.MAX_VALUE);
+        final List<List<DataCell>> chunks = new ArrayList<>();
+        List<DataCell> currentChunk = new ArrayList<>(chunkSize);
+        for (final DataRow row : inputTable) {
+            currentChunk.add(row.getCell(m_urlColIndex));
+            if (currentChunk.size() == chunkSize && chunks.size() < nThreads - 1) {
+                chunks.add(currentChunk);
+                currentChunk = new ArrayList<>(chunkSize);
             }
         }
-
-        // enqueue the last chunk and wait
-        if (!dataCellChunk.isEmpty()) {
-            futures.add(pool.enqueue(processChunk(dataCellChunk, joiner, exec, urlCount, rowCount, fsFactory)));
+        if (!currentChunk.isEmpty()) {
+            chunks.add(currentChunk);
         }
 
-        for (Future<?> f : futures) {
-            f.get();
-        }
+        // MultiThreadWorker processes one chunk per task; processFinished is called
+        // sequentially in chunk-index order and merges each chunk's results into the joiner.
+        new MultiThreadWorker<List<DataCell>, RSSFeedReaderDataTableCreator2>(2 * nThreads, nThreads) {
+
+            private long m_processedUrls;
+
+            @Override
+            protected void beforeSubmitting(final List<DataCell> in, final long index) throws Exception {
+                exec.checkCanceled();
+            }
+
+            @Override
+            protected RSSFeedReaderDataTableCreator2 compute(final List<DataCell> chunk, final long index)
+                    throws Exception {
+                final RSSFeedReaderDataTableCreator2 creator = new RSSFeedReaderDataTableCreator2(
+                    m_createDocColumn.getBooleanValue(), m_createXMLColumn.getBooleanValue(),
+                    m_getHttpResponseCodeColumn.getBooleanValue(), m_timeOutModel.getIntValue(),
+                    m_docColName.getStringValue(), m_xmlColName.getStringValue(),
+                    m_httpColName.getStringValue(), m_tokenizerModel.getStringValue());
+                for (final DataCell urlCell : chunk) {
+                    creator.createDataCellsFromUrl(urlCell, fsFactory);
+                }
+                return creator;
+            }
+
+            @Override
+            protected void processFinished(
+                    final ComputationTask task) throws ExecutionException, CancellationException, InterruptedException {
+                m_processedUrls += task.getInput().size();
+                exec.setProgress((double)m_processedUrls / rowCount,
+                    "Parsed feed entries from " + m_processedUrls + "/" + rowCount + " urls.");
+                joiner.joinResults(task.get(), exec);
+            }
+        }.run(chunks);
 
         exec.setMessage("Creating output table.");
         if (joiner.getMissingRowCount() > 0) {
-            this.setWarningMessage(
+            setWarningMessage(
                 "Could not load/connect to " + joiner.getMissingRowCount() + " of " + rowCount + " URLs.");
         }
         return new BufferedDataTable[]{joiner.createDataTable(exec)};
-    }
-
-    private Runnable processChunk(final List<DataCell> dataCellsWithUrls, final RSSFeedReaderDataTableCreator2 joiner,
-        final ExecutionContext exec, final AtomicLong urlCount, final long inputTableSize,
-        final FileStoreFactory fsFactory) throws CanceledExecutionException {
-        exec.checkCanceled();
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    RSSFeedReaderDataTableCreator2 rssFeedReaderTC =
-                        new RSSFeedReaderDataTableCreator2(m_createDocColumn.getBooleanValue(),
-                            m_createXMLColumn.getBooleanValue(), m_getHttpResponseCodeColumn.getBooleanValue(),
-                            m_timeOutModel.getIntValue(), m_docColName.getStringValue(), m_xmlColName.getStringValue(),
-                            m_httpColName.getStringValue(), m_tokenizerModel.getStringValue());
-                    for (DataCell dataCell : dataCellsWithUrls) {
-                        exec.checkCanceled();
-                        rssFeedReaderTC.createDataCellsFromUrl(dataCell, fsFactory);
-                        long processedUrls = urlCount.addAndGet(1);
-                        double progress = (double)processedUrls / (double)inputTableSize;
-                        exec.setProgress(progress,
-                            "Parsed feed entries from " + processedUrls + "/" + inputTableSize + " urls.");
-                    }
-                    exec.checkCanceled();
-                    joiner.joinResults(rssFeedReaderTC, exec);
-                } catch (final CanceledExecutionException e) {
-                    // handled in main executer thread
-                }
-            }
-        };
     }
 
     /**
